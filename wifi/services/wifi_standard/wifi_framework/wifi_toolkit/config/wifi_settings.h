@@ -296,6 +296,10 @@ public:
 
     int SetWifiDisabledByAirplane(bool disabledByAirplane, int instId = 0);
 
+    int SetRandomMacDisabled(bool isRandomMacDisabled, int instId = 0);
+
+    bool IsRandomMacDisabled(int instId = 0);
+
     int GetStaLastRunState(int instId = 0);
 
     int SetStaLastRunState(int bRun, int instId = 0);

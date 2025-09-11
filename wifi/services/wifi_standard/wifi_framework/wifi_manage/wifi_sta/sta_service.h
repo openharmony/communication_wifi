@@ -411,7 +411,7 @@ public:
      */
     virtual ErrCode DeliverAudioState(int state);
 
-/**
+    /**
      * @Description fold status
      *
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
@@ -451,6 +451,7 @@ public:
      */
     virtual void GetDetectNetState(OperateResState &state);
 
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     /**
      * @Description Add wifi block list and wifi white list
      *
@@ -458,8 +459,14 @@ public:
      * @param result - the result of wifi access list
      * @return ErrCode - operation result
      */
-#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     virtual ErrCode SetWifiRestrictedList(const std::vector<WifiRestrictedInfo> &wifiRestrictedInfoList) const;
+    
+    /**
+     * @Description Reconnect By Mdm
+     *
+     * @return ErrCode - operation result
+     */
+    ErrCode ReconnectByMdm() const;
 #endif
 private:
     void NotifyDeviceConfigChange(ConfigChange value, WifiDeviceConfig config, bool isRemoveAll) const;

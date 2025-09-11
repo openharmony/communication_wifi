@@ -166,20 +166,23 @@ static int ContextAppendRead(Context *context, const char *buf, int len)
     if (ExpandReadCache(context, len) < 0) {
         return -1;
     }
-    if (context->rEnd + len < context->rCapacity) {
+    if (context->rCapacity < context->rEnd || len < 0) {
+        return -1;
+    }
+    unsigned int tmp = context->rCapacity - context->rEnd;
+    if ((unsigned int)len < tmp) {
         if (memmove_s(context->szRead + context->rEnd, context->rCapacity - context->rEnd, buf, len) != EOK) {
             return -1;
         }
         context->rEnd += len;
     } else {
-        int tmp = (int)(context->rCapacity - context->rEnd);
         if (tmp > 0 && memmove_s(context->szRead + context->rEnd, tmp, buf, tmp) != EOK) {
             return -1;
         }
         if (tmp < len && memmove_s(context->szRead, len - tmp, buf + tmp, len - tmp) != EOK) {
             return -1;
         }
-        context->rEnd = (uint32_t)(len - tmp);
+        context->rEnd = (unsigned int)len - tmp;
     }
     return 0;
 }
@@ -193,20 +196,23 @@ int ContextAppendWrite(Context *context, const char *buf, int len)
     if (ExpandWriteCache(context, len) < 0) {
         return -1;
     }
-    if (context->wEnd + len < context->wCapacity) {
+    if (context->rCapacity < context->wEnd || len < 0) {
+        return -1;
+    }
+    unsigned int tmp = context->wCapacity - context->wEnd;
+    if ((unsigned int)len < tmp) {
         if (memmove_s(context->szWrite + context->wEnd, context->wCapacity - context->wEnd, buf, len) != EOK) {
             return -1;
         }
         context->wEnd += len;
     } else {
-        int tmp = (int)(context->wCapacity - context->wEnd);
         if (tmp > 0 && memmove_s(context->szWrite + context->wEnd, tmp, buf, tmp) != EOK) {
             return -1;
         }
         if (tmp < len && memmove_s(context->szWrite, len - tmp, buf + tmp, len - tmp) != EOK) {
             return -1;
         }
-        context->wEnd = (uint32_t)(len - tmp);
+        context->wEnd = (unsigned int)len - tmp;
     }
     return 0;
 }

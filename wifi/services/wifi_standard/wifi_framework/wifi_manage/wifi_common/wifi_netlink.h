@@ -37,6 +37,7 @@ public:
     int32_t SendCmdKernel(int32_t sockFd, int32_t cmd, int32_t flag);
     int32_t StartMonitor(int32_t sockFd);
     int32_t ProcessQueryTcp(int32_t sockFd);
+    int32_t ProcessQueryIpv6Tcp(int32_t sockFd);
     int32_t SendQoeCmd(int32_t cmd, int32_t arg = 0);
     int32_t ProcessReportMsg(int32_t sockFd, int32_t cmd);
 private:

@@ -79,6 +79,8 @@ constexpr int PIN_CODE_LEN = 8;
 
 /* DHCP timeout interval */
 constexpr int DHCP_TIME = 15;
+/* Subnet mask length threshold for mobile hotspot detection */
+constexpr int HOTSPOT_SUBNETMASK_MIN_LENGTH = 24;
 /* rssi thresholds */
 constexpr int INVALID_RSSI_VALUE = -127;
 constexpr int MAX_RSSI_VALUE = 200;

@@ -1160,6 +1160,30 @@ void OnSetVoWifiDetectPeriodTest(const uint8_t* data, size_t size)
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_VOWIFI_DETECT_PERIOD), datas);
 }
 
+void OnIsRandomMacDisabledTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_RANDOMMAC_DISABLED), datas);
+}
+
+void OnSetRandomMacDisabledTest(const uint8_t* data, size_t size)
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    datas.WriteInt32(0);
+    datas.WriteBuffer(data, size);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_RANDOMMAC_DISABLED), datas);
+}
+
 void OnGetVoWifiDetectPeriodTest(const uint8_t* data, size_t size)
 {
     MessageParcel datas;
@@ -1257,6 +1281,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::OnSetVoWifiDetectModeTest(data, size);
     OHOS::Wifi::OnSetVoWifiDetectPeriodTest(data, size);
     OHOS::Wifi::OnGetVoWifiDetectPeriodTest(data, size);
+    OHOS::Wifi::OnIsRandomMacDisabledTest(data, size);
+    OHOS::Wifi::OnSetRandomMacDisabledTest(data, size);
     sleep(4);
     return 0;
 }

@@ -33,6 +33,7 @@ ohos_unittest("wifi_pro_unittest") {
     integer_overflow = false
     ubsan = false
     debug = false
+    blocklist = "$WIFI_ROOT_DIR/test/cfi_blocklist.txt"
   }
 
   sources = [

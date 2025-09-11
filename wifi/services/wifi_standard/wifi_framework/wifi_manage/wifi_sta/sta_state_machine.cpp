@@ -646,7 +646,9 @@ bool StaStateMachine::InitState::NotAllowConnectToNetwork(int networkId, const s
         return true;
     }
 
-    if (networkId == pStaStateMachine->linkedInfo.networkId && connTriggerMode != NETWORK_SELECTED_BY_SELFCURE) {
+    if (networkId == pStaStateMachine->linkedInfo.networkId && connTriggerMode != NETWORK_SELECTED_BY_SELFCURE &&
+        connTriggerMode != NETWORK_SELECTED_BY_MDM &&
+        pStaStateMachine->linkedInfo.connState != ConnState::DISCONNECTING) {
         WIFI_LOGI("This network is connected and does not need to be reconnected m_instId = %{public}d",
             pStaStateMachine->m_instId);
         return true;
@@ -1062,7 +1064,8 @@ bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::st
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
     std::string currentMac, realMac;
     WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
-    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC || ShouldUseFactoryMac(deviceConfig)) {
+    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC ||
+        WifiSettings::GetInstance().IsRandomMacDisabled() || ShouldUseFactoryMac(deviceConfig)) {
         currentMac = realMac;
     } else {
         WifiStoreRandomMac randomMacInfo;
@@ -1095,8 +1098,10 @@ bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::st
         return false;
     }
     deviceConfig.macAddress = currentMac;
-    deviceConfig.wifiPrivacySetting =
-        (currentMac == realMac) ? WifiPrivacyConfig::DEVICEMAC : WifiPrivacyConfig::RANDOMMAC;
+    if (!WifiSettings::GetInstance().IsRandomMacDisabled()) {
+        deviceConfig.wifiPrivacySetting =
+            (currentMac == realMac) ? WifiPrivacyConfig::DEVICEMAC : WifiPrivacyConfig::RANDOMMAC;
+    }
     WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
     LOGI("SetRandomMac wifiPrivacySetting:%{public}d,ssid:%{public}s,keyMgmt:%{public}s,macAddress:%{public}s",
@@ -2102,6 +2107,7 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     }
 #endif
 #endif
+    WifiConfigCenter::GetInstance().SetBrowserState(err == ERR_OK);
 }
 
 void StaStateMachine::SetPortalBrowserFlag(bool flag)
@@ -3115,7 +3121,7 @@ void StaStateMachine::DhcpResultNotify::SaveDhcpResultExt(DhcpResult *dest, Dhcp
         WIFI_LOGE("SaveDhcpResultExt strOptLocalAddr2 strcpy_s failed!");
         return;
     }
-    if (source->dnsList.dnsNumber > 0 && source->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
+    if (source->dnsList.dnsNumber >= 0 && source->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
         dest->dnsList.dnsNumber = 0;
         for (uint32_t i = 0; i < source->dnsList.dnsNumber; i++) {
             if (memcpy_s(dest->dnsList.dnsAddr[i], DHCP_LEASE_DATA_MAX_LEN, source->dnsList.dnsAddr[i],
@@ -3278,7 +3284,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4ResultExt(IpInfo &ipInfo, I
     if (ipInfo.secondDns != 0) {
         ipInfo.dnsAddr.push_back(ipInfo.secondDns);
     }
-    if (result->dnsList.dnsNumber > 0 && result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
+    if (result->dnsList.dnsNumber >= 0 && result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
         for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
             unsigned int ipv4Address = IpTools::ConvertIpv4Address(result->dnsList.dnsAddr[i]);
             if (std::find(ipInfo.dnsAddr.begin(), ipInfo.dnsAddr.end(), ipv4Address) != ipInfo.dnsAddr.end()) {
@@ -3306,13 +3312,15 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
             /* If not phone hotspot, set .isDataRestricted = 0. */
             std::string strVendor = result->strOptVendor;
             std::string ipAddress = result->strOptClientId;
+            int maskLength = IpTools::GetMaskLength(result->strOptSubnet);
             pStaStateMachine->linkedInfo.isDataRestricted =
                 (strVendor.find("ANDROID_METERED") == std::string::npos &&
                 strVendor.find("OPEN_HARMONY") == std::string::npos) ? 0 : 1;
             if (!pStaStateMachine->linkedInfo.isDataRestricted) {
                 pStaStateMachine->linkedInfo.isDataRestricted =
                     (strVendor.find("hostname:") != std::string::npos &&
-                    ipAddress.find("172.20.10.") != std::string::npos);
+                    ipAddress.find("172.20.10.") != std::string::npos &&
+                    maskLength >= HOTSPOT_SUBNETMASK_MIN_LENGTH);
             }
             pStaStateMachine->linkedInfo.platformType = strVendor;
             WIFI_LOGI("WifiLinkedInfo.isDataRestricted = %{public}d, WifiLinkedInfo.platformType = %{public}s",
@@ -3504,7 +3512,7 @@ void StaStateMachine::DhcpResultNotify::DealDhcpOfferResult()
         if (ipInfo.secondDns != 0) {
             ipInfo.dnsAddr.push_back(ipInfo.secondDns);
         }
-        if (DhcpOfferInfo.dnsList.dnsNumber > 0 && DhcpOfferInfo.dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
+        if (DhcpOfferInfo.dnsList.dnsNumber >= 0 && DhcpOfferInfo.dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
             for (uint32_t i = 0; i < DhcpOfferInfo.dnsList.dnsNumber; i++) {
                 uint32_t ipv4Address = IpTools::ConvertIpv4Address(DhcpOfferInfo.dnsList.dnsAddr[i]);
                 if (std::find(ipInfo.dnsAddr.begin(), ipInfo.dnsAddr.end(), ipv4Address) != ipInfo.dnsAddr.end()) {
@@ -4185,7 +4193,7 @@ void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)
     if (enableSignalPoll) {
         WIFI_LOGD("SignalPoll, StartTimer for SIGNAL_POLL.\n");
         StopTimer(static_cast<int>(CMD_SIGNAL_POLL));
-        StartTimer(static_cast<int>(CMD_SIGNAL_POLL), staSignalPollDelayTime_);
+        StartTimer(static_cast<int>(CMD_SIGNAL_POLL), staSignalPollDelayTime_, MsgLogLevel::LOG_D);
     }
 }
 

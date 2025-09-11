@@ -594,9 +594,10 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleTcpQualityQuery(Internal
     pSelfCureStateMachine_->StopTimer(CMD_INTERNET_STATUS_DETECT_INTERVAL);
     if (WifiConfigCenter::GetInstance().GetScreenState() != MODE_STATE_CLOSE) {
         IpQosMonitor::GetInstance().QueryPackets();
+        IpQosMonitor::GetInstance().QueryIpv6Packets();
     }
     pSelfCureStateMachine_->MessageExecutedLater(CMD_INTERNET_STATUS_DETECT_INTERVAL,
-        INTERNET_STATUS_DETECT_INTERVAL_MS);
+        INTERNET_STATUS_DETECT_INTERVAL_MS, MsgLogLevel::LOG_D);
 }
 
 void SelfCureStateMachine::ConnectedMonitorState::HandleGatewayChanged(InternalMessagePtr msg)
@@ -1302,6 +1303,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(Intern
         return;
     }
     isUsedMultiGwSelfcure_ = true;
+    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_MULTI_GATEWAY, true);
     std::string ipAddr = MultiGateway::GetInstance().GetGatewayIp();
     std::string macString = "";
     MultiGateway::GetInstance().GetNextGatewayMac(macString);
@@ -1313,21 +1315,13 @@ void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(Intern
         }
         return;
     }
+
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
-    if (MultiGateway::GetInstance().SetStaticArp(ifaceName, ipAddr, macString) != 0) {
-        WIFI_LOGE("SetStaticArp failed");
-        if (lastMultiGwSelfFailedType_ != -1) {
-            SelectSelfCureByFailedReason(lastMultiGwSelfFailedType_);
-        }
-        return;
-    }
-    WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::MULTI_GATEWAY_SELFCURE));
-    pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_MULTI_GATEWAY, true);
+    MultiGateway::GetInstance().SetStaticArp(ifaceName, ipAddr, macString);
     if (!pSelfCureStateMachine_->IsHttpReachable()) {
         MultiGateway::GetInstance().DelStaticArp(ifaceName, ipAddr);
         pSelfCureStateMachine_->SendMessage(WIFI_CURE_CMD_MULTI_GATEWAY);
     } else {
-        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::MULTI_GATEWAY_SELFCURE_SUCC));
         pSelfCureStateMachine_->SwitchState(pSelfCureStateMachine_->pConnectedMonitorState_);
     }
 }
@@ -1355,7 +1349,6 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int 
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
     WifiConfigCenter::GetInstance().SetLastNetworkId(networkId);
-    WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::RAND_MAC_REASSOC_SELFCURE));
     IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
     if (pStaService == nullptr) {
         WIFI_LOGE("Get pStaService failed!");
@@ -1546,8 +1539,6 @@ void SelfCureStateMachine::InternetSelfCureState::HandleHttpReachableAfterSelfCu
         WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::REASSOC_SELFCURE_SUCC));
     } else if (currentCureLevel == WIFI_CURE_RESET_LEVEL_HIGH_RESET) {
         WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::RESET_SELFCURE_SUCC));
-    } else if (currentCureLevel == WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC) {
-        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::RAND_MAC_REASSOC_SELFCURE_SUCC));
     }
 }
 
@@ -3044,7 +3035,7 @@ void SelfCureStateMachine::HandleConnectFailed()
             WIFI_LOGE("%{public}s: GetDeviceConfig failed!.", __FUNCTION__);
             return;
         }
-        //Connect failed, updateSelfcureConnectHistoryInfo
+        // Connect failed, updateSelfcureConnectHistoryInfo
         WifiSelfCureHistoryInfo selfCureHistoryInfo;
         std::string internetSelfCureHistory = config.internetSelfCureHistory;
         SelfCureUtils::GetInstance().String2InternetSelfCureHistoryInfo(internetSelfCureHistory, selfCureHistoryInfo);

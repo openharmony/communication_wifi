@@ -53,6 +53,8 @@ public:
     bool IsIpConflictDetect();
     std::string GetSelfCureHistory();
     void ReportNoInternetChrEvent();
+    bool IsIpv6SelfCureSupported();
+    bool DisableIpv6();
 private:
     class SelfCureDnsResultCallback : public NetManagerStandard::NetsysDnsReportCallback {
     public:

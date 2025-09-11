@@ -371,6 +371,12 @@ ErrCode StaInterface::SetWifiRestrictedList(const std::vector<WifiRestrictedInfo
     LOGI("Enter SetWifiRestrictedList.\n");
     return pStaService->SetWifiRestrictedList(wifiRestrictedInfoList);
 }
+
+ErrCode StaInterface::ReconnectByMdm()
+{
+    LOGI("Enter ReconnectByMdm");
+    return WIFI_OPT_SUCCESS;
+}
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

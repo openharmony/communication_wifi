@@ -217,6 +217,8 @@ public:
     virtual bool GetScanAlwaysState(int instId) = 0;
     virtual bool GetSupportHwPnoFlag(int instId = 0) = 0;
     virtual int SetAcceptUnvalidated(int networkId, bool state) = 0;
+    virtual bool IsRandomMacDisabled(int instId = 0) = 0;
+    virtual int SetRandomMacDisabled(bool isRandomMacDisabled, int instId = 0) = 0;
 };
 class WifiSettings : public MockWifiSettings {
 public:
@@ -402,6 +404,8 @@ public:
     MOCK_METHOD1(GetScanAlwaysState, bool(int instId));
     MOCK_METHOD1(GetSupportHwPnoFlag, bool(int instId));
     MOCK_METHOD2(SetAcceptUnvalidated, int(int networkId, bool state));
+    MOCK_METHOD1(IsRandomMacDisabled, bool(int instId));
+    MOCK_METHOD2(SetRandomMacDisabled, int(bool isRandomMacDisabled, int instId));
 };
 }  // namespace Wifi
 }  // namespace OHOS

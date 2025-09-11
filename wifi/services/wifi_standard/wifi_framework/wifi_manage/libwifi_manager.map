@@ -434,6 +434,7 @@
         "OHOS::Wifi::ArpChecker::~ArpChecker()";
         "OHOS::Wifi::WifiControllerMachine::IsLocalOnlyHotspot(bool)";
         "OHOS::Wifi::WifiControllerMachine::ShouldUseRpt(int)";
+        "OHOS::Wifi::WifiControllerMachine::IsOpenSoftApAllowed(int)";
         "OHOS::Wifi::WifiSettings::SyncP2pVendorConfig()";
         "OHOS::Wifi::WifiSettings::AddRandomMac(OHOS::Wifi::WifiStoreRandomMac&)";
         "OHOS::Wifi::WifiNetAgent::DelInterfaceAddress(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
@@ -474,6 +475,8 @@
         "OHOS::Wifi::ApConfigUse::GetApVaildBands(std::__h::vector<OHOS::Wifi::BandType, std::__h::allocator<OHOS::Wifi::BandType>>&) const";
         "OHOS::Wifi::ApConfigUse::GetApVaildChannel(OHOS::Wifi::BandType, std::__h::vector<int, std::__h::allocator<int>>&) const";
         "OHOS::Wifi::ApConfigUse::UpdateApChannelConfig(OHOS::Wifi::HotspotConfig&) const";
+        "OHOS::Wifi::WifiSettings::IsRandomMacDisabled(int)";
+        "OHOS::Wifi::WifiSettings::SetRandomMacDisabled(bool, int)";
     };
     local:
         *;

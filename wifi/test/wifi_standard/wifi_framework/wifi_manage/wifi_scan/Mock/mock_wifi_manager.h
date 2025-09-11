@@ -54,6 +54,7 @@ public:
     virtual void DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId = 0) = 0;
     virtual void PushServiceCloseMsg(WifiCloseServiceCode code, int instId = 0);
     virtual void AutoStartEnhanceService(void) = 0;
+    virtual int GetSupportedFeatures(long &features) const = 0;
 #ifdef FEATURE_HPF_SUPPORT
     virtual void InstallPacketFilterProgram(int event = 0, int instId = 0) = 0;
 #endif
@@ -73,6 +74,7 @@ public:
     MOCK_METHOD2(DealStoreScanInfoEvent, void(std::vector<InterScanInfo> &results, int));
     MOCK_METHOD2(PushServiceCloseMsg, void(WifiCloseServiceCode, int));
     MOCK_METHOD0(AutoStartEnhanceService, void());
+    MOCK_CONST_METHOD1(GetSupportedFeatures, int(long&));
 #ifdef FEATURE_HPF_SUPPORT
     MOCK_METHOD2(InstallPacketFilterProgram, void(int event, int instId));
 #endif

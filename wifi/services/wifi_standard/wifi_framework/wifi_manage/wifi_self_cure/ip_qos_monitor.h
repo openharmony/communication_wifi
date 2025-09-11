@@ -28,14 +28,20 @@ public:
     static IpQosMonitor &GetInstance();
     void StartMonitor(int32_t arg = 0);
     void QueryPackets(int32_t arg = 0);
+    void QueryIpv6Packets(int32_t arg = 0);
     void HandleTcpReportMsgComplete(const std::vector<int64_t> &elems, int32_t cmd);
     void ParseTcpReportMsg(const std::vector<int64_t> &elems, int32_t cmd);
     void HandleTcpPktsResp(const std::vector<int64_t> &elems);
+    void HandleIpv6TcpPktsResp(const std::vector<int64_t> &elems);
     bool ParseNetworkInternetGood(const std::vector<int64_t> &elems);
+    bool ParseIpv6NetworkInternetGood(const std::vector<int64_t> &elems);
     int64_t GetCurrentTcpTxCounter();
     int64_t GetCurrentTcpRxCounter();
     void ResetTxRxProperty();
     bool GetTxRxStatus();
+    int64_t GetCurrentIpv6TcpTxCounter();
+    int64_t GetCurrentIpv6TcpRxCounter();
+    int32_t GetIpv6FailedCounter();
 private:
     bool AllowSelfCureNetwork(int32_t currentRssi);
     int32_t mInstId = 0;
@@ -43,7 +49,10 @@ private:
     bool mHttpDetectedAllowed = true;
     int64_t mLastTcpTxCounter = 0;
     int64_t mLastTcpRxCounter = 0;
+    int64_t mLastIpv6TcpTxCounter = 0;
+    int64_t mLastIpv6TcpRxCounter = 0;
     int32_t mInternetFailedCounter = 0;
+    int32_t mIpv6FailedCounter = 0;
     sptr<NetStateObserver> mNetWorkDetect;
     bool lastTxRxGood_ = false;
     std::mutex txRxStatusMtx_;

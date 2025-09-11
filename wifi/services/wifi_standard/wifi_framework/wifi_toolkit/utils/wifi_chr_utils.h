@@ -21,23 +21,26 @@
 namespace OHOS {
 namespace Wifi {
 const int SIGNALARR_LENGTH = 6;
+inline const int BEACON_ABNORMAL_TWO_HOUR = 2 * 60 * 60;
 
 class WifiChrUtils {
 public:
     static WifiChrUtils &GetInstance();
-    ~WifiChrUtils() = default;
     void AddSignalPollInfoArray(WifiSignalPollInfo signalInfo);
     void GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length);
     void ClearSignalPollInfoArray();
-    bool IsBeaconLost(const std::string &bssid, const int32_t signalLevel, const int32_t instId);
+    bool IsBeaconLost(const std::string &bssid, const int32_t signalLevel, const int32_t screenState,
+        const int32_t instId);
 
 private:
     WifiChrUtils();
+    ~WifiChrUtils() = default;
  
 private:
     std::vector<WifiSignalPollInfo> signalPollInfoArray;
     std::mutex signalInfoMutex;
     WifiSignalPollInfo signalPollInfoItem_;
+    int64_t intTime_ = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

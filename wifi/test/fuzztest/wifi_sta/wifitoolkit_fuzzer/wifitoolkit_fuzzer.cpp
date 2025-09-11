@@ -29,12 +29,14 @@
 #include "wifi_errcode.h"
 #include "xml_parser.h"
 #include "softap_parser.h"
+#include "wifi_randommac_helper.h"
 #include <mutex>
 
 namespace OHOS {
 namespace Wifi {
 constexpr int U32_AT_SIZE_ZERO = 4;
 constexpr int WIFI_MAX_SSID_LEN = 16;
+constexpr int TWO = 2;
 static bool g_isInsted = false;
 
 class MockXmlParser : public XmlParser {
@@ -49,6 +51,7 @@ static std::unique_ptr<NetworkXmlParser> m_networkXmlParser = nullptr;
 static std::unique_ptr<AppParser> m_appXmlParser = nullptr;
 static std::unique_ptr<MockXmlParser> m_xmlParser = nullptr;
 static std::unique_ptr<SoftapXmlParser> m_softapXmlParser = nullptr;
+static std::unique_ptr<WifiRandomMacHelper> m_WifiRandomMacHelper = nullptr;
 
 void MyExit()
 {
@@ -92,6 +95,7 @@ void InitParam()
 
 void NetworkXmlParserTest(const uint8_t* data, size_t size)
 {
+    root_node = nullptr;
     WifiDeviceConfig config;
     config.ssid = std::string(reinterpret_cast<const char*>(data), size);
     config.bssid = std::string(reinterpret_cast<const char*>(data), size);
@@ -186,6 +190,32 @@ void SoftapParserTest(const uint8_t* data, size_t size)
     m_softapXmlParser->TransBandinfo(root_node);
     m_softapXmlParser->GetSoftapConfigs();
 }
+
+void WifiRandomMacHelperTest(const uint8_t* data, size_t size)
+{
+    int index = 0;
+    unsigned long long addr1 = static_cast<unsigned long long>(data[index++]);
+    unsigned long long random = static_cast<unsigned long long>(data[index++]);
+    std::string content = std::string(reinterpret_cast<const char*>(data), size);
+    std::string randomMacAddr = std::string(reinterpret_cast<const char*>(data), size);
+    std::vector<uint8_t> outPlant;
+    std::vector<uint8_t> byte;
+    std::vector<uint8_t> bytes;
+    std::vector<uint8_t> addr;
+    bool value = (static_cast<int>(data[0]) % TWO) ? true : false;
+    #ifdef SUPPORT_LOCAL_RANDOM_MAC
+    m_WifiRandomMacHelper->CalculateRandomMacForWifiDeviceConfig(content, randomMacAddr);
+    #endif
+    m_WifiRandomMacHelper->GetRandom();
+    m_WifiRandomMacHelper->GenerateRandomMacAddress(randomMacAddr);
+    m_WifiRandomMacHelper->LongLongToBytes(value, outPlant);
+    m_WifiRandomMacHelper->BytesToLonglong(byte);
+    m_WifiRandomMacHelper->BytesArrayToString(bytes);
+    m_WifiRandomMacHelper->StringAddrFromLongAddr(addr1, randomMacAddr);
+    m_WifiRandomMacHelper->LongAddrFromByteAddr(addr);
+    m_WifiRandomMacHelper->GenerateRandomMacAddressByLong(random, randomMacAddr);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -197,6 +227,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::AppXmlParserTest(data, size);
     OHOS::Wifi::AppParserTest(data, size);
     OHOS::Wifi::SoftapParserTest(data, size);
+    OHOS::Wifi::WifiRandomMacHelperTest(data, size);
     return 0;
 }
 }

@@ -120,6 +120,9 @@ public:
     void StaServiceStartWifiDetectionTest();
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     void StaServiceSetWifiRestrictedListSuccess();
+    void StaServiceReconnectByMdmTest1();
+    void StaServiceReconnectByMdmTest2();
+
 #endif
     void DisableAutoJoin();
     void EnableAutoJoin();
@@ -483,6 +486,34 @@ void StaServiceTest::StaServiceDisconnectSuccess()
 {
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(1));
     EXPECT_TRUE(pStaService->Disconnect() == WIFI_OPT_SUCCESS);
+}
+
+void StaServiceTest::StaServiceReconnectByMdmTest1()
+{
+    WifiDeviceConfig config;
+    config.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+
+    WifiLinkedInfo info;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+
+    EXPECT_CALL(WifiSettings::GetInstance(), SetRandomMacDisabled(_, _)).WillRepeatedly(Return(false));
+    EXPECT_TRUE(pStaService->ReconnectByMdm() == WIFI_OPT_SUCCESS);
+}
+
+void StaServiceTest::StaServiceReconnectByMdmTest2()
+{
+    WifiDeviceConfig config;
+    config.wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
+
+    WifiLinkedInfo info;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+    .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+
+    EXPECT_CALL(WifiSettings::GetInstance(), SetRandomMacDisabled(_, _)).WillRepeatedly(Return(true));
+    EXPECT_TRUE(pStaService->ReconnectByMdm() == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceStartWpsSuccess()
@@ -1032,6 +1063,16 @@ HWTEST_F(StaServiceTest, StaServiceEnableDeviceConfigSuccess, TestSize.Level0)
 HWTEST_F(StaServiceTest, StaServiceSetWifiRestrictedListSuccess, TestSize.Level0)
 {
     StaServiceSetWifiRestrictedListSuccess();
+}
+
+HWTEST_F(StaServiceTest, StaServiceReconnectByMdmTest1, TestSize.Level0)
+{
+    StaServiceReconnectByMdmTest1();
+}
+
+HWTEST_F(StaServiceTest, StaServiceReconnectByMdmTest2, TestSize.Level0)
+{
+    StaServiceReconnectByMdmTest2();
 }
 #endif
 

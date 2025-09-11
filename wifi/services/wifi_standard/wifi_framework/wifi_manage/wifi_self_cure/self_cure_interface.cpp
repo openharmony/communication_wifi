@@ -189,5 +189,17 @@ void SelfCureInterface::DealRssiLevelChanged(int rssi, int instId)
     }
     pSelfCureService->HandleRssiLevelChanged(rssi);
 }
+
+ErrCode SelfCureInterface::NotifyIpv6FailureDetected()
+{
+    WIFI_LOGD("Enter SelfCureInterface::NotifyIpv6FailureDetected");
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGE("pSelfCureService is null");
+        return WIFI_OPT_FAILED;
+    }
+    bool ret = pSelfCureService->NotifyIpv6FailureDetected();
+    return ret ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
+}
 }  // namespace Wifi
 }  // namespace OHOS

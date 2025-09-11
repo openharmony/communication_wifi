@@ -87,7 +87,7 @@ bool WifiNetAgent::RegisterNetSupplierCallback(int instId)
     TimeStats timeStats(__func__);
     WIFI_LOGI("Enter RegisterNetSupplierCallback.");
     std::unique_lock<std::mutex> lock(netAgentMutex_);
-    sptr<NetConnCallback> pNetConnCallback = (std::make_unique<NetConnCallback>()).release();
+    sptr<NetConnCallback> pNetConnCallback = sptr<NetConnCallback>::MakeSptr();
     if (pNetConnCallback == nullptr) {
         WIFI_LOGE("pNetConnCallback is null\n");
         return false;
@@ -137,7 +137,7 @@ void WifiNetAgent::UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info,
         WIFI_LOGE("wifi is not avaliable, no need UpdateNetLinkInfo");
         return;
     }
-    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = (std::make_unique<NetManagerStandard::NetLinkInfo>()).release();
+    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = sptr<NetManagerStandard::NetLinkInfo>::MakeSptr();
     if (netLinkInfo == nullptr) {
         WIFI_LOGE("%{public}s netLinkInfo is null", __func__);
         return;
@@ -286,7 +286,7 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
 {
     unsigned int prefixLength =
         static_cast<unsigned int>(IpTools::GetMaskLength(IpTools::ConvertIpv4Address(wifiIpInfo.netmask)));
-    sptr<NetManagerStandard::INetAddr> netAddr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+    sptr<NetManagerStandard::INetAddr> netAddr = sptr<NetManagerStandard::INetAddr>::MakeSptr();
     if (netAddr == nullptr) {
         WIFI_LOGE("%{public}s netAddr is null", __func__);
         return;
@@ -298,7 +298,7 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
     netAddr->prefixlen_ = prefixLength;
     netLinkInfo->netAddrList_.push_back(*netAddr);
 
-    sptr<NetManagerStandard::INetAddr> netIpv6Addr = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+    sptr<NetManagerStandard::INetAddr> netIpv6Addr = sptr<NetManagerStandard::INetAddr>::MakeSptr();
     if (netIpv6Addr == nullptr) {
         WIFI_LOGE("%{public}s netIpv6Addr is null", __func__);
         return;
@@ -307,6 +307,11 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
     netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
     netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
     netIpv6Addr->prefixlen_ = 0;
+    if (!wifiIpV6Info.linkIpV6Address.empty()) {
+        netIpv6Addr->address_ = wifiIpV6Info.linkIpV6Address;
+        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
+        LOGI("SetNetLinkIPInfo linkIpv6:%{public}s", MacAnonymize(wifiIpV6Info.linkIpV6Address).c_str());
+    }
     if (!wifiIpV6Info.globalIpV6Address.empty()) {
         netIpv6Addr->address_ = wifiIpV6Info.globalIpV6Address;
         netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
@@ -332,7 +337,7 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
 void WifiNetAgent::SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
     IpV6Info &wifiIpV6Info)
 {
-    sptr<NetManagerStandard::INetAddr> dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+    sptr<NetManagerStandard::INetAddr> dns = sptr<NetManagerStandard::INetAddr>::MakeSptr();
     if (dns == nullptr) {
         WIFI_LOGE("%{public}s dns is null", __func__);
         return;
@@ -344,7 +349,7 @@ void WifiNetAgent::SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
         netLinkInfo->dnsList_.push_back(*dns);
         LOGI("SetNetLinkDnsInfo ipv4 address:%{public}s", IpAnonymize(dns->address_).c_str());
     }
-    sptr<NetManagerStandard::INetAddr> ipv6dns = (std::make_unique<NetManagerStandard::INetAddr>()).release();
+    sptr<NetManagerStandard::INetAddr> ipv6dns = sptr<NetManagerStandard::INetAddr>::MakeSptr();
     if (ipv6dns == nullptr) {
         WIFI_LOGE("%{public}s ipv6dns is null", __func__);
         return;
@@ -361,7 +366,7 @@ void WifiNetAgent::SetNetLinkDnsInfo(sptr<NetManagerStandard::NetLinkInfo> &netL
 void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
     IpV6Info &wifiIpV6Info)
 {
-    sptr<NetManagerStandard::Route> route = (std::make_unique<NetManagerStandard::Route>()).release();
+    sptr<NetManagerStandard::Route> route = sptr<NetManagerStandard::Route>::MakeSptr();
     if (route == nullptr) {
         WIFI_LOGE("%{public}s route is null", __func__);
         return;
@@ -374,7 +379,13 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
     route->gateway_.family_ = NetManagerStandard::INetAddr::IPV4;
     netLinkInfo->routeList_.push_back(*route);
     LOGI("SetNetLinkRouteInfo gateway:%{public}s", IpAnonymize(route->gateway_.address_).c_str());
-    if (!wifiIpV6Info.gateway.empty()) {
+    
+    // Check if we have IPv6 addresses other than link-local before adding default route
+    bool hasUsableIpv6Address = !wifiIpV6Info.globalIpV6Address.empty() ||
+                                !wifiIpV6Info.randGlobalIpV6Address.empty() ||
+                                !wifiIpV6Info.uniqueLocalAddress1.empty() ||
+                                !wifiIpV6Info.uniqueLocalAddress2.empty();
+    if (!wifiIpV6Info.gateway.empty() && hasUsableIpv6Address) {
         sptr<NetManagerStandard::Route> ipv6route = (std::make_unique<NetManagerStandard::Route>()).release();
         if (ipv6route == nullptr) {
             WIFI_LOGE("%{public}s ipv6route is null", __func__);
@@ -388,14 +399,16 @@ void WifiNetAgent::SetNetLinkRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &ne
         ipv6route->gateway_.address_ = wifiIpV6Info.gateway;
         ipv6route->gateway_.family_ = NetManagerStandard::INetAddr::IPV6;
         netLinkInfo->routeList_.push_back(*ipv6route);
-        LOGI("SetNetLinkRouteInfo gateway:%{public}s", MacAnonymize(wifiIpV6Info.gateway).c_str());
+        LOGI("SetNetLinkRouteInfo ipv6 gateway:%{public}s", MacAnonymize(wifiIpV6Info.gateway).c_str());
+    } else if (!wifiIpV6Info.gateway.empty() && !hasUsableIpv6Address) {
+        LOGI("Skip IPv6 default route: gateway exists but no usable IPv6 addresses available");
     }
 }
 
 void WifiNetAgent::SetNetLinkHostRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo)
 {
     if ((wifiIpInfo.ipAddress & wifiIpInfo.netmask) != (wifiIpInfo.gateway & wifiIpInfo.netmask)) {
-        sptr<NetManagerStandard::Route> hostRoute = (std::make_unique<NetManagerStandard::Route>()).release();
+        sptr<NetManagerStandard::Route> hostRoute = sptr<NetManagerStandard::Route>::MakeSptr();
         if (hostRoute == nullptr) {
             WIFI_LOGE("%{public}s hostRoute is null", __func__);
             return;
@@ -416,7 +429,7 @@ void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo
 {
     unsigned int prefixLength =
         static_cast<unsigned int>(IpTools::GetMaskLength(IpTools::ConvertIpv4Address(wifiIpInfo.netmask)));
-    sptr<NetManagerStandard::Route> localRoute = (std::make_unique<NetManagerStandard::Route>()).release();
+    sptr<NetManagerStandard::Route> localRoute = sptr<NetManagerStandard::Route>::MakeSptr();
     if (localRoute == nullptr) {
         WIFI_LOGE("%{public}s localRoute is null", __func__);
         return;
@@ -432,7 +445,7 @@ void WifiNetAgent::SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo
         prefixLength, IpAnonymize(strLocalRoute).c_str());
     if (!wifiIpV6Info.netmask.empty()) {
         unsigned int ipv6PrefixLength = IpTools::GetIPV6MaskLength(wifiIpV6Info.netmask);
-        sptr<NetManagerStandard::Route> ipv6route = (std::make_unique<NetManagerStandard::Route>()).release();
+        sptr<NetManagerStandard::Route> ipv6route = sptr<NetManagerStandard::Route>::MakeSptr();
         if (ipv6route == nullptr) {
             WIFI_LOGE("%{public}s ipv6route is null", __func__);
             return;

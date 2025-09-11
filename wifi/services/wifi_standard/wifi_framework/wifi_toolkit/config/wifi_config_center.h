@@ -286,6 +286,10 @@ public:
 
     int GetScreenState() const;
 
+    void SetBrowserState(bool browser);
+
+    bool GetBrowserState();
+
     void SetWlanPage(bool isWlanPage);
 
     bool IsWlanPage() const;
@@ -372,6 +376,7 @@ public:
     void SetDfsControlData(DfsControlData dfsControlData);
  
     DfsControlData GetDfsControlData();
+    
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description set screen state
@@ -510,6 +515,7 @@ private:
     int systemMode_ = SystemMode::M_DEFAULT;
     int mDeviceType = ProductDeviceType::DEFAULT;
     DfsControlData dfsControlData_ = DfsControlData();
+    std::atomic<bool> browserOn_ {false};
 };
 } // namespace Wifi
 } // namespace OHOS

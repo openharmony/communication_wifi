@@ -349,7 +349,7 @@ static bool CheckOriSsidLength(const WifiDeviceConfig &config)
 
 bool WifiDeviceServiceImpl::CheckConfigPwd(const WifiDeviceConfig &config)
 {
-    if (config.ssid.length() <= 0 || (config.keyMgmt.length()) <= 0) {
+    if ((config.ssid.length() <= 0) || (config.keyMgmt.length()) <= 0) {
         WIFI_LOGE("CheckConfigPwd: invalid ssid or keyMgmt!");
         return false;
     }
@@ -700,6 +700,11 @@ ErrCode WifiDeviceServiceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config
     if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("UpdateDeviceConfig:VerifySetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!CheckConfigPwd(config)) {
+        WIFI_LOGE("UpdateDeviceConfig CheckConfigPwd failed!");
+        return WIFI_OPT_INVALID_PARAM;
     }
 
     if (!IsStaServiceRunning()) {
@@ -2712,6 +2717,46 @@ bool WifiDeviceServiceImpl::IsDisableWifiProhibitedByEdm(void)
         }
     }
     return false;
+}
+
+ErrCode WifiDeviceServiceImpl::IsRandomMacDisabled(bool &isRandomMacDisabled)
+{
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("IsRandomMacDisabled:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("IsRandomMacDisabled:VerifyGetWifiConfigPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    isRandomMacDisabled = WifiSettings::GetInstance().IsRandomMacDisabled();
+    WIFI_LOGI("Get isRandomMacDisabled success, isRandomMacDisabled= %{public}d", isRandomMacDisabled);
+    return WIFI_OPT_SUCCESS;
+#else
+    return WIFI_OPT_NOT_SUPPORTED;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::SetRandomMacDisabled(bool isRandomMacDisabled)
+{
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    if (WifiPermissionUtils::VerifyManageEdmPolicyPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetRandomMacDisabeled:VerifyManageEdmPolicyPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    WifiSettings::GetInstance().SetRandomMacDisabled(isRandomMacDisabled);
+    WIFI_LOGI("Set isRandomMacDisabled success, isRandomMacDisabled= %{public}d", isRandomMacDisabled);
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService != nullptr) {
+        pService->ReconnectByMdm();
+    }
+    return WIFI_OPT_SUCCESS;
+#else
+    return WIFI_OPT_NOT_SUPPORTED;
+#endif
 }
 }  // namespace Wifi
 }  // namespace OHOS

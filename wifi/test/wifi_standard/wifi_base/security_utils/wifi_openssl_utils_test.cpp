@@ -26,6 +26,7 @@ namespace Wifi {
 #define CIPHER_TEXT_MAX_LEN 50
 #define KEY_LEN 16
 #define AES_TYPE 2
+#define AES_GCM_TAG_LEN 4
 
 class WifiOpensslUtilsTest : public testing::Test {
 public:
@@ -64,6 +65,59 @@ HWTEST_F(WifiOpensslUtilsTest, OpensslAesEncryptTest1, TestSize.Level1)
     EXPECT_NE(cipherTextLen, CIPHER_TEXT_MAX_LEN);
     for (int i = 0; i < cipherTextLen; i++) {
         EXPECT_EQ(newCipherText[i], cipherText[i]);
+    }
+}
+
+HWTEST_F(WifiOpensslUtilsTest, OpensslAesDecryptTest1, TestSize.Level1)
+{
+    int cipherTextLen = 0;
+    uint8_t newCipherText[CIPHER_TEXT_MAX_LEN];
+    AesCipherInfo info;
+    info.aesType = AES_TYPE;
+    memcpy_s(info.key, MAX_KEY_LEN, key, KEY_LEN);
+    memcpy_s(info.iv, AES_IV_LEN, iv, AES_IV_LEN);
+    EXPECT_EQ(pWifiOpensslUtilsOpt->OpensslAesEncrypt(plainText, PLAIN_TEXT_LEN,
+        &info, newCipherText, &cipherTextLen), 0);
+    EXPECT_NE(cipherTextLen, CIPHER_TEXT_MAX_LEN);
+    for (int i = 0; i < cipherTextLen; i++) {
+        EXPECT_EQ(newCipherText[i], cipherText[i]);
+    }
+    
+    int decryptedPlainTextLen = 0;
+    uint8_t newPlainText[PLAIN_TEXT_LEN];
+ 
+    // 测试cipherText为空指针的情况
+    EXPECT_EQ(pWifiOpensslUtilsOpt->OpensslAesDecrypt(nullptr, cipherTextLen,
+        &info, newPlainText, &decryptedPlainTextLen), -1);
+ 
+    // 测试info为空指针的情况
+    EXPECT_EQ(pWifiOpensslUtilsOpt->OpensslAesDecrypt(newCipherText, cipherTextLen,
+        nullptr, newPlainText, &decryptedPlainTextLen), -1);
+ 
+    // 测试plainText为空指针的情况
+    EXPECT_EQ(pWifiOpensslUtilsOpt->OpensslAesDecrypt(newCipherText, cipherTextLen,
+        &info, nullptr, &decryptedPlainTextLen), -1);
+ 
+    // 测试plainTextLen为空指针的情况
+    EXPECT_EQ(pWifiOpensslUtilsOpt->OpensslAesDecrypt(newCipherText, cipherTextLen,
+        &info, newPlainText, nullptr), -1);
+ 
+    // 测试cipherTextLen为0的情况
+    EXPECT_EQ(pWifiOpensslUtilsOpt->OpensslAesDecrypt(newCipherText, 0,
+        &info, newPlainText, &decryptedPlainTextLen), -1);
+    
+    // 测试cipherTextLen小于AES_GCM_TAG_LEN的情况
+    for (int i = 0; i <= AES_GCM_TAG_LEN; i++) {
+        EXPECT_EQ(pWifiOpensslUtilsOpt->OpensslAesDecrypt(newCipherText, i,
+            &info, newPlainText, &decryptedPlainTextLen), -1);
+    }
+ 
+    // 解密后校验
+    EXPECT_EQ(pWifiOpensslUtilsOpt->OpensslAesDecrypt(newCipherText, cipherTextLen,
+        &info, newPlainText, &decryptedPlainTextLen), 0);
+    EXPECT_EQ(decryptedPlainTextLen, PLAIN_TEXT_LEN);
+    for (int i = 0; i < decryptedPlainTextLen; i++) {
+        EXPECT_EQ(newPlainText[i], plainText[i]);
     }
 }
 

@@ -435,6 +435,146 @@ public:
         pStaStateMachine->pSeparatedState->GoOutState();
     }
 
+    void TryToSaveIpV4ResultHostnameMatchTest()
+    {
+        IpInfo ipInfo;
+        IpV6Info ipv6Info;
+        DhcpResult result;
+        
+        // 测试所有条件满足的情况：包含hostname、IP匹配172.20.10.、掩码>=24
+        memset_s(&result, sizeof(result), 0, sizeof(result));
+        result.iptype = 0; // IPv4
+        
+        if (snprintf_s(result.strOptVendor, sizeof(result.strOptVendor), sizeof(result.strOptVendor) - 1,
+                "%s", "hostname:TestHost") < 0) {
+            return;
+        }
+        
+        if (snprintf_s(result.strOptClientId, sizeof(result.strOptClientId), sizeof(result.strOptClientId) - 1,
+                "%s", "172.20.10.100") < 0) {
+            return;
+        }
+        
+        if (snprintf_s(result.strOptSubnet, sizeof(result.strOptSubnet), sizeof(result.strOptSubnet) - 1,
+                "%s", "255.255.255.0") < 0) {
+            return;
+        }
+        
+        if (snprintf_s(result.strOptRouter1, sizeof(result.strOptRouter1), sizeof(result.strOptRouter1) - 1,
+                "%s", "172.20.10.1") < 0) {
+            return;
+        }
+        
+        pStaStateMachine->linkedInfo.isDataRestricted = 0;
+        pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4Result(ipInfo, ipv6Info, &result);
+        EXPECT_EQ(pStaStateMachine->linkedInfo.isDataRestricted, 1);
+    }
+
+    void TryToSaveIpV4ResultHostnameNoMatchTest()
+    {
+        IpInfo ipInfo;
+        IpV6Info ipv6Info;
+        DhcpResult result;
+        
+        // 测试不包含hostname的情况
+        memset_s(&result, sizeof(result), 0, sizeof(result));
+        result.iptype = 0; // IPv4
+        
+        if (snprintf_s(result.strOptVendor, sizeof(result.strOptVendor), sizeof(result.strOptVendor) - 1,
+                "%s", "test vendor string") < 0) {
+            return;
+        }
+        
+        if (snprintf_s(result.strOptClientId, sizeof(result.strOptClientId), sizeof(result.strOptClientId) - 1,
+                "%s", "172.20.10.100") < 0) {
+            return;
+        }
+        
+        if (snprintf_s(result.strOptSubnet, sizeof(result.strOptSubnet), sizeof(result.strOptSubnet) - 1,
+                "%s", "255.255.255.0") < 0) {
+            return;
+        }
+        
+        if (snprintf_s(result.strOptRouter1, sizeof(result.strOptRouter1), sizeof(result.strOptRouter1) - 1,
+                "%s", "172.20.10.1") < 0) {
+            return;
+        }
+        
+        pStaStateMachine->linkedInfo.isDataRestricted = 0;
+        pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4Result(ipInfo, ipv6Info, &result);
+        EXPECT_EQ(pStaStateMachine->linkedInfo.isDataRestricted, 0);
+    }
+
+    void TryToSaveIpV4ResultIpNoMatchTest()
+    {
+        IpInfo ipInfo;
+        IpV6Info ipv6Info;
+        DhcpResult result;
+        
+        // 测试IP不匹配172.20.10.的情况
+        memset_s(&result, sizeof(result), 0, sizeof(result));
+        result.iptype = 0; // IPv4
+        
+        if (snprintf_s(result.strOptVendor, sizeof(result.strOptVendor), sizeof(result.strOptVendor) - 1,
+                "%s", "hostname:TestHost") < 0) {
+            return;
+        }
+        
+        if (snprintf_s(result.strOptClientId, sizeof(result.strOptClientId), sizeof(result.strOptClientId) - 1,
+                "%s", "192.168.1.100") < 0) {
+            return;
+        }
+        
+        if (snprintf_s(result.strOptSubnet, sizeof(result.strOptSubnet), sizeof(result.strOptSubnet) - 1,
+                "%s", "255.255.255.0") < 0) {
+            return;
+        }
+        
+        if (snprintf_s(result.strOptRouter1, sizeof(result.strOptRouter1), sizeof(result.strOptRouter1) - 1,
+                "%s", "192.168.1.1") < 0) {
+            return;
+        }
+        
+        pStaStateMachine->linkedInfo.isDataRestricted = 0;
+        pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4Result(ipInfo, ipv6Info, &result);
+        EXPECT_EQ(pStaStateMachine->linkedInfo.isDataRestricted, 0);
+    }
+
+    void TryToSaveIpV4ResultMaskNoMatchTest()
+    {
+        IpInfo ipInfo;
+        IpV6Info ipv6Info;
+        DhcpResult result;
+        
+        // 测试掩码长度<24的情况
+        memset_s(&result, sizeof(result), 0, sizeof(result));
+        result.iptype = 0; // IPv4
+        
+        if (snprintf_s(result.strOptVendor, sizeof(result.strOptVendor), sizeof(result.strOptVendor) - 1,
+                "%s", "hostname:TestHost") < 0) {
+            return;
+        }
+
+        if (snprintf_s(result.strOptClientId, sizeof(result.strOptClientId), sizeof(result.strOptClientId) - 1,
+                "%s", "172.20.10.100") < 0) {
+            return;
+        }
+        
+        if (snprintf_s(result.strOptSubnet, sizeof(result.strOptSubnet), sizeof(result.strOptSubnet) - 1,
+                "%s", "255.255.254.0") < 0) {
+            return;
+        }
+        
+        if (snprintf_s(result.strOptRouter1, sizeof(result.strOptRouter1), sizeof(result.strOptRouter1) - 1,
+                "%s", "172.20.10.1") < 0) {
+            return;
+        }
+        
+        pStaStateMachine->linkedInfo.isDataRestricted = 0;
+        pStaStateMachine->pDhcpResultNotify->TryToSaveIpV4Result(ipInfo, ipv6Info, &result);
+        EXPECT_EQ(pStaStateMachine->linkedInfo.isDataRestricted, 0);
+    }
+
     void SeparatedStateExeMsgSuccess1()
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
@@ -2778,6 +2918,30 @@ HWTEST_F(StaStateMachineTest, DhcpResultNotifyClear2Test, TestSize.Level1)
     pStaStateMachine->pDhcpResultNotify->DhcpIpv4Result.isOptSuc = 1;
     pStaStateMachine->pDhcpResultNotify->ClearDhcpResult(&pStaStateMachine->pDhcpResultNotify->DhcpIpv4Result);
     EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->DhcpIpv4Result.isOptSuc == 0);
+}
+
+HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultHostnameMatchTest, TestSize.Level1)
+{
+    TryToSaveIpV4ResultHostnameMatchTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultHostnameNoMatchTest, TestSize.Level1)
+{
+    TryToSaveIpV4ResultHostnameNoMatchTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultIpNoMatchTest, TestSize.Level1)
+{
+    TryToSaveIpV4ResultIpNoMatchTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultMaskNoMatchTest, TestSize.Level1)
+{
+    TryToSaveIpV4ResultMaskNoMatchTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 } // namespace Wifi
 } // namespace OHOS

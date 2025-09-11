@@ -275,6 +275,7 @@ struct WifiConfig {
     bool scanOnlySwitch;
     std::string realMacAddress;
     int staApExclusionType;
+    bool isRandomMacDisabled;
 
     WifiConfig()
     {
@@ -321,6 +322,7 @@ struct WifiConfig {
         scanOnlySwitch = true;
         realMacAddress = "";
         staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
+        isRandomMacDisabled = false;
     }
 };
 

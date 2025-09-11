@@ -43,6 +43,7 @@ public:
     void StopSelfCureWifi(int32_t status);
     bool CheckSelfCureWifiResult(int event);
     bool IsWifiSelfcureDone();
+    bool NotifyIpv6FailureDetected();
 private:
     void RegisterP2pEnhanceCallback();
     void P2pEnhanceStateChange(const std::string &ifName, int32_t state, int32_t frequency);

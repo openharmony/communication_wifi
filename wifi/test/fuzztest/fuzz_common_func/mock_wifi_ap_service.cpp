@@ -97,7 +97,7 @@ void MockApStateMachine::SendMessage(InternalMessagePtr msg)
     return;
 }
 
-void MockApStateMachine::StartTimer(int timerName, int64_t interval)
+void MockApStateMachine::StartTimer(int timerName, int64_t interval, MsgLogLevel logLevel)
 {
     return;
 }

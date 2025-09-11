@@ -24,6 +24,8 @@
 #include "wifi_config_center.h"
 #include "wifi_country_code_manager.h"
 #include "wifi_sta_hal_interface.h"
+#include <fstream>
+#include <cstdlib>
 
 namespace OHOS {
 namespace Wifi {
@@ -558,5 +560,32 @@ void SelfCureUtils::ReportNoInternetChrEvent()
     }
     WriteWifiAccessIntFailedHiSysEvent(1, networkFailReason, resetState, selfcureHistory);
 }
+
+bool SelfCureUtils::IsIpv6SelfCureSupported()
+{
+    // Check if the system supports IPv6 self-cure functionality
+    // This can be configured based on system capabilities or policies
+    return true;
+}
+
+bool SelfCureUtils::DisableIpv6()
+{
+    WIFI_LOGI("Attempting to disable IPv6");
+    std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName();
+    // write sys event
+    std::string selfcureHistory = GetSelfCureHistory();
+    int resetState = (WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered() ? 1 : 0);
+    WriteWifiAccessIntFailedHiSysEvent(1, NetworkFailReason::IPV6_STATE_UNREACHABLE, resetState, selfcureHistory);
+    // Use NetManagerStandard API to disable IPv6 on WiFi interface
+    int result = NetManagerStandard::NetsysController::GetInstance().SetEnableIpv6(ifName, 0);
+    if (result == 0) {
+        WIFI_LOGI("IPv6 disabled successfully on interface %{public}s", ifName.c_str());
+        return true;
+    } else {
+        WIFI_LOGE("Failed to disable IPv6 on interface %{public}s, result: %{public}d", ifName.c_str(), result);
+        return false;
+    }
+}
+
 } // namespace Wifi
 } // namespace OHOS

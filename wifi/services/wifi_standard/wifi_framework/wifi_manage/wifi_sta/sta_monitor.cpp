@@ -29,6 +29,11 @@ DEFINE_WIFILOG_LABEL("StaMonitor");
 namespace OHOS {
 namespace Wifi {
 constexpr const char* WPA_CSA_CHANNEL_SWITCH_FREQ_PREFIX = "freq=";
+/*
+if the reject is caused by driver fail, we need set a delay time to reconnect to reduce the probability of conflicts
+between this connection and other vap associations (like scan or p2p_enhance)
+*/
+const int32_t CONNECT_REJECT_DELAY_TIME_MS = 500;
 StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)
 {
     WIFI_LOGI("StaMonitor constuctor insId %{public}d", instId);
@@ -264,7 +269,11 @@ void StaMonitor::OnWpaConnectionRejectCallBack(const AssocRejectInfo &assocRejec
     msg->AddStringMessageBody(assocRejectInfo.bssid);
     msg->SetParam1(assocRejectInfo.statusCode);
     msg->SetParam2(assocRejectInfo.timeOut);
-    pStaStateMachine->SendMessage(msg);
+    if (assocRejectInfo.statusCode == Wifi80211StatusCode::WLAN_STATUS_EXT_DRIVER_FAIL) {
+        pStaStateMachine->MessageExecutedLater(msg, CONNECT_REJECT_DELAY_TIME_MS);
+    } else {
+        pStaStateMachine->SendMessage(msg);
+    }
 }
 
 void StaMonitor::OnWpsPbcOverlapCallBack(int status)

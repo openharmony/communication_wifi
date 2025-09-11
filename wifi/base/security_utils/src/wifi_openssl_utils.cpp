@@ -16,6 +16,7 @@
 #include "wifi_openssl_utils.h"
 #include <openssl/evp.h>
 #include <openssl/rand.h>
+#include <openssl/crypto.h>
 #include "common.h"
 #include "log.h"
 
@@ -76,6 +77,7 @@ int WifiOpensslUtils::OpensslAesEncrypt(const uint8_t *plainText, int plainTextL
     EVP_CIPHER_CTX *ctx = nullptr;
     int len = 0;
     const EVP_CIPHER *cipher = GetAesCipher(info->aesType);
+    uint8_t tag[AES_GCM_TAG_LEN];
 
     if ((ctx = EVP_CIPHER_CTX_new()) == nullptr) {
         goto err;
@@ -103,7 +105,6 @@ int WifiOpensslUtils::OpensslAesEncrypt(const uint8_t *plainText, int plainTextL
     }
     *cipherTextLen += len;
 
-    uint8_t tag[AES_GCM_TAG_LEN];
     if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, AES_GCM_TAG_LEN, static_cast<void *>(tag)) != 1) {
         goto err;
     }
@@ -115,6 +116,7 @@ int WifiOpensslUtils::OpensslAesEncrypt(const uint8_t *plainText, int plainTextL
     *cipherTextLen += AES_GCM_TAG_LEN;
     res = 0;
 err:
+    OPENSSL_cleanse(tag, AES_GCM_TAG_LEN);
     if (ctx != nullptr) {
         LOGE("%{public}s: Aes Encrypt encrypt res %{public}d !", __func__, res);
         EVP_CIPHER_CTX_free(ctx);
@@ -128,6 +130,7 @@ int WifiOpensslUtils::OpensslAesDecrypt(const uint8_t *cipherText, int cipherTex
     LOGI("enter %{public}s", __func__);
     int res = -1;
     if (cipherText == nullptr || cipherTextLen == 0 || info == nullptr ||
+        plainText == nullptr || plainTextLen == nullptr ||
         cipherTextLen <= AES_GCM_TAG_LEN) {
         LOGE("%{public}s param is illegal", __func__);
         return res;

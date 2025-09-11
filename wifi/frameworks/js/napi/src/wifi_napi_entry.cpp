@@ -439,6 +439,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("factoryReset", FactoryReset),
         DECLARE_NAPI_FUNCTION("startWifiDetection", StartWifiDetection),
         DECLARE_NAPI_FUNCTION("enableHiLinkHandshake", EnableHiLinkHandshake),
+        DECLARE_NAPI_FUNCTION("isRandomMacDisabled", IsRandomMacDisabled),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));

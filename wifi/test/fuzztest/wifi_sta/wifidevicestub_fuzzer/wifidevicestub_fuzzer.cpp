@@ -908,7 +908,6 @@ bool WifiFuzzTest()
 
 void WifiDeviceServiceImplTest()
 {
-
     int networkId = FDP->ConsumeIntegral<int>();
     int uid = FDP->ConsumeIntegral<int>();
     std::string networkName = FDP->ConsumeBytesAsString(NUM_BYTES);

@@ -26,6 +26,7 @@
 #include "wifi_common_event_helper.h"
 #include "wifi_code_convert.h"
 #include "wifi_sensor_scene.h"
+#include "wifi_service_manager.h"
 DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 
 #define MIN(A, B) (((A) >= (B)) ? (B) : (A))
@@ -834,6 +835,10 @@ void ScanService::MergeScanResult(std::vector<WifiScanInfo> &results, std::vecto
     if (WifiConfigCenter::GetInstance().GetWifiScanConfig()->SaveScanInfoList(results) != 0) {
         WIFI_LOGE("SaveScanInfoList failed.\n");
     }
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr && pEnhanceService->CheckScanInfo(false)) {
+        WifiConfigCenter::GetInstance().GetWifiScanConfig()->SaveExternalScanInfoList(results);
+    }
     WifiConfigCenter::GetInstance().UpdateLinkedInfo(m_instId);
 }
 
@@ -874,6 +879,10 @@ bool ScanService::StoreFullScanInfo(
         }
         if (WifiConfigCenter::GetInstance().GetWifiScanConfig()->SaveScanInfoList(results) != 0) {
             WIFI_LOGE("SaveScanInfoList failed.\n");
+        }
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr && pEnhanceService->CheckScanInfo(false)) {
+            WifiConfigCenter::GetInstance().GetWifiScanConfig()->SaveExternalScanInfoList(results);
         }
         return true;
     }

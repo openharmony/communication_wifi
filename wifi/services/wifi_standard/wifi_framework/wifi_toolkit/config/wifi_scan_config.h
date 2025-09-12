@@ -71,9 +71,13 @@ public:
 
     int SaveScanInfoList(const std::vector<WifiScanInfo> &results);
 
+    int SaveExternalScanInfoList(const std::vector<WifiScanInfo> &results);
+
     int ClearScanInfoList();
 
     int GetScanInfoList(std::vector<WifiScanInfo> &results);
+
+    int GetExternalScanInfoList(std::vector<WifiScanInfo> &results);
 
     void GetScanInfoListInner(std::vector<WifiScanInfo> &results);
 
@@ -98,6 +102,7 @@ private:
     std::mutex mScanMutex;
     std::map<std::string, WifiCategory> mWifiCategoryRecord;
     std::vector<WifiScanInfo> mWifiScanInfoList;
+    std::vector<WifiScanInfo> externalWifiScanInfoList_ = {};
     std::map<std::string, int> hilinkAbilityRecord;
 };
 }  // namespace Wifi

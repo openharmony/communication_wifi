@@ -358,7 +358,7 @@ std::string GetBundleName()
 
 std::string GetBundleAppIdByBundleName(const int callingUid, const std::string &bundleName)
 {
-    if (bundleName.isEmpty()) {
+    if (bundleName.empty()) {
         return "";
     }
     int userId = static_cast<int32_t>(GetCallingUid() / UID_CALLINGUID_TRANSFORM_DIVISOR);

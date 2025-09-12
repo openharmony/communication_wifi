@@ -1334,6 +1334,10 @@ void WifiDeviceFuzzTest()
     OHOS::Wifi::OnLimitSpeedFuzzTest();
     OHOS::Wifi::OnEnableHiLinkHandshakeFuzzTest();
     OHOS::Wifi::OnGetWifiDetailStateFuzzTest();
+}
+
+void WifiDeviceFuzzTestPart2()
+{
     OHOS::Wifi::OnSetTxPowerFuzzTest();
     OHOS::Wifi::OnStartWifiDetectionFuzzTest();
     OHOS::Wifi::OnSetSatelliteStateFuzzTest();

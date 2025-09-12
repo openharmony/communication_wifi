@@ -235,6 +235,15 @@ bool SelfCureService::NotifyIpv6FailureDetected()
         return false;
     }
 
+    // Check if static IPv6 is configured
+    WifiDeviceConfig wificonfig;
+    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, wificonfig, m_instId) == 0 &&
+        wificonfig.wifiIpConfig.assignMethod ==  AssignIpMethod::STATIC &&
+        wificonfig.wifiIpConfig.staticIpAddress.ipAddress.address.family == 1) {
+        WIFI_LOGI("Static IPv6 configured, ignore IPv6 failure");
+        return false;
+    }
+
     // Check if the system supports IPv6 self-cure functionality
     if (!SelfCureUtils::GetInstance().IsIpv6SelfCureSupported()) {
         WIFI_LOGI("IPv6 self-cure not supported, ignore IPv6 failure");

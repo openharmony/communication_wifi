@@ -629,6 +629,10 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_AUTO_STARTUP_SUPPORT" ]
     }
 
+    if (wifi_feature_with_ipv6_selfcure) {
+      defines += [ "FEATURE_IPV6_SELF_CURE" ]
+    }
+
     if (wifi_feature_dynamic_unload_sa) {
       defines += [ "DYNAMIC_UNLOAD_SA" ]
     }

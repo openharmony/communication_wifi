@@ -333,6 +333,14 @@ int WifiScanConfig::SaveScanInfoList(const std::vector<WifiScanInfo> &results)
     return 0;
 }
 
+int WifiScanConfig::SaveExternalScanInfoList(const std::vector<WifiScanInfo> &results)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    externalWifiScanInfoList_.clear();
+    externalWifiScanInfoList_ = results;
+    return 0;
+}
+
 int WifiScanConfig::ClearScanInfoList()
 {
     if (WifiConfigCenter::GetInstance().HasWifiActive()) {
@@ -343,6 +351,7 @@ int WifiScanConfig::ClearScanInfoList()
 #endif
     std::unique_lock<std::mutex> lock(mScanMutex);
     mWifiScanInfoList.clear();
+    externalWifiScanInfoList_.clear();
     return 0;
 }
 
@@ -372,6 +381,26 @@ int WifiScanConfig::GetScanInfoList(std::vector<WifiScanInfo> &results)
         results.assign(mWifiScanInfoList.begin(), mWifiScanInfoList.end());
     }
     LOGI("WifiSettings::GetScanInfoList size = %{public}zu", results.size());
+    return 0;
+}
+
+int WifiScanConfig::GetExternalScanInfoList(std::vector<WifiScanInfo> &results)
+{
+    std::unique_lock<std::mutex> lock(mScanMutex);
+    int64_t currentTime = GetElapsedMicrosecondsSinceBoot();
+    for (auto iter = externalWifiScanInfoList_.begin(); iter != externalWifiScanInfoList_.end();) {
+        if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES) {
+            continue;
+        }
+        if (iter->timestamp > currentTime - WIFI_GET_SCAN_INFO_VALID_TIMESTAMP) {
+            results.push_back(*iter);
+        }
+        ++iter;
+    }
+    if (results.empty()) {
+        results.assign(externalWifiScanInfoList_.begin(), externalWifiScanInfoList_.end());
+    }
+    LOGI("WifiSettings::GetExternalScanInfoList size = %{public}zu", results.size());
     return 0;
 }
 

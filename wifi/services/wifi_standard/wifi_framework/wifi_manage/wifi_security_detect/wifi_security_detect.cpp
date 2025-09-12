@@ -370,11 +370,6 @@ void WifiSecurityDetect::AddWifiStandardToJson(cJSON *root, int wifiStandard)
 
 void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
 {
-    WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetDeviceConfig(info.networkId, config) != 0) {
-        WIFI_LOGE("%{public}s, not find networkId:%{public}d", __FUNCTION__, info.networkId);
-        return;
-    }
     SecurityModelResult model;
     model.devId = "";
     model.modelId = securityGuardModelID;
@@ -396,8 +391,6 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
         free(jsonStr);
     }
     cJSON_Delete(root);
-    WIFI_LOGI(
-        "ssid:%{public}s bssid:%{public}s", SsidAnonymize(config.ssid).c_str(), MacAnonymize(config.bssid).c_str());
     securityDetectThread_->PostAsyncTask([=]() mutable -> int32_t {
         if (!IsSettingSecurityDetectOn()) {
             return WIFI_OPT_FAILED;
@@ -409,6 +402,11 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
             return WIFI_OPT_FAILED;
         }
         WIFI_LOGI("PopupNotification result is %{public}d", result);
+        WifiDeviceConfig config;
+        if (WifiSettings::GetInstance().GetDeviceConfig(info.networkId, config) != 0) {
+            WIFI_LOGE("%{public}s, not find networkId:%{public}d", __FUNCTION__, info.networkId);
+            return WIFI_OPT_FAILED;
+        }
         config.isSecureWifi = result;
         config.lastDetectTime = time(0);
         PopupNotification(config.isSecureWifi ? WifiNotification::CLOSE : WifiNotification::OPEN, info.networkId);

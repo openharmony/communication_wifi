@@ -1441,6 +1441,8 @@ void DataShareReadySubscriber::OnReceiveEvent(const EventFwk::CommonEventData &e
     if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
         WifiManager::GetInstance().GetWifiEventSubscriberManager()->AccessDataShare();
         WifiManager::GetInstance().GetWifiEventSubscriberManager()->RegisterLocationEvent();
+        WifiSettings::GetInstance().SetDeviceNameApSsid(
+            WifiDataShareHelperUtils::GetInstance().GetDatashareNameApSsid());
 #ifdef WIFI_SECURITY_DETECT_ENABLE
         WifiSecurityDetect::GetInstance().SetDatashareReady();
         WifiSecurityDetect::GetInstance().RegisterSecurityDetectObserver();

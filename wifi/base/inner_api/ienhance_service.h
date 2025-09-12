@@ -340,6 +340,14 @@ public:
      * @return Errcode - operation result
      */
     virtual ErrCode RegisterSensorEnhanceCallback(SensorEnhanceCallback callback) = 0;
+
+    /**
+     * @Description CheckScanInfo
+     *
+     * @param uid - uid function
+     * @return bool - operation result
+     */
+    virtual bool CheckScanInfo(bool isGetScanInfoList, int uid = 0) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

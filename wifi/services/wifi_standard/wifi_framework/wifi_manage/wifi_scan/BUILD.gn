@@ -122,6 +122,7 @@ if (defined(ohos_lite)) {
 
     external_deps = [
       "ability_base:want",
+      "ability_runtime:app_manager",
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
       "hilog:libhilog",

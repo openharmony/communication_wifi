@@ -183,7 +183,7 @@ void OnStartP2pListenFuzzTest()
     int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
-    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());;
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_START_LISTEN), datas);
 }
 

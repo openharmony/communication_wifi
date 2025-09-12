@@ -1015,5 +1015,29 @@ HWTEST_F(StaStateMachineTest, DealGetDhcpIpTimeoutTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
+HWTEST_F(StaStateMachineTest, HandleStaticIpv6_StaticIpv6_Test, TestSize.Level1)
+{
+    // Arrange - Set up test data
+    bool isStaticIpv6 = true;
+    std::string expectedIfName = "wlan0";
+    // Mock the interface name in config center
+    WifiConfigCenter::GetInstance().SetStaIfaceName(expectedIfName, 0);
+    // Act - Call the function under test
+    pStaStateMachine->pGetIpState->HandleStaticIpv6(isStaticIpv6);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, HandleStaticIpv6_NonStaticIpv6_Test, TestSize.Level1)
+{
+    // Arrange - Set up test data
+    bool isStaticIpv6 = false;
+    std::string expectedIfName = "wlan0";
+    // Mock the interface name in config center
+    WifiConfigCenter::GetInstance().SetStaIfaceName(expectedIfName, 0);
+    // Act - Call the function under test
+    pStaStateMachine->pGetIpState->HandleStaticIpv6(isStaticIpv6);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
 }
 }

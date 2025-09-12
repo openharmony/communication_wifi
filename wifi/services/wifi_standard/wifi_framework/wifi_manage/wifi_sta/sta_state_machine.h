@@ -317,6 +317,7 @@ public:
         bool IsPublicESS();
         bool IsProhibitUseCacheIp();
         void DealGetDhcpIpTimeout(InternalMessagePtr msg);
+        void HandleStaticIpv6(bool isStaticIpv6);
         StaStateMachine *pStaStateMachine;
     };
     /**

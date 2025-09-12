@@ -134,19 +134,6 @@ ErrCode WifiScanServiceImpl::Scan(bool compatible)
                 GetScanInitiatorName(), WifiScanFailReason::PERMISSION_DENIED);
             return WIFI_OPT_PERMISSION_DENIED;
         }
-    } else {
-        if (!WifiAuthCenter::IsSystemAccess()) {
-            WIFI_LOGE("Scan:NOT System APP, PERMISSION_DENIED!");
-            WriteWifiScanApiFailHiSysEvent(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo().
-                GetScanInitiatorName(), WifiScanFailReason::PERMISSION_DENIED);
-            return WIFI_OPT_NON_SYSTEMAPP;
-        }
-        if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("Scan:VerifyWifiConnectionPermission PERMISSION_DENIED!");
-            WriteWifiScanApiFailHiSysEvent(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo().
-                GetScanInitiatorName(), WifiScanFailReason::PERMISSION_DENIED);
-            return WIFI_OPT_PERMISSION_DENIED;
-        }
     }
     
     if (!IsScanServiceRunning()) {
@@ -292,8 +279,13 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
             return WIFI_OPT_PERMISSION_DENIED;
         }
     }
-
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(result);
+#ifndef OHOS_ARCH_LITE
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr && pEnhanceService->CheckScanInfo(true, GetCallingUid())) {
+        WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetExternalScanInfoList(result);
+    }
+#endif
     if (!compatible) {
     #ifdef SUPPORT_RANDOM_MAC_ADDR
         if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED ||

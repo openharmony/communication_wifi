@@ -40,6 +40,7 @@
 #include "wifi_app_state_aware.h"
 #include "wifi_net_observer.h"
 #include "wifi_system_timer.h"
+#include "netsys_controller.h"
 #ifdef WIFI_CONFIG_UPDATE
 #include "wifi_config_update.h"
 #endif
@@ -1709,6 +1710,8 @@ void StaStateMachine::GetIpState::GoInState()
         isStaticIpv6 = true;
     }
 
+    HandleStaticIpv6(isStaticIpv6);
+
     if (assignMethod == AssignIpMethod::STATIC) {
         pStaStateMachine->currentTpType = config.wifiIpConfig.staticIpAddress.ipAddress.address.family;
         if (!pStaStateMachine->ConfigStaticIpAddress(config.wifiIpConfig.staticIpAddress)) {
@@ -1818,6 +1821,22 @@ bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessagePtr msg)
     }
 
     return ret;
+}
+
+void StaStateMachine::GetIpState::HandleStaticIpv6(bool isStaticIpv6)
+{
+#ifndef OHOS_ARCH_LITE
+    std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
+    if (isStaticIpv6) {
+        NetManagerStandard::NetsysController::GetInstance().SetIpv6PrivacyExtensions(ifName, 1);
+        NetManagerStandard::NetsysController::GetInstance().SetEnableIpv6(ifName, 1);
+        NetManagerStandard::NetsysController::GetInstance().SetIpv6AutoConf(ifName, 0);
+        WIFI_LOGI("Static IPv6 set enable ipv6 and disable ipv6 autoconf.\n");
+    } else {
+        NetManagerStandard::NetsysController::GetInstance().SetIpv6AutoConf(ifName, 1);
+        WIFI_LOGI("Non-Static IPv6 set enable ipv6 autoconf.\n");
+    }
+#endif
 }
 
 void StaStateMachine::GetIpState::DealGetDhcpIpTimeout(InternalMessagePtr msg)

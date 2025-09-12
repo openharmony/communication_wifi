@@ -70,6 +70,7 @@ declare_args() {
     wifi_hiappevent_enable = true
   }
   wifi_feature_auto_enable_support = false
+  wifi_feature_with_ipv6_selfcure = true
 }
 
 memory_optimization_cflags = [

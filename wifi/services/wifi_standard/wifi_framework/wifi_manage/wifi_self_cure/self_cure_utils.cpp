@@ -563,9 +563,14 @@ void SelfCureUtils::ReportNoInternetChrEvent()
 
 bool SelfCureUtils::IsIpv6SelfCureSupported()
 {
-    // Check if the system supports IPv6 self-cure functionality
-    // This can be configured based on system capabilities or policies
+#ifdef FEATURE_IPV6_SELF_CURE
+    if (WifiConfigCenter::GetInstance().GetDeviceType() != ProductDeviceType::PHONE) {
+        return false;
+    }
     return true;
+#else
+    return false;
+#endif
 }
 
 bool SelfCureUtils::DisableIpv6()

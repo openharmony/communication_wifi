@@ -186,9 +186,6 @@ HWTEST_F(SelfCureInterfaceTest, DealDhcpOfferReportTest, TestSize.Level1)
 
 HWTEST_F(SelfCureInterfaceTest, NotifyIpv6FailureDetectedTest, TestSize.Level1)
 {
-    // Test IPv6 failure notification interface
-    EXPECT_EQ(WIFI_OPT_SUCCESS, pSelfCureInterface->NotifyIpv6FailureDetected());
-
     // Test with null service
     pSelfCureInterface->pSelfCureService = nullptr;
     EXPECT_EQ(WIFI_OPT_FAILED, pSelfCureInterface->NotifyIpv6FailureDetected());

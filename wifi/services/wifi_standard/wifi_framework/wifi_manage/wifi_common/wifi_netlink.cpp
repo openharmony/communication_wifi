@@ -211,7 +211,7 @@ int32_t WifiNetLink::ProcessReportMsg(int32_t sockFd, int32_t cmd)
         return 0;
     } else {
         const char* type = (cmd == CMD_QUERY_IPV6_PKTS) ? "IPv6" : "IPv4";
-        WIFI_LOGI("Received invalid %{public}s message info.hdr.nlmsg_type = %{public}d", type, info.hdr.nlmsg_type);
+        WIFI_LOGI("Received invalid %{public}s message", type);
         return -1;
     }
 }

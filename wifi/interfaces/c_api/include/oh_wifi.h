@@ -64,7 +64,12 @@ typedef enum Wifi_ResultCode {
      * @error Operation failed.
      * Possible reasons: Internal execution failed.
      */
-    WIFI_OPERATION_FAILED = 2501000
+    WIFI_OPERATION_FAILED = 2501000,
+    /**
+     * @error Wi-Fi STA disabled.
+     * @since 21
+     */
+    WIFI_STA_DISABLED = 2501001
 } Wifi_ResultCode;
 
 /**
@@ -83,6 +88,23 @@ typedef enum Wifi_ResultCode {
  */
 Wifi_ResultCode OH_Wifi_IsWifiEnabled(bool *enabled);
 
+/**
+ * @brief Get the device Mac address.
+ *
+ * @param macAddr - The character array of device Mac address terminated using '\0'.
+ * @param macAddrLen - The size of the memory allocated for the macAddr character array.
+ * @permission ohos.permission.GET_WIFI_LOCAL_MAC and ohos.permission.GET_WIFI_INFO.
+ * @return wifi functions result code.
+ *     For a detailed definition, please refer to {@link Wifi_ResultCode}.
+ *     {@link WIFI_SUCCESS} Successfully obtained the device Mac address.
+ *     {@link WIFI_PERMISSION_DENIED} Permission denied.
+ *     {@link WIFI_NOT_SUPPORTED} Capability not supported.
+ *     {@link WIFI_INVALID_PARAM} The input parameter macAddr is a null pointer.
+ *     {@link WIFI_OPERATION_FAILED} Internal execution failed.
+ *     {@link WIFI_STA_DISABLED} Wi-Fi STA disabled.
+ * @since 21
+ */
+Wifi_ResultCode OH_Wifi_GetDeviceMacAddress(char *macAddr, unsigned int *macAddrLen);
 #ifdef __cplusplus
 }
 #endif

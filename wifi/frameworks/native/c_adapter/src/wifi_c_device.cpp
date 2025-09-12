@@ -204,7 +204,8 @@ static OHOS::Wifi::ErrCode ConvertDeviceConfigFromCpp(const OHOS::Wifi::WifiDevi
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
     result->bssidType = deviceConfig.bssidType;
-    if (memcpy_s(result->preSharedKey, WIFI_MAX_KEY_LEN, deviceConfig.preSharedKey.c_str(), WIFI_MAX_KEY_LEN) != EOK) {
+    if (memcpy_s(result->preSharedKey, WIFI_MAX_KEY_LEN, deviceConfig.preSharedKey.c_str(),
+        deviceConfig.preSharedKey.size() + 1) != EOK) {
         return OHOS::Wifi::WIFI_OPT_FAILED;
     }
     result->securityType = GetSecTypeByKeyMgmt(deviceConfig.keyMgmt);

@@ -18,7 +18,10 @@
 #include "wificdevice_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
 #include "kits/c/wifi_device.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
+static FuzzedDataProvider *FDP = nullptr;
+static const int32_t NUM_BYTES = 1;
 
 static void EnableWifiTest()
 {
@@ -40,311 +43,213 @@ static void DisconnectTest()
 {
     Disconnect();
 }
-static void RemoveDeviceTest(const uint8_t* data, size_t size)
+static void RemoveDeviceTest()
 {
-    if (size == 0) {
-        return;
-    }
-    int networkId = static_cast<int>(data[0]);
+    int networkId = FDP->ConsumeIntegral<int>();
     RemoveDevice(networkId);
 }
-static void DisableDeviceConfigTest(const uint8_t* data, size_t size)
+static void DisableDeviceConfigTest()
 {
-    if (size == 0) {
-        return;
-    }
-    int networkId = static_cast<int>(data[0]);
+    int networkId = FDP->ConsumeIntegral<int>();
     DisableDeviceConfig(networkId);
 }
-static void EnableDeviceConfigTest(const uint8_t* data, size_t size)
+static void EnableDeviceConfigTest()
 {
-    if (size == 0) {
-        return;
-    }
-    int networkId = static_cast<int>(data[0]);
+    int networkId = FDP->ConsumeIntegral<int>();
     EnableDeviceConfig(networkId);
 }
-static void ConnectToTest(const uint8_t* data, size_t size)
+static void ConnectToTest()
 {
-    if (size == 0) {
-        return;
-    }
-    int networkId = static_cast<int>(data[0]);
+    int networkId = FDP->ConsumeIntegral<int>();
     ConnectTo(networkId);
 }
-static void AddDeviceConfigTest(const uint8_t* data, size_t size)
+static void AddDeviceConfigTest()
 {
-    int index = 0;
     WifiDeviceConfig config;
-    if (size >= sizeof(WifiDeviceConfig)) {
-        if (memcpy_s(config.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
-            return;
-        }
-        if (memcpy_s(config.bssid, WIFI_MAC_LEN, data, WIFI_MAC_LEN - 1) != EOK) {
-            return;
-        }
-        if (memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, data, WIFI_MAX_KEY_LEN - 1) != EOK) {
-            return;
-        }
-        config.securityType = static_cast<int>(data[index++]);
-        config.netId = static_cast<int>(data[index++]);
-        config.freq = static_cast<int>(data[index++]);
-        config.wapiPskType = static_cast<int>(data[index++]);
-        config.isHiddenSsid = static_cast<int>(data[index++]);
-        config.ipType = static_cast<IpType>(static_cast<int>(data[index++]) % TWO);
-    }
-    int result = static_cast<int>(data[index++]);
+    std::string ssid_str = FDP->ConsumeBytesAsString(NUM_BYTES);
+    strcpy_s(config.ssid, sizeof(config.ssid), ssid_str.c_str());
+    std::vector<unsigned char> bssid_vec = FDP->ConsumeBytes<unsigned char>(NUM_BYTES);
+    memcpy_s(config.bssid, sizeof(config.bssid), bssid_vec.data(), bssid_vec.size());
+    std::string preSharedKey_str = FDP->ConsumeBytesAsString(NUM_BYTES);
+    strcpy_s(config.preSharedKey, sizeof(config.ssid), preSharedKey_str.c_str());
+    config.securityType = FDP->ConsumeIntegral<int>();
+    config.netId = FDP->ConsumeIntegral<int>();
+    config.freq = FDP->ConsumeIntegral<int>();
+    config.wapiPskType = FDP->ConsumeIntegral<int>();
+    config.isHiddenSsid = FDP->ConsumeIntegral<int>();
+    config.ipType = static_cast<IpType>(FDP->ConsumeIntegral<uint8_t>() % TWO);
+    int result = FDP->ConsumeIntegral<int>();
     AddDeviceConfig(&config, &result);
 }
-static void AdvanceScanTest(const uint8_t* data, size_t size)
+static void AdvanceScanTest()
 {
     WifiScanParams params;
-    if (size >= sizeof(WifiScanParams)) {
-        if (memcpy_s(params.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
-            return;
-        }
-        if (memcpy_s(params.bssid, WIFI_MAC_LEN, data, WIFI_MAC_LEN - 1) != EOK) {
-            return;
-        }
-        int index = 0;
-        params.scanType = WIFI_FREQ_SCAN;
-        params.freqs = static_cast<int>(data[index++]);
-        params.band = static_cast<int>(data[index++]);
-        params.ssidLen = static_cast<int>(data[index++]);
-    }
+    std::string ssid_str = FDP->ConsumeBytesAsString(NUM_BYTES);
+    strcpy_s(params.ssid, sizeof(params.ssid), ssid_str.c_str());
+    std::vector<unsigned char> bssid_vec = FDP->ConsumeBytes<unsigned char>(NUM_BYTES);
+    memcpy_s(params.bssid, sizeof(params.bssid), bssid_vec.data(), bssid_vec.size());
+    params.scanType = static_cast<WifiScanType>(FDP->ConsumeIntegral<uint8_t>() % FOUR);
+    params.freqs = FDP->ConsumeIntegral<int>();
+    params.band = FDP->ConsumeIntegral<int>();
+    params.ssidLen =  FDP->ConsumeIntegral<char>();
     AdvanceScan(&params);
 }
-static void GetSignalLevelTest(const uint8_t* data, size_t size)
+static void GetSignalLevelTest()
 {
-    int rssi = 0;
-    int band = 0;
-    if (size >= TWO) {
-        int index = 0;
-        rssi = static_cast<int>(data[index++]);
-        band = static_cast<int>(data[index++]);
-    }
+    int rssi = FDP->ConsumeIntegral<int>();
+    int band = FDP->ConsumeIntegral<int>();
     GetSignalLevel(rssi, band);
 }
 
-static void GetScanInfoListTest(const uint8_t* data, size_t size)
+static void GetScanInfoListTest()
 {
     WifiScanInfo result;
-    unsigned int mSize;
-    if (size >= sizeof(WifiScanInfo)) {
-        if (memcpy_s(result.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
-            return;
-        }
-
-        if (memcpy_s(result.bssid, WIFI_MAC_LEN, data + WIFI_MAX_SSID_LEN, WIFI_MAC_LEN) != EOK) {
-            return;
-        }
-        int index = 0;
-        result.securityType = static_cast<int>(data[index++]);
-        result.rssi = static_cast<int>(data[index++]);
-        result.band = static_cast<int>(data[index++]);
-        result.frequency = static_cast<int>(data[index++]);
-        result.channelWidth = static_cast<WifiChannelWidth>(static_cast<int>(data[index++]) % WIDTH_INVALID);
-        result.centerFrequency0 = static_cast<int>(data[index++]);
-        result.centerFrequency1 = static_cast<int>(data[index++]);
-        result.timestamp = static_cast<int64_t>(OHOS::Wifi::U32_AT(data));
-        mSize = static_cast<unsigned int>(data[0]);
-    }
+    std::string ssid_str = FDP->ConsumeBytesAsString(NUM_BYTES);
+    strcpy_s(result.ssid, sizeof(result.ssid), ssid_str.c_str());
+    std::vector<unsigned char> bssid_vec = FDP->ConsumeBytes<unsigned char>(NUM_BYTES);
+    memcpy_s(result.bssid, sizeof(result.bssid), bssid_vec.data(), bssid_vec.size());
+    result.securityType = FDP->ConsumeIntegral<int>();
+    result.rssi = FDP->ConsumeIntegral<int>();
+    result.band = FDP->ConsumeIntegral<int>();
+    result.frequency = FDP->ConsumeIntegral<int>();
+    result.channelWidth = static_cast<WifiChannelWidth>(FDP->ConsumeIntegralInRange<int>(0, WIDTH_INVALID));
+    result.centerFrequency0 = FDP->ConsumeIntegral<int>();
+    result.centerFrequency1 = FDP->ConsumeIntegral<int>();
+    result.timestamp = FDP->ConsumeIntegral<int64_t>();
+    unsigned int mSize = FDP->ConsumeIntegral<unsigned int>();
     (void)GetScanInfoList(&result, &mSize);
 }
 
-static void GetDeviceConfigsTest(const uint8_t* data, size_t size)
+static void GetDeviceConfigsTest()
 {
     WifiDeviceConfig result;
-    unsigned int mSize;
-    if (size >= sizeof(WifiDeviceConfig)) {
-        if (memcpy_s(result.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
-            return;
-        }
-
-        if (memcpy_s(result.bssid, WIFI_MAC_LEN, data + WIFI_MAX_SSID_LEN, WIFI_MAC_LEN) != EOK) {
-            return;
-        }
-
-        if (memcpy_s(result.preSharedKey, WIFI_MAX_KEY_LEN, data + WIFI_MAX_SSID_LEN, WIFI_MAX_KEY_LEN - 1) != EOK) {
-            return;
-        }
-        int index = 0;
-        result.securityType = static_cast<int>(data[index++]);
-        result.netId = static_cast<int>(data[index++]);
-        result.freq = static_cast<unsigned int>(data[index++]);
-        result.wapiPskType = static_cast<int>(data[index++]);
-        result.ipType = static_cast<IpType>(static_cast<int>(data[index++]) % UNKNOWN);
-        result.staticIp.ipAddress = static_cast<unsigned int>(data[index++]);
-        result.staticIp.gateway = static_cast<unsigned int>(data[index++]);
-        result.staticIp.netmask = static_cast<unsigned int>(data[index++]);
-        result.isHiddenSsid = static_cast<int>(data[index++]);
-        mSize = static_cast<unsigned int>(data[0]);
-    }
+    std::string ssid_str = FDP->ConsumeBytesAsString(NUM_BYTES);
+    strcpy_s(result.ssid, sizeof(result.ssid), ssid_str.c_str());
+    std::vector<unsigned char> bssid_vec = FDP->ConsumeBytes<unsigned char>(NUM_BYTES);
+    memcpy_s(result.bssid, sizeof(result.bssid), bssid_vec.data(), bssid_vec.size());
+    std::string preSharedKey_str = FDP->ConsumeBytesAsString(NUM_BYTES);
+    strcpy_s(result.preSharedKey, sizeof(result.ssid), preSharedKey_str.c_str());
+    result.securityType = FDP->ConsumeIntegral<int>();
+    result.netId = FDP->ConsumeIntegral<int>();
+    result.freq = FDP->ConsumeIntegral<int>();
+    result.wapiPskType = FDP->ConsumeIntegral<int>();
+    result.ipType = static_cast<IpType>(FDP->ConsumeIntegral<uint8_t>() % UNKNOWN);
+    result.staticIp.ipAddress = FDP->ConsumeIntegral<unsigned int>();
+    result.staticIp.gateway = FDP->ConsumeIntegral<unsigned int>();
+    result.staticIp.netmask = FDP->ConsumeIntegral<unsigned int>();
+    result.isHiddenSsid = FDP->ConsumeIntegral<int>();
+    unsigned int mSize = FDP->ConsumeIntegral<unsigned int>();
     (void)GetDeviceConfigs(&result, &mSize);
 }
 
-static void ConnectToDeviceTest(const uint8_t* data, size_t size)
+static void ConnectToDeviceTest()
 {
     WifiDeviceConfig config;
-    if (size >= sizeof(WifiDeviceConfig)) {
-        if (memcpy_s(config.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
-            return;
-        }
-
-        if (memcpy_s(config.bssid, WIFI_MAC_LEN, data + WIFI_MAX_SSID_LEN, WIFI_MAC_LEN) != EOK) {
-            return;
-        }
-
-        if (memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, data + WIFI_MAX_SSID_LEN, WIFI_MAX_KEY_LEN - 1) != EOK) {
-            return;
-        }
-        int index = 0;
-        config.securityType = static_cast<int>(data[index++]);
-        config.netId = static_cast<int>(data[index++]);
-        config.freq = static_cast<unsigned int>(data[index++]);
-        config.wapiPskType = static_cast<int>(data[index++]);
-        config.ipType = static_cast<IpType>(static_cast<int>(data[index++]) % UNKNOWN);
-        config.staticIp.ipAddress = static_cast<unsigned int>(data[index++]);
-        config.staticIp.gateway = static_cast<unsigned int>(data[index++]);
-        config.staticIp.netmask = static_cast<unsigned int>(data[index++]);
-        config.isHiddenSsid = static_cast<int>(data[index++]);
-    }
+    std::string ssid_str = FDP->ConsumeBytesAsString(NUM_BYTES);
+    strcpy_s(config.ssid, sizeof(config.ssid), ssid_str.c_str());
+    std::vector<unsigned char> bssid_vec = FDP->ConsumeBytes<unsigned char>(NUM_BYTES);
+    memcpy_s(config.bssid, sizeof(config.bssid), bssid_vec.data(), bssid_vec.size());
+    std::string preSharedKey_str = FDP->ConsumeBytesAsString(NUM_BYTES);
+    strcpy_s(config.preSharedKey, sizeof(config.ssid), preSharedKey_str.c_str());
+    config.securityType = FDP->ConsumeIntegral<int>();
+    config.netId = FDP->ConsumeIntegral<int>();
+    config.freq = FDP->ConsumeIntegral<int>();
+    config.wapiPskType = FDP->ConsumeIntegral<int>();
+    config.isHiddenSsid = FDP->ConsumeIntegral<int>();
+    config.ipType = static_cast<IpType>(FDP->ConsumeIntegral<uint8_t>() % UNKNOWN);
+    config.staticIp.ipAddress = FDP->ConsumeIntegral<unsigned int>();
+    config.staticIp.gateway = FDP->ConsumeIntegral<unsigned int>();
+    config.staticIp.netmask = FDP->ConsumeIntegral<unsigned int>();
+    config.isHiddenSsid = FDP->ConsumeIntegral<int>();
     (void)ConnectToDevice(&config);
 }
 
-static void GetLinkedInfoTest(const uint8_t* data, size_t size)
+static void GetLinkedInfoTest()
 {
     WifiLinkedInfo result;
-    if (size >= sizeof(WifiLinkedInfo)) {
-        if (memcpy_s(result.ssid, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
-            return;
-        }
-
-        if (memcpy_s(result.bssid, WIFI_MAC_LEN, data + WIFI_MAX_SSID_LEN, WIFI_MAC_LEN) != EOK) {
-            return;
-        }
-        int index = 0;
-        result.rssi = static_cast<int>(data[index++]);
-        result.band = static_cast<int>(data[index++]);
-        result.frequency = static_cast<int>(data[index++]);
-        result.connState = static_cast<WifiConnState>(static_cast<int>(data[index++]) % (WIFI_CONNECTED + 1));
-        result.disconnectedReason = static_cast<unsigned short>(data[index++]);
-        result.ipAddress = static_cast<unsigned int>(data[index++]);
-    }
+    std::string ssid_str = FDP->ConsumeBytesAsString(NUM_BYTES);
+    strcpy_s(result.ssid, sizeof(result.ssid), ssid_str.c_str());
+    std::vector<unsigned char> bssid_vec = FDP->ConsumeBytes<unsigned char>(NUM_BYTES);
+    memcpy_s(result.bssid, sizeof(result.bssid), bssid_vec.data(), bssid_vec.size());
+    result.frequency = FDP->ConsumeIntegral<int>();
+    result.connState = static_cast<WifiConnState>(FDP->ConsumeIntegral<uint8_t>() % (WIFI_CONNECTED + 1));
+    result.disconnectedReason = FDP->ConsumeIntegral<unsigned short>();
+    result.ipAddress = FDP->ConsumeIntegral<unsigned int>();
     (void)GetLinkedInfo(&result);
 }
 
-static void GetDeviceMacAddressTest(const uint8_t* data, size_t size)
+static void GetDeviceMacAddressTest()
 {
-    unsigned char result;
-    if (size > 0) {
-        result = static_cast<unsigned char>(data[0]);
-    }
+    unsigned char result = FDP->ConsumeIntegral<unsigned char>();
     (void)GetDeviceMacAddress(&result);
 }
 
-static void GetWifiDetailStateTest(const uint8_t* data, size_t size)
+static void GetWifiDetailStateTest()
 {
-    WifiDetailState state;
-    if (size > 0) {
-        state = static_cast<WifiDetailState>(data[0]);
-    }
+    WifiDetailState state = static_cast<WifiDetailState>(FDP->ConsumeIntegralInRange<int>(-1, 5));
     (void)GetWifiDetailState(&state);
 }
 
-static void GetIpInfoTest(const uint8_t* data, size_t size)
+static void GetIpInfoTest()
 {
     IpInfo info;
-    if (size >= sizeof(IpInfo)) {
-        int index = 0;
-        info.ipAddress = static_cast<unsigned int>(data[index++]);
-        info.netMask = static_cast<unsigned int>(data[index++]);
-        info.netGate = static_cast<unsigned int>(data[index++]);
-        info.dns1 = static_cast<unsigned int>(data[index++]);
-        info.dns2 = static_cast<unsigned int>(data[index++]);
-        info.serverAddress = static_cast<unsigned int>(data[index++]);
-        info.leaseDuration = static_cast<int>(data[index++]);
-    }
+    info.ipAddress = FDP->ConsumeIntegral<unsigned int>();
+    info.netMask = FDP->ConsumeIntegral<unsigned int>();
+    info.netGate = FDP->ConsumeIntegral<unsigned int>();
+    info.dns1 = FDP->ConsumeIntegral<unsigned int>();
+    info.dns2 = FDP->ConsumeIntegral<unsigned int>();
+    info.serverAddress = FDP->ConsumeIntegral<unsigned int>();
+    info.leaseDuration = FDP->ConsumeIntegral<int>();
     (void)GetIpInfo(&info);
 }
 
-static void SetLowLatencyModeTest(const uint8_t* data, size_t size)
+static void SetLowLatencyModeTest()
 {
-    int enabled = 0;
-    if (size == 0) {
-        return;
-    }
-    enabled = static_cast<int>(data[0]);
+    int enabled = FDP->ConsumeIntegral<int>();
     (void)SetLowLatencyMode(enabled);
 }
 
-static void Get5GHzChannelListTest(const uint8_t* data, size_t size)
+static void Get5GHzChannelListTest()
 {
-    int result = 0;
-    int sizet = 0;
-    if (size >= TWO) {
-        int index = 0;
-        result = static_cast<int>(data[index++]);
-        sizet = static_cast<int>(data[index++]);
-    }
+    int result = FDP->ConsumeIntegral<int>();
+    int sizet = FDP->ConsumeIntegral<int>();
     (void)Get5GHzChannelList(&result, &sizet);
 }
 
-static void IsBandTypeSupportedTest(const uint8_t* data, size_t size)
+static void IsBandTypeSupportedTest()
 {
-    bool supported = true;
-    int bandType = static_cast<int>(data[0]);
+    bool supported =  FDP->ConsumeBool();
+    int bandType = FDP->ConsumeIntegral<int>();
     (void)IsBandTypeSupported(bandType, &supported);
 }
 
-static void IsRandomMacDisabledTest(const uint8_t* data, size_t size)
-{
-    bool isRandomMacDisabled = false;
-    if (size == 0) {
-        return;
-    }
-    isRandomMacDisabled = (static_cast<int>(data[0]) % TWO) ? true : false;
-    (void)IsRandomMacDisabled(&isRandomMacDisabled);
-}
-
-static void SetRandomMacDisabledTest(const uint8_t* data, size_t size)
-{
-    bool isRandomMacDisabled = false;
-    if (size == 0) {
-        return;
-    }
-    isRandomMacDisabled = (static_cast<int>(data[0]) % TWO) ? true : false;
-    (void)SetRandomMacDisabled(isRandomMacDisabled);
-}
 namespace OHOS {
 namespace Wifi {
-    bool WifiCDeviceFuzzerTest(const uint8_t* data, size_t size)
+    bool WifiCDeviceFuzzerTest()
     {
         EnableWifiTest();
         DisableWifiTest();
         EnableSemiWifiTest();
         ScanTest();
-        RemoveDeviceTest(data, size);
-        DisableDeviceConfigTest(data, size);
-        EnableDeviceConfigTest(data, size);
-        ConnectToTest(data, size);
+        RemoveDeviceTest();
+        DisableDeviceConfigTest();
+        EnableDeviceConfigTest();
+        ConnectToTest();
         DisconnectTest();
-        AddDeviceConfigTest(data, size);
-        AdvanceScanTest(data, size);
-        GetSignalLevelTest(data, size);
+        AddDeviceConfigTest();
+        AdvanceScanTest();
+        GetSignalLevelTest();
         (void)IsWifiActive();
-        GetScanInfoListTest(data, size);
-        GetDeviceConfigsTest(data, size);
-        ConnectToDeviceTest(data, size);
-        GetLinkedInfoTest(data, size);
-        GetDeviceMacAddressTest(data, size);
-        GetWifiDetailStateTest(data, size);
-        GetIpInfoTest(data, size);
-        SetLowLatencyModeTest(data, size);
-        Get5GHzChannelListTest(data, size);
-        IsBandTypeSupportedTest(data, size);
-        SetRandomMacDisabledTest(data, size);
-        IsRandomMacDisabledTest(data, size);
+        GetScanInfoListTest();
+        GetDeviceConfigsTest();
+        ConnectToDeviceTest();
+        GetLinkedInfoTest();
+        GetDeviceMacAddressTest();
+        GetWifiDetailStateTest();
+        GetIpInfoTest();
+        SetLowLatencyModeTest();
+        Get5GHzChannelListTest();
+        IsBandTypeSupportedTest();
         return true;
     }
 }  // namespace Wifi
@@ -352,7 +257,9 @@ namespace Wifi {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::Wifi::WifiCDeviceFuzzerTest(data, size);
+    FuzzedDataProvider fdp(data, size);
+    FDP = &fdp;
+    OHOS::Wifi::WifiCDeviceFuzzerTest();
     return 0;
 }
 

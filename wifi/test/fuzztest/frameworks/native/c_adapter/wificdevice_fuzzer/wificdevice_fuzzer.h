@@ -19,4 +19,5 @@
 #define FUZZ_PROJECT_NAME "wificdevice_fuzzer"
 
 #define TWO 2
+#define FOUR 4
 #endif

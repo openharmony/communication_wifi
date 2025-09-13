@@ -14,6 +14,7 @@
  */
 
 #include "wifiap_fuzzer.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -38,6 +39,8 @@ constexpr int TWO = 2;
 constexpr int THREE = 3;
 constexpr int U32_AT_SIZE_ZERO = 4;
 constexpr int SIX = 6;
+FuzzedDataProvider *FDP = nullptr;
+static const int32_t NUM_BYTES = 1;
 
 MockPendant *pMockPendant = new MockPendant();
 std::shared_ptr<ApService> pApService = std::make_shared<ApService>(pMockPendant->GetMockApStateMachine(),
@@ -125,14 +128,14 @@ void WifiApRootStateFuzzTest(const uint8_t* data, size_t size)
     pApRootState->ExecuteStateMsg(msg);
 }
 
-void BlockListAndStationFuzzTest(const uint8_t* data, size_t size)
+void BlockListAndStationFuzzTest()
 {
     StationInfo staInfo;
-    int index = 0;
-    staInfo.deviceName = std::string(reinterpret_cast<const char*>(data), size);
-    staInfo.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    staInfo.bssidType = static_cast<int>(data[index++]);
-    staInfo.ipAddr = std::string(reinterpret_cast<const char*>(data), size);
+    staInfo.deviceName = FDP->ConsumeBytesAsString(NUM_BYTES);
+    staInfo.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    staInfo.bssidType = FDP->ConsumeIntegral<int>();
+    staInfo.ipAddr = FDP->ConsumeBytesAsString(NUM_BYTES);
+ 
     pApStationsManager->AddBlockList(staInfo);
     pApStationsManager->DelBlockList(staInfo);
     pApStationsManager->StationJoin(staInfo);
@@ -323,6 +326,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::Wifi::FDP = &fdp;
     OHOS::Wifi::UpdateApChannelConfigFuzzTest(data, size);
     OHOS::Wifi::GetBestChannelFor2GFuzzTest(data, size);
     OHOS::Wifi::GetBestChannelFor5GFuzzTest(data, size);
@@ -332,8 +337,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::JudgeDbacWithP2pFuzzTest(data, size);
     OHOS::Wifi::GetIndoorChanByCountryCodeFuzzTest(data, size);
     OHOS::Wifi::GetPreferredChannelByBandFuzzTest(data, size);
+    OHOS::Wifi::BlockListAndStationFuzzTest();
     OHOS::Wifi::WifiApRootStateFuzzTest(data, size);
-    OHOS::Wifi::BlockListAndStationFuzzTest(data, size);
     OHOS::Wifi::EnableAllBlockListFuzzTest(data, size);
     OHOS::Wifi::StationLeaveFuzzTest(data, size);
     OHOS::Wifi::GetAllConnectedStationsFuzzTest(data, size);

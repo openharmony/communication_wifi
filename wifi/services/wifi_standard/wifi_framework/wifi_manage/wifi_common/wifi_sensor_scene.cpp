@@ -79,9 +79,8 @@ void WifiSensorScene::DealStaConnChanged(OperateResState state, const WifiLinked
         rssiCnt_ = 0;
         reportRssi_ = 0;
         connRssi_ = 0;
-        return;
     }
-    if (lastState_ == OperateResState::DISCONNECT_DISCONNECTED) {
+    if (lastState_ == OperateResState::DISCONNECT_DISCONNECTED && state == OperateResState::CONNECT_AP_CONNECTED) {
         connRssi_ = info.rssi;
         IsOutdoorScene() ? connScene_ = OUTDOOR_SCENE : connScene_ = INDOOR_SCENE;
     }

@@ -53,6 +53,9 @@ export function setUrl(want: Want): void {
 
 export function getUrl(): string {
   hilog.info(DOMAIN, TAG, '%{public}s', 'get url:' + extractDomain(url_));
+  if (extractDomain(url_) === 'Invalid URL') {
+    return 'Invalid URL';
+  }
   return url_;
 }
 

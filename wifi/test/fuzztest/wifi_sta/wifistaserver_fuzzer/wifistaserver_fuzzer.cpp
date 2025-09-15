@@ -551,12 +551,12 @@ void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
     std::string key = std::string(reinterpret_cast<const char*>(data), size);
 
     if (size >= sizeof(WifiLinkedInfo)) {
-        int index = 0;
-        info.networkId = static_cast<int>(data[index++]);
-        info.rssi = static_cast<int>(data[index++]);
-        info.band = static_cast<int>(data[index++]);
-        info.linkSpeed = static_cast<int>(data[index++]);
-        info.macType = static_cast<int>(data[index++]);
+        int indexInner = 0;
+        info.networkId = static_cast<int>(data[indexInner++]);
+        info.rssi = static_cast<int>(data[indexInner++]);
+        info.band = static_cast<int>(data[indexInner++]);
+        info.linkSpeed = static_cast<int>(data[indexInner++]);
+        info.macType = static_cast<int>(data[indexInner++]);
         info.ssid = std::string(reinterpret_cast<const char*>(data), size);
         info.bssid = std::string(reinterpret_cast<const char*>(data), size);
         info.macAddress = std::string(reinterpret_cast<const char*>(data), size);

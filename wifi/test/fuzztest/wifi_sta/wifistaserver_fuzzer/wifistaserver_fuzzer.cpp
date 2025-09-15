@@ -541,7 +541,13 @@ void SimAkaAuthFuzzTest(const uint8_t* data, size_t size)
 
 void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
 {
+    int index = 0;
+    int wifiStandard = static_cast<int>(data[index++]);
     WifiLinkedInfo info;
+    cJSON *root = cJSON_CreateObject();
+    if (root == NULL) {
+        return;
+    }
     std::string key = std::string(reinterpret_cast<const char*>(data), size);
 
     if (size >= sizeof(WifiLinkedInfo)) {
@@ -565,6 +571,10 @@ void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
     WifiSecurityDetect::GetInstance().IsSettingSecurityDetectOn();
     WifiSecurityDetect::GetInstance().UnRegisterSecurityDetectObserver();
     WifiSecurityDetect::GetInstance().AssembleUri(key);
+    WifiSecurityDetect::GetInstance().AuthenticationConvert(key);
+    WifiSecurityDetect::GetInstance().ConverWifiLinkInfoToJson(info, root);
+    WifiSecurityDetect::GetInstance().AddWifiStandardToJson(root, wifiStandard);
+    cJSON_Delete(root);
 }
 
 void SecurityDetectFuzzTest02(const uint8_t* data, size_t size)

@@ -62,7 +62,6 @@ ohos_fuzztest("WifiToolkitFuzzTest") {
     defines += [ "DTFUZZ_TEST" ]
   }
 
-
   sources = [
     "$WIFI_ROOT_DIR/base/utils/wifi_app_parser.cpp",
     "$WIFI_ROOT_DIR/base/utils/xml_parser.cpp",

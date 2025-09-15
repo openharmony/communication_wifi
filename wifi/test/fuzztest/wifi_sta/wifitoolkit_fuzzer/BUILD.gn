@@ -62,10 +62,6 @@ ohos_fuzztest("WifiToolkitFuzzTest") {
     defines += [ "DTFUZZ_TEST" ]
   }
 
-  if (wifi_feature_with_sta_asset) {
-    external_deps += [ "asset:asset_sdk" ]
-    defines += [ "SUPPORT_ClOUD_WIFI_ASSET" ]
-  }
 
   sources = [
     "$WIFI_ROOT_DIR/base/utils/wifi_app_parser.cpp",
@@ -98,6 +94,11 @@ ohos_fuzztest("WifiToolkitFuzzTest") {
     "netstack:http_client",
     "samgr:samgr_proxy",
   ]
+
+  if (wifi_feature_with_sta_asset) {
+    external_deps += [ "asset:asset_sdk" ]
+    defines += [ "SUPPORT_ClOUD_WIFI_ASSET" ]
+  }
 
   part_name = "wifi"
   subsystem_name = "communication"

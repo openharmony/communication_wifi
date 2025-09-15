@@ -62,6 +62,11 @@ ohos_fuzztest("WifiToolkitFuzzTest") {
     defines += [ "DTFUZZ_TEST" ]
   }
 
+  if (wifi_feature_with_sta_asset) {
+    external_deps += [ "asset:asset_sdk" ]
+    defines += [ "SUPPORT_ClOUD_WIFI_ASSET" ]
+  }
+
   sources = [
     "$WIFI_ROOT_DIR/base/utils/wifi_app_parser.cpp",
     "$WIFI_ROOT_DIR/base/utils/xml_parser.cpp",

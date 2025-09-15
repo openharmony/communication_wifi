@@ -362,6 +362,7 @@ public:
     private:
         bool HandleNetworkConnectionEvent(InternalMessagePtr msg);
         void DealApRoamingStateTimeout(InternalMessagePtr msg);
+        void DealWpaLinkFailEventInRoaming(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
 

@@ -1228,6 +1228,12 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
             "VerifyGetWifiPeersMacPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+
+    uint32_t passLen = config.GetPreSharedKey().length();
+    if (passLen < WIFI_P2P_PASSPHRASE_MIN_LEN || passLen > WIFI_P2P_PASSPHRASE_MAX_LEN) {
+        WIFI_LOGE("password is invalid");
+        return WIFI_OPT_P2P_INVALID_PASSWORD;
+    }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_HID2D_REQUEST);
 
     if (!IsP2pServiceRunning()) {

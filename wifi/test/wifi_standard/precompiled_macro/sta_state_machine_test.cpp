@@ -201,6 +201,12 @@ public:
         pStaStateMachine->pApRoamingState->DealApRoamingStateTimeout(msg);
     }
 
+    void DealWpaLinkFailEventInRoamingTest()
+    {
+        InternalMessagePtr msg = nullptr;
+        pStaStateMachine->pApRoamingState->DealWpaLinkFailEventInRoaming(msg);
+    }
+
     void SaveDhcpResultTest()
     {
         DhcpResult *dest = nullptr;
@@ -505,6 +511,12 @@ HWTEST_F(StaStateMachineTest, StartDetectTimerTest, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealApRoamingStateTimeoutTest, TestSize.Level1)
 {
     DealApRoamingStateTimeoutTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, DealWpaLinkFailEventInRoamingTest, TestSize.Level1)
+{
+    DealWpaLinkFailEventInRoamingTest();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 

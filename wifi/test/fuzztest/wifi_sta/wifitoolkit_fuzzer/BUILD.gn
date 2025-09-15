@@ -81,7 +81,6 @@ ohos_fuzztest("WifiToolkitFuzzTest") {
   ]
 
   external_deps = [
-    "asset:asset_sdk",
     "c_utils:utils",
     "cJSON:cjson",
     "dhcp:dhcp_sdk",

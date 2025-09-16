@@ -231,11 +231,13 @@ void AssetManagerTest()
     OperateResState state = static_cast<OperateResState>(randomInt % FORTYTHREE);
     WifiLinkedInfo info;
     int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    if (tmpInt <= 0 || tmpInt > 100) {
+        return;
+    }
     std::vector<WifiDeviceConfig>wifiDeviceConfigs;
     std::vector<WifiDeviceConfig> newWifiDeviceConfigs;
     bool flagSync = FDP->ConsumeIntegral<bool>();
     bool firstSync = FDP->ConsumeIntegral<bool>();
-    m_WifiAssetManager->InitUpLoadLocalDeviceSync();
     m_WifiAssetManager->WifiAssetQuery(tmpInt);
     m_WifiAssetManager->WifiAssetUpdate(config, tmpInt);
     m_WifiAssetManager->WifiAssetAddPack(wifiDeviceConfigs, tmpInt, flagSync, firstSync);

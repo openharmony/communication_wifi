@@ -1613,6 +1613,7 @@ void StaStateMachine::ApLinkedState::DealCsaChannelChanged(InternalMessagePtr ms
         return;
     }
     pStaStateMachine->linkedInfo.frequency = newFrq;
+    pStaStateMachine->DealSignalPollResult();
     // trigger wifi connection broadcast to notify sta channel has changed for p2penhance
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
 }

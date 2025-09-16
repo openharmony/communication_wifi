@@ -571,7 +571,6 @@ void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
     WifiSecurityDetect::GetInstance().IsSettingSecurityDetectOn();
     WifiSecurityDetect::GetInstance().UnRegisterSecurityDetectObserver();
     WifiSecurityDetect::GetInstance().AssembleUri(key);
-    // WifiSecurityDetect::GetInstance().AuthenticationConvert(key);
     WifiSecurityDetect::GetInstance().ConverWifiLinkInfoToJson(info, root);
     WifiSecurityDetect::GetInstance().AddWifiStandardToJson(root, wifiStandard);
     cJSON_Delete(root);

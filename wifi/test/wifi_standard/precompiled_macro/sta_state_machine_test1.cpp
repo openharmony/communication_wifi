@@ -212,6 +212,12 @@ void DealApRoamingStateTimeoutTest1()
     pStaStateMachine->pApRoamingState->DealApRoamingStateTimeout(msg);
 }
 
+void DealWpaLinkFailEventInRoamingTest1()
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    pStaStateMachine->pApRoamingState->DealWpaLinkFailEventInRoaming(msg);
+}
+
 void ApRoamingStateExeMsgSuccess1()
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();

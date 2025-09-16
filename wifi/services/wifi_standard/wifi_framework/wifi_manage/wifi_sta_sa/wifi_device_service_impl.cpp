@@ -213,7 +213,9 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
 
     if (m_instId == INSTID_WLAN0) {
         WifiManager::GetInstance().GetWifiTogglerManager()->StopWifiToggledTimer();
-        WifiManager::GetInstance().GetWifiTogglerManager()->StartSemiWifiToggledTimer();
+        if (WifiConfigCenter::GetInstance().GetAirplaneModeState() != MODE_STATE_OPEN) {
+            WifiManager::GetInstance().GetWifiTogglerManager()->StartSemiWifiToggledTimer();
+        }
     }
     return WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, m_instId);
 }

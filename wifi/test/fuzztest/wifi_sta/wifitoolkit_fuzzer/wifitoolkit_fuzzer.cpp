@@ -41,6 +41,7 @@ constexpr int U32_AT_SIZE_ZERO = 4;
 constexpr int WIFI_MAX_SSID_LEN = 16;
 constexpr int TWO = 2;
 constexpr int FORTYTHREE = 43;
+constexpr int HUNDRED = 100;
 static bool g_isInsted = false;
 FuzzedDataProvider *FDP = nullptr;
 static const int32_t NUM_BYTES = 1;
@@ -231,7 +232,7 @@ void AssetManagerTest()
     OperateResState state = static_cast<OperateResState>(randomInt % FORTYTHREE);
     WifiLinkedInfo info;
     int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
-    if (tmpInt <= 0 || tmpInt > 100) {
+    if (tmpInt <= 0 || tmpInt > HUNDRED) {
         return;
     }
     std::vector<WifiDeviceConfig>wifiDeviceConfigs;

@@ -26,7 +26,7 @@ HalDeviceManager::~HalDeviceManager()
  
 HalDeviceManager &HalDeviceManager::GetInstance()
 {
-    static HalDeviceManager instance; 
+    static HalDeviceManager instance;
     return instance;
 }
  

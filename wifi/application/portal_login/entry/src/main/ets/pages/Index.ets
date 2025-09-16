@@ -418,7 +418,13 @@ struct Index {
       hilog.info(DOMAIN, TAG, '%{public}s', 'on new want.');
       bindToNetById(this.context);
       this.webUrl = getUrl();
-      this.webviewController.loadUrl(this.webUrl);
+      try {
+        this.webviewController.loadUrl(this.webUrl);
+        hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + extractDomain(this.webUrl));
+      } catch (error) {
+        let err: BusinessError = error as BusinessError;
+        hilog.error(DOMAIN, TAG, '%{public}s', `Failed to load url. Code:${err.code}, message:${err.message}`);
+      }
     });
     if (settings.getValueSync(this.context, 'user_setup_complete', '0', settings.domainName.DEVICE_SHARED) === '0') {
         hilog.info(DOMAIN, TAG, '%{public}s', 'in oobe.');

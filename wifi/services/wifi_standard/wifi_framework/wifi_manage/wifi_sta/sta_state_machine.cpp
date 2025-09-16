@@ -209,7 +209,6 @@ ErrCode StaStateMachine::InitStaStateMachine()
         [this](const std::string &regCmd) { this->RegisterCustomEapCallback(regCmd); });
     NetEapObserver::GetInstance().SetReplyCustomEapDataCallback(
         [this](int result, const std::string &strEapData) { this->ReplyCustomEapDataCallback(result, strEapData); });
-    NetEapObserver::GetInstance().ReRegisterCustomEapCallback();
 #endif
 #endif
 
@@ -392,10 +391,11 @@ void StaStateMachine::ClosedState::StartWifiProcess()
     WIFI_LOGI("Register netsupplier %{public}d", pStaStateMachine->m_instId);
     WifiNetAgent::GetInstance().OnStaMachineWifiStart(pStaStateMachine->m_instId);
 #endif
-
+#ifdef EXTENSIBLE_AUTHENTICATION
+    NetEapObserver::GetInstance().ReRegisterCustomEapCallback();
+#endif
     pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
 }
-
 
 void StaStateMachine::ClosedState::StopWifiProcess()
 {

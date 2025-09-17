@@ -541,16 +541,22 @@ void SimAkaAuthFuzzTest(const uint8_t* data, size_t size)
 
 void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
 {
+    int index = 0;
+    int wifiStandard = static_cast<int>(data[index++]);
     WifiLinkedInfo info;
+    cJSON *root = cJSON_CreateObject();
+    if (root == NULL) {
+        return;
+    }
     std::string key = std::string(reinterpret_cast<const char*>(data), size);
 
     if (size >= sizeof(WifiLinkedInfo)) {
-        int index = 0;
-        info.networkId = static_cast<int>(data[index++]);
-        info.rssi = static_cast<int>(data[index++]);
-        info.band = static_cast<int>(data[index++]);
-        info.linkSpeed = static_cast<int>(data[index++]);
-        info.macType = static_cast<int>(data[index++]);
+        int indexInner = 0;
+        info.networkId = static_cast<int>(data[indexInner++]);
+        info.rssi = static_cast<int>(data[indexInner++]);
+        info.band = static_cast<int>(data[indexInner++]);
+        info.linkSpeed = static_cast<int>(data[indexInner++]);
+        info.macType = static_cast<int>(data[indexInner++]);
         info.ssid = std::string(reinterpret_cast<const char*>(data), size);
         info.bssid = std::string(reinterpret_cast<const char*>(data), size);
         info.macAddress = std::string(reinterpret_cast<const char*>(data), size);
@@ -565,6 +571,9 @@ void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
     WifiSecurityDetect::GetInstance().IsSettingSecurityDetectOn();
     WifiSecurityDetect::GetInstance().UnRegisterSecurityDetectObserver();
     WifiSecurityDetect::GetInstance().AssembleUri(key);
+    WifiSecurityDetect::GetInstance().ConverWifiLinkInfoToJson(info, root);
+    WifiSecurityDetect::GetInstance().AddWifiStandardToJson(root, wifiStandard);
+    cJSON_Delete(root);
 }
 
 void SecurityDetectFuzzTest02(const uint8_t* data, size_t size)

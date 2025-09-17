@@ -30,14 +30,22 @@
 #include "xml_parser.h"
 #include "softap_parser.h"
 #include "wifi_randommac_helper.h"
+#include "wifi_asset_manager.h"
+#include "wifi_encryption_util.h"
 #include <mutex>
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace Wifi {
 constexpr int U32_AT_SIZE_ZERO = 4;
 constexpr int WIFI_MAX_SSID_LEN = 16;
 constexpr int TWO = 2;
+constexpr int FORTYTHREE = 43;
+constexpr int HUNDRED = 100;
 static bool g_isInsted = false;
+FuzzedDataProvider *FDP = nullptr;
+static const int32_t NUM_BYTES = 1;
+
 
 class MockXmlParser : public XmlParser {
 public:
@@ -52,6 +60,7 @@ static std::unique_ptr<AppParser> m_appXmlParser = nullptr;
 static std::unique_ptr<MockXmlParser> m_xmlParser = nullptr;
 static std::unique_ptr<SoftapXmlParser> m_softapXmlParser = nullptr;
 static std::unique_ptr<WifiRandomMacHelper> m_WifiRandomMacHelper = nullptr;
+static std::unique_ptr<WifiAssetManager> m_WifiAssetManager = nullptr;
 
 void MyExit()
 {
@@ -216,18 +225,68 @@ void WifiRandomMacHelperTest(const uint8_t* data, size_t size)
     m_WifiRandomMacHelper->GenerateRandomMacAddressByLong(random, randomMacAddr);
 }
 
+void AssetManagerTest()
+{
+    WifiDeviceConfig config;
+    int32_t randomInt = FDP->ConsumeIntegral<int32_t>();
+    OperateResState state = static_cast<OperateResState>(randomInt % FORTYTHREE);
+    WifiLinkedInfo info;
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    if (tmpInt <= 0 || tmpInt > HUNDRED) {
+        return;
+    }
+    std::vector<WifiDeviceConfig>wifiDeviceConfigs;
+    std::vector<WifiDeviceConfig> newWifiDeviceConfigs;
+    bool flagSync = FDP->ConsumeIntegral<bool>();
+    bool firstSync = FDP->ConsumeIntegral<bool>();
+    m_WifiAssetManager->WifiAssetQuery(tmpInt);
+    m_WifiAssetManager->WifiAssetUpdate(config, tmpInt);
+    m_WifiAssetManager->WifiAssetAddPack(wifiDeviceConfigs, tmpInt, flagSync, firstSync);
+    m_WifiAssetManager->WifiAssetUpdatePack(wifiDeviceConfigs, tmpInt);
+    m_WifiAssetManager->WifiAssetRemovePack(wifiDeviceConfigs, tmpInt, flagSync);
+    m_WifiAssetManager->WifiAssetRemoveAll(tmpInt, flagSync);
+    m_WifiAssetManager->IsWifiConfigUpdated(newWifiDeviceConfigs, config);
+    m_WifiAssetManager->WifiAssetRemoveAll(tmpInt, flagSync);
+    m_WifiAssetManager->IsWifiConfigUpdated(newWifiDeviceConfigs, config);
+    m_WifiAssetManager->DealStaConnChanged(state, info, tmpInt);
+}
+
+void WifiencryptionutilTest()
+{
+    WifiEncryptionInfo wifiEncryptionInfo;
+    EncryptedData encryptedData;
+    std::string decryptedData = FDP->ConsumeBytesAsString(NUM_BYTES);
+    std::string key = FDP->ConsumeBytesAsString(NUM_BYTES);
+    std::string inputString = FDP->ConsumeBytesAsString(NUM_BYTES);
+    std::string keyName = FDP->ConsumeBytesAsString(NUM_BYTES);
+    std::string data = FDP->ConsumeBytesAsString(NUM_BYTES);
+    std::vector<uint8_t> outPlant;
+    SetUpHks();
+    WifiDecryption(wifiEncryptionInfo, encryptedData, decryptedData);
+    ImportKey(wifiEncryptionInfo, key);
+    DeleteKey(wifiEncryptionInfo);
+    WifiLoopEncrypt(wifiEncryptionInfo, inputString, encryptedData);
+    WifiLoopDecrypt(wifiEncryptionInfo, encryptedData, decryptedData);
+    WifiGenerateMacRandomizationSecret(keyName, data, outPlant);
+}
+
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
+    FuzzedDataProvider fdp(data, size);
+    OHOS::Wifi::FDP = &fdp;
     OHOS::Wifi::InitParam();
     OHOS::Wifi::NetworkXmlParserTest(data, size);
     OHOS::Wifi::AppXmlParserTest(data, size);
     OHOS::Wifi::AppParserTest(data, size);
     OHOS::Wifi::SoftapParserTest(data, size);
     OHOS::Wifi::WifiRandomMacHelperTest(data, size);
+    OHOS::Wifi::WifiencryptionutilTest();
+    OHOS::Wifi::AssetManagerTest();
     return 0;
 }
 }

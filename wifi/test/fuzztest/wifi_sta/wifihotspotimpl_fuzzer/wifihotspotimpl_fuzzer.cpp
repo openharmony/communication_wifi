@@ -19,7 +19,6 @@
 #include "wifi_hotspot_service_impl.h"
 #include "wifi_hotspot_mgr_stub.h"
 #include "wifi_hotspot_mgr_service_impl.h"
-#include "wifi_hotspot_service_impl.h"
 #include "wifi_log.h"
 #include "wifi_global_func.h"
 #include "wifi_channel_helper.h"
@@ -38,7 +37,6 @@ constexpr int IPADDR_SEG_ZERO = 0;
 constexpr int IPADDR_SEG_ONE = 1;
 constexpr int IPADDR_SEG_TWO = 2;
 constexpr int IPADDR_SEG_THREE = 3;
-constexpr int DATA_SIZE_MIN = 1;
 static bool g_isInsted = false;
 std::shared_ptr<WifiHotspotServiceImpl> pWifiHotspotServiceImpl = std::make_shared<WifiHotspotServiceImpl>();
 std::shared_ptr<WifiHotspotMgrServiceImpl> pWifiHotspotMgrServiceImpl = std::make_shared<WifiHotspotMgrServiceImpl>();
@@ -165,9 +163,6 @@ void IsValidHotspotConfigFuzzTest(const uint8_t* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    if ((data == NULL) || (size < DATA_SIZE_MIN)) {
-        return 0;
-    }
     FuzzedDataProvider fdp(data, size);
     OHOS::Wifi::FDP = &fdp;
     OHOS::Wifi::TransRandomToRealMacFuzzTest(data, size);

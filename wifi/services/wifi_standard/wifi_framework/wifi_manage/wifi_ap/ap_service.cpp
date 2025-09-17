@@ -70,6 +70,8 @@ ErrCode ApService::EnableHotspot()
             break;
         }
         m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT));
+        m_ApStateMachine.StartTimer(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT_TIMEOUT),
+            START_HOTSPOT_TIMEOUT);
         return ErrCode::WIFI_OPT_SUCCESS;
     } while (0);
     WIFI_LOGI("Ap disabled, set softap toggled false");
@@ -80,8 +82,6 @@ ErrCode ApService::EnableHotspot()
         WIFI_LOGE("StopAp not going well.");
     }
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT));
-    m_ApStateMachine.StartTimer(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT_TIMEOUT),
-        START_HOTSPOT_TIMEOUT);
     return WIFI_OPT_FAILED;
 }
 

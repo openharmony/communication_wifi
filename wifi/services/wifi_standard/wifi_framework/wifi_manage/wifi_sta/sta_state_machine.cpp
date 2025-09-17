@@ -884,6 +884,16 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     } else { //connecting to another network while already connected
         pStaStateMachine->mPortalUrl = "";
         pStaStateMachine->StopDhcp(true, true);
+        // Update net supplier info to disable network
+#ifndef OHOS_ARCH_LITE
+    if (pStaStateMachine->NetSupplierInfo != nullptr) {
+        pStaStateMachine->NetSupplierInfo->isAvailable_ = false;
+        pStaStateMachine->NetSupplierInfo->ident_ = "";
+        WIFI_LOGI("On disconnect update net supplier info\n");
+        WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(pStaStateMachine->NetSupplierInfo,
+            pStaStateMachine->m_instId);
+    }
+#endif
         pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
             pStaStateMachine->linkedInfo);
@@ -1048,15 +1058,6 @@ void StaStateMachine::StopDhcp(bool isStopV4, bool isStopV6)
         IpV6Info ipV6Info;
         WifiConfigCenter::GetInstance().SaveIpV6Info(ipV6Info, m_instId);
     }
-    
-#ifndef OHOS_ARCH_LITE
-    if (NetSupplierInfo != nullptr) {
-        NetSupplierInfo->isAvailable_ = false;
-        NetSupplierInfo->ident_ = "";
-        WIFI_LOGI("On disconnect update net supplier info\n");
-        WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(NetSupplierInfo, m_instId);
-    }
-#endif
     HandlePostDhcpSetup();
 }
 
@@ -1134,6 +1135,16 @@ void StaStateMachine::SeparatedState::GoInState()
     pStaStateMachine->StopDhcp(true, true);
     pStaStateMachine->isRoam = false;
     pStaStateMachine->mPortalUrl = "";
+    // Update net supplier info to disable network
+#ifndef OHOS_ARCH_LITE
+    if (pStaStateMachine->NetSupplierInfo != nullptr) {
+        pStaStateMachine->NetSupplierInfo->isAvailable_ = false;
+        pStaStateMachine->NetSupplierInfo->ident_ = "";
+        WIFI_LOGI("On disconnect update net supplier info\n");
+        WifiNetAgent::GetInstance().OnStaMachineUpdateNetSupplierInfo(pStaStateMachine->NetSupplierInfo,
+            pStaStateMachine->m_instId);
+    }
+#endif
     /* Callback result to InterfaceService. */
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED, pStaStateMachine->linkedInfo);

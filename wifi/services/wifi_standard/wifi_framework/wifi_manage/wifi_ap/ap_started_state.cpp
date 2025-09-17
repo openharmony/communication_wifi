@@ -146,8 +146,8 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
     WIFI_LOGI("set softap config with param, id=%{public}d", m_id);
     ApConfigUse::GetInstance().UpdateApChannelConfig(apConfig);
     {
-        std::unique_lock<std::mutex> lock(enhanceServiceMutex_);
 #ifndef OHOS_ARCH_LITE
+        std::unique_lock<std::mutex> lock(enhanceServiceMutex_);
         if ((apConfig.GetBandWidth() == AP_BANDWIDTH_160 ||
                 (apConfig.GetChannel() >= CHANNEL50 && apConfig.GetChannel() <= CHANNEL144))) {
             if (enhanceService_ != nullptr && enhanceService_->GetDfsControlData().enableAidfs_) {

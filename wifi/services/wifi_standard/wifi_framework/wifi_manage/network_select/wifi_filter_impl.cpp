@@ -451,6 +451,14 @@ bool NotCurrentNetworkFilter::Filter(NetworkCandidate &networkCandidate)
         networkCandidate.filtedReason[filterName].insert(FiltedReason::SAME_BSSID);
         return false;
     }
+
+    if ((networkCandidate.interScanInfo.ssid == linkedInfo.ssid) &&
+        NetworkSelectionUtils::IsConfigOpenOrEapType(networkCandidate)) {
+        WIFI_LOGI("NotCurrentNetworkFilter, same ssid and open or eap type:%{public}s",
+            networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::SAME_SSID_OPENOREAP);
+        return false;
+    }
     return true;
 }
 

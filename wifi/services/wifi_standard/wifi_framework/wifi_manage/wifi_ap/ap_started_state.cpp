@@ -337,7 +337,7 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
 
 void ApStartedState::ProcessCmdEnableApTimeout(InternalMessagePtr msg) const
 {
-    if (WifiConfigCenter::GetInstance().GetHotspotState(m_id) == static_cast<int>(ApState::AP_STATE_STARTED)){
+    if (WifiConfigCenter::GetInstance().GetHotspotState(m_id) == static_cast<int>(ApState::AP_STATE_STARTED)) {
         WIFI_LOGI("Current state is AP_STATE_STARTED, no need deal CMD_START_HOTSPOT_TIMEOUT.");
         return;
     }

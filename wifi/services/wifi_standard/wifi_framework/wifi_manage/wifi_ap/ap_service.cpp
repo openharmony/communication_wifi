@@ -81,7 +81,7 @@ ErrCode ApService::EnableHotspot()
     }
     m_ApStateMachine.SendMessage(static_cast<int>(ApStatemachineEvent::CMD_STOP_HOTSPOT));
     m_ApStateMachine.StartTimer(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT_TIMEOUT),
-    START_HOTSPOT_TIMEOUT);
+        START_HOTSPOT_TIMEOUT);
     return WIFI_OPT_FAILED;
 }
 

@@ -923,7 +923,11 @@ ErrCode WifiDeviceServiceImpl::EnableDeviceConfig(int networkId, bool attemptEna
     }
 
     if (!IsStaServiceRunning()) {
-        return WIFI_OPT_STA_NOT_OPENED;
+        int uid = 0;
+        CheckCallingUid(uid);
+        if (!IsWifiBrokerProcess(uid)) {
+            return WIFI_OPT_STA_NOT_OPENED;
+        }
     }
 
     if (networkId < 0) {

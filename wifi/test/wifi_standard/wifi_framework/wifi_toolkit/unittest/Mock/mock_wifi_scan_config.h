@@ -56,6 +56,8 @@ public:
     virtual void RemoveWifiCategoryRecord(const std::string bssid) = 0;
     virtual void RecordHilinkAbility(const std::string &bssid, int isSupportHilink) = 0;
     virtual bool GetHilinkAbility(const std::string &bssid) = 0;
+    virtual int SaveExternalScanInfoList(const std::vector<WifiScanInfo> &results) = 0;
+    virtual int GetExternalScanInfoList(std::vector<WifiScanInfo> &results) = 0;
 };
 
 class WifiScanConfig : public MockWifiScanConfig {
@@ -90,6 +92,8 @@ public:
     MOCK_METHOD1(RemoveWifiCategoryRecord, void(const std::string bssid));
     MOCK_METHOD2(RecordHilinkAbility, void(const std::string &bssid, int isSupportHilink));
     MOCK_METHOD1(GetHilinkAbility, bool(const std::string &bssid));
+    MOCK_METHOD1(SaveExternalScanInfoList, int(const std::vector<WifiScanInfo> &results));
+    MOCK_METHOD1(GetExternalScanInfoList, int(std::vector<WifiScanInfo> &results));
 };
 }  // namespace OHOS
 }  // namespace Wifi

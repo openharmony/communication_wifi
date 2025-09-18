@@ -43,6 +43,9 @@
 #endif
 #include "wifi_global_func.h"
 #include "wifi_sensor_scene.h"
+#ifdef EXTENSIBLE_AUTHENTICATION
+#include "net_eap_observer.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -754,6 +757,9 @@ void WifiServiceScheduler::DispatchWifiOpenRes(OperateResState state, int instId
         if (pWifiProService != nullptr) {
             pWifiProService->OnWifiStateOpen(static_cast<int>(state));
         }
+#endif
+#ifdef EXTENSIBLE_AUTHENTICATION
+        NetEapObserver::GetInstance().OnWifiStateOpen(static_cast<int>(state));
 #endif
         return;
     }

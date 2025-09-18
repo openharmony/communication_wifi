@@ -29,9 +29,9 @@ public:
     static void TearDownTestCase() {}
     virtual void SetUp()
     {
-       wifiIntelligenceStateMachine_ = std::make_unique<WifiIntelligenceStateMachine>();
+        wifiIntelligenceStateMachine_ = std::make_unique<WifiIntelligenceStateMachine>();
         defaultState_ = std::make_unique<WifiIntelligenceStateMachine::DefaultState>(
-            wifiIntelligenceStateMachine_.get()); 
+            wifiIntelligenceStateMachine_.get());
     }
     virtual void TearDown() {}
 public:

@@ -209,7 +209,6 @@ ErrCode StaStateMachine::InitStaStateMachine()
         [this](const std::string &regCmd) { this->RegisterCustomEapCallback(regCmd); });
     NetEapObserver::GetInstance().SetReplyCustomEapDataCallback(
         [this](int result, const std::string &strEapData) { this->ReplyCustomEapDataCallback(result, strEapData); });
-    NetEapObserver::GetInstance().ReRegisterCustomEapCallback();
 #endif
 #endif
 
@@ -395,7 +394,6 @@ void StaStateMachine::ClosedState::StartWifiProcess()
 
     pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
 }
-
 
 void StaStateMachine::ClosedState::StopWifiProcess()
 {

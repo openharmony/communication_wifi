@@ -175,7 +175,9 @@ ErrCode WifiTogglerManager::ScanOnlyToggled(int isOpen)
 
 ErrCode WifiTogglerManager::AirplaneToggled(int isOpen)
 {
-    pWifiControllerMachine->SendMessage(CMD_AIRPLANE_TOGGLED, isOpen);
+    if (pWifiControllerMachine) {
+        pWifiControllerMachine->SendMessage(CMD_AIRPLANE_TOGGLED, isOpen);
+    }
     return WIFI_OPT_SUCCESS;
 }
 

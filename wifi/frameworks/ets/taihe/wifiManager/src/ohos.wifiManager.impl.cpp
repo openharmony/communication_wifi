@@ -57,21 +57,6 @@ bool IsWifiActive()
     return static_cast<ani_boolean>(activeStatus);
 }
 
-::ohos::wifiManager::WifiLinkedInfo GetLinkedInfoSync()
-{
-    WifiLinkedInfo linkedInfo;
-    if (g_wifiDevicePtr == nullptr) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-        ::ohos::wifiManager::WifiLinkedInfo errorResult = MakeWifiLinkedInfo(linkedInfo);
-        return errorResult;
-    }
-    ErrCode ret = g_wifiDevicePtr->GetLinkedInfo(linkedInfo);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
-    }
-    return MakeWifiLinkedInfo(linkedInfo);
-}
-
 int GetSignalLevel(int rssi, int band)
 {
     int level = -1;
@@ -886,6 +871,21 @@ bool GetScanAlwaysAllowed()
     return isScanAlwaysAllowed;
 }
 
+::ohos::wifiManager::WifiLinkedInfo GetLinkedInfoSync()
+{
+    WifiLinkedInfo linkedInfo;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        ::ohos::wifiManager::WifiLinkedInfo errorResult = MakeWifiLinkedInfo(linkedInfo);
+        return errorResult;
+    }
+    ErrCode ret = g_wifiDevicePtr->GetLinkedInfo(linkedInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return MakeWifiLinkedInfo(linkedInfo);
+}
+
 int32_t AddDeviceConfigSync(::ohos::wifiManager::WifiDeviceConfig const& config)
 {
     int32_t networkId = -1;
@@ -1651,7 +1651,6 @@ void OffP2pDiscoveryChange(::taihe::optional_view<::taihe::callback<void(int)>> 
 
 TH_EXPORT_CPP_API_IsConnected(IsConnected);
 TH_EXPORT_CPP_API_IsWifiActive(IsWifiActive);
-TH_EXPORT_CPP_API_GetLinkedInfoSync(GetLinkedInfoSync);
 TH_EXPORT_CPP_API_GetSignalLevel(GetSignalLevel);
 TH_EXPORT_CPP_API_GetIpInfo(GetIpInfo);
 TH_EXPORT_CPP_API_GetIpv6Info(GetIpv6Info);
@@ -1707,6 +1706,9 @@ TH_EXPORT_CPP_API_Get5GChannelList(Get5GChannelList);
 TH_EXPORT_CPP_API_StartScan(StartScan);
 TH_EXPORT_CPP_API_GetDisconnectedReason(GetDisconnectedReason);
 TH_EXPORT_CPP_API_GetScanAlwaysAllowed(GetScanAlwaysAllowed);
+TH_EXPORT_CPP_API_GetLinkedInfoSync(GetLinkedInfoSync);
+TH_EXPORT_CPP_API_GetLinkedInfoReturnsPromise(GetLinkedInfoSync);
+TH_EXPORT_CPP_API_GetLinkedInfoWithCallback(GetLinkedInfoSync);
 TH_EXPORT_CPP_API_AddDeviceConfigSync(AddDeviceConfigSync);
 TH_EXPORT_CPP_API_AddDeviceConfigReturnsPromise(AddDeviceConfigSync);
 TH_EXPORT_CPP_API_AddDeviceConfigWithCallback(AddDeviceConfigSync);

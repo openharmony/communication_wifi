@@ -308,9 +308,10 @@ void WifiChannelHelper::UpdateValidChannels(std::vector<int32_t> &supp2Gfreqs, s
     }
 }
 
-void WifiChannelHelper::FilterDfsChannel(std::vector<int> &channels)
+void WifiChannelHelper::FilterDfsChannel(std::vector<int> &channels, bool force)
 {
-    if (WifiConfigCenter::GetInstance().GetDfsControlData().enableDfs_ == 1 || channels.empty()) {
+    if ((WifiConfigCenter::GetInstance().GetDfsControlData().enableDfs_ == 1 && !force)
+        || channels.empty()) {
         return;
     }
     for (auto it = channels.begin(); it != channels.end();) {

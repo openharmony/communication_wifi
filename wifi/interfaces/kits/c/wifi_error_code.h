@@ -71,6 +71,8 @@ typedef enum {
     ERROR_P2P_GROUP_NOT_AVAILABLE = -200,
     /* sta and p2p mac is same */
     ERROR_P2P_AND_STA_MAC_SAME = -201,
+    /* invalid p2p password */
+    ERROR_P2P_INVALID_PASSWORD = -202,
 } WifiErrorCode;
 
 #endif // WIFI_ERROR_CODE_C_H

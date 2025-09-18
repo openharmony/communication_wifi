@@ -52,6 +52,7 @@ enum ErrCode {
     WIFI_OPT_USER_DOES_NOT_RESPOND,   /* user does not respond */
     WIFI_OPT_USER_REFUSE_THE_ACTION,  /* user refuse the action */
     WIFI_OPT_INVALID_PARAM_NEW,       /* invalid params since API-18 */
+    WIFI_OPT_P2P_INVALID_PASSWORD,    /* invalid p2p password */
 };
 }  // namespace Wifi
 }  // namespace OHOS

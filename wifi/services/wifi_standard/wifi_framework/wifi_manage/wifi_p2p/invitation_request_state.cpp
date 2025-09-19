@@ -20,6 +20,8 @@ DEFINE_WIFILOG_P2P_LABEL("InvitationRequestState");
 
 namespace OHOS {
 namespace Wifi {
+constexpr int INVITE_REQ_TIMEOUT = 55 * 1000;
+
 InvitationRequestState::InvitationRequestState(
     P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr, WifiP2pDeviceManager &deviceMgr)
     : State("InvitationRequestState"), p2pStateMachine(stateMachine), groupManager(groupMgr), deviceManager(deviceMgr)
@@ -32,6 +34,8 @@ void InvitationRequestState::GoInState()
         if (deviceManager.UpdateDeviceStatus(
             p2pStateMachine.savedP2pConfig.GetDeviceAddress(), P2pDeviceStatus::PDS_INVITED)) {
             WIFI_LOGE("UpdateDeviceStatus failed.");
+            p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_INVITE_REQ_TIMEOUT),
+                INVITE_REQ_TIMEOUT);
             return;
         }
 
@@ -41,12 +45,15 @@ void InvitationRequestState::GoInState()
         WIFI_LOGE("Invitation failed.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_FAILED);
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
+        p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_INVITE_REQ_TIMEOUT),
+            INVITE_REQ_TIMEOUT);
     }
 }
 
 void InvitationRequestState::GoOutState()
 {
     WIFI_LOGI("             GoOutState");
+    p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_INVITE_REQ_TIMEOUT));
 }
 
 bool InvitationRequestState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -79,6 +86,11 @@ bool InvitationRequestState::ExecuteStateMsg(InternalMessagePtr msg)
         }
         case P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE: {
             p2pStateMachine.DelayMessage(msg);
+            p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
+            break;
+        }
+        case P2P_STATE_MACHINE_CMD::P2P_INVITE_REQ_TIMEOUT: {
+            WifiP2PHalInterface::GetInstance().CancelConnect();
             p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
             break;
         }

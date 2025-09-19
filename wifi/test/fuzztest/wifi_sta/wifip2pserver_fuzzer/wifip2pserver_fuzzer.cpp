@@ -36,6 +36,7 @@ constexpr int U32_AT_SIZE_ZERO = 4;
 static bool g_isInsted = false;
 static std::unique_ptr<P2pInterface> pP2pInterface = nullptr;
 static std::unique_ptr<WifiP2pGroupManager> pWifiP2pGroupManager = nullptr;
+static std::unique_ptr<WifiP2pService> pWifiP2pService = nullptr;
 IP2pServiceCallbacks mP2pCallback;
 
 void MyExit()
@@ -250,6 +251,9 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     pWifiP2pGroupManager->AddMacAddrPairInfo(type, group);
     pWifiP2pGroupManager->SetCurrentGroup(type, group);
     pWifiP2pGroupManager->RemoveMacAddrPairInfo(type, group);
+    pWifiP2pGroupManager->AddOrUpdateGroup(group);
+    pWifiP2pService->EnableP2p();
+    pWifiP2pService->DisableP2p();
 }
 
 /* Fuzzer entry point */

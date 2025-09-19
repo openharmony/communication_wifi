@@ -417,7 +417,8 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    if (WifiConfigCenter::GetInstance().GetWifiToggledEnable(INSTID_WLAN1) == WIFI_STATE_ENABLED) {
+    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(INSTID_WLAN1);
+    if (staState == WifiOprMidState::RUNNING) {
         WIFI_LOGI("SetWifiToggledState DISABLED");
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED, INSTID_WLAN1);
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, 1);

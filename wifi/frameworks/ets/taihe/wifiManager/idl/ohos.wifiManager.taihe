@@ -83,23 +83,23 @@ struct WifiScanInfo {
     ssid: String;
     bssid: String;
     securityType: WifiSecurityType;
-    rssi: f64;
-    band: f64;
+    rssi: i32;
+    band: i32;
     supportedWifiCategory: WifiCategory;
 }
 
 struct WifiLinkedInfo {
     ssid: String;
     bssid: String;
-    rssi: f64;
-    band: f64;
+    rssi: i32;
+    band: i32;
     macAddress: String;
     connState: ConnState;
     supportedWifiCategory: WifiCategory;
 }
 
 struct IpInfo {
-    ipAddress: f64;
+    ipAddress: i32;
 }
 
 struct Ipv6Info {
@@ -113,7 +113,7 @@ struct StationInfo {
 struct HotspotConfig {
     ssid: String;
     securityType: WifiSecurityType;
-    band: f64;
+    band: i32;
     preSharedKey: String;
 }
 
@@ -134,7 +134,7 @@ struct WifiP2pDevice {
     deviceAddressType: DeviceAddressType;
     primaryDeviceType: String;
     deviceStatus: P2pDeviceStatus;
-    groupCapabilities: f64;
+    groupCapabilities: i32;
 }
 
 // 函数
@@ -145,7 +145,7 @@ function IsWifiActive(): bool;
 @gen_promise("getLinkedInfo")
 function GetLinkedInfoSync(): WifiLinkedInfo;
 
-function GetSignalLevel(rssi: f64, band: f64): f64;
+function GetSignalLevel(rssi: i32, band: i32): i32;
 function GetIpInfo(): IpInfo;
 function GetIpv6Info(): Ipv6Info;
 function IsOpenSoftApAllowed(): bool;

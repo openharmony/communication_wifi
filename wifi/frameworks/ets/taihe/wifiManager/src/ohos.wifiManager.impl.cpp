@@ -104,7 +104,7 @@ bool IsWifiActive()
     return MakeWifiLinkedInfo(linkedInfo);
 }
 
-double GetSignalLevel(double rssi, double band)
+int GetSignalLevel(int rssi, int band)
 {
     int level = -1;
     int tmpRssi = static_cast<int>(rssi);

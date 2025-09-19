@@ -239,7 +239,6 @@ void AssetManagerTest()
     std::vector<WifiDeviceConfig> newWifiDeviceConfigs;
     bool flagSync = FDP->ConsumeIntegral<bool>();
     bool firstSync = FDP->ConsumeIntegral<bool>();
-    m_WifiAssetManager->WifiAssetQuery(tmpInt);
     m_WifiAssetManager->WifiAssetUpdate(config, tmpInt);
     m_WifiAssetManager->WifiAssetAddPack(wifiDeviceConfigs, tmpInt, flagSync, firstSync);
     m_WifiAssetManager->WifiAssetUpdatePack(wifiDeviceConfigs, tmpInt);

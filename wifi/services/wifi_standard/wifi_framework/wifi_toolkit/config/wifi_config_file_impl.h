@@ -363,6 +363,10 @@ int WifiConfigFileImpl<T>::LoadConfig()
         LOGE("File name is empty.");
         return -1;
     }
+    if (!std::filesystem::exists(mFileName)) {
+        LOGE("Loading config file: %{public}s, fs.exists() failed!", mFileName.c_str());
+        return 0;
+    }
     std::ifstream fs(mFileName.c_str());
     if (!fs.is_open()) {
         LOGE("Loading config file: %{public}s, fs.is_open() failed!", mFileName.c_str());

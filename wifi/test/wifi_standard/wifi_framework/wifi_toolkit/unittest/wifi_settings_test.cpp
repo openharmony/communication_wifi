@@ -797,7 +797,7 @@ HWTEST_F(WifiSettingsTest, FindWifiBlockListConfigTest, TestSize.Level1)
     EXPECT_EQ(result, false);
 }
  
-HWTEST_F(WifiSettingsTest, FindWifiWhiteListConfigTest, TestSize.Level1)
+HWTEST_F(WifiSettingsTest, FindWifiWhiteListConfigTest00, TestSize.Level1)
 {
     WIFI_LOGI("FindWifiWhiteListConfigTest enter!");
     WifiRestrictedInfo info;
@@ -809,7 +809,7 @@ HWTEST_F(WifiSettingsTest, FindWifiWhiteListConfigTest, TestSize.Level1)
     EXPECT_EQ(result, true);
 }
 
-HWTEST_F(WifiSettingsTest, FindWifiWhiteListConfigTest, TestSize.Level1)
+HWTEST_F(WifiSettingsTest, FindWifiWhiteListConfigTest01, TestSize.Level1)
 {
     WifiRestrictedInfo info;
     info.ssid = "whiteTest2";

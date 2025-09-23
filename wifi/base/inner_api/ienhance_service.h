@@ -338,6 +338,13 @@ public:
      * @return bool - operation result
      */
     virtual bool CheckScanInfo(bool isGetScanInfoList, int uid = 0) = 0;
+
+    /**
+     * @Description check is in action listen
+     *
+     * @return true: in action listen, false: not in action listen
+     */
+    virtual bool IsInActionListenState() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

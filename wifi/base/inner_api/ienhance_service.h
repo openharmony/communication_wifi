@@ -340,6 +340,13 @@ public:
     virtual bool CheckScanInfo(bool isGetScanInfoList, int uid = 0) = 0;
 
     /**
+     * @Description get ipv6 control ability
+     *
+     * @return Ipv6ControlData Ipv6 data info
+     */
+    virtual Ipv6ControlData GetIpv6ControlData() = 0;
+    
+    /**
      * @Description check is in action listen
      *
      * @return true: in action listen, false: not in action listen

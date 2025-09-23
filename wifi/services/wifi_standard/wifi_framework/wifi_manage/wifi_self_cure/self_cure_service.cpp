@@ -244,6 +244,13 @@ bool SelfCureService::NotifyIpv6FailureDetected()
         return false;
     }
 
+    int currentRssi = linkedInfo.rssi;
+    // Check if RSSI is too low
+    if (currentRssi < MIN_VAL_LEVEL_3_5) {
+        WIFI_LOGI("RSSI too low (%{public}d), ignore IPv6 failure", currentRssi);
+        return false;
+    }
+
     // Check if the system supports IPv6 self-cure functionality
     if (!SelfCureUtils::GetInstance().IsIpv6SelfCureSupported()) {
         WIFI_LOGI("IPv6 self-cure not supported, ignore IPv6 failure");

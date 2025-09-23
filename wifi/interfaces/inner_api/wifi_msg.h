@@ -1154,6 +1154,12 @@ struct DfsControlData {
     uint32_t enableAidfs_ = ENABLE_AIDFS;
     uint32_t enableDfs_ = 1;
 };
+
+struct Ipv6ControlData {
+    bool enableIpv6SelfCure = true;
+    int txPacketThreshold = 3;
+    int failCountThreshold = 3;
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

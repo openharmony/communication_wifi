@@ -348,6 +348,13 @@ public:
      * @return bool - operation result
      */
     virtual bool CheckScanInfo(bool isGetScanInfoList, int uid = 0) = 0;
+
+    /**
+     * @Description get ipv6 control ability
+     *
+     * @return Ipv6ControlData Ipv6 data info
+     */
+    virtual Ipv6ControlData GetIpv6ControlData() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

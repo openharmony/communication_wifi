@@ -428,59 +428,41 @@ function StartScan(): void;
 function GetDisconnectedReason(): DisconnectedReason;
 function GetScanAlwaysAllowed(): bool;
 
+@gen_async("getLinkedInfo")
+@gen_promise("getLinkedInfo")
 function GetLinkedInfoSync(): WifiLinkedInfo;
-@static_overload("getLinkedInfo")
-@promise function GetLinkedInfoReturnsPromise(): WifiLinkedInfo;
-@static_overload("getLinkedInfo")
-@async function GetLinkedInfoWithCallback(): WifiLinkedInfo;
 
+@gen_async("addDeviceConfig")
+@gen_promise("addDeviceConfig")
 function AddDeviceConfigSync(config: WifiDeviceConfig): i32;
-@static_overload("addDeviceConfig")
-@promise function AddDeviceConfigReturnsPromise(config: WifiDeviceConfig): i32;
-@static_overload("addDeviceConfig")
-@async function AddDeviceConfigWithCallback(config: WifiDeviceConfig): i32;
 
+@gen_async("getP2pPeerDevices")
+@gen_promise("getP2pPeerDevices")
 function GetP2pPeerDevicesSync(): Array<WifiP2pDevice>;
-@static_overload("getP2pPeerDevices")
-@promise function GetP2pPeerDevicesReturnsPromise(): Array<WifiP2pDevice>;
-@static_overload("getP2pPeerDevices")
-@async function GetP2pPeerDevicesWithCallback(): Array<WifiP2pDevice>;
 
+@gen_async("getP2pLinkedInfo")
+@gen_promise("getP2pLinkedInfo")
 function GetP2pLinkedInfoSync(): WifiP2pLinkedInfo;
-@static_overload("getP2pLinkedInfo")
-@promise function GetP2pLinkedInfoReturnsPromise(): WifiP2pLinkedInfo;
-@static_overload("getP2pLinkedInfo")
-@async function GetP2pLinkedInfoWithCallback(): WifiP2pLinkedInfo;
 
+@gen_async("addCandidateConfig")
+@gen_promise("addCandidateConfig")
 function AddCandidateConfigSync(config: WifiDeviceConfig): i32;
-@static_overload("addCandidateConfig")
-@promise function AddCandidateConfigReturnsPromise(config: WifiDeviceConfig): i32;
-@static_overload("addCandidateConfig")
-@async function AddCandidateConfigWithCallback(config: WifiDeviceConfig): i32;
 
+@gen_async("removeCandidateConfig")
+@gen_promise("removeCandidateConfig")
 function RemoveCandidateConfigSync(networkId: i32): void;
-@static_overload("removeCandidateConfig")
-@promise function RemoveCandidateConfigReturnsPromise(networkId: i32): void;
-@static_overload("removeCandidateConfig")
-@async function RemoveCandidateConfigWithCallback(networkId: i32): void;
 
+@gen_async("getP2pLocalDevice")
+@gen_promise("getP2pLocalDevice")
 function GetP2pLocalDeviceSync(): WifiP2pDevice;
-@static_overload("getP2pLocalDevice")
-@promise function GetP2pLocalDeviceReturnsPromise(): WifiP2pDevice;
-@static_overload("getP2pLocalDevice")
-@async function GetP2pLocalDeviceWithCallback(): WifiP2pDevice;
 
+@gen_async("getP2pGroups")
+@gen_promise("getP2pGroups")
 function GetP2pGroupsSync(): Array<WifiP2pGroupInfo>;
-@static_overload("getP2pGroups")
-@promise function GetP2pGroupsReturnsPromise(): Array<WifiP2pGroupInfo>;
-@static_overload("getP2pGroups")
-@async function GetP2pGroupsWithCallback(): Array<WifiP2pGroupInfo>;
 
+@gen_async("getCurrentGroup")
+@gen_promise("getCurrentGroup")
 function GetCurrentGroupSync(): WifiP2pGroupInfo;
-@static_overload("getCurrentGroup")
-@promise function GetCurrentGroupReturnsPromise(): WifiP2pGroupInfo;
-@static_overload("getCurrentGroup")
-@async function GetCurrentGroupWithCallback(): WifiP2pGroupInfo;
 
 function OnWifiStateChange(callback: (data: i32) => void): void;
 function OffWifiStateChange(callback: Optional<(data: i32) => void>): void;

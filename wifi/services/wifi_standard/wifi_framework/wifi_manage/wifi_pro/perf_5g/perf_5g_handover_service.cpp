@@ -509,7 +509,6 @@ void Perf5gHandoverService::StopMonitor()
 void Perf5gHandoverService::ActiveScan(int32_t rssi)
 {
     if (pWifiScanController_ == nullptr) {
-        WIFI_LOGE("ActiveScan, pWifiScanController_ is nullptr");
         return;
     }
     bool needScanInMonitor = false;

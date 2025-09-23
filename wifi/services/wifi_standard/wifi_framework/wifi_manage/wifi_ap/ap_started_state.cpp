@@ -392,6 +392,7 @@ void ApStartedState::ProcessCmdUpdateCountryCode(InternalMessagePtr msg) const
     if (wifiCountryCode.empty() ||
         strncasecmp(wifiCountryCode.c_str(), m_wifiCountryCode.c_str(), WIFI_COUNTRY_CODE_LEN) == 0) {
         WIFI_LOGI("wifi country code is same or empty, code=%{public}s", wifiCountryCode.c_str());
+        WifiChannelHelper::GetInstance().UpdateValidFreqs();
         return;
     }
     WifiErrorNo ret = WifiApHalInterface::GetInstance().SetWifiCountryCode(

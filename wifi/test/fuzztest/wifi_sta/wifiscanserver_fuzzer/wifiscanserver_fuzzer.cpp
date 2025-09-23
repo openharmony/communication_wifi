@@ -261,7 +261,6 @@ void AllowExternScanByForbidFuzzTest(const uint8_t* data, size_t size)
     int appId = static_cast<int>(data[0]);
     int state = static_cast<int>(data[0]);
     int frequency = static_cast<int>(data[0]);
-    int listenChannel = static_cast<int>(data[0]);
     int delaySeconds = static_cast<int>(data[0]);
     int lastStaFreq = static_cast<int>(data[0]);
     int p2pFreq = static_cast<int>(data[0]);

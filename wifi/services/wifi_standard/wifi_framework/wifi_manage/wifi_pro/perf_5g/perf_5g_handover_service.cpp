@@ -30,6 +30,7 @@
 #include "network_black_list_manager.h"
 #include "wifi_common_util.h"
 #include "wifi_global_func.h"
+#include "wifi_config_center.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -191,13 +192,20 @@ std::string Perf5gHandoverService::Switch5g()
         selectRelationAp_.reset();
         return "";
     }
+    WifiLinkedInfo linkedInfoWlan1;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfoWlan1, 1);
+    if (linkedInfoWlan1.networkId != INVALID_NETWORK_ID && selectRelationAp_->apInfo.bssid == linkedInfoWlan1.bssid) {
+        WIFI_LOGI("Switch5g : TarAp is wlan1.");
+        selectRelationAp_.reset();
+        return "";
+    }
     IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst();
     if (pStaService == nullptr) {
         WIFI_LOGE("Switch5g: pStaService is invalid");
+        selectRelationAp_.reset();
         return "";
     }
     int32_t ret;
- 
     WIFI_LOGI("Switch5g StartConnectToBssid. bssid(%{public}s)", MacAnonymize(selectRelationAp_->apInfo.bssid).data());
     ret = pStaService->StartConnectToBssid(
         selectRelationAp_->apInfo.networkId, selectRelationAp_->apInfo.bssid, NETWORK_SELECTED_BY_AUTO);

@@ -104,7 +104,6 @@ void InitParam()
 
 void NetworkXmlParserTest(const uint8_t* data, size_t size)
 {
-    root_node = nullptr;
     WifiDeviceConfig config;
     config.ssid = std::string(reinterpret_cast<const char*>(data), size);
     config.bssid = std::string(reinterpret_cast<const char*>(data), size);
@@ -120,7 +119,7 @@ void NetworkXmlParserTest(const uint8_t* data, size_t size)
     m_networkXmlParser->ParseProxyConfig(root_node);
     m_networkXmlParser->HasWepKeys(config);
     m_networkXmlParser->GetKeyMgmt(root_node, config);
-    m_networkXmlParser->GetRandMacSetting(root_node);
+    m_networkXmlParser->GetRandMacSetting(nullptr);
     m_networkXmlParser->ParseWifiConfig(root_node);
     m_networkXmlParser->ParseNetworkStatus(root_node, config);
     m_networkXmlParser->ParseWepKeys(root_node, config);
@@ -239,6 +238,7 @@ void AssetManagerTest()
     std::vector<WifiDeviceConfig> newWifiDeviceConfigs;
     bool flagSync = FDP->ConsumeIntegral<bool>();
     bool firstSync = FDP->ConsumeIntegral<bool>();
+    m_WifiAssetManager->WifiAssetQuery(tmpInt);
     m_WifiAssetManager->WifiAssetUpdate(config, tmpInt);
     m_WifiAssetManager->WifiAssetAddPack(wifiDeviceConfigs, tmpInt, flagSync, firstSync);
     m_WifiAssetManager->WifiAssetUpdatePack(wifiDeviceConfigs, tmpInt);

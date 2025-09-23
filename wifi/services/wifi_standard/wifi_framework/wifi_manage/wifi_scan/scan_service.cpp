@@ -180,26 +180,6 @@ void ScanService::P2pEnhanceStateChange(const std::string &ifName, int32_t state
     }
 }
 
-void ScanService::RegisterP2pEnhanceActionListenCallback()
-{
-    P2pEnhanceActionListenCallback p2pEnhanceActionListenChangeCallback = [this](int listenChannel) {
-        this->P2pEnhanceActionListenChange(listenChannel);
-    };
-    if (mEnhanceService == nullptr) {
-        WIFI_LOGE("%{public}s, get mEnhanceService failed!", __FUNCTION__);
-        return;
-    }
-    ErrCode ret = mEnhanceService->RegisterP2pEnhanceActionListenCallback(
-        WIFI_SERVICE_SCAN, p2pEnhanceActionListenChangeCallback);
-    WIFI_LOGI("%{public}s, result %{public}d.", __FUNCTION__, ret);
-}
-
-void ScanService::P2pEnhanceActionListenChange(int listenChannel)
-{
-    WIFI_LOGI("%{public}s, listenChannel %{public}d.", __FUNCTION__, listenChannel);
-    WifiConfigCenter::GetInstance().SetP2pEnhanceActionListenChannel(listenChannel);
-}
-
 void ScanService::RegisterScanCallbacks(const IScanSerivceCallbacks &iScanSerivceCallbacks)
 {
     mScanSerivceCallbacks = iScanSerivceCallbacks;
@@ -218,7 +198,6 @@ void ScanService::HandleScanStatusReport(ScanStatusReport &scanStatusReport)
         case SCAN_STARTED_STATUS: {
             CHECK_NULL_AND_RETURN_NULL(pScanStateMachine)
             RegisterP2pEnhanceCallback();
-            RegisterP2pEnhanceActionListenCallback();
             scanStartedFlag = true;
             /* Pno scan maybe has started, stop it first. */
             pScanStateMachine->SendMessage(CMD_STOP_PNO_SCAN);
@@ -2784,7 +2763,7 @@ bool ScanService::AllowScanByHid2dState()
 bool ScanService::AllowScanByActionListen()
 {
 #ifdef SUPPORT_SCAN_CONTROL_ACTION_LISTEN
-    if (WifiConfigCenter::GetInstance().GetP2pEnhanceActionListenChannel() != 0) {
+    if (mEnhanceService != nullptr && mEnhanceService->IsInActionListenState()) {
         RecordScanLimitInfo(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
             ScanLimitType::ACTION_LISTEN);
         WIFI_LOGW("Scan is not allowed in ActionListen condition.");

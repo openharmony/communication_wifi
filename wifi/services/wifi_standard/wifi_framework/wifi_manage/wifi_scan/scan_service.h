@@ -139,9 +139,6 @@ public:
 
     void P2pEnhanceStateChange(const std::string &ifName, int32_t state, int32_t frequency);
 
-    void RegisterP2pEnhanceActionListenCallback();
-
-    void P2pEnhanceActionListenChange(int listenChannel);
     /**
      * @Description Start a complete Wi-Fi scan.
      *

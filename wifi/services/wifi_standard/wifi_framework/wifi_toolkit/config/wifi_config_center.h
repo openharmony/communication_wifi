@@ -236,10 +236,6 @@ public:
 
     int GetP2pEnhanceState();
 
-    int SetP2pEnhanceActionListenChannel(int channel);
-
-    int GetP2pEnhanceActionListenChannel();
-
     int SetP2pEnhanceFreq(int freq);
 
     int GetP2pEnhanceFreq();

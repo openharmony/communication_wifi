@@ -293,6 +293,16 @@ HWTEST_F(WifiProStateMachineTest, ProcessSwitchResultTest02, TestSize.Level1)
     EXPECT_EQ(pWifiProStateMachine_->isWifi2WifiSwitching_, false);
 }
 
+HWTEST_F(WifiProStateMachineTest, IsKeepCurrWifiConnectedExtralTest01, TestSize.Level1)
+{
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.networkId = 1;
+    linkedInfo.connState = ConnState::CONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+    EXPECT_EQ(pWifiProStateMachine_->IsKeepCurrWifiConnectedExtral(), true);
+}
+
 HWTEST_F(WifiProStateMachineTest, TryNoNetSwitchTest, TestSize.Level1)
 {
     NetworkSelectionResult networkSelectionResult;

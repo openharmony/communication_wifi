@@ -49,12 +49,20 @@ void GetGroupUidFuzzerTest(const uint8_t *data, size_t size)
     pShareManager.GetGroupUid(callingUid);
 }
 
+void IpPoolFuzzerTest(const uint8_t *data, size_t size)
+{
+    IpPool pIpPool;
+    std::string gcMac;
+    pIpPool.ReleaseIpPool();
+}
+
 void WifiHid2dServiceUtilsFuzzerTest(const uint8_t *data, size_t size)
 {
     ClearSharedLinkCountFuzzerTest(data, size);
     IncreaseSharedLinkFuzzerTest(data, size);
     IncreaseSharedLinkFuzzerTest1(data, size);
     GetGroupUidFuzzerTest(data, size);
+    IpPoolFuzzerTest(data, size);
 }
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)

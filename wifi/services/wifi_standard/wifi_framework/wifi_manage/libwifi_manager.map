@@ -96,8 +96,6 @@
         "OHOS::Wifi::WifiConfigCenter::GetP2pEnhanceState()";
         "OHOS::Wifi::WifiConfigCenter::SetLastConnStaFreq(int)";
         "OHOS::Wifi::WifiConfigCenter::GetLastConnStaFreq()";
-        "OHOS::Wifi::WifiConfigCenter::SetP2pEnhanceActionListenChannel(int)";
-        "OHOS::Wifi::WifiConfigCenter::GetP2pEnhanceActionListenChannel()";
         "OHOS::Wifi::WifiConfigCenter::SetP2pEnhanceFreq(int)";
         "OHOS::Wifi::WifiConfigCenter::GetP2pEnhanceFreq()";
         "OHOS::Wifi::WifiConfigCenter::GetP2pMidState()";

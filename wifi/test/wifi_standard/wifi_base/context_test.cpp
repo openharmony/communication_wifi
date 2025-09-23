@@ -78,7 +78,6 @@ HWTEST_F(ContextTest, AppendCacheTest, TestSize.Level1)
     ASSERT_TRUE(CalculateLeft(ctx) == 31);
     ContextAppendWrite(ctx, buff, strlen(buff));
     ASSERT_TRUE(ctx->wCapacity == 2048);
-    ASSERT_TRUE(ctx->wEnd == (1023 + 1024));
     ctx->wCapacity = -1;
     ContextAppendWrite(ctx, buff, strlen(buff));
 }

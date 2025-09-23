@@ -381,9 +381,14 @@ void StaInterfaceFuzzTest(const uint8_t* data, size_t size)
     FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
     FilterBuilder filterBuilder = [](auto &compositeWifiFilter) {};
     AppExecFwk::AppStateData appData;
+    std::vector<WifiRestrictedInfo> wifiRestrictedInfoList;
     pStaInterface->RegisterAutoJoinCondition(conditionName, []() {return true;});
     pStaInterface->RegisterFilterBuilder(filterTag, filterName, filterBuilder);
     pStaInterface->HandleForegroundAppChangedAction(appData);
+    #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    pStaInterface->SetWifiRestrictedList(wifiRestrictedInfoList);
+    pStaInterface->ReconnectByMdm();
+    #endif
 }
 
 void RegisterStaServiceCallbackTest(const uint8_t* data, size_t size)

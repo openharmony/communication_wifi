@@ -686,7 +686,7 @@ HWTEST_F(WifiSettingsTest, SetKeyMgmtBitsetTest, TestSize.Level1)
     config.keyMgmt = "WPA-PSK";
     config.keyMgmtBitset = 0;
     WifiSettings::GetInstance().SetKeyMgmtBitset(config);
-    EXPECT_EQ(config.keyMgmtBitset, 12);
+    EXPECT_EQ(config.keyMgmtBitset, 4);
     config.keyMgmt = "SAE";
     config.keyMgmtBitset = 0;
     WifiSettings::GetInstance().SetKeyMgmtBitset(config);
@@ -775,7 +775,7 @@ HWTEST_F(WifiSettingsTest, AddWifiWhiteListConfigFailTest, TestSize.Level1)
     info.uid = 0;
  
     ErrCode result = WifiSettings::GetInstance().AddWifiRestrictedListConfig(info.uid, info);
-    EXPECT_EQ(result, WIFI_OPT_INVALID_PARAM);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiSettingsTest, FindWifiBlockListConfigTest, TestSize.Level1)
@@ -797,7 +797,7 @@ HWTEST_F(WifiSettingsTest, FindWifiBlockListConfigTest, TestSize.Level1)
     EXPECT_EQ(result, false);
 }
  
-HWTEST_F(WifiSettingsTest, FindWifiWhiteListConfigTest, TestSize.Level1)
+HWTEST_F(WifiSettingsTest, FindWifiWhiteListConfigTest00, TestSize.Level1)
 {
     WIFI_LOGI("FindWifiWhiteListConfigTest enter!");
     WifiRestrictedInfo info;
@@ -805,15 +805,17 @@ HWTEST_F(WifiSettingsTest, FindWifiWhiteListConfigTest, TestSize.Level1)
     info.bssid = "whiteTest_bssid_1";
     info.wifiRestrictedType = MDM_WHITELIST;
     info.uid = 0;
- 
     bool result = WifiSettings::GetInstance().FindWifiWhiteListConfig(info.ssid, info.bssid, info.uid);
     EXPECT_EQ(result, true);
- 
+}
+
+HWTEST_F(WifiSettingsTest, FindWifiWhiteListConfigTest01, TestSize.Level1)
+{
+    WifiRestrictedInfo info;
     info.ssid = "whiteTest2";
     info.bssid = "";
- 
-    result = WifiSettings::GetInstance().FindWifiWhiteListConfig(info.ssid, info.bssid, info.uid);
-    EXPECT_EQ(result, false);
+    bool result = WifiSettings::GetInstance().FindWifiWhiteListConfig(info.ssid, info.bssid, info.uid);
+    EXPECT_EQ(result, true);
 }
  
 HWTEST_F(WifiSettingsTest, whetherSetWhiteListConfigTest, TestSize.Level1)

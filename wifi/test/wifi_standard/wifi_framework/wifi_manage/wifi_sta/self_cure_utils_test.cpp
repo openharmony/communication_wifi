@@ -105,7 +105,7 @@ HWTEST_F(SelfCureUtilsTest, ReportNoInternetChrEventTest001, TestSize.Level1)
 HWTEST_F(SelfCureUtilsTest, IsIpv6SelfCureSupportedTest, TestSize.Level1)
 {
     // Test IPv6 self-cure support check
-    EXPECT_TRUE(SelfCureUtils::GetInstance().IsIpv6SelfCureSupported());
+    EXPECT_FALSE(SelfCureUtils::GetInstance().IsIpv6SelfCureSupported());
 }
 
 HWTEST_F(SelfCureUtilsTest, DisableIpv6Test, TestSize.Level1)

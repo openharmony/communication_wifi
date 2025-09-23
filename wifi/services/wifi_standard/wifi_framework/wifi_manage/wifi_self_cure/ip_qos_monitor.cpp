@@ -133,7 +133,24 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
 void IpQosMonitor::HandleIpv6TcpPktsResp(const std::vector<int64_t> &elems)
 {
     WIFI_LOGD("enter %{public}s", __FUNCTION__);
-    bool ipv6InternetGood = ParseIpv6NetworkInternetGood(elems);
+    Ipv6ControlData controlData;
+    controlData.enableIpv6SelfCure = true;
+    controlData.txPacketThreshold = MIN_DELTA_TCP_TX;
+    controlData.failCountThreshold = IPV6_FAILURE_THRESHOLD;
+#ifndef OHOS_ARCH_LITE
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s: pEnhanceService is null", __FUNCTION__);
+    } else {
+        controlData = pEnhanceService->GetIpv6ControlData();
+    }
+#endif
+    if (!controlData.enableIpv6SelfCure) {
+        WIFI_LOGD("IPv6 self cure is disabled by EnhanceService");
+        return;
+    }
+
+    bool ipv6InternetGood = ParseIpv6NetworkInternetGood(elems, controlData.txPacketThreshold);
     if (ipv6InternetGood) {
         mIpv6FailedCounter = 0;
         WIFI_LOGD("IPv6 connection is good, reset failed counter");
@@ -152,7 +169,7 @@ void IpQosMonitor::HandleIpv6TcpPktsResp(const std::vector<int64_t> &elems)
     }
     
     // Notify SelfCure service when IPv6 fails 3 times consecutively
-    if (mIpv6FailedCounter >= IPV6_FAILURE_THRESHOLD) {
+    if (mIpv6FailedCounter >= controlData.failCountThreshold) {
         ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(mInstId);
         if (pSelfCureService == nullptr) {
             WIFI_LOGE("%{public}s: pSelfCureService is null", __FUNCTION__);
@@ -237,7 +254,7 @@ bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
     return true;
 }
 
-bool IpQosMonitor::ParseIpv6NetworkInternetGood(const std::vector<int64_t> &elems)
+bool IpQosMonitor::ParseIpv6NetworkInternetGood(const std::vector<int64_t> &elems, int32_t txPacketThreshold)
 {
     WIFI_LOGD("enter %{public}s", __FUNCTION__);
     
@@ -286,7 +303,7 @@ bool IpQosMonitor::ParseIpv6NetworkInternetGood(const std::vector<int64_t> &elem
     mLastIpv6TcpRxCounter = tcpRxPkts;
     
     if (deltaTcpRxPkts == 0) {
-        if (deltaTcpTxPkts >= MIN_DELTA_TCP_TX) {
+        if (deltaTcpTxPkts >= txPacketThreshold) {
             WIFI_LOGI("%{public}s IPv6 internetGood: false", __FUNCTION__);
             return false;
         }

@@ -14,7 +14,7 @@
  */
 
 export namespace wifiManager {
-    loadLibrary("wifimanager_ani.z");
+    loadLibraryWithPermissionCheck("wifimanager_ani.z", "@ohos.wifiManager");
     export native function isWifiActive(): boolean;
 }
 

@@ -269,6 +269,7 @@ private:
     bool InLandscapeSwitchLimitList();
     bool IsAllowScan(bool hasSwitchRecord);
     bool IsFirstConnectAndNonet();
+    bool IsKeepCurrWifiConnectedExtral();
 };
 } // namespace Wifi
 } // namespace OHOS

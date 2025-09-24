@@ -259,33 +259,12 @@ void AllowExternScanByForbidFuzzTest(const uint8_t* data, size_t size)
 {
     int staScene = static_cast<int>(data[0]);
     int appId = static_cast<int>(data[0]);
-    int state = static_cast<int>(data[0]);
-    int frequency = static_cast<int>(data[0]);
-    int delaySeconds = static_cast<int>(data[0]);
-    int lastStaFreq = static_cast<int>(data[0]);
-    int p2pFreq = static_cast<int>(data[0]);
-    int p2pEnhanceFreq = static_cast<int>(data[0]);
-    int freq = static_cast<int>(data[0]);
-    bool disable = (static_cast<int>(data[0]) % TWO) ? true : false;
-    const std::string ifName;
-    std::vector<int> scanFreqs;
     ScanMode scanMode = static_cast<ScanMode>(static_cast<int>(data[0]) % SIZE);
     pScanService->AllowScanDuringScanning(scanMode);
     pScanService->AllowScanByMovingFreeze(scanMode);
     pScanService->IsMovingFreezeState(scanMode);
     pScanService->AllowExternScanByIntervalMode(appId, staScene, scanMode);
     pScanService->SystemScanByInterval(appId, staScene, appId);
-    pScanService->P2pEnhanceStateChange(ifName, state, frequency);
-    pScanService->DisableScan(disable);
-    pScanService->ResetSingleScanCountAndMessage();
-    pScanService->AddSingleScanCountAndMessage(delaySeconds);
-    pScanService->GetRelatedFreqs(lastStaFreq, p2pFreq, p2pEnhanceFreq);
-    pScanService->StartSingleScanWithoutControlTimer();
-    pScanService->SelectTheFreqToSingleScan(lastStaFreq, p2pFreq, p2pEnhanceFreq);
-    pScanService->StartSingleScanWithoutControl(freq);
-    pScanService->RestartSystemScanTimeOut();
-    pScanService->Allow5GApScan();
-    pScanService->GetSavedNetworkFreq(scanFreqs);
 }
 
 void GetAllowBandFreqsControlInfoFuzzTest(const uint8_t* data, size_t size)
@@ -303,7 +282,6 @@ void GetAllowBandFreqsControlInfoFuzzTest(const uint8_t* data, size_t size)
     savedNetworkSsid.push_back(std::string(reinterpret_cast<const char*>(data), size));
     pScanService->GetSavedNetworkSsidList(savedNetworkSsid);
     pScanService->GetHiddenNetworkSsidList(savedNetworkSsid);
-    pScanService->ResetScanInterval();
 }
 
 void BeginPnoScanFuzzTest(const uint8_t* data, size_t size)

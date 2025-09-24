@@ -50,6 +50,7 @@ constexpr int32_t WIFI_PRO_DETECT_TIMEOUT = 16 * 1000;  // ms
 constexpr int64_t MAX_INTERVAL_TIME = 120 * 1000 * 1000;
 constexpr int64_t SCREEN_ON_DURATIONSECS = 30 * 1000 * 1000;
 constexpr int64_t DEFAULT_SCAN_INTERVAL_TIME = 20 * 1000 * 1000;
+constexpr int64_t POOR5G_SWITCH_2GTHRESHOLD = -76;
 // show reason
 std::map<WifiSwitchReason, std::string> g_switchReason = {
     {WIFI_SWITCH_REASON_NO_INTERNET, "NO_INTERNET"},
@@ -181,6 +182,33 @@ bool WifiProStateMachine::IsKeepCurrWifiConnected()
     }
 #endif
 
+    return false;
+}
+
+bool WifiProStateMachine::IsKeepCurrWifiConnectedExtral()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.networkId == INVALID_NETWORK_ID) {
+        WIFI_LOGE("IsKeepCurrWifiConnectedExtral : disconnected.");
+        return true;
+    }
+
+    if (wifiSwitchReason_ == WIFI_SWITCH_REASON_POOR_RSSI && linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) &&
+        networkSelectionResult_.interScanInfo.band == static_cast<int>(BandType::BAND_2GHZ)) {
+        if (linkedInfo.rssi >= POOR5G_SWITCH_2GTHRESHOLD) {
+            WIFI_LOGI("IsKeepCurrWifiConnectedExtral : cur5g rssi %{public}d, tar2.4g.", linkedInfo.rssi);
+            return true;
+        }
+    }
+
+    WifiLinkedInfo linkedInfoWlan1;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfoWlan1, 1);
+    if (linkedInfoWlan1.networkId != INVALID_NETWORK_ID &&
+        networkSelectionResult_.interScanInfo.bssid == linkedInfoWlan1.bssid) {
+        WIFI_LOGI("IsKeepCurrWifiConnectedExtral : TarAp is wlan1.");
+        return true;
+    }
     return false;
 }
 
@@ -442,7 +470,7 @@ bool WifiProStateMachine::IsSatisfiedWifi2WifiCondition()
         return false;
     }
 
-    if (IsKeepCurrWifiConnected()) {
+    if (IsKeepCurrWifiConnected() || IsKeepCurrWifiConnectedExtral()) {
         return false;
     }
 

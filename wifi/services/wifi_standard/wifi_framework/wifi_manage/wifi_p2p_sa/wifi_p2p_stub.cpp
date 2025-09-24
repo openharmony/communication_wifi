@@ -20,6 +20,7 @@
 #include "wifi_p2p_death_recipient.h"
 #include "wifi_common_def.h"
 #include "wifi_manager_service_ipc_interface_code.h"
+#include "ipc_skeleton.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pStub");
 
@@ -775,8 +776,8 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             WIFI_LOGI("create new `WifiP2pCallbackProxy`!");
         }
 
-        int pid = data.ReadInt32();
-        int tokenId = data.ReadInt32();
+        int pid = GetCallingPid();
+        int tokenId = IPCSkeleton::GetCallingTokenID();
         int eventNum = data.ReadInt32();
         std::vector<std::string> event;
         if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {

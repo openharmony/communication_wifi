@@ -28,9 +28,24 @@ enum SettingsDialogClickType {
 using P2pEnhanceCallback = std::function<void(const std::string &, int32_t, int32_t)>;
 using P2pEnhanceActionListenCallback = std::function<void(int)>;
 using SensorEnhanceCallback = std::function<void(int)>;
+using MovementEnhanceCallback = std::function<void(int32_t movementType, int32_t movementValue)>;
 class IEnhanceService {
 public:
     virtual ~IEnhanceService() = default;
+     /**
+     * @Description Register MovementEnhance state Callback
+     * @param name - registrant name
+     * @param movementEnhanceCallback - callback
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RegisterMovementEnhanceCallback(MovementEnhanceCallback callback) = 0;
+
+    /**
+     * @Description Unregister Movement state Callback
+     * @param name - registrant name
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode UnRegisterMovementEnhanceCallback() = 0;
     /**
      * @Description  Enhance service initialization function.
      *

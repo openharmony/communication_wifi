@@ -411,6 +411,20 @@ void OnRegisterCallBackFuzzTest()
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REGISTER_CALLBACK), datas);
 }
 
+void OnGetSupportedFeaturesFuzzTest()
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES),
+        datas, reply, option);
+}
+
 void OnSetP2pDeviceNameFuzzTest()
 {
     MessageParcel datas;

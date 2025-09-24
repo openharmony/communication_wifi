@@ -114,7 +114,6 @@
                 "image_framework",
                 "init",
                 "ipc",
-                "movement",
                 "napi",
                 "netmanager_base",
                 "netmanager_ext",

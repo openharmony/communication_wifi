@@ -32,6 +32,7 @@
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
 #include "telephony_observer.h"
 #endif
+#include "ienhance_service.h"
 namespace OHOS {
 namespace Wifi {
 #ifdef HAS_POWERMGR_PART
@@ -40,6 +41,9 @@ inline const std::string COMMON_EVENT_POWER_MANAGER_STATE_CHANGED = "usual.event
 const int CAST_ENGINE_SA_ID = 65546;
 const int SHARE_SERVICE_ID = 2902;
 const int MOUSE_CROSS_SERVICE_ID = 65569;
+constexpr int32_t MOVEMENT_TYPE_STILL = 4;
+constexpr int32_t MOVEMENT_TYPE_STAY = 14;
+constexpr int32_t MOVEMENT_VALUE_ENTER = 1;
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 inline const std::string COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED = "usual.event.ASSET_SYNC_DATA_CHANGED_SA";
 const int ASSETID = 6226;
@@ -183,9 +187,6 @@ private:
     void InitSubscribeListener();
     void HandleAppMgrServiceChange(bool add);
     void HandleCommNetConnManagerSysChange(int systemAbilityId, bool add);
-#ifdef HAS_MOVEMENT_PART
-    void HandleHasMovementPartChange(int systemAbilityId, bool add);
-#endif
     void HandleEthernetServiceChange(int systemAbilityId, bool add);
     void HandleDistributedKvDataServiceChange(bool add);
     void HandleCastServiceChange(bool add);
@@ -214,10 +215,10 @@ private:
     void GetMdmProp();
     void RegisterMdmPropListener();
     static void MdmPropChangeEvt(const char *key, const char *value, void *context);
-#ifdef HAS_MOVEMENT_PART
-    void RegisterMovementCallBack();
-    void UnRegisterMovementCallBack();
-#endif
+    void RegisterMovementEnhanceCallback();
+    void UnRegisterMovementEnhanceCallback();
+    void OnMovementChanged(int32_t movementType, int32_t movementValue);
+    void HandleMovementChange();
 #ifdef FEATURE_P2P_SUPPORT
     void HandleP2pBusinessChange(int systemAbilityId, bool add);
 #endif
@@ -264,9 +265,8 @@ private:
     std::shared_ptr<WifiScanEventChangeSubscriber> wifiScanEventChangeSubscriber_ = nullptr;
     std::shared_ptr<SettingsEnterSubscriber> settingsEnterSubscriber_ = nullptr;
     std::shared_ptr<DataShareReadySubscriber> dataShareReadySubscriber_ = nullptr;
-#ifdef HAS_MOVEMENT_PART
-    std::mutex deviceMovementEventMutex;
-#endif
+    std::unique_ptr<WifiEventHandler> movementChangeEventHandler_ = nullptr; 
+    IEnhanceService *mEnhanceService;                /* EnhanceService handle */
     static bool mIsMdmForbidden;
     bool islocationModeObservered = false;
     std::mutex locationEventMutex;

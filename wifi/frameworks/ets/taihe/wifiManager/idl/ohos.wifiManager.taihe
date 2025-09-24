@@ -15,7 +15,7 @@
  
 @!namespace("@ohos.wifiManager", "wifiManager")
 @!sts_inject("""
-static { loadLibrary("wifiManager_taihe_native.z")}
+static { loadLibraryWithPermissionCheck("wifiManager_taihe_native.z", "@ohos.wifiManager")}
 """)
 enum WifiSecurityType: i32 {
     WIFI_SEC_TYPE_INVALID = 0,

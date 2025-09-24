@@ -143,6 +143,7 @@ ohos_unittest("wifi_scan_unittest") {
   external_deps = [
     "ability_base:want",
     "ability_base:zuri",
+    "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:ability_manager",
     "ability_runtime:app_context",
     "ability_runtime:app_manager",

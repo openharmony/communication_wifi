@@ -389,9 +389,14 @@ void ApStartedState::ProcessCmdDisconnectStation(InternalMessagePtr msg) const
 void ApStartedState::ProcessCmdUpdateCountryCode(InternalMessagePtr msg) const
 {
     std::string wifiCountryCode = msg->GetStringFromMessage();
-    if (wifiCountryCode.empty() ||
-        strncasecmp(wifiCountryCode.c_str(), m_wifiCountryCode.c_str(), WIFI_COUNTRY_CODE_LEN) == 0) {
-        WIFI_LOGI("wifi country code is same or empty, code=%{public}s", wifiCountryCode.c_str());
+    if (wifiCountryCode.empty()) {
+        WIFI_LOGI("wifi country code is empty");
+        return;
+    }
+    if (strncasecmp(wifiCountryCode.c_str(), m_wifiCountryCode.c_str(), WIFI_COUNTRY_CODE_LEN) == 0) {
+        WIFI_LOGI("wifi country code is same, code=%{public}s", wifiCountryCode.c_str());
+        WifiChannelHelper::GetInstance()
+            .UpdateValidFreqs();  // Resolve the issue of 5GHz hotspot not available after reboot
         return;
     }
     WifiErrorNo ret = WifiApHalInterface::GetInstance().SetWifiCountryCode(

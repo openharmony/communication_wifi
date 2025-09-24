@@ -101,22 +101,32 @@ void WifiChannelHelper::UpdateValidFreqs()
     std::vector<int> freqs5G;
     std::vector<int> freqsDfs;
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
+    std::string apIfaceName = WifiConfigCenter::GetInstance().GetApIfaceName();
     int band = static_cast<int>(ScanBandType::SCAN_BAND_24_GHZ);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqs2G)) {
         WIFI_LOGE("get 2g frequencies failed.");
+        if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(apIfaceName, band, freqs2G)) {
+            WIFI_LOGE("ap iface get 2g frequencies failed.");
+        }
     }
 #endif
     band = static_cast<int>(ScanBandType::SCAN_BAND_5_GHZ);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqs5G)) {
         WIFI_LOGE("get 5g frequencies failed.");
+        if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(apIfaceName, band, freqs5G)) {
+            WIFI_LOGE("ap iface get 5g frequencies failed.");
+        }
     }
 #endif
     band = static_cast<int>(ScanBandType::SCAN_BAND_5_GHZ_DFS_ONLY);
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, freqsDfs)) {
-        WIFI_LOGE("get 5g frequencies failed.");
+        WIFI_LOGE("get 5g DFS frequencies failed.");
+        if (!HalDeviceManager::GetInstance().GetFrequenciesByBand(apIfaceName, band, freqsDfs)) {
+            WIFI_LOGE("ap iface get 5g DFS frequencies failed.");
+        }
     }
 #endif
     mValidFreqs[ScanBandType::SCAN_BAND_24_GHZ] = freqs2G;

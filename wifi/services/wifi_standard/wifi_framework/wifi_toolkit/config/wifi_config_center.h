@@ -236,10 +236,6 @@ public:
 
     int GetP2pEnhanceState();
 
-    int SetP2pEnhanceActionListenChannel(int channel);
-
-    int GetP2pEnhanceActionListenChannel();
-
     int SetP2pEnhanceFreq(int freq);
 
     int GetP2pEnhanceFreq();
@@ -481,7 +477,6 @@ private:
     std::atomic<int> mP2pState {static_cast<int>(P2pState::P2P_STATE_CLOSED)};
     std::atomic<int> p2pEnhanceState_ {0};
     std::atomic<int> p2pEnhanceFreq_ {0};
-    std::atomic<int> p2pEnhanceActionListenChannel_ {0};
     std::atomic<int> mP2pDiscoverState {0};
     std::atomic<P2pBusinessType> mP2pBusinessType {P2pBusinessType::INVALID};
     std::atomic<int> mP2pCreatorUid {-1};

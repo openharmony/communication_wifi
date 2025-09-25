@@ -846,7 +846,6 @@ HWTEST_F(WifiSettingsTest, SetDeviceNameApSsidTest, TestSize.Level1)
 {
     std::string ssid = "";
     WifiSettings::GetInstance().SetDeviceNameApSsid(ssid);
-    const std::string ellipsis = "...";
     ssid = "ThisIsAVeryLongSSIDThatExceedsTheMaximumLength";
     WifiSettings::GetInstance().SetDeviceNameApSsid(ssid);
 }

@@ -227,19 +227,15 @@ bool WifiControllerMachine::EnableState::ExecuteStateMsg(InternalMessagePtr msg)
             HandleConcreteClientRemoved(msg);
             break;
         default:
-#ifdef FEATURE_AP_SUPPORT
-            return HandleApMsg(msg);
-#else
-            return false;
-#endif
+            return HandleExtMsg(msg);
     }
     return true;
 }
 
-#ifdef FEATURE_AP_SUPPORT
-bool WifiControllerMachine::EnableState::HandleApMsg(InternalMessagePtr msg)
+bool WifiControllerMachine::EnableState::HandleExtMsg(InternalMessagePtr msg)
 {
     switch (msg->GetMessageName()) {
+#ifdef FEATURE_AP_SUPPORT
         case CMD_SOFTAP_TOGGLED:
             HandleSoftapToggleChangeInEnabledState(msg);
             break;
@@ -274,12 +270,15 @@ bool WifiControllerMachine::EnableState::HandleApMsg(InternalMessagePtr msg)
             HandleRptStartFail(msg);
             break;
 #endif
+#endif
+        case CMD_P2P_RETRY_OPEN:
+            HandleRetryOpenP2p();
+            break;
         default:
             return false;
     }
     return true;
 }
-#endif
 
 WifiControllerMachine::DefaultState::DefaultState(WifiControllerMachine *wifiControllerMachine)
     : State("DefaultState"), pWifiControllerMachine(wifiControllerMachine)
@@ -898,6 +897,17 @@ void WifiControllerMachine::EnableState::HandleRptStartFail(InternalMessagePtr m
 }
 #endif
 #endif
+
+void WifiControllerMachine::EnableState::HandleRetryOpenP2p(void)
+{
+    if (!pWifiControllerMachine->concreteManagers.IdExist(0)) {
+        return;
+    }
+    auto conManage = pWifiControllerMachine->concreteManagers.GetManager(0);
+    if (conManage->GetMachine() != nullptr) {
+        conManage->GetMachine()->SendMessage(CONCRETE_CMD_RETRY_OPEN_P2P);
+    }
+}
 
 void WifiControllerMachine::HandleConcreteStop(int id)
 {

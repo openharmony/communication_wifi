@@ -69,13 +69,14 @@ public:
         void HandleApStart(int id);
         bool HandleWifiToggleChangeForWlan1(int id, int isOpen);
         void HandleWifiToggleChangeInEnabledState(InternalMessagePtr msg);
+        void HandleRetryOpenP2p(void);
+        bool HandleExtMsg(InternalMessagePtr msg);
 #ifdef FEATURE_AP_SUPPORT
         void HandleSoftapToggleChangeInEnabledState(InternalMessagePtr msg);
         void HandleSoftapOpen(int id);
         void HandleSoftapClose(int id);
         void HandleApRemoved(InternalMessagePtr msg);
         void HandleApStop(InternalMessagePtr msg);
-        bool HandleApMsg(InternalMessagePtr msg);
 #ifdef FEATURE_RPT_SUPPORT
         void HandleRptStartFail(InternalMessagePtr msg);
         void HandleP2pStop(InternalMessagePtr msg);

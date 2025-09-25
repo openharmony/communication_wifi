@@ -74,6 +74,7 @@ private:
     std::condition_variable p2pEnableCond;
     // has p2p been activated once, flag to dlopen p2p service
     std::atomic<bool> hasP2pActivatedOnce_{false};
+    std::atomic<int> retryOpenCount_{0};
 };
 
 }  // namespace Wifi

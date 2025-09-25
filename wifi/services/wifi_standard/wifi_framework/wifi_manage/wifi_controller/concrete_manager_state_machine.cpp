@@ -332,6 +332,12 @@ bool ConcreteMangerMachine::ConnectState::ExecuteStateMsg(InternalMessagePtr msg
             ret = EXECUTED;
             SwitchSemiActiveInConnectState();
             break;
+#ifdef FEATURE_P2P_SUPPORT
+        case CONCRETE_CMD_RETRY_OPEN_P2P:
+            ret = EXECUTED;
+            WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
+            break;
+#endif /* FEATURE_P2P_SUPPORT */
         default:
             break;
     }
@@ -466,6 +472,12 @@ bool ConcreteMangerMachine::SemiActiveState::ExecuteStateMsg(InternalMessagePtr 
             }
             WifiManager::GetInstance().GetWifiTogglerManager()->StopSemiWifiToggledTimer();
             break;
+#ifdef FEATURE_P2P_SUPPORT
+        case CONCRETE_CMD_RETRY_OPEN_P2P:
+            ret = EXECUTED;
+            WifiManager::GetInstance().GetWifiP2pManager()->AutoStartP2pService();
+            break;
+#endif /* FEATURE_P2P_SUPPORT */
         default:
             break;
     }

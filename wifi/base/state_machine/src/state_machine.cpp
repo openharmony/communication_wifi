@@ -566,10 +566,6 @@ void StateMachineHandler::ClearWhenQuit()
 
 void StateMachineHandler::PerformSwitchState(State *msgProcessedState, InternalMessagePtr msg)
 {
-    if (msgProcessedState == nullptr || msg == nullptr) {
-        LOGE("pointer is null.");
-    }
-
     State *targetState = pTargetState;
     if (targetState != nullptr) {
         if (pFirstState != nullptr) {
@@ -623,8 +619,6 @@ void StateMachineHandler::ExecuteMessage(InternalMessagePtr msg)
 
         if (pStateMachine != nullptr) {
             PerformSwitchState(msgProcessedState, msg);
-        } else {
-            LOGE("pointer is null.");
         }
 
         if (pStateMachine != nullptr && msg->GetMessageName() != SM_INIT_CMD) {

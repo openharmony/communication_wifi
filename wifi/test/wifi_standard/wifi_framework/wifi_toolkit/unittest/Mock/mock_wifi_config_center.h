@@ -112,7 +112,6 @@ public:
     virtual bool SetWifiStateOnAirplaneChanged(const int &state);
     virtual void SetWifiToggledState(int state, int id = 0) = 0;
     virtual int SetLastConnStaFreq(int freq) = 0;
-    virtual int SetP2pEnhanceActionListenChannel(int channel) = 0;
     virtual int GetFreezeModeState() const = 0;
     virtual void SetThreadStatusFlag(bool state) = 0;
     virtual int SetChangeDeviceConfig(ConfigChange value, const WifiDeviceConfig &config) = 0;
@@ -278,7 +277,6 @@ public:
     MOCK_METHOD1(SetWifiStateOnAirplaneChanged, bool(const int &state));
     MOCK_METHOD2(SetWifiToggledState, void(int state, int));
     MOCK_METHOD1(SetLastConnStaFreq, int(int freq));
-    MOCK_METHOD1(SetP2pEnhanceActionListenChannel, int(int channel));
     MOCK_CONST_METHOD0(GetFreezeModeState, int());
     MOCK_METHOD1(SetThreadStatusFlag, void(bool state));
     MOCK_METHOD2(SetChangeDeviceConfig, int(ConfigChange value, const WifiDeviceConfig &config));

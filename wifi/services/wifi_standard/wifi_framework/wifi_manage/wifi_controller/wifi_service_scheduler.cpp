@@ -847,7 +847,6 @@ void WifiServiceScheduler::DispatchWifiCloseRes(OperateResState state, int instI
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
         WifiConfigCenter::GetInstance().ClearLocalHid2dInfo();
-        WifiConfigCenter::GetInstance().SetP2pEnhanceActionListenChannel(0);
         BroadCastWifiStateChange(WifiState::DISABLED, instId);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CLOSE),
             static_cast<int>(WifiOperateState::STA_CLOSED));

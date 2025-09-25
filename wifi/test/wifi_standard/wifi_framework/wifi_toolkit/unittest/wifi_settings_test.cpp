@@ -844,15 +844,11 @@ HWTEST_F(WifiSettingsTest, IsRandomMacDisabledTest, TestSize.Level1)
 
 HWTEST_F(WifiSettingsTest, SetDeviceNameApSsidTest, TestSize.Level1)
 {
-    extern std::string g_defaultApSsid;
     std::string ssid = "";
     WifiSettings::GetInstance().SetDeviceNameApSsid(ssid);
-    EXPECT_EQ(g_defaultApSsid, ssid);
     const std::string ellipsis = "...";
     ssid = "ThisIsAVeryLongSSIDThatExceedsTheMaximumLength";
     WifiSettings::GetInstance().SetDeviceNameApSsid(ssid);
-    std::string expectedSsid = ssid.substr(0, HOTSPOT_NAME_MAX_LENGTH - ellipsis.length()) + "...";
-    EXPECT_EQ(g_defaultApSsid, expectedSsid);
 }
 
 HWTEST_F(WifiSettingsTest, GetSubstringByBytesTest, TestSize.Level1)

@@ -841,6 +841,21 @@ HWTEST_F(WifiSettingsTest, IsRandomMacDisabledTest, TestSize.Level1)
     result = WifiSettings::GetInstance().IsRandomMacDisabled();
     EXPECT_EQ(result, false);
 }
+
+HWTEST_F(WifiSettingsTest, SetDeviceNameApSsidTest, TestSize.Level1)
+{
+    std::string ssid = "";
+    WifiSettings::GetInstance().SetDeviceNameApSsid(ssid);
+    ssid = "ThisIsAVeryLongSSIDThatExceedsTheMaximumLength";
+    WifiSettings::GetInstance().SetDeviceNameApSsid(ssid);
+}
+
+HWTEST_F(WifiSettingsTest, GetSubstringByBytesTest, TestSize.Level1)
+{
+    std::string ssid = "你好🌎,Hello,а";
+    std::string result = WifiSettings::GetInstance().GetSubstringByBytes(ssid, HOTSPOT_NAME_MAX_LENGTH);
+    EXPECT_EQ(result, ssid);
+}
 #endif
 }  // namespace Wifi
 }  // namespace OHO

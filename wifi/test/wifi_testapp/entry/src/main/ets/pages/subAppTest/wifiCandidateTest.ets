@@ -15,7 +15,7 @@
 
 import { TestData } from '../../entryability/model/testData'
 import { WifiModel } from '../../entryability/model/wifiModel'
-import ConfigData from '../../utils/ConfigData';
+import ConfigData from '../../Utils/ConfigData';
 import wifiManager from '@ohos.wifiManager'
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { PageTitle } from '../../Component/pageTitle';

@@ -79,7 +79,7 @@ export function testDisableWifi(): string {
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive );
     } else {
-      let ret = wifi.disableWifi();
+      let ret: boolean = wifi.disableWifi();
       if ( ret ) {
         message = ( MessageData.testWifiDisableResult ) + ret
       } else {
@@ -104,7 +104,7 @@ export function testIsWifiActive(): string {
   try {
     let message = ( MessageData.testIsActive );
     console.log( TAG , LogData.testIsWifiActive_StartLog )
-    let ret = wifi.isWifiActive();
+    let ret:boolean = wifi.isWifiActive();
     if ( ret ) {
       wifiEnable = true
     } else {
@@ -129,7 +129,7 @@ export function testScan(): string {
     if ( !wifiEnable ) {
       message = ( MessageData.testIsInactive );
     } else {
-      let ret = wifi.scan()
+      let ret:boolean = wifi.scan()
       message = ( MessageData.testScanResult ) + ret
       router.pushUrl( { url : PAGE_URI_WIFI_FOUND_MODE } );
       promptAction.showToast( { message : message } )
@@ -145,22 +145,6 @@ export function testScan(): string {
   }
 }
 
-export function testForcibleScan(): string {
-  try {
-    let message = ( MessageData.testForcibleScan )
-    console.log( TAG , LogData.testForcibleScan_StartLog )
-    let ret = wifi.scan()
-    message = ( MessageData.testForcibleScanResult ) + ret
-    promptAction.showToast( { message : message } )
-    console.log( TAG , LogData.testForcibleScan_EndLog )
-    return message
-  } catch( e ) {
-    console.log( TAG , `Failed to testForcibleScan. message: ${ e.message }, code: ${ e.code }` )
-    let message = `Failed to testForcibleScan. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast( { message : message } )
-    return message
-  }
-}
 
 export function testGetScanInfosPromise(): string {
   try {

@@ -26,7 +26,8 @@ export enum Category {
   Stress ,
   App ,
   Stability,
-  NewApi
+  NewApi,
+  Socket
 }
 
 let NextId = 0;
@@ -56,7 +57,8 @@ export enum CaseCategory {
   Hotspot ,
   HotspotManager ,
   P2p ,
-  P2pManager
+  P2pManager,
+  Socket
 }
 
 export class TestApi {

@@ -776,8 +776,8 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
             WIFI_LOGI("create new `WifiP2pCallbackProxy`!");
         }
 
-        int pid = GetCallingPid();
-        int tokenId = IPCSkeleton::GetCallingTokenID();
+        int pid = static_cast<int>(GetCallingPid());
+        int tokenId = static_cast<int>(IPCSkeleton::GetCallingTokenID());
         int eventNum = data.ReadInt32();
         std::vector<std::string> event;
         if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {

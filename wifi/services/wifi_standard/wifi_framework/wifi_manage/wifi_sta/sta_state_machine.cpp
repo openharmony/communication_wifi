@@ -348,6 +348,21 @@ bool StaStateMachine::ClosedState::ExecuteStateMsg(InternalMessagePtr msg)
             StopWifiProcess();
             break;
         }
+        case WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            SaveFoldStatus(msg);
+            break;
+        }
+        case WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            DealScreenStateChangedEvent(msg);
+            break;
+        }
+        case WIFI_AUDIO_STATE_CHANGED_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            pStaStateMachine->DealAudioStateChangedEvent(msg);
+            break;
+        }
         default:
             WIFI_LOGD("InitState-msgCode=%d not handled.\n", msg->GetMessageName());
             break;
@@ -410,6 +425,35 @@ void StaStateMachine::ClosedState::StopWifiProcess()
     WifiConfigCenter::GetInstance().SetUserLastSelectedNetworkId(INVALID_NETWORK_ID, pStaStateMachine->m_instId);
 }
 
+void StaStateMachine::ClosedState::SaveFoldStatus(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("SaveFoldStatus, msg is nullptr");
+        return;
+    }
+    pStaStateMachine->foldStatus_ = msg->GetParam1();
+}
+
+void StaStateMachine::InitState::DealScreenStateChangedEvent(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("DealScreenStateChangedEvent InternalMessage msg is null.");
+        return;
+    }
+
+    int screenState = msg->GetParam1();
+    WIFI_LOGI("InitState::DealScreenStateChangedEvent, Receive msg: screenState=%{public}d", screenState);
+    if (screenState == MODE_STATE_OPEN) {
+        pStaStateMachine->enableSignalPoll = true;
+    } else {
+        if (pStaStateMachine->isAudioOn_ == AUDIO_OFF) {
+            pStaStateMachine->enableSignalPoll = false;
+        } else {
+            pStaStateMachine->enableSignalPoll = true;
+        }
+    }
+}
+
 /* --------------------------- state machine Init State ------------------------------ */
 StaStateMachine::InitState::InitState(StaStateMachine *staStateMachine)
     : State("InitState"), pStaStateMachine(staStateMachine)
@@ -465,35 +509,11 @@ bool StaStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
             HandleNetworkConnectionEvent(msg);
             break;
         }
-        case WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT: {
-            ret = EXECUTED;
-            SaveFoldStatus(msg);
-            break;
-        }
-        case WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT: {
-            ret = EXECUTED;
-            DealScreenStateChangedEvent(msg);
-            break;
-        }
-        case WIFI_AUDIO_STATE_CHANGED_NOTIFY_EVENT: {
-            ret = EXECUTED;
-            pStaStateMachine->DealAudioStateChangedEvent(msg);
-            break;
-        }
         default:
             WIFI_LOGD("InitState-msgCode=%d not handled.\n", msg->GetMessageName());
             break;
     }
     return ret;
-}
-
-void StaStateMachine::InitState::SaveFoldStatus(InternalMessagePtr msg)
-{
-    if (msg == nullptr) {
-        WIFI_LOGE("SaveFoldStatus, msg is nullptr");
-        return;
-    }
-    pStaStateMachine->foldStatus_ = msg->GetParam1();
 }
 
 void StaStateMachine::InitState::HandleNetworkConnectionEvent(InternalMessagePtr msg)
@@ -689,26 +709,6 @@ bool StaStateMachine::InitState::NotExistInScanList(WifiDeviceConfig &config)
         }
     }
     return true;
-}
-
-void StaStateMachine::InitState::DealScreenStateChangedEvent(InternalMessagePtr msg)
-{
-    if (msg == nullptr) {
-        WIFI_LOGE("DealScreenStateChangedEvent InternalMessage msg is null.");
-        return;
-    }
-
-    int screenState = msg->GetParam1();
-    WIFI_LOGI("InitState::DealScreenStateChangedEvent, Receive msg: screenState=%{public}d", screenState);
-    if (screenState == MODE_STATE_OPEN) {
-        pStaStateMachine->enableSignalPoll = true;
-    } else {
-        if (pStaStateMachine->isAudioOn_ == AUDIO_OFF) {
-            pStaStateMachine->enableSignalPoll = false;
-        } else {
-            pStaStateMachine->enableSignalPoll = true;
-        }
-    }
 }
 
 /* --------------------------- state machine link State ------------------------------ */

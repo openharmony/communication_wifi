@@ -5423,6 +5423,7 @@ void StaStateMachine::UpdateHiLinkAttribute()
     for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
         if (iter->bssid == linkedInfo.bssid) {
             linkedInfo.isHiLinkNetwork = iter->isHiLinkNetwork;
+            linkedInfo.isHiLinkProNetwork = iter->isHiLinkProNetwork;
             WIFI_LOGI("set hilink=%{public}d, bssid=%{public}s", iter->isHiLinkNetwork,
                 MacAnonymize(linkedInfo.bssid).c_str());
             break;

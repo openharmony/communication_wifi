@@ -172,6 +172,7 @@ WifiErrorNo WifiHdiWpaClient::QueryScanInfos(std::vector<InterScanInfo> &scanInf
             free(results[i].infoElems);
         }
         tmp.isHiLinkNetwork = results[i].isHiLinkNetwork;
+        tmp.isHiLinkProNetwork = results[i].isHiLinkProNetwork;
         scanInfos.emplace_back(tmp);
     }
     free(results);

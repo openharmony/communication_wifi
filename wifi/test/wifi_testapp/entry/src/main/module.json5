@@ -53,9 +53,6 @@
     ],
     "requestPermissions": [
       {
-        "name": "ohos.permission.CAPTURE_SCREEN"
-      },
-      {
         "name": "ohos.permission.WRITE_MEDIA",
         "reason": "$string:app_name",
         "usedScene": {
@@ -86,6 +83,12 @@
         "name": "ohos.permission.SET_WIFI_INFO"
       },
       {
+        "name": "ohos.permission.MANAGE_WIFI_CONNECTION"
+      },
+      {
+        "name": "ohos.permission.MANAGE_ENTERPRISE_WIFI_CONNECTION"
+      },
+      {
         "name": "ohos.permission.GET_WIFI_INFO"
       },
       {
@@ -96,27 +99,6 @@
             "FormAbility"
           ]
         }
-      },
-      {
-        "name": "ohos.permission.GET_WIFI_PEERS_MAC"
-      },
-      {
-        "name": "ohos.permission.MANAGE_WIFI_CONNECTION"
-      },
-      {
-        "name": "ohos.permission.SET_WIFI_CONFIG"
-      },
-      {
-        "name": "ohos.permission.GET_WIFI_CONFIG"
-      },
-      {
-        "name": "ohos.permission.GET_WIFI_LOCAL_MAC"
-      },
-      {
-        "name": "ohos.permission.MANAGE_WIFI_HOTSPOT"
-      },
-      {
-        "name": "ohos.permission.GET_WIFI_INFO_INTERNAL"
       },
       {
         "name": "ohos.permission.INTERNET"

@@ -1121,7 +1121,7 @@ export function testStartPortalCertification() {
 export function testStartWifiDetection() {
   try {
     let message = ''
-    wifiManager.StartWifiDetection()
+    // wifiManager.StartWifiDetection()
     message = "StartWifiDetection 调用成功"
     promptAction.showToast({ message : message })
     console.log(TAG , LogDataManager.testRemoveDeviceManager_EndLog);
@@ -1350,6 +1350,45 @@ export function testOnStreamChangeManager() {
   } catch( e ) {
     console.log(TAG , `Failed to testOnStreamChangeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testOnStreamChangeManager. message: ${ e.message }, code: ${ e.code }`
+    promptAction.showToast({ message : message })
+    return message
+  }
+}
+
+export function testGetLinkedInfoSyncManager() {
+  try {
+    let message = ''
+    console.log(TAG , "testGetLinkedInfoSyncManager_StartLog")
+    if ( !wifiManagerEnable ) {
+      message = (MessageDataManager.testIsInactive);
+      return message
+    }
+    let linkedInfo = wifiManager.getLinkedInfoSync();
+    message = "同步获取连接信息成功: " + JSON.stringify(linkedInfo)
+    AppStorage.setOrCreate('linkedInfoSyncManagerMessage' , JSON.stringify(linkedInfo));
+    promptAction.showToast({ message : message })
+    console.log(TAG , "testGetLinkedInfoSyncManager_EndLog")
+    return message
+  } catch( e ) {
+    console.log(TAG , `Failed to testGetLinkedInfoSyncManager. message: ${ e.message }, code: ${ e.code }`)
+    let message = `Failed to testGetLinkedInfoSyncManager. message: ${ e.message }, code: ${ e.code }`
+    promptAction.showToast({ message : message })
+    return message
+  }
+}
+
+export function testIsScanAlwaysAllowedManager() {
+  try {
+    let message = ''
+    console.log(TAG , "testIsScanAlwaysAllowedManager_StartLog")
+    let isAllowed = wifiManager.isScanAlwaysAllowed();
+    message = "是否总是允许扫描: " + isAllowed
+    promptAction.showToast({ message : message })
+    console.log(TAG , "testIsScanAlwaysAllowedManager_EndLog")
+    return message
+  } catch( e ) {
+    console.log(TAG , `Failed to testIsScanAlwaysAllowedManager. message: ${ e.message }, code: ${ e.code }`)
+    let message = `Failed to testIsScanAlwaysAllowedManager. message: ${ e.message }, code: ${ e.code }`
     promptAction.showToast({ message : message })
     return message
   }

@@ -41,11 +41,16 @@
     "pages/subAppTest/wifiScanTest",
     "pages/subAppTest/wifiCandidateTest",
     "pages/subAppTest/p2pDiscoveryTest",
+    "pages/subAppTest/tcpSocketTest",
+    "pages/subAppTest/udpSocketTest",
+    "pages/subAppTest/httpSocketTest",
+    "pages/subAppTest/httpsSocketTest",
     "pages/subStabilityTest/wifiSwitchStabilityTest",
     "pages/subStabilityTest/wifiScanStabilityTest",
     "pages/subStabilityTest/wifiConnectStabilityTest",
     "pages/subStabilityTest/hotspotStabilityTest",
     "pages/subStabilityTest/webLatencyTest",
-    "pages/newApi/AllInOneView"
+    "pages/newApi/AllInOneView",
+    "pages/newApi/QuickVerifyTest"
   ]
 }

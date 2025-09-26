@@ -216,5 +216,10 @@ bool WifiTogglerManager::IsSatelliteStateStart()
 {
     return false;
 }
+
+void WifiTogglerManager::RetryOpenP2p(void)
+{
+    return;
+}
 }
 }

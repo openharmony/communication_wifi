@@ -24,7 +24,6 @@ import {
   testDisableWifi ,
   testIsWifiActive ,
   testScan ,
-  testForcibleScan ,
   testGetScanInfosPromise ,
   testGetScanInfosCallback ,
   testAddDeviceConfigPromise ,
@@ -73,6 +72,8 @@ import {
   testGetWifiDetailState,
   testSetScanAlwaysAllowed,
   testGetScanAlwaysAllowed,
+  testGetLinkedInfoSyncManager,
+  testIsScanAlwaysAllowedManager,
   testAddDeviceConfigManagerPromise ,
   testAddDeviceConfigManagerCallback ,
   testAddCandidateConfigManagerPromise ,
@@ -137,7 +138,11 @@ import {
   testGetHotspotStationsManager ,
   testOnHotspotStateChangeManager ,
   testOnHotspotStaJoinManager ,
-  testOnHotspotStaLeaveManager
+  testOnHotspotStaLeaveManager ,
+  testIsMeteredHotspot ,
+  testAddHotspotBlockList ,
+  testDelHotspotBlockList ,
+  testGetHotspotBlockList
 } from "./hotspotManagerInterface"
 
 import {
@@ -271,14 +276,6 @@ const WifiTestCase: WifiTest[] = [
     'detail' : '启动WLAN扫描' ,
     'method' : 'scan' ,
     'api' : testScan ,
-    'result' : 'None' ,
-    'category' : CaseCategory.Wifi
-  },
-  {
-    'name' : '强行启动WLAN扫描' ,
-    'detail' : '强行启动WLAN扫描' ,
-    'method' : 'scan' ,
-    'api' : testForcibleScan ,
     'result' : 'None' ,
     'category' : CaseCategory.Wifi
   },
@@ -634,6 +631,22 @@ const WifiManagerTestCase: WifiTest[] = [
     'detail' : '获取扫描始终允许标志' ,
     'method' : 'getScanAlwaysAllowed' ,
     'api' : testGetScanAlwaysAllowed ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
+    'name' : '同步获取连接信息' ,
+    'detail' : '同步获取连接信息' ,
+    'method' : 'getLinkedInfoSync' ,
+    'api' : testGetLinkedInfoSyncManager ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
+    'name' : '是否总是允许扫描' ,
+    'detail' : '是否总是允许扫描' ,
+    'method' : 'isScanAlwaysAllowed' ,
+    'api' : testIsScanAlwaysAllowedManager ,
     'result' : 'None' ,
     'category' : CaseCategory.WifiManager
   },
@@ -1092,6 +1105,38 @@ const HotspotManagerTestCase: WifiTest[] = [
     'api' : testOnHotspotStaLeaveManager ,
     'result' : 'None' ,
     'category' : CaseCategory.HotspotManager
+  },
+  {
+    'name' : '是否为计量热点' ,
+    'detail' : '是否为计量热点' ,
+    'method' : 'isMeteredHotspot' ,
+    'api' : testIsMeteredHotspot ,
+    'result' : 'None' ,
+    'category' : CaseCategory.HotspotManager
+  },
+  {
+    'name' : '添加热点黑名单' ,
+    'detail' : '添加热点黑名单' ,
+    'method' : 'addHotspotBlockList' ,
+    'api' : testAddHotspotBlockList ,
+    'result' : 'None' ,
+    'category' : CaseCategory.HotspotManager
+  },
+  {
+    'name' : '删除热点黑名单' ,
+    'detail' : '删除热点黑名单' ,
+    'method' : 'delHotspotBlockList' ,
+    'api' : testDelHotspotBlockList ,
+    'result' : 'None' ,
+    'category' : CaseCategory.HotspotManager
+  },
+  {
+    'name' : '获取热点黑名单列表' ,
+    'detail' : '获取热点黑名单列表' ,
+    'method' : 'getHotspotBlockList' ,
+    'api' : testGetHotspotBlockList ,
+    'result' : 'None' ,
+    'category' : CaseCategory.HotspotManager
   }
 ]
 
@@ -1462,6 +1507,13 @@ const TestComposition: WifiTestComposition[] = [
     'category': Category.NewApi
   },
   {
+    'name': '快速验证测试',
+    'detail': '快速验证WiFi相关功能',
+    'url': 'pages/newApi/QuickVerifyTest',
+    'image': $r('app.media.wifi'),
+    'category': Category.NewApi
+  },
+  {
     'name' : 'WIFI' ,
     'detail' : 'wifi发现' ,
     'url' : 'pages/subAppTest/wifiScanTest' ,
@@ -1480,6 +1532,34 @@ const TestComposition: WifiTestComposition[] = [
     'detail' : 'p2p扫描结果' ,
     'url' : 'pages/subAppTest/p2pDiscoveryTest' ,
     'image' : $r('app.media.WLAN') ,
+    'category' : Category.App
+  },
+  {
+    'name' : 'TCP Socket验证' ,
+    'detail' : 'TCP连接测试' ,
+    'url' : 'pages/subAppTest/tcpSocketTest' ,
+    'image' : $r('app.media.wifi') ,
+    'category' : Category.App
+  },
+  {
+    'name' : 'UDP Socket验证' ,
+    'detail' : 'UDP连接测试' ,
+    'url' : 'pages/subAppTest/udpSocketTest' ,
+    'image' : $r('app.media.wifi') ,
+    'category' : Category.App
+  },
+  {
+    'name' : 'HTTP验证' ,
+    'detail' : 'HTTP请求测试' ,
+    'url' : 'pages/subAppTest/httpSocketTest' ,
+    'image' : $r('app.media.wifi') ,
+    'category' : Category.App
+  },
+  {
+    'name' : 'HTTPS验证' ,
+    'detail' : 'HTTPS请求测试' ,
+    'url' : 'pages/subAppTest/httpsSocketTest' ,
+    'image' : $r('app.media.wifi') ,
     'category' : Category.App
   },
 

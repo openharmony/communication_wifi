@@ -299,8 +299,8 @@ std::string Ipv6Address::GetRandomAddr(const std::string &ipv6Prefix, int prefix
     struct in6_addr rndAddr = IN6ADDR_ANY_INIT;
     inet_pton(AF_INET6, resHex.c_str(), &rndAddr);
     struct in6_addr ipv6Addr = IN6ADDR_ANY_INIT;
-    inet_pton(AF_INET6, ipv6Prefix.c_str(), &ipv6Addr);
-    if (prefixLength < 0 || (prefixLength / CHAR_BIT) >= sizeof(rndAddr.s6_addr)) {
+    inet_pton(AF_INET6, ipv6Prefix.c_str(), &ipv6Addr); 
+    if (prefixLength < 0 || static_cast<size_t>(prefixLength / CHAR_BIT) >= sizeof(rndAddr.s6_addr)) {
         LOGE("Get random address error: prefix");
         return "";
     }

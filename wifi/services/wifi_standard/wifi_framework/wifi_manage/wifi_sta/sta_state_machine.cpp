@@ -434,7 +434,7 @@ void StaStateMachine::ClosedState::SaveFoldStatus(InternalMessagePtr msg)
     pStaStateMachine->foldStatus_ = msg->GetParam1();
 }
 
-void StaStateMachine::InitState::DealScreenStateChangedEvent(InternalMessagePtr msg)
+void StaStateMachine::ClosedState::DealScreenStateChangedEvent(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("DealScreenStateChangedEvent InternalMessage msg is null.");
@@ -442,7 +442,7 @@ void StaStateMachine::InitState::DealScreenStateChangedEvent(InternalMessagePtr 
     }
 
     int screenState = msg->GetParam1();
-    WIFI_LOGI("InitState::DealScreenStateChangedEvent, Receive msg: screenState=%{public}d", screenState);
+    WIFI_LOGI("ClosedState::DealScreenStateChangedEvent, Receive msg: screenState=%{public}d", screenState);
     if (screenState == MODE_STATE_OPEN) {
         pStaStateMachine->enableSignalPoll = true;
     } else {

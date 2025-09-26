@@ -128,7 +128,6 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
             "TelStateRegistry", TEL_STATE_REGISTRY_DELAY_TIME);
     }
 #endif
-    RegisterMovementEnhanceCallback();
 }
 
 WifiEventSubscriberManager::~WifiEventSubscriberManager()
@@ -564,9 +563,17 @@ void WifiEventSubscriberManager::MdmPropChangeEvt(const char *key, const char *v
     }
 }
 
+void WifiEventSubscriberManager::OnEnhanceServiceReady()
+{
+    WIFI_LOGI("Enhance service is ready, registering movement callback");
+    enhanceServiceReady_ = true;
+    RegisterMovementEnhanceCallback();
+}
+
 void WifiEventSubscriberManager::RegisterMovementEnhanceCallback()
 {
     WIFI_LOGI("%{public}s enter.", __FUNCTION__);
+    IEnhanceService *mEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (mEnhanceService == nullptr) {
         WIFI_LOGE("%{public}s, get mEnhanceService failed!", __FUNCTION__);
         return;
@@ -581,6 +588,7 @@ void WifiEventSubscriberManager::RegisterMovementEnhanceCallback()
 void WifiEventSubscriberManager::UnRegisterMovementEnhanceCallback()
 {
     WIFI_LOGI("%{public}s enter.", __FUNCTION__);
+    IEnhanceService *mEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (mEnhanceService == nullptr) {
         WIFI_LOGE("%{public}s, get mEnhanceService failed!", __FUNCTION__);
         return;

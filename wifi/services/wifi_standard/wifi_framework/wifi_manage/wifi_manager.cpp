@@ -347,6 +347,7 @@ void WifiManager::AutoStartEnhanceService(void)
             WIFI_LOGE("init Enhance service failed, ret %{public}d!", static_cast<int>(errCode));
             break;
         }
+        wifiEventSubscriberManager->OnEnhanceServiceReady();
     } while (0);
     return;
 }

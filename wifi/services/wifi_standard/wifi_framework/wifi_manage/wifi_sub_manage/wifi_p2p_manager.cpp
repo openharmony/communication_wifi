@@ -40,6 +40,8 @@ namespace OHOS {
 namespace Wifi {
 constexpr int32_t P2P_ENABLE_WAIT_MS = 500;
 constexpr int64_t TIMEOUT_REMOVE_GROUP = 15 * 60 * 1000;
+constexpr int P2P_RETRY_OPEN_MAX = 3;
+
 WifiP2pManager::WifiP2pManager()
 {
     WIFI_LOGI("create WifiP2pManager");
@@ -351,12 +353,17 @@ void WifiP2pManager::DealP2pStateChanged(P2pState state)
         if (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::CLOSED) {
             AutoStopP2pService();
         }
+        retryOpenCount_ = 0;
     }
     if (state == P2pState::P2P_STATE_CLOSED) {
         bool ret = WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);
         if (ret) {
             WIFI_LOGE("P2p start failed, stop wifi!");
             AutoStopP2pService();
+            if (retryOpenCount_ < P2P_RETRY_OPEN_MAX) {
+                WifiManager::GetInstance().GetWifiTogglerManager()->RetryOpenP2p();
+                retryOpenCount_++;
+            }
         }
     }
     WifiCommonEventHelper::PublishP2pStateChangedEvent((int)state, "OnP2pStateChanged");

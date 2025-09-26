@@ -266,7 +266,6 @@ private:
     std::shared_ptr<SettingsEnterSubscriber> settingsEnterSubscriber_ = nullptr;
     std::shared_ptr<DataShareReadySubscriber> dataShareReadySubscriber_ = nullptr;
     std::unique_ptr<WifiEventHandler> movementChangeEventHandler_ = nullptr;
-    IEnhanceService *mEnhanceService;        
     static bool mIsMdmForbidden;
     bool islocationModeObservered = false;
     std::mutex locationEventMutex;

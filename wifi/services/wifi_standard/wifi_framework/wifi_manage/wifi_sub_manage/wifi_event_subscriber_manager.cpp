@@ -567,6 +567,7 @@ void WifiEventSubscriberManager::MdmPropChangeEvt(const char *key, const char *v
 void WifiEventSubscriberManager::RegisterMovementEnhanceCallback()
 {
     WIFI_LOGI("%{public}s enter.", __FUNCTION__);
+    IEnhanceService *mEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (mEnhanceService == nullptr) {
         WIFI_LOGE("%{public}s, get mEnhanceService failed!", __FUNCTION__);
         return;
@@ -581,6 +582,7 @@ void WifiEventSubscriberManager::RegisterMovementEnhanceCallback()
 void WifiEventSubscriberManager::UnRegisterMovementEnhanceCallback()
 {
     WIFI_LOGI("%{public}s enter.", __FUNCTION__);
+    IEnhanceService *mEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (mEnhanceService == nullptr) {
         WIFI_LOGE("%{public}s, get mEnhanceService failed!", __FUNCTION__);
         return;

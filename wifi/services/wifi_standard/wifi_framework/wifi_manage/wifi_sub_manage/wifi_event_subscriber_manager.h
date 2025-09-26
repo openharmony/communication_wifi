@@ -182,6 +182,7 @@ public:
     bool IsMdmForbidden(void);
     void AccessDataShare();
     void RegisterLocationEvent();
+    void OnEnhanceServiceReady();
 
 private:
     void InitSubscribeListener();
@@ -266,7 +267,6 @@ private:
     std::shared_ptr<SettingsEnterSubscriber> settingsEnterSubscriber_ = nullptr;
     std::shared_ptr<DataShareReadySubscriber> dataShareReadySubscriber_ = nullptr;
     std::unique_ptr<WifiEventHandler> movementChangeEventHandler_ = nullptr;
-    IEnhanceService *mEnhanceService;        
     static bool mIsMdmForbidden;
     bool islocationModeObservered = false;
     std::mutex locationEventMutex;
@@ -290,6 +290,7 @@ private:
     int32_t simCount_ { 0 };
     std::mutex cellularObserverLock_;
 #endif
+    std::atomic<bool> enhanceServiceReady_{false};
 };
 
 }  // namespace Wifi

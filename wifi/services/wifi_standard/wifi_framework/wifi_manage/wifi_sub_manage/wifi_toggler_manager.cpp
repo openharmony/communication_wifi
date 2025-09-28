@@ -175,6 +175,16 @@ ErrCode WifiTogglerManager::ScanOnlyToggled(int isOpen)
 
 ErrCode WifiTogglerManager::AirplaneToggled(int isOpen)
 {
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    if (isOpen) {
+        for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+            ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(i);
+            if (pSelfCureService != nullptr) {
+                pSelfCureService->StopSelfCureWifi(SCE_WIFI_STATUS_LOST);
+            }
+        }
+    }
+#endif // FEATURE_SELF_CURE_SUPPORT
     if (pWifiControllerMachine) {
         pWifiControllerMachine->SendMessage(CMD_AIRPLANE_TOGGLED, isOpen);
     }

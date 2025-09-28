@@ -243,6 +243,7 @@ int32_t ApInfoHelper::GetOldestApInfoData(ApInfoData &data)
             oldestData = *iter;
             index = std::distance(apInfos_.begin(), iter);
         }
+        iter++;
     }
     data = oldestData;
     return index;

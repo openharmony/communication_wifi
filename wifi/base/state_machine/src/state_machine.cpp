@@ -539,7 +539,7 @@ void StateMachineHandler::SwitchState(State *targetState)
         LOGE("targetState is null.");
         return;
     }
-    LOGE("SwitchState, Switch to targetState: %{public}s.", targetState->GetStateName().c_str());
+    WIFI_LOGI("SwitchState, Switch to targetState: %{public}s.", targetState->GetStateName().c_str());
     pTargetState = static_cast<State *>(targetState);
 }
 

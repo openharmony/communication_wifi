@@ -189,6 +189,8 @@ public:
     private:
         void StartWifiProcess();
         void StopWifiProcess();
+        void SaveFoldStatus(InternalMessagePtr msg);
+        void DealScreenStateChangedEvent(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -210,10 +212,8 @@ public:
         bool RestrictedByMdm(WifiDeviceConfig &config);
 #endif
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
-        void SaveFoldStatus(InternalMessagePtr msg);
         bool NotAllowConnectToNetwork(int networkId, const std::string& bssid, int connTriggerMode);
         bool NotExistInScanList(WifiDeviceConfig &config);
-        void DealScreenStateChangedEvent(InternalMessagePtr msg);
         void DealHiddenSsidConnectMiss(int networkId);
         StaStateMachine *pStaStateMachine;
     };

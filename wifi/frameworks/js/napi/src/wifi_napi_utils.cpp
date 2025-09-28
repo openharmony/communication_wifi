@@ -320,7 +320,7 @@ napi_status SetValueU8Vector(const napi_env& env, const char* fieldStr,
         return status;
     }
     std::vector<uint8_t> vec = value;
-    for (std::size_t i = 0; i < vec.size(); ++i) {
+    for (size_t i = 0; i < vec.size(); ++i) {
         napi_value value;
         napi_status status = napi_create_int32(env, vec[i], &value);
         if (status != napi_ok) {

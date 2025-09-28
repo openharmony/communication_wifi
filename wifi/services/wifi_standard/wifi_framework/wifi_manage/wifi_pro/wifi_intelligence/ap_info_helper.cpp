@@ -242,8 +242,8 @@ int32_t ApInfoHelper::GetOldestApInfoData(ApInfoData &data)
         if (iter->time < oldestData.time) {
             oldestData = *iter;
             index = std::distance(apInfos_.begin(), iter);
-            iter++;
         }
+        iter++;
     }
     data = oldestData;
     return index;

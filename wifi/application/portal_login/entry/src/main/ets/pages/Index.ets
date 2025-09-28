@@ -305,6 +305,7 @@ struct Index {
         .fileAccess(false)
         .geolocationAccess(false)
         .domStorageAccess(true)
+        .overviewModeAccess(false)
         .onOverrideUrlLoading((request) => {
           const url = request.getRequestUrl();
           if (validateURL(url) && !url.startsWith('http') && !url.startsWith('https')) {

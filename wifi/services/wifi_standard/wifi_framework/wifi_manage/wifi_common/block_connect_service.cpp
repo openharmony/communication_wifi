@@ -266,7 +266,8 @@ bool BlockConnectService::UpdateNetworkSelectStatus(int targetNetworkId, Disable
         WIFI_LOGE("Failed to get device config %{public}d", targetNetworkId);
         return false;
     }
-    DisablePolicy disablePolicy = CalculateDisablePolicy(disableReason);
+    DisablePolicy disablePolicy = CalculateDisablePolicy(targetNetwork.isAllowAutoConnect ?
+        disableReason : DisabledReason::DISABLED_BY_SYSTEM);
     if (disablePolicy.disableStatus == WifiDeviceConfigStatus::ENABLED) {
         targetNetwork.networkSelectionStatus.status = WifiDeviceConfigStatus::ENABLED;
         targetNetwork.networkSelectionStatus.networkSelectionDisableReason = disableReason;

@@ -987,7 +987,7 @@ void WifiProStateMachine::WifiHasNetState::WifiHasNetStateInit()
     pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
     qoeScaning_ = false;
     pWifiProStateMachine_->currentState_ = WifiProState::WIFI_HASNET;
-    pWifiProStateMachine_->SendMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
+    // 先下掉wifipro本身的网络监测，观察几个版本 pWifiProStateMachine_->SendMessage(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
     pWifiProStateMachine_->perf5gHandoverService_.NetworkStatusChanged(NetworkStatus::HAS_INTERNET);
 }
 

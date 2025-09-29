@@ -724,6 +724,7 @@ ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
     WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
     WifiSettings::GetInstance().SyncDeviceConfig();
     if (!isAllowed) {
+        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(networkId, DisabledReason::DISABLED_BY_SYSTEM);
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
         if (linkedInfo.networkId != networkId && pStaStateMachine->GetTargetNetworkId() != networkId) {
@@ -731,6 +732,8 @@ ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
             return WIFI_OPT_SUCCESS;
         }
         Disconnect();
+    } else {
+        BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
     }
     return WIFI_OPT_SUCCESS;
 }

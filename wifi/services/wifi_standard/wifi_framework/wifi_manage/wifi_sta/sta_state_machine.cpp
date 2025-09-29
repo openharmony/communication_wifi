@@ -3983,7 +3983,7 @@ void StaStateMachine::DealMloConnectionLinkInfo()
 {
     if (linkedInfo.supportedWifiCategory != WifiCategory::WIFI7
         && linkedInfo.supportedWifiCategory != WifiCategory::WIFI7_PLUS) {
-        WIFI_LOGI("%{public}s not support wifi7", __FUNCTION__);
+        WIFI_LOGD("%{public}s not support wifi7", __FUNCTION__);
         return;
     }
     if (!linkedInfo.isMloConnected) {
@@ -4013,7 +4013,7 @@ void StaStateMachine::UpdateLinkedBssid(std::string &bssid)
 #ifndef OHOS_ARCH_LITE
 void StaStateMachine::UpdateLinkedInfoFromScanInfo()
 {
-    WIFI_LOGI("UpdateLinkedInfoFromScanInfo");
+    WIFI_LOGD("UpdateLinkedInfoFromScanInfo");
     std::vector<InterScanInfo> scanInfos;
     if (WifiStaHalInterface::GetInstance().QueryScanInfos(
         WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), scanInfos) != WIFI_HAL_OPT_OK) {

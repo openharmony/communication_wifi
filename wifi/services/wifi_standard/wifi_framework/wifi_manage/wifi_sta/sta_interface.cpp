@@ -664,7 +664,7 @@ void StaInterface::ProcessVoWifiNetlinkReportEvent(const int type)
 
 ErrCode StaInterface::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
 {
-    WIFI_LOGI("Enter GetSignalPollInfoArray");
+    WIFI_LOGD("Enter GetSignalPollInfoArray");
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     return pStaService->GetSignalPollInfoArray(wifiSignalPollInfos, length);
 }

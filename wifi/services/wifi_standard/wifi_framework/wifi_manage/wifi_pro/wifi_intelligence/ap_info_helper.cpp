@@ -667,7 +667,7 @@ std::string ApInfoHelper::GetCurrentCellIdInfo()
                 break;
         }
     }
-    WIFI_LOGI("GetCurrentCellIdInfo, cellInfo:%{private}s",
+    WIFI_LOGD("GetCurrentCellIdInfo, cellInfo:%{private}s",
         (std::to_string(currentCell.cellId) + currentCell.mcc + currentCell.mnc).c_str());
     return std::to_string(currentCell.cellId) + currentCell.mcc + currentCell.mnc;
 }

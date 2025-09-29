@@ -108,6 +108,8 @@ void NapiEvent::EventNotify(AsyncEventData *asyncEvent)
             }
         }
         res = napi_reference_ref(asyncEvent->env, asyncEvent->callbackRef, &refCount);
+        WIFI_LOGD("napi_send_event, res: %{public}d, callbackRef: %{private}p, refCount: %{public}d",
+            res, asyncEvent->callbackRef, refCount);
         if (res != napi_ok || refCount <= 1) {
             WIFI_LOGE("napi_send_event, do NOT call back, res: %{public}d!", res);
             goto EXIT;

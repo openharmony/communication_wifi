@@ -539,7 +539,7 @@ void StateMachineHandler::SwitchState(State *targetState)
         LOGE("targetState is null.");
         return;
     }
-    WIFI_LOGD("SwitchState, Switch to targetState: %{public}s.", targetState->GetStateName().c_str());
+    WIFI_LOGE("SwitchState, Switch to targetState: %{public}s.", targetState->GetStateName().c_str());
     pTargetState = static_cast<State *>(targetState);
 }
 
@@ -623,8 +623,7 @@ void StateMachineHandler::ExecuteMessage(InternalMessagePtr msg)
 
         if (pStateMachine != nullptr) {
             PerformSwitchState(msgProcessedState, msg);
-        } else {
-            LOGD("pointer is null.");
+        }
 
         if (pStateMachine != nullptr && msg->GetMessageName() != SM_INIT_CMD) {
         }

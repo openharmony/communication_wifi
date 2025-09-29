@@ -540,7 +540,7 @@ bool HalDeviceManager::GetChipsetCategory(const std::string &ifaceName, uint32_t
     }
 
     std::lock_guard<std::mutex> lock(mMutex);
-    LOGI("GetChipsetCategory, ifaceName:%{public}s", ifaceName.c_str());
+    LOGD("GetChipsetCategory, ifaceName:%{public}s", ifaceName.c_str());
     sptr<IConcreteChip> chip = nullptr;
     if (!GetChip(ifaceName, IfaceType::STA, chip)) {
         LOGE("GetChipsetCategory, get chip failed");
@@ -553,7 +553,7 @@ bool HalDeviceManager::GetChipsetCategory(const std::string &ifaceName, uint32_t
         LOGE("GetChipsetCategory, call GetChipCaps failed! ret:%{public}d", ret);
         return false;
     }
-    LOGI("GetChipsetCategory success");
+    LOGD("GetChipsetCategory success");
     return true;
 }
 

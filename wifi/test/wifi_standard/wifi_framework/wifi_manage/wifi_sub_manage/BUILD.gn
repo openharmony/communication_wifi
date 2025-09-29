@@ -94,13 +94,6 @@ ohos_unittest("wifi_sub_manage_unittest") {
     "wifi_toggler_manager_test.cpp",
   ]
 
-  if (defined(global_parts_info) && defined(global_parts_info.msdp_movement)) {
-    sources += [
-      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_msdp_state_listener.cpp",
-      "wifi_msdp_state_listener_test.cpp",
-    ]
-  }
-
   include_dirs = [
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan/Mock",
@@ -208,10 +201,6 @@ ohos_unittest("wifi_sub_manage_unittest") {
       "cellular_data:tel_cellular_data_api",
       "core_service:tel_core_service_api",]
     defines += [ "TELEPHONE_CORE_SERVICE_ENABLE" ]
-  }
-  if (defined(global_parts_info) && defined(global_parts_info.msdp_movement)) {
-    external_deps += [ "movement:movement_client" ]
-    defines += [ "HAS_MOVEMENT_PART" ]
   }
 
   part_name = "wifi"

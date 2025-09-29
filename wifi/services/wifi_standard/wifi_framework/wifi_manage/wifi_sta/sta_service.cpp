@@ -723,6 +723,8 @@ ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
     targetNetwork.isAllowAutoConnect = isAllowed;
     WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
     WifiSettings::GetInstance().SyncDeviceConfig();
+    BlockConnectService::GetInstance().UpdateNetworkSelectStatus(networkId, isAllowed ?
+        DisabledReason::DISABLED_NONE : DisabledReason::DISABLED_BY_SYSTEM);
     if (!isAllowed) {
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);

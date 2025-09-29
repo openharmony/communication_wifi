@@ -380,7 +380,7 @@ int WifiScanConfig::GetScanInfoList(std::vector<WifiScanInfo> &results)
     if (results.empty()) {
         results.assign(mWifiScanInfoList.begin(), mWifiScanInfoList.end());
     }
-    LOGD("WifiSettings::GetScanInfoList size = %{public}zu", results.size());
+    LOGI("WifiSettings::GetScanInfoList size = %{public}zu", results.size());
     return 0;
 }
 

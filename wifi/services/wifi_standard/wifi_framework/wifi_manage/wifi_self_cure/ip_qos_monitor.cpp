@@ -234,6 +234,7 @@ bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
             mLastTcpRxCounter = tcpRxPkts;
             return true; // Return true on overflow to avoid false negative
         }
+        
         WIFI_LOGI("deltaTcpTxPkts = %{public}" PRId64 ", deltaTcpRxPkts = %{public}" PRId64,
             deltaTcpTxPkts, deltaTcpRxPkts);
         mLastTcpTxCounter = tcpTxPkts;

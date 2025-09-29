@@ -307,6 +307,9 @@ void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bo
     if (systemAbilityId == MIRACAST_SERVICE_SA_ID) {
         WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(MIRACAST_SERVICE_UID);
     }
+    if (systemAbilityId == HICAR_SERVICE_SA_ID) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(HICAR_SERVICE_UID);
+    }
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
         WIFI_LOGE("Get P2P service failed!");
@@ -505,6 +508,7 @@ void WifiEventSubscriberManager::InitSubscribeListener()
     SubscribeSystemAbility(MIRACAST_SERVICE_SA_ID);
     SubscribeSystemAbility(SHARE_SERVICE_ID);
     SubscribeSystemAbility(MOUSE_CROSS_SERVICE_ID);
+    SubscribeSystemAbility(HICAR_SERVICE_SA_ID);
 }
 
 int WifiEventSubscriberManager::GetLastStaStateByDatashare()

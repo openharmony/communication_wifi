@@ -695,7 +695,7 @@ std::vector<std::string> splitString(std::string str, char delimiter)
 
 void WifiDeviceProxy::ParseDeviceConfigs(MessageParcel &reply, std::vector<WifiDeviceConfig> &result)
 {
-    WIFI_LOGI("ParseDeviceConfigs");
+    WIFI_LOGD("ParseDeviceConfigs");
     constexpr int MAX_DEVICE_CONFIG_SIZE = 1024;
     std::vector<uint32_t> allSize;
     reply.ReadUInt32Vector(&allSize);

@@ -450,7 +450,7 @@ void WifiManager::InstallPacketFilterProgram(int event, int instId)
         WIFI_LOGE("%{public}s InstallFilterProgram fail", __FUNCTION__);
         return;
     }
-    WIFI_LOGI("%{public}s InstallFilterProgram success", __FUNCTION__);
+    WIFI_LOGD("%{public}s InstallFilterProgram success", __FUNCTION__);
 }
 #endif
 

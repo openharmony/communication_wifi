@@ -1046,7 +1046,7 @@ WifiErrorNo HdiWpaStaSetSuspendMode(int mode, const char *ifaceName)
         return WIFI_HAL_OPT_FAILED;
     }
     pthread_mutex_unlock(GetWpaObjMutex());
-    LOGI("HdiWpaStaSetSuspendMode success.");
+    LOGD("HdiWpaStaSetSuspendMode success.");
     return WIFI_HAL_OPT_OK;
 }
 

@@ -347,6 +347,9 @@ void WifiManager::AutoStartEnhanceService(void)
             WIFI_LOGE("init Enhance service failed, ret %{public}d!", static_cast<int>(errCode));
             break;
         }
+    #ifndef OHOS_ARCH_LITE
+        wifiEventSubscriberManager->OnEnhanceServiceReady();
+    #endif
     } while (0);
     return;
 }

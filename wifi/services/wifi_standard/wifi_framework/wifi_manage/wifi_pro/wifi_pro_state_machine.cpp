@@ -987,7 +987,7 @@ void WifiProStateMachine::WifiHasNetState::WifiHasNetStateInit()
     pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
     qoeScaning_ = false;
     pWifiProStateMachine_->currentState_ = WifiProState::WIFI_HASNET;
-    // 先下掉wifipro本身的网络监测，观察几个版本
+    // Remove the network monitoring function of wifipro itself
     pWifiProStateMachine_->perf5gHandoverService_.NetworkStatusChanged(NetworkStatus::HAS_INTERNET);
 }
 

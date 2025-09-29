@@ -149,7 +149,7 @@ bool WifiIntelligenceStateMachine::DefaultState::ExecuteStateMsg(InternalMessage
         return false;
     }
     bool ret = NOT_EXECUTED;
-    WIFI_LOGI("DefaultState-msgCode=%{public}d is received.", msg->GetMessageName());
+    WIFI_LOGD("DefaultState-msgCode=%{public}d is received.", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case EVENT_WIFI_CONNECT_STATE_CHANGED: {
             ret = EXECUTED;
@@ -187,7 +187,7 @@ bool WifiIntelligenceStateMachine::DefaultState::ExecuteStateMsg(InternalMessage
             break;
         }
         default:
-            WIFI_LOGW("DefaultState msg %{public}d.", msg->GetMessageName());
+            WIFI_LOGD("DefaultState msg %{public}d.", msg->GetMessageName());
             break;
     }
     return ret;
@@ -297,7 +297,7 @@ bool WifiIntelligenceStateMachine::EnabledState::ExecuteStateMsg(InternalMessage
         return false;
     }
     bool ret = NOT_EXECUTED;
-    WIFI_LOGI("EnabledState-msgCode=%{public}d is received.", msg->GetMessageName());
+    WIFI_LOGD("EnabledState-msgCode=%{public}d is received.", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case EVENT_WIFI_ENABLED:
             ret = EXECUTED;
@@ -342,7 +342,7 @@ bool WifiIntelligenceStateMachine::DisabledState::ExecuteStateMsg(InternalMessag
         return false;
     }
     bool ret = NOT_EXECUTED;
-    WIFI_LOGI("DisabledState-msgCode=%{public}d is received.", msg->GetMessageName());
+    WIFI_LOGD("DisabledState-msgCode=%{public}d is received.", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case EVENT_CONFIGURATION_CHANGED: {
             ret = EXECUTED;
@@ -382,7 +382,7 @@ bool WifiIntelligenceStateMachine::DisabledState::ExecuteStateMsg(InternalMessag
             break;
         }
         default:
-            WIFI_LOGI("DisabledState-msgCode=%{public}d not handle.", msg->GetMessageName());
+            WIFI_LOGD("DisabledState-msgCode=%{public}d not handle.", msg->GetMessageName());
             break;
     }
     return ret;
@@ -704,7 +704,7 @@ bool WifiIntelligenceStateMachine::DisconnectedState::ExecuteStateMsg(InternalMe
         return false;
     }
     bool ret = NOT_EXECUTED;
-    WIFI_LOGI("DisconnectedState-msgCode=%{public}d is received.", msg->GetMessageName());
+    WIFI_LOGD("DisconnectedState-msgCode=%{public}d is received.", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case EVENT_UPDATE_TARGET_SSID: {
             ret = EXECUTED;
@@ -713,7 +713,7 @@ bool WifiIntelligenceStateMachine::DisconnectedState::ExecuteStateMsg(InternalMe
             break;
         }
         default:
-            WIFI_LOGI("DisconnectedState-msgCode=%{public}d not handle.", msg->GetMessageName());
+            WIFI_LOGD("DisconnectedState-msgCode=%{public}d not handle.", msg->GetMessageName());
             break;
     }
     return ret;
@@ -757,7 +757,7 @@ bool WifiIntelligenceStateMachine::ConnectedState::ExecuteStateMsg(InternalMessa
         return false;
     }
     bool ret = NOT_EXECUTED;
-    WIFI_LOGI("ConnectedState-msgCode=%{public}d is received.", msg->GetMessageName());
+    WIFI_LOGD("ConnectedState-msgCode=%{public}d is received.", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case EVENT_CHECK_WIFI_INTERNET_RESULT:
             ret = EXECUTED;
@@ -840,7 +840,7 @@ bool WifiIntelligenceStateMachine::InternetReadyState::ExecuteStateMsg(InternalM
         return false;
     }
     bool ret = NOT_EXECUTED;
-    WIFI_LOGI("InternetReadyState-msgCode=%{public}d is received.", msg->GetMessageName());
+    WIFI_LOGD("InternetReadyState-msgCode=%{public}d is received.", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case EVENT_CELL_STATE_CHANGE:
         case EVENT_SCREEN_ON: {
@@ -865,7 +865,7 @@ bool WifiIntelligenceStateMachine::InternetReadyState::ExecuteStateMsg(InternalM
             break;
         }
         default:
-            WIFI_LOGI("InternetReadyState-msgCode=%{public}d not handle.", msg->GetMessageName());
+            WIFI_LOGD("InternetReadyState-msgCode=%{public}d not handle.", msg->GetMessageName());
             break;
     }
     return ret;

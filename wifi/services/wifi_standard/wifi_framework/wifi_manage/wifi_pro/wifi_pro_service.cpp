@@ -142,7 +142,7 @@ void WifiProService::NotifyCheckWifiInternetResult(OperateResState state)
 
 void WifiProService::HandleRssiLevelChanged(int32_t rssi)
 {
-    WIFI_LOGI("HandleRssiLevelChanged, %{public}d.", rssi);
+    WIFI_LOGD("HandleRssiLevelChanged, %{public}d.", rssi);
     if (pWifiProStateMachine_ == nullptr) {
         WIFI_LOGE("%{public}s pWifiProStateMachine_ is null.", __FUNCTION__);
         return;
@@ -153,7 +153,7 @@ void WifiProService::HandleRssiLevelChanged(int32_t rssi)
 
 void WifiProService::HandleScanResult(const std::vector<InterScanInfo> &scanInfos)
 {
-    WIFI_LOGI("Enter HandleScanResult.");
+    WIFI_LOGD("Enter HandleScanResult.");
     if (pWifiProStateMachine_ == nullptr) {
         WIFI_LOGE("%{public}s pWifiProStateMachine_ is null.", __FUNCTION__);
         return;

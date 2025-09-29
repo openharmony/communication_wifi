@@ -716,7 +716,7 @@ void WifiServiceScheduler::OnRssiReportCallback(int index, int antRssi)
 
 void WifiServiceScheduler::OnNetlinkReportCallback(int type, const std::vector<uint8_t>& recvMsg)
 {
-    WIFI_LOGI("OnNetlinkReportCallback, type:%{public}d", type);
+    WIFI_LOGD("OnNetlinkReportCallback, type:%{public}d", type);
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGE("get pEnhance service failed!");

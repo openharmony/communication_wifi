@@ -37,6 +37,7 @@ enum class WifiMacAddrInfoType {
 };
 
 struct WifiMacAddrInfo {
+    WifiMacAddrInfo() {};
     std::string bssid; /* mac address */
     int bssidType; /* mac address type */
     bool operator == (const WifiMacAddrInfo& mac)

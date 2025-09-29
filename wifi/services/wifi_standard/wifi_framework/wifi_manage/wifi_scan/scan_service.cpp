@@ -2976,8 +2976,9 @@ int CalculateBitPerTone(int snrDb)
 {
     int bitPerTone;
     if (snrDb <= SNR_BIT_PER_TONE_LUT_MAX) {
-        int lutInIdx = MAX(snrDb, SNR_BIT_PER_TONE_LUT_MIN) - SNR_BIT_PER_TONE_LUT_MIN;
-        lutInIdx = MIN(lutInIdx, sizeof(SNR_BIT_PER_TONE_LUT) / sizeof(int) - 1);
+        size_t lutInIdx = static_cast<size_t>(MAX(snrDb, SNR_BIT_PER_TONE_LUT_MIN)) - SNR_BIT_PER_TONE_LUT_MIN;
+        size_t lutSize = sizeof(SNR_BIT_PER_TONE_LUT) / sizeof(int);
+        lutInIdx = MIN(lutInIdx, lutSize - 1);
         bitPerTone = SNR_BIT_PER_TONE_LUT[lutInIdx];
     } else {
         bitPerTone = snrDb * SNR_BIT_PER_TONE_HIGH_SNR_SCALE;

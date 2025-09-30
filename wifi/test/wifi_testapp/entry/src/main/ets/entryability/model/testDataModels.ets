@@ -195,7 +195,23 @@ import {
   testOnP2pDiscoveryChangeManager
 } from './p2pManagerInterface'
 
-import wifi from '@ohos.wifi';
+import {
+  testCreateServer,
+  testServerStart,
+  testServerStop,
+  testServerClose,
+  testServerOnConnectionAccepted,
+  testServerOnServerStopped,
+  testCreateConnection,
+  testConnectionConnect,
+  testConnectionDisconnect,
+  testConnectionClose,
+  testConnectionGetPeerDeviceId,
+  testConnectionSendData,
+  testConnectionOnConnectResult,
+  testConnectionOnDisconnected,
+  testConnectionOnDataReceived
+} from './linkEnhanceInterface'
 
 interface WifiTest {
   name: string;
@@ -1498,6 +1514,132 @@ const p2pManagerTestCase: WifiTest[] = [
   },
 ]
 
+export const LinkEnhanceTestCase: WifiTest[] = [
+// Server相关接口测试
+  {
+    'name': '创建服务器',
+    'detail': '创建linkEnhance服务器实例',
+    'method': 'createServer',
+    'api': testCreateServer,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '启动服务器',
+    'detail': '启动linkEnhance服务器',
+    'method': 'server.start',
+    'api': testServerStart,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '停止服务器',
+    'detail': '停止linkEnhance服务器',
+    'method': 'server.stop',
+    'api': testServerStop,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '关闭服务器',
+    'detail': '关闭linkEnhance服务器并清理资源',
+    'method': 'server.close',
+    'api': testServerClose,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '监听连接接受事件(开/关)',
+    'detail': '注册/注销服务器连接接受事件监听',
+    'method': 'server.on/off.connectionAccepted',
+    'api': testServerOnConnectionAccepted,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '监听服务器停止事件(开/关)',
+    'detail': '注册/注销服务器停止事件监听',
+    'method': 'server.on/off.serverStopped',
+    'api': testServerOnServerStopped,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+
+  // Connection相关接口测试
+  {
+    'name': '创建连接',
+    'detail': '创建linkEnhance连接实例',
+    'method': 'createConnection',
+    'api': testCreateConnection,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '建立连接',
+    'detail': '连接到对端设备',
+    'method': 'connection.connect',
+    'api': testConnectionConnect,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '断开连接',
+    'detail': '断开与对端设备的连接',
+    'method': 'connection.disconnect',
+    'api': testConnectionDisconnect,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '关闭连接',
+    'detail': '关闭连接并清理资源',
+    'method': 'connection.close',
+    'api': testConnectionClose,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '获取对端设备ID',
+    'detail': '获取连接的对端设备ID',
+    'method': 'connection.getPeerDeviceId',
+    'api': testConnectionGetPeerDeviceId,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '发送数据',
+    'detail': '向对端设备发送数据',
+    'method': 'connection.sendData',
+    'api': testConnectionSendData,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '监听连接结果事件(开/关)',
+    'detail': '注册/注销连接结果事件监听',
+    'method': 'connection.on/off.connectResult',
+    'api': testConnectionOnConnectResult,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '监听断开连接事件(开/关)',
+    'detail': '注册/注销断开连接事件监听',
+    'method': 'connection.on/off.disconnected',
+    'api': testConnectionOnDisconnected,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '监听数据接收事件(开/关)',
+    'detail': '注册/注销数据接收事件监听',
+    'method': 'connection.on/off.dataReceived',
+    'api': testConnectionOnDataReceived,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  }
+]
+
 const TestComposition: WifiTestComposition[] = [
   {
     'name': 'new api',
@@ -1602,6 +1744,13 @@ const TestComposition: WifiTestComposition[] = [
     'name' : 'P2pManager' ,
     'detail' : 'p2pManager测试' ,
     'url' : 'pages/subManualApiTest/p2pManagerInterfaceTest' ,
+    'image' : $r('app.media.WLAN') ,
+    'category' : Category.API
+  },
+  {
+    'name' : 'LinkEnhance' ,
+    'detail' : '软总线增强连接测试' ,
+    'url' : 'pages/subManualApiTest/linkEnhanceInterfaceTest' ,
     'image' : $r('app.media.WLAN') ,
     'category' : Category.API
   },
@@ -1864,4 +2013,12 @@ export function initP2pManagerApIData(): Array<TestApi> {
     TestApiArray.push(new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category));
   })
   return TestApiArray;
+}
+
+export function initLinkEnhanceApiData(): Array<TestApi> {
+  let linkEnhanceApiArray: Array<TestApi> = []
+  LinkEnhanceTestCase.forEach(item => {
+    linkEnhanceApiArray.push(new TestApi(item.name, item.detail, item.method, item.api, item.result, item.category))
+  })
+  return linkEnhanceApiArray
 }

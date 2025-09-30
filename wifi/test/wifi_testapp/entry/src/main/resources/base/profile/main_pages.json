@@ -8,6 +8,7 @@
     "pages/subManualApiTest/wifiManagerInterfaceTest",
     "pages/subManualApiTest/hotspotManagerInterfaceTest",
     "pages/subManualApiTest/p2pManagerInterfaceTest",
+    "pages/subManualApiTest/linkEnhanceInterfaceTest",
 
     "pages/subAutoTest/wifiAutoTest",
     "pages/subAutoTest/wifiManagerAutoTest",

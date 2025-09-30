@@ -58,7 +58,8 @@ export enum CaseCategory {
   HotspotManager ,
   P2p ,
   P2pManager,
-  Socket
+  Socket,
+  LinkEnhance
 }
 
 export class TestApi {

@@ -92,6 +92,15 @@
         "name": "ohos.permission.GET_WIFI_INFO"
       },
       {
+        "name": "ohos.permission.DISTRIBUTED_DATASYNC",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "FormAbility"
+          ]
+        }
+      },
+      {
         "name": "ohos.permission.LOCATION",
         "reason": "$string:app_name",
         "usedScene": {

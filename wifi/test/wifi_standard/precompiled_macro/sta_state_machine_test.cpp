@@ -781,6 +781,11 @@ HWTEST_F(StaStateMachineTest, StopWifiProcessInLinkStateTest01, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     pStaStateMachine->pLinkState->StopWifiProcessInLinkState(msg);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    if (pStaStateMachine->selfCureService_ != nullptr) {
+        EXPECT_FALSE(pStaStateMachine->selfCureService_->IsSelfCureL2Connecting());
+    }
+#endif
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 

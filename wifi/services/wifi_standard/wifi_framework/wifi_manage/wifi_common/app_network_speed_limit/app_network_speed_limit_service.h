@@ -54,6 +54,7 @@ public:
     void HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData);
     void ReceiveNetworkControlInfo(const WifiNetworkControlInfo &networkControlInfo);
     void LimitSpeed(const int controlId, const int limitMode);
+    void HandleNetworkConnectivityChange(int32_t bearType, int32_t code);
 
 private:
     void Init();
@@ -100,6 +101,7 @@ private:
     std::unordered_set<int> m_additionalWindowPidSet;
     std::unique_ptr<WifiEventHandler> m_asyncSendLimit = nullptr;
     int64_t m_delayTime;
+    std::atomic<bool> isVpnConnected_ = false;
 };
 } // namespace Wifi
 } // namespace OHOS

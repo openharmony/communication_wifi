@@ -22,6 +22,8 @@
 #include "speed_limit_configs_writer.h"
 #include "wifi_app_state_aware.h"
 #include "wifi_global_func.h"
+#include "net_all_capabilities.h"
+#include "net_supplier_info.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -263,6 +265,10 @@ bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const s
 
 void AppNetworkSpeedLimitService::AsyncLimitSpeed(const AsyncParamInfo &asyncParamInfo)
 {
+    if (isVpnConnected_) {
+        WIFI_LOGD("%{public}s VPN is connected, cancel speed limit setting", __FUNCTION__);
+        return;
+    }
     m_asyncSendLimit->PostAsyncTask([asyncParamInfo, this]() {
             this->HandleRequest(asyncParamInfo);
         });
@@ -518,6 +524,24 @@ void AppNetworkSpeedLimitService::HighPriorityTransmit(int uid, int protocol, in
     if (ret != 0) {
         WIFI_LOGE("%{public}s highPriorityTransmit failed, ret = %{public}d.", __FUNCTION__, ret);
         return;
+    }
+}
+
+void AppNetworkSpeedLimitService::HandleNetworkConnectivityChange(int32_t bearType, int32_t code)
+{
+    // Only handle VPN network events
+    if (bearType != NetManagerStandard::NetBearType::BEARER_VPN) {
+        WIFI_LOGD("%{public}s Non-VPN network event, bearType: %{public}d, ignored",
+            __FUNCTION__, bearType);
+        return;
+    }
+
+    // VPN event: directly update state based on connection code
+    bool currentVpnState = (code == NetManagerStandard::NetConnState::NET_CONN_STATE_CONNECTED);
+    bool preVpnState = isVpnConnected_.exchange(currentVpnState);
+    if (preVpnState != currentVpnState) {
+        WIFI_LOGI("%{public}s VPN connection state changed: %{public}d -> %{public}d",
+            __FUNCTION__, preVpnState, currentVpnState);
     }
 }
 } // namespace Wifi

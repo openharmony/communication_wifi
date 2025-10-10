@@ -321,5 +321,106 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, HighPriorityTransmit, TestSize.Level1)
     AppNetworkSpeedLimitService::GetInstance().HighPriorityTransmit(uid, protocol, enable);
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControl_Game_VpnConnected_Intercept, TestSize.Level1)
+{
+    WIFI_LOGI("ReceiveNetworkControl_Game_VpnConnected_Intercept enter");
+    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_.store(true);
+    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] = BG_LIMIT_OFF;
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_GAME;
+    networkControlInfo.state = MSG_GAME_STATE_START;
+    networkControlInfo.bundleName = "com.test.game";
+    networkControlInfo.uid = 10001;
+    networkControlInfo.rtt = 100;
+
+    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
+    sleep(1);
+    int curLimitMode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME];
+    EXPECT_EQ(BG_LIMIT_OFF, curLimitMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControl_VideoCall_VpnConnected_Intercept, TestSize.Level1)
+{
+    WIFI_LOGI("ReceiveNetworkControl_VideoCall_VpnConnected_Intercept enter");
+    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_.store(true);
+    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_VIDEO_CALL] = BG_LIMIT_OFF;
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_VIDEO_CALL;
+    networkControlInfo.state = 1;
+
+    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
+    sleep(1);
+    int curLimitMode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_VIDEO_CALL];
+    EXPECT_EQ(BG_LIMIT_OFF, curLimitMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControl_Game_VpnDisconnected_Normal, TestSize.Level1)
+{
+    WIFI_LOGI("ReceiveNetworkControl_Game_VpnDisconnected_Normal enter");
+    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_.store(false);
+    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] = BG_LIMIT_OFF;
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_GAME;
+    networkControlInfo.state = MSG_GAME_STATE_START;
+    networkControlInfo.bundleName = "com.test.game";
+    networkControlInfo.uid = 10001;
+    networkControlInfo.rtt = 100;
+
+    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
+    sleep(1);
+    int curLimitMode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME];
+    EXPECT_NE(BG_LIMIT_OFF, curLimitMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControl_VideoCall_VpnDisconnected_Normal, TestSize.Level1)
+{
+    WIFI_LOGI("ReceiveNetworkControl_VideoCall_VpnDisconnected_Normal enter");
+    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_.store(false);
+    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_VIDEO_CALL] = BG_LIMIT_OFF;
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_VIDEO_CALL;
+    networkControlInfo.state = 1;
+
+    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
+    sleep(1);
+    int curLimitMode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_VIDEO_CALL];
+    EXPECT_EQ(BG_LIMIT_LEVEL_7, curLimitMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControl_AudioPlayback_VpnConnected_Intercept, TestSize.Level1)
+{
+    WIFI_LOGI("ReceiveNetworkControl_AudioPlayback_VpnConnected_Intercept enter");
+    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_.store(true);
+    size_t initialSize = AppNetworkSpeedLimitService::GetInstance().m_bgAudioPlaybackUidSet.size();
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_AUDIO_PLAYBACK;
+    networkControlInfo.state = 1;
+    networkControlInfo.uid = 10002;
+    networkControlInfo.pid = 20002;
+
+    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
+    sleep(1);
+    size_t currentSize = AppNetworkSpeedLimitService::GetInstance().m_bgAudioPlaybackUidSet.size();
+    EXPECT_EQ(initialSize, currentSize);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControl_AudioPlayback_VpnDisconnected_Normal, TestSize.Level1)
+{
+    WIFI_LOGI("ReceiveNetworkControl_AudioPlayback_VpnDisconnected_Normal enter");
+    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_.store(false);
+    AppNetworkSpeedLimitService::GetInstance().m_bgAudioPlaybackUidSet.clear();
+    size_t initialSize = AppNetworkSpeedLimitService::GetInstance().m_bgAudioPlaybackUidSet.size();
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_AUDIO_PLAYBACK;
+    networkControlInfo.state = 1;
+    networkControlInfo.uid = 10003;
+    networkControlInfo.pid = 20003;
+
+    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
+    sleep(1);
+    size_t currentSize = AppNetworkSpeedLimitService::GetInstance().m_bgAudioPlaybackUidSet.size();
+    EXPECT_EQ(initialSize + 1, currentSize);
+}
 } // namespace Wifi
 } // namespace OHOS

@@ -44,6 +44,7 @@
 #endif
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sensor_scene.h"
+#include "app_network_speed_limit_service.h"
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
 #include "telephony_observer_client.h"
 #include "telephony_types.h"
@@ -1227,6 +1228,7 @@ void CesEventSubscriber::OnReceiveConnectivityChangedEvent(const OHOS::EventFwk:
 
     WIFI_LOGI("%{public}s net: %{public}d code: %{public}d", __FUNCTION__, bearType, code);
     WifiSensorScene::GetInstance().OnConnectivityChanged(bearType, code);
+    AppNetworkSpeedLimitService::GetInstance().HandleNetworkConnectivityChange(bearType, code);
 }
 
 void WifiEventSubscriberManager::RegisterNetworkStateChangeEvent()

@@ -41,6 +41,13 @@ enum class WifiConnectionType {
     DISCONNECT
 };
 
+enum class EventAccessInternetFailReason {
+    ARP_OPERATE_RES = 0,
+    HTTP_OPERATE_RES = 1,
+    NOINTERNET = 2,
+    IPV6_FAILED = 3,
+};
+
 inline const int HISYS_EVENT_DEFAULT_VALUE = -1;
 inline const int HISYS_EVENT_PROTAL_STATE_NOT_PORTAL = 0;
 inline const int HISYS_EVENT_PROTAL_STATE_PORTAL_VERIFIED = 1;

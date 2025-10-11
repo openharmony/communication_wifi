@@ -235,6 +235,7 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
     }
     pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_IDLE, false);
     pSelfCureStateMachine_->StopTimer(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD);
+    SelfCureUtils::GetInstance().SetIpv6Disabled(false);
     IpQosMonitor::GetInstance().StartMonitor();
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);

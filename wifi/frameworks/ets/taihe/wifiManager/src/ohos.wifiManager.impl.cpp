@@ -19,6 +19,7 @@
 #include "stdexcept"
 
 #include "define.h"
+#include "wifi_utils_taihe.h"
 #include "wifi_callback_taihe.h"
 #include "wifi_errorcode_taihe.h"
 using namespace OHOS::Wifi;
@@ -28,38 +29,18 @@ std::shared_ptr<WifiScan> g_wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILIT
 static std::shared_ptr<WifiHotspot> g_wifiHotspotPtr = WifiHotspot::GetInstance(WIFI_HOTSPOT_ABILITY_ID);
 std::shared_ptr<WifiP2p> g_wifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
 namespace {
-::ohos::wifiManager::WifiScanInfo MakeTmpWifiScanInfo(WifiScanInfo scanInfo)
-{
-    return {scanInfo.ssid, scanInfo.bssid,
-        static_cast<::ohos::wifiManager::WifiSecurityType::key_t>(scanInfo.securityType),
-        scanInfo.rssi, scanInfo.band,
-        static_cast<::ohos::wifiManager::WifiCategory::key_t>(scanInfo.supportedWifiCategory)};
-}
 
-::ohos::wifiManager::WifiLinkedInfo MakeWifiLinkedInfo(WifiLinkedInfo linkedInfo)
-{
-    ::ohos::wifiManager::ConnState connState =
-        static_cast<::ohos::wifiManager::ConnState::key_t>(linkedInfo.connState);
-    ::ohos::wifiManager::WifiCategory supportedWifiCategory =
-        static_cast<::ohos::wifiManager::WifiCategory::key_t>(linkedInfo.supportedWifiCategory);
-    return {linkedInfo.ssid, linkedInfo.bssid, linkedInfo.rssi, linkedInfo.band,
-        linkedInfo.macAddress, connState, supportedWifiCategory};
-}
+OHOS::sptr<WifiIdlDeviceEventCallback> wifiDeviceCallback =
+    OHOS::sptr<WifiIdlDeviceEventCallback>(new (std::nothrow) WifiIdlDeviceEventCallback());
 
-::ohos::wifiManager::IpInfo MakeIpInfo(int32_t ipAddress)
-{
-    return {ipAddress};
-}
- 
-::ohos::wifiManager::Ipv6Info MakeIpv6Info(::taihe::string_view linkIpv6Address)
-{
-    return {linkIpv6Address};
-}
+OHOS::sptr<WifiIdlScanEventCallback> wifiScanCallback =
+    OHOS::sptr<WifiIdlScanEventCallback>(new (std::nothrow) WifiIdlScanEventCallback());
 
-::ohos::wifiManager::StationInfo MakeTmpStationInfo()
-{
-    return {""};
-}
+OHOS::sptr<WifiIdlHotspotEventCallback> wifiHotspotCallback =
+    OHOS::sptr<WifiIdlHotspotEventCallback>(new (std::nothrow) WifiIdlHotspotEventCallback());
+
+OHOS::sptr<WifiIdlP2pEventCallback> wifiP2pCallback =
+    OHOS::sptr<WifiIdlP2pEventCallback>(new (std::nothrow) WifiIdlP2pEventCallback());
 
 bool IsConnected()
 {
@@ -89,31 +70,14 @@ bool IsWifiActive()
     return static_cast<ani_boolean>(activeStatus);
 }
 
-::ohos::wifiManager::WifiLinkedInfo GetLinkedInfoSync()
-{
-    WifiLinkedInfo linkedInfo;
-    if (g_wifiDevicePtr == nullptr) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-        ::ohos::wifiManager::WifiLinkedInfo errorResult = MakeWifiLinkedInfo(linkedInfo);
-        return errorResult;
-    }
-    ErrCode ret = g_wifiDevicePtr->GetLinkedInfo(linkedInfo);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
-    }
-    return MakeWifiLinkedInfo(linkedInfo);
-}
-
 int GetSignalLevel(int rssi, int band)
 {
     int level = -1;
-    int tmpRssi = static_cast<int>(rssi);
-    int tmpBand = static_cast<int>(band);
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
         return 0.0;
     }
-    ErrCode ret = g_wifiDevicePtr->GetSignalLevel(tmpRssi, tmpBand, level);
+    ErrCode ret = g_wifiDevicePtr->GetSignalLevel(rssi, band, level);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
     }
@@ -125,14 +89,14 @@ int GetSignalLevel(int rssi, int band)
     IpInfo ipInfo;
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-        ::ohos::wifiManager::IpInfo errorResult = MakeIpInfo(ipInfo.ipAddress);
+        ::ohos::wifiManager::IpInfo errorResult = MakeIpInfo(ipInfo);
         return errorResult;
     }
     ErrCode ret = g_wifiDevicePtr->GetIpInfo(ipInfo);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
     }
-    ::ohos::wifiManager::IpInfo result = MakeIpInfo(ipInfo.ipAddress);
+    ::ohos::wifiManager::IpInfo result = MakeIpInfo(ipInfo);
     return result;
 }
 
@@ -141,14 +105,14 @@ int GetSignalLevel(int rssi, int band)
     IpV6Info ipInfo;
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-        ::ohos::wifiManager::Ipv6Info errorResult = MakeIpv6Info(ipInfo.linkIpV6Address);
+        ::ohos::wifiManager::Ipv6Info errorResult = MakeIpv6Info(ipInfo);
         return errorResult;
     }
     ErrCode ret = g_wifiDevicePtr->GetIpv6Info(ipInfo);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
     }
-    ::ohos::wifiManager::Ipv6Info result = MakeIpv6Info(ipInfo.linkIpV6Address);
+    ::ohos::wifiManager::Ipv6Info result = MakeIpv6Info(ipInfo);
     return result;
 }
 
@@ -181,11 +145,12 @@ bool IsOpenSoftApAllowed()
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
     }
     WIFI_LOGI("GetScanInfoList, size: %{public}zu", scanInfos.size());
-    for (WifiScanInfo scanInfo : scanInfos) {
-        ::ohos::wifiManager::WifiScanInfo tmpInfo = MakeTmpWifiScanInfo(scanInfo);
+    for (WifiScanInfo& scanInfo : scanInfos) {
+        ::ohos::wifiManager::WifiScanInfo tmpInfo = MakeWifiScanInfo(scanInfo);
         result.emplace_back(tmpInfo);
     }
-    return ::taihe::array<::ohos::wifiManager::WifiScanInfo>(taihe::copy_data_t{}, result.data(), result.size());
+    return ::taihe::array<::ohos::wifiManager::WifiScanInfo>(taihe::copy_data_t{},
+        result.data(), result.size());
 }
 
 bool IsMeteredHotspot()
@@ -216,11 +181,6 @@ bool IsMeteredHotspot()
     return static_cast<::ohos::wifiManager::WifiDetailState::key_t>(state);
 }
 
-void StationInfoToTaihe(::ohos::wifiManager::StationInfo &tmpInfo, StationInfo stationInfo)
-{
-    tmpInfo.macAddress = stationInfo.bssid;
-}
-
 ::taihe::array<::ohos::wifiManager::StationInfo> GetStations()
 {
     std::vector<StationInfo> vecStationInfo;
@@ -235,9 +195,8 @@ void StationInfoToTaihe(::ohos::wifiManager::StationInfo &tmpInfo, StationInfo s
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
     }
     WIFI_LOGI("Get station list size: %{public}zu", vecStationInfo.size());
-    for (StationInfo stationInfo : vecStationInfo) {
-        ::ohos::wifiManager::StationInfo tmpInfo = MakeTmpStationInfo();
-        StationInfoToTaihe(tmpInfo, stationInfo);
+    for (StationInfo& stationInfo : vecStationInfo) {
+        ::ohos::wifiManager::StationInfo tmpInfo = MakeStationInfo(stationInfo);
         result.emplace_back(tmpInfo);
     }
     return ::taihe::array<::ohos::wifiManager::StationInfo>(taihe::copy_data_t{}, result.data(), result.size());
@@ -279,23 +238,820 @@ void EnableSemiWifi()
     }
 }
 
-OHOS::sptr<WifiIdlDeviceEventCallback> wifiDeviceCallback =
-        OHOS::sptr<WifiIdlDeviceEventCallback>(new (std::nothrow) WifiIdlDeviceEventCallback());
+::taihe::array<::ohos::wifiManager::WifiDeviceConfig> GetDeviceConfigs()
+{
+    WifiDeviceConfig tmpWifiDeviceConfig;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return {MakeWifiDeviceConfig(tmpWifiDeviceConfig)};
+    }
+    std::vector<WifiDeviceConfig> vecDeviceConfigs;
+    bool isCandidate = false;
+    ErrCode ret = g_wifiDevicePtr->GetDeviceConfigs(vecDeviceConfigs, isCandidate);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get device configs fail: %{public}d", ret);
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return {MakeWifiDeviceConfig(tmpWifiDeviceConfig)};
+    }
+    WIFI_LOGI("Get device configs size: %{public}zu", vecDeviceConfigs.size());
+    std::vector<::ohos::wifiManager::WifiDeviceConfig> result;
+    for (const WifiDeviceConfig& device : vecDeviceConfigs) {
+        result.emplace_back(MakeWifiDeviceConfig(device));
+    }
+    return ::taihe::array<::ohos::wifiManager::WifiDeviceConfig>(
+        taihe::copy_data_t{}, result.data(), result.size());
+}
 
-OHOS::sptr<WifiIdlScanEventCallback> wifiScanCallback =
-    OHOS::sptr<WifiIdlScanEventCallback>(new (std::nothrow) WifiIdlScanEventCallback());
+void Disconnect()
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->Disconnect();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+}
 
-OHOS::sptr<WifiIdlHotspotEventCallback> wifiHotspotCallback =
-    OHOS::sptr<WifiIdlHotspotEventCallback>(new (std::nothrow) WifiIdlHotspotEventCallback());
+void ConnectToNetwork(int32_t networkId)
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    bool isCandidate = false;
+    ErrCode ret = g_wifiDevicePtr->ConnectToNetwork(networkId, isCandidate);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+}
 
-OHOS::sptr<WifiIdlP2pEventCallback> wifiP2pCallback =
-    OHOS::sptr<WifiIdlP2pEventCallback>(new (std::nothrow) WifiIdlP2pEventCallback());
+::taihe::array<::taihe::string> GetDeviceMacAddress()
+{
+    std::string macAddr;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return {static_cast<::taihe::string>(macAddr)};
+    }
+    ErrCode ret = g_wifiDevicePtr->GetDeviceMacAddress(macAddr);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get mac address fail: %{public}d", ret);
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return {static_cast<::taihe::string>(macAddr)};
+    }
+    return {static_cast<::taihe::string>(macAddr)};
+}
 
-void OnWifiStateChange(::taihe::callback_view<void(double)> callback)
+bool IsHotspotActive()
+{
+    bool isActive = false;
+    if (g_wifiHotspotPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+        return isActive;
+    }
+    ErrCode ret = g_wifiHotspotPtr->IsHotspotActive(isActive);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+    }
+    return isActive;
+}
+
+void P2pConnect(::ohos::wifiManager::WifiP2PConfig const& config)
+{
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return;
+    }
+    WifiP2pConfig newConfig = ConvertWifiP2pConfig(config);
+    ErrCode ret = g_wifiP2pPtr->P2pConnect(newConfig);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+}
+
+::taihe::array<::ohos::wifiManager::WifiDeviceConfig> GetCandidateConfigs()
+{
+    WifiDeviceConfig tmpResult;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return {MakeWifiDeviceConfig(tmpResult)};
+    }
+    std::vector<WifiDeviceConfig> vecDeviceConfigs;
+    bool isCandidate = true;
+    ErrCode ret = g_wifiDevicePtr->GetDeviceConfigs(vecDeviceConfigs, isCandidate);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return {MakeWifiDeviceConfig(tmpResult)};
+    }
+    std::vector<::ohos::wifiManager::WifiDeviceConfig> result;
+    for (const WifiDeviceConfig& device : vecDeviceConfigs) {
+        result.emplace_back(MakeWifiDeviceConfig(device));
+    }
+    return ::taihe::array<::ohos::wifiManager::WifiDeviceConfig>(
+        taihe::copy_data_t{}, result.data(), result.size());
+}
+
+void P2pCancelConnect()
+{
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return;
+    }
+    ErrCode ret = g_wifiP2pPtr->P2pCancelConnect();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+}
+
+void ConnectToCandidateConfig(int32_t networkId)
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    bool isCandidate = true;
+    ErrCode ret = g_wifiDevicePtr->ConnectToNetwork(networkId, isCandidate);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+}
+
+void Reconnect()
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->ReConnect();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+}
+
+void Reassociate()
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->ReAssociate();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+}
+
+void ConnectToDevice(::ohos::wifiManager::WifiDeviceConfig const& config)
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    WifiDeviceConfig convertedConfig = ConvertWifiDeviceConfig(config);
+    ErrCode ret = g_wifiDevicePtr->ConnectToDevice(convertedConfig);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+}
+
+void SetHotspotConfig(::ohos::wifiManager::HotspotConfig const& config)
+{
+    if (g_wifiHotspotPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+        return;
+    }
+    if (!IsSecTypeSupported(config.securityType)) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+        return;
+    }
+    HotspotConfig convertedConfig = ConvertHotspotConfig(config);
+    ErrCode ret = g_wifiHotspotPtr->SetHotspotConfig(convertedConfig);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+        return;
+    }
+}
+
+bool IsFeatureSupported(int64_t featureId)
+{
+    bool isSupported = false;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+        return isSupported;
+    }
+    ErrCode ret = g_wifiDevicePtr->IsFeatureSupported(featureId, isSupported);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_CORE);
+        return isSupported;
+    }
+    return isSupported;
+}
+
+::ohos::wifiManager::HotspotConfig GetHotspotConfig()
+{
+    HotspotConfig config;
+    if (g_wifiHotspotPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+        return MakeHotspotConfig(config);
+    }
+    ErrCode ret = g_wifiHotspotPtr->GetHotspotConfig(config);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+    }
+    return MakeHotspotConfig(config);
+}
+
+void DisableHotspot()
+{
+    if (g_wifiHotspotPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+        return;
+    }
+    ErrCode ret = g_wifiHotspotPtr->DisableHotspot();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+    }
+}
+
+void EnableHotspot()
+{
+    if (g_wifiHotspotPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+        return;
+    }
+    ErrCode ret = g_wifiHotspotPtr->EnableHotspot();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+    }
+}
+
+bool IsHotspotDualBandSupported()
+{
+    bool isSupported = false;
+    if (g_wifiHotspotPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+        return isSupported;
+    }
+    ErrCode ret = g_wifiHotspotPtr->IsHotspotDualBandSupported(isSupported);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+    }
+    return isSupported;
+}
+
+int64_t GetSupportedFeatures()
+{
+    long features = -1;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+        return static_cast<int64_t>(features);
+    }
+    ErrCode ret = g_wifiDevicePtr->GetSupportedFeatures(features);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_CORE);
+    }
+    return static_cast<int64_t>(features);
+}
+
+::taihe::string GetCountryCode()
+{
+    std::string countryCode;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+        return static_cast<::taihe::string>(countryCode);
+    }
+    ErrCode ret = g_wifiDevicePtr->GetCountryCode(countryCode);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_CORE);
+    }
+    return static_cast<::taihe::string>(countryCode);
+}
+
+void RemoveDevice(int32_t id)
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->RemoveDevice(id);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return;
+}
+
+::taihe::array<::ohos::wifiManager::WifiLinkedInfo> GetMultiLinkedInfo()
+{
+    WifiLinkedInfo tmpResult;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return {MakeWifiLinkedInfo(tmpResult)};
+    }
+    std::vector<WifiLinkedInfo> wifiMultiLinkedInfo;
+    ErrCode ret = g_wifiDevicePtr->GetMultiLinkedInfo(wifiMultiLinkedInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetMultiLinkedInfo value fail:%{public}d", ret);
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return {MakeWifiLinkedInfo(tmpResult)};
+    }
+    WIFI_LOGI("%{public}s get multi linkedInfo size: %{public}zu",
+        __FUNCTION__, wifiMultiLinkedInfo.size());
+    std::vector<::ohos::wifiManager::WifiLinkedInfo> result;
+    for (WifiLinkedInfo& linkedInfo : wifiMultiLinkedInfo) {
+        ::ohos::wifiManager::WifiLinkedInfo tmpInfo = MakeWifiLinkedInfo(linkedInfo);
+        result.emplace_back(tmpInfo);
+    }
+    return ::taihe::array<::ohos::wifiManager::WifiLinkedInfo>(
+        taihe::copy_data_t{}, result.data(), result.size());
+}
+
+void AllowAutoConnect(int32_t netId, bool isAllowed)
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->AllowAutoConnect(netId, isAllowed);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return;
+}
+
+bool IsBandTypeSupported(::ohos::wifiManager::WifiBandType bandType)
+{
+    bool supported = false;
+    int type = static_cast<int>(bandType);
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return supported;
+    }
+    ErrCode ret = g_wifiDevicePtr->IsBandTypeSupported(type, supported);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return supported;
+}
+
+void CreateGroup(::ohos::wifiManager::WifiP2PConfig const& config)
+{
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return;
+    }
+    WifiP2pConfig configInner = ConvertWifiP2pConfig(config);
+    ErrCode ret = g_wifiP2pPtr->CreateGroup(configInner);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+    return;
+}
+
+void StartDiscoverDevices()
+{
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return;
+    }
+    ErrCode ret = g_wifiP2pPtr->DiscoverDevices();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+    return;
+}
+
+void RemoveGroup()
+{
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return;
+    }
+    ErrCode ret = g_wifiP2pPtr->RemoveGroup();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+    return;
+}
+
+void StopDiscoverDevices()
+{
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return;
+    }
+    ErrCode ret = g_wifiP2pPtr->StopDiscoverDevices();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+    return;
+}
+
+::taihe::array<::ohos::wifiManager::StationInfo> GetHotspotBlockList()
+{
+    StationInfo tmpStationInfo;
+    ::ohos::wifiManager::StationInfo tmpResult = MakeStationInfo(tmpStationInfo);
+    if (g_wifiHotspotPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+        return {tmpResult};
+    }
+    std::vector<StationInfo> vecStationInfo;
+    ErrCode ret = g_wifiHotspotPtr->GetBlockLists(vecStationInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+        return {tmpResult};
+    }
+    WIFI_LOGI("Get block list size: %{public}zu", vecStationInfo.size());
+    std::vector<::ohos::wifiManager::StationInfo> result;
+    for (StationInfo& info : vecStationInfo) {
+        ::ohos::wifiManager::StationInfo tmpInfo = MakeStationInfo(info);
+        result.emplace_back(tmpInfo);
+    }
+    return ::taihe::array<::ohos::wifiManager::StationInfo>(taihe::copy_data_t{},
+        result.data(), result.size());
+}
+
+void SetDeviceName(::taihe::string_view devName)
+{
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return;
+    }
+    std::string name = static_cast<std::string>(devName);
+    ErrCode ret = g_wifiP2pPtr->SetP2pDeviceName(name);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+    return;
+}
+
+void EnableHiLinkHandshake(bool isHiLinkEnable, ::taihe::string_view bssid,
+    ::ohos::wifiManager::WifiDeviceConfig const& config)
+{
+    WifiDeviceConfig deviceConfig = ConvertWifiDeviceConfig(config);
+    std::string bssidInner = static_cast<std::string>(bssid);
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->EnableHiLinkHandshake(isHiLinkEnable, bssidInner, deviceConfig);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+}
+
+void StartPortalCertification()
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->StartPortalCertification();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+}
+
+void DeletePersistentGroup(int32_t netId)
+{
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return;
+    }
+    WifiP2pGroupInfo groupInfo;
+    groupInfo.SetNetworkId(netId);
+    ErrCode ret = g_wifiP2pPtr->DeleteGroup(groupInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+    return;
+}
+
+void DisableNetwork(int32_t netId)
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->DisableDeviceConfig(netId);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+}
+
+int32_t UpdateNetwork(::ohos::wifiManager::WifiDeviceConfig const& config)
+{
+    WifiDeviceConfig configInner = ConvertWifiDeviceConfig(config);
+    int updateResult = -1;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return updateResult;
+    }
+    ErrCode ret = g_wifiDevicePtr->UpdateDeviceConfig(configInner, updateResult);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return updateResult;
+}
+
+void RemoveAllNetwork()
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->RemoveAllDevice();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return;
+}
+
+void DelHotspotBlockList(::ohos::wifiManager::StationInfo const& stationInfo)
+{
+    StationInfo stationInfoInner = ConvertStationInfo(stationInfo);
+    if (g_wifiHotspotPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+        return;
+    }
+    ErrCode ret = g_wifiHotspotPtr->DelBlockList(stationInfoInner);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Del block list fail: %{public}d", ret);
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+    }
+}
+
+void AddHotspotBlockList(::ohos::wifiManager::StationInfo const& stationInfo)
+{
+    StationInfo stationInfoInner = ConvertStationInfo(stationInfo);
+    if (g_wifiHotspotPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+        return;
+    }
+    ErrCode ret = g_wifiHotspotPtr->AddBlockList(stationInfoInner);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Add block list fail: %{public}d", ret);
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+    }
+}
+
+void SetScanAlwaysAllowed(bool isScanAlwaysAllowed)
+{
+    if (g_wifiScanPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+        return;
+    }
+    ErrCode ret = g_wifiScanPtr->SetScanOnlyAvailable(isScanAlwaysAllowed);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_CORE);
+    }
+    return;
+}
+
+void FactoryReset()
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->FactoryReset();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return;
+}
+
+::taihe::array<int32_t> Get5GChannelList()
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return {-1};
+    }
+    std::vector<int32_t> vec5GChannels;
+    ErrCode ret = g_wifiDevicePtr->Get5GHzChannelList(vec5GChannels);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return {-1};
+    }
+    return ::taihe::array<int32_t>(taihe::copy_data_t{}, vec5GChannels.data(), vec5GChannels.size());
+}
+
+void StartScan()
+{
+    if (g_wifiScanPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    bool compatible = false;
+    ErrCode ret = g_wifiScanPtr->Scan(compatible);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+}
+
+::ohos::wifiManager::DisconnectedReason GetDisconnectedReason()
+{
+    DisconnectedReason reason = DisconnectedReason::DISC_REASON_DEFAULT;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return static_cast<::ohos::wifiManager::DisconnectedReason::key_t>(reason);
+    }
+    
+    ErrCode ret = g_wifiDevicePtr->GetDisconnectedReason(reason);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetDisconnectedReason failed:%{public}d", ret);
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return static_cast<::ohos::wifiManager::DisconnectedReason::key_t>(reason);
+}
+
+bool GetScanAlwaysAllowed()
+{
+    bool isScanAlwaysAllowed = false;
+    if (g_wifiScanPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+        return isScanAlwaysAllowed;
+    }
+    ErrCode ret = g_wifiScanPtr->GetScanOnlyAvailable(isScanAlwaysAllowed);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_CORE);
+    }
+    return isScanAlwaysAllowed;
+}
+
+void ConnectToCandidateConfigWithUserActionSync(int32_t networkId)
+{
+    std::vector<std::string> event = {EVENT_STA_CANDIDATE_CONNECT_CHANGE};
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->RegisterCallBack(wifiDeviceCallback, event);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+
+    bool isCandidate = true;
+    ret = g_wifiDevicePtr->ConnectToNetwork(networkId, isCandidate);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+}
+
+::ohos::wifiManager::WifiLinkedInfo GetLinkedInfoSync()
+{
+    WifiLinkedInfo linkedInfo;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        ::ohos::wifiManager::WifiLinkedInfo errorResult = MakeWifiLinkedInfo(linkedInfo);
+        return errorResult;
+    }
+    ErrCode ret = g_wifiDevicePtr->GetLinkedInfo(linkedInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return MakeWifiLinkedInfo(linkedInfo);
+}
+
+int32_t AddDeviceConfigSync(::ohos::wifiManager::WifiDeviceConfig const& config)
+{
+    int32_t networkId = -1;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return networkId;
+    }
+    WifiDeviceConfig configInner = ConvertWifiDeviceConfig(config);
+    bool isCandidate = false;
+    ErrCode ret = g_wifiDevicePtr->AddDeviceConfig(configInner, networkId, isCandidate);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return networkId;
+}
+
+::taihe::array<::ohos::wifiManager::WifiP2pDevice> GetP2pPeerDevicesSync()
+{
+    WifiP2pDevice tmpResult;
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return {MakeWifiP2pDevice(tmpResult)};
+    }
+    std::vector<WifiP2pDevice> vecP2pDevices;
+    ErrCode ret = g_wifiP2pPtr->QueryP2pDevices(vecP2pDevices);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+        return {MakeWifiP2pDevice(tmpResult)};
+    }
+    std::vector<::ohos::wifiManager::WifiP2pDevice> result;
+    for (WifiP2pDevice& device : vecP2pDevices) {
+        result.emplace_back(MakeWifiP2pDevice(device));
+    }
+    return ::taihe::array<::ohos::wifiManager::WifiP2pDevice>(taihe::copy_data_t{},
+        result.data(), result.size());
+}
+
+::ohos::wifiManager::WifiP2pLinkedInfo GetP2pLinkedInfoSync()
+{
+    WifiP2pLinkedInfo linkedInfo;
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return MakeWifiP2pLinkedInfo(linkedInfo);
+    }
+    ErrCode ret = g_wifiP2pPtr->QueryP2pLinkedInfo(linkedInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+    return MakeWifiP2pLinkedInfo(linkedInfo);
+}
+
+int32_t AddCandidateConfigSync(::ohos::wifiManager::WifiDeviceConfig const& config)
+{
+    int32_t networkId = -1;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return networkId;
+    }
+    WifiDeviceConfig configInner = ConvertWifiDeviceConfig(config);
+    bool isCandidate = true;
+    ErrCode ret = g_wifiDevicePtr->AddDeviceConfig(configInner, networkId, isCandidate);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return networkId;
+}
+
+void RemoveCandidateConfigSync(int32_t networkId)
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->RemoveCandidateConfig(networkId);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+}
+
+::ohos::wifiManager::WifiP2pDevice GetP2pLocalDeviceSync()
+{
+    WifiP2pDevice deviceInfo;
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return MakeWifiP2pDevice(deviceInfo);
+    }
+    ErrCode ret = g_wifiP2pPtr->QueryP2pLocalDevice(deviceInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+    return MakeWifiP2pDevice(deviceInfo);
+}
+
+::taihe::array<::ohos::wifiManager::WifiP2pGroupInfo> GetP2pGroupsSync()
+{
+    WifiP2pGroupInfo info;
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return {MakeWifiP2pGroupInfo(info)};
+    }
+    std::vector<WifiP2pGroupInfo> vecGroupInfoList;
+    ErrCode ret = g_wifiP2pPtr->QueryP2pGroups(vecGroupInfoList);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+        return {MakeWifiP2pGroupInfo(info)};
+    }
+    std::vector<::ohos::wifiManager::WifiP2pGroupInfo> result;
+    for (WifiP2pGroupInfo &groupInfo : vecGroupInfoList) {
+        result.emplace_back(MakeWifiP2pGroupInfo(groupInfo));
+    }
+    return ::taihe::array<::ohos::wifiManager::WifiP2pGroupInfo>(taihe::copy_data_t{},
+        result.data(), result.size());
+}
+
+::ohos::wifiManager::WifiP2pGroupInfo GetCurrentGroupSync()
+{
+    WifiP2pGroupInfo groupInfo;
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return MakeWifiP2pGroupInfo(groupInfo);
+    }
+    ErrCode ret = g_wifiP2pPtr->GetCurrentGroup(groupInfo);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+    return MakeWifiP2pGroupInfo(groupInfo);
+}
+
+void OnWifiStateChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiStateChangeLock);
     auto wifiStateChangedCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"wifiStateChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -312,7 +1068,7 @@ void OnWifiStateChange(::taihe::callback_view<void(double)> callback)
     g_wifiStateChangeVec.emplace_back(wifiStateChangedCallback);
 }
 
-void OffWifiStateChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffWifiStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiStateChangeLock);
     if (g_wifiStateChangeVec.empty()) {
@@ -331,11 +1087,11 @@ void OffWifiStateChange(::taihe::optional_view<::taihe::callback<void(double)>> 
     }
 }
 
-void OnWifiConnectionChange(::taihe::callback_view<void(double)> callback)
+void OnWifiConnectionChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiConnectionChangeLock);
     auto wifiConnectionChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"wifiConnectionChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -353,7 +1109,7 @@ void OnWifiConnectionChange(::taihe::callback_view<void(double)> callback)
     g_wifiConnectionChangeVec.emplace_back(wifiConnectionChangeCallback);
 }
  
-void OffWifiConnectionChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffWifiConnectionChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiConnectionChangeLock);
     if (g_wifiConnectionChangeVec.empty()) {
@@ -372,11 +1128,11 @@ void OffWifiConnectionChange(::taihe::optional_view<::taihe::callback<void(doubl
     }
 }
  
-void OnWifiScanStateChange(::taihe::callback_view<void(double)> callback)
+void OnWifiScanStateChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiScanStateChangeLock);
     auto wifiScanStateChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"wifiScanStateChange"};
     if (g_wifiScanPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -394,7 +1150,7 @@ void OnWifiScanStateChange(::taihe::callback_view<void(double)> callback)
     g_wifiScanStateChangeVec.emplace_back(wifiScanStateChangeCallback);
 }
  
-void OffWifiScanStateChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffWifiScanStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiScanStateChangeLock);
     if (g_wifiScanStateChangeVec.empty()) {
@@ -413,11 +1169,11 @@ void OffWifiScanStateChange(::taihe::optional_view<::taihe::callback<void(double
     }
 }
  
-void OnWifiRssiChange(::taihe::callback_view<void(double)> callback)
+void OnWifiRssiChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiRssiChangeLock);
     auto wifiRssiChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"wifiRssiChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -435,7 +1191,7 @@ void OnWifiRssiChange(::taihe::callback_view<void(double)> callback)
     g_wifiRssiChangeVec.emplace_back(wifiRssiChangeCallback);
 }
  
-void OffWifiRssiChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffWifiRssiChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiRssiChangeLock);
     if (g_wifiRssiChangeVec.empty()) {
@@ -454,11 +1210,11 @@ void OffWifiRssiChange(::taihe::optional_view<::taihe::callback<void(double)>> c
     }
 }
 
-void OnStreamChange(::taihe::callback_view<void(double)> callback)
+void OnStreamChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiStreamChangeLock);
     auto wifiRssiChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"streamChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -476,7 +1232,7 @@ void OnStreamChange(::taihe::callback_view<void(double)> callback)
     g_wifiStreamChangeVec.emplace_back(wifiRssiChangeCallback);
 }
 
-void OffStreamChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffStreamChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiStreamChangeLock);
     if (g_wifiStreamChangeVec.empty()) {
@@ -495,11 +1251,11 @@ void OffStreamChange(::taihe::optional_view<::taihe::callback<void(double)>> cal
     }
 }
 
-void OnDeviceConfigChange(::taihe::callback_view<void(double)> callback)
+void OnDeviceConfigChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiDeviceConfigChangeLock);
     auto wifiDeviceConfigChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"deviceConfigChange"};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
@@ -517,7 +1273,7 @@ void OnDeviceConfigChange(::taihe::callback_view<void(double)> callback)
     g_wifiDeviceConfigChangeVec.emplace_back(wifiDeviceConfigChangeCallback);
 }
 
-void OffDeviceConfigChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffDeviceConfigChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiDeviceConfigChangeLock);
     if (g_wifiDeviceConfigChangeVec.empty()) {
@@ -536,11 +1292,11 @@ void OffDeviceConfigChange(::taihe::optional_view<::taihe::callback<void(double)
     }
 }
 
-void OnHotspotStateChange(::taihe::callback_view<void(double)> callback)
+void OnHotspotStateChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStateChangeLock);
     auto wifiHotspotStateChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"hotspotStateChange"};
     if (g_wifiHotspotPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
@@ -558,7 +1314,7 @@ void OnHotspotStateChange(::taihe::callback_view<void(double)> callback)
     g_wifiHotspotStateChangeVec.emplace_back(wifiHotspotStateChangeCallback);
 }
 
-void OffHotspotStateChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffHotspotStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiHotspotStateChangeLock);
     if (g_wifiHotspotStateChangeVec.empty()) {
@@ -661,11 +1417,11 @@ void OffHotspotStaLeave(
     }
 }
 
-void OnP2pStateChange(::taihe::callback_view<void(double)> callback)
+void OnP2pStateChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pStateChangeLock);
     auto wifiP2pStateChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"p2pStateChange"};
     if (g_wifiP2pPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
@@ -683,7 +1439,7 @@ void OnP2pStateChange(::taihe::callback_view<void(double)> callback)
     g_wifiP2pStateChangeVec.emplace_back(wifiP2pStateChangeCallback);
 }
 
-void OffP2pStateChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffP2pStateChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pStateChangeLock);
     if (g_wifiP2pStateChangeVec.empty()) {
@@ -872,11 +1628,11 @@ void OffP2pPersistentGroupChange(::taihe::optional_view<::taihe::callback<void(
     }
 }
 
-void OnP2pDiscoveryChange(::taihe::callback_view<void(double)> callback)
+void OnP2pDiscoveryChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pDiscoveryChangeLock);
     auto wifiP2pDiscoveryChangeCallback =
-        ::taihe::optional<::taihe::callback<void(double)>>{std::in_place_t{}, callback};
+        ::taihe::optional<::taihe::callback<void(int)>>{std::in_place_t{}, callback};
     std::vector<std::string> event = {"p2pDiscoveryChange"};
     if (g_wifiP2pPtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
@@ -894,7 +1650,7 @@ void OnP2pDiscoveryChange(::taihe::callback_view<void(double)> callback)
     g_wifiP2pDiscoveryChangeVec.emplace_back(wifiP2pDiscoveryChangeCallback);
 }
 
-void OffP2pDiscoveryChange(::taihe::optional_view<::taihe::callback<void(double)>> callback)
+void OffP2pDiscoveryChange(::taihe::optional_view<::taihe::callback<void(int)>> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiP2pDiscoveryChangeLock);
     if (g_wifiP2pDiscoveryChangeVec.empty()) {
@@ -916,7 +1672,6 @@ void OffP2pDiscoveryChange(::taihe::optional_view<::taihe::callback<void(double)
 
 TH_EXPORT_CPP_API_IsConnected(IsConnected);
 TH_EXPORT_CPP_API_IsWifiActive(IsWifiActive);
-TH_EXPORT_CPP_API_GetLinkedInfoSync(GetLinkedInfoSync);
 TH_EXPORT_CPP_API_GetSignalLevel(GetSignalLevel);
 TH_EXPORT_CPP_API_GetIpInfo(GetIpInfo);
 TH_EXPORT_CPP_API_GetIpv6Info(GetIpv6Info);
@@ -928,6 +1683,60 @@ TH_EXPORT_CPP_API_GetStations(GetStations);
 TH_EXPORT_CPP_API_EnableWifi(EnableWifi);
 TH_EXPORT_CPP_API_DisableWifi(DisableWifi);
 TH_EXPORT_CPP_API_EnableSemiWifi(EnableSemiWifi);
+TH_EXPORT_CPP_API_GetDeviceConfigs(GetDeviceConfigs);
+TH_EXPORT_CPP_API_Disconnect(Disconnect);
+TH_EXPORT_CPP_API_ConnectToNetwork(ConnectToNetwork);
+TH_EXPORT_CPP_API_GetDeviceMacAddress(GetDeviceMacAddress);
+TH_EXPORT_CPP_API_IsHotspotActive(IsHotspotActive);
+TH_EXPORT_CPP_API_P2pConnect(P2pConnect);
+TH_EXPORT_CPP_API_GetCandidateConfigs(GetCandidateConfigs);
+TH_EXPORT_CPP_API_P2pCancelConnect(P2pCancelConnect);
+TH_EXPORT_CPP_API_ConnectToCandidateConfig(ConnectToCandidateConfig);
+TH_EXPORT_CPP_API_Reconnect(Reconnect);
+TH_EXPORT_CPP_API_Reassociate(Reassociate);
+TH_EXPORT_CPP_API_ConnectToDevice(ConnectToDevice);
+TH_EXPORT_CPP_API_SetHotspotConfig(SetHotspotConfig);
+TH_EXPORT_CPP_API_IsFeatureSupported(IsFeatureSupported);
+TH_EXPORT_CPP_API_GetHotspotConfig(GetHotspotConfig);
+TH_EXPORT_CPP_API_DisableHotspot(DisableHotspot);
+TH_EXPORT_CPP_API_EnableHotspot(EnableHotspot);
+TH_EXPORT_CPP_API_IsHotspotDualBandSupported(IsHotspotDualBandSupported);
+TH_EXPORT_CPP_API_GetSupportedFeatures(GetSupportedFeatures);
+TH_EXPORT_CPP_API_GetCountryCode(GetCountryCode);
+TH_EXPORT_CPP_API_RemoveDevice(RemoveDevice);
+TH_EXPORT_CPP_API_GetMultiLinkedInfo(GetMultiLinkedInfo);
+TH_EXPORT_CPP_API_AllowAutoConnect(AllowAutoConnect);
+TH_EXPORT_CPP_API_IsBandTypeSupported(IsBandTypeSupported);
+TH_EXPORT_CPP_API_CreateGroup(CreateGroup);
+TH_EXPORT_CPP_API_StartDiscoverDevices(StartDiscoverDevices);
+TH_EXPORT_CPP_API_RemoveGroup(RemoveGroup);
+TH_EXPORT_CPP_API_StopDiscoverDevices(StopDiscoverDevices);
+TH_EXPORT_CPP_API_GetHotspotBlockList(GetHotspotBlockList);
+TH_EXPORT_CPP_API_SetDeviceName(SetDeviceName);
+TH_EXPORT_CPP_API_EnableHiLinkHandshake(EnableHiLinkHandshake);
+TH_EXPORT_CPP_API_StartPortalCertification(StartPortalCertification);
+TH_EXPORT_CPP_API_DeletePersistentGroup(DeletePersistentGroup);
+TH_EXPORT_CPP_API_DisableNetwork(DisableNetwork);
+TH_EXPORT_CPP_API_UpdateNetwork(UpdateNetwork);
+TH_EXPORT_CPP_API_RemoveAllNetwork(RemoveAllNetwork);
+TH_EXPORT_CPP_API_DelHotspotBlockList(DelHotspotBlockList);
+TH_EXPORT_CPP_API_AddHotspotBlockList(AddHotspotBlockList);
+TH_EXPORT_CPP_API_SetScanAlwaysAllowed(SetScanAlwaysAllowed);
+TH_EXPORT_CPP_API_FactoryReset(FactoryReset);
+TH_EXPORT_CPP_API_Get5GChannelList(Get5GChannelList);
+TH_EXPORT_CPP_API_StartScan(StartScan);
+TH_EXPORT_CPP_API_GetDisconnectedReason(GetDisconnectedReason);
+TH_EXPORT_CPP_API_GetScanAlwaysAllowed(GetScanAlwaysAllowed);
+TH_EXPORT_CPP_API_ConnectToCandidateConfigWithUserActionSync(ConnectToCandidateConfigWithUserActionSync);
+TH_EXPORT_CPP_API_GetLinkedInfoSync(GetLinkedInfoSync);
+TH_EXPORT_CPP_API_AddDeviceConfigSync(AddDeviceConfigSync);
+TH_EXPORT_CPP_API_GetP2pPeerDevicesSync(GetP2pPeerDevicesSync);
+TH_EXPORT_CPP_API_GetP2pLinkedInfoSync(GetP2pLinkedInfoSync);
+TH_EXPORT_CPP_API_AddCandidateConfigSync(AddCandidateConfigSync);
+TH_EXPORT_CPP_API_RemoveCandidateConfigSync(RemoveCandidateConfigSync);
+TH_EXPORT_CPP_API_GetP2pLocalDeviceSync(GetP2pLocalDeviceSync);
+TH_EXPORT_CPP_API_GetP2pGroupsSync(GetP2pGroupsSync);
+TH_EXPORT_CPP_API_GetCurrentGroupSync(GetCurrentGroupSync);
 TH_EXPORT_CPP_API_OnWifiStateChange(OnWifiStateChange);
 TH_EXPORT_CPP_API_OffWifiStateChange(OffWifiStateChange);
 TH_EXPORT_CPP_API_OnWifiConnectionChange(OnWifiConnectionChange);

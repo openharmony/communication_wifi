@@ -18,31 +18,31 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiCallbackTaihe");
-std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiStateChangeVec = {};
 std::shared_mutex g_wifiStateChangeLock;
  
-std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiConnectionChangeVec = {};
 std::shared_mutex g_wifiConnectionChangeLock;
  
-std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiRssiChangeVec = {};
 std::shared_mutex g_wifiRssiChangeLock;
  
-std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiStreamChangeVec = {};
 std::shared_mutex g_wifiStreamChangeLock;
  
-std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiDeviceConfigChangeVec = {};
 std::shared_mutex g_wifiDeviceConfigChangeLock;
  
-std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiScanStateChangeVec = {};
 std::shared_mutex g_wifiScanStateChangeLock;
  
-std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiHotspotStateChangeVec = {};
 std::shared_mutex g_wifiHotspotStateChangeLock;
  
@@ -56,7 +56,7 @@ std::vector<::taihe::optional<::taihe::callback<
     g_wifiHotspotStaLeaveVec = {};
 std::shared_mutex g_wifiHotspotStaLeaveLock;
  
-std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiP2pStateChangeVec = {};
 std::shared_mutex g_wifiP2pStateChangeLock;
  
@@ -80,7 +80,7 @@ std::vector<::taihe::optional<::taihe::callback<
     g_wifiP2pPersistentGroupChangeVec = {};
 std::shared_mutex g_wifiP2pPersistentGroupChangeLock;
  
-std::vector<::taihe::optional<::taihe::callback<void(double)>>>
+std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiP2pDiscoveryChangeVec = {};
 std::shared_mutex g_wifiP2pDiscoveryChangeLock;
 
@@ -90,9 +90,8 @@ void WifiIdlDeviceEventCallback::OnWifiStateChanged(int state)
     std::shared_lock<std::shared_mutex> guard(g_wifiStateChangeLock);
     WIFI_LOGI("OnWifiStateChanged event: %{public}d [0:DISABLING, 1:DISABLED, 2:ENABLING, 3:ENABLED]",
         state);
-    double result = static_cast<double>(state);
     for (auto callback : g_wifiStateChangeVec) {
-        (*callback)(result);
+        (*callback)(state);
     }
 }
 
@@ -101,9 +100,8 @@ void WifiIdlDeviceEventCallback::OnWifiConnectionChanged(int state, const WifiLi
     std::shared_lock<std::shared_mutex> guard(g_wifiStateChangeLock);
     WIFI_LOGI("OnWifiConnectionChanged event: %{public}d [4:CONNECTED, 6:DISCONNECTED, 7:SPECIAL_CONNECT]",
         state);
-    double result = static_cast<double>(state);
     for (auto callback : g_wifiConnectionChangeVec) {
-        (*callback)(result);
+        (*callback)(state);
     }
 }
 
@@ -111,9 +109,8 @@ void WifiIdlDeviceEventCallback::OnWifiRssiChanged(int rssi)
 {
     std::shared_lock<std::shared_mutex> guard(g_wifiRssiChangeLock);
     WIFI_LOGI("OnWifiRssiChanged event: %{public}d", rssi);
-    double result = static_cast<double>(rssi);
     for (auto callback : g_wifiRssiChangeVec) {
-        (*callback)(result);
+        (*callback)(rssi);
     }
 }
 
@@ -126,9 +123,8 @@ void WifiIdlDeviceEventCallback::OnStreamChanged(int direction)
     std::shared_lock<std::shared_mutex> guard(g_wifiStreamChangeLock);
     WIFI_LOGD("OnStreamChanged event: %{public}d [0:DATA_NONE, 1:DATA_IN, 2:DATA_OUT, 3:DATA_INOUT]",
         direction);
-    double result = static_cast<double>(direction);
     for (auto callback : g_wifiStreamChangeVec) {
-        (*callback)(result);
+        (*callback)(direction);
     }
 }
 
@@ -136,7 +132,7 @@ void WifiIdlDeviceEventCallback::OnDeviceConfigChanged(ConfigChange value)
 {
     std::shared_lock<std::shared_mutex> guard(g_wifiDeviceConfigChangeLock);
     WIFI_LOGI("OnDeviceConfigChanged event: %{public}d", static_cast<int>(value));
-    double result = static_cast<double>(value);
+    int result = static_cast<int>(value);
     for (auto callback : g_wifiDeviceConfigChangeVec) {
         (*callback)(result);
     }
@@ -152,9 +148,8 @@ void WifiIdlScanEventCallback::OnWifiScanStateChanged(int state)
 {
     std::shared_lock<std::shared_mutex> guard(g_wifiScanStateChangeLock);
     WIFI_LOGI("scan received state changed event: %{public}d", state);
-    double result = static_cast<double>(state);
     for (auto callback : g_wifiScanStateChangeVec) {
-        (*callback)(result);
+        (*callback)(state);
     }
 }
 
@@ -169,9 +164,8 @@ void WifiIdlHotspotEventCallback::OnHotspotStateChanged(int state)
 {
     std::shared_lock<std::shared_mutex> guard(g_wifiHotspotStateChangeLock);
     WIFI_LOGI("Hotspot received state changed event: %{public}d", state);
-    double result = static_cast<double>(state);
     for (auto callback : g_wifiHotspotStateChangeVec) {
-        (*callback)(result);
+        (*callback)(state);
     }
 }
 
@@ -207,9 +201,8 @@ void WifiIdlP2pEventCallback::OnP2pStateChanged(int state)
 {
     std::shared_lock<std::shared_mutex> guard(g_wifiP2pStateChangeLock);
     WIFI_LOGI("received p2p state changed event: %{public}d", state);
-    double result = static_cast<double>(state);
     for (auto callback : g_wifiP2pStateChangeVec) {
-        (*callback)(result);
+        (*callback)(state);
     }
 }
 
@@ -291,7 +284,7 @@ void WifiIdlP2pEventCallback::OnP2pDiscoveryChanged(bool isChange)
 {
     std::shared_lock<std::shared_mutex> guard(g_wifiP2pDiscoveryChangeLock);
     WIFI_LOGI("received discovery state changed event");
-    double result = static_cast<double>(isChange);
+    int result = static_cast<int>(isChange);
     for (auto callback : g_wifiP2pDiscoveryChangeVec) {
         (*callback)(result);
     }

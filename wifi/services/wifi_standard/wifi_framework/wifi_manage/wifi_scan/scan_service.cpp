@@ -2155,8 +2155,8 @@ void ScanService::GetSavedNetworkFreq(std::vector<int> &scanFreqs)
 
 void ScanService::CheckNeedFastScan(std::vector<int> &scanFreqs)
 {
-    if (GetDeviceType() != ProductDeviceType::WEARABLE) {
-        WIFI_LOGD("Not wearable device, do not fast scan");
+    if (GetDeviceType() != ProductDeviceType::WEARABLE && GetDeviceType() != ProductDeviceType::TV) {
+        WIFI_LOGD("Not wearable or tv device, do not fast scan");
         return;
     }
     /* If scan freqs is empty, the freq for the first periodic scanning is selected based on

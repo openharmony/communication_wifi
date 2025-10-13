@@ -1313,7 +1313,7 @@ NO_SANITIZE("cfi") napi_value GetMultiLinkedInfo(napi_env env, napi_callback_inf
 NO_SANITIZE("cfi") napi_value GetDisconnectedReason(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     DisconnectedReason reason = DisconnectedReason::DISC_REASON_DEFAULT;
     ErrCode ret = wifiDevicePtr->GetDisconnectedReason(reason);
     if (ret != WIFI_OPT_SUCCESS) {
@@ -1999,7 +1999,7 @@ NO_SANITIZE("cfi") napi_value EnableSemiWifi(napi_env env, napi_callback_info in
 NO_SANITIZE("cfi") napi_value GetWifiDetailState(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     WifiDetailState state = WifiDetailState::STATE_UNKNOWN;
     ErrCode ret = wifiDevicePtr->GetWifiDetailState(state);
     if (ret != WIFI_OPT_SUCCESS) {

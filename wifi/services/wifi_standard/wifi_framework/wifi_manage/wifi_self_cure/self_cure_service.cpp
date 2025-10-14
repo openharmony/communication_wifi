@@ -235,6 +235,11 @@ bool SelfCureService::NotifyIpv6FailureDetected()
         return false;
     }
 
+    if (SelfCureUtils::GetInstance().HasIpv6Disabled()) {
+        WIFI_LOGI("IPv6 already disabled, ignore IPv6 failure");
+        return false;
+    }
+
     // Check if static IPv6 is configured
     WifiDeviceConfig wificonfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, wificonfig, m_instId) == 0 &&

@@ -122,9 +122,6 @@ void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSuppl
     if (instId >= 0 && instId < STA_INSTANCE_MAX_NUM) {
         isWifiAvailable_[instId] = netSupplierInfo->isAvailable_;
     }
-    if (supplierIdNow == 0) {
-        RegisterNetSupplier(instId);
-    }
     uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
     int32_t result = NetConnClient::GetInstance().UpdateNetSupplierInfo(supplierIdNow, netSupplierInfo);
     WIFI_LOGI("Update network result:%{public}d", result);
@@ -210,7 +207,11 @@ void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStanda
 {
     if (netAgentEventHandler_) {
         netAgentEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo, m_instId = instId]() {
-           this->UpdateNetSupplierInfo(netInfo, m_instId);
+            uint32_t& supplierIdNow = (m_instId == 0) ? supplierId : supplierIdForWlan1;
+            if (supplierIdNow == INVALID_SUPPLIER_ID) {
+                this->RegisterNetSupplier(m_instId);
+            }
+            this->UpdateNetSupplierInfo(netInfo, m_instId);
         });
     }
 }

@@ -122,6 +122,9 @@ void WifiNetAgent::UpdateNetSupplierInfo(const sptr<NetManagerStandard::NetSuppl
     if (instId >= 0 && instId < STA_INSTANCE_MAX_NUM) {
         isWifiAvailable_[instId] = netSupplierInfo->isAvailable_;
     }
+    if (supplierIdNow == 0) {
+        RegisterNetSupplier(instId);
+    }
     uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
     int32_t result = NetConnClient::GetInstance().UpdateNetSupplierInfo(supplierIdNow, netSupplierInfo);
     WIFI_LOGI("Update network result:%{public}d", result);

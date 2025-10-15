@@ -602,7 +602,9 @@ ErrCode StaService::ConnectToNetwork(int networkId, int type) const
 #endif
     LOGI("ConnectToNetwork, ssid = %{public}s.", SsidAnonymize(config.ssid).c_str());
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
-    pStaStateMachine->SetPortalBrowserFlag(false);
+    if(type != NETWORK_SELECTED_BY_SELFCURE){
+        pStaStateMachine->SetPortalBrowserFlag(false);
+    }
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, type);
     return WIFI_OPT_SUCCESS;
 }

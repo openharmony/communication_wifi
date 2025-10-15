@@ -490,6 +490,14 @@ public:
      */
     virtual ErrCode ReconnectByMdm() = 0;
 #endif
+
+    /**
+     * @Description battery status changed
+     *
+     * @param chargeStatus charge state[in]
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode OnBatteryStateChanged(const int chargeStatus) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

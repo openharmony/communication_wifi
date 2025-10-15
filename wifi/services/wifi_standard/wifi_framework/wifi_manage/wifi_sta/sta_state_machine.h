@@ -345,6 +345,11 @@ public:
         void NetDetectionNotify(InternalMessagePtr msg);
         void DealNetworkCheck(InternalMessagePtr msg);
         void FoldStatusNotify(InternalMessagePtr msg);
+#ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
+        void DealWifiPowerSaveWhenScreenStatusNotify(InternalMessagePtr msg);
+        void DealWifiPowerSaveWhenBatteryStatusNotify(InternalMessagePtr msg);
+        void DealWifiPowerSaveWhenWifiConnected();
+#endif
         StaStateMachine *pStaStateMachine;
     };
     /**

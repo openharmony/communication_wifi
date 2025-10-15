@@ -423,10 +423,13 @@ HotspotConfig ConvertHotspotConfig(const ::ohos::wifiManager::HotspotConfig &con
 
 ::ohos::wifiManager::WifiInfoElem MakeWifiInfoElem(const WifiInfoElem& wifiInfoElem)
 {
+    std::vector<uint8_t> content;
+    for (size_t i = 0; i < wifiInfoElem.content.size(); i++) {
+        content.emplace_back(static_cast<uint8_t>(wifiInfoElem.content[i]));
+    }
     return {
         wifiInfoElem.id,
-        ::taihe::array<uint8_t>(
-            taihe::copy_data_t{}, wifiInfoElem.content.data(), wifiInfoElem.content.size())
+        ::taihe::array<uint8_t>(taihe::copy_data_t{}, content.data(), content.size())
     };
 }
 

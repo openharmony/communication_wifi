@@ -201,6 +201,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->SetVoWifiDetectPeriod(networkId);
     pStaInterface->GetVoWifiDetectPeriod(networkId);
     pStaInterface->ProcessVoWifiNetlinkReportEvent(networkId);
+    pStaService->OnBatteryStateChanged(networkId);
     std::vector<WifiSignalPollInfo> wifiSignalPollInfos = {};
     pStaInterface->GetSignalPollInfoArray(wifiSignalPollInfos, networkId);
     OperateResState state;
@@ -251,6 +252,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->DeliverStaIfaceData(conditionName);
     WifiTelephonyUtils::GetDataSlotId(index);
     pStaService->AddDeviceConfig(config);
+    pStaService->HandleBatteryStatusChanged(networkId);
 }
 
 void StaAutoServerFuzzTest(const uint8_t* data, size_t size)

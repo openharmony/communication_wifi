@@ -825,5 +825,23 @@ HWTEST_F(StaInterfaceTest, OnFoldStateChangedTest4, TestSize.Level1)
     OnFoldStateChangedTest4();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
+
+HWTEST_F(StaInterfaceTest, OnBatteryStateChangedSuccess1, TestSize.Level1)
+{
+    int chargeStatus = MODE_STATE_OPEN;
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaInterface->OnBatteryStateChanged(chargeStatus));
+}
+
+HWTEST_F(StaInterfaceTest, OnBatteryStateChangedSuccess2, TestSize.Level1)
+{
+    int chargeStatus = MODE_STATE_CLOSE;
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pStaInterface->OnBatteryStateChanged(chargeStatus));
+}
+
+HWTEST_F(StaInterfaceTest, OnBatteryStateChangedFail1, TestSize.Level1)
+{
+    int chargeStatus = 0;
+    EXPECT_EQ(WIFI_OPT_INVALID_PARAM, pStaInterface->OnBatteryStateChanged(chargeStatus));
+}
 } // namespace Wifi
 } // namespace OHOS

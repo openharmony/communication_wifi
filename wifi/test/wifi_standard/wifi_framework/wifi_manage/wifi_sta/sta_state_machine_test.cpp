@@ -29,10 +29,12 @@
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
 #include "mock_wifi_sta_hal_interface.h"
+#include "mock_wifi_supplicant_hal_interface.h"
 #include "mock_block_connect_service.h"
 #include "wifi_history_record_manager.h"
 #include "sta_define.h"
 #include "wifi_telephony_utils.h"
+#include "wifi_battery_utils.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -2943,5 +2945,39 @@ HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultMaskNoMatchTest, TestSize.Level
     TryToSaveIpV4ResultMaskNoMatchTest();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
+
+#ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
+HWTEST_F(StaStateMachineTest, DealWifiPowerSaveWhenBatteryStatusNotifyTest01, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(MODE_STATE_CLOSE);
+    msg->SetMessageName(WIFI_BATTERY_STATE_CHANGED_NOTIFY_EVENT);
+    EXPECT_TRUE(pStaStateMachine->pLinkedState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(StaStateMachineTest, DealWifiPowerSaveWhenBatteryStatusNotifyTest02, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(MODE_STATE_OPEN);
+    msg->SetMessageName(WIFI_BATTERY_STATE_CHANGED_NOTIFY_EVENT);
+    EXPECT_TRUE(pStaStateMachine->pLinkedState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(StaStateMachineTest, DealWifiPowerSaveWhenScreenStatusNotifyTest01, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(MODE_STATE_CLOSE);
+    msg->SetMessageName(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT);
+    EXPECT_TRUE(pStaStateMachine->pLinkedState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(StaStateMachineTest, DealWifiPowerSaveWhenScreenStatusNotifyTest02, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>;
+    msg->SetParam1(MODE_STATE_OPEN);
+    msg->SetMessageName(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT);
+    EXPECT_TRUE(pStaStateMachine->pLinkedState->ExecuteStateMsg(msg));
+}
+#endif
 } // namespace Wifi
 } // namespace OHOS

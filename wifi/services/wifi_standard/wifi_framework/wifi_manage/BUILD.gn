@@ -735,6 +735,10 @@ if (defined(ohos_lite)) {
       defines += [ "EXTENSIBLE_AUTHENTICATION" ]
       external_deps += ["netmanager_ext:ethernet_manager_if"]
     }
+
+    if (wifi_feature_with_dynamic_adjust_wifi_power_save) {
+      defines += [ "DYNAMIC_ADJUST_WIFI_POWER_SAVE" ]
+    }
   
     if (defined(global_parts_info) &&
       defined(global_parts_info.telephony_state_registry) &&

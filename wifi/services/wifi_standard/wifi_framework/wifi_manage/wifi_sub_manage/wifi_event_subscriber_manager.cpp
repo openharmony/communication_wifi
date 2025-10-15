@@ -727,6 +727,13 @@ void CesEventSubscriber::OnReceiveBatteryEvent(const OHOS::EventFwk::CommonEvent
         WifiConfigCenter::GetInstance().SetNoChargerPlugModeState(MODE_STATE_OPEN);
     }
 
+#ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+    if (pService != nullptr) {
+        pService->OnBatteryStateChanged(WifiConfigCenter::GetInstance().GetNoChargerPlugModeState());
+    }
+#endif
+
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
         IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
         if (pScanService == nullptr) {

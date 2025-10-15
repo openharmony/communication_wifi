@@ -378,5 +378,11 @@ ErrCode StaInterface::ReconnectByMdm()
     return WIFI_OPT_SUCCESS;
 }
 #endif
+
+Errcode StaInterface::OnBatteryStateChanged(int chargeStatus)
+{
+    WIFI_LOGI("Enter OnBatteryStateChanged, chargeStatus = %{public}d", chargeStatus);
+    return WIFI_OPT_SUCCESS;
+}
 }  // namespace Wifi
 }  // namespace OHOS

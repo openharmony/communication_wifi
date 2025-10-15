@@ -21,6 +21,7 @@
 #include "ip_tools.h"
 #include "mac_address.h"
 #include "sta_monitor.h"
+#include "wifi_battery_utils.h"
 #include "wifi_common_util.h"
 #include "wifi_global_func.h"
 #include "wifi_logger.h"
@@ -209,6 +210,10 @@ ErrCode StaStateMachine::InitStaStateMachine()
         [this](const std::string &regCmd) { this->RegisterCustomEapCallback(regCmd); });
     NetEapObserver::GetInstance().SetReplyCustomEapDataCallback(
         [this](int result, const std::string &strEapData) { this->ReplyCustomEapDataCallback(result, strEapData); });
+#endif
+#ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
+    bool isCharged = BatteryUtils::GetInstance().IsChargedPlugIn();
+    WifiConfigCenter::GetInstance().SetNoChargerPlugModeState(isCharged ? MODE_STATE_CLOSE : MODE_STATE_OPEN);
 #endif
 #endif
 
@@ -2597,6 +2602,9 @@ void StaStateMachine::LinkedState::GoInState()
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
+#ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
+    DealWifiPowerSaveWhenWifiConnected();
+#endif
     return;
 }
 
@@ -2639,6 +2647,18 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             FoldStatusNotify(msg);
             break;
         }
+#ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
+        case WIFI_BATTERY_STATE_CHANGED_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            DealWifiPowerSaveWhenBatteryStatusNotify(msg);
+            break;
+        }
+        case WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT: {
+            ret = EXECUTED;
+            DealWifiPowerSaveWhenScreenStatusNotify(msg);
+            break;
+        }
+#endif
 #ifdef FEATURE_ITNETWORK_PREFERRED_SUPPORT
         case WIFI_SVR_CMD_STA_WPA_STATE_CHANGE_EVENT: {
             ret = EXECUTED;
@@ -2696,6 +2716,56 @@ void StaStateMachine::LinkedState::FoldStatusNotify(InternalMessagePtr msg)
         isExpandUpdateRssi_ = true;
     }
 }
+
+#ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
+void StaStateMachine::LinkedState::DealWifiPowerSaveWhenBatteryStatusNotify(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("msg is nullptr.");
+        return;
+    }
+    int noChargerPlugModeState = msg->GetParam1();
+    if (noChargerPlugModeState == MODE_STATE_CLOSE) {
+        WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(false, pStaStateMachine->m_instId);
+    } else if (noChargerPlugModeState == MODE_STATE_OPEN) {
+        WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(true, pStaStateMachine->m_instId);
+    } else {
+        WIFI_LOGE("noChargerPlugModeState is %{public}d", noChargerPlugModeState);
+    }
+}
+
+void StaStateMachine::LinkedState::DealWifiPowerSaveWhenScreenStatusNotify(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("msg is nullptr.");
+        return;
+    }
+    int screenState = msg->GetParam1();
+    bool isCharged = WifiConfigCenter::GetInstance().GetNoChargerPlugModeState() == MODE_STATE_CLOSE;
+    WIFI_LOGI("notify screenstate = %{public}d, isCharged = %{public}d", screenState, isCharged);
+    if (screenState == MODE_STATE_OPEN) {
+        WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(!isCharged, pStaStateMachine->m_instId);
+    } else if (screenState == MODE_STATE_CLOSE) {
+        WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(true, pStaStateMachine->m_instId);
+    } else {
+        WIFI_LOGE("unexpected screen state");
+    }
+    pStaStateMachine->DealScreenStateChangedEvent(msg);
+}
+
+void StaStateMachine::LinkedState::DealWifiPowerSaveWhenWifiConnected()
+{
+    bool isCharged = WifiConfigCenter::GetInstance().GetNoChargerPlugModeState() == MODE_STATE_CLOSE;
+    if (!isCharged) {
+        WIFI_LOGI("no charge when wifi connected");
+        return;
+    }
+    int screenState = WifiConfigCenter::GetInstance().GetScreenState();
+    if (screenState == MODE_STATE_OPEN) {
+        WifiSupplicantHalInterface::GetInstance().WpaSetPowerMode(false, pStaStateMachine->m_instId);
+    }
+}
+#endif
 
 void StaStateMachine::LinkedState::UpdateExpandOffset()
 {

@@ -77,7 +77,8 @@
             "wifi_feature_with_portal_login",
             "wifi_feature_with_security_detect",
             "wifi_feature_auto_enable_support",
-            "wifi_feature_with_ipv6_selfcure"
+            "wifi_feature_with_ipv6_selfcure",
+            "wifi_feature_with_dynamic_adjust_wifi_power_save"
         ],
         "adapted_system_type": [
             "small",

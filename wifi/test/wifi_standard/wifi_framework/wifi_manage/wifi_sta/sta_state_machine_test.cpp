@@ -2973,7 +2973,7 @@ HWTEST_F(StaStateMachineTest, DealWifiPowerSaveWhenScreenStatusNotifyTest01, Tes
 
 HWTEST_F(StaStateMachineTest, DealWifiPowerSaveWhenScreenStatusNotifyTest02, TestSize.Level1)
 {
-    InternalMessagePtr msg = std::make_shared<InternalMessage>;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     msg->SetParam1(MODE_STATE_OPEN);
     msg->SetMessageName(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT);
     EXPECT_TRUE(pStaStateMachine->pLinkedState->ExecuteStateMsg(msg));

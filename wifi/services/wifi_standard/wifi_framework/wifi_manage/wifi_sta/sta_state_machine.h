@@ -345,7 +345,9 @@ public:
         void NetDetectionNotify(InternalMessagePtr msg);
         void DealNetworkCheck(InternalMessagePtr msg);
         void FoldStatusNotify(InternalMessagePtr msg);
+#ifndef OHOS_ARCH_LITE
         bool ProcessMessageByMacros(InternalMessagePtr msg);
+#endif
 #ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
         void DealWifiPowerSaveWhenScreenStatusNotify(InternalMessagePtr msg);
         void DealWifiPowerSaveWhenBatteryStatusNotify(InternalMessagePtr msg);

@@ -2648,13 +2648,16 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
             break;
         }
         default:
+#ifndef OHOS_ARCH_LITE
             ret = ProcessMessageByMacros(msg);
+#endif
             break;
     }
 
     return ret;
 }
 
+#ifndef OHOS_ARCH_LITE
 bool StateMachine::LinkedState::ProcessMessageByMacros(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
@@ -2694,6 +2697,7 @@ bool StateMachine::LinkedState::ProcessMessageByMacros(InternalMessagePtr msg)
 
     return ret;
 }
+#endif
 
 void StaStateMachine::LinkedState::DhcpResultNotify(InternalMessagePtr msg)
 {

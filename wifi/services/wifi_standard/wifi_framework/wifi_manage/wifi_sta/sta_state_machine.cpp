@@ -2658,7 +2658,7 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
 }
 
 #ifndef OHOS_ARCH_LITE
-bool StateMachine::LinkedState::ProcessMessageByMacros(InternalMessagePtr msg)
+bool StaStateMachine::LinkedState::ProcessMessageByMacros(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGI("msg is nullptr.");

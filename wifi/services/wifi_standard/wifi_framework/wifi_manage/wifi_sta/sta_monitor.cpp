@@ -34,6 +34,8 @@ if the reject is caused by driver fail, we need set a delay time to reconnect to
 between this connection and other vap associations (like scan or p2p_enhance)
 */
 const int32_t CONNECT_REJECT_DELAY_TIME_MS = 2000;
+const int ZERO = 0;
+const int ONE = 1;
 const int TWO = 2;
 const int THREE = 3;
 StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)

@@ -90,11 +90,13 @@ void WifiP2pServiceManager::ClearLocalService()
 }
 const std::vector<WifiP2pServiceInfo> &WifiP2pServiceManager::GetLocalServiceList()
 {
+    std::unique_lock<std::mutex> lock(serviceMutex);
     return localServicesInfo;
 }
 
 bool WifiP2pServiceManager::AddDeviceResponses(const WifiP2pServiceResponseList &rspList)
 {
+    std::unique_lock<std::mutex> lock(serviceMutex);
     const WifiP2pServiceResponseList responseList = rspList.FilterSerivceResponse(P2pServiceStatus::PSRS_SUCCESS);
     const WifiP2pDevice &device = responseList.GetDevice();
 
@@ -186,6 +188,7 @@ void WifiP2pServiceManager::GetDeviceServices(std::vector<WifiP2pServiceInfo> &s
 
 bool WifiP2pServiceManager::AddServiceResponse(const WifiP2pServiceResponseList &p2pSvrRespList)
 {
+    std::unique_lock<std::mutex> lock(serviceMutex);
     auto findIter = serviceRespons.find(p2pSvrRespList.GetDevice().GetDeviceAddress());
     if (findIter == serviceRespons.end()) {
         serviceRespons.emplace(std::make_pair(p2pSvrRespList.GetDevice().GetDeviceAddress(), p2pSvrRespList));
@@ -213,6 +216,7 @@ bool WifiP2pServiceManager::AddServiceResponse(const WifiP2pServiceResponseList 
 
 bool WifiP2pServiceManager::RemoveServiceResponse(const WifiP2pServiceResponseList &p2pSvrRespList)
 {
+    std::unique_lock<std::mutex> lock(serviceMutex);
     auto findIter = serviceRespons.find(p2pSvrRespList.GetDevice().GetDeviceAddress());
     if (findIter == serviceRespons.end()) {
         WIFI_LOGE("Cannot find %{private}s respList", p2pSvrRespList.GetDevice().GetDeviceAddress().c_str());
@@ -241,6 +245,7 @@ bool WifiP2pServiceManager::RemoveServiceResponse(const WifiP2pServiceResponseLi
 
 bool WifiP2pServiceManager::RemoveServiceResponse(const std::string &deviceAddress)
 {
+    std::unique_lock<std::mutex> lock(serviceMutex);
     auto findIter = serviceRespons.find(deviceAddress);
     if (findIter == serviceRespons.end()) {
         return false;
@@ -252,12 +257,14 @@ bool WifiP2pServiceManager::RemoveServiceResponse(const std::string &deviceAddre
 
 bool WifiP2pServiceManager::ClearAllServiceResponse()
 {
+    std::unique_lock<std::mutex> lock(serviceMutex);
     serviceRespons.clear();
     return true;
 }
 
 bool WifiP2pServiceManager::GetServiceResponseList(std::vector<WifiP2pServiceResponseList> &respList)
 {
+    std::unique_lock<std::mutex> lock(serviceMutex);
     for (auto respListIter = respList.begin(); respListIter != respList.end(); ++respListIter) {
         auto findIter = serviceRespons.find(respListIter->GetDevice().GetDeviceAddress());
         if (findIter != serviceRespons.end()) {
@@ -321,6 +328,7 @@ void WifiP2pServiceManager::ProcessServiceResponseList(const WifiP2pServiceRespo
 
 bool WifiP2pServiceManager::IsRecordedRequest(const std::string &deviceAddress, int dialogToken)
 {
+    std::unique_lock<std::mutex> lock(serviceMutex);
     auto findIter = requestRecord.find(deviceAddress);
     if (findIter == requestRecord.end()) {
         return false;

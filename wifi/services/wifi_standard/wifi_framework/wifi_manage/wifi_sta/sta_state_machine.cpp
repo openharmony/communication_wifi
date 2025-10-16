@@ -142,7 +142,7 @@ StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       targetNetworkId_(INVALID_NETWORK_ID),
       lastSignalLevel_(INVALID_SIGNAL_LEVEL), targetRoamBssid(WPA_BSSID_ANY), currentTpType(IPTYPE_IPV4),
-      getIpSucNum(0), getIpFailNum(0), enableSignalPoll(true), isRoam(false),
+      enableSignalPoll(true), isRoam(false),
       lastTimestamp(0), autoPullBrowserFlag(true), portalState(PortalState::UNCHECKED), detectNum(0),
       portalExpiredDetectCount(0), mIsWifiInternetCHRFlag(false), networkStatusHistoryInserted(false),
       pDhcpResultNotify(nullptr), pClosedState(nullptr), pInitState(nullptr),
@@ -1048,8 +1048,6 @@ void StaStateMachine::StopDhcp(bool isStopV4, bool isStopV6)
 #ifdef OHOS_ARCH_LITE
         IfConfig::GetInstance().FlushIpAddr(WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), IPTYPE_IPV4);
 #endif
-        getIpSucNum = 0;
-        getIpFailNum = 0;
     }
     if (isStopV6) {
         StopDhcpClient(ifname.c_str(), true, false);
@@ -1701,7 +1699,6 @@ void StaStateMachine::GetIpState::GoInState()
     /* Callback result to InterfaceService. */
     pStaStateMachine->SaveLinkstate(ConnState::CONNECTING, DetailedState::OBTAINING_IPADDR);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP, pStaStateMachine->linkedInfo);
-    pStaStateMachine->getIpSucNum = 0;
     WifiDeviceConfig config;
     AssignIpMethod assignMethod = AssignIpMethod::DHCP;
     int ret = WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config,
@@ -1788,7 +1785,6 @@ bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessagePtr msg)
     if (msg == nullptr) {
         return false;
     }
-
     bool ret = NOT_EXECUTED;
     WIFI_LOGI("GetIpState-msgCode=%{public}d received. m_instId = %{public}d\n", msg->GetMessageName(),
         pStaStateMachine->m_instId);
@@ -1799,38 +1795,47 @@ bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessagePtr msg)
             int ipType = msg->GetParam2();
             WIFI_LOGI("GetIpState, get ip result:%{public}d, ipType = %{public}d, m_instId = %{public}d\n",
                 result, ipType, pStaStateMachine->m_instId);
-            switch (result) {
-                case DhcpReturnCode::DHCP_RESULT: {
-                    pStaStateMachine->pDhcpResultNotify->DealDhcpResult(ipType);
-                    break;
-                }
-                case DhcpReturnCode::DHCP_JUMP: {
-                    pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
-                    break;
-                }
-                case DhcpReturnCode::DHCP_FAIL: {
-                    pStaStateMachine->pDhcpResultNotify->DealDhcpResultFailed();
-                    break;
-                }
-                case DhcpReturnCode::DHCP_OFFER_REPORT: {
-                    pStaStateMachine->pDhcpResultNotify->DealDhcpOfferResult();
-                    break;
-                }
-                default:
-                    break;
-            }
+            DealDhcpResultNotify(result, ipType);
             break;
         }
         case CMD_START_GET_DHCP_IP_TIMEOUT: {
             ret = EXECUTED;
-            DealGetDhcpIpTimeout(msg);
+            DealGetDhcpIpv4Timeout(msg);
+            break;
+        }
+        case CMD_IPV6_DELAY_TIMEOUT: {
+            ret = EXECUTED;
+            pStaStateMachine->pDhcpResultNotify->DealDhcpJump();
             break;
         }
         default:
             break;
     }
-
     return ret;
+}
+
+void StaStateMachine::GetIpState::DealDhcpResultNotify(int result, int ipType)
+{
+    switch (result) {
+        case DhcpReturnCode::DHCP_RESULT: {
+            pStaStateMachine->pDhcpResultNotify->DealDhcpResult(ipType);
+            break;
+        }
+        case DhcpReturnCode::DHCP_JUMP: {
+            pStaStateMachine->pDhcpResultNotify->DealDhcpJump();
+            break;
+        }
+        case DhcpReturnCode::DHCP_FAIL: {
+            pStaStateMachine->pDhcpResultNotify->DealDhcpIpv4ResultFailed();
+            break;
+        }
+        case DhcpReturnCode::DHCP_OFFER_REPORT: {
+            pStaStateMachine->pDhcpResultNotify->DealDhcpOfferResult();
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 void StaStateMachine::GetIpState::HandleStaticIpv6(bool isStaticIpv6)
@@ -1849,13 +1854,13 @@ void StaStateMachine::GetIpState::HandleStaticIpv6(bool isStaticIpv6)
 #endif
 }
 
-void StaStateMachine::GetIpState::DealGetDhcpIpTimeout(InternalMessagePtr msg)
+void StaStateMachine::GetIpState::DealGetDhcpIpv4Timeout(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
-        WIFI_LOGE("DealGetDhcpIpTimeout InternalMessage msg is null.");
+        WIFI_LOGE("DealGetDhcpIpv4Timeout InternalMessage msg is null.");
         return;
     }
-    WIFI_LOGI("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT DealGetDhcpIpTimeout");
+    WIFI_LOGI("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT DealGetDhcpIpv4Timeout");
     BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
                                                                  DisabledReason::DISABLED_DHCP_FAILURE);
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
@@ -3241,6 +3246,7 @@ void StaStateMachine::DhcpResultNotify::OnSuccessDhcpResult(int status, const ch
         {
             std::unique_lock<std::mutex> lock(dhcpResultMutex);
             SaveDhcpResult(&DhcpIpv4Result, result);
+            isDhcpIpv4Success = true;
         }
     } else {
         std::unique_lock<std::mutex> lock(dhcpResultMutex);
@@ -3302,7 +3308,7 @@ void StaStateMachine::DhcpResultNotify::DealDhcpResult(int ipType)
         result = &(StaStateMachine::DhcpResultNotify::DhcpIpv6Result);
         TryToSaveIpV6Result(ipInfo, ipv6Info, result);
     }
-    TryToCloseDhcpClient(result->iptype);
+    TryToJumpToConnectedState(result->iptype);
 
     WifiDeviceConfig config;
     AssignIpMethod assignMethod = AssignIpMethod::DHCP;
@@ -3450,6 +3456,19 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
 #endif
 }
 
+void StaStateMachine::DhcpResultNotify::DealDhcpJump()
+{
+    WIFI_LOGI("DhcpResultNotify DealDhcpJump");
+    WriteIsInternetHiSysEvent(CONNECTED_NETWORK);
+    pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
+    pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
+    pStaStateMachine->InvokeOnStaConnChanged(
+        OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
+    /* Delay to wait for the network adapter information to take effect. */
+    pStaStateMachine->DealSetStaConnectFailedCount(0, true);
+    pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+}
+
 void StaStateMachine::DhcpResultNotify::DhcpResultNotifyEvent(DhcpReturnCode result, int ipType)
 {
     InternalMessagePtr msg = pStaStateMachine->CreateMessage();
@@ -3464,32 +3483,25 @@ void StaStateMachine::DhcpResultNotify::DhcpResultNotifyEvent(DhcpReturnCode res
     pStaStateMachine->SendMessage(msg);
 }
 
-void StaStateMachine::DhcpResultNotify::TryToCloseDhcpClient(int iptype)
+void StaStateMachine::DhcpResultNotify::TryToJumpToConnectedState(int iptype)
 {
-    std::string ifname = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
-    WifiDeviceConfig config;
-    int ret = WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId,
-        config, pStaStateMachine->m_instId);
-    int family = config.wifiIpConfig.staticIpAddress.ipAddress.address.family;
-    if (iptype == 1 && (config.wifiIpConfig.assignMethod != AssignIpMethod::STATIC || family == 0 || ret != 0)) {
-        WIFI_LOGI("TryToCloseDhcpClient DHCP or StaticV4: iptype ipv6 return");
-        return;
+    if (isDhcpIpv4Success) {
+        //if get Ipv4 result jump to connected state
+        WIFI_LOGI("TryToJumpToConnectedState, ipv4 success, jump to connected state");
+        pStaStateMachine->StopTimer(static_cast<int>(CMD_IPV6_DELAY_TIMEOUT));
+        DhcpResultNotifyEvent(DhcpReturnCode::DHCP_JUMP);
+    } else if (iptype == 1 && !isDhcpIpv6Success) {
+        IpV6Info ipv6Info;
+        WifiConfigCenter::GetInstance().GetIpv6Info(ipv6Info, pStaStateMachine->m_instId);
+        // if get ipv6 global address, start delay timer to jump to connected state
+        if (!ipv6Info.globalIpV6Address.empty() || !ipv6Info.randGlobalIpV6Address.empty()) {
+            isDhcpIpv6Success = true;
+            pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
+            pStaStateMachine->StopTimer(static_cast<int>(CMD_IPV6_DELAY_TIMEOUT));
+            WIFI_LOGI("TryToJumpToConnectedState, start CMD_IPV6_DELAY_TIMEOUT timer");
+            pStaStateMachine->StartTimer(static_cast<int>(CMD_IPV6_DELAY_TIMEOUT), IPV6_DELAY_TIME);
+        }
     }
-
-    WIFI_LOGI("TryToCloseDhcpClient, getIpSucNum=%{public}d, isRoam=%{public}d",
-        pStaStateMachine->getIpSucNum, pStaStateMachine->isRoam);
-    DhcpResultNotifyEvent(DhcpReturnCode::DHCP_JUMP);
-    WriteIsInternetHiSysEvent(CONNECTED_NETWORK);
-    if (pStaStateMachine->getIpSucNum == 0) {
-        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
-        pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
-        pStaStateMachine->InvokeOnStaConnChanged(
-            OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
-        /* Delay to wait for the network adapter information to take effect. */
-        pStaStateMachine->DealSetStaConnectFailedCount(0, true);
-    }
-    pStaStateMachine->getIpSucNum++;
-    WIFI_LOGI("TryToCloseDhcpClient, getIpSucNum=%{public}d", pStaStateMachine->getIpSucNum);
 }
 
 void StaStateMachine::DhcpResultNotify::OnFailed(int status, const char *ifname, const char *reason)
@@ -3525,23 +3537,25 @@ void StaStateMachine::DhcpResultNotify::OnFailedDhcpResult(int status, const cha
     DhcpResultNotifyEvent(DhcpReturnCode::DHCP_FAIL);
 }
 
-void StaStateMachine::DhcpResultNotify::DealDhcpResultFailed()
+void StaStateMachine::DhcpResultNotify::DealDhcpIpv4ResultFailed()
 {
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
+    if (isDhcpIpv6Success) {
+        WIFI_LOGI("DhcpResultNotify DealDhcpIpv4ResultFailed, but ipv6 success, so jump to connected state");
+        pStaStateMachine->StopTimer(static_cast<int>(CMD_IPV6_DELAY_TIMEOUT));
+        DhcpResultNotifyEvent(DhcpReturnCode::DHCP_JUMP);
+        return;
+    }
     BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId,
         DisabledReason::DISABLED_DHCP_FAILURE);
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
         pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_DHCP_FAILURE);
 
-    WIFI_LOGI("DhcpResultNotify OnFailed type: %{public}d, sucNum: %{public}d, failNum: %{public}d",
-        pStaStateMachine->currentTpType, pStaStateMachine->getIpSucNum, pStaStateMachine->getIpFailNum);
-    if (pStaStateMachine->getIpFailNum == 0) {
-        pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
-            pStaStateMachine->linkedInfo);
-        pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
-        pStaStateMachine->StartDisConnectToNetwork();
-    }
-    pStaStateMachine->getIpFailNum++;
+    WIFI_LOGI("DhcpResultNotify OnFailed type: %{public}d", pStaStateMachine->currentTpType);
+    pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
+        pStaStateMachine->linkedInfo);
+    pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
+    pStaStateMachine->StartDisConnectToNetwork();
 }
 
 void StaStateMachine::DhcpResultNotify::DealDhcpOfferResult()
@@ -3584,6 +3598,8 @@ void StaStateMachine::DhcpResultNotify::Clear()
     ClearDhcpResult(&DhcpIpv4Result);
     ClearDhcpResult(&DhcpIpv6Result);
     ClearDhcpResult(&DhcpOfferInfo);
+    isDhcpIpv4Success = false;
+    isDhcpIpv6Success = false;
     WIFI_LOGI("Clear all DHCP results for StaStateMachine instance %{public}d",
         pStaStateMachine->m_instId);
 }

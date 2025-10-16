@@ -422,10 +422,10 @@ void StaMonitor::OnWpaCustomEapNotifyCallBack(const std::string &notifyParam)
         }
     }
     WpaEapData wpaEapData;
-    wpaEapData.msgId = CheckDataToUint(vecEapDatas[0]);
-    wpaEapData.code = CheckDataToUint(vecEapDatas[1]);
-    wpaEapData.type = CheckDataToUint(vecEapDatas[2]);
-    wpaEapData.bufferLen = CheckDataToUint(vecEapDatas[3]);
+    wpaEapData.msgId = static_cast<int32_t>(CheckDataToUint(vecEapDatas[0]));
+    wpaEapData.code = static_cast<int32_t>(CheckDataToUint(vecEapDatas[1]));
+    wpaEapData.type = static_cast<int32_t>(CheckDataToUint(vecEapDatas[2]));
+    wpaEapData.bufferLen = static_cast<int32_t>(CheckDataToUint(vecEapDatas[3]));
     wpaEapData.eapBuffer.reserve(wpaEapData.bufferLen);
 
     DecodeBase64(vecEapDatas[4], wpaEapData.eapBuffer);

@@ -36,7 +36,7 @@ between this connection and other vap associations (like scan or p2p_enhance)
 const int32_t CONNECT_REJECT_DELAY_TIME_MS = 2000;
 const int ZERO = 0;
 const int ONE = 1;
-const int TOW = 2;
+const int TWO = 2;
 const int THREE = 3;
 StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)
 {
@@ -428,7 +428,7 @@ void StaMonitor::OnWpaCustomEapNotifyCallBack(const std::string &notifyParam)
     WpaEapData wpaEapData;
     wpaEapData.msgId = static_cast<int32_t>(CheckDataToUint(vecEapDatas[ZERO]));
     wpaEapData.code = static_cast<int32_t>(CheckDataToUint(vecEapDatas[ONE]));
-    wpaEapData.type = static_cast<int32_t>(CheckDataToUint(vecEapDatas[TOW]));
+    wpaEapData.type = static_cast<int32_t>(CheckDataToUint(vecEapDatas[TWO]));
     wpaEapData.bufferLen = static_cast<int32_t>(CheckDataToUint(vecEapDatas[THREE]));
     wpaEapData.eapBuffer.reserve(wpaEapData.bufferLen);
 

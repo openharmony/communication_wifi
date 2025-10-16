@@ -201,7 +201,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->SetVoWifiDetectPeriod(networkId);
     pStaInterface->GetVoWifiDetectPeriod(networkId);
     pStaInterface->ProcessVoWifiNetlinkReportEvent(networkId);
-    pStaService->OnBatteryStateChanged(networkId);
+    pStaInterface->OnBatteryStateChanged(networkId);
     std::vector<WifiSignalPollInfo> wifiSignalPollInfos = {};
     pStaInterface->GetSignalPollInfoArray(wifiSignalPollInfos, networkId);
     OperateResState state;

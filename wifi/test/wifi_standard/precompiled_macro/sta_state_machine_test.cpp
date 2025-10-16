@@ -94,7 +94,6 @@ public:
     void ConfigStaticIpAddressSuccess1()
     {
         pStaStateMachine->currentTpType = IPTYPE_IPV4;
-        pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         StaticIpAddress staticIpAddress;
         pStaStateMachine->pDhcpResultNotify->pStaStateMachine = nullptr;
@@ -104,7 +103,6 @@ public:
     void ConfigStaticIpAddressSuccess2()
     {
         pStaStateMachine->currentTpType = IPTYPE_IPV6;
-        pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         StaticIpAddress staticIpAddress;
         pStaStateMachine->pDhcpResultNotify->pStaStateMachine = nullptr;
@@ -114,7 +112,6 @@ public:
     void ConfigStaticIpAddressSuccess3()
     {
         pStaStateMachine->currentTpType = IPTYPE_MIX;
-        pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         StaticIpAddress staticIpAddress;
         pStaStateMachine->pDhcpResultNotify->pStaStateMachine = nullptr;
@@ -125,7 +122,6 @@ public:
     {
         pStaStateMachine->currentTpType = IPTYPE_BUTT;
         StaticIpAddress staticIpAddress;
-        pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         EXPECT_FALSE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
@@ -1025,10 +1021,10 @@ HWTEST_F(StaStateMachineTest, IsGoodSignalQualityTest01, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, DealGetDhcpIpTimeoutTest, TestSize.Level1)
 {
     InternalMessagePtr msg = nullptr;
-    pStaStateMachine->pGetIpState->DealGetDhcpIpTimeout(msg);
+    pStaStateMachine->pGetIpState->DealGetDhcpIpv4Timeout(msg);
     InternalMessagePtr msg1 = std::make_shared<InternalMessage>();
     msg1->SetMessageName(WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT);
-    pStaStateMachine->pGetIpState->DealGetDhcpIpTimeout(msg1);
+    pStaStateMachine->pGetIpState->DealGetDhcpIpv4Timeout(msg1);
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 

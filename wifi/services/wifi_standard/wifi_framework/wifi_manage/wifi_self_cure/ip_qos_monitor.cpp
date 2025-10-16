@@ -28,6 +28,7 @@ static const int32_t CMD_START_MONITOR = 10;
 static const int32_t CMD_QUERY_PKTS = 15;
 static const int32_t CMD_QUERY_IPV6_PKTS = 24;
 static const int32_t IPV6_FAILURE_THRESHOLD = 3;
+static const int32_t INTERNET_FAILURE_THRESHOLD = 2;
 
 namespace OHOS {
 namespace Wifi {
@@ -108,7 +109,7 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
     }
     mInternetFailedCounter++;
     WIFI_LOGI("%{public}s: mInternetFailedCounter = %{public}d", __FUNCTION__, mInternetFailedCounter);
-    if ((mInternetFailedCounter >= 1) && (linkedInfo.connState == ConnState::CONNECTED)) {
+    if ((mInternetFailedCounter >= INTERNET_FAILURE_THRESHOLD) && (linkedInfo.connState == ConnState::CONNECTED)) {
         ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(mInstId);
         if (pSelfCureService == nullptr) {
             WIFI_LOGE("%{public}s: pSelfCureService is null", __FUNCTION__);

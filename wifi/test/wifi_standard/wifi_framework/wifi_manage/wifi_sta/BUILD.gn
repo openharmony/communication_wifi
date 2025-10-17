@@ -260,6 +260,10 @@ ohos_unittest("wifi_sta_unittest") {
     defines += [ "FEATURE_WIFI_MDM_RESTRICTED_SUPPORT" ]
   }
 
+  if (wifi_feature_with_dynamic_adjust_wifi_power_save) {
+    defines += [ "DYNAMIC_ADJUST_WIFI_POWER_SAVE" ]
+  }
+
   defines += [
     "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     "private=public",

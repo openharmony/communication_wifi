@@ -427,6 +427,14 @@ public:
     virtual ErrCode OnFoldStateChanged(const int foldStatus) override;
 
     /**
+     * @Description Battery State Changed.
+     *
+     * @param chargeStatus charge state[in]
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    virtual ErrCode OnBatteryStateChanged(const int chargeStatus) override;
+
+    /**
      * @Description Fetch Wifi SignalInfo For VoWiFi.
      *
      * @return VoWifiSignalInfo : wifi signal info

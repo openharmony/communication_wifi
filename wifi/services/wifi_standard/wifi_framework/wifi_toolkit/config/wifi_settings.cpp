@@ -2694,3 +2694,14 @@ std::string WifiSettings::GetDefaultApSsid()
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+wifi/application/portal_login/entry/src/main/ets/entryability/EntryAbility.ets
+wifi/test/wifi_testapp/entry/src/main/ets/Component/NewApiTest.ets
+wifi/test/wifi_testapp/entry/src/main/ets/pages/newApi/AllInOneView.ets
+wifi/application/portal_login/entry/src/main/ets/common/utils.ets
+wifi/application/portal_login/entry/src/main/ets/entryability/EntryAbility.ets
+wifi/test/wifi_testapp/entry/src/main/ets/pages/newApi/CreateGroupView.ets
+wifi/test/wifi_testapp/entry/src/main/ets/pages/newApi/ChangeNameView.ets
+wifi/test/wifi_testapp/entry/src/main/ets/Component/NewApiTest.ets
+wifi/application/portal_login/entry/src/main/ets/common/utils.ets
+wifi/test/wifi_testapp/entry/src/main/ets/pages/newApi/components/NormalNav.ets

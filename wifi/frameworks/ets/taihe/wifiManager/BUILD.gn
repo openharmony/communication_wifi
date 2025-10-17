@@ -55,11 +55,13 @@ taihe_shared_library("wifiManager_taihe_native") { #调用taihe_shared_library�
     "src/ani_constructor.cpp",
     "src/ohos.wifiManager.impl.cpp",
     "src/wifi_callback_taihe.cpp",
-    "src/wifi_errorcode_taihe.cpp"
+    "src/wifi_errorcode_taihe.cpp",
+    "src/wifi_utils_taihe.cpp"
   ]
   deps = [
     ":run_taihe",
-    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk"
+    "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit:wifi_toolkit"
   ]
   external_deps = [
     "c_utils:utils",

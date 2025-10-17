@@ -415,18 +415,27 @@ struct Index {
           this.webUrl = getUrl();
           try {
             webview.ProxyController.removeProxyOverride(() => {
-              hilog.info(DOMAIN, TAG, '%{public}s', 'PROXYCONTROLLER proxy changed');
+              hilog.info(DOMAIN, TAG, '%{public}s', 'removeProxyOverride proxy changed');
             });
           } catch (error) {
             let err: BusinessError = error as BusinessError;
-            hilog.error(DOMAIN, TAG, '%{public}s', `PROXYCONTROLLER Code:${err.code}, message:${err.message}`);
+            hilog.error(DOMAIN, TAG, '%{public}s', `removeProxyOverride Code:${err.code}, message:${err.message}`);
+          }
+          let proxyConfig:webview.ProxyConfig = new webview.ProxyConfig();
+          try {
+            webview.ProxyController.applyProxyOverride(proxyConfig, () => {
+              hilog.info(DOMAIN, TAG, '%{public}s', 'applyProxyOverride proxy changed');
+            });
+          } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            hilog.error(DOMAIN, TAG, '%{public}s', `applyProxyOverride Code:${err.code}, message:${err.message}`);
           }
           try {
-            this.webviewController.loadUrl(this.webUrl);	
-            hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + extractDomain(this.webUrl));	
-          } catch (error) {	
-            let err: BusinessError = error as BusinessError;	
-            hilog.error(DOMAIN, TAG, '%{public}s', `Failed to load url. Code:${err.code}, message:${err.message}`);	
+            this.webviewController.loadUrl(this.webUrl);
+            hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + extractDomain(this.webUrl));
+          } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            hilog.error(DOMAIN, TAG, '%{public}s', `Failed to load url. Code:${err.code}, message:${err.message}`);
           }
           this.isLoaded = true;
         }

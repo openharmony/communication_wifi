@@ -35,6 +35,11 @@ between this connection and other vap associations (like scan or p2p_enhance)
 */
 const int32_t CONNECT_REJECT_DELAY_TIME_MS = 2000;
 
+#define EAP_DATE_ZERO 0 
+#define EAP_DATE_ONE 1 
+#define EAP_DATE_TWO 2 
+#define EAP_DATE_THREE 3
+
 StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)
 {
     WIFI_LOGI("StaMonitor constuctor insId %{public}d", instId);

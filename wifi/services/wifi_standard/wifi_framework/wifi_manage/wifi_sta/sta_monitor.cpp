@@ -36,6 +36,7 @@ between this connection and other vap associations (like scan or p2p_enhance)
 const int32_t CONNECT_REJECT_DELAY_TIME_MS = 2000;
 constexpr int ZERO = 0;
 constexpr int ONE = 1;
+
 constexpr int TWO = 2;
 constexpr int THREE = 3;
 StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)

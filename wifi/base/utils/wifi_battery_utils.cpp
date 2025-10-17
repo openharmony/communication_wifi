@@ -43,7 +43,8 @@ bool BatteryUtils::IsChargedPlugIn()
 #ifdef HAS_BATTERY_MANAGER_PART
     auto &batterySrvClient = PowerMgr::BatterySrvClient::GetInstance();
     auto batteryPluggedType = batterySrvClient.GetPluggedType();
-    if (batteryPluggedType == PowerMgr::BatteryPluggedType::PLUGGED_TYPE_USB) {
+    if (batteryPluggedType == PowerMgr::BatteryPluggedType::PLUGGED_TYPE_USB ||
+        batteryPluggedType == PowerMgr::BatteryPluggedType::PLUGGED_TYPE_AC) {
         return true;
     }
 #endif

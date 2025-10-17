@@ -239,6 +239,10 @@ if (defined(ohos_lite)) {
     if (wifi_feature_autoopen_specified_location) {
       defines += [ "FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT" ]
     }
+
+    if (wifi_feature_with_dynamic_adjust_wifi_power_save) {
+      defines += [ "DYNAMIC_ADJUST_WIFI_POWER_SAVE" ]
+    }
     part_name = "wifi"
     subsystem_name = "communication"
   }

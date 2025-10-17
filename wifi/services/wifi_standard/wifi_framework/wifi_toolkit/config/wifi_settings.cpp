@@ -2678,30 +2678,3 @@ std::string WifiSettings::GetDefaultApSsid()
 }
 }  // namespace Wifi
 }  // namespace OHOS
-
-
-/**
- * Copyright (c) 2025 Huawei Device Co., Ltd.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-wifi/application/portal_login/entry/src/main/ets/entryability/EntryAbility.ets
-wifi/test/wifi_testapp/entry/src/main/ets/Component/NewApiTest.ets
-wifi/test/wifi_testapp/entry/src/main/ets/pages/newApi/AllInOneView.ets
-wifi/application/portal_login/entry/src/main/ets/common/utils.ets
-wifi/application/portal_login/entry/src/main/ets/entryability/EntryAbility.ets
-wifi/test/wifi_testapp/entry/src/main/ets/pages/newApi/CreateGroupView.ets
-wifi/test/wifi_testapp/entry/src/main/ets/pages/newApi/ChangeNameView.ets
-wifi/test/wifi_testapp/entry/src/main/ets/Component/NewApiTest.ets
-wifi/application/portal_login/entry/src/main/ets/common/utils.ets
-wifi/test/wifi_testapp/entry/src/main/ets/pages/newApi/components/NormalNav.ets

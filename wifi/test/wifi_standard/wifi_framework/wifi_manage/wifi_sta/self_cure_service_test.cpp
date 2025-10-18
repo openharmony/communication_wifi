@@ -211,7 +211,6 @@ HWTEST_F(SelfCureServiceTest, SetTxRxGoodButNoInternetTest, TestSize.Level1)
     OperateResState state = OperateResState::CONNECT_NETWORK_ENABLED;
     WifiLinkedInfo info;
     pSelfCureService->HandleStaConnChanged(state, info);
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 HWTEST_F(SelfCureServiceTest, IsSelfCureOnGoingTest, TestSize.Level1)

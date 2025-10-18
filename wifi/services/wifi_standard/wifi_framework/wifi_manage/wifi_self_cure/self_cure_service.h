@@ -44,6 +44,7 @@ public:
     bool CheckSelfCureWifiResult(int event);
     bool IsWifiSelfcureDone();
     bool NotifyIpv6FailureDetected();
+    void SetTxRxGoodButNoInternet(bool isTxRxGoodButNoInternet);
 private:
     void RegisterP2pEnhanceCallback();
     void P2pEnhanceStateChange(const std::string &ifName, int32_t state, int32_t frequency);
@@ -54,6 +55,7 @@ private:
     OperateResState lastState = OperateResState::DISCONNECT_DISCONNECTED;
     OperateResState lastNetworkState_ = OperateResState::DISCONNECT_DISCONNECTED;
     WifiLinkedInfo lastWifiLinkedInfo;
+    bool isTxRxGoodButNoInternet_ = false;
 };
 } //namespace Wifi
 } //namespace OHOS

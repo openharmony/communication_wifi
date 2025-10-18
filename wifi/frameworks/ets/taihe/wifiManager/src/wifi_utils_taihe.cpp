@@ -258,7 +258,6 @@ void ConfigStaticIp(const ::ohos::wifiManager::WifiDeviceConfig &config, WifiDev
             ConfigStaticIpv4(config, cppConfig);
         }
     }
-    ConfigStaticIpv4(config, cppConfig);
 }
 
 void ConfigStaticIpv4(const ::ohos::wifiManager::WifiDeviceConfig &config, WifiDeviceConfig& cppConfig)

@@ -414,11 +414,28 @@ struct Index {
           hilog.info(DOMAIN, TAG, '%{public}s', 'startCountdown LoadUrl');
           this.webUrl = getUrl();
           try {
-            this.webviewController.loadUrl(this.webUrl);	
-            hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + extractDomain(this.webUrl));	
-          } catch (error) {	
-            let err: BusinessError = error as BusinessError;	
-            hilog.error(DOMAIN, TAG, '%{public}s', `Failed to load url. Code:${err.code}, message:${err.message}`);	
+            webview.ProxyController.removeProxyOverride(() => {
+              hilog.info(DOMAIN, TAG, '%{public}s', 'removeProxyOverride proxy changed');
+            });
+          } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            hilog.error(DOMAIN, TAG, '%{public}s', `removeProxyOverride Code:${err.code}, message:${err.message}`);
+          }
+          let proxyConfig:webview.ProxyConfig = new webview.ProxyConfig();
+          try {
+            webview.ProxyController.applyProxyOverride(proxyConfig, () => {
+              hilog.info(DOMAIN, TAG, '%{public}s', 'applyProxyOverride proxy changed');
+            });
+          } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            hilog.error(DOMAIN, TAG, '%{public}s', `applyProxyOverride Code:${err.code}, message:${err.message}`);
+          }
+          try {
+            this.webviewController.loadUrl(this.webUrl);
+            hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + extractDomain(this.webUrl));
+          } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            hilog.error(DOMAIN, TAG, '%{public}s', `Failed to load url. Code:${err.code}, message:${err.message}`);
           }
           this.isLoaded = true;
         }
@@ -452,17 +469,14 @@ struct Index {
     }
     emitter.on('WANT_UPDATE', () => {
       hilog.info(DOMAIN, TAG, '%{public}s', 'on new want.');
+      this.isNetBind = false;
+      this.timerCount = 10;
+      this.isLoaded = false;
+      this.startCountdown();
       bindToNetById(this.context)
         .then(()=>{
-            this.webUrl = getUrl();
             hilog.info(DOMAIN, TAG, '%{public}s', 'on new want bindToNetById.');
-            try {
-              this.webviewController.loadUrl(this.webUrl);	
-              hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + extractDomain(this.webUrl));	
-            } catch (error) {	
-              let err: BusinessError = error as BusinessError;	
-              hilog.error(DOMAIN, TAG, '%{public}s', `Failed to load url. Code:${err.code}, message:${err.message}`);	
-            }
+            this.isNetBind = true;
         })
         .catch(()=>{
           hilog.error(DOMAIN, TAG, '%{public}s', 'on new want bindToNetById failed.');

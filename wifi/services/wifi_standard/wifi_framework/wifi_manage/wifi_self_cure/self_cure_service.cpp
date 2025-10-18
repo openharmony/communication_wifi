@@ -75,8 +75,17 @@ void SelfCureService::HandleRssiLevelChanged(int rssi)
     pSelfCureStateMachine->SendMessage(msg);
 }
 
+void SelfCureService::SetTxRxGoodButNoInternet(bool isTxRxGoodButNoInternet)
+{
+    WIFI_LOGI("SetTxRxGoodButNoInternet: %{public}d", isTxRxGoodButNoInternet);
+    isTxRxGoodButNoInternet_ = isTxRxGoodButNoInternet;
+}
+
 void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLinkedInfo &info)
 {
+    if (isTxRxGoodButNoInternet_ && state == OperateResState::CONNECT_NETWORK_ENABLED) {
+        state = OperateResState::CONNECT_NETWORK_DISABLED;
+    }
     WIFI_LOGD("self cure wifi connection state change, state = %{public}d", state);
     if (pSelfCureStateMachine == nullptr) {
         WIFI_LOGE("%{public}s pSelfCureStateMachine is null.", __FUNCTION__);
@@ -86,6 +95,7 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_CONNECTED_RCVD, info);
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
+        isTxRxGoodButNoInternet_ = false;
         pSelfCureStateMachine->SetHttpMonitorStatus(false);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_DISCONNECTED_RCVD, info);
         if (lastState == OperateResState::CONNECT_OBTAINING_IP) {

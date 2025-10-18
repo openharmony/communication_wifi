@@ -201,5 +201,16 @@ ErrCode SelfCureInterface::NotifyIpv6FailureDetected()
     bool ret = pSelfCureService->NotifyIpv6FailureDetected();
     return ret ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
 }
+ 
+void SelfCureInterface::NotifyTxRxGoodButNoInternet(bool isTxRxGoodButNoInternet)
+{
+    WIFI_LOGD("Enter NotifyTxRxGoodButNoInternet: %{public}d", isTxRxGoodButNoInternet);
+    std::lock_guard<std::mutex> lock(mutex);
+    if (pSelfCureService == nullptr) {
+        WIFI_LOGE("NotifyTxRxGoodButNoInternet: pSelfCureService is null");
+        return;
+    }
+    pSelfCureService->SetTxRxGoodButNoInternet(isTxRxGoodButNoInternet);
+}
 }  // namespace Wifi
 }  // namespace OHOS

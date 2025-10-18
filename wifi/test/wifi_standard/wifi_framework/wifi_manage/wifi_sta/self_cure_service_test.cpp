@@ -196,6 +196,24 @@ HWTEST_F(SelfCureServiceTest, NotifyIpv6FailureDetectedTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
+HWTEST_F(SelfCureServiceTest, SetTxRxGoodButNoInternetTest, TestSize.Level1)
+{
+    // Test setting tx/rx good but no internet to true
+    pSelfCureService->SetTxRxGoodButNoInternet(true);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    
+    // Test setting tx/rx good but no internet to false
+    pSelfCureService->SetTxRxGoodButNoInternet(false);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+    
+    // Test HandleStaConnChanged with tx/rx good but no internet flag set
+    pSelfCureService->SetTxRxGoodButNoInternet(true);
+    OperateResState state = OperateResState::CONNECT_NETWORK_ENABLED;
+    WifiLinkedInfo info;
+    pSelfCureService->HandleStaConnChanged(state, info);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
 HWTEST_F(SelfCureServiceTest, IsSelfCureOnGoingTest, TestSize.Level1)
 {
     EXPECT_EQ(pSelfCureService->IsSelfCureOnGoing(), false);

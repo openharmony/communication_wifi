@@ -23,6 +23,7 @@
 #include "wifi_msg.h"
 #include "iremote_broker.h"
 #include "ethernet_client.h"
+#include "wifi_internal_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -87,6 +88,7 @@ public:
     bool SetReplyCustomEapDataCallback(const std::function<void(int, const std::string&)> &callback);
     void ReRegisterCustomEapCallback();
     bool NotifyWpaEapInterceptInfo(const WpaEapData &wpaEapData);
+    void OnWifiStateOpen(int state);
     sptr<NetEapCallback> GetNetEapCallbackPtr()
     {
         return netEapCallback_;

@@ -96,8 +96,6 @@ HWTEST_F(P2pEnabledStateTest, GoInState, TestSize.Level1)
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetPersistentReconnect(Eq(1)))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
-    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), UpdateGroupInfoToWpa()).WillOnce(Return()).WillOnce(Return());
-    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), UpdatePersistentGroups()).WillOnce(Return()).WillOnce(Return());
     pP2pEnabledState->GoInState();
     pP2pEnabledState->GoInState();
 }

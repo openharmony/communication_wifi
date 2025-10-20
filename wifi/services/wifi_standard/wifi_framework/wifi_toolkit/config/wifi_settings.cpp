@@ -1917,9 +1917,43 @@ std::string WifiSettings::GetPackageName(std::string tag)
     return "";
 }
 
+std::string WifiSettings::GetSubstringByBytes(const std::string& value, int size)
+{
+    std::string result;
+    size_t charLen;
+    for (size_t index = 0; index < value.length();) {
+        unsigned char tmp = static_cast<unsigned char>(value[index]);
+        if ((tmp & 0x80) == 0) {
+            charLen = static_cast<size_t>(Utf8CharLength::ASCII_CHAR_LENGTH); // ASCII
+        } else if ((tmp & 0xE0) == 0xC0) {
+            charLen = static_cast<size_t>(Utf8CharLength::TWO_BYTE_CHAR_LENGTH); // 2-byte UTF-8
+        } else if ((tmp & 0xF0) == 0xE0) {
+            charLen = static_cast<size_t>(Utf8CharLength::THREE_BYTE_CHAR_LENGTH); // 3-byte UTF-8
+        } else if ((tmp & 0xF8) == 0xF0) {
+            charLen = static_cast<size_t>(Utf8CharLength::FOUR_BYTE_CHAR_LENGTH); // 4-byte UTF-8
+        } else {
+            charLen = 1;
+        }
+            if (result.length() + charLen <= static_cast<size_t>(size)) {
+            result.append(value, index, charLen);
+            index += charLen;
+        } else {
+            return result;
+        }
+    }
+    return result;
+}
+
 void WifiSettings::SetDeviceNameApSsid(std::string ssid)
 {
-    g_defaultApSsid = ssid;
+    const std::string ellipsis = "...";
+    std::string result;
+    if (ssid.length() > HOTSPOT_NAME_MAX_LENGTH) {
+        result = GetSubstringByBytes(ssid, HOTSPOT_NAME_MAX_LENGTH - ellipsis.length()) + ellipsis;
+    } else {
+        result = ssid;
+    }
+    g_defaultApSsid = result;
 }
 
 void WifiSettings::InitDefaultHotspotConfig()

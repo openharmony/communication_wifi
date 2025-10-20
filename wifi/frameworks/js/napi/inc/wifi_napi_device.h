@@ -22,6 +22,11 @@
 
 namespace OHOS {
 namespace Wifi {
+// writable properties
+#define DECLARE_WRITABLE_NAPI_FUNCTION(name, func)                                 \
+    {                                                                              \
+        (name), nullptr, (func), nullptr, nullptr, nullptr, napi_writable, nullptr \
+    }
 napi_value EnableWifi(napi_env env, napi_callback_info info);
 napi_value DisableWifi(napi_env env, napi_callback_info info);
 napi_value IsWifiActive(napi_env env, napi_callback_info info);

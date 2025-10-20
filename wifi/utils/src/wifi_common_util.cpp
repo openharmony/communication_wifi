@@ -497,7 +497,7 @@ bool IsOtherVapConnect()
         return false;
     }
     for (ifa = ifaddr, n = 0; ifa != nullptr; ifa = ifa->ifa_next, n++) {
-        if (ifa->ifa_addr == nullptr) {
+        if (ifa->ifa_addr == nullptr || !(ifa->ifa_flags & IFF_UP)) {
             continue;
         }
         /* For an AF_INET interface address, display the address */

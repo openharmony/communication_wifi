@@ -65,6 +65,7 @@ constexpr int WIFI_GET_SCAN_INFO_VALID_TIMESTAMP = 30 * 1000 * 1000;
 constexpr int HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS = 10 * 60 * 1000;
 constexpr int WIFI_DISAPPEAR_TIMES = 3;
 constexpr int WIFI_MDM_RESTRICTED_MAX_NUM = 200;
+constexpr int HOTSPOT_NAME_MAX_LENGTH = 30;
 constexpr uint32_t COMPARE_MAC_OFFSET = 2;
 /* Plaintext string length */
 constexpr uint32_t COMPARE_MAC_LENGTH = 17 - 4;
@@ -95,6 +96,13 @@ enum class ThermalLevel {
     OVERHEATED = 4,
     WARNING = 5,
     EMERGENCY = 6,
+};
+
+enum class Utf8CharLength {
+    ASCII_CHAR_LENGTH = 1,
+    TWO_BYTE_CHAR_LENGTH = 2,
+    THREE_BYTE_CHAR_LENGTH = 3,
+    FOUR_BYTE_CHAR_LENGTH = 4,
 };
 
 enum WifiMacAddrErrCode {
@@ -381,6 +389,7 @@ private:
     int SyncWifiConfig();
     std::vector<WifiDeviceConfig> RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const;
     std::string FuzzyBssid(const std::string bssid);
+    std::string GetSubstringByBytes(const std::string &value, int size);
 #ifndef OHOS_ARCH_LITE
     void MergeWifiConfig();
     void MergeSoftapConfig();

@@ -1691,7 +1691,7 @@ ErrCode WifiDeviceServiceImpl::IsFeatureSupported(long feature, bool &isSupporte
 
 ErrCode WifiDeviceServiceImpl::GetDeviceMacAddress(std::string &result)
 {
-    WIFI_LOGI("GetDeviceMacAddress");
+    WIFI_LOGD("GetDeviceMacAddress");
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetDeviceMacAddress:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

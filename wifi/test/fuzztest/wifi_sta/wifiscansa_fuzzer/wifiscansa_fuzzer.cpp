@@ -140,9 +140,10 @@ void WifiScanServiceImplFuzzTest(const uint8_t* data, size_t size)
 
 void WifiScanMgrServiceImplFuzzTest(const uint8_t* data, size_t size)
 {
-    pWifiScanMgrServiceImpl.OnStart();
-    pWifiScanMgrServiceImpl.OnStop();
-    pWifiScanMgrServiceImpl.Init();
+    int32_t fd = static_cast<int32_t>(data[0]);
+    std::vector<std::u16string> args;
+    
+    pWifiScanMgrServiceImpl.Dump(fd, args);
 }
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)

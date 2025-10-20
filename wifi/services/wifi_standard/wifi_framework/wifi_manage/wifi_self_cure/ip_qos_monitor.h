@@ -34,7 +34,7 @@ public:
     void HandleTcpPktsResp(const std::vector<int64_t> &elems);
     void HandleIpv6TcpPktsResp(const std::vector<int64_t> &elems);
     bool ParseNetworkInternetGood(const std::vector<int64_t> &elems);
-    bool ParseIpv6NetworkInternetGood(const std::vector<int64_t> &elems);
+    bool ParseIpv6NetworkInternetGood(const std::vector<int64_t> &elems, int32_t txPacketThreshold = 3);
     int64_t GetCurrentTcpTxCounter();
     int64_t GetCurrentTcpRxCounter();
     void ResetTxRxProperty();

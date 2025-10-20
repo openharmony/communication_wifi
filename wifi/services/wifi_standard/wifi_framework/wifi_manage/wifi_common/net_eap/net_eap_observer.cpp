@@ -85,6 +85,13 @@ bool NetEapObserver::StopNetEapObserver()
     return false;
 }
 
+void NetEapObserver::OnWifiStateOpen(int state)
+{
+    if (state == static_cast<int>(OperateResState::OPEN_WIFI_SUCCEED)) {
+        ReRegisterCustomEapCallback();
+    }
+}
+
 void NetEapObserver::ReRegisterCustomEapCallback()
 {
     WIFI_LOGI("%{public}s, enter", __func__);

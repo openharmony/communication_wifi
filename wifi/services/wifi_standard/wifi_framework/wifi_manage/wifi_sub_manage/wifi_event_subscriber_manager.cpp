@@ -29,9 +29,6 @@
 #include "wifi_app_state_aware.h"
 #include "wifi_net_agent.h"
 #include "block_connect_service.h"
-#ifdef HAS_MOVEMENT_PART
-#include "wifi_msdp_state_listener.h"
-#endif
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 #include "wifi_asset_manager.h"
 #endif
@@ -47,6 +44,7 @@
 #endif
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sensor_scene.h"
+#include "app_network_speed_limit_service.h"
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
 #include "telephony_observer_client.h"
 #include "telephony_types.h"
@@ -76,9 +74,6 @@ const std::string WLAN_PAGE_ENTER = "enterWlanPage";
 
 bool WifiEventSubscriberManager::mIsMdmForbidden = false;
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
-#ifdef HAS_MOVEMENT_PART
-static sptr<DeviceMovementCallback> deviceMovementCallback_ = nullptr;
-#endif
 
 using CesFuncType = void (CesEventSubscriber::*)(const OHOS::EventFwk::CommonEventData &eventData);
 
@@ -166,6 +161,7 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
         mWifiEventSubsThread_.reset();
     }
 #endif
+    UnRegisterMovementEnhanceCallback();
 }
 
 void WifiEventSubscriberManager::Init()
@@ -249,17 +245,6 @@ void WifiEventSubscriberManager::HandleEthernetServiceChange(int systemAbilityId
 #endif
 }
 
-#ifdef HAS_MOVEMENT_PART
-void WifiEventSubscriberManager::HandleHasMovementPartChange(int systemAbilityId, bool add)
-{
-    if (add) {
-        RegisterMovementCallBack();
-    } else {
-        UnRegisterMovementCallBack();
-    }
-}
-#endif
-
 void WifiEventSubscriberManager::HandleDistributedKvDataServiceChange(bool add)
 {
     WIFI_LOGI("HandleDistributedKvDataServiceChange, mode=[%{public}d]!", add);
@@ -307,6 +292,9 @@ void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bo
     if (systemAbilityId == MIRACAST_SERVICE_SA_ID) {
         WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(MIRACAST_SERVICE_UID);
     }
+    if (systemAbilityId == HICAR_SERVICE_SA_ID) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(HICAR_SERVICE_UID);
+    }
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
         WIFI_LOGE("Get P2P service failed!");
@@ -327,11 +315,6 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
         case COMM_NET_CONN_MANAGER_SYS_ABILITY_ID:
             HandleCommNetConnManagerSysChange(systemAbilityId, add);
             break;
-#ifdef HAS_MOVEMENT_PART
-        case MSDP_MOVEMENT_SERVICE_ID:
-            HandleHasMovementPartChange(systemAbilityId, add);
-            break;
-#endif
         case DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID:
             HandleDistributedKvDataServiceChange(add);
             break;
@@ -497,14 +480,12 @@ void WifiEventSubscriberManager::InitSubscribeListener()
     SubscribeSystemAbility(APP_MGR_SERVICE_ID);
     SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID);
     SubscribeSystemAbility(COMM_ETHERNET_MANAGER_SYS_ABILITY_ID);
-#ifdef HAS_MOVEMENT_PART
-    SubscribeSystemAbility(MSDP_MOVEMENT_SERVICE_ID);
-#endif
     SubscribeSystemAbility(SOFTBUS_SERVER_SA_ID);
     SubscribeSystemAbility(CAST_ENGINE_SA_ID);
     SubscribeSystemAbility(MIRACAST_SERVICE_SA_ID);
     SubscribeSystemAbility(SHARE_SERVICE_ID);
     SubscribeSystemAbility(MOUSE_CROSS_SERVICE_ID);
+    SubscribeSystemAbility(HICAR_SERVICE_SA_ID);
 }
 
 int WifiEventSubscriberManager::GetLastStaStateByDatashare()
@@ -587,36 +568,76 @@ void WifiEventSubscriberManager::MdmPropChangeEvt(const char *key, const char *v
     }
 }
 
-#ifdef HAS_MOVEMENT_PART
-void WifiEventSubscriberManager::RegisterMovementCallBack()
+void WifiEventSubscriberManager::OnEnhanceServiceReady()
 {
-    WIFI_LOGI("RegisterMovementCallBack");
-    std::unique_lock<std::mutex> lock(deviceMovementEventMutex);
-    if (!deviceMovementCallback_) {
-        deviceMovementCallback_ = sptr<DeviceMovementCallback>(new DeviceMovementCallback());
+    WIFI_LOGI("Enhance service is ready, registering movement callback");
+    enhanceServiceReady_ = true;
+    RegisterMovementEnhanceCallback();
+}
+
+void WifiEventSubscriberManager::RegisterMovementEnhanceCallback()
+{
+    WIFI_LOGI("%{public}s enter.", __FUNCTION__);
+    IEnhanceService *mEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (mEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s, get mEnhanceService failed!", __FUNCTION__);
+        return;
     }
-    if (Msdp::MovementClient::GetInstance().SubscribeCallback(
-        Msdp::MovementDataUtils::MovementType::TYPE_STILL, deviceMovementCallback_) != ERR_OK) {
-        WIFI_LOGE("Register movement still observer failed!");
+    MovementEnhanceCallback movementCallback = [this](int32_t movementType, int32_t movementValue) {
+        this->OnMovementChanged(movementType, movementValue);
+    };
+    ErrCode ret = mEnhanceService->RegisterMovementEnhanceCallback(movementCallback);
+    WIFI_LOGI("%{public}s, result %{public}d.", __FUNCTION__, ret);
+}
+
+void WifiEventSubscriberManager::UnRegisterMovementEnhanceCallback()
+{
+    WIFI_LOGI("%{public}s enter.", __FUNCTION__);
+    IEnhanceService *mEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (mEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s, get mEnhanceService failed!", __FUNCTION__);
+        return;
     }
-    if (Msdp::MovementClient::GetInstance().SubscribeCallback(
-        Msdp::MovementDataUtils::MovementType::TYPE_STAY, deviceMovementCallback_) != ERR_OK) {
-        WIFI_LOGE("Register movement stay observer failed!");
+    ErrCode ret = mEnhanceService->UnRegisterMovementEnhanceCallback();
+    WIFI_LOGI("%{public}s, result %{public}d.", __FUNCTION__, ret);
+}
+
+void WifiEventSubscriberManager::OnMovementChanged(int32_t movementType, int32_t movementValue)
+{
+    WIFI_LOGI("OnMovementChanged, type: %{public}d, value: %{public}d", movementType, movementValue);
+    // 静止状态
+    if (movementType == MOVEMENT_TYPE_STILL) {
+        if (movementValue == MOVEMENT_VALUE_ENTER) {
+            WifiConfigCenter::GetInstance().SetFreezeModeState(MODE_STATE_OPEN);
+        } else {
+            WifiConfigCenter::GetInstance().SetFreezeModeState(MODE_STATE_CLOSE);
+        }
+    }
+    // 停留状态
+    if (movementType == MOVEMENT_TYPE_STAY) {
+        HandleMovementChange();
     }
 }
 
-void WifiEventSubscriberManager::UnRegisterMovementCallBack()
+void WifiEventSubscriberManager::HandleMovementChange()
 {
-    WIFI_LOGI("UnRegisterMovementCallBack");
-    std::unique_lock<std::mutex> lock(deviceMovementEventMutex);
-    if (!deviceMovementCallback_) {
-        return;
+    WIFI_LOGI("HandleMovementChange enter");
+    if (!movementChangeEventHandler_) {
+        movementChangeEventHandler_ = std::make_unique<WifiEventHandler>("WIFI_MOVEMENT_STATE_AWARE_THREAD");
     }
-    Msdp::MovementClient::GetInstance().UnSubscribeCallback(
-        Msdp::MovementDataUtils::MovementType::TYPE_STILL, deviceMovementCallback_);
-    deviceMovementCallback_ = nullptr;
+    movementChangeEventHandler_->PostAsyncTask([this]() {
+        for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+            IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
+            if (pScanService == nullptr) {
+                WIFI_LOGE("scan service is NOT start!");
+                continue;
+            }
+            if (pScanService->OnMovingFreezeStateChange() != WIFI_OPT_SUCCESS) {
+                WIFI_LOGE("OnMovingFreezeStateChange failed");
+            }
+        }
+    });
 }
-#endif
 
 CesEventSubscriber::CesEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo)
@@ -705,6 +726,13 @@ void CesEventSubscriber::OnReceiveBatteryEvent(const OHOS::EventFwk::CommonEvent
     } else if (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_POWER_DISCONNECTED) {
         WifiConfigCenter::GetInstance().SetNoChargerPlugModeState(MODE_STATE_OPEN);
     }
+
+#ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+    if (pService != nullptr) {
+        pService->OnBatteryStateChanged(WifiConfigCenter::GetInstance().GetNoChargerPlugModeState());
+    }
+#endif
 
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
         IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
@@ -1207,6 +1235,7 @@ void CesEventSubscriber::OnReceiveConnectivityChangedEvent(const OHOS::EventFwk:
 
     WIFI_LOGI("%{public}s net: %{public}d code: %{public}d", __FUNCTION__, bearType, code);
     WifiSensorScene::GetInstance().OnConnectivityChanged(bearType, code);
+    AppNetworkSpeedLimitService::GetInstance().HandleNetworkConnectivityChange(bearType, code);
 }
 
 void WifiEventSubscriberManager::RegisterNetworkStateChangeEvent()
@@ -1648,7 +1677,7 @@ void WifiEventSubscriberManager::UnRegisterCellularStateObserver()
 
 void CellularStateObserver::OnCellInfoUpdated(int32_t slotId, const std::vector<sptr<Telephony::CellInformation>> &vec)
 {
-    WIFI_LOGI("CellularStateObserver::OnCellInfoUpdated");
+    WIFI_LOGD("CellularStateObserver::OnCellInfoUpdated");
 #if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
     IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(INSTID_WLAN0);
     if (pWifiProService != nullptr) {

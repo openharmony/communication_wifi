@@ -593,6 +593,19 @@ ErrCode StaInterface::FetchWifiSignalInfoForVoWiFi(VoWifiSignalInfo &signalInfo)
     signalInfo = pStaService->FetchWifiSignalInfoForVoWiFi();
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode StaInterface::OnBatteryStateChanged(const int chargeStatus)
+{
+    WIFI_LOGI("Enter OnBatteryStateChanged, chargeStatus = %{public}d", chargeStatus);
+    if (chargeStatus != MODE_STATE_OPEN && chargeStatus != MODE_STATE_CLOSE) {
+        WIFI_LOGE("chargeStatus param is error.");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    std::lock_guard<std::mutex> lock(mutex);
+    CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
+    pStaService->HandleBatteryStatusChanged(chargeStatus);
+    return WIFI_OPT_SUCCESS;
+}
  
 ErrCode StaInterface::IsSupportVoWifiDetect(bool &isSupported)
 {
@@ -664,7 +677,7 @@ void StaInterface::ProcessVoWifiNetlinkReportEvent(const int type)
 
 ErrCode StaInterface::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
 {
-    WIFI_LOGI("Enter GetSignalPollInfoArray");
+    WIFI_LOGD("Enter GetSignalPollInfoArray");
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     return pStaService->GetSignalPollInfoArray(wifiSignalPollInfos, length);
 }

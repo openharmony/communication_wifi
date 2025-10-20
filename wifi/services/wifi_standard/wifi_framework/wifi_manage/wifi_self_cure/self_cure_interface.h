@@ -133,6 +133,14 @@ public:
      * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     ErrCode NotifyIpv6FailureDetected() override;
+ 
+    /**
+     * @Description Notify that tx/rx is good but network is actually not
+     * working
+     *
+     * @param isTxRxGoodButNoInternet - true if tx/rx good but no internet
+     */
+    void NotifyTxRxGoodButNoInternet(bool isTxRxGoodButNoInternet) override;
 private:
     std::mutex mutex;
     std::vector<SelfCureServiceCallback> mSelfCureCallback;

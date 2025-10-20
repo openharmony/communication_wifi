@@ -98,6 +98,14 @@ public:
      * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode NotifyIpv6FailureDetected() = 0;
+
+    /**
+     * @Description Notify that tx/rx is good but network is actually not
+     * working
+     *
+     * @param isTxRxGoodButNoInternet - true if tx/rx good but no internet
+     */
+    virtual void NotifyTxRxGoodButNoInternet(bool isTxRxGoodButNoInternet) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

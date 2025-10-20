@@ -35,6 +35,8 @@
 #define MIRACAST_SERVICE_SA_ID 5527
 #define SHARE_SERVICE_UID 5520
 #define MOUSE_CROSS_SERVICE_UID 6699
+#define HICAR_SERVICE_UID 65872
+#define HICAR_SERVICE_SA_ID 65872
 #define HILINK_PRO_NETWORK 4
 namespace OHOS {
 namespace Wifi {
@@ -235,10 +237,6 @@ public:
     int SetP2pEnhanceState(int state);
 
     int GetP2pEnhanceState();
-
-    int SetP2pEnhanceActionListenChannel(int channel);
-
-    int GetP2pEnhanceActionListenChannel();
 
     int SetP2pEnhanceFreq(int freq);
 
@@ -481,7 +479,6 @@ private:
     std::atomic<int> mP2pState {static_cast<int>(P2pState::P2P_STATE_CLOSED)};
     std::atomic<int> p2pEnhanceState_ {0};
     std::atomic<int> p2pEnhanceFreq_ {0};
-    std::atomic<int> p2pEnhanceActionListenChannel_ {0};
     std::atomic<int> mP2pDiscoverState {0};
     std::atomic<P2pBusinessType> mP2pBusinessType {P2pBusinessType::INVALID};
     std::atomic<int> mP2pCreatorUid {-1};

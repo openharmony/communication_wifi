@@ -36,6 +36,7 @@ constexpr int U32_AT_SIZE_ZERO = 4;
 static bool g_isInsted = false;
 static std::unique_ptr<P2pInterface> pP2pInterface = nullptr;
 static std::unique_ptr<WifiP2pGroupManager> pWifiP2pGroupManager = nullptr;
+static std::unique_ptr<WifiP2pService> pWifiP2pService = nullptr;
 IP2pServiceCallbacks mP2pCallback;
 
 void MyExit()
@@ -252,6 +253,32 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     pWifiP2pGroupManager->RemoveMacAddrPairInfo(type, group);
 }
 
+void P2pServerFuzzTest01(const uint8_t* data, size_t size)
+{
+    std::vector<StationInfo> result;
+    WifiP2pConfig config;
+    if (size >= THREE) {
+        int index2 = 0;
+        std::string mDeviceAddress = std::string(reinterpret_cast<const char*>(data), size);
+        std::string passphrase = std::string(reinterpret_cast<const char*>(data), size);
+        std::string groupName = std::string(reinterpret_cast<const char*>(data), size);
+        int groupOwnerIntent = static_cast<int>(data[index2++]);
+        int deviceAddressType = static_cast<int>(data[index2++]);
+        int netId = static_cast<int>(data[index2++]);
+
+        config.SetDeviceAddress(mDeviceAddress);
+        config.SetDeviceAddressType(deviceAddressType);
+        config.SetNetId(netId);
+        config.SetPassphrase(passphrase);
+        config.SetGroupOwnerIntent(groupOwnerIntent);
+        config.SetGroupName(groupName);
+    }
+    pWifiP2pService->EnableP2p();
+    pWifiP2pService->DisableP2p();
+    pWifiP2pService->CreateRptGroup(config);
+    pWifiP2pService->GetRptStationsList(result);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -260,6 +287,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
     OHOS::Wifi::InitParam();
     OHOS::Wifi::P2pServerFuzzTest(data, size);
+    OHOS::Wifi::P2pServerFuzzTest01(data, size);
     return 0;
 }
 }

@@ -29,10 +29,13 @@
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
 #include "mock_wifi_sta_hal_interface.h"
+#include "mock_wifi_supplicant_hal_interface.h"
 #include "mock_block_connect_service.h"
 #include "wifi_history_record_manager.h"
 #include "sta_define.h"
 #include "wifi_telephony_utils.h"
+#include "wifi_battery_utils.h"
+#include "ip_qos_monitor.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -840,7 +843,6 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         pStaStateMachine->currentTpType = IPTYPE_IPV4;
-        pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         StaticIpAddress staticIpAddress;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
@@ -855,7 +857,6 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         pStaStateMachine->currentTpType = IPTYPE_IPV6;
-        pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         StaticIpAddress staticIpAddress;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
@@ -869,7 +870,6 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
         pStaStateMachine->currentTpType = IPTYPE_MIX;
-        pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         StaticIpAddress staticIpAddress;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
@@ -882,7 +882,6 @@ public:
     {
         pStaStateMachine->currentTpType = IPTYPE_BUTT;
         StaticIpAddress staticIpAddress;
-        pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
@@ -920,6 +919,33 @@ public:
         pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_PORTAL, "");
     }
+
+    void HandleNetCheckResultTxRxGoodButNoInternetTest()
+    {
+        IpQosMonitor::GetInstance().lastTxRxGood_ = true;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(MODE_STATE_OPEN));
+        
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(1));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(
+            OperateResState::CONNECT_NETWORK_ENABLED, _, _)).Times(AtLeast(1));
+        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
+        
+        IpQosMonitor::GetInstance().lastTxRxGood_ = false;
+    }
+    
+    void HandleNetCheckResultTxRxGoodButNoInternetFalseTest()
+    {
+        IpQosMonitor::GetInstance().lastTxRxGood_ = false;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(MODE_STATE_OPEN));
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+ 
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(1));
+        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
+    }
+
     void HandleNetCheckResultFail()
     {
         pStaStateMachine->linkedInfo.connState = ConnState::DISCONNECTED;
@@ -1174,7 +1200,6 @@ public:
     void DhcpResultNotifyOnSuccessTest()
     {
         pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
-        pStaStateMachine->getIpSucNum = 1;
         pStaStateMachine->isRoam = false;
         IpInfo ipInfo;
         ipInfo.ipAddress = IpTools::ConvertIpv4Address("192.168.0.2");
@@ -1199,8 +1224,6 @@ public:
     {
         pStaStateMachine->linkedInfo.detailedState = DetailedState::CONNECTED;
         pStaStateMachine->currentTpType = IPTYPE_IPV6;
-        pStaStateMachine->getIpSucNum = 0;
-        pStaStateMachine->getIpFailNum = 1;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpV6Info(_, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpv6Info(_, _)).Times(testing::AtLeast(0));
         std::string ifname = "wlan0";
@@ -1790,10 +1813,10 @@ public:
     void DealGetDhcpIpTimeoutTest()
     {
         InternalMessagePtr msg = nullptr;
-        pStaStateMachine->pGetIpState->DealGetDhcpIpTimeout(msg);
+        pStaStateMachine->pGetIpState->DealGetDhcpIpv4Timeout(msg);
         InternalMessagePtr msg1 = std::make_shared<InternalMessage>();
         msg1->SetMessageName(WIFI_SVR_CMD_STA_WPA_EAP_UMTS_AUTH_EVENT);
-        pStaStateMachine->pGetIpState->DealGetDhcpIpTimeout(msg1);
+        pStaStateMachine->pGetIpState->DealGetDhcpIpv4Timeout(msg1);
     }
 
     void FillSuiteB192CfgTest()
@@ -1930,8 +1953,60 @@ public:
     {
         pStaStateMachine-> CloseNoInternetDialog();
     }
-};
 
+    void DhcpResultNotifySuccessOrderTest()
+    {
+        DhcpResult result;
+        std::string ifname = "wlan0";
+        // 1. 仅IPv4成功
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success = true;
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success = false;
+        pStaStateMachine->pDhcpResultNotify->OnSuccess(0, ifname.c_str(), &result);
+        EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success);
+        EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success);
+
+        // 2. 仅IPv6成功
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success = false;
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success = true;
+        pStaStateMachine->pDhcpResultNotify->OnSuccess(0, ifname.c_str(), &result);
+        EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success);
+        EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success);
+
+        // 3. 两者都成功
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success = true;
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success = true;
+        pStaStateMachine->pDhcpResultNotify->OnSuccess(0, ifname.c_str(), &result);
+        EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success);
+        EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success);
+
+        // 4. 两者都失败
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success = false;
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success = false;
+        pStaStateMachine->pDhcpResultNotify->OnFailed(0, ifname.c_str(), "fail");
+        EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success);
+        EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success);
+
+        // 5. 顺序测试：先IPv4后IPv6
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success = false;
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success = false;
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success = true;
+        EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success);
+        EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success);
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success = true;
+        EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success);
+        EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success);
+
+        // 6. 顺序测试：先IPv6后IPv4
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success = false;
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success = false;
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success = true;
+        EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success);
+        EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success);
+        pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success = true;
+        EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv4Success);
+        EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->isDhcpIpv6Success);
+    }
+};
 HWTEST_F(StaStateMachineTest, HandleInternetAccessChanged_01, TestSize.Level1)
 {
     HandleInternetAccessChangedTest1();
@@ -2360,6 +2435,16 @@ HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess4, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess5, TestSize.Level1)
 {
     HandleNetCheckResultSuccess5();
+}
+
+HWTEST_F(StaStateMachineTest, HandleNetCheckResultTxRxGoodButNoInternetTest, TestSize.Level1)
+{
+    HandleNetCheckResultTxRxGoodButNoInternetTest();
+}
+ 
+HWTEST_F(StaStateMachineTest, HandleNetCheckResultTxRxGoodButNoInternetFalseTest, TestSize.Level1)
+{
+    HandleNetCheckResultTxRxGoodButNoInternetFalseTest();
 }
 
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultFail, TestSize.Level1)
@@ -2943,6 +3028,40 @@ HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultMaskNoMatchTest, TestSize.Level
     TryToSaveIpV4ResultMaskNoMatchTest();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
+
+#ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
+HWTEST_F(StaStateMachineTest, DealWifiPowerSaveWhenBatteryStatusNotifyTest01, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(MODE_STATE_CLOSE);
+    msg->SetMessageName(WIFI_BATTERY_STATE_CHANGED_NOTIFY_EVENT);
+    EXPECT_TRUE(pStaStateMachine->pLinkedState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(StaStateMachineTest, DealWifiPowerSaveWhenBatteryStatusNotifyTest02, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(MODE_STATE_OPEN);
+    msg->SetMessageName(WIFI_BATTERY_STATE_CHANGED_NOTIFY_EVENT);
+    EXPECT_TRUE(pStaStateMachine->pLinkedState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(StaStateMachineTest, DealWifiPowerSaveWhenScreenStatusNotifyTest01, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(MODE_STATE_CLOSE);
+    msg->SetMessageName(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT);
+    EXPECT_TRUE(pStaStateMachine->pLinkedState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(StaStateMachineTest, DealWifiPowerSaveWhenScreenStatusNotifyTest02, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetParam1(MODE_STATE_OPEN);
+    msg->SetMessageName(WIFI_SCREEN_STATE_CHANGED_NOTIFY_EVENT);
+    EXPECT_TRUE(pStaStateMachine->pLinkedState->ExecuteStateMsg(msg));
+}
+#endif
 
 HWTEST_F(StaStateMachineTest, DealDisconnectEventInLinkStateTest01, TestSize.Level1)
 {

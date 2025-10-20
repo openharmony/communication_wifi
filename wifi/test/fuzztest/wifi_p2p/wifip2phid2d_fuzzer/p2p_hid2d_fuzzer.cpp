@@ -15,6 +15,7 @@
 
 #include "p2p_hid2d_fuzzer.h"
 #include "wifi_hid2d_service_utils.h"
+#include "wifi_common_util.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -42,11 +43,47 @@ void IncreaseSharedLinkFuzzerTest1(const uint8_t *data, size_t size)
     pShareManager.IncreaseSharedLink();
 }
 
-void GetGroupUidFuzzerTest(const uint8_t *data, size_t size)
+void IncreaseSharedLinkFuzzerTest2(const uint8_t *data, size_t size)
 {
     SharedLinkManager pShareManager;
     int callingUid = static_cast<int>(data[0]);
+    pShareManager.IncreaseSharedLink(callingUid);
+}
+
+void DecreaseSharedLinkFuzzerTest(const uint8_t *data, size_t size)
+{
+    SharedLinkManager pShareManager;
+    int callingUid = static_cast<int>(data[0]);
+    pShareManager.DecreaseSharedLink(callingUid);
+}
+void ClearUidCountFuzzerTest(const uint8_t *data, size_t size)
+{
+    SharedLinkManager pShareManager;
+    int uid = static_cast<int>(data[0]);
+    pShareManager.ClearUidCount(uid);
+}
+
+void CheckNeedRemoveGroupFuzzerTest(const uint8_t *data, size_t size)
+{
+    SharedLinkManager pShareManager;
+    int uid = static_cast<int>(data[0]);
+    pShareManager.CheckNeedRemoveGroup(uid);
+}
+
+void GetGroupUidFuzzerTest(const uint8_t *data, size_t size)
+{
+    SharedLinkManager pShareManager;
+    
+    int callingUid = static_cast<int>(data[0]);
     pShareManager.GetGroupUid(callingUid);
+}
+
+void IpPoolFuzzerTest(const uint8_t *data, size_t size)
+{
+    IpPool pIpPool;
+    std::string gcMac;
+    pIpPool.ReleaseIpPool();
+    pIpPool.ReleaseIp(gcMac);
 }
 
 void WifiHid2dServiceUtilsFuzzerTest(const uint8_t *data, size_t size)
@@ -55,6 +92,11 @@ void WifiHid2dServiceUtilsFuzzerTest(const uint8_t *data, size_t size)
     IncreaseSharedLinkFuzzerTest(data, size);
     IncreaseSharedLinkFuzzerTest1(data, size);
     GetGroupUidFuzzerTest(data, size);
+    IpPoolFuzzerTest(data, size);
+    IncreaseSharedLinkFuzzerTest2(data, size);
+    DecreaseSharedLinkFuzzerTest(data, size);
+    ClearUidCountFuzzerTest(data, size);
+    CheckNeedRemoveGroupFuzzerTest(data, size);
 }
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)

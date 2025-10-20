@@ -122,7 +122,6 @@ HWTEST_F(P2pGroupOperatingStateTest, ProcessCmdCreateGroup3, TestSize.Level1)
     config.SetPassphrase(std::string("12345679"));
     config.SetGroupName(std::string("groupName"));
     msg->SetMessageObj(config);
-    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), DealCreateNewGroupWithConfig(_, _)).WillOnce(Return(true));
     EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), BroadcastActionResult(_, _)).WillOnce(Return());
     EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 }

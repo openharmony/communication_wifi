@@ -59,7 +59,7 @@ public:
     bool IsValid5GChannel(int channel);
     void UpdateValidFreqs();
 
-    void FilterDfsChannel(std::vector<int> &channels);
+    void FilterDfsChannel(std::vector<int> &channels, bool force = false);
 
     void FilterDfsFreq(std::vector<int> &freqList);
 private:

@@ -80,6 +80,10 @@ struct Index {
   @State mode: WebDarkMode = WebDarkMode.Auto;
   @State access: boolean = true;
   @StorageProp('topRectHeight') topRectHeight: number = 0;
+  private isLoaded: boolean = false;
+  private isNetBind: boolean = false;
+  @State timerCount: number = 10;
+  private timerId: number = -1;
 
   @Builder
   ContextMenu() {
@@ -300,11 +304,12 @@ struct Index {
       })
       .backgroundColor($r('sys.color.ohos_id_color_background'))
 
-      Web({ src: this.webUrl, controller: this.webviewController })
+      Web({ src: '', controller: this.webviewController })
         .javaScriptAccess(true)
         .fileAccess(false)
         .geolocationAccess(false)
         .domStorageAccess(true)
+        .overviewModeAccess(false)
         .onOverrideUrlLoading((request) => {
           const url = request.getRequestUrl();
           if (validateURL(url) && !url.startsWith('http') && !url.startsWith('https')) {
@@ -399,15 +404,63 @@ struct Index {
     }
     .padding({ top: px2vp(this.topRectHeight) })
   }
+  
+  private startCountdown() {
+    this.timerId = setInterval(() => {
+      hilog.info(DOMAIN, TAG, '%{public}s', 'Timer count is:' + this.timerCount);
+      if (this.timerCount > 0 && !this.isLoaded) {
+        this.timerCount--
+        if (this.isNetBind) {
+          hilog.info(DOMAIN, TAG, '%{public}s', 'startCountdown LoadUrl');
+          this.webUrl = getUrl();
+          try {
+            webview.ProxyController.removeProxyOverride(() => {
+              hilog.info(DOMAIN, TAG, '%{public}s', 'removeProxyOverride proxy changed');
+            });
+          } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            hilog.error(DOMAIN, TAG, '%{public}s', `removeProxyOverride Code:${err.code}, message:${err.message}`);
+          }
+          let proxyConfig:webview.ProxyConfig = new webview.ProxyConfig();
+          try {
+            webview.ProxyController.applyProxyOverride(proxyConfig, () => {
+              hilog.info(DOMAIN, TAG, '%{public}s', 'applyProxyOverride proxy changed');
+            });
+          } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            hilog.error(DOMAIN, TAG, '%{public}s', `applyProxyOverride Code:${err.code}, message:${err.message}`);
+          }
+          try {
+            this.webviewController.loadUrl(this.webUrl);
+            hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + extractDomain(this.webUrl));
+          } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            hilog.error(DOMAIN, TAG, '%{public}s', `Failed to load url. Code:${err.code}, message:${err.message}`);
+          }
+          this.isLoaded = true;
+        }
+      } else {
+        clearInterval(this.timerId)
+        this.timerId = -1
+        hilog.info(DOMAIN, TAG, '%{public}s', 'Stop timer.');
+      }
+    }, 100) // 100ms执行一次
+  }
+
+  onDidBuild() {
+    hilog.info(DOMAIN, TAG, '%{public}s', 'Enter onDidBuild.');
+    this.startCountdown();
+  } 
 
   aboutToAppear(): void {
-    this.netConnect.register((err: BusinessError) => {
-      hilog.error(DOMAIN, TAG, '%{public}s', 'Failed to register netconnect.' + JSON.stringify(err));
-    });
-    this.netConnect.on('netLost', (data: connection.NetHandle) => {
-      handleNetworkChange(data, this.context);
-    });
-    bindToNetById(this.context);
+    bindToNetById(this.context)
+    .then(()=>{
+        hilog.info(DOMAIN, TAG, '%{public}s', 'aboutToAppear bindToNetById.');
+        this.isNetBind = true;
+      })
+      .catch(()=>{
+        hilog.error(DOMAIN, TAG, '%{public}s', 'aboutToAppear bindToNetById failed.');
+      })
     try {
       i18n.System.setAppPreferredLanguage('default');
     } catch (error) {
@@ -416,15 +469,18 @@ struct Index {
     }
     emitter.on('WANT_UPDATE', () => {
       hilog.info(DOMAIN, TAG, '%{public}s', 'on new want.');
-      bindToNetById(this.context);
-      this.webUrl = getUrl();
-      try {
-        this.webviewController.loadUrl(this.webUrl);
-        hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + extractDomain(this.webUrl));
-      } catch (error) {
-        let err: BusinessError = error as BusinessError;
-        hilog.error(DOMAIN, TAG, '%{public}s', `Failed to load url. Code:${err.code}, message:${err.message}`);
-      }
+      this.isNetBind = false;
+      this.timerCount = 10;
+      this.isLoaded = false;
+      this.startCountdown();
+      bindToNetById(this.context)
+        .then(()=>{
+            hilog.info(DOMAIN, TAG, '%{public}s', 'on new want bindToNetById.');
+            this.isNetBind = true;
+        })
+        .catch(()=>{
+          hilog.error(DOMAIN, TAG, '%{public}s', 'on new want bindToNetById failed.');
+        });
     });
     if (settings.getValueSync(this.context, 'user_setup_complete', '0', settings.domainName.DEVICE_SHARED) === '0') {
         hilog.info(DOMAIN, TAG, '%{public}s', 'in oobe.');
@@ -433,10 +489,6 @@ struct Index {
   }
 
   aboutToDisappear(): void {
-    this.netConnect.unregister((err: BusinessError) => {
-      hilog.error(
-        DOMAIN, TAG, '%{public}s', 'Failed to unregister netconnect.' + JSON.stringify(err));
-      });
     emitter.off('WANT_UPDATE');
   }
 }

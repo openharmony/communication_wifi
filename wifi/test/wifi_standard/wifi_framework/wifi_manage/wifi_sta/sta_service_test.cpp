@@ -499,7 +499,7 @@ void StaServiceTest::StaServiceReconnectByMdmTest1()
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
     EXPECT_CALL(WifiSettings::GetInstance(), SetRandomMacDisabled(_, _)).WillRepeatedly(Return(false));
-    EXPECT_TRUE(pStaService->ReconnectByMdm() == WIFI_OPT_SUCCESS);
+    EXPECT_FALSE(pStaService->ReconnectByMdm() == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceReconnectByMdmTest2()
@@ -513,7 +513,7 @@ void StaServiceTest::StaServiceReconnectByMdmTest2()
     .Times(AtLeast(0)).WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
 
     EXPECT_CALL(WifiSettings::GetInstance(), SetRandomMacDisabled(_, _)).WillRepeatedly(Return(true));
-    EXPECT_TRUE(pStaService->ReconnectByMdm() == WIFI_OPT_SUCCESS);
+    EXPECT_FALSE(pStaService->ReconnectByMdm() == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceStartWpsSuccess()

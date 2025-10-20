@@ -417,7 +417,8 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    if (WifiConfigCenter::GetInstance().GetWifiToggledEnable(INSTID_WLAN1) == WIFI_STATE_ENABLED) {
+    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(INSTID_WLAN1);
+    if (staState == WifiOprMidState::RUNNING) {
         WIFI_LOGI("SetWifiToggledState DISABLED");
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED, INSTID_WLAN1);
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, 1);
@@ -1228,6 +1229,12 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
             "VerifyGetWifiPeersMacPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+
+    uint32_t passLen = config.GetPreSharedKey().length();
+    if (passLen < WIFI_P2P_PASSPHRASE_MIN_LEN || passLen > WIFI_P2P_PASSPHRASE_MAX_LEN) {
+        WIFI_LOGE("password is invalid");
+        return WIFI_OPT_P2P_INVALID_PASSWORD;
+    }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_HID2D_REQUEST);
 
     if (!IsP2pServiceRunning()) {
@@ -1350,7 +1357,7 @@ ErrCode WifiP2pServiceImpl::Hid2dGetChannelListFor5G(std::vector<int>& vecChanne
         WifiSettings::GetInstance().SetDefaultFrequenciesByCountryBand(BandType::BAND_5GHZ, tempFrequenciesList);
         TransformFrequencyIntoChannel(tempFrequenciesList, vecChannelList);
     }
-    WifiChannelHelper::GetInstance().FilterDfsChannel(vecChannelList);
+    WifiChannelHelper::GetInstance().FilterDfsChannel(vecChannelList, true);
     std::string strChannel;
     for (auto channel : vecChannelList) {
         strChannel += std::to_string(channel) + ",";
@@ -1429,7 +1436,7 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
     int callingUid = GetCallingUid();
     if (callingUid != SOFT_BUS_SERVICE_UID && callingUid != CAST_ENGINE_SERVICE_UID &&
         callingUid != MIRACAST_SERVICE_UID && callingUid != SHARE_SERVICE_UID &&
-        callingUid != MOUSE_CROSS_SERVICE_UID) {
+        callingUid != MOUSE_CROSS_SERVICE_UID && callingUid != HICAR_SERVICE_UID) {
         WIFI_LOGE("%{public}s, permission denied! uid = %{public}d", __func__, callingUid);
         return WIFI_OPT_PERMISSION_DENIED;
     }

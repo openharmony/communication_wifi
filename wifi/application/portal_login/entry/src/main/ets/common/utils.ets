@@ -77,27 +77,39 @@ export function setNetId(want: Want): void {
 }
 
 export async function bindToNetById(context: common.UIAbilityContext) {
-  await connection.getAllNets((error: BusinessError, netHandleArray: connection.NetHandle[]) => {
-    if (error) {
-      hilog.error(DOMAIN, TAG, '%{public}s', `Failed to get all nets. Code:${error.code}, message:${error.message}`);
-      return;
-    }
-    hilog.info(DOMAIN, TAG, '%{public}s', 'Succeeded get all nets.' + JSON.stringify(netHandleArray));
+  try {
+    const netHandleArray: connection.NetHandle[] = await new Promise((resolve, reject) => {
+      connection.getAllNets((error: BusinessError, nets: connection.NetHandle[]) => {
+        if (error) {
+          hilog.error(DOMAIN, TAG, '%{public}s', `Failed to get all nets. Code:${error.code}, message:${error.message}`);
+          reject(error);
+        } else {
+          hilog.info(DOMAIN, TAG, '%{public}s', 'Succeeded get all nets.' + JSON.stringify(nets));
+          resolve(nets);
+        }
+      });
+    });
     const targetNetHandle = netHandleArray.find((netHandle) => netHandle.netId === netId_);
     if (targetNetHandle) {
-      connection.setAppNet(targetNetHandle)
-        .then(() => {
-          hilog.info(DOMAIN, TAG, '%{public}s', 'Succeeded bind net. netId:' + netId_);
-        })
-        .catch((error: BusinessError) => {
-          hilog.error(DOMAIN, TAG, '%{public}s', `Failed bind net. Code:${error.code}, message:${error.message},
-            netId:` + netId_);
-        })
+      await new Promise<void>((resolve, reject) => {
+        connection.setAppNet(targetNetHandle, (error: BusinessError, data: void) => {
+          if (error) {
+            hilog.error(DOMAIN, TAG, '%{public}s', `Failed bind net. Code:${error.code}, message:${error.message}, netId:` + netId_);
+            reject(error);
+          } else {
+            hilog.info(DOMAIN, TAG, '%{public}s', 'Succeeded bind net. netId:' + netId_);
+            resolve();
+          }
+        });
+      });
     } else {
       hilog.error(DOMAIN, TAG, '%{public}s', 'Not find matched NetHandle.');
       exitApp(context);
     }
-  })
+  } catch (error) {
+    hilog.error(DOMAIN, TAG, '%{public}s', `bindToNetById process failed: ${error.message}`);
+    exitApp(context);
+  }
 }
 
 export function exitApp(context: common.UIAbilityContext): void {

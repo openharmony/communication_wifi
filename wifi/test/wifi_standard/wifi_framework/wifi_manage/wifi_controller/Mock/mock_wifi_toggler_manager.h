@@ -51,6 +51,7 @@ public:
     void StartSemiWifiToggledTimer();
     void StopSemiWifiToggledTimer();
     void OnSemiWifiToggledTimeOut();
+    void RetryOpenP2p(void);
 private:
     void InitConcreteCallback(void);
     void InitSoftapCallback(void);

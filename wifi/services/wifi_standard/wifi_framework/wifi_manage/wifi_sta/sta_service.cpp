@@ -724,6 +724,7 @@ ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
     WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
     WifiSettings::GetInstance().SyncDeviceConfig();
     if (!isAllowed) {
+        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(networkId, DisabledReason::DISABLED_BY_SYSTEM);
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
         if (linkedInfo.networkId != networkId && pStaStateMachine->GetTargetNetworkId() != networkId) {
@@ -731,6 +732,8 @@ ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
             return WIFI_OPT_SUCCESS;
         }
         Disconnect();
+    } else {
+        BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -1219,6 +1222,15 @@ bool StaService::VoWifiDetectSet(std::string cmd)
 void StaService::GetDetectNetState(OperateResState &state)
 {
     pStaStateMachine->GetDetectNetState(state);
+}
+
+void StaService::HandleBatteryStatusChanged(int chargeStatus)
+{
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("pStaStateMachine is null");
+        return;
+    }
+    pStaStateMachine->SendMessage(WIFI_BATTERY_STATE_CHANGED_NOTIFY_EVENT, chargeStatus);
 }
 }  // namespace Wifi
 }  // namespace OHOS

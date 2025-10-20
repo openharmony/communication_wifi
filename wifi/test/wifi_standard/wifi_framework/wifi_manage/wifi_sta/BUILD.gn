@@ -156,6 +156,7 @@ local_base_ldflags = [
 local_base_external_deps = [
   "ability_base:want",
   "ability_base:zuri",
+  "ability_runtime:ability_connect_callback_stub",
   "ability_runtime:ability_manager",
   "ability_runtime:app_manager",
   "ability_runtime:extension_manager",
@@ -257,6 +258,10 @@ ohos_unittest("wifi_sta_unittest") {
 
   if (wifi_feature_mdm_restricted_enable) {
     defines += [ "FEATURE_WIFI_MDM_RESTRICTED_SUPPORT" ]
+  }
+
+  if (wifi_feature_with_dynamic_adjust_wifi_power_save) {
+    defines += [ "DYNAMIC_ADJUST_WIFI_POWER_SAVE" ]
   }
 
   defines += [

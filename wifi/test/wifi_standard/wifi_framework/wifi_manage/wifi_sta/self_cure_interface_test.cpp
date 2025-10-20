@@ -191,6 +191,20 @@ HWTEST_F(SelfCureInterfaceTest, NotifyIpv6FailureDetectedTest, TestSize.Level1)
     EXPECT_EQ(WIFI_OPT_FAILED, pSelfCureInterface->NotifyIpv6FailureDetected());
 }
 
+HWTEST_F(SelfCureInterfaceTest, NotifyTxRxGoodButNoInternetTest, TestSize.Level1)
+{
+    // Test with valid service
+    pSelfCureInterface->NotifyTxRxGoodButNoInternet(true);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+
+    pSelfCureInterface->NotifyTxRxGoodButNoInternet(false);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+
+    // Test with null service
+    pSelfCureInterface->pSelfCureService = nullptr;
+    pSelfCureInterface->NotifyTxRxGoodButNoInternet(true);
+    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+}
 
 } // namespace Wifi
 } // namespace OHOS

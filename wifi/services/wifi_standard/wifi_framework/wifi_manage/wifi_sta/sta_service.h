@@ -468,6 +468,13 @@ public:
      */
     ErrCode ReconnectByMdm() const;
 #endif
+
+    /**
+     * @Description battery status change
+     *
+     * @param chargeStatus
+     */
+     virtual void HandleBatteryStatusChanged(int chargeStatus);
 private:
     void NotifyDeviceConfigChange(ConfigChange value, WifiDeviceConfig config, bool isRemoveAll) const;
     void NotifyCandidateApprovalStatus(CandidateApprovalStatus status) const;

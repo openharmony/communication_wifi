@@ -201,6 +201,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->SetVoWifiDetectPeriod(networkId);
     pStaInterface->GetVoWifiDetectPeriod(networkId);
     pStaInterface->ProcessVoWifiNetlinkReportEvent(networkId);
+    pStaInterface->OnBatteryStateChanged(networkId);
     std::vector<WifiSignalPollInfo> wifiSignalPollInfos = {};
     pStaInterface->GetSignalPollInfoArray(wifiSignalPollInfos, networkId);
     OperateResState state;
@@ -251,6 +252,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->DeliverStaIfaceData(conditionName);
     WifiTelephonyUtils::GetDataSlotId(index);
     pStaService->AddDeviceConfig(config);
+    pStaService->HandleBatteryStatusChanged(networkId);
 }
 
 void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
@@ -381,9 +383,14 @@ void StaInterfaceFuzzTest(const uint8_t* data, size_t size)
     FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
     FilterBuilder filterBuilder = [](auto &compositeWifiFilter) {};
     AppExecFwk::AppStateData appData;
+    std::vector<WifiRestrictedInfo> wifiRestrictedInfoList;
     pStaInterface->RegisterAutoJoinCondition(conditionName, []() {return true;});
     pStaInterface->RegisterFilterBuilder(filterTag, filterName, filterBuilder);
     pStaInterface->HandleForegroundAppChangedAction(appData);
+    #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    pStaInterface->SetWifiRestrictedList(wifiRestrictedInfoList);
+    pStaInterface->ReconnectByMdm();
+    #endif
 }
 
 void RegisterStaServiceCallbackTest(const uint8_t* data, size_t size)
@@ -541,16 +548,22 @@ void SimAkaAuthFuzzTest(const uint8_t* data, size_t size)
 
 void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
 {
+    int index = 0;
+    int wifiStandard = static_cast<int>(data[index++]);
     WifiLinkedInfo info;
+    cJSON *root = cJSON_CreateObject();
+    if (root == NULL) {
+        return;
+    }
     std::string key = std::string(reinterpret_cast<const char*>(data), size);
 
     if (size >= sizeof(WifiLinkedInfo)) {
-        int index = 0;
-        info.networkId = static_cast<int>(data[index++]);
-        info.rssi = static_cast<int>(data[index++]);
-        info.band = static_cast<int>(data[index++]);
-        info.linkSpeed = static_cast<int>(data[index++]);
-        info.macType = static_cast<int>(data[index++]);
+        int indexInner = 0;
+        info.networkId = static_cast<int>(data[indexInner++]);
+        info.rssi = static_cast<int>(data[indexInner++]);
+        info.band = static_cast<int>(data[indexInner++]);
+        info.linkSpeed = static_cast<int>(data[indexInner++]);
+        info.macType = static_cast<int>(data[indexInner++]);
         info.ssid = std::string(reinterpret_cast<const char*>(data), size);
         info.bssid = std::string(reinterpret_cast<const char*>(data), size);
         info.macAddress = std::string(reinterpret_cast<const char*>(data), size);
@@ -565,6 +578,9 @@ void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
     WifiSecurityDetect::GetInstance().IsSettingSecurityDetectOn();
     WifiSecurityDetect::GetInstance().UnRegisterSecurityDetectObserver();
     WifiSecurityDetect::GetInstance().AssembleUri(key);
+    WifiSecurityDetect::GetInstance().ConverWifiLinkInfoToJson(info, root);
+    WifiSecurityDetect::GetInstance().AddWifiStandardToJson(root, wifiStandard);
+    cJSON_Delete(root);
 }
 
 void SecurityDetectFuzzTest02(const uint8_t* data, size_t size)

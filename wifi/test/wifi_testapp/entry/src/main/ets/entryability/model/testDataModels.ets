@@ -24,7 +24,6 @@ import {
   testDisableWifi ,
   testIsWifiActive ,
   testScan ,
-  testForcibleScan ,
   testGetScanInfosPromise ,
   testGetScanInfosCallback ,
   testAddDeviceConfigPromise ,
@@ -73,6 +72,8 @@ import {
   testGetWifiDetailState,
   testSetScanAlwaysAllowed,
   testGetScanAlwaysAllowed,
+  testGetLinkedInfoSyncManager,
+  testIsScanAlwaysAllowedManager,
   testAddDeviceConfigManagerPromise ,
   testAddDeviceConfigManagerCallback ,
   testAddCandidateConfigManagerPromise ,
@@ -137,7 +138,11 @@ import {
   testGetHotspotStationsManager ,
   testOnHotspotStateChangeManager ,
   testOnHotspotStaJoinManager ,
-  testOnHotspotStaLeaveManager
+  testOnHotspotStaLeaveManager ,
+  testIsMeteredHotspot ,
+  testAddHotspotBlockList ,
+  testDelHotspotBlockList ,
+  testGetHotspotBlockList
 } from "./hotspotManagerInterface"
 
 import {
@@ -190,7 +195,23 @@ import {
   testOnP2pDiscoveryChangeManager
 } from './p2pManagerInterface'
 
-import wifi from '@ohos.wifi';
+import {
+  testCreateServer,
+  testServerStart,
+  testServerStop,
+  testServerClose,
+  testServerOnConnectionAccepted,
+  testServerOnServerStopped,
+  testCreateConnection,
+  testConnectionConnect,
+  testConnectionDisconnect,
+  testConnectionClose,
+  testConnectionGetPeerDeviceId,
+  testConnectionSendData,
+  testConnectionOnConnectResult,
+  testConnectionOnDisconnected,
+  testConnectionOnDataReceived
+} from './linkEnhanceInterface'
 
 interface WifiTest {
   name: string;
@@ -271,14 +292,6 @@ const WifiTestCase: WifiTest[] = [
     'detail' : '启动WLAN扫描' ,
     'method' : 'scan' ,
     'api' : testScan ,
-    'result' : 'None' ,
-    'category' : CaseCategory.Wifi
-  },
-  {
-    'name' : '强行启动WLAN扫描' ,
-    'detail' : '强行启动WLAN扫描' ,
-    'method' : 'scan' ,
-    'api' : testForcibleScan ,
     'result' : 'None' ,
     'category' : CaseCategory.Wifi
   },
@@ -634,6 +647,22 @@ const WifiManagerTestCase: WifiTest[] = [
     'detail' : '获取扫描始终允许标志' ,
     'method' : 'getScanAlwaysAllowed' ,
     'api' : testGetScanAlwaysAllowed ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
+    'name' : '同步获取连接信息' ,
+    'detail' : '同步获取连接信息' ,
+    'method' : 'getLinkedInfoSync' ,
+    'api' : testGetLinkedInfoSyncManager ,
+    'result' : 'None' ,
+    'category' : CaseCategory.WifiManager
+  },
+  {
+    'name' : '是否总是允许扫描' ,
+    'detail' : '是否总是允许扫描' ,
+    'method' : 'isScanAlwaysAllowed' ,
+    'api' : testIsScanAlwaysAllowedManager ,
     'result' : 'None' ,
     'category' : CaseCategory.WifiManager
   },
@@ -1092,6 +1121,38 @@ const HotspotManagerTestCase: WifiTest[] = [
     'api' : testOnHotspotStaLeaveManager ,
     'result' : 'None' ,
     'category' : CaseCategory.HotspotManager
+  },
+  {
+    'name' : '是否为计量热点' ,
+    'detail' : '是否为计量热点' ,
+    'method' : 'isMeteredHotspot' ,
+    'api' : testIsMeteredHotspot ,
+    'result' : 'None' ,
+    'category' : CaseCategory.HotspotManager
+  },
+  {
+    'name' : '添加热点黑名单' ,
+    'detail' : '添加热点黑名单' ,
+    'method' : 'addHotspotBlockList' ,
+    'api' : testAddHotspotBlockList ,
+    'result' : 'None' ,
+    'category' : CaseCategory.HotspotManager
+  },
+  {
+    'name' : '删除热点黑名单' ,
+    'detail' : '删除热点黑名单' ,
+    'method' : 'delHotspotBlockList' ,
+    'api' : testDelHotspotBlockList ,
+    'result' : 'None' ,
+    'category' : CaseCategory.HotspotManager
+  },
+  {
+    'name' : '获取热点黑名单列表' ,
+    'detail' : '获取热点黑名单列表' ,
+    'method' : 'getHotspotBlockList' ,
+    'api' : testGetHotspotBlockList ,
+    'result' : 'None' ,
+    'category' : CaseCategory.HotspotManager
   }
 ]
 
@@ -1453,11 +1514,144 @@ const p2pManagerTestCase: WifiTest[] = [
   },
 ]
 
+export const LinkEnhanceTestCase: WifiTest[] = [
+// Server相关接口测试
+  {
+    'name': '创建服务器',
+    'detail': '创建linkEnhance服务器实例',
+    'method': 'createServer',
+    'api': testCreateServer,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '启动服务器',
+    'detail': '启动linkEnhance服务器',
+    'method': 'server.start',
+    'api': testServerStart,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '停止服务器',
+    'detail': '停止linkEnhance服务器',
+    'method': 'server.stop',
+    'api': testServerStop,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '关闭服务器',
+    'detail': '关闭linkEnhance服务器并清理资源',
+    'method': 'server.close',
+    'api': testServerClose,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '监听连接接受事件(开/关)',
+    'detail': '注册/注销服务器连接接受事件监听',
+    'method': 'server.on/off.connectionAccepted',
+    'api': testServerOnConnectionAccepted,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '监听服务器停止事件(开/关)',
+    'detail': '注册/注销服务器停止事件监听',
+    'method': 'server.on/off.serverStopped',
+    'api': testServerOnServerStopped,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+
+  // Connection相关接口测试
+  {
+    'name': '创建连接',
+    'detail': '创建linkEnhance连接实例',
+    'method': 'createConnection',
+    'api': testCreateConnection,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '建立连接',
+    'detail': '连接到对端设备',
+    'method': 'connection.connect',
+    'api': testConnectionConnect,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '断开连接',
+    'detail': '断开与对端设备的连接',
+    'method': 'connection.disconnect',
+    'api': testConnectionDisconnect,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '关闭连接',
+    'detail': '关闭连接并清理资源',
+    'method': 'connection.close',
+    'api': testConnectionClose,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '获取对端设备ID',
+    'detail': '获取连接的对端设备ID',
+    'method': 'connection.getPeerDeviceId',
+    'api': testConnectionGetPeerDeviceId,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '发送数据',
+    'detail': '向对端设备发送数据',
+    'method': 'connection.sendData',
+    'api': testConnectionSendData,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '监听连接结果事件(开/关)',
+    'detail': '注册/注销连接结果事件监听',
+    'method': 'connection.on/off.connectResult',
+    'api': testConnectionOnConnectResult,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '监听断开连接事件(开/关)',
+    'detail': '注册/注销断开连接事件监听',
+    'method': 'connection.on/off.disconnected',
+    'api': testConnectionOnDisconnected,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  },
+  {
+    'name': '监听数据接收事件(开/关)',
+    'detail': '注册/注销数据接收事件监听',
+    'method': 'connection.on/off.dataReceived',
+    'api': testConnectionOnDataReceived,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  }
+]
+
 const TestComposition: WifiTestComposition[] = [
   {
     'name': 'new api',
     'detail': 'wifiManager测试',
     'url': 'pages/newApi/AllInOneView',
+    'image': $r('app.media.wifi'),
+    'category': Category.NewApi
+  },
+  {
+    'name': '快速验证测试',
+    'detail': '快速验证WiFi相关功能',
+    'url': 'pages/newApi/QuickVerifyTest',
     'image': $r('app.media.wifi'),
     'category': Category.NewApi
   },
@@ -1480,6 +1674,34 @@ const TestComposition: WifiTestComposition[] = [
     'detail' : 'p2p扫描结果' ,
     'url' : 'pages/subAppTest/p2pDiscoveryTest' ,
     'image' : $r('app.media.WLAN') ,
+    'category' : Category.App
+  },
+  {
+    'name' : 'TCP Socket验证' ,
+    'detail' : 'TCP连接测试' ,
+    'url' : 'pages/subAppTest/tcpSocketTest' ,
+    'image' : $r('app.media.wifi') ,
+    'category' : Category.App
+  },
+  {
+    'name' : 'UDP Socket验证' ,
+    'detail' : 'UDP连接测试' ,
+    'url' : 'pages/subAppTest/udpSocketTest' ,
+    'image' : $r('app.media.wifi') ,
+    'category' : Category.App
+  },
+  {
+    'name' : 'HTTP验证' ,
+    'detail' : 'HTTP请求测试' ,
+    'url' : 'pages/subAppTest/httpSocketTest' ,
+    'image' : $r('app.media.wifi') ,
+    'category' : Category.App
+  },
+  {
+    'name' : 'HTTPS验证' ,
+    'detail' : 'HTTPS请求测试' ,
+    'url' : 'pages/subAppTest/httpsSocketTest' ,
+    'image' : $r('app.media.wifi') ,
     'category' : Category.App
   },
 
@@ -1522,6 +1744,13 @@ const TestComposition: WifiTestComposition[] = [
     'name' : 'P2pManager' ,
     'detail' : 'p2pManager测试' ,
     'url' : 'pages/subManualApiTest/p2pManagerInterfaceTest' ,
+    'image' : $r('app.media.WLAN') ,
+    'category' : Category.API
+  },
+  {
+    'name' : 'LinkEnhance' ,
+    'detail' : '软总线增强连接测试' ,
+    'url' : 'pages/subManualApiTest/linkEnhanceInterfaceTest' ,
     'image' : $r('app.media.WLAN') ,
     'category' : Category.API
   },
@@ -1784,4 +2013,12 @@ export function initP2pManagerApIData(): Array<TestApi> {
     TestApiArray.push(new TestApi(item.name , item.detail , item.method , item.api , item.result , item.category));
   })
   return TestApiArray;
+}
+
+export function initLinkEnhanceApiData(): Array<TestApi> {
+  let linkEnhanceApiArray: Array<TestApi> = []
+  LinkEnhanceTestCase.forEach(item => {
+    linkEnhanceApiArray.push(new TestApi(item.name, item.detail, item.method, item.api, item.result, item.category))
+  })
+  return linkEnhanceApiArray
 }

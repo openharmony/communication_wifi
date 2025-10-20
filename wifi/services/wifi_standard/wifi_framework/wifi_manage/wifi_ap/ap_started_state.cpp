@@ -48,7 +48,6 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiApStartedState");
 namespace OHOS {
 namespace Wifi {
 const int STA_JOIN_HANDLE_DELAY = 5 * 1000;
-const int START_HOTSPOT_TIMEOUT = 3 * 1000;
 ApStartedState::ApStartedState(ApStateMachine &apStateMachine, ApMonitor &apMonitor, int id)
     : State("ApStartedState"),
       m_hotspotConfig(HotspotConfig()),
@@ -65,8 +64,6 @@ ApStartedState::~ApStartedState()
 void ApStartedState::GoInState()
 {
     WIFI_LOGI("Instance %{public}d %{public}s  GoInState.", m_id, GetStateName().c_str());
-    m_ApStateMachine.StartTimer(static_cast<int>(ApStatemachineEvent::CMD_START_HOTSPOT_TIMEOUT),
-        START_HOTSPOT_TIMEOUT);
 }
 
 void ApStartedState::GoOutState()
@@ -146,8 +143,8 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
     WIFI_LOGI("set softap config with param, id=%{public}d", m_id);
     ApConfigUse::GetInstance().UpdateApChannelConfig(apConfig);
     {
-        std::unique_lock<std::mutex> lock(enhanceServiceMutex_);
 #ifndef OHOS_ARCH_LITE
+        std::unique_lock<std::mutex> lock(enhanceServiceMutex_);
         if ((apConfig.GetBandWidth() == AP_BANDWIDTH_160 ||
                 (apConfig.GetChannel() >= CHANNEL50 && apConfig.GetChannel() <= CHANNEL144))) {
             if (enhanceService_ != nullptr && enhanceService_->GetDfsControlData().enableAidfs_) {
@@ -340,6 +337,10 @@ void ApStartedState::ProcessCmdUpdateConfigResult(InternalMessagePtr msg) const
 
 void ApStartedState::ProcessCmdEnableApTimeout(InternalMessagePtr msg) const
 {
+    if (WifiConfigCenter::GetInstance().GetHotspotState(m_id) == static_cast<int>(ApState::AP_STATE_STARTED)) {
+        WIFI_LOGI("Current state is AP_STATE_STARTED, no need deal CMD_START_HOTSPOT_TIMEOUT.");
+        return;
+    }
     WIFI_LOGI("Ap enable timeout, set softap toggled false.");
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);
@@ -388,9 +389,14 @@ void ApStartedState::ProcessCmdDisconnectStation(InternalMessagePtr msg) const
 void ApStartedState::ProcessCmdUpdateCountryCode(InternalMessagePtr msg) const
 {
     std::string wifiCountryCode = msg->GetStringFromMessage();
-    if (wifiCountryCode.empty() ||
-        strncasecmp(wifiCountryCode.c_str(), m_wifiCountryCode.c_str(), WIFI_COUNTRY_CODE_LEN) == 0) {
-        WIFI_LOGI("wifi country code is same or empty, code=%{public}s", wifiCountryCode.c_str());
+    if (wifiCountryCode.empty()) {
+        WIFI_LOGI("wifi country code is empty");
+        return;
+    }
+    if (strncasecmp(wifiCountryCode.c_str(), m_wifiCountryCode.c_str(), WIFI_COUNTRY_CODE_LEN) == 0) {
+        WIFI_LOGI("wifi country code is same, code=%{public}s", wifiCountryCode.c_str());
+        WifiChannelHelper::GetInstance()
+            .UpdateValidFreqs();  // Resolve the issue of 5GHz hotspot not available after reboot
         return;
     }
     WifiErrorNo ret = WifiApHalInterface::GetInstance().SetWifiCountryCode(
@@ -516,7 +522,6 @@ void ApStartedState::ProcessCmdAssociatedStaChanged(InternalMessagePtr msg)
 
 void ApStartedState::ProcessCmdEnableAp(InternalMessagePtr msg)
 {
-    WIFI_LOGI("Instance %{public}d %{public}s  GoInState", m_id, GetStateName().c_str());
     do {
         if (!m_ApStateMachine.m_ApStationsManager.EnableAllBlockList()) {
             WIFI_LOGE("Set Blocklist failed.");

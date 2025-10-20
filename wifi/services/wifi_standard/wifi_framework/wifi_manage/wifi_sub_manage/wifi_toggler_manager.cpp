@@ -175,7 +175,19 @@ ErrCode WifiTogglerManager::ScanOnlyToggled(int isOpen)
 
 ErrCode WifiTogglerManager::AirplaneToggled(int isOpen)
 {
-    pWifiControllerMachine->SendMessage(CMD_AIRPLANE_TOGGLED, isOpen);
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    if (isOpen) {
+        for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+            ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(i);
+            if (pSelfCureService != nullptr) {
+                pSelfCureService->StopSelfCureWifi(SCE_WIFI_STATUS_LOST);
+            }
+        }
+    }
+#endif // FEATURE_SELF_CURE_SUPPORT
+    if (pWifiControllerMachine) {
+        pWifiControllerMachine->SendMessage(CMD_AIRPLANE_TOGGLED, isOpen);
+    }
     return WIFI_OPT_SUCCESS;
 }
 
@@ -383,6 +395,13 @@ bool WifiTogglerManager::IsInterfaceUp(std::string &iface)
 bool WifiTogglerManager::IsSatelliteStateStart()
 {
     return mIsSatelliteStart;
+}
+
+void WifiTogglerManager::RetryOpenP2p(void)
+{
+    if (pWifiControllerMachine) {
+        pWifiControllerMachine->SendMessage(CMD_P2P_RETRY_OPEN);
+    }
 }
 #endif
 }  // namespace Wifi

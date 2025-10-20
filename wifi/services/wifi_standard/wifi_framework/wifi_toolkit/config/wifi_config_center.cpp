@@ -914,17 +914,6 @@ int WifiConfigCenter::GetP2pEnhanceState()
     return p2pEnhanceState_.load();
 }
 
-int WifiConfigCenter::SetP2pEnhanceActionListenChannel(int channel)
-{
-    p2pEnhanceActionListenChannel_.store(channel);
-    return 0;
-}
-
-int WifiConfigCenter::GetP2pEnhanceActionListenChannel()
-{
-    return p2pEnhanceActionListenChannel_.load();
-}
-
 int WifiConfigCenter::SetP2pEnhanceFreq(int freq)
 {
     p2pEnhanceFreq_.store(freq);
@@ -1529,7 +1518,7 @@ bool WifiConfigCenter::IsAllowPopUp()
             LOGI("Not allow pop up dialog, device type:%{public}d", mDeviceType);
             return false;
         default:
-            LOGI("Allow pop up dialog, device type:%{public}d", mDeviceType);
+            LOGD("Allow pop up dialog, device type:%{public}d", mDeviceType);
             return true;
     }
 }

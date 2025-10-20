@@ -8,6 +8,7 @@
     "pages/subManualApiTest/wifiManagerInterfaceTest",
     "pages/subManualApiTest/hotspotManagerInterfaceTest",
     "pages/subManualApiTest/p2pManagerInterfaceTest",
+    "pages/subManualApiTest/linkEnhanceInterfaceTest",
 
     "pages/subAutoTest/wifiAutoTest",
     "pages/subAutoTest/wifiManagerAutoTest",
@@ -41,11 +42,16 @@
     "pages/subAppTest/wifiScanTest",
     "pages/subAppTest/wifiCandidateTest",
     "pages/subAppTest/p2pDiscoveryTest",
+    "pages/subAppTest/tcpSocketTest",
+    "pages/subAppTest/udpSocketTest",
+    "pages/subAppTest/httpSocketTest",
+    "pages/subAppTest/httpsSocketTest",
     "pages/subStabilityTest/wifiSwitchStabilityTest",
     "pages/subStabilityTest/wifiScanStabilityTest",
     "pages/subStabilityTest/wifiConnectStabilityTest",
     "pages/subStabilityTest/hotspotStabilityTest",
     "pages/subStabilityTest/webLatencyTest",
-    "pages/newApi/AllInOneView"
+    "pages/newApi/AllInOneView",
+    "pages/newApi/QuickVerifyTest"
   ]
 }

@@ -21,7 +21,7 @@ import router from '@ohos.router';
 import { PageTitle } from '../../Component/pageTitle'
 import { TestImageDisplay } from '../../Component/testImageDisplay'
 import { P2pModel } from '../../entryability/model/p2pModel'
-import ConfigData from '../../utils/ConfigData';
+import ConfigData from '../../Utils/ConfigData';
 
 interface myParams extends Object {
   testItem: TestData

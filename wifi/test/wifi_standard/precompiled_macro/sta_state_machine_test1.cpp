@@ -252,23 +252,23 @@ void DealDhcpResultTest()
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 
-void TryToCloseDhcpClientTest()
+void TryToJumpToConnectedStateTest()
 {
     int ipType = 1;
-    pStaStateMachine->pDhcpResultNotify->TryToCloseDhcpClient(ipType);
+    pStaStateMachine->pDhcpResultNotify->TryToJumpToConnectedState(ipType);
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 
-void TryToCloseDhcpClientTest1()
+void TryToJumpToConnectedStateTest1()
 {
     int ipType = 2;
-    pStaStateMachine->pDhcpResultNotify->TryToCloseDhcpClient(ipType);
+    pStaStateMachine->pDhcpResultNotify->TryToJumpToConnectedState(ipType);
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 
-void DealDhcpResultFailedTest()
+void DealDhcpIpv4ResultFailedTest()
 {
-    pStaStateMachine->pDhcpResultNotify->DealDhcpResultFailed();
+    pStaStateMachine->pDhcpResultNotify->DealDhcpIpv4ResultFailed();
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 
@@ -397,21 +397,21 @@ HWTEST_F(StaStateMachineTest, DealDhcpResultTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
-HWTEST_F(StaStateMachineTest, TryToCloseDhcpClientTest, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, TryToJumpToConnectedStateTest, TestSize.Level1)
 {
-    TryToCloseDhcpClientTest();
+    TryToJumpToConnectedStateTest();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
-HWTEST_F(StaStateMachineTest, TryToCloseDhcpClientTest1, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, TryToJumpToConnectedStateTest1, TestSize.Level1)
 {
-    TryToCloseDhcpClientTest1();
+    TryToJumpToConnectedStateTest1();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
-HWTEST_F(StaStateMachineTest, DealDhcpResultFailedTest, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, DealDhcpIpv4ResultFailedTest, TestSize.Level1)
 {
-    DealDhcpResultFailedTest();
+    DealDhcpIpv4ResultFailedTest();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 

@@ -568,10 +568,6 @@ if (defined(ohos_lite)) {
       "wifi_manager.cpp",
       "wifi_service_manager.cpp",
     ]
-    if (defined(global_parts_info) &&
-        defined(global_parts_info.msdp_movement)) {
-      sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage/wifi_msdp_state_listener.cpp" ]
-    }
 
     deps = [
       "$WIFI_ROOT_DIR/base:wifi_base",
@@ -674,12 +670,6 @@ if (defined(ohos_lite)) {
     }
 
     if (defined(global_parts_info) &&
-        defined(global_parts_info.msdp_movement)) {
-      external_deps += [ "movement:movement_client" ]
-      defines += [ "HAS_MOVEMENT_PART" ]
-    }
-
-    if (defined(global_parts_info) &&
         defined(global_parts_info.powermgr_power_manager)) {
       if (wifi_feature_powermgr_support) {
         defines += [ "HAS_POWERMGR_PART" ]
@@ -744,6 +734,10 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_extensible_authentication) {
       defines += [ "EXTENSIBLE_AUTHENTICATION" ]
       external_deps += ["netmanager_ext:ethernet_manager_if"]
+    }
+
+    if (wifi_feature_with_dynamic_adjust_wifi_power_save) {
+      defines += [ "DYNAMIC_ADJUST_WIFI_POWER_SAVE" ]
     }
   
     if (defined(global_parts_info) &&

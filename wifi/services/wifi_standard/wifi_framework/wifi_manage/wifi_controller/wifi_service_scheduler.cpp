@@ -43,6 +43,9 @@
 #endif
 #include "wifi_global_func.h"
 #include "wifi_sensor_scene.h"
+#ifdef EXTENSIBLE_AUTHENTICATION
+#include "net_eap_observer.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -713,7 +716,7 @@ void WifiServiceScheduler::OnRssiReportCallback(int index, int antRssi)
 
 void WifiServiceScheduler::OnNetlinkReportCallback(int type, const std::vector<uint8_t>& recvMsg)
 {
-    WIFI_LOGI("OnNetlinkReportCallback, type:%{public}d", type);
+    WIFI_LOGD("OnNetlinkReportCallback, type:%{public}d", type);
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGE("get pEnhance service failed!");
@@ -754,6 +757,9 @@ void WifiServiceScheduler::DispatchWifiOpenRes(OperateResState state, int instId
         if (pWifiProService != nullptr) {
             pWifiProService->OnWifiStateOpen(static_cast<int>(state));
         }
+#endif
+#ifdef EXTENSIBLE_AUTHENTICATION
+        NetEapObserver::GetInstance().OnWifiStateOpen(static_cast<int>(state));
 #endif
         return;
     }
@@ -841,7 +847,6 @@ void WifiServiceScheduler::DispatchWifiCloseRes(OperateResState state, int instI
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
         WifiConfigCenter::GetInstance().ClearLocalHid2dInfo();
-        WifiConfigCenter::GetInstance().SetP2pEnhanceActionListenChannel(0);
         BroadCastWifiStateChange(WifiState::DISABLED, instId);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CLOSE),
             static_cast<int>(WifiOperateState::STA_CLOSED));

@@ -41,6 +41,8 @@ export struct TestList {
       }
       .height(ConfigData.WH_100_100)
       .backgroundColor($r("app.color.lead"))
+      .scrollBar(BarState.Auto)
+      .edgeEffect(EdgeEffect.Spring)
     }
   }
 }

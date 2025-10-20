@@ -227,7 +227,7 @@ void WifiScanManager::DealScanCloseRes(int instId)
 
 void WifiScanManager::DealScanFinished(int state, int instId)
 {
-    WIFI_LOGE("%{public}s, state: %{public}d!", __func__, state);
+    WIFI_LOGI("%{public}s, state: %{public}d!", __func__, state);
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_SCAN_STATE_CHANGE;
     cbMsg.msgData = state;

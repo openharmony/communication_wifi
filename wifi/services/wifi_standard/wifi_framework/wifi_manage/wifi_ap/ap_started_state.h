@@ -261,8 +261,8 @@ private:
     std::set<std::string> curAssocMacList;
 #ifndef OHOS_ARCH_LITE
     IEnhanceService *enhanceService_ = nullptr;
-#endif
     std::mutex enhanceServiceMutex_;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

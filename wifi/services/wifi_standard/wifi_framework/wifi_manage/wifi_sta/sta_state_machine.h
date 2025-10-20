@@ -67,12 +67,14 @@ constexpr int CMD_START_GET_DHCP_IP_TIMEOUT = 0X04;
 constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 constexpr int CMD_LINK_SWITCH_DETECT_TIMEOUT = 0x07;
 constexpr int CMD_NO_INTERNET_TIMEOUT = 0x08;
+constexpr int CMD_IPV6_DELAY_TIMEOUT = 0x09;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY_WITH_TASK = 1 * 1000;
 constexpr int STA_SIGNAL_START_GET_DHCP_IP_DELAY = 30 * 1000;
 constexpr int STA_LINK_SWITCH_DETECT_DURATION = 2000; // ms
+constexpr int IPV6_DELAY_TIME = 5 * 1000; // ms
 
 /* pincode length */
 constexpr int PIN_CODE_LEN = 8;
@@ -189,6 +191,8 @@ public:
     private:
         void StartWifiProcess();
         void StopWifiProcess();
+        void SaveFoldStatus(InternalMessagePtr msg);
+        void DealScreenStateChangedEvent(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -210,10 +214,8 @@ public:
         bool RestrictedByMdm(WifiDeviceConfig &config);
 #endif
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
-        void SaveFoldStatus(InternalMessagePtr msg);
         bool NotAllowConnectToNetwork(int networkId, const std::string& bssid, int connTriggerMode);
         bool NotExistInScanList(WifiDeviceConfig &config);
-        void DealScreenStateChangedEvent(InternalMessagePtr msg);
         void DealHiddenSsidConnectMiss(int networkId);
         StaStateMachine *pStaStateMachine;
     };
@@ -316,7 +318,8 @@ public:
     private:
         bool IsPublicESS();
         bool IsProhibitUseCacheIp();
-        void DealGetDhcpIpTimeout(InternalMessagePtr msg);
+        void DealGetDhcpIpv4Timeout(InternalMessagePtr msg);
+        void DealDhcpResultNotify(int result, int ipType);
         void HandleStaticIpv6(bool isStaticIpv6);
         StaStateMachine *pStaStateMachine;
     };
@@ -345,6 +348,12 @@ public:
         void NetDetectionNotify(InternalMessagePtr msg);
         void DealNetworkCheck(InternalMessagePtr msg);
         void FoldStatusNotify(InternalMessagePtr msg);
+        bool ProcessMessageByMacros(InternalMessagePtr msg);
+#ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
+        void DealWifiPowerSaveWhenScreenStatusNotify(InternalMessagePtr msg);
+        void DealWifiPowerSaveWhenBatteryStatusNotify(InternalMessagePtr msg);
+        void DealWifiPowerSaveWhenWifiConnected();
+#endif
         StaStateMachine *pStaStateMachine;
     };
     /**
@@ -410,14 +419,15 @@ public:
         void OnFailedDhcpResult(int status, const char *ifname, const char *reason);
         void OnDhcpOfferResult(int status, const char *ifname, DhcpResult *result);
         void DealDhcpResult(int ipType);
-        void DealDhcpResultFailed();
+        void DealDhcpIpv4ResultFailed();
+        void DealDhcpJump();
         void DealDhcpOfferResult();
         void Clear();
     private:
         void TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToSaveIpV4ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
-        void TryToCloseDhcpClient(int iptype);
+        void TryToJumpToConnectedState(int iptype);
         void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
         void SaveDhcpResultExt(DhcpResult *dest, DhcpResult *source);
         void DhcpResultNotifyEvent(DhcpReturnCode result, int ipType = -1);
@@ -428,6 +438,8 @@ public:
         DhcpResult DhcpIpv4Result;
         DhcpResult DhcpIpv6Result;
         DhcpResult DhcpOfferInfo;
+        bool isDhcpIpv4Success = false;
+        bool isDhcpIpv6Success = false;
     };
 
 public:
@@ -1045,8 +1057,6 @@ private:
     int lastSignalLevel_;
     std::string targetRoamBssid;
     int currentTpType;
-    int getIpSucNum;
-    int getIpFailNum;
     bool enableSignalPoll;
     bool isRoam;
     bool isCurrentRoaming_ = false;

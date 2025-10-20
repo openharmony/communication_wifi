@@ -61,7 +61,7 @@ public:
 
     void FilterDfsChannel(std::vector<int> &channels, bool force = false);
 
-    void FilterDfsFreq(std::vector<int> &freqList);
+    void FilterDfsFreq(std::vector<int> &freqList, bool force);
 private:
     WifiChannelHelper();
     void UpdateValidChannels(std::vector<int32_t> &supp2Gfreqs, std::vector<int32_t> &supp5Gfreqs);

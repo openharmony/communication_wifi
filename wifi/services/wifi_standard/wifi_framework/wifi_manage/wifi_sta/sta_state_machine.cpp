@@ -897,10 +897,13 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
             pStaStateMachine->m_instId);
     }
 #endif
+        ConnState currentState = pStaStateMachine->linkedInfo.connState;
+        DetailedState currentDetailState = pStaStateMachine->linkedInfo.detailedState;
         pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
             pStaStateMachine->linkedInfo);
         pStaStateMachine->InitWifiLinkedInfo();
+        pStaStateMachine->SaveLinkstate(currentState, currentDetailState);
         WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     }
     return;

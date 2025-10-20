@@ -3062,5 +3062,17 @@ HWTEST_F(StaStateMachineTest, DealWifiPowerSaveWhenScreenStatusNotifyTest02, Tes
     EXPECT_TRUE(pStaStateMachine->pLinkedState->ExecuteStateMsg(msg));
 }
 #endif
+
+HWTEST_F(StaStateMachineTest, DealDisconnectEventInLinkStateTest01, TestSize.Level1)
+{
+    ConnState currentState = pStaStateMachine->linkedInfo.connState;
+    pStaStateMachine->linkedInfo.networkId = 1;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    int disReason = 8;
+    msg->SetParam1(disReason);
+    pStaStateMachine->pLinkState->pStaStateMachine->targetNetworkId_ = 0;
+    pStaStateMachine->pLinkState->DealDisconnectEventInLinkState(msg);
+    EXPECT_TRUE(currentState == pStaStateMachine->linkedInfo.connState);
+}
 } // namespace Wifi
 } // namespace OHOS

@@ -278,7 +278,7 @@ bool IpQosMonitor::ParseIpv6NetworkInternetGood(const std::vector<int64_t> &elem
     int64_t tcpRxPkts = elems[QOS_TCP_RX_PKTS];
     WIFI_LOGD("IPv6 tcpTxPkts = %{public}" PRId64 ", tcpRxPkts = %{public}" PRId64, tcpTxPkts, tcpRxPkts);
     
-    if ((mLastIpv6TcpTxCounter == 0) || (mLastIpv6TcpRxCounter == 0)) {
+    if ((mLastIpv6TcpTxCounter == 0) && (mLastIpv6TcpRxCounter == 0)) {
         mLastIpv6TcpTxCounter = tcpTxPkts;
         mLastIpv6TcpRxCounter = tcpRxPkts;
         WIFI_LOGI("IPv6 mLastTcpTxCounter = %{public}" PRId64 ", mLastTcpRxCounter = %{public}" PRId64,

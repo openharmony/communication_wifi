@@ -35,6 +35,7 @@
 #include "sta_define.h"
 #include "wifi_telephony_utils.h"
 #include "wifi_battery_utils.h"
+#include "ip_qos_monitor.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -918,6 +919,33 @@ public:
         pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_PORTAL, "");
     }
+
+    void HandleNetCheckResultTxRxGoodButNoInternetTest()
+    {
+        IpQosMonitor::GetInstance().lastTxRxGood_ = true;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(MODE_STATE_OPEN));
+        
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(1));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(
+            OperateResState::CONNECT_NETWORK_ENABLED, _, _)).Times(AtLeast(1));
+        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
+        
+        IpQosMonitor::GetInstance().lastTxRxGood_ = false;
+    }
+    
+    void HandleNetCheckResultTxRxGoodButNoInternetFalseTest()
+    {
+        IpQosMonitor::GetInstance().lastTxRxGood_ = false;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(MODE_STATE_OPEN));
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+ 
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(1));
+        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
+    }
+
     void HandleNetCheckResultFail()
     {
         pStaStateMachine->linkedInfo.connState = ConnState::DISCONNECTED;
@@ -2407,6 +2435,16 @@ HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess4, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess5, TestSize.Level1)
 {
     HandleNetCheckResultSuccess5();
+}
+
+HWTEST_F(StaStateMachineTest, HandleNetCheckResultTxRxGoodButNoInternetTest, TestSize.Level1)
+{
+    HandleNetCheckResultTxRxGoodButNoInternetTest();
+}
+ 
+HWTEST_F(StaStateMachineTest, HandleNetCheckResultTxRxGoodButNoInternetFalseTest, TestSize.Level1)
+{
+    HandleNetCheckResultTxRxGoodButNoInternetFalseTest();
 }
 
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultFail, TestSize.Level1)

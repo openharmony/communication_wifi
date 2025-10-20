@@ -28,7 +28,6 @@ DEFINE_WIFILOG_LABEL("WifiHiAppEvent");
 constexpr int32_t HA_CONFIG_TIMEOUT = 90;  // report every 90 second
 constexpr int32_t HA_CONFIG_ROW = 30;  // report every 30 data points
 constexpr int32_t HA_NOT_SUPPORT = -200;  // processId not hap
-constexpr int64_t MAX_RAMDOM_VALUE = 999999;
 constexpr const char *KIT_NAME = "ConnectivityKit";
 WifiHiAppEvent::WifiHiAppEvent()
 {
@@ -93,10 +92,7 @@ void WifiHiAppEvent::WriteEndEvent(const int64_t beginTime, const int result, co
         return;
     }
     HiviewDFX::HiAppEvent::Event event("api_diagnostic", "api_exec_end", HiviewDFX::HiAppEvent::BEHAVIOR);
-    std::random_device randSeed;
-    std::mt19937 gen(randSeed());
-    std::uniform_int_distribution<> dis(0, MAX_RAMDOM_VALUE);
-    auto transId = std::string("transId_") + std::to_string(dis(gen));
+    auto transId = std::string("transId_") + std::to_string(std::rand());
     event.AddParam("trans_id", transId);
     event.AddParam("api_name", apiName);
     event.AddParam("sdk_name", std::string(KIT_NAME));

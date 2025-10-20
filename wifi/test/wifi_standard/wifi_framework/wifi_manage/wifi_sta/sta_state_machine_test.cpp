@@ -2943,5 +2943,17 @@ HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultMaskNoMatchTest, TestSize.Level
     TryToSaveIpV4ResultMaskNoMatchTest();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
+
+HWTEST_F(StaStateMachineTest, DealDisconnectEventInLinkStateTest01, TestSize.Level1)
+{
+    ConnState currentState = pStaStateMachine->linkedInfo.connState;
+    pStaStateMachine->linkedInfo.networkId = 1;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    int disReason = 8;
+    msg->SetParam1(disReason);
+    pStaStateMachine->pLinkState->pStaStateMachine->targetNetworkId_ = 0;
+    pStaStateMachine->pLinkState->DealDisconnectEventInLinkState(msg);
+    EXPECT_TRUE(currentState == pStaStateMachine->linkedInfo.connState);
+}
 } // namespace Wifi
 } // namespace OHOS

@@ -2332,13 +2332,20 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     if (!portalUrl.empty()) {
         mPortalUrl = portalUrl;
     }
+    bool isTxRxGoodButNoInternet = false;
     /*when detect result is NETWORK_NOTWORKING but tx rx is good, considered as NETWORK_IS_WORKING*/
     if (netState == SystemNetWorkState::NETWORK_NOTWORKING &&
         IpQosMonitor::GetInstance().GetTxRxStatus() &&
         WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_OPEN) {
         WIFI_LOGI("net detection result is NETWORK_NOTWORKING but tx rx is good, considered as NETWORK_IS_WORKING");
         netState = SystemNetWorkState::NETWORK_IS_WORKING;
+        isTxRxGoodButNoInternet = true;
     }
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    if (selfCureService_ != nullptr) {
+        selfCureService_->NotifyTxRxGoodButNoInternet(isTxRxGoodButNoInternet);
+    }
+#endif
     bool updatePortalAuthTime = false;
     if (netState == SystemNetWorkState::NETWORK_IS_WORKING) {
         mIsWifiInternetCHRFlag = false;

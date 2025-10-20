@@ -34,6 +34,12 @@ if the reject is caused by driver fail, we need set a delay time to reconnect to
 between this connection and other vap associations (like scan or p2p_enhance)
 */
 const int32_t CONNECT_REJECT_DELAY_TIME_MS = 2000;
+
+#define EAP_DATE_ZERO 0
+#define EAP_DATE_ONE 1
+#define EAP_DATE_TWO 2
+#define EAP_DATE_THREE 3
+
 StaMonitor::StaMonitor(int instId) : pStaStateMachine(nullptr), m_instId(instId)
 {
     WIFI_LOGI("StaMonitor constuctor insId %{public}d", instId);
@@ -422,10 +428,10 @@ void StaMonitor::OnWpaCustomEapNotifyCallBack(const std::string &notifyParam)
         }
     }
     WpaEapData wpaEapData;
-    wpaEapData.msgId = CheckDataToUint(vecEapDatas[0]);
-    wpaEapData.code = CheckDataToUint(vecEapDatas[1]);
-    wpaEapData.type = CheckDataToUint(vecEapDatas[2]);
-    wpaEapData.bufferLen = CheckDataToUint(vecEapDatas[3]);
+    wpaEapData.msgId = static_cast<int32_t>(CheckDataToUint(vecEapDatas[EAP_DATE_ZERO]));
+    wpaEapData.code = static_cast<int32_t>(CheckDataToUint(vecEapDatas[EAP_DATE_ONE]));
+    wpaEapData.type = static_cast<int32_t>(CheckDataToUint(vecEapDatas[EAP_DATE_TWO]));
+    wpaEapData.bufferLen = static_cast<int32_t>(CheckDataToUint(vecEapDatas[EAP_DATE_THREE]));
     wpaEapData.eapBuffer.reserve(wpaEapData.bufferLen);
 
     DecodeBase64(vecEapDatas[4], wpaEapData.eapBuffer);

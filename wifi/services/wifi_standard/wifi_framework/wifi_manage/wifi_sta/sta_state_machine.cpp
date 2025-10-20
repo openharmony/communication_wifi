@@ -2280,7 +2280,7 @@ void StaStateMachine::RegisterCustomEapCallback(const std::string &regCmd) //net
             WIFI_LOGI("%{public}s regCmd invalid, regCmd[%{public}s]", __func__, regCmd.c_str());
             return false;
         }
-        if (CheckDataToUint(vecEapDatas[0]) != static_cast<int>(NetManagerStandard::NetType::WLAN0)) {
+        if (static_cast<int>(CheckDataToUint(vecEapDatas[0])) != static_cast<int>(NetManagerStandard::NetType::WLAN0)) {
             WIFI_LOGI("%{public}s netType not WLAN0, regCmd[%{public}s]", __func__, regCmd.c_str());
             return false;
         }

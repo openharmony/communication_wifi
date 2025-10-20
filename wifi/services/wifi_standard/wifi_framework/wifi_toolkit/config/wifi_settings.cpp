@@ -1934,7 +1934,7 @@ std::string WifiSettings::GetSubstringByBytes(const std::string& value, int size
         } else {
             charLen = 1;
         }
-        if (result.length() + charLen <= size) {
+            if (result.length() + charLen <= static_cast<size_t>(size)) {
             result.append(value, index, charLen);
             index += charLen;
         } else {

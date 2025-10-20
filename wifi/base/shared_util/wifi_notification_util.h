@@ -33,7 +33,7 @@ inline const std::string WIFI_EVENT_DIALOG_REJECT = "ohos.event.wifi.DIALOG_REJE
 inline const std::string EVENT_SETTINGS_WLAN_KEEP_CONNECTED = "event.settings.wlan.keep_connected";
 enum WifiNotificationId {
     WIFI_PORTAL_NOTIFICATION_ID = 101000,
-    WIFI_5G_CONN_NOTIFICATION_ID = 101001
+    WIFI_5G_CONN_NOTIFICATION_ID = 101100
 };
 
 enum WifiNotificationStatus {

@@ -334,13 +334,13 @@ void WifiChannelHelper::FilterDfsChannel(std::vector<int> &channels, bool force)
     }
 }
 
-void WifiChannelHelper::FilterDfsFreq(std::vector<int> &freqList)
+void WifiChannelHelper::FilterDfsFreq(std::vector<int> &freqList, bool force)
 {
-    if (WifiConfigCenter::GetInstance().GetDfsControlData().enableDfs_ == 1 || freqList.empty()) {
+    if ((WifiConfigCenter::GetInstance().GetDfsControlData().enableDfs_ == 1 && !force) || freqList.empty()) {
         return;
     }
     for (auto it = freqList.begin(); it != freqList.end();) {
-        if (*it >= FREQ5240 && *it <= FREQ5730) {
+        if (*it > FREQ5240 && *it <= FREQ5730) {
             WIFI_LOGI("filter: not recommend DFS:%{public}d", *it);
             it = freqList.erase(it);
         } else {

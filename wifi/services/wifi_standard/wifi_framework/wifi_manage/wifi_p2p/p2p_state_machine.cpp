@@ -1056,7 +1056,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
     if (freqList.empty()) {
         return 0;
     }
-    WifiChannelHelper::GetInstance().FilterDfsFreq(freqList);
+    WifiChannelHelper::GetInstance().FilterDfsFreq(freqList, false);
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int retFreq = 0;
@@ -1067,6 +1067,8 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
             return retFreq;
         }
     }
+    /* dfs channel need 1min cac detect, force filter dfs channel avoid peer not find group owner immediately */
+    WifiChannelHelper::GetInstance().FilterDfsFreq(freqList, true);
     std::random_device rd;
     int randomIndex = static_cast<int>(static_cast<size_t>(std::abs(static_cast<int>(rd()))) % freqList.size());
     retFreq = freqList.at(randomIndex);

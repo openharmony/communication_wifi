@@ -185,6 +185,11 @@ if (defined(ohos_lite)) {
       ]
       defines += [ "INIT_LIB_ENABLE" ]
     }
+    if (defined(global_parts_info) &&
+        defined(global_parts_info.account_os_account)) {
+      external_deps += [ "os_account:os_account_innerkits" ]
+      defines += [ "HAS_ACCOUNT_PART" ]
+    }
 
     public_deps = []
 

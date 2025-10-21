@@ -2454,7 +2454,7 @@ void StaStateMachine::PublishPortalNitificationAndLogin()
         (lastCheckNetState_ != OperateResState::CONNECT_CHECK_PORTAL) && WifiConfigCenter::GetInstance().IsAllowPopUp();
 
     if (shouldShowNotification) {
-        if (selfCureService_ == nullptr || (selfCureService_ != nullptr && !selfCureService_->IsSelfCureOnGoing())) {
+        if (selfCureService_ == nullptr || !selfCureService_->IsSelfCureOnGoing()) {
             WIFI_LOGI("%{public}s, ShowPortalNitification", __func__);
             ShowPortalNitification();
         }
@@ -2584,6 +2584,9 @@ StaStateMachine::LinkedState::~LinkedState()
 
 void StaStateMachine::LinkedState::GoInState()
 {
+    if (pStaStateMachine == nullptr) {
+        return;
+    }
     WIFI_LOGI("LinkedState GoInState function. m_instId = %{public}d", pStaStateMachine->m_instId);
     WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CONNECT),
         static_cast<int>(WifiOperateState::STA_CONNECTED));
@@ -2593,7 +2596,7 @@ void StaStateMachine::LinkedState::GoInState()
     CheckIfRestoreWifi();
 #endif
 #ifndef OHOS_ARCH_LITE
-    if (pStaStateMachine != nullptr && pStaStateMachine->m_NetWorkState != nullptr) {
+    if (pStaStateMachine->m_NetWorkState != nullptr) {
         pStaStateMachine->m_NetWorkState->StartNetStateObserver(pStaStateMachine->m_NetWorkState);
         pStaStateMachine->lastTimestamp = 0;
         pStaStateMachine->StartDetectTimer(DETECT_TYPE_DEFAULT);

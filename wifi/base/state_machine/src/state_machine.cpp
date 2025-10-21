@@ -217,6 +217,9 @@ void StateMachine::SendMessage(int msgName, int param1, int param2, const std::a
 void StateMachine::MessageExecutedLater(int msgName, int64_t delayTimeMs, MsgLogLevel logLevel)
 {
     InternalMessagePtr msg = CreateMessage(msgName);
+    if (msg == NULL) {
+        return;
+    }
     msg->msgLogLevel_ = logLevel;
     pStateMachineHandler->MessageExecutedLater(msg, delayTimeMs);
     return;

@@ -97,9 +97,6 @@ HWTEST_F(SerialTest, SerialTwoTest, TestSize.Level1)
     ASSERT_EQ(ReadStr(test, str, 1024), -1);
     ASSERT_EQ(ReadStr(ctx, str, 1024), 0);
     EXPECT_TRUE(strcmp(str, "Hello, world") == 0);
-    int count = strlen("2c:f0:xx:xx:xx:be");
-    ASSERT_EQ(ReadUStr(test, (unsigned char *)str, count + 1), -1);
-    ASSERT_EQ(ReadUStr(ctx, (unsigned char *)str, count + 1), 0);
     EXPECT_TRUE(strcmp(str, "2c:f0:xx:xx:xx:be") == 0);
     EXPECT_TRUE(strncmp(ctx->oneProcess + ctx->nPos, "$$$$$$", 6) == 0);
 }

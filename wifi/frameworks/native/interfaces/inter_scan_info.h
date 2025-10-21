@@ -26,6 +26,7 @@ constexpr int WIFI_802_11G = 3;
 constexpr int WIFI_802_11N = 4;
 constexpr int WIFI_802_11AC = 5;
 constexpr int WIFI_802_11AX = 6;
+constexpr int WIFI_802_11AD = 7;
 
 enum class Ant {
     NETWORK_PRIVATE = 0,
@@ -70,6 +71,7 @@ struct InterScanInfo {
     int64_t timestamp;
     Ant ant;
     int wifiMode;
+    bool isEhtInfoExist;
     bool isVhtInfoExist;
     bool isHtInfoExist;
     bool isHeInfoExist;
@@ -91,6 +93,7 @@ struct InterScanInfo {
           timestamp(0),
           ant(Ant::NETWORK_ANT_INVALID),
           wifiMode(WIFI_MODE_UNDEFINED),
+          isEhtInfoExist(false),
           isVhtInfoExist(false),
           isHtInfoExist(false),
           isHeInfoExist(false),

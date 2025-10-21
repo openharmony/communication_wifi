@@ -149,6 +149,7 @@ WifiErrorNo WifiHdiWpaClient::QueryScanInfos(std::vector<InterScanInfo> &scanInf
         tmp.channelWidth = (WifiChannelWidth)results[i].channelWidth;
         tmp.centerFrequency0 = results[i].centerFrequency0;
         tmp.centerFrequency1 = results[i].centerFrequency1;
+        tmp.isEhtInfoExist = results[i].isEhtInfoExist;
         tmp.isVhtInfoExist = results[i].isVhtInfoExist;
         tmp.isHtInfoExist = results[i].isHtInfoExist;
         tmp.isHeInfoExist = results[i].isHeInfoExist;

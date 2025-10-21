@@ -31,6 +31,8 @@ constexpr int64_t TIMEOUT_CLEAR_SET = 4 * 60 * 1000;
 constexpr int32_t MIN_RSSI_LEVEL_3 = -75;
 constexpr int32_t MIN_BSSID_COUNT = 2;
 constexpr int32_t INVALID_RSSI = -200;
+constexpr int64_t TV_MAX_TIME = 8 * 1000 * 1000;
+constexpr int MAX_FAIL_COUNT = 3;
 #endif
 
 BlockConnectService &BlockConnectService::GetInstance()
@@ -86,7 +88,9 @@ BlockConnectService::BlockConnectService()
         static_cast<int>(DisconnectDetailReason::DISASSOC_IEEE_802_1X_AUTH_FAILED),
         static_cast<int>(DisconnectDetailReason::DISASSOC_LOW_ACK)
     };
-
+#ifndef OHOS_ARCH_LITE
+    CheckNeedChangePolicy();
+#endif
     mLastConnectedApInfo = {"", -1, 0};
 }
 
@@ -548,6 +552,24 @@ void BlockConnectService::ClearSetTimerCallback()
     autoJoinUnusableBssidSet_.clear();
     curUnusableSsid_ = "";
     curUnusableKeyMgmt_ = "";
+}
+
+void BlockConnectService::CheckNeedChangePolicy(void)
+{
+    if (GetDeviceType() != ProductDeviceType::TV) {
+        return;
+    }
+    std::vector<DisabledReason> keysToChange = {
+        DisabledReason::DISABLED_ASSOCIATION_REJECTION,
+        DisabledReason::DISABLED_AUTHENTICATION_FAILURE,
+        DisabledReason::DISABLED_DHCP_FAILURE,
+        DisabledReason::DISABLED_CONSECUTIVE_FAILURES };
+    for (const auto& key : keysToChange) {
+        auto it = blockConnectPolicies.find(key);
+        if (it != blockConnectPolicies.end()) {
+            it->second = DisablePolicy(TV_MAX_TIME, MAX_FAIL_COUNT, WifiDeviceConfigStatus::DISABLED);
+        }
+    }
 }
 #endif
 }

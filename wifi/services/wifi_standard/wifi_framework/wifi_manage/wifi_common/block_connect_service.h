@@ -102,6 +102,7 @@ private:
     void StartClearSetTimer();
     void StopClearSetTimer();
     void ClearSetTimerCallback();
+    void CheckNeedChangePolicy(void);
 #endif
     LastConnectedApInfo mLastConnectedApInfo;
     std::map<DisabledReason, DisablePolicy> blockConnectPolicies;

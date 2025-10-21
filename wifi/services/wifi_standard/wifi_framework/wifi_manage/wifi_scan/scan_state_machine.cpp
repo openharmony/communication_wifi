@@ -1114,7 +1114,9 @@ void ScanStateMachine::CommonScanInfoProcess()
 
 void ScanStateMachine::SetWifiMode(InterScanInfo &scanInfo)
 {
-    if (scanInfo.isHeInfoExist) {
+    if (scanInfo.isEhtInfoExist) {
+        scanInfo.wifiMode = WIFI_802_11AD;
+    } else if (scanInfo.isHeInfoExist) {
         scanInfo.wifiMode = WIFI_802_11AX;
     } else if (scanInfo.band != SCAN_24GHZ_BAND && scanInfo.isVhtInfoExist) {
         scanInfo.wifiMode = WIFI_802_11AC;

@@ -18,6 +18,11 @@
 #include "wifi_common_util.h"
 #include "wifi_config_center.h"
 #include "parameters.h"
+#include "wifi_global_func.h"
+
+#ifdef HAS_ACCOUNT_PART
+#include "os_account_manager.h"
+#endif
  
 namespace OHOS {
 namespace Wifi {
@@ -238,6 +243,13 @@ WifiAssetManager::WifiAssetManager()
     if (assetServiceThread_ == nullptr) {
         assetServiceThread_ = std::make_unique<WifiEventHandler>("WifiEventAddAsset");
     }
+#ifdef HAS_ACCOUNT_PART
+    if (GetDeviceType() == ProductDeviceType::PC) {
+        int userId = static_cast<int>(USER_ID_DEFAULT);
+        OHOS::AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
+        g_userIdValue = {.u32 = static_cast<uint32_t>(userId)};
+    }
+#endif
     staCallback_.callbackModuleName = WIFI_ASSET_NETWORK_ON_SYNC;
     staCallback_.OnStaConnChanged = [&](OperateResState state, const WifiLinkedInfo &info, int instId) {
         this->DealStaConnChanged(state, info, instId);

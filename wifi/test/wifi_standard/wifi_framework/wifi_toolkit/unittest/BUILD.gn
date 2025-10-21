@@ -155,6 +155,11 @@ ohos_unittest("toolkit_unittest") {
   if (wifi_feature_mdm_restricted_enable) {
     defines += [ "FEATURE_WIFI_MDM_RESTRICTED_SUPPORT" ]
   }
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.account_os_account)) {
+    external_deps += [ "os_account:os_account_innerkits" ]
+    defines += [ "HAS_ACCOUNT_PART" ]
+  }
   defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
   configs = [ ":module_private_config" ]
 

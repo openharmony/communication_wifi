@@ -178,16 +178,6 @@ int ReadChar(Context *context, char *c);
  */
 int ReadStr(Context *context, char *str, int count);
 
-/**
- * @Description Reads data of the unsigned char* type from the context
- *
- * @param context - Communication Context
- * @param uStr - pointer to the unsigned string
- * @param count - Size of uStr
- * @return int - 0 Success; < 0 read error; > 0 the message is longger than count, return the length
- */
-int ReadUStr(Context *context, unsigned char *uStr, int count);
-
 #ifdef __cplusplus
 }
 #endif

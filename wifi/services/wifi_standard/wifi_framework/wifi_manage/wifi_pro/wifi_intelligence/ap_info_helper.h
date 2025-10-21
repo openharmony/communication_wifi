@@ -69,11 +69,11 @@ struct ApInfoData {
 };
 
 struct LinkedCellInfo {
-    int64_t cellId;
+    int64_t cellId = 0L;
     std::string mcc;
     std::string mnc;
-    int32_t rssi;
-    int32_t rat;
+    int32_t rssi = 0L;
+    int32_t rat = 0L;
 };
 
 enum RatType { GSM_TYPE = 1, WCDMA_TYPE = 2, LTE_TYPE = 3, NR_TYPE = 4 };

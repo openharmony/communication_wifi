@@ -46,6 +46,12 @@ bool IpPool::InitIpPool(const std::string& serverIp)
         return false;
     }
 
+    size_t lastDotPos = hostIp.find_last_of("\\.");
+    if (lastDotPos == std::string::npos) {
+        return false;
+    }
+ 
+    std::string serverIpHead = hostIp.substr(0, lastDotPos);
     std::string serverIpHead = hostIp.substr(0, hostIp.find_last_of("\\."));
     ipList.clear();
     mapGcMacToAllocIp.clear();

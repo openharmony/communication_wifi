@@ -197,7 +197,7 @@ struct WifiEapConfig {
     caCertAlias: String;
     caPath: String;
     clientCertAlias: String;
-    certEntry: Array<u8>;
+    certEntry: @typedarray Array<u8>;
     certPassword: String;
     altSubjectMatch: String;
     domainSuffixMatch: String;
@@ -243,7 +243,7 @@ struct WifiDeviceConfig {
 
 struct WifiInfoElem {
     eid: i32;
-    content: Array<u8>;
+    content: @typedarray Array<u8>;
 }
 
 struct WifiScanInfo {

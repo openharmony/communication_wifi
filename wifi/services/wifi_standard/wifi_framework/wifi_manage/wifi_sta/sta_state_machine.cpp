@@ -3291,6 +3291,21 @@ void StaStateMachine::DhcpResultNotify::SaveDhcpResultExt(DhcpResult *dest, Dhcp
         WIFI_LOGI("SaveDhcpResultExt destDnsNumber:%{public}d sourceDnsNumber:%{public}d", dest->dnsList.dnsNumber,
             source->dnsList.dnsNumber);
     }
+
+    if (source->addrList.addrNumber >= 0 && source->addrList.addrNumber <= DHCP_ADDR_MAX_NUMBER) {
+        dest->addrList.addrNumber = 0;
+        for (uint32_t i = 0; i < source->addrList.addrNumber; i++) {
+            if (memcpy_s(dest->addrList.addr[i], DHCP_ADDR_DATA_MAX_LEN, source->addrList.addr[i],
+                DHCP_ADDR_DATA_MAX_LEN -1) != EOK) {
+                WIFI_LOGE("SaveDhcpResultExt addrList memcpy_s failed! i:%{public}d", i);
+            } else {
+                dest->addrList.addrType[i] = source->addrList.addrType[i];
+                dest->addrList.addrNumber++;
+            }
+        }
+        WIFI_LOGI("SaveDhcpResultExt destAddrNumber:%{public}d sourceAddrNumber:%{public}d", dest->addrList.addrNumber,
+            source->addrList.addrNumber);
+    }
     WIFI_LOGI("SaveDhcpResultExt ok, ipType:%{public}d", dest->iptype);
 }
 
@@ -3540,12 +3555,14 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
         }
         WIFI_LOGI("TryToSaveIpV6Result ipv6Info dnsAddr size:%{public}zu", ipv6Info.dnsAddr.size());
     }
+    if (result->addrList.addrNumber <= DHCP_ADDR_MAX_NUMBER) {
+        for (uint32_t i = 0; i < result->addrList.addrNumber; i++) {
+            ipv6Info.IpAddrMap[result->addrList.addr[i]] = result->addrList.addrType[i];
+        }
+        WIFI_LOGI("TryToSaveIpV6Result ipv6Info IpAddrMap size:%{public}zu", ipv6Info.IpAddrMap.size());
+    }
     WifiConfigCenter::GetInstance().SaveIpV6Info(ipv6Info, pStaStateMachine->m_instId);
-    WIFI_LOGI("SaveIpV6 addr=%{private}s, linkaddr=%{private}s, randaddr=%{private}s, gateway=%{private}s, "
-        "mask=%{private}s, dns=%{private}s, dns2=%{private}s",
-        ipv6Info.globalIpV6Address.c_str(), ipv6Info.linkIpV6Address.c_str(),
-        ipv6Info.randGlobalIpV6Address.c_str(), ipv6Info.gateway.c_str(), ipv6Info.netmask.c_str(),
-        ipv6Info.primaryDns.c_str(), ipv6Info.secondDns.c_str());
+    WIFI_LOGI("SaveIpV6 Info complete.");
 #ifndef OHOS_ARCH_LITE
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config,

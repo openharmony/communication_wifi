@@ -18,12 +18,19 @@
 #include "cert_manager_api.h"
 #include "securec.h"
 #include "wifi_log.h"
+#include "wifi_global_func.h"
+#include "cm_type.h"
+
+#ifdef HAS_ACCOUNT_PART
+#include "os_account_manager.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
 constexpr int MAX_ALIAS_LEN = 128;
 constexpr int RETRY_INTERVAL = 5 * 100 * 1000; // wait for the remote sa to be ready
 constexpr int IPC_ERROR_REMOTE_SA_DIE = 29189; // means the remote sa is dead
+constexpr int DEFAULT_USER_ID = 100;
 
 static bool CheckParamters(const std::vector<uint8_t>& certEntry, const std::string& pwd,
     std::string& alias)
@@ -80,15 +87,41 @@ int WifiCertUtils::InstallCert(const std::vector<uint8_t>& certEntry, const std:
     certAlias.size = strlen(certAliasBuf) + 1;
     certAlias.data = reinterpret_cast<uint8_t*>(certAliasBuf);
 
-    uint32_t store = 3;
     char retUriBuf[MAX_ALIAS_LEN] = { 0 };
     struct CmBlob keyUri = { sizeof(retUriBuf), reinterpret_cast<uint8_t*>(retUriBuf) };
-    int ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
+    int ret = 0;
+#ifdef HAS_ACCOUNT_PART
+    if (GetDeviceType() == ProductDeviceType::PC) {
+        uint32_t store = CM_SYS_CREDENTIAL_STORE;
+        int userId = DEFAULT_USER_ID;
+        OHOS::AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
+        struct CmAppCertParam appCertParam = {&appCert, &appCertPwd, &certAlias, store, static_cast<uint32_t>(userId)};
+        ret = CmInstallSystemAppCert(&appCertParam, &keyUri);
+        if (ret == IPC_ERROR_REMOTE_SA_DIE) {
+            LOGE("CmInstallSystemAppCert fail, remote sa die, code:%{public}d, retry after %{public}d",
+                ret,
+                RETRY_INTERVAL);
+            usleep(RETRY_INTERVAL);
+            ret = CmInstallSystemAppCert(&appCertParam, &keyUri);
+        }
+    } else {
+        uint32_t store = CM_PRI_CREDENTIAL_STORE;
+        ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
+        if (ret == IPC_ERROR_REMOTE_SA_DIE) {
+            LOGE("CmInstallAppCert fail, remote sa die, code:%{public}d, retry after %{public}d", ret, RETRY_INTERVAL);
+            usleep(RETRY_INTERVAL);
+            ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
+        }
+    }
+#else
+    uint32_t store = CM_PRI_CREDENTIAL_STORE;
+    ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
     if (ret == IPC_ERROR_REMOTE_SA_DIE) {
-        LOGE("CmInstallAppCert fail, remote sa die, code:%{public}d, retry after %{public}d.", ret, RETRY_INTERVAL);
+        LOGE("CmInstallAppCert fail, remote sa die, code:%{public}d, retry after %{public}d", ret, RETRY_INTERVAL);
         usleep(RETRY_INTERVAL);
         ret = CmInstallAppCert(&appCert, &appCertPwd, &certAlias, store, &keyUri);
     }
+#endif
     free(data);
     data = nullptr;
     if (ret == CM_SUCCESS) {

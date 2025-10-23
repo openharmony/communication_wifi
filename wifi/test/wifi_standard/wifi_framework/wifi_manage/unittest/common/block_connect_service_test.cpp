@@ -54,6 +54,7 @@ HWTEST_F(BlockConnectServiceTest, shouldAutoConnect_ReturnsTrueWhenStatusIsEnabl
     WifiDeviceConfig config;
     config.networkSelectionStatus.status = WifiDeviceConfigStatus::ENABLED;
     bool result = BlockConnectService::GetInstance().ShouldAutoConnect(config);
+    BlockConnectService::GetInstance().CheckNeedChangePolicy();
     EXPECT_EQ(result, true);
 }
 

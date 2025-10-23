@@ -52,7 +52,6 @@ bool IpPool::InitIpPool(const std::string& serverIp)
     }
  
     std::string serverIpHead = hostIp.substr(0, lastDotPos);
-    std::string serverIpHead = hostIp.substr(0, hostIp.find_last_of("\\."));
     ipList.clear();
     mapGcMacToAllocIp.clear();
     for (int i = HID2D_IPPOOL_START; i <= HID2D_IPPOOL_END; ++i) {

@@ -233,6 +233,14 @@ private:
      * @Return true if p2p enhance filter cause auto connect fail otherwise false
      */
     bool IsAutoConnectFailByP2PEnhanceFilter(const std::vector<InterScanInfo> &scanInfos);
+
+    /**
+     * @Description  determine whether the candidate is a hidden network selected by the user
+     *
+     * @param candidate chosen by autoConnectSelector
+     * @Return true if candidate is user choice hidden network otherwise false
+     */
+    bool IsCandidateWithUserSelectChoiceHidden(NetworkSelectionResult &candidate);
 };
 }  // namespace Wifi
 }  // namespace OHOS

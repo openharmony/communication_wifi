@@ -312,30 +312,17 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
     netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
     netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
     netIpv6Addr->prefixlen_ = 0;
-    if (!wifiIpV6Info.linkIpV6Address.empty()) {
-        netIpv6Addr->address_ = wifiIpV6Info.linkIpV6Address;
+
+    std::vector<std::pair<std::string, int>> ipv6Addr(wifiIpV6Info.IpAddrMap.begin(), wifiIpV6Info.IpAddrMap.end());
+    std::sort(ipv6Addr.begin(), ipv6Addr.end(),
+        [](const std::pair<std::string, int> &a, const std::pair<std::string, int> &b) {
+            return a.second < b.second;
+        });
+    for (const auto &addr : ipv6Addr) {
+        netIpv6Addr->address_ = addr.first;
         netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
-        LOGI("SetNetLinkIPInfo linkIpv6:%{public}s", MacAnonymize(wifiIpV6Info.linkIpV6Address).c_str());
-    }
-    if (!wifiIpV6Info.globalIpV6Address.empty()) {
-        netIpv6Addr->address_ = wifiIpV6Info.globalIpV6Address;
-        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
-        LOGI("SetNetLinkIPInfo globalIpv6:%{public}s", MacAnonymize(wifiIpV6Info.globalIpV6Address).c_str());
-    }
-    if (!wifiIpV6Info.randGlobalIpV6Address.empty()) {
-        netIpv6Addr->address_ = wifiIpV6Info.randGlobalIpV6Address;
-        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
-        LOGI("SetNetLinkIPInfo randGlobalIpv6:%{public}s", MacAnonymize(wifiIpV6Info.randGlobalIpV6Address).c_str());
-    }
-    if (!wifiIpV6Info.uniqueLocalAddress1.empty()) {
-        netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress1;
-        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
-        LOGI("SetNetLinkIPInfo LocalIpv6:%{public}s", MacAnonymize(wifiIpV6Info.uniqueLocalAddress1).c_str());
-    }
-    if (!wifiIpV6Info.uniqueLocalAddress2.empty()) {
-        netIpv6Addr->address_ = wifiIpV6Info.uniqueLocalAddress2;
-        netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
-        LOGI("SetNetLinkIPInfo randLocalIpv6:%{public}s", MacAnonymize(wifiIpV6Info.uniqueLocalAddress2).c_str());
+        LOGI("SetNetLinkIPInfo ipv6 address:%{public}s type:%{public}d",
+            IpAnonymize(netIpv6Addr->address_).c_str(), addr.second);
     }
 }
 

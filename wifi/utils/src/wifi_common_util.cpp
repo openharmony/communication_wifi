@@ -771,7 +771,7 @@ std::string EncodeBase64(const std::vector<uint8_t> &input)
         std::vector<char> outputBuffer {};
         WIFI_LOGI("%{public}s: length is %{public}zu", __func__, bptr->length);
         outputBuffer.insert(outputBuffer.end(), bptr->data, bptr->data + bptr->length);
-        outputBuffer[bptr->length] = 0;
+        outputBuffer.push_back(0);
         output = static_cast<char*>(&outputBuffer[0]);
     }
     BIO_free_all(bio);
@@ -997,6 +997,27 @@ std::string Ipv4IntAnonymize(uint32_t ipInt)
 std::string Ipv6Anonymize(std::string str)
 {
     return DataAnonymize(str, ':', '*', 1);
+}
+
+std::shared_ptr<int> CheckDataLegalContainZero(const std::string& data, int base) {
+    std::shared_ptr<int> pNum = nullptr;
+    if (data.empty() || data.size() > MAX_INT32_LENGTH) {
+        WIFI_LOGE("CheckDataLegalContainZero: invalid data:%{private}s", data.c_str());
+        return nullptr;
+    }
+ 
+    std::regex pattern("-?\\d+");
+    if (!std::regex_match(data, pattern)) {
+        return nullptr;
+    }
+    errno = 0;
+    char *endptr = nullptr;
+    long int num = std::strtol(data.c_str(), &endptr, base);
+    if (errno == ERANGE) {
+        WIFI_LOGE("CheckDataLegalContainZero errno == ERANGE, data:%{private}s", data.c_str());
+        return nullptr;
+    }
+    return std::make_shared<int>(num);
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -160,7 +160,7 @@ export function extractDomain(urlString: string): string {
 
 export enum UserAgentSet {
   harmonyUA = '',
-  mobileUA = 'Mozilla/5.0 (Linux; Android 12; BRA-AL00) AppleWebKit/537.36 (KHTML, like Gecko)' + 
+  mobileUA = 'Mozilla/5.0 (Linux; Android 12; BRA-AL00) AppleWebKit/537.36 (KHTML, like Gecko) ' + 
   'Chrome/100.0.4896.75 Mobile Safari/537.36',
   desktopUA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' +
     'Chrome/114.0.0.0 Safari/537.36'

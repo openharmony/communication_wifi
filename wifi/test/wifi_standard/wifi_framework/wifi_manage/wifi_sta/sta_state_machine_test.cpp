@@ -966,6 +966,8 @@ public:
             WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig1), Return(0)));
         pStaStateMachine->HandleNetCheckResultIsPortal(SystemNetWorkState::NETWORK_IS_WORKING, false);
 
+        pStaStateMachine->mIsWifiInternetCHRFlag = true;
+        pStaStateMachine->HandleNetCheckResultIsPortal(SystemNetWorkState::NETWORK_IS_WORKING, false);
         // tet not hilink and open
         WifiLinkedInfo linkedInfo2;
         linkedInfo1.isHiLinkNetwork = 0;

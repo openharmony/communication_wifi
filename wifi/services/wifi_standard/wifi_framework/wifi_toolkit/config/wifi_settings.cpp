@@ -437,7 +437,6 @@ void WifiSettings::SetUserConnectChoice(int networkId)
                     config.networkId);
                 ClearNetworkConnectChoice(config.networkId);
             }
-            continue;
         }
         if (config.networkSelectionStatus.seenInLastQualifiedNetworkSelection || config.hiddenSSID) {
             LOGI("%{public}s add select net:%{public}d set time:%{public}ld to net:%{public}d with ssid:%{public}s",

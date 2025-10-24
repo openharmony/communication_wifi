@@ -136,8 +136,13 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos)) {
         std::string bssid = "";
+        SelectedType selectedType = NETWORK_SELECTED_BY_AUTO;
         if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
             bssid = networkSelectionResult.interScanInfo.bssid;
+        }
+        if (IsCandidateWithUserSelectChoiceHidden(networkSelectionResult)) {
+            WIFI_LOGI("AutoSelectDevice select user choise hidden network");
+            selectedType = NETWORK_SELECTED_BY_USER;
         }
         int networkId = networkSelectionResult.wifiDeviceConfig.networkId;
         std::string &ssid = networkSelectionResult.wifiDeviceConfig.ssid;
@@ -145,7 +150,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
                   SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());
         auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
         message->SetParam1(networkId);
-        message->SetParam2(NETWORK_SELECTED_BY_AUTO);
+        message->SetParam2(selectedType);
         message->AddStringMessageBody(bssid);
         pStaStateMachine->SendMessage(message);
     } else {
@@ -586,6 +591,23 @@ bool StaAutoConnectService::IsAllowAutoJoin()
         }
     }
     return true;
+}
+
+bool StaAutoConnectService::IsCandidateWithUserSelectChoiceHidden(NetworkSelectionResult &candidate)
+{
+    WifiDeviceConfig candidateConfig = candidate.wifiDeviceConfig;
+    struct timespec times = {0, 0};
+    clock_gettime(CLOCK_BOOTTIME, &times);
+    long currentTime = static_cast<int64_t>(times.tv_sec) * MSEC + times.tv_nsec / (MSEC * MSEC);
+    long choiceSetToGet = currentTime - candidateConfig.networkSelectionStatus.connectChoiceTimestamp;
+    WIFI_LOGD("%{public}s.candidateConfig hiddenSSID:%{public}d, networkSelectionStatus.status:%{public}d, "
+        "networkSelectionStatus.connectChoice:%{public}d, networkId:%{public}d, choiceSetToGet:%{public}ld",
+        __FUNCTION__, candidateConfig.hiddenSSID, candidateConfig.networkSelectionStatus.status,
+        candidateConfig.networkSelectionStatus.connectChoice, candidateConfig.networkId, choiceSetToGet);
+    return candidateConfig.hiddenSSID &&
+        candidateConfig.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED &&
+        candidateConfig.networkId == candidateConfig.networkSelectionStatus.connectChoice &&
+        choiceSetToGet > CONNECT_CHOICE_INVALID && choiceSetToGet < CONNECT_CHOICE_TIMEOUT_MS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

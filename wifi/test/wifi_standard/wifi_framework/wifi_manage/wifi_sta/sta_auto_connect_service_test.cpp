@@ -1491,5 +1491,33 @@ HWTEST_F(StaAutoConnectServiceTest, IsAutoConnectFailByP2PEnhanceFilterFail1, Te
 {
     IsAutoConnectFailByP2PEnhanceFilterFail1();
 }
+
+HWTEST_F(StaAutoConnectServiceTest, IsCandidateWithUserSelectChoiceHiddenSucc, TestSize.Level0)
+{
+    NetworkSelectionResult candidate;
+    candidate.wifiDeviceConfig.networkId = 1;
+    candidate.wifiDeviceConfig.hiddenSSID = true;
+    candidate.wifiDeviceConfig.networkSelectionStatus.connectChoice = 1;
+    struct timespec times = {0, 0};
+    clock_gettime(CLOCK_BOOTTIME, &times);
+    long currentTime = static_cast<int64_t>(times.tv_sec) * MSEC + times.tv_nsec / (MSEC * MSEC);
+    candidate.wifiDeviceConfig.networkSelectionStatus.connectChoiceTimestamp = currentTime - MSEC;
+    candidate.wifiDeviceConfig.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED;
+    EXPECT_TRUE(pStaAutoConnectService->IsCandidateWithUserSelectChoiceHidden(candidate));
+}
+
+HWTEST_F(StaAutoConnectServiceTest, IsCandidateWithUserSelectChoiceHiddenFail, TestSize.Level0)
+{
+    NetworkSelectionResult candidate;
+    candidate.wifiDeviceConfig.networkId = 1;
+    candidate.wifiDeviceConfig.hiddenSSID = false;
+    candidate.wifiDeviceConfig.networkSelectionStatus.connectChoice = 1;
+    struct timespec times = {0, 0};
+    clock_gettime(CLOCK_BOOTTIME, &times);
+    long currentTime = static_cast<int64_t>(times.tv_sec) * MSEC + times.tv_nsec / (MSEC * MSEC);
+    candidate.wifiDeviceConfig.networkSelectionStatus.connectChoiceTimestamp = currentTime - MSEC;
+    candidate.wifiDeviceConfig.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED;
+    EXPECT_FALSE(pStaAutoConnectService->IsCandidateWithUserSelectChoiceHidden(candidate));
+}
 } // Wifi
 } // OHOS

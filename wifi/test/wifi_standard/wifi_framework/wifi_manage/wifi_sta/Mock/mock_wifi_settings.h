@@ -23,6 +23,8 @@
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr int MSEC = 1000;
 class MockWifiSettings {
 public:
     virtual ~MockWifiSettings() = default;

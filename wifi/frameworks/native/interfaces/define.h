@@ -118,6 +118,8 @@
 /* Begin apf filter */
 #define MODE_STATE_OPEN (1)
 #define MODE_STATE_CLOSE (2)
+#define MODE_STATE_ENTER_FORCESLEEP (3)
+#define MODE_STATE_EXIT_FORCESLEEP (4)
 /* End apf filter */
 #define WIFI_STATE_DISABLED (0)
 #define WIFI_STATE_ENABLED (1)

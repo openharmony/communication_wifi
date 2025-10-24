@@ -999,7 +999,8 @@ std::string Ipv6Anonymize(std::string str)
     return DataAnonymize(str, ':', '*', 1);
 }
 
-bool CanConvertToInt(const std::string& str) {
+bool CanConvertToInt(const std::string& str)
+{
     if (str.empty()) {
         return false;
     }

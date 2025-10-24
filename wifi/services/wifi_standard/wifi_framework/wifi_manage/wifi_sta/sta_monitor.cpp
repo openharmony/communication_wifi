@@ -422,16 +422,16 @@ void StaMonitor::OnWpaCustomEapNotifyCallBack(const std::string &notifyParam)
         return;
     }
     for (size_t i = 0; i < paramSize - 1; i++) {
-        if (CheckDataLegal(vecEapDatas[i]) == 0) {
+        if (!CanConvertToInt(vecEapDatas[i])) {
             WIFI_LOGE("%{public}s notifyParam %{public}zu is not number", __FUNCTION__, i);
             return;
         }
     }
     WpaEapData wpaEapData;
-    wpaEapData.msgId = static_cast<int32_t>(CheckDataToUint(vecEapDatas[EAP_DATE_ZERO]));
-    wpaEapData.code = static_cast<int32_t>(CheckDataToUint(vecEapDatas[EAP_DATE_ONE]));
-    wpaEapData.type = static_cast<int32_t>(CheckDataToUint(vecEapDatas[EAP_DATE_TWO]));
-    wpaEapData.bufferLen = static_cast<int32_t>(CheckDataToUint(vecEapDatas[EAP_DATE_THREE]));
+    wpaEapData.msgId = CheckDataLegal(vecEapDatas[EAP_DATE_ZERO]);
+    wpaEapData.code = CheckDataLegal(vecEapDatas[EAP_DATE_ONE]);
+    wpaEapData.type = CheckDataLegal(vecEapDatas[EAP_DATE_TWO]);
+    wpaEapData.bufferLen = CheckDataLegal(vecEapDatas[EAP_DATE_THREE]);
     wpaEapData.eapBuffer.reserve(wpaEapData.bufferLen);
 
     DecodeBase64(vecEapDatas[4], wpaEapData.eapBuffer);
@@ -440,8 +440,8 @@ void StaMonitor::OnWpaCustomEapNotifyCallBack(const std::string &notifyParam)
         WIFI_LOGE("%{public}s notifyParam eapData is empty", __FUNCTION__);
         return;
     }
-    WIFI_LOGI("%{public}s buffer size:%{public}zu, first char is:%{public}d", __FUNCTION__,
-        wpaEapData.eapBuffer.size(), wpaEapData.eapBuffer[0]);
+    WIFI_LOGI("%{public}s buffer size:%{public}zu, msgId:%{public}d, first char is:%{public}d", __FUNCTION__,
+        wpaEapData.eapBuffer.size(), wpaEapData.msgId, wpaEapData.eapBuffer[0]);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_EAP_CUSTOM_AUTH_EVENT, wpaEapData);
 #endif
     return;

@@ -369,6 +369,7 @@ uint32_t GenerateStandardErrCode(uint8_t subSystem, uint16_t errCode);
 unsigned long StringToUlong(const std::string &word);
 float StringToFloat(const std::string &word);
 double StringToDouble(const std::string &word);
+bool CanConvertToInt(const std::string& str);
 /**
  * @Description Internal HiLinkNetwork Type To Bool
  *

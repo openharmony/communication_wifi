@@ -114,7 +114,7 @@ struct HotspotStabilityTest {
     };
     wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
       backgroundTaskManager.startBackgroundRunning(context ,
-        backgroundTaskManager.BackgroundMode.WIFI_INTERACTION , wantAgentObj).then(() => {
+        backgroundTaskManager.BackgroundMode.DATA_TRANSFER , wantAgentObj).then(() => {
         console.info(`Succeeded in operationing startBackgroundRunning.`);
       }).catch((err: BusinessError) => {
         console.error(`Failed to operation startBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);

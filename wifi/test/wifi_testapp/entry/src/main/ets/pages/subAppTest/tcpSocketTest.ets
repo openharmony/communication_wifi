@@ -14,8 +14,17 @@
  */
 
 import socket from '@ohos.net.socket';
-import { TitleBar } from '../../Component/titleBar';
+import connection from '@ohos.net.connection';
 import ConfigData from '../../utils/ConfigData';
+import { TestImageDisplay } from '../../Component/testImageDisplay';
+import { PageTitle } from '../../Component/pageTitle';
+import { TestData } from '../../entryability/model/testData'
+import router from '@ohos.router';
+
+interface myParams extends Object {
+  testItem: TestData
+}
+
 
 export interface NetAddress {
   address: string;
@@ -26,6 +35,12 @@ export interface NetAddress {
 export interface TCPConnectOptions {
   address: NetAddress;
   timeout?: number;
+}
+
+// 定义连接参数接口
+interface ConnectParams {
+  address: string;
+  port: string;
 }
 
 const TAG = 'wifiTestApp [tcpSocketTest]';
@@ -42,14 +57,143 @@ struct TcpSocketTest {
   @State responseData: string = '';
   @State isConnected: boolean = false;
   @State connectionStatus: string = '未连接';
+  @State networkStatus: string = '检测中...';
+  @State networkType: string = '未知';
+  @State reconnectCount: number = 0;
   private tcpSocket: socket.TCPSocket | null = null;
+  private shouldReconnect: boolean = false;
+  private lastConnectParams: ConnectParams | null = null;
+  private netConnection: connection.NetConnection | null = null;
+  private testItem: TestData = (router.getParams() as myParams).testItem
 
   aboutToAppear() {
     this.initSocket();
+    this.registerNetworkListener();
+    this.checkCurrentNetwork();
   }
 
   initSocket() {
     this.tcpSocket = socket.constructTCPSocketInstance();
+  }
+
+  // 注册网络监听
+  registerNetworkListener() {
+    try {
+      // 创建 NetConnection 对象
+      this.netConnection = connection.createNetConnection();
+      
+      // 监听网络可用事件
+      this.netConnection.on('netAvailable', (netHandle: connection.NetHandle) => {
+        console.log(TAG, `网络可用: netId=${netHandle.netId}`);
+        this.networkStatus = '网络可用';
+        this.handleNetworkChange();
+      });
+
+      // 监听网络能力变化
+      this.netConnection.on('netCapabilitiesChange', (netCapabilityInfo: connection.NetCapabilityInfo) => {
+        console.log(TAG, `网络能力变化: ${JSON.stringify(netCapabilityInfo)}`);
+        if (netCapabilityInfo.netCap) {
+          this.updateNetworkType(netCapabilityInfo.netCap);
+        }
+        this.handleNetworkChange();
+      });
+
+      // 监听网络丢失
+      this.netConnection.on('netLost', (netHandle: connection.NetHandle) => {
+        console.log(TAG, `网络丢失: netId=${netHandle.netId}`);
+        this.networkStatus = '网络断开';
+        this.responseData += '\n[系统] 网络连接丢失';
+      });
+
+      // 注册监听
+      this.netConnection.register((error: Error) => {
+        if (error) {
+          console.error(TAG, `注册网络监听失败: ${JSON.stringify(error)}`);
+          this.networkStatus = '监听注册失败';
+        } else {
+          console.log(TAG, '网络监听已注册');
+        }
+      });
+    } catch (error) {
+      console.error(TAG, `创建网络监听失败: ${JSON.stringify(error)}`);
+      this.networkStatus = '监听创建失败';
+    }
+  }
+
+  // 检查当前网络状态
+  async checkCurrentNetwork() {
+    try {
+      const netHandle = await connection.getDefaultNet();
+      const netCapabilities = await connection.getNetCapabilities(netHandle);
+      this.updateNetworkType(netCapabilities);
+      this.networkStatus = '网络正常';
+      console.log(TAG, `当前网络类型: ${this.networkType}`);
+    } catch (error) {
+      console.error(TAG, `获取网络状态失败: ${JSON.stringify(error)}`);
+      this.networkStatus = '无网络';
+      this.networkType = '未连接';
+    }
+  }
+
+  // 更新网络类型显示
+  updateNetworkType(netCapabilities: connection.NetCapabilities) {
+    if (netCapabilities.bearerTypes.includes(connection.NetBearType.BEARER_WIFI)) {
+      this.networkType = 'WiFi';
+    } else if (netCapabilities.bearerTypes.includes(connection.NetBearType.BEARER_CELLULAR)) {
+      this.networkType = '蜂窝网络';
+    } else if (netCapabilities.bearerTypes.includes(connection.NetBearType.BEARER_ETHERNET)) {
+      this.networkType = '以太网';
+    } else {
+      this.networkType = '其他';
+    }
+  }
+
+  // 处理网络变化
+  handleNetworkChange() {
+    console.log(TAG, '检测到网络变化');
+    this.responseData += `\n[系统] 检测到网络变化，当前网络: ${this.networkType}`;
+    
+    // 如果当前有连接，需要重连
+    if (this.isConnected && this.lastConnectParams) {
+      this.reconnectCount++;
+      this.responseData += `\n[系统] 准备重连 (第${this.reconnectCount}次)...`;
+      
+      // 先关闭旧连接
+      this.closeSocketForReconnect();
+      
+      // 延迟1秒后重连，等待新网络稳定
+      setTimeout(() => {
+        this.reconnectToServer();
+      }, 1000);
+    }
+  }
+
+  // 关闭Socket用于重连
+  async closeSocketForReconnect() {
+    if (this.tcpSocket) {
+      try {
+        await this.tcpSocket.close();
+        console.log(TAG, '旧Socket已关闭，准备重连');
+      } catch (error) {
+        console.error(TAG, `关闭旧Socket失败: ${JSON.stringify(error)}`);
+      }
+      // 创建新的Socket实例
+      this.tcpSocket = socket.constructTCPSocketInstance();
+      this.isConnected = false;
+    }
+  }
+
+  // 重新连接到服务器
+  async reconnectToServer() {
+    if (this.lastConnectParams) {
+      console.log(TAG, `开始重连到 ${this.lastConnectParams.address}:${this.lastConnectParams.port}`);
+      this.connectionStatus = '重连中...';
+      // 恢复之前的连接参数
+      this.serverAddress = this.lastConnectParams.address;
+      this.serverPort = this.lastConnectParams.port;
+      // 执行连接
+      await this.connectToServer();
+    }
   }
 
   async connectToServer() {
@@ -60,7 +204,16 @@ struct TcpSocketTest {
 
     try {
       this.connectionStatus = '连接中...';
-      this.responseData = '';
+      if (!this.responseData) {
+        this.responseData = '';
+      }
+
+      // 保存连接参数，用于网络变化时重连
+      const params: ConnectParams = {
+        address: this.serverAddress,
+        port: this.serverPort
+      };
+      this.lastConnectParams = params;
 
       // 绑定本地地址（可选）
       const bindAddress: NetAddress = { address: '0.0.0.0', port: 0, family: 1 };
@@ -80,7 +233,7 @@ struct TcpSocketTest {
 
       this.isConnected = true;
       this.connectionStatus = '已连接';
-      this.responseData = `成功连接到 ${this.serverAddress}:${this.serverPort}`;
+      this.responseData += `\n成功连接到 ${this.serverAddress}:${this.serverPort}`;
 
       // 设置消息接收回调
       this.tcpSocket.on('message', (data) => {
@@ -154,8 +307,9 @@ struct TcpSocketTest {
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TitleBar({ detail: "TCP Socket验证" })
+      Stack({ alignContent : Alignment.TopStart }) {
+        TestImageDisplay({ testItem : this.testItem })
+        PageTitle({ testItem : this.testItem })
       }
 
       Column() {
@@ -207,6 +361,34 @@ struct TcpSocketTest {
         }
         .width('100%')
         .margin({ bottom: 10 })
+
+        // 网络状态
+        Row() {
+          Text('网络状态: ')
+            .fontSize(16)
+            .width('30%')
+          Text(`${this.networkStatus} (${this.networkType})`)
+            .fontSize(16)
+            .fontColor(this.networkStatus === '网络正常' || this.networkStatus === '网络可用' ? Color.Green : Color.Orange)
+            .width('70%')
+        }
+        .width('100%')
+        .margin({ bottom: 10 })
+
+        // 重连次数
+        if (this.reconnectCount > 0) {
+          Row() {
+            Text('重连次数: ')
+              .fontSize(16)
+              .width('30%')
+            Text(`${this.reconnectCount}`)
+              .fontSize(16)
+              .fontColor(Color.Blue)
+              .width('70%')
+          }
+          .width('100%')
+          .margin({ bottom: 10 })
+        }
 
         // 操作按钮
         Row() {
@@ -282,9 +464,29 @@ struct TcpSocketTest {
   }
 
   aboutToDisappear() {
+    // 取消网络监听
+    if (this.netConnection) {
+      try {
+        this.netConnection.unregister((error: Error) => {
+          if (error) {
+            console.error(TAG, `取消网络监听失败: ${JSON.stringify(error)}`);
+          } else {
+            console.log(TAG, '网络监听已取消');
+          }
+        });
+      } catch (error) {
+        console.error(TAG, `取消网络监听异常: ${JSON.stringify(error)}`);
+      }
+      this.netConnection = null;
+    }
+
+    // 关闭Socket
     if (this.tcpSocket) {
       this.tcpSocket.close();
       this.tcpSocket = null;
     }
+    
+    // 清空连接参数
+    this.lastConnectParams = null;
   }
 }

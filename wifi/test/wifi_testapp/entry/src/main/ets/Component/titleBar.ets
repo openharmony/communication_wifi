@@ -40,32 +40,6 @@ export struct TitleBar {
   @State offsetY: number = 0
   @State myscale: number = 1
   @State angle: number = 0
-  getScreen = (isFullScreen: boolean) => {
-    let screenshotOptions: screenshot.ScreenshotOptions = {
-      screenRect : { left : 0 , top : 0 , width : 400 , height : 400 } ,
-      imageSize : { width : 400 , height : 400 } ,
-      rotation : 0 ,
-      displayId : 0
-    }
-    if ( isFullScreen ) {
-      screenshotOptions = {
-        rotation : 0
-      }
-    } else {
-      console.log("error -----------")
-    }
-    try {
-      screenshot.save(screenshotOptions , (err , data: image.PixelMap) => {
-        if ( err ) {
-          console.log(TAG , `Failed to save the screenshot. Error:${ JSON.stringify(err) }`)
-        }
-        console.log(TAG , 'save callback')
-        MediaUtils.savePicture(data , getContext(this))
-      })
-    } catch( err ) {
-      console.log(TAG , `save failed, code is ${ err.code }, message is ${ err.message }`)
-    }
-  }
 
   @Builder
   CustomBtn(text: Resource , isFullScreen: boolean) {
@@ -82,7 +56,6 @@ export struct TitleBar {
     .margin({ left : 3 , right : 3 , top : 2 })
     .onClick(() => {
       console.log(TAG , '[Screenshot] onClick,screenshot')
-      this.getScreen(isFullScreen)
     })
   }
 
@@ -156,7 +129,6 @@ export struct TitleBar {
                 })
                 .onActionEnd(() => {
                   console.log(TAG , 'PinchGesture end')
-                  this.getScreen(true);
                 }) ,
               RotationGesture({ fingers : 2 , angle : 2 })
                 .onActionStart(() => {

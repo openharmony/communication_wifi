@@ -518,5 +518,21 @@ HWTEST_F(WifiCommonUtilTest, IsBundleInstalledTest01, TestSize.Level1)
     std::string bundleName = "com.ohos.wifitest01";
     EXPECT_FALSE(IsBundleInstalled(bundleName));
 }
+
+HWTEST_F(WifiCommonUtilTest, CanConvertToInt001, TestSize.Level1)
+{
+    WIFI_LOGI("CanConvertToInt001 enter");
+    std::string str1 = "12";
+    EXPECT_TRUE(CanConvertToInt(str1));
+ 
+    std::string str2 = "-12";
+    EXPECT_TRUE(CanConvertToInt(str2));
+ 
+    std::string str3 = "0";
+    EXPECT_TRUE(CanConvertToInt(str3));
+ 
+    std::string str4 = "ca";
+    EXPECT_FALSE(CanConvertToInt(str4));
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -95,7 +95,6 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     CesEventSubscriber::OnReceiveUserUnlockedEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE, &
     CesEventSubscriber::OnReceiveConnectivityChangedEvent},
-    CesEventSubscriber::OnReceiveUserUnlockedEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_ENTER_FORCE_SLEEP, &
     CesEventSubscriber::OnReceiveForceSleepEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_EXIT_FORCE_SLEEP, &

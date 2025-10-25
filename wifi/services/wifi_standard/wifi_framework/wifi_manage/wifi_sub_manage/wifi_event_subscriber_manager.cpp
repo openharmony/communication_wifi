@@ -95,9 +95,9 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     CesEventSubscriber::OnReceiveUserUnlockedEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_CONNECTIVITY_CHANGE, &
     CesEventSubscriber::OnReceiveConnectivityChangedEvent},
-    {OHOS::EventFwk::CommonEventSupport::MODE_STATE_ENTER_FORCESLEEP, &
+    {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_ENTER_FORCE_SLEEP, &
     CesEventSubscriber::OnReceiveForceSleepEvent},
-    {OHOS::EventFwk::CommonEventSupport::MODE_STATE_EXIT_FORCESLEEP, &
+    {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_EXIT_FORCE_SLEEP, &
     CesEventSubscriber::OnReceiveForceSleepEvent}
 };
 
@@ -825,12 +825,12 @@ void CesEventSubscriber::OnReceiveForceSleepEvent(const OHOS::EventFwk::CommonEv
     if (GetDeviceType() != ProductDeviceType::TV) {
         return;
     }
+#ifdef  FEATURE_HPF_SUPPORT
     std::string action = eventData.GetWant().GetAction();
     WIFI_LOGI("ForceSleepEventSubscriber OnReceiveEvent %{public}s,  %{public}d", action.c_str(), eventData.GetCode());
-    int modeState = (action == OHOS::EventFwk::common_event_support::MODE_STATE_ENTER_FORCESLEEP) ?
+    int modeState = (action == OHOS::EventFwk::common_event_support::COMMON_EVENT_ENTER_FORCE_SLEEP) ?
         MODE_STATE_ENTER_FORCESLEEP : MODE_STATE_EXIT_FORCESLEEP;
 
-#ifdef  FEATURE_HPF_SUPPORT
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
         WifiManager::GetInstance().InstallPacketFilterProgram(modeState, i);
     }

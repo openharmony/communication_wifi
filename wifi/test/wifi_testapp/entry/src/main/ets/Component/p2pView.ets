@@ -14,8 +14,6 @@
  */
 
 import ConfigData from '../utils/ConfigData';
-import { testOnP2pConnectionChange , testGetCurrentGroupCallback } from '../entryability/model/p2pInterface'
-import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
 
 /**
@@ -33,8 +31,6 @@ export struct P2pView {
 
   aboutToAppear() {
     console.log(TAG , `aboutToAppear ${ JSON.stringify(this.p2p) }`)
-    testOnP2pConnectionChange()
-    testGetCurrentGroupCallback();
 
     this.p2pConnectState = AppStorage.get("p2pConnectState") ! //非空断言操作符
     this.p2pLinkedDeviceName = AppStorage.get("p2pLinkedDeviceName") ! //非空断言操作符

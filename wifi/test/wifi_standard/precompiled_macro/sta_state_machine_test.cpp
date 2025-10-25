@@ -546,6 +546,30 @@ HWTEST_F(StaStateMachineTest, TryToSaveIpV6ResultTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
+HWTEST_F(StaStateMachineTest, TryToSaveIpV6ResultAddrListTest, TestSize.Level1)
+{
+    IpInfo ipInfo;
+    IpV6Info ipv6Info;
+    DhcpResult result;
+    // Set up IPv6 addresses in addrList
+    result.addrList.addrNumber = 2;
+    strcpy_s(result.addrList.addr[0], DHCP_MAX_FILE_BYTES, "2001:db8::1");
+    result.addrList.addrType[0] = 1;
+    strcpy_s(result.addrList.addr[1], DHCP_MAX_FILE_BYTES, "2001:db8::2");
+    result.addrList.addrType[1] = 2;
+    // Set other required fields to avoid null checks
+    strcpy_s(result.strOptClientId, DHCP_MAX_FILE_BYTES, "2001:db8::1");
+    strcpy_s(result.strOptRouter1, DHCP_MAX_FILE_BYTES, "2001:db8::1");
+    strcpy_s(result.strOptSubnet, DHCP_MAX_FILE_BYTES, "64");
+    strcpy_s(result.strOptDns1, DHCP_MAX_FILE_BYTES, "2001:db8::53");
+    // Call the function
+    pStaStateMachine->pDhcpResultNotify->TryToSaveIpV6Result(ipInfo, ipv6Info, &result);
+    // Verify IpAddrMap is populated correctly
+    EXPECT_EQ(ipv6Info.IpAddrMap.size(), 2u);
+    EXPECT_EQ(ipv6Info.IpAddrMap["2001:db8::1"], 1);
+    EXPECT_EQ(ipv6Info.IpAddrMap["2001:db8::2"], 2);
+}
+
 HWTEST_F(StaStateMachineTest, SetConnectMethodTest, TestSize.Level1)
 {
     SetConnectMethodTest();

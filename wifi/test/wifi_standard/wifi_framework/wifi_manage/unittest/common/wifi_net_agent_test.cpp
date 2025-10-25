@@ -185,6 +185,32 @@ HWTEST_F(WifiNetAgentTest, SetNetLinkIPInfoTest001, TestSize.Level1)
     EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
+HWTEST_F(WifiNetAgentTest, SetNetLinkIPInfoTest002, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
+    IpInfo wifiIpInfo;
+    IpV6Info wifiIpV6Info;
+    // Set up IpAddrMap with IPv6 addresses of different types
+    wifiIpV6Info.IpAddrMap["2001:db8::1"] = 2;  // Type 2
+    wifiIpV6Info.IpAddrMap["2001:db8::2"] = 1;  // Type 1
+    wifiIpV6Info.IpAddrMap["2001:db8::3"] = 3;  // Type 3
+    wifiIpV6Info.netmask = "64";
+    wifiNetAgent.SetNetLinkIPInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+    // Verify IPv6 addresses are added and sorted by type (ascending order)
+    std::vector<std::string> ipv6Addresses;
+    for (const auto& addr : netLinkInfo->netAddrList_) {
+        if (addr.type_ == NetManagerStandard::INetAddr::IPV6) {
+            ipv6Addresses.push_back(addr.address_);
+        }
+    }
+    // Expected order: type 1, 2, 3 -> "2001:db8::2", "2001:db8::1", "2001:db8::3"
+    EXPECT_EQ(ipv6Addresses.size(), 3u);
+    EXPECT_EQ(ipv6Addresses[0], "2001:db8::2");
+    EXPECT_EQ(ipv6Addresses[1], "2001:db8::1");
+    EXPECT_EQ(ipv6Addresses[2], "2001:db8::3");
+}
+
 HWTEST_F(WifiNetAgentTest, SetNetLinkDnsInfoTest001, TestSize.Level1)
 {
     WifiNetAgent wifiNetAgent;

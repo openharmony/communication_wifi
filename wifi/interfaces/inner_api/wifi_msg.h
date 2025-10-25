@@ -952,7 +952,7 @@ struct IpV6Info {
     std::string uniqueLocalAddress1;
     std::string uniqueLocalAddress2;
     std::vector<std::string> dnsAddr;
-    
+    std::map<std::string, int> IpAddrMap;
     IpV6Info()
     {
         linkIpV6Address = "";
@@ -965,6 +965,7 @@ struct IpV6Info {
         uniqueLocalAddress1 = "";
         uniqueLocalAddress2 = "";
         dnsAddr.clear();
+        IpAddrMap.clear();
     }
 };
 

@@ -138,7 +138,7 @@ int WifiCertUtils::UninstallCert(std::string& uri)
         return -1;
     }
 
-    uint32_t store = 0;
+    uint32_t store = CM_PRI_CREDENTIAL_STORE;
     struct CmBlob keyUri;
     char keyUriBuf[MAX_ALIAS_LEN] = { 0 };
 
@@ -146,6 +146,11 @@ int WifiCertUtils::UninstallCert(std::string& uri)
         LOGE("memcpy_s uri.c_str() error.");
         return -1;
     }
+
+    if (strncmp(keyUriBuf, "oh:t=sk", strlen("oh:t=sk")) == 0) {
+        store = CM_SYS_CREDENTIAL_STORE;
+    }
+
     keyUri.size = strlen(keyUriBuf) + 1;
     keyUri.data = reinterpret_cast<uint8_t*>(keyUriBuf);
     return CmUninstallAppCert(&keyUri, store);

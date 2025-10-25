@@ -14,9 +14,17 @@
  */
 
 import http from '@ohos.net.http';
-import { TitleBar } from '../../Component/titleBar';
+import connection from '@ohos.net.connection';
+import { TestImageDisplay } from '../../Component/testImageDisplay';
+import { PageTitle } from '../../Component/pageTitle';
+import { TestData } from '../../entryability/model/testData'
+import router from '@ohos.router';
 import ConfigData from '../../utils/ConfigData';
 import { BusinessError } from '@ohos.base';
+
+interface myParams extends Object {
+  testItem: TestData
+}
 
 const TAG = 'wifiTestApp [httpsSocketTest]';
 
@@ -26,6 +34,7 @@ const TAG = 'wifiTestApp [httpsSocketTest]';
 @Entry
 @Component
 struct HttpsSocketTest {
+  private testItem: TestData = (router.getParams() as myParams).testItem
   @State selectIndex: number = 0;
   @State selectValue: string = 'GET';
   @State typeList: Array<SelectOption> = [
@@ -49,14 +58,149 @@ struct HttpsSocketTest {
   @State codeValue: string = '';
   @State isLoading: boolean = false;
   @State sslVerify: boolean = true;
+  @State networkStatus: string = '检测中...';
+  @State networkType: string = '未知';
+  @State networkSwitchCount: number = 0;
+  private netConnection: connection.NetConnection | null = null;
+
+  aboutToAppear() {
+    this.registerNetworkListener();
+    this.checkCurrentNetwork();
+  }
+
+  // 注册网络监听
+  registerNetworkListener() {
+    try {
+      this.netConnection = connection.createNetConnection();
+      
+      // 监听网络切换
+      this.netConnection.on('netAvailable', (netHandle: connection.NetHandle) => {
+        console.log(TAG, `网络切换: netId=${netHandle.netId}`);
+        this.networkStatus = '网络已切换';
+        this.networkSwitchCount++;
+        this.resData += `\n\n⚠️ [系统] 检测到网络切换 (第${this.networkSwitchCount}次)`;
+        this.resData += '\n⚠️ [警告] HTTP模块无Close接口，旧连接可能未关闭';
+        this.resData += '\n💡 [建议] 推荐使用 RCP HTTP验证 页面进行测试';
+      });
+
+      this.netConnection.on('netCapabilitiesChange', (netCapabilityInfo: connection.NetCapabilityInfo) => {
+        if (netCapabilityInfo.netCap) {
+          this.updateNetworkType(netCapabilityInfo.netCap);
+        }
+      });
+
+      this.netConnection.on('netLost', (netHandle: connection.NetHandle) => {
+        console.log(TAG, `网络丢失: netId=${netHandle.netId}`);
+        this.networkStatus = '网络断开';
+        this.resData += '\n[系统] 网络连接丢失';
+      });
+
+      this.netConnection.register((error: Error) => {
+        if (error) {
+          console.error(TAG, `注册网络监听失败: ${JSON.stringify(error)}`);
+          this.networkStatus = '监听注册失败';
+        } else {
+          console.log(TAG, '网络监听已注册');
+        }
+      });
+    } catch (error) {
+      console.error(TAG, `创建网络监听失败: ${JSON.stringify(error)}`);
+      this.networkStatus = '监听创建失败';
+    }
+  }
+
+  async checkCurrentNetwork() {
+    try {
+      const netHandle = await connection.getDefaultNet();
+      const netCapabilities = await connection.getNetCapabilities(netHandle);
+      this.updateNetworkType(netCapabilities);
+      this.networkStatus = '网络正常';
+      console.log(TAG, `当前网络类型: ${this.networkType}`);
+    } catch (error) {
+      console.error(TAG, `获取网络状态失败: ${JSON.stringify(error)}`);
+      this.networkStatus = '无网络';
+      this.networkType = '未连接';
+    }
+  }
+
+  updateNetworkType(netCapabilities: connection.NetCapabilities) {
+    if (netCapabilities.bearerTypes.includes(connection.NetBearType.BEARER_WIFI)) {
+      this.networkType = 'WiFi';
+    } else if (netCapabilities.bearerTypes.includes(connection.NetBearType.BEARER_CELLULAR)) {
+      this.networkType = '蜂窝网络';
+    } else if (netCapabilities.bearerTypes.includes(connection.NetBearType.BEARER_ETHERNET)) {
+      this.networkType = '以太网';
+    } else {
+      this.networkType = '其他';
+    }
+  }
+
+  aboutToDisappear() {
+    // 取消网络监听
+    if (this.netConnection) {
+      try {
+        this.netConnection.unregister((error: Error) => {
+          if (error) {
+            console.error(TAG, `取消网络监听失败: ${JSON.stringify(error)}`);
+          } else {
+            console.log(TAG, '网络监听已取消');
+          }
+        });
+      } catch (error) {
+        console.error(TAG, `取消网络监听异常: ${JSON.stringify(error)}`);
+      }
+      this.netConnection = null;
+    }
+  }
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TitleBar({ detail: "HTTPS验证" })
+      Stack({ alignContent : Alignment.TopStart }) {
+        TestImageDisplay({ testItem : this.testItem })
+        PageTitle({ testItem : this.testItem })
       }
-
       Column() {
+        // 警告提示
+        Row() {
+          Text('⚠️ ')
+            .fontSize(14)
+            .fontColor(Color.Orange)
+          Text('HTTP模块不支持网络切换时的自动重连，推荐使用 RCP HTTP验证')
+            .fontSize(12)
+            .fontColor(Color.Orange)
+        }
+        .width('100%')
+        .padding(8)
+        .backgroundColor('#FFF3E0')
+        .borderRadius(5)
+        .margin({ top: 5, bottom: 5 })
+
+        // 网络状态显示
+        Row() {
+          Text('网络状态: ')
+            .fontSize(14)
+            .fontColor(Color.Gray)
+          Text(`${this.networkStatus} (${this.networkType})`)
+            .fontSize(14)
+            .fontColor(this.networkStatus === '网络正常' ? Color.Green : Color.Orange)
+        }
+        .width('100%')
+        .margin({ bottom: 5 })
+
+        // 网络切换次数
+        if (this.networkSwitchCount > 0) {
+          Row() {
+            Text('网络切换次数: ')
+              .fontSize(14)
+              .fontColor(Color.Gray)
+            Text(`${this.networkSwitchCount}`)
+              .fontSize(14)
+              .fontColor(Color.Red)
+          }
+          .width('100%')
+          .margin({ bottom: 10 })
+        }
+
         // HTTPS请求配置区域
         Text('HTTPS请求配置')
           .fontSize(18)
@@ -161,7 +305,7 @@ struct HttpsSocketTest {
               this.sendHttpsRequest();
             })
 
-          Button('清空响应')
+          Button('清空响应数据')
             .width('45%')
             .backgroundColor(Color.Orange)
             .onClick(() => {

@@ -18,7 +18,7 @@ import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { ContentTable } from '../../Component/contentTable';
 import router from '@ohos.router';
 import ConfigData from '../../utils/ConfigData';
-import { initP2pApiData } from '../../entryability/model/testDataModels'
+import { initP2pManagerApIData } from '../../entryability/model/testDataModels'
 import { TestData } from '../../entryability/model/testData'
 
 interface myParams extends Object {
@@ -302,7 +302,7 @@ struct P2pManagerInterfaceTest {
         .width(ConfigData.WH_95_100)
         .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
 
-        ContentTable({ testItem : this.testItem , apiItems : initP2pApiData() })
+        ContentTable({ testItem : this.testItem , apiItems : initP2pManagerApIData() })
       }
     }
     .alignItems(HorizontalAlign.Center)

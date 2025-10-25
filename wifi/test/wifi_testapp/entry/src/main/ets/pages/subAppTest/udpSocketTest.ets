@@ -14,13 +14,26 @@
  */
 
 import socket from '@ohos.net.socket';
-import { TitleBar } from '../../Component/titleBar';
+import connection from '@ohos.net.connection';
+import { TestImageDisplay } from '../../Component/testImageDisplay';
+import { PageTitle } from '../../Component/pageTitle';
+import { TestData } from '../../entryability/model/testData'
 import ConfigData from '../../utils/ConfigData';
+import router from '@ohos.router';
+
+interface myParams extends Object {
+  testItem: TestData
+}
 
 export interface NetAddress {
   address: string;
   family?: number; 
   port?: number; 
+}
+
+// 定义绑定参数接口
+interface BindParams {
+  localPort: string;
 }
 
 const TAG = 'wifiTestApp [udpSocketTest]';
@@ -31,6 +44,7 @@ const TAG = 'wifiTestApp [udpSocketTest]';
 @Entry
 @Component
 struct UdpSocketTest {
+  private testItem: TestData = (router.getParams() as myParams).testItem
   @State serverAddress: string = '192.168.1.100';
   @State serverPort: string = '8081';
   @State localPort: string = '9090';
@@ -38,14 +52,140 @@ struct UdpSocketTest {
   @State responseData: string = '';
   @State isSocketBound: boolean = false;
   @State socketStatus: string = '未绑定';
+  @State networkStatus: string = '检测中...';
+  @State networkType: string = '未知';
+  @State reconnectCount: number = 0;
   private udpSocket: socket.UDPSocket | null = null;
+  private lastBindParams: BindParams | null = null;
+  private netConnection: connection.NetConnection | null = null;
 
   aboutToAppear() {
     this.initSocket();
+    this.registerNetworkListener();
+    this.checkCurrentNetwork();
   }
 
   initSocket() {
     this.udpSocket = socket.constructUDPSocketInstance();
+  }
+
+  // 注册网络监听
+  registerNetworkListener() {
+    try {
+      // 创建 NetConnection 对象
+      this.netConnection = connection.createNetConnection();
+      
+      // 监听网络可用事件
+      this.netConnection.on('netAvailable', (netHandle: connection.NetHandle) => {
+        console.log(TAG, `网络可用: netId=${netHandle.netId}`);
+        this.networkStatus = '网络可用';
+        this.handleNetworkChange();
+      });
+
+      // 监听网络能力变化
+      this.netConnection.on('netCapabilitiesChange', (netCapabilityInfo: connection.NetCapabilityInfo) => {
+        console.log(TAG, `网络能力变化: ${JSON.stringify(netCapabilityInfo)}`);
+        if (netCapabilityInfo.netCap) {
+          this.updateNetworkType(netCapabilityInfo.netCap);
+        }
+        this.handleNetworkChange();
+      });
+
+      // 监听网络丢失
+      this.netConnection.on('netLost', (netHandle: connection.NetHandle) => {
+        console.log(TAG, `网络丢失: netId=${netHandle.netId}`);
+        this.networkStatus = '网络断开';
+        this.responseData += '\n[系统] 网络连接丢失';
+      });
+
+      // 注册监听
+      this.netConnection.register((error: Error) => {
+        if (error) {
+          console.error(TAG, `注册网络监听失败: ${JSON.stringify(error)}`);
+          this.networkStatus = '监听注册失败';
+        } else {
+          console.log(TAG, '网络监听已注册');
+        }
+      });
+    } catch (error) {
+      console.error(TAG, `创建网络监听失败: ${JSON.stringify(error)}`);
+      this.networkStatus = '监听创建失败';
+    }
+  }
+
+  // 检查当前网络状态
+  async checkCurrentNetwork() {
+    try {
+      const netHandle = await connection.getDefaultNet();
+      const netCapabilities = await connection.getNetCapabilities(netHandle);
+      this.updateNetworkType(netCapabilities);
+      this.networkStatus = '网络正常';
+      console.log(TAG, `当前网络类型: ${this.networkType}`);
+    } catch (error) {
+      console.error(TAG, `获取网络状态失败: ${JSON.stringify(error)}`);
+      this.networkStatus = '无网络';
+      this.networkType = '未连接';
+    }
+  }
+
+  // 更新网络类型显示
+  updateNetworkType(netCapabilities: connection.NetCapabilities) {
+    if (netCapabilities.bearerTypes.includes(connection.NetBearType.BEARER_WIFI)) {
+      this.networkType = 'WiFi';
+    } else if (netCapabilities.bearerTypes.includes(connection.NetBearType.BEARER_CELLULAR)) {
+      this.networkType = '蜂窝网络';
+    } else if (netCapabilities.bearerTypes.includes(connection.NetBearType.BEARER_ETHERNET)) {
+      this.networkType = '以太网';
+    } else {
+      this.networkType = '其他';
+    }
+  }
+
+  // 处理网络变化
+  handleNetworkChange() {
+    console.log(TAG, '检测到网络变化');
+    this.responseData += `\n[系统] 检测到网络变化，当前网络: ${this.networkType}`;
+    
+    // 如果当前Socket已绑定，需要重新绑定
+    if (this.isSocketBound && this.lastBindParams) {
+      this.reconnectCount++;
+      this.responseData += `\n[系统] 准备重新绑定 (第${this.reconnectCount}次)...`;
+      
+      // 先关闭旧Socket
+      this.closeSocketForRebind();
+      
+      // 延迟1秒后重新绑定，等待新网络稳定
+      setTimeout(() => {
+        this.rebindSocket();
+      }, 1000);
+    }
+  }
+
+  // 关闭Socket用于重新绑定
+  async closeSocketForRebind() {
+    if (this.udpSocket) {
+      try {
+        await this.udpSocket.close();
+        console.log(TAG, '旧Socket已关闭，准备重新绑定');
+      } catch (error) {
+        console.error(TAG, `关闭旧Socket失败: ${JSON.stringify(error)}`);
+      }
+      // 创建新的Socket实例
+      this.udpSocket = socket.constructUDPSocketInstance();
+      this.isSocketBound = false;
+    }
+  }
+
+  // 重新绑定Socket
+  async rebindSocket() {
+    if (this.lastBindParams) {
+      console.log(TAG, `开始重新绑定到本地端口 ${this.lastBindParams.localPort}`);
+      this.socketStatus = '重新绑定中...';
+      // 恢复之前的绑定参数
+      this.localPort = this.lastBindParams.localPort;
+      // 执行绑定
+      await this.bindSocket();
+    }
   }
 
   async bindSocket() {
@@ -56,7 +196,15 @@ struct UdpSocketTest {
 
     try {
       this.socketStatus = '绑定中...';
-      this.responseData = '';
+      if (!this.responseData) {
+        this.responseData = '';
+      }
+
+      // 保存绑定参数，用于网络变化时重新绑定
+      const params: BindParams = {
+        localPort: this.localPort
+      };
+      this.lastBindParams = params;
 
       // 绑定本地端口
       const bindAddress: NetAddress = { 
@@ -68,7 +216,7 @@ struct UdpSocketTest {
 
       this.isSocketBound = true;
       this.socketStatus = '已绑定';
-      this.responseData = `成功绑定到本地端口 ${this.localPort}`;
+      this.responseData += `\n成功绑定到本地端口 ${this.localPort}`;
 
       // 设置消息接收回调
       this.udpSocket.on('message', (data) => {
@@ -154,8 +302,9 @@ struct UdpSocketTest {
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TitleBar({ detail: "UDP Socket验证" })
+      Stack({ alignContent : Alignment.TopStart }) {
+        TestImageDisplay({ testItem : this.testItem })
+        PageTitle({ testItem : this.testItem })
       }
 
       Column() {
@@ -222,6 +371,34 @@ struct UdpSocketTest {
         }
         .width('100%')
         .margin({ bottom: 10 })
+
+        // 网络状态
+        Row() {
+          Text('网络状态: ')
+            .fontSize(16)
+            .width('30%')
+          Text(`${this.networkStatus} (${this.networkType})`)
+            .fontSize(16)
+            .fontColor(this.networkStatus === '网络正常' || this.networkStatus === '网络可用' ? Color.Green : Color.Orange)
+            .width('70%')
+        }
+        .width('100%')
+        .margin({ bottom: 10 })
+
+        // 重连次数
+        if (this.reconnectCount > 0) {
+          Row() {
+            Text('重连次数: ')
+              .fontSize(16)
+              .width('30%')
+            Text(`${this.reconnectCount}`)
+              .fontSize(16)
+              .fontColor(Color.Blue)
+              .width('70%')
+          }
+          .width('100%')
+          .margin({ bottom: 10 })
+        }
 
         // 操作按钮
         Row() {
@@ -297,9 +474,29 @@ struct UdpSocketTest {
   }
 
   aboutToDisappear() {
+    // 取消网络监听
+    if (this.netConnection) {
+      try {
+        this.netConnection.unregister((error: Error) => {
+          if (error) {
+            console.error(TAG, `取消网络监听失败: ${JSON.stringify(error)}`);
+          } else {
+            console.log(TAG, '网络监听已取消');
+          }
+        });
+      } catch (error) {
+        console.error(TAG, `取消网络监听异常: ${JSON.stringify(error)}`);
+      }
+      this.netConnection = null;
+    }
+
+    // 关闭Socket
     if (this.udpSocket) {
       this.udpSocket.close();
       this.udpSocket = null;
     }
+    
+    // 清空绑定参数
+    this.lastBindParams = null;
   }
 }

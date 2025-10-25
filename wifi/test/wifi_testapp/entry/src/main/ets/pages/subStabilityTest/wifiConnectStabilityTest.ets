@@ -120,7 +120,7 @@ struct WiFiConnectStabilityTest {
     };
     wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
       backgroundTaskManager.startBackgroundRunning(context ,
-        backgroundTaskManager.BackgroundMode.WIFI_INTERACTION , wantAgentObj).then(() => {
+        backgroundTaskManager.BackgroundMode.DATA_TRANSFER , wantAgentObj).then(() => {
         console.info(`Succeeded in operationing startBackgroundRunning.`);
       }).catch((err: BusinessError) => {
         console.error(`Failed to operation startBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
@@ -293,8 +293,6 @@ struct WiFiConnectStabilityTest {
       } else if ( number == 0 ) {
         this.disconnect_EndTime = new Date().getTime()
         console.log(TAG , "WIFI断连结束时间: " + this.disconnect_EndTime + "ms")
-        let removeMessage = wifiManager.removeAllNetwork()
-        console.log(TAG , "移除网络配置接口的调用结果: " + removeMessage)
       }
       console.log(TAG , " on.wifiConnectionChange callback success --------")
       promptAction.showToast({ message : "wifi连接状态: " + wifiConnectionMessage })
@@ -335,7 +333,6 @@ struct WiFiConnectStabilityTest {
         }
         await sleep(3)
 
-        wifiManager.connectToDevice(this.wifiConfig)
         // 打时间戳
         this.connect_StartTime = new Date().getTime()
         console.log(TAG , "第" + (this.connectNumber + 1) + "次WIFI连接-----")

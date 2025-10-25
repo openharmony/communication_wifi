@@ -62,8 +62,6 @@ export class WifiModel {
     promptAction.showToast({ message : 'connecting' })
     console.log(TAG , `connectNetwork bssid=${ connectInfo.bssid }`)
     try {
-      wifiManager.connectToDevice(connectInfo)
-      console.log(TAG , `connectToDevice success`)
     } catch( error ) {
       console.log(TAG , `connectToDevice fail. message: ${ error.message }, code: ${ error.code }`)
     }

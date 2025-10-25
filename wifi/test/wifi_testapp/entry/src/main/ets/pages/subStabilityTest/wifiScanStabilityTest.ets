@@ -111,7 +111,7 @@ struct WiFiScanStabilityTest {
     };
     wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
       backgroundTaskManager.startBackgroundRunning(context ,
-        backgroundTaskManager.BackgroundMode.WIFI_INTERACTION , wantAgentObj).then(() => {
+        backgroundTaskManager.BackgroundMode.DATA_TRANSFER , wantAgentObj).then(() => {
         console.info(`Succeeded in operationing startBackgroundRunning.`);
       }).catch((err: BusinessError) => {
         console.error(`Failed to operation startBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
@@ -286,9 +286,7 @@ struct WiFiScanStabilityTest {
     this.openScanSuccessNumber = 0
     this.openScanFailNumber = 0
     this.scanStateMessageLog = ""
-    wifiManager.setScanAlwaysAllowed(false)
     let funcMessage = false
-    funcMessage = wifiManager.getScanAlwaysAllowed()
     console.log(TAG , "getScanAlwaysAllowed:" + funcMessage)
     for ( this.openScanNumber ; this.openScanNumber < this.testNumbers ; this.openScanNumber ++ ) {
       if ( !this.scanLoopState ) {
@@ -304,7 +302,7 @@ struct WiFiScanStabilityTest {
         }
         this.onWifiScanState()
         await sleep(5)
-        wifiManager.startScan()
+        wifiManager.scan()
         this.scan_StartTime = new Date().getTime()
         console.log(TAG , "第" + (this.openScanNumber + 1) + "次WIFI扫描-----")
         console.log(TAG , "第" + (this.openScanNumber + 1) + "次WIFI扫描开始时间: " + this.scan_StartTime + "ms")

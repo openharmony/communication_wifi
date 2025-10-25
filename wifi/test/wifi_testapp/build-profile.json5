@@ -14,32 +14,13 @@
  */
 {
   "app": {
-    "signingConfigs": [
-      {
-        "name": "default",
-        "material": {
-          "certpath": "C:/Users/kaihong/.ohos/config/openharmony/default_wifi_testapp_35IRd5YaFkrlzOFUavRjmwR7larQz-n2TJJjk4LQeR0=.cer",
-          "storePassword": "0000001B70B57E15EE2E2844FE5648CF0327F7BDEF27B3CB3D917EA2A957C593DF5ED4666B3D2034B1B51E",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001B1D0E91154195FE69B669AFF74A84971A2DE4F36F1DEA1D16DA4F48ED5805391697144E299497F0",
-          "profile": "C:/Users/kaihong/.ohos/config/openharmony/default_wifi_testapp_35IRd5YaFkrlzOFUavRjmwR7larQz-n2TJJjk4LQeR0=.p7b",
-          "signAlg": "SHA256withECDSA",
-          "storeFile": "C:/Users/kaihong/.ohos/config/openharmony/default_wifi_testapp_35IRd5YaFkrlzOFUavRjmwR7larQz-n2TJJjk4LQeR0=.p12"
-        }
-      }
-    ],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "compileSdkVersion": 20,
-        //指定OpenHarmony应用/服务编译时的版本
-        "compatibleSdkVersion": 20,
-        //指定OpenHarmony应用/服务兼容的最低版本。
-        "targetSdkVersion": 20,
-        //指定OpenHarmony应用/服务目标版本。若没有设置，默认为compatibleSdkVersion
-        "runtimeOS": "OpenHarmony"
-        //指定为OpenHarmony
+        "compatibleSdkVersion": "6.0.0(20)",
+        "runtimeOS": "HarmonyOS",
+        "targetSdkVersion": "6.0.0(20)"
       }
     ],
   },

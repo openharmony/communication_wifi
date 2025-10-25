@@ -771,7 +771,7 @@ std::string EncodeBase64(const std::vector<uint8_t> &input)
         std::vector<char> outputBuffer {};
         WIFI_LOGI("%{public}s: length is %{public}zu", __func__, bptr->length);
         outputBuffer.insert(outputBuffer.end(), bptr->data, bptr->data + bptr->length);
-        outputBuffer[bptr->length] = 0;
+        outputBuffer.push_back(0);
         output = static_cast<char*>(&outputBuffer[0]);
     }
     BIO_free_all(bio);
@@ -997,6 +997,29 @@ std::string Ipv4IntAnonymize(uint32_t ipInt)
 std::string Ipv6Anonymize(std::string str)
 {
     return DataAnonymize(str, ':', '*', 1);
+}
+
+bool CanConvertToInt(const std::string& str)
+{
+    if (str.empty()) {
+        return false;
+    }
+    size_t start = 0;
+    // 处理正负号
+    if (str[0] == '-') {
+        start = 1;
+        // 如果只有符号没有数字，返回false
+        if (start >= str.length()) {
+            return false;
+        }
+    }
+    // 检查每个字符是否为数字
+    for (size_t i = start; i < str.length(); i++) {
+        if (!std::isdigit(static_cast<unsigned char>(str[i]))) {
+            return false;
+        }
+    }
+    return true;
 }
 }  // namespace Wifi
 }  // namespace OHOS

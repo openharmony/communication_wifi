@@ -903,6 +903,8 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
             pStaStateMachine->linkedInfo);
         pStaStateMachine->InitWifiLinkedInfo();
+        // Avoid overwriting the state in the connecting,
+        // because the state in the connecting needs to restrict connections initiated by automatic network selection.
         pStaStateMachine->SaveLinkstate(currentState, currentDetailState);
         WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     }
@@ -2374,10 +2376,6 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #endif
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
         HandleNetCheckResultIsPortal(netState, updatePortalAuthTime);
-        if (!mIsWifiInternetCHRFlag) {
-            WriteWifiAccessIntFailedHiSysEvent(1, NetworkFailReason::DNS_STATE_UNREACHABLE, 1, "");
-            mIsWifiInternetCHRFlag = true;
-        }
     } else {
         WriteIsInternetHiSysEvent(NO_NETWORK);
 #ifndef OHOS_ARCH_LITE
@@ -2437,6 +2435,10 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
+        if (!mIsWifiInternetCHRFlag) {
+            WriteWifiAccessIntFailedHiSysEvent(1, NetworkFailReason::DNS_STATE_UNREACHABLE, 1, "");
+            mIsWifiInternetCHRFlag = true;
+        }
     } else {
         if (GetDeviceType() == ProductDeviceType::TV) {
             PublishPortalNitificationAndLogin();

@@ -65,6 +65,7 @@ public:
     void OnReceiveNotificationEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveUserUnlockedEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveConnectivityChangedEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveForceSleepEvent(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     bool lastSleepState = false;
 };

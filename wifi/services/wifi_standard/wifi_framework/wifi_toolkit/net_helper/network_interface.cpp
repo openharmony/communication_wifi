@@ -29,11 +29,25 @@
 
 #include "securec.h"
 #include "wifi_logger.h"
+#include "wifi_common_util.h"
 
 DEFINE_WIFILOG_LABEL("WifiNetworkInterface");
 
 namespace OHOS {
 namespace Wifi {
+
+constexpr const char *TCP_RMEM_PROC_FILE = "/proc/sys/net/ipv4/tcp_rmem";
+constexpr const char *TCP_WMEM_PROC_FILE = "/proc/sys/net/ipv4/tcp_wmem";
+constexpr const char *MEMINFO_FILE = "/proc/meminfo";
+constexpr const char *TCP_RMEM_LOW = "524288 2097152 8388608";
+constexpr const char *TCP_RMEM_HIGH = "524288 2097152 16777216";
+constexpr const char *TCP_WMEM_LOW = "262144 524288 2097152";
+constexpr const char *TCP_WMEM_HIGH = "262144 524288 4194304";
+constexpr const char *MEM_TOTAL_LABEL = "MemTotal";
+constexpr int32_t M_LINE_MAX_SIZE = 1024;
+constexpr int32_t EIGHT_GB_MEMORY_SIZE = 8388608;
+constexpr int32_t TEN = 10;
+
 bool NetworkInterface::IsValidInterfaceName(const std::string &interfaceName)
 {
     size_t len = interfaceName.length();
@@ -384,6 +398,53 @@ bool NetworkInterface::WriteDataToFile(const std::string &fileName, const std::s
         return false;
     }
     close(fd);
+    return true;
+}
+
+bool NetworkInterface::UpdateTcpMem()
+{
+    if (!IsValidPath(MEMINFO_FILE)) {
+        WIFI_LOGE("invalid path:%{public}s", MEMINFO_FILE);
+        return false;
+    }
+    FILE *file = fopen(MEMINFO_FILE, "r");
+    if (file == nullptr) {
+        return false;
+    }
+    int memTotal = 0;
+    char buf[M_LINE_MAX_SIZE] = {0};
+    while (fgets(buf, M_LINE_MAX_SIZE, file) != nullptr) {
+        // Get mem title.
+        std::string line(buf);
+        auto title_end_pos = line.find(":");
+        auto title = line.substr(0, title_end_pos);
+        // Get mem size.
+        if (title == MEM_TOTAL_LABEL) {
+            auto mem_size_end_pos = line.find_last_of(" ");
+            auto mem_size_begin_pos = line.find_last_of(" ", mem_size_end_pos - 1);
+            if ((mem_size_end_pos != std::string::npos) && (mem_size_begin_pos != std::string::npos)) {
+                auto mem_size_string = line.substr(mem_size_begin_pos + 1, mem_size_end_pos - mem_size_begin_pos - 1);
+                memTotal = CheckDataLegal(mem_size_string, TEN);
+            }
+            break;
+        }
+    }
+    (void)fclose(file);
+    if (memTotal > EIGHT_GB_MEMORY_SIZE) {
+        if (!WriteFile(TCP_RMEM_PROC_FILE, TCP_RMEM_HIGH) ||
+            !WriteFile(TCP_WMEM_PROC_FILE, TCP_WMEM_HIGH)) {
+            WIFI_LOGE("write tcp_rmem failed");
+            return false;
+        }
+    } else {
+        // memory less than 8GB or unknown
+        if (!WriteFile(TCP_RMEM_PROC_FILE, TCP_RMEM_LOW) ||
+            !WriteFile(TCP_WMEM_PROC_FILE, TCP_WMEM_LOW)) {
+            WIFI_LOGE("write tcp_rmem failed");
+            return false;
+        }
+    }
+    WIFI_LOGD("Write tcp_rmem and tcp_wmem succeed!");
     return true;
 }
 }  // namespace Wifi

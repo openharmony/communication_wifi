@@ -161,6 +161,11 @@ bool IpAddressChange(const std::string &interface, const BaseAddress &ipAddress,
  * @return true: success     false: fail
  */
 bool WriteDataToFile(const std::string &fileName, const std::string &content);
+/**
+ * @Description  Write tcp_rmem & tcp_wmem
+ * @return true: success     false: fail
+ */
+bool UpdateTcpMem();
 }; /* namespace NetworkInterface */
 }  // namespace Wifi
 }  // namespace OHOS

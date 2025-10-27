@@ -133,8 +133,10 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     }
     BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     NetworkSelectionResult networkSelectionResult;
-    
-    if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos)) {
+    std::string failReason = "";
+
+    if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT,
+        scanInfos, failReason)) {
         std::string bssid = "";
         SelectedType selectedType = NETWORK_SELECTED_BY_AUTO;
         if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
@@ -164,8 +166,13 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
                 break;
             }
         }
-        if (hasSavedConfigSeen && !IsAutoConnectFailByP2PEnhanceFilter(scanInfos)) {
-            WriteAutoConnectFailEvent("AUTO_SELECT_FAIL");
+        if (hasSavedConfigSeen) {
+            bool isFilteredByP2P = IsAutoConnectFailByP2PEnhanceFilter(scanInfos);
+            if (!failReason.empty()) {
+                WriteAutoConnectFailEvent("AUTO_SELECT_FAIL", failReason);
+            } else if (!isFilteredByP2P) {
+                WriteAutoConnectFailEvent("AUTO_SELECT_FAIL");
+            }
         }
     }
     for (const auto &callBackItem : mStaCallbacks) {

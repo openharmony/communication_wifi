@@ -53,7 +53,8 @@ void NetworkSelectionManager::SelectNetworkWithSsid(WifiDeviceConfig& deviceConf
     }
     WIFI_LOGI("select scanInfo size: %{public}zu", interScanInfoList.size());
     NetworkSelectionResult networkSelectionResult;
-    SelectNetwork(networkSelectionResult, NetworkSelectType::USER_CONNECT, interScanInfoList);
+    std::string failReason;
+    SelectNetwork(networkSelectionResult, NetworkSelectType::USER_CONNECT, interScanInfoList, failReason);
     autoSelectBssid = networkSelectionResult.interScanInfo.bssid;
 }
 
@@ -79,7 +80,8 @@ void NetworkSelectionManager::ConvertScanInfo(WifiScanInfo &wifiScanInfo, InterS
 
 bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelectionResult,
                                             NetworkSelectType type,
-                                            const std::vector<InterScanInfo> &scanInfos)
+                                            const std::vector<InterScanInfo> &scanInfos,
+                                            std::string &failReason)
 {
     if (scanInfos.empty()) {
         WIFI_LOGI("scanInfos is empty, ignore this selection");
@@ -128,6 +130,7 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     if (IsOutdoorFilter(bestNetworkCandidates.at(0))) {
         WIFI_LOGI("bestNetworkCandidates do not satisfy outdoor select condition");
         iodStatisticInfo.outdoorFilterCnt++;
+        failReason = "IOD_FILTER";
         WriteIodHiSysEvent(iodStatisticInfo);
         return false;
     }

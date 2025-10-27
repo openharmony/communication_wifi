@@ -370,6 +370,8 @@ unsigned long StringToUlong(const std::string &word);
 float StringToFloat(const std::string &word);
 double StringToDouble(const std::string &word);
 bool CanConvertToInt(const std::string& str);
+bool IsValidPath(const std::string &filePath);
+bool WriteFile(const std::string &filePath, const std::string &fileContent);
 /**
  * @Description Internal HiLinkNetwork Type To Bool
  *

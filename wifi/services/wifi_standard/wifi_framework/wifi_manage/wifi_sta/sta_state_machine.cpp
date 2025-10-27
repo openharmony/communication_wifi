@@ -61,6 +61,7 @@
 #include "sta_define.h"
 #include "ip_qos_monitor.h"
 #include "wifi_telephony_utils.h"
+#include "network_interface.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -1446,6 +1447,9 @@ void StaStateMachine::ApLinkedState::GoInState()
         pStaStateMachine->enableSignalPoll = false;
     } else {
         pStaStateMachine->enableSignalPoll = true;
+    }
+    if (!NetworkInterface::UpdateTcpMem()) {
+        WIFI_LOGE("UpdateTcpMem() failed!");
     }
     return;
 }

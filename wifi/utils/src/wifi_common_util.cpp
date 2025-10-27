@@ -1021,5 +1021,55 @@ bool CanConvertToInt(const std::string& str)
     }
     return true;
 }
+
+bool IsValidPath(const std::string &filePath)
+{
+    if (filePath.empty()) {
+        return false;
+    }
+ 
+    // filePath must be the full path of a file, so the last one character cannot be '/'
+    size_t index = filePath.find_last_of('/');
+    if (index == std::string::npos || index == filePath.length() - 1) {
+        return false;
+    }
+ 
+    std::string path = filePath.substr(0, index);
+    char *realPaths = realpath(path.c_str(), nullptr);
+    if (realPaths == nullptr) {
+        return false;
+    }
+ 
+    free(realPaths);
+    return true;
+}
+ 
+bool WriteFile(const std::string &filePath, const std::string &fileContent)
+{
+#ifndef OHOS_ARCH_LITE
+    if (!IsValidPath(filePath)) {
+        WIFI_LOGE("invalid path:%{public}s", filePath.c_str());
+        return false;
+    }
+    FILE* file = fopen(filePath.c_str(), "w");
+    if (file == nullptr) {
+        WIFI_LOGI("Failed to open file");
+        return false;
+    }
+    size_t size = sizeof(char);
+    size_t count = strlen(fileContent.c_str());
+    if (fwrite(fileContent.c_str(), size, count, file) != count) {
+        WIFI_LOGI("Failed to write file");
+        (void)fclose(file);
+        return false;
+    }
+    (void)fflush(file);
+    (void)fsync(fileno(file));
+    (void)fclose(file);
+    return true;
+#else
+    return false;
+#endif
+}
 }  // namespace Wifi
 }  // namespace OHOS

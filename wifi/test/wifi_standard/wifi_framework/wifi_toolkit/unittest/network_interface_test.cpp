@@ -190,5 +190,16 @@ HWTEST_F(NetworkInterfaceTest, IpAddressChange_001, TestSize.Level1)
     BaseAddressTest ipAddress = BaseAddressTest("192.168", BaseAddress::FamilyType::FAMILY_INET);
     EXPECT_FALSE(NetworkInterface::IpAddressChange("test", ipAddress, true, true));
 }
+/**
+ * @tc.name: UpdateTcpMem_001
+ * @tc.desc: UpdateTcpMem
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(NetworkInterfaceTest, UpdateTcpMem_001, TestSize.Level1)
+{
+    WIFI_LOGI("UpdateTcpMem_001 enter");
+    EXPECT_TRUE(NetworkInterface::UpdateTcpMem());
+}
 }  // namespace Wifi
 }  // namespace OHOS

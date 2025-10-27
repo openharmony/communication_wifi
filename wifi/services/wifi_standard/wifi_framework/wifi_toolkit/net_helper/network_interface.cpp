@@ -413,7 +413,7 @@ bool NetworkInterface::UpdateTcpMem()
     }
     int memTotal = 0;
     char buf[M_LINE_MAX_SIZE] = {0};
-    while (fgets(buf, M_LINE_MAX_SIZE, file)) {
+    while (fgets(buf, M_LINE_MAX_SIZE, file) != nullptr) {
         // Get mem title.
         std::string line(buf);
         auto title_end_pos = line.find(":");

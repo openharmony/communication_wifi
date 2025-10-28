@@ -36,6 +36,7 @@ enum class AppType {
     GAME_RTT,
     LIVE_STREAM_APP,
     GAME_BACKGROUND_LIMIT_LIST_APP,
+    RSS_GAME_LIST_APP,
     OTHER_APP
 };
 
@@ -53,6 +54,7 @@ struct KeyForegroundListAppInfo : CommonAppInfo {};
 struct KeyBackgroundLimitListAppInfo : CommonAppInfo {};
 struct GameBackgroundLimitListAppInfo : CommonAppInfo {};
 struct LiveStreamAppInfo : CommonAppInfo {};
+struct RssGameListAppInfo : CommonAppInfo {};
 
 struct AppParserResult {
     std::vector<LowLatencyAppInfo> m_lowLatencyAppVec {};
@@ -65,6 +67,7 @@ struct AppParserResult {
     std::vector<KeyBackgroundLimitListAppInfo> m_keyBackgroundLimitListAppVec {};
     std::vector<LiveStreamAppInfo> m_liveStreamAppVec {};
     std::vector<GameBackgroundLimitListAppInfo> m_gameBackgroundLimitListAppVec {};
+    std::vector<RssGameListAppInfo> m_rssGameListAppVec {};
     std::unordered_map<std::string, int> m_gameRtt {};
     std::string m_delayTime = "";
 };
@@ -89,6 +92,7 @@ private:
     KeyBackgroundLimitListAppInfo ParseKeyBackgroundLimitListAppInfo(const xmlNodePtr &innode);
     LiveStreamAppInfo ParseLiveStreamAppInfo(const xmlNodePtr &innode);
     GameBackgroundLimitListAppInfo ParseGameBackgroundLimitListAppInfo(const xmlNodePtr &innode);
+    RssGameListAppInfo ParseRssGameListAppInfo(const xmlNodePtr &innode);
     void ParseAsyncLimitSpeedDelayTime(const xmlNodePtr &innode);
     AppType GetAppTypeAsInt(const xmlNodePtr &innode);
     std::string GetLocalFileVersion(const xmlNodePtr &innode);
@@ -112,6 +116,7 @@ public:
     std::string GetAsyncLimitSpeedDelayTime() const;
     bool IsLiveStreamApp(const std::string &bundleName) const;
     bool IsGameBackgroundLimitApp(const std::string &bundleName) const;
+    bool IsRssGameApp(const std::string &bundleName) const;
     bool IsOverGameRtt(const std::string &bundleName, const int gameRtt) const;
 private:
     AppParser();

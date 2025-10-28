@@ -23,6 +23,7 @@ ohos_fuzztest("WifiToolkitFuzzTest") {
 
   include_dirs = [
     "$WIFI_ROOT_DIR/base/utils",
+    "$WIFI_ROOT_DIR/base/shared_util",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/log",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper",
@@ -33,9 +34,19 @@ ohos_fuzztest("WifiToolkitFuzzTest") {
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_status_history",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_ap",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/common",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/hid2d",
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/frameworks/native/src",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func",
@@ -49,6 +60,7 @@ ohos_fuzztest("WifiToolkitFuzzTest") {
   ]
 
   defines = [
+    "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num",
     "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num",
     "FEATURE_AP_SUPPORT",
     "FEATURE_STA_SUPPORT",
@@ -66,6 +78,7 @@ ohos_fuzztest("WifiToolkitFuzzTest") {
   sources = [
     "$WIFI_ROOT_DIR/base/utils/wifi_app_parser.cpp",
     "$WIFI_ROOT_DIR/base/utils/xml_parser.cpp",
+    "$WIFI_ROOT_DIR/base/shared_util/wifi_watchdog_utils.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/network_parser.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/package_parser.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/softap_parser.cpp",
@@ -73,6 +86,12 @@ ohos_fuzztest("WifiToolkitFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/wifi_asset/wifi_asset_manager.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select/network_selection_manager.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/network_select/network_selector_factory.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_channel_helper.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_sensor_scene.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_service_manager.cpp",
+    "$WIFI_ROOT_DIR/frameworks/native/src/network_selection.cpp",
     "wifitoolkit_fuzzer.cpp",
   ]
 
@@ -83,17 +102,24 @@ ohos_fuzztest("WifiToolkitFuzzTest") {
   ]
 
   external_deps = [
+    "ability_runtime:extension_manager",
+    "ability_runtime:app_context",
+    "ability_runtime:app_manager",
+    "bounds_checking_function:libsec_shared",
     "c_utils:utils",
     "cJSON:cjson",
     "dhcp:dhcp_sdk",
     "dhcp:dhcp_utils",
     "hilog:libhilog",
     "huks:libhukssdk",
+    "hicollie:libhicollie",
     "ipc:ipc_single",
     "init:libbegetutil",
     "libxml2:libxml2",
     "netstack:http_client",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
+    "netmanager_base:net_conn_manager_if",
   ]
 
   if (wifi_feature_with_sta_asset) {

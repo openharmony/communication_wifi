@@ -173,14 +173,12 @@ static int32_t WifiAssetAttrAdd(const WifiDeviceConfig &config, bool flagSync = 
     AssetValue aliasValue = {.blob = {static_cast<uint32_t>(aliasId.size()),
         const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(aliasId.c_str()))}};
     AssetValue authTypeValue = {.u32 = SEC_ASSET_AUTH_TYPE_NONE};
-    AssetValue conflictTypeValue = {.u32 = SEC_ASSET_CONFLICT_OVERWRITE};
     AssetAttr attr[] = {
         {.tag = SEC_ASSET_TAG_ALIAS, .value = aliasValue},
         {.tag = SEC_ASSET_TAG_USER_ID, .value = g_userIdValue},
         {.tag = SEC_ASSET_TAG_AUTH_TYPE, .value = authTypeValue},
         {.tag = SEC_ASSET_TAG_SECRET, .value = secret},
         {.tag = SEC_ASSET_TAG_SYNC_TYPE, .value = g_trustAccountValue},
-        {.tag = SEC_ASSET_TAG_CONFLICT_RESOLUTION, .value = conflictTypeValue},
     };
     ret = AssetAdd(attr, sizeof(attr) / sizeof(attr[0]));
     if (flagSync && ret == SEC_ASSET_SUCCESS) {

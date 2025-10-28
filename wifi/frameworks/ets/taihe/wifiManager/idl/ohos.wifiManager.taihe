@@ -432,8 +432,8 @@ function DeletePersistentGroup(netId: i32): void;
 function DisableNetwork(netId: i32): void;
 function UpdateNetwork(config: WifiDeviceConfig): i32;
 function RemoveAllNetwork(): void;
-function DelHotspotBlockList(stationInfo: StationInfo);
-function AddHotspotBlockList(stationInfo: StationInfo);
+function DelHotspotBlockList(stationInfo: StationInfo); void
+function AddHotspotBlockList(stationInfo: StationInfo); void
 function SetScanAlwaysAllowed(isScanAlwaysAllowed: bool): void;
 function FactoryReset(): void;
 function Get5GChannelList(): Array<i32>;

@@ -3374,7 +3374,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
                     ipAddress.find("172.20.10.") != std::string::npos &&
                     maskLength >= HOTSPOT_SUBNETMASK_MIN_LENGTH);
             }
-            pStaStateMachine->NetSupplierInfo->isMetered_ = (bool)pStaStateMachine->linkedInfo.isDataRestricted;
+            pStaStateMachine->NetSupplierInfo->isMetered_ = static_cast<bool>(pStaStateMachine->linkedInfo.isDataRestricted);
             pStaStateMachine->linkedInfo.platformType = strVendor;
             WIFI_LOGI("WifiLinkedInfo.isDataRestricted = %{public}d, WifiLinkedInfo.platformType = %{public}s",
                 pStaStateMachine->linkedInfo.isDataRestricted, pStaStateMachine->linkedInfo.platformType.c_str());

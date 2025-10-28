@@ -329,8 +329,8 @@ void WritePortalInfoHiSysEvent(bool isCN, bool isEverConnected)
         WIFI_LOGE("Failed to create cJSON object");
         return;
     }
-    cJSON_AddBoolToObject(root, "OVER_SEA", isCN);
-    cJSON_AddBoolToObject(root, "IS_FIRST_DETECT", isEverConnected);
+    cJSON_AddNumberToObject(root, "OVER_SEA", isCN);
+    cJSON_AddNumberToObject(root, "IS_FIRST_DETECT", isEverConnected);
     char *jsonStr = cJSON_PrintUnformatted(root);
     if (jsonStr == nullptr) {
         cJSON_Delete(root);

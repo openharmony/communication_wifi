@@ -77,7 +77,7 @@ public:
 
     ErrCode EnableDeviceConfig(int networkId, bool attemptEnable) override;
 
-    ErrCode DisableDeviceConfig(int networkId) override;
+    ErrCode DisableDeviceConfig(int networkId, int64_t blockDuration) override;
 
     ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) override;
 
@@ -253,6 +253,7 @@ private:
     static constexpr int WEP_KEY_LEN1 = 5;
     static constexpr int WEP_KEY_LEN2 = 13;
     static constexpr int WEP_KEY_LEN3 = 16;
+    
 
 #ifdef OHOS_ARCH_LITE
     static std::mutex g_instanceLock;

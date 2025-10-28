@@ -36,7 +36,7 @@ public:
     MOCK_CONST_METHOD1(UpdateDeviceConfig, int(const WifiDeviceConfig &config));
     MOCK_CONST_METHOD1(RemoveDevice, ErrCode(int networkId));
     MOCK_CONST_METHOD2(EnableDeviceConfig, ErrCode(int networkId, bool attemptEnable));
-    MOCK_CONST_METHOD1(DisableDeviceConfig, ErrCode(int networkId));
+    MOCK_CONST_METHOD2(DisableDeviceConfig, ErrCode(int networkId, int64_t blockDuration));
     MOCK_CONST_METHOD2(AllowAutoConnect, ErrCode(int32_t networkId, bool isAllowed));
     MOCK_CONST_METHOD1(StartWps, ErrCode(const WpsConfig &config));
     MOCK_CONST_METHOD0(CancelWps, ErrCode());

@@ -255,11 +255,11 @@ ErrCode WifiDeviceImpl::EnableDeviceConfig(int networkId, bool attemptEnable)
     return client_->EnableDeviceConfig(networkId, attemptEnable);
 }
 
-ErrCode WifiDeviceImpl::DisableDeviceConfig(int networkId)
+ErrCode WifiDeviceImpl::DisableDeviceConfig(int networkId, int64_t blockDuration)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
-    return client_->DisableDeviceConfig(networkId);
+    return client_->DisableDeviceConfig(networkId, blockDuration);
 }
 
 ErrCode WifiDeviceImpl::AllowAutoConnect(int32_t networkId, bool isAllowed)

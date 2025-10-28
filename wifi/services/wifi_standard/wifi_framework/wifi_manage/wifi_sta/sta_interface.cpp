@@ -273,12 +273,12 @@ ErrCode StaInterface::EnableDeviceConfig(int networkId, bool attemptEnable)
     return pStaService->EnableDeviceConfig(networkId, attemptEnable);
 }
 
-ErrCode StaInterface::DisableDeviceConfig(int networkId)
+ErrCode StaInterface::DisableDeviceConfig(int networkId, int64_t blockDuration)
 {
     LOGI("Enter DisableDeviceConfig.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    return pStaService->DisableDeviceConfig(networkId);
+    return pStaService->DisableDeviceConfig(networkId, blockDuration);
 }
 
 ErrCode StaInterface::AllowAutoConnect(int32_t networkId, bool isAllowed)

@@ -820,7 +820,7 @@ ErrCode WifiDeviceProxy::EnableDeviceConfig(int networkId, bool attemptEnable)
     return ErrCode(owner.retCode);
 }
 
-ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
+ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId, int64_t blockDuration)
 {
     if (remoteDied_ || remote_ == nullptr) {
         WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
@@ -839,6 +839,7 @@ ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
     }
     (void)WriteInt32(&req, 0);
     (void)WriteInt32(&req, networkId);
+    (void)WriteInt64(&req, blockDuration);
     owner.funcId = static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_DEVICE);
     int error = remote_->Invoke(remote_, static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_DEVICE), &req,
         &owner, IpcCallback);

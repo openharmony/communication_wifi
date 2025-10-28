@@ -273,8 +273,10 @@ void OnDisableDeviceConfigFuzzTest()
         return;
     }
     int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    int64_t blockDuration = FDP->ConsumeIntegral<int64_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
+    datas.WriteInt64(blockDuration);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_DEVICE), datas);
 }

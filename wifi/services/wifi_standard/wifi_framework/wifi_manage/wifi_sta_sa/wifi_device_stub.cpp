@@ -735,7 +735,8 @@ void WifiDeviceStub::OnDisableDeviceConfig(uint32_t code, MessageParcel &data, M
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int networkId = data.ReadInt32();
-    ErrCode ret = DisableDeviceConfig(networkId);
+    int64_t blockDuration = data.ReadInt64();
+    ErrCode ret = DisableDeviceConfig(networkId, blockDuration);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 

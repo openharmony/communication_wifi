@@ -1397,20 +1397,33 @@ NO_SANITIZE("cfi") napi_value AllowAutoConnect(napi_env env, napi_callback_info 
 NO_SANITIZE("cfi") napi_value DisableNetwork(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    size_t argc = 1;
-    napi_value argv[1];
+    size_t argc = 2;
+    napi_value argv[2];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, argc >= 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
-    napi_valuetype valueType;
-    napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    napi_valuetype valueType1;
+    napi_typeof(env, argv[0], &valueType1);
+    WIFI_NAPI_ASSERT(env, valueType1 == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
-    int networkId = -1;
+    int32_t networkId = -1;
     napi_get_value_int32(env, argv[0], &networkId);
-    ErrCode ret = wifiDevicePtr->DisableDeviceConfig(networkId);
+
+    ErrCode ret = WIFI_OPT_FAILED;
+    if (argc == 1) {
+        ret = wifiDevicePtr->DisableDeviceConfig(networkId);
+    } else if (argc == 2) {
+        napi_valuetype valueType2;
+        napi_typeof(env, argv[1], &valueType2);
+        WIFI_NAPI_ASSERT(env, valueType2 == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+        int64_t blockDuration = -1;
+        napi_get_value_int64(env, argv[1], &blockDuration);
+        ret = wifiDevicePtr->DisableDeviceConfig(networkId, blockDuration);
+    } else {
+        WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    }
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 

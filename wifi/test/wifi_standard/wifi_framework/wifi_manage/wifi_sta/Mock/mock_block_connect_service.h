@@ -27,8 +27,10 @@ public:
     virtual ~MockBlockConnectService() = default;
     virtual bool ShouldAutoConnect(const WifiDeviceConfig &config) = 0;
     virtual bool UpdateAllNetworkSelectStatus() = 0;
-    virtual bool UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason, int wpaReason) = 0;
-    virtual bool UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason) = 0;
+    virtual bool UpdateNetworkSelectStatusForWpa(int targetNetworkId, DisabledReason disableReason,
+                                                 int wpaReason) = 0;
+    virtual bool UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason,
+                                           int64_t blockDuration = -1) = 0;
     virtual bool EnableNetworkSelectStatus(int targetNetworkId) = 0;
     virtual bool IsFrequentDisconnect(std::string bssid, int wpaReason, int locallyGenerated) = 0;
     virtual bool IsWrongPassword(int targetNetworkId) = 0;
@@ -49,8 +51,10 @@ public:
 
     MOCK_METHOD1(ShouldAutoConnect, bool(const WifiDeviceConfig &config));
     MOCK_METHOD0(UpdateAllNetworkSelectStatus, bool());
-    MOCK_METHOD3(UpdateNetworkSelectStatus, bool(int targetNetworkId, DisabledReason disableReason, int wpaReason));
-    MOCK_METHOD2(UpdateNetworkSelectStatus, bool(int targetNetworkId, DisabledReason disableReason));
+    MOCK_METHOD3(UpdateNetworkSelectStatusForWpa, bool(int targetNetworkId, DisabledReason disableReason,
+                                                       int wpaReason));
+    MOCK_METHOD3(UpdateNetworkSelectStatus, bool(int targetNetworkId, DisabledReason disableReason,
+                                                 int64_t blockDuration));
     MOCK_METHOD1(EnableNetworkSelectStatus, bool(int targetNetworkId));
     MOCK_METHOD3(IsFrequentDisconnect, bool(std::string bssid, int wpaReason, int locallyGenerated));
     MOCK_METHOD1(IsWrongPassword, bool(int targetNetworkId));

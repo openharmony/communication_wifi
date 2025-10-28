@@ -941,7 +941,7 @@ ErrCode WifiDeviceServiceImpl::EnableDeviceConfig(int networkId, bool attemptEna
     return pService->EnableDeviceConfig(networkId, attemptEnable);
 }
 
-ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
+ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId, int64_t blockDuration)
 {
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("DisableDeviceConfig:NOT System APP, PERMISSION_DENIED!");
@@ -969,7 +969,7 @@ ErrCode WifiDeviceServiceImpl::DisableDeviceConfig(int networkId)
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-    return pService->DisableDeviceConfig(networkId);
+    return pService->DisableDeviceConfig(networkId, blockDuration);
 }
 
 ErrCode WifiDeviceServiceImpl::AllowAutoConnect(int32_t networkId, bool isAllowed)

@@ -854,7 +854,7 @@ ErrCode WifiDeviceProxy::EnableDeviceConfig(int networkId, bool attemptEnable)
     return ErrCode(reply.ReadInt32());
 }
 
-ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
+ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId, int64_t blockDuration)
 {
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
@@ -868,6 +868,7 @@ ErrCode WifiDeviceProxy::DisableDeviceConfig(int networkId)
     }
     data.WriteInt32(0);
     data.WriteInt32(networkId);
+    data.WriteInt64(blockDuration);
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_DISABLE_DEVICE), data, reply,
         option);
     if (error != ERR_NONE) {

@@ -43,7 +43,8 @@ bool operator == (const WifiDeviceConfig &lhs, const WifiDeviceConfig &rhs)
 {
     return lhs.networkId == rhs.networkId;
 }
-
+constexpr int SECOND_TO_MICROSECOND = 1000 * 1000;
+constexpr int BLOCK_DURATION_5_MIN = 5 * 60 * SECOND_TO_MICROSECOND;
 class StaInterfaceTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -207,14 +208,16 @@ public:
 
     void DisableDeviceConfigSuceess()
     {
-        EXPECT_CALL(*pMockStaService, DisableDeviceConfig(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->DisableDeviceConfig(0) == WIFI_OPT_SUCCESS);
+        EXPECT_CALL(*pMockStaService, DisableDeviceConfig(_, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->DisableDeviceConfig(0, -1) == WIFI_OPT_SUCCESS);
+        EXPECT_TRUE(pStaInterface->DisableDeviceConfig(0, BLOCK_DURATION_5_MIN) == WIFI_OPT_SUCCESS);
     }
 
     void DisableDeviceConfigFail1()
     {
-        EXPECT_CALL(*pMockStaService, DisableDeviceConfig(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_TRUE(pStaInterface->DisableDeviceConfig(0) == WIFI_OPT_FAILED);
+        EXPECT_CALL(*pMockStaService, DisableDeviceConfig(_, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->DisableDeviceConfig(0, -1) == WIFI_OPT_FAILED);
+        EXPECT_TRUE(pStaInterface->DisableDeviceConfig(0, BLOCK_DURATION_5_MIN) == WIFI_OPT_FAILED);
     }
 
     void StartWpsSuceess()

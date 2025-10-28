@@ -60,6 +60,7 @@
 #endif
 #include "sta_define.h"
 #include "ip_qos_monitor.h"
+#include "wifi_country_code_manager.h"
 #include "wifi_telephony_utils.h"
 #include "network_interface.h"
 
@@ -2119,10 +2120,11 @@ void StaStateMachine::HandlePortalNetworkPorcess()
         return;
     }
     int netId = m_NetWorkState->GetWifiNetId();
+    int deviceType = WifiConfigCenter::GetInstance().GetDeviceType();
+    RecordPortalInfo();
+#ifndef SUPPORT_PORTAL_LOGIN
     AAFwk::Want want;
     want.SetParam("netId", netId);
-    int deviceType = WifiConfigCenter::GetInstance().GetDeviceType();
-#ifndef SUPPORT_PORTAL_LOGIN
     std::string bundle = WifiSettings::GetInstance().GetPackageName("BROWSER_BUNDLE");
     want.SetAction(PORTAL_ACTION);
     want.SetUri(mPortalUrl);
@@ -2133,30 +2135,42 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     if (err != ERR_OK) {
         WIFI_LOGI("want browser StartAbility is failed %{public}d", err);
         WriteBrowserFailedForPortalHiSysEvent(err, mPortalUrl);
-        AAFwk::Want wantPortalLogin;
-        wantPortalLogin.SetParam("netId", netId);
-        wantPortalLogin.SetElementName("com.wifiservice.portallogin", "EntryAbility");
-        wantPortalLogin.SetParam("url", mPortalUrl);
-        wantPortalLogin.SetParam("shouldShowBrowseItem", deviceType != ProductDeviceType::TV);
-        WIFI_LOGI("wantPortalLogin wifi netId is %{public}d, deviceType is %{public}d", netId, deviceType);
-        OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(wantPortalLogin);
-        if (err != ERR_OK) {
-            WIFI_LOGI("wantPortalLogin portal StartAbility is failed %{public}d", err);
-        }
+        err = StartPortalLogin(netId, mPortalUrl, deviceType);
     }
 #else
+    OHOS::ErrCode err = StartPortalLogin(netId, mPortalUrl, deviceType);
+#endif
+#endif
+    WifiConfigCenter::GetInstance().SetBrowserState(err == ERR_OK);
+}
+
+OHOS::ErrCode StaStateMachine::StartPortalLogin(int netId, std::string url, int deviceType)
+{
+    AAFwk::Want want;
+    want.SetParam("netId", netId);
     want.SetElementName("com.wifiservice.portallogin", "EntryAbility");
-    want.SetParam("url", mPortalUrl);
+    want.SetParam("url", url);
     want.SetParam("shouldShowBrowseItem", deviceType != ProductDeviceType::TV);
     WIFI_LOGI("portal login wifi netId is %{public}d, deviceType is %{public}d", netId, deviceType);
     OHOS::ErrCode err = WifiNotificationUtil::GetInstance().StartAbility(want);
     if (err != ERR_OK) {
-        WIFI_LOGI("want portal login StartAbility is failed %{public}d", err);
-        WriteBrowserFailedForPortalHiSysEvent(err, mPortalUrl);
+        WIFI_LOGE("want portal login StartAbility is failed %{public}d", err);
+        WriteBrowserFailedForPortalHiSysEvent(err, url);
     }
-#endif
-#endif
-    WifiConfigCenter::GetInstance().SetBrowserState(err == ERR_OK);
+    return err;
+}
+ 
+void StaStateMachine::RecordPortalInfo()
+{
+    std::string wifiCountryCode;
+    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(wifiCountryCode);
+    bool isCN = wifiCountryCode == DEFAULT_REGION;
+ 
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    bool isEverConnected = WifiSettings::GetInstance().GetDeviceEverConnected(linkedInfo.networkId);
+ 
+    WritePortalInfoHiSysEvent(isCN, isEverConnected);
 }
 
 void StaStateMachine::SetPortalBrowserFlag(bool flag)

@@ -341,8 +341,10 @@ void WifiDeviceStub::OnDisableDeviceConfig(uint32_t code, IpcIo *req, IpcIo *rep
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     int networkId = 0;
+    int64_t blockDuration = -1;
     (void)ReadInt32(req, &networkId);
-    ErrCode ret = DisableDeviceConfig(networkId);
+    (void)ReadInt64(req, &blockDuration);
+    ErrCode ret = DisableDeviceConfig(networkId, blockDuration);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
 }

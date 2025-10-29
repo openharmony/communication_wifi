@@ -208,7 +208,7 @@ std::string Perf5gHandoverService::Switch5g()
     int32_t ret;
     WIFI_LOGI("Switch5g StartConnectToBssid. bssid(%{public}s)", MacAnonymize(selectRelationAp_->apInfo.bssid).data());
     ret = pStaService->StartConnectToBssid(
-        selectRelationAp_->apInfo.networkId, selectRelationAp_->apInfo.bssid, NETWORK_SELECTED_BY_AUTO);
+        selectRelationAp_->apInfo.networkId, selectRelationAp_->apInfo.bssid, NETWORK_SELECTED_BY_WIFIPRO);
     if (ret == WIFI_OPT_SUCCESS) {
         return selectRelationAp_->apInfo.bssid;
     }

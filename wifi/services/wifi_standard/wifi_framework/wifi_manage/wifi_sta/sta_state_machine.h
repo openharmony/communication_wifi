@@ -1038,7 +1038,7 @@ private:
     void UpdateHiLinkAttribute();
     void LogSignalInfo(WifiSignalPollInfo &signalInfo);
     void HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime);
-    void EnableScreenOffSignalPoll();
+    void EnableScreenOffSignalPoll(int delayTime);
     void PublishPortalNitificationAndLogin();
     OHOS::ErrCode StartPortalLogin(int netId, std::string url, int deviceType);
     void RecordPortalInfo();

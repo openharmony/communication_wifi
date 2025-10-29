@@ -266,6 +266,7 @@ bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const s
 
 void AppNetworkSpeedLimitService::AsyncLimitSpeed(const AsyncParamInfo &asyncParamInfo)
 {
+    HandlePowerModeIfNeeded(asyncParamInfo);
     if (isVpnConnected_) {
         WIFI_LOGD("%{public}s VPN is connected, cancel speed limit setting", __FUNCTION__);
         return;
@@ -433,9 +434,6 @@ void AppNetworkSpeedLimitService::FilterLimitSpeedConfigs()
 
 void AppNetworkSpeedLimitService::WifiConnectStateChanged()
 {
-    if (!m_isWifiConnected) {
-        ResetPowerMode();
-    }
     if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] != BG_LIMIT_OFF) {
         SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_TEMP, m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP],
             m_isHighPriorityTransmit);
@@ -474,17 +472,14 @@ void AppNetworkSpeedLimitService::ForegroundAppChangedAction(const std::string &
         WIFI_LOGI("%{public}s top app speed limit is turnning off, update background app list", __FUNCTION__);
         SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_OFF, m_isHighPriorityTransmit);
     }
-    CheckAndResetGamePowerMode(bundleName);
 }
 
 void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)
 {
     WIFI_LOGI("%{public}s enter game limit configs, game state is %{public}d", __FUNCTION__, networkControlInfo.state);
-    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
     switch (networkControlInfo.state) {
         case GameSceneId::MSG_GAME_STATE_START:
         case GameSceneId::MSG_GAME_STATE_FOREGROUND:
-            SetGamePowerMode(ifaceName, GAME_POWER_MODE_INACTIVE);
             if (AppParser::GetInstance().IsOverGameRtt(networkControlInfo.bundleName, networkControlInfo.rtt)) {
                 SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
                     networkControlInfo.uid);
@@ -495,15 +490,12 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
             break;
         case GameSceneId::MSG_GAME_STATE_BACKGROUND:
         case GameSceneId::MSG_GAME_STATE_END:
-            SetGamePowerMode(ifaceName, GAME_POWER_MODE_INACTIVE);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_OFF, GAME_BOOST_DISABLE, networkControlInfo.uid);
             break;
         case GameSceneId::MSG_GAME_ENTER_PVP_BATTLE:
-            SetGamePowerMode(ifaceName, GAME_POWER_MODE_ACTIVE);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE, networkControlInfo.uid);
             break;
         case GameSceneId::MSG_GAME_EXIT_PVP_BATTLE:
-            SetGamePowerMode(ifaceName, GAME_POWER_MODE_INACTIVE);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_3, GAME_BOOST_DISABLE, networkControlInfo.uid);
             break;
         default:
@@ -552,6 +544,55 @@ void AppNetworkSpeedLimitService::HandleNetworkConnectivityChange(int32_t bearTy
     if (preVpnState != currentVpnState) {
         WIFI_LOGI("%{public}s VPN connection state changed: %{public}d -> %{public}d",
             __FUNCTION__, preVpnState, currentVpnState);
+    }
+}
+
+void AppNetworkSpeedLimitService::HandlePowerModeIfNeeded(const AsyncParamInfo &asyncParamInfo)
+{
+    if (asyncParamInfo.funcName == RECEIVE_NETWORK_CONTROL &&
+        asyncParamInfo.networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_GAME) {
+        // Power mode management for game scenarios
+        m_asyncSendLimit->PostAsyncTask([asyncParamInfo, this]() {
+            this->HandleGamePowerMode(asyncParamInfo.networkControlInfo);
+            }, "HandleGamePowerMode");
+    } else if (asyncParamInfo.funcName == HANDLE_WIFI_CONNECT_CHANGED) {
+        // Reset power mode on WiFi disconnect
+        if (!m_isWifiConnected) {
+            m_asyncSendLimit->PostAsyncTask([this]() {
+                this->ResetPowerMode();
+                }, "ResetPowerModeOnWifiDisconnect");
+        }
+    } else if (asyncParamInfo.funcName == HANDLE_FOREGROUND_APP_CHANGED) {
+        // Check and reset power mode on foreground app change
+        m_asyncSendLimit->PostAsyncTask([asyncParamInfo, this]() {
+            this->CheckAndResetGamePowerMode(asyncParamInfo.bundleName);
+            }, "CheckAndResetGamePowerModeOnAppChange");
+    }
+}
+
+void AppNetworkSpeedLimitService::HandleGamePowerMode(const WifiNetworkControlInfo &networkControlInfo)
+{
+    WIFI_LOGI("%{public}s handle game power mode, game state is %{public}d", __FUNCTION__, networkControlInfo.state);
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
+    
+    switch (networkControlInfo.state) {
+        case GameSceneId::MSG_GAME_STATE_START:
+        case GameSceneId::MSG_GAME_STATE_FOREGROUND:
+            SetGamePowerMode(ifaceName, GAME_POWER_MODE_INACTIVE);
+            break;
+        case GameSceneId::MSG_GAME_STATE_BACKGROUND:
+        case GameSceneId::MSG_GAME_STATE_END:
+            SetGamePowerMode(ifaceName, GAME_POWER_MODE_INACTIVE);
+            break;
+        case GameSceneId::MSG_GAME_ENTER_PVP_BATTLE:
+            SetGamePowerMode(ifaceName, GAME_POWER_MODE_ACTIVE);
+            break;
+        case GameSceneId::MSG_GAME_EXIT_PVP_BATTLE:
+            SetGamePowerMode(ifaceName, GAME_POWER_MODE_INACTIVE);
+            break;
+        default:
+            WIFI_LOGE("%{public}s unknown game state: %{public}d", __FUNCTION__, networkControlInfo.state);
+            break;
     }
 }
 
@@ -606,7 +647,7 @@ void AppNetworkSpeedLimitService::CheckAndResetGamePowerMode(const std::string &
     }
     bool isGame = AppParser::GetInstance().IsRssGameApp(bundleName);
     if (isGame) {
-        WIFI_LOGI("%{public}s Foreground app [%{public}s] is game, keep power mode no-sleep",
+        WIFI_LOGD("%{public}s Foreground app [%{public}s] is game, keep power mode no-sleep",
                   __FUNCTION__, bundleName.c_str());
         return;
     }

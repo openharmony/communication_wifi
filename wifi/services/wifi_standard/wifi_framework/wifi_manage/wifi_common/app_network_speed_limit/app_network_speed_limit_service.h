@@ -89,6 +89,8 @@ private:
     void SetGamePowerMode(const std::string &ifaceName, bool gameActive);
     void ResetPowerMode();
     void CheckAndResetGamePowerMode(const std::string &bundleName);
+    void HandlePowerModeIfNeeded(const AsyncParamInfo &asyncParamInfo);
+    void HandleGamePowerMode(const WifiNetworkControlInfo &networkControlInfo);
 
 private:
     StaServiceCallback m_staCallback;

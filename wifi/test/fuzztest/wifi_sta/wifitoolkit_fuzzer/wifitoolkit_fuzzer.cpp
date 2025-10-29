@@ -341,7 +341,6 @@ void WifinetworkselectionmanagerTest()
     m_NetworkSelectionManager->SelectNetworkWithSsid(deviceConfig, autoSelectBssid);
     m_NetworkSelectionManager->GetAllDeviceConfigs(networkCandidates,scanInfos);
     m_NetworkSelectionManager->ConvertScanInfo(wifiScanInfo, interScanInfo);
-    m_NetworkSelectionManager->SelectNetwork(networkSelectionResult, type, scanInfos);
     m_NetworkSelectionManager->GetFilteredReasonForChr(networkCandidates);
 }
 

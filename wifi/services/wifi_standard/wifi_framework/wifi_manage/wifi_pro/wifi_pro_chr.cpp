@@ -72,6 +72,13 @@ void WifiProChr::ResetChrRecord()
     poorLinkCnt_ = 0;
     noNetCnt_ = 0;
     qoeSlowCnt_ = 0;
+    gatewayIpSameCnt_ = 0;
+    gatewayIpDiffCnt_ = 0;
+    gatewayIpUnknownCnt_ = 0;
+    gatewayMacSameCnt_ = 0;
+    gatewayMacDiffCnt_ = 0;
+    gatewayMacUnknownCnt_ = 0;
+    gatewayBssidSimilarCnt_ = 0;
     reasonNotSwitchCnt_.clear();
     selectNetResultCnt_.clear();
     wifiProResultCnt_.clear();

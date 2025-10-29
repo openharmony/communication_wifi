@@ -333,7 +333,6 @@ void WifinetworkselectionmanagerTest()
     WifiScanInfo wifiScanInfo;
     InterScanInfo interScanInfo;
     NetworkSelectionResult networkSelectionResult;
-    int32_t randomInt = FDP->ConsumeIntegral<int32_t>();
     std::string autoSelectBssid = FDP->ConsumeBytesAsString(NUM_BYTES);
     std::vector<NetworkSelection::NetworkCandidate> networkCandidates;
     std::vector<InterScanInfo> scanInfos;

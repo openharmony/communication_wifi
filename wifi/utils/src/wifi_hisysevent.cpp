@@ -322,6 +322,25 @@ void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &server)
     cJSON_Delete(root);
 }
 
+void WritePortalInfoHiSysEvent(bool isCN, bool isEverConnected)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "OVER_SEA", isCN);
+    cJSON_AddNumberToObject(root, "IS_FIRST_DETECT", isEverConnected);
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_PORTAL_INFO", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
+
 void WriteAuthFailHiSysEvent(const std::string &authFailReason, int subErrCode)
 {
     cJSON *root = cJSON_CreateObject();

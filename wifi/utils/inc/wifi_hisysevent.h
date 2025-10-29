@@ -193,6 +193,8 @@ void WriteWifiPnoScanHiSysEvent(int isStartScan, int suspendReason);
 
 void WriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &server);
 
+void WritePortalInfoHiSysEvent(bool isCN, bool isEverConnected);
+
 void WriteP2pKpiCountHiSysEvent(int eventType);
 
 void WriteP2pConnectFailedHiSysEvent(int errCode, int failRes);

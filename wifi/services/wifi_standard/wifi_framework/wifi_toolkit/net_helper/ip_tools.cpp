@@ -15,6 +15,7 @@
 
 #include "ip_tools.h"
 #include "wifi_common_util.h"
+#include <fstream>
 
 namespace OHOS {
 namespace Wifi {
@@ -305,6 +306,42 @@ std::string IpTools::ConvertIpv6AddressToCompleted(const std::string &address)
         stream << std::setw(bitNum) << std::setfill('0') << std::hex << value;
     }
     return stream.str();
+}
+
+int IpTools::GetGatewayMac(std::string &gatewayIp, std::string &gatewayMac, std::string &ifaceName)
+{
+    int ret = -1;
+ 
+    if (gatewayIp.empty() || ifaceName.empty()) {
+        return ret;
+    }
+ 
+    std::ifstream arpFile("/proc/net/arp");
+    if (!arpFile.is_open()) {
+        return ret;
+    }
+ 
+    // IP address  HW type  Flags  HW address  Mask  Device
+    std::string ipAddress;
+    std::string hwType;
+    std::string flags;
+    std::string hwAddress;
+    std::string mask;
+    std::string device;
+ 
+    std::string line;
+    std::getline(arpFile, line); // Skip the header line
+    while (std::getline(arpFile, line)) {
+        std::stringstream ss(line);
+        ss >> ipAddress >> hwType >> flags >> hwAddress >> mask >> device;
+        if (gatewayIp == ipAddress && device == ifaceName) {
+            gatewayMac = hwAddress;
+            ret = 0;
+            break;
+        }
+    }
+    arpFile.close();
+    return ret;
 }
 }  // namespace Wifi
 }  // namespace OHOS

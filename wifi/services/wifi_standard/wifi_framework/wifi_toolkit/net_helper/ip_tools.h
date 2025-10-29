@@ -131,6 +131,16 @@ public:
      * @return std::string : IPv6 address in string format
      */
     static std::string ConvertIpv6AddressToCompleted(const std::string &address);
+
+    /**
+     * @Description : Get gateway MAC address
+     *
+     * @param gatewayIp - IPv4 address of gateway [in]
+     * @param gatewayMac - MAC address of gateway [out]
+     * @param ifaceName - Interface name [in]
+     * @return int - 0 : success; others: failure
+     */
+    static int GetGatewayMac(std::string &gatewayIp, std::string &gatewayMac, std::string &ifaceName);
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -202,5 +202,16 @@ HWTEST_F(WifiInternalEventDispatcherTest, ExitFail, TestSize.Level1)
     WifiInternalEventDispatcher::GetInstance().Exit();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
+
+HWTEST_F(WifiInternalEventDispatcherTest, IsStatusBarFrozen, TestSize.Level1)
+{
+    WifiEventCallbackMsg msg;
+    msg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
+    msg.msgData = static_cast<int32_t>(OHOS::Wifi::ConnState::CONNECTING);
+    int uid = 20000;
+    sptr<IWifiDeviceCallBack> callback;
+    WifiInternalEventDispatcher::GetInstance().InvokeDeviceCallbacksExtral(true, msg, callback);
+    EXPECT_EQ(false, WifiInternalEventDispatcher::GetInstance().IsStatusBarFrozen(uid, msg));
+}
 }  // namespace Wifi
 }  // namespace OHOS

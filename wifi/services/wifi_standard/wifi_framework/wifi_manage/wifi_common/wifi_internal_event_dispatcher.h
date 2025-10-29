@@ -29,6 +29,7 @@
 #include "i_wifi_scan_callback.h"
 #include "i_wifi_hotspot_callback.h"
 #include "i_wifi_p2p_callback.h"
+#include "ienhance_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -123,6 +124,9 @@ public:
     void ResetAllFrozenApp();
     bool IsAppFrozen(int pid);
     int GetRemoteUid(const sptr<IRemoteObject> &remote);
+    bool IsStatusBarFrozen(int uid, const WifiEventCallbackMsg &msg);
+    void InvokeDeviceCallbacksExtral(
+        bool isFrozen, const WifiEventCallbackMsg &msg, const sptr<IWifiDeviceCallBack> callback);
 private:
     static void DealStaCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void DealScanCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
@@ -159,6 +163,7 @@ private:
     sptr<IWifiP2pCallback> mP2pSingleCallback;
     std::mutex mPidFrozenMutex;
     std::set<int> frozenPidList;
+    IEnhanceService *pEnhanceService;
 };
 }  // namespace Wifi
 }  // namespace OHOS

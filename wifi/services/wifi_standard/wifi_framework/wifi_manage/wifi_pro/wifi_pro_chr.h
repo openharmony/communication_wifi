@@ -81,8 +81,16 @@ public:
     void WriteWifiProSysEvent();
     cJSON *FillWifiProStatisticsJson();
     void FillWifiProStatisticsJsons(cJSON *root);
+    void RecordGatewayInfoBeforeSwitch();
+    void RecordGatewayInfoAfterSwitch();
     
 private:
+    static constexpr int ARP_CHECK_TIME_MS = 300;
+    static constexpr int SIMILAR_BSSID_PREFIX_LEN = 14;
+    static constexpr const char *MAC_ADDR_ALL_ZERO = "00:00:00:00:00:00";
+    void DoOneArp(IpInfo &ipInfo, std::string &gatewayIp, std::string &ifaceName);
+    bool IsSimilarBssid(std::string &bssid1, std::string &bssid2);
+
     int64_t wifiProStartTime_ = 0;
     int64_t wifiProSumTime_ = 0;
     int64_t lastLoadTime_ = 0;
@@ -92,6 +100,16 @@ private:
     uint32_t poorLinkCnt_ = 0;
     uint32_t noNetCnt_ = 0;
     uint32_t qoeSlowCnt_ = 0;
+    uint32_t gatewayIpSameCnt_ = 0;
+    uint32_t gatewayIpDiffCnt_ = 0;
+    uint32_t gatewayIpUnknownCnt_ = 0;
+    uint32_t gatewayMacSameCnt_ = 0;
+    uint32_t gatewayMacDiffCnt_ = 0;
+    uint32_t gatewayMacUnknownCnt_ = 0;
+    uint32_t gatewayBssidSimilarCnt_ = 0;
+    std::string lastGatewayIp_;
+    std::string lastGatewayMac_;
+    std::string lastBssid_;
     std::map<ReasonNotSwitch, uint32_t> reasonNotSwitchCnt_ = {};
     std::map<WifiProEventResult, uint32_t> selectNetResultCnt_ = {};
     std::map<WifiProEventResult, uint32_t> wifiProResultCnt_ = {};

@@ -334,7 +334,6 @@ void WifinetworkselectionmanagerTest()
     InterScanInfo interScanInfo;
     NetworkSelectionResult networkSelectionResult;
     int32_t randomInt = FDP->ConsumeIntegral<int32_t>();
-    NetworkSelectType type = static_cast<NetworkSelectType>(randomInt % SIX);
     std::string autoSelectBssid = FDP->ConsumeBytesAsString(NUM_BYTES);
     std::vector<NetworkSelection::NetworkCandidate> networkCandidates;
     std::vector<InterScanInfo> scanInfos;

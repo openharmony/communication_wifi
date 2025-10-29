@@ -138,5 +138,17 @@ HWTEST_F(WifiIpToolsTest, ConvertIpv6AddressToCompletedTest, TestSize.Level1)
     ipv6Str = "123";
     EXPECT_FALSE(IpTools::ConvertIpv6AddressToCompleted(ipv6Str) == "1230:0000:0000:0000:0000:0000:0000:0000");
 }
+
+HWTEST_F(WifiIpToolsTest, GetGatewayMacTest, TestSize.Level1)
+{
+    std::string gatewayIp;
+    std::string gatewayMac;
+    std::string ifaceName;
+    EXPECT_FALSE(IpTools::GetGatewayMac(gatewayIp, gatewayMac, ifaceName) == 0);
+    gatewayIp = "192.10.1.1";
+    EXPECT_FALSE(IpTools::GetGatewayMac(gatewayIp, gatewayMac, ifaceName) == 0);
+    ifaceName = "wlan0";
+    EXPECT_FALSE(IpTools::GetGatewayMac(gatewayIp, gatewayMac, ifaceName) == 0);
+}
 }  // namespace Wifi
 }  // namespace OHOS

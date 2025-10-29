@@ -53,11 +53,13 @@ public:
      * @param networkSelectionResult Network selection result
      * @param type the type of networkSelection
      * @param scanInfos scanInfos
+     * @param failReason the reason for selection failure (output parameter)
      * @return whether network selection is successful.
      */
     bool SelectNetwork(NetworkSelectionResult &networkSelectionResult,
                        NetworkSelectType type,
-                       const std::vector<InterScanInfo> &scanInfos);
+                       const std::vector<InterScanInfo> &scanInfos,
+                       std::string &failReason);
 private:
     std::unique_ptr<NetworkSelectorFactory> pNetworkSelectorFactory = nullptr;
 

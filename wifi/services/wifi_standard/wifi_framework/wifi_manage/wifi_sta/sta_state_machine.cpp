@@ -3209,7 +3209,7 @@ void StaStateMachine::DealAudioStateChangedEvent(InternalMessagePtr msg)
         WIFI_LOGE("%{public}s enhanceService NULL", __FUNCTION__);
         return;
     }
-    bool isAudioScene = isAudioOn_ == AUDIO_ON ? true : false;
+    bool isAudioScene = isAudioOn_ != AUDIO_OFF ? true : false;
     enhanceService_->NotifyAudioSceneChanged(isAudioScene);
 #endif
 }

@@ -443,7 +443,8 @@ bool WifiProStateMachine::SelectNetwork(NetworkSelectionResult &networkSelection
     }
     BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     std::unique_ptr<NetworkSelectionManager> pNetworkSelectionManager = std::make_unique<NetworkSelectionManager>();
-    if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, mNetworkSelectType, scanInfos)) {
+    std::string failReason;
+    if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, mNetworkSelectType, scanInfos, failReason)) {
         WIFI_LOGI("Wifi2Wifi select network result, ssid: %{public}s, bssid: %{public}s.",
             SsidAnonymize(networkSelectionResult.interScanInfo.ssid).c_str(),
             MacAnonymize(networkSelectionResult.interScanInfo.bssid).c_str());
@@ -554,7 +555,7 @@ void WifiProStateMachine::ProcessSwitchResult(const InternalMessagePtr msg)
     }
     Wifi2WifiFinish();
 }
- 
+
 bool WifiProStateMachine::InLandscapeSwitchLimitList()
 {
 #ifndef OHOS_ARCH_LITE

@@ -1040,6 +1040,8 @@ private:
     void HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime);
     void EnableScreenOffSignalPoll();
     void PublishPortalNitificationAndLogin();
+    OHOS::ErrCode StartPortalLogin(int netId, std::string url, int deviceType);
+    void RecordPortalInfo();
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;

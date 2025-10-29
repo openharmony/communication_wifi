@@ -168,6 +168,9 @@ enum ConnState {
     /** The Wi-Fi special connection. */
     SPECIAL_CONNECT,
 
+    /** The Wi-Fi is switching. */
+    SWITCHING,   
+
     /** Failed to set up the Wi-Fi connection. */
     UNKNOWN
 };
@@ -304,6 +307,8 @@ struct WifiLinkedInfo {
     int linkId;
     int centerFrequency0; /* 40M center frequency */
     int centerFrequency1; /* 160M center frequency */
+    int connTriggerMode; /* Connection Trigger Module */
+    int disconnTriggerMode;  /* Disconnection Trigger Module */
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -341,6 +346,8 @@ struct WifiLinkedInfo {
         linkId = INVALID_LINK_ID;
         centerFrequency0 = 0;
         centerFrequency1 = 0;
+        connTriggerMode = -1;
+        disconnTriggerMode = ConnState::UNKNOWN;
     }
 };
 

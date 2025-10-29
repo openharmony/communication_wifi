@@ -1914,9 +1914,12 @@ public:
     void AudioStateNotifyTest()
     {
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
-        msg->SetParam1(AUDIO_ON);
+        msg->SetParam1(AUDIO_ON_VOIP);
         pStaStateMachine->DealAudioStateChangedEvent(msg);
-        EXPECT_EQ(pStaStateMachine->isAudioOn_, AUDIO_ON);
+        EXPECT_EQ(pStaStateMachine->isAudioOn_, AUDIO_ON_VOIP);
+        msg->SetParam1(AUDIO_ON_AUDIO);
+        pStaStateMachine->DealAudioStateChangedEvent(msg);
+        EXPECT_EQ(pStaStateMachine->isAudioOn_, AUDIO_ON_AUDIO);
         msg->SetParam1(AUDIO_OFF);
         pStaStateMachine->DealAudioStateChangedEvent(msg);
         EXPECT_EQ(pStaStateMachine->isAudioOn_, AUDIO_OFF);

@@ -1038,7 +1038,7 @@ private:
     void UpdateHiLinkAttribute();
     void LogSignalInfo(WifiSignalPollInfo &signalInfo);
     void HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime);
-    void EnableScreenOffSignalPoll();
+    void EnableScreenOffSignalPoll(int delayTime);
     void PublishPortalNitificationAndLogin();
 private:
     std::shared_mutex m_staCallbackMutex;

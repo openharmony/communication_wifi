@@ -20,6 +20,10 @@
 #include "wifi_hisysevent.h"
 #include "hisysevent.h"
 #include "cJSON.h"
+#include "ip_tools.h"
+#include "arp_checker.h"
+#include "wifi_msg.h"
+
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiProChr");
@@ -68,6 +72,13 @@ void WifiProChr::ResetChrRecord()
     poorLinkCnt_ = 0;
     noNetCnt_ = 0;
     qoeSlowCnt_ = 0;
+    gatewayIpSameCnt_ = 0;
+    gatewayIpDiffCnt_ = 0;
+    gatewayIpUnknownCnt_ = 0;
+    gatewayMacSameCnt_ = 0;
+    gatewayMacDiffCnt_ = 0;
+    gatewayMacUnknownCnt_ = 0;
+    gatewayBssidSimilarCnt_ = 0;
     reasonNotSwitchCnt_.clear();
     selectNetResultCnt_.clear();
     wifiProResultCnt_.clear();
@@ -204,6 +215,107 @@ void WifiProChr::RecordWifiProSwitchSuccTime()
     }
 }
 
+void WifiProChr::RecordGatewayInfoBeforeSwitch()
+{
+    int instId = 0;
+    IpInfo ipInfo;
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, instId);
+    if (ipInfo.gateway == 0) {
+        lastGatewayIp_ = "";
+        lastGatewayMac_ = "";
+        lastBssid_ = "";
+        WIFI_LOGI("RecordGatewayInfoBeforeSwitch Get Ip Info failed");
+        return;
+    }
+    lastGatewayIp_ = IpTools::ConvertIpv4Address(ipInfo.gateway);
+    lastGatewayMac_ = "";
+    std::string ifaceName = "wlan0";
+    int ret = IpTools::GetGatewayMac(lastGatewayIp_, lastGatewayMac_, ifaceName);
+    if (ret != 0) {
+        WIFI_LOGI("RecordGatewayInfoBeforeSwitch Get gateway mac failed");
+        return;
+    }
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, instId);
+    lastBssid_ = linkedInfo.bssid;
+    WIFI_LOGI("RecordGatewayInfoBeforeSwitch  gateway mac %{public}s", MacAnonymize(lastGatewayMac_).c_str());
+}
+
+void WifiProChr::DoOneArp(IpInfo &ipInfo, std::string &gatewayIp, std::string &ifaceName)
+{
+    int instId = 0;
+    uint64_t arpRtt = 0;
+    std::string macAddress;
+    WifiConfigCenter::GetInstance().GetMacAddress(macAddress, instId);
+    std::string ipAddress = IpTools::ConvertIpv4Address(ipInfo.ipAddress);
+    ArpChecker arpChecker;
+    arpChecker.Start(ifaceName, macAddress, ipAddress, gatewayIp);
+    arpChecker.DoArpCheck(ARP_CHECK_TIME_MS, true, arpRtt);
+}
+
+bool WifiProChr::IsSimilarBssid(std::string &bssid1, std::string &bssid2)
+{
+    if (bssid1 == MAC_ADDR_ALL_ZERO || bssid1.length() < SIMILAR_BSSID_PREFIX_LEN ||
+        bssid2.length() < SIMILAR_BSSID_PREFIX_LEN) {
+        WIFI_LOGI("IsSimilarBssid zero or invalid len");
+        return false;
+    }
+    bool isSimilar = bssid1.compare(0, SIMILAR_BSSID_PREFIX_LEN, bssid2.c_str(), 0,  SIMILAR_BSSID_PREFIX_LEN) == 0;
+    WIFI_LOGI("IsSimilarBssid %{public}d", isSimilar);
+    return isSimilar;
+}
+
+void WifiProChr::RecordGatewayInfoAfterSwitch()
+{
+    int instId = 0;
+    IpInfo ipInfo;
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, instId);
+    if (ipInfo.gateway == 0 || lastGatewayIp_.empty()) {
+        gatewayIpUnknownCnt_++;
+        WIFI_LOGI("GatewayInfoAfterSwitch unknown gateway ip");
+        return;
+    }
+ 
+    std::string gatewayIp = IpTools::ConvertIpv4Address(ipInfo.gateway);
+    if (gatewayIp != lastGatewayIp_) {
+        WIFI_LOGI("GatewayInfoAfterSwitch diff ip, last: %{public}s now: %{public}s",
+            IpAnonymize(lastGatewayIp_).c_str(), IpAnonymize(gatewayIp).c_str());
+        lastGatewayIp_ = gatewayIp;
+        gatewayIpDiffCnt_++;
+        return;
+    }
+    gatewayIpSameCnt_++;
+ 
+    std::string gatewayMac;
+    std::string ifaceName = "wlan0";
+    int ret = IpTools::GetGatewayMac(gatewayIp, gatewayMac, ifaceName);
+    if (gatewayMac == MAC_ADDR_ALL_ZERO) {
+        WIFI_LOGI("GatewayInfoAfterSwitch gateway mac all zero, do one arp");
+        DoOneArp(ipInfo, gatewayIp, ifaceName);
+        ret = IpTools::GetGatewayMac(gatewayIp, gatewayMac, ifaceName);
+    }
+    if (ret != 0 || lastGatewayMac_.empty()) {
+        WIFI_LOGI("GatewayInfoAfterSwitch same ip: %{public}s, unknown gateway mac", IpAnonymize(gatewayIp).c_str());
+        gatewayMacUnknownCnt_++;
+        return;
+    }
+    if (gatewayMac == lastGatewayMac_) {
+        WIFI_LOGI("GatewayInfoAfterSwitch same ip %{public}s, same mac: %{public}s",
+            IpAnonymize(gatewayIp).c_str(), MacAnonymize(gatewayMac).c_str());
+        gatewayMacSameCnt_++;
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, instId);
+        if (IsSimilarBssid(lastBssid_, linkedInfo.bssid)) {
+            gatewayBssidSimilarCnt_++;
+        }
+    } else {
+        WIFI_LOGI("GatewayInfoAfterSwitch same ip %{public}s, diff mac last: %{public}s, now: %{public}s",
+            IpAnonymize(gatewayIp).c_str(), MacAnonymize(lastGatewayMac_).c_str(), MacAnonymize(gatewayMac).c_str());
+        gatewayMacDiffCnt_++;
+        lastGatewayMac_ = gatewayMac;
+    }
+}
+
 void WifiProChr::RecordCountWiFiPro(bool isValid)
 {
     WIFI_LOGD("RecordCountWiFiPro, isValid : %{public}d, switchReason_ : %{public}d",
@@ -326,6 +438,13 @@ void WifiProChr::FillWifiProStatisticsJsons(cJSON *root)
     cJSON_AddNumberToObject(
         root, "REASON_NOT_SWITCH_NOT_AUTOSWITCH", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_NOT_ALLOW_AUTOSWITCH]);
     cJSON_AddNumberToObject(root, "REASON_NOT_SWITCH_DISABLED", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_DISABLED]);
+    cJSON_AddNumberToObject(root, "GATEWAYIP_SAME_CNT", gatewayIpSameCnt_);
+    cJSON_AddNumberToObject(root, "GATEWAYIP_DIFF_CNT", gatewayIpDiffCnt_);
+    cJSON_AddNumberToObject(root, "GATEWAYIP_UNKNOWN_CNT", gatewayIpUnknownCnt_);
+    cJSON_AddNumberToObject(root, "GATEWAYMAC_SAME_CNT", gatewayMacSameCnt_);
+    cJSON_AddNumberToObject(root, "GATEWAYMAC_DIFF_CNT", gatewayMacDiffCnt_);
+    cJSON_AddNumberToObject(root, "GATEWAYMAC_UNKNOWN_CNT", gatewayMacUnknownCnt_);
+    cJSON_AddNumberToObject(root, "GATEWAY_BSSID_SIMILAR_CNT", gatewayBssidSimilarCnt_);
 }
 }  // namespace Wifi
 }  // namespace OHOS

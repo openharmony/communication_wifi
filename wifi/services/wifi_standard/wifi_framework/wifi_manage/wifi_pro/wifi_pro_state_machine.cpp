@@ -508,6 +508,7 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
     targetBssid_ = networkSelectionResult.interScanInfo.bssid;
     isWifi2WifiSwitching_ = true;
     WifiProChr::GetInstance().RecordWifiProConnectTime();
+    WifiProChr::GetInstance().RecordGatewayInfoBeforeSwitch();
     WIFI_LOGE("TryWifi2Wifi: Switch reason : %{public}s", (g_switchReason[wifiSwitchReason_]).c_str());
     if (pStaService->StartConnectToBssid(networkId, targetBssid_, NETWORK_SELECTED_BY_WIFIPRO) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("TryWifi2Wifi: ConnectToNetwork failed.");
@@ -552,6 +553,7 @@ void WifiProStateMachine::ProcessSwitchResult(const InternalMessagePtr msg)
         WifiProChr::GetInstance().RecordSwitchChrCnt(true);
         WifiProChr::GetInstance().RecordWifiProSwitchSuccTime();
         HandleWifi2WifiSucsess(BLOCKLIST_VALID_TIME);
+        WifiProChr::GetInstance().RecordGatewayInfoAfterSwitch();
     }
     Wifi2WifiFinish();
 }

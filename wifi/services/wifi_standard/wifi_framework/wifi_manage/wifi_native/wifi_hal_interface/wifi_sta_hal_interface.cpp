@@ -252,6 +252,7 @@ static void ConvertsScanInfo(InterScanInfo &interScanInfo, ScanInfo &scanInfo)
     interScanInfo.channelWidth = (WifiChannelWidth)scanInfo.channelWidth;
     interScanInfo.centerFrequency0 = scanInfo.centerFrequency0;
     interScanInfo.centerFrequency1 = scanInfo.centerFrequency1;
+    interScanInfo.isEhtInfoExist = scanInfo.isEhtInfoExist;
     interScanInfo.isVhtInfoExist = scanInfo.isVhtInfoExist;
     interScanInfo.isHtInfoExist = scanInfo.isHtInfoExist;
     interScanInfo.isHeInfoExist = scanInfo.isHeInfoExist;

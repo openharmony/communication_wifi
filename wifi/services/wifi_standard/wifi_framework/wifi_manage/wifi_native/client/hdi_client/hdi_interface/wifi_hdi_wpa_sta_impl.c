@@ -576,11 +576,11 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
             break;
         }
         LOGI("-->>%{public}2d %{private}s %{private}s %{public}d %{public}d %{public}d %{public}d \
-         %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d",
+         %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d %{public}d",
              j, results[j].ssid, results[j].bssid, results[j].freq, results[j].siglv,
              results[j].centerFrequency0, results[j].centerFrequency1, results[j].channelWidth,
-             results[j].isVhtInfoExist, results[j].isHtInfoExist, results[j].isHeInfoExist, results[j].isErpExist,
-             results[j].maxRates, results[j].extMaxRates);
+             results[j].isVhtInfoExist, results[j].isHtInfoExist, results[j].isHeInfoExist, results[j].isEhtInfoExist,
+             results[j].isErpExist, results[j].maxRates, results[j].extMaxRates);
         token = strtok_r(NULL, "\n", &savedPtr);
         j++;
     }

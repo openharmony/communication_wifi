@@ -462,6 +462,30 @@ bool NotCurrentNetworkFilter::Filter(NetworkCandidate &networkCandidate)
     return true;
 }
 
+SameBssidNetworkFilter::SameBssidNetworkFilter() : SimpleWifiFilter("SameBssidNetwork") {}
+
+SameBssidNetworkFilter::~SameBssidNetworkFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+
+bool SameBssidNetworkFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (networkCandidate.interScanInfo.bssid == linkedInfo.bssid) {
+        WIFI_LOGI("SameBssidNetworkFilter, same bssid:%{public}s",
+            networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::SAME_BSSID);
+        return false;
+    }
+    return true;
+}
+
 SignalLevelFilter::SignalLevelFilter() : SimpleWifiFilter("SignalLevel") {}
 
 SignalLevelFilter::~SignalLevelFilter()

@@ -109,6 +109,7 @@ typedef struct ScanInfo {
     char flags[WIFI_SCAN_INFO_CAPABILITY_LENGTH];
     int64_t timestamp;
     int ant;
+    int isEhtInfoExist;
     int isVhtInfoExist;
     int isHtInfoExist;
     int isHeInfoExist;
@@ -235,6 +236,7 @@ typedef struct CStationInfo {
 } CStationInfo;
 
 struct NeedParseIe {
+    ScanInfoElem* ieEhtOper;
     ScanInfoElem* ieExtern;
     ScanInfoElem* ieVhtOper;
     ScanInfoElem* ieHtOper;

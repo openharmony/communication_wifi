@@ -53,6 +53,7 @@ const unsigned int VHT_OPER_EID = 192;
 const unsigned int EXT_EXIST_EID = 255;
 const unsigned int EXT_HE_OPER_EID = 36;
 const unsigned int HE_OPER_BASIC_LEN = 6;
+const unsigned int EHT_OPER_BASIC_LEN = 5;
 const unsigned int VHT_OPER_INFO_EXTST_MASK = 0x40;
 const unsigned int GHZ_HE_INFO_EXIST_MASK_6 = 0x02;
 const unsigned int GHZ_HE_WIDTH_MASK_6 = 0x03;
@@ -221,6 +222,22 @@ static int HexStringToString(const char *str, char *out)
     return 0;
 }
 
+static bool GetChanWidthCenterFreqEht(ScanInfo *pcmd, ScanInfoElem* infoElem)
+{
+    if ((pcmd == NULL) || (infoElem == NULL)) {
+        LOGE("pcmd or iesNeedParse is NULL.");
+        return false;
+    }
+    if ((infoElem->content == NULL) || ((unsigned int)infoElem->size < (EHT_OPER_BASIC_LEN + 1))) {
+        return false;
+    }
+    if (infoElem->content[0] != HDI_EID_EXT_EHT_OPERATION_80211BE) {
+        return false;
+    }
+    pcmd->isEhtInfoExist = 1;
+    return true;
+}
+
 static bool GetChanWidthCenterFreqVht(ScanInfo *pcmd, ScanInfoElem* infoElem)
 {
     if ((pcmd == NULL) || (infoElem == NULL)) {
@@ -340,6 +357,9 @@ static void GetChanWidthCenterFreq(ScanInfo *pcmd, struct NeedParseIe* iesNeedPa
         return;
     }
 
+    if ((iesNeedParse->ieEhtOper != NULL) && GetChanWidthCenterFreqEht(pcmd, iesNeedParse->ieEhtOper)) {
+        return;
+    }
     if ((iesNeedParse->ieExtern != NULL) && GetChanWidthCenterFreqHe(pcmd, iesNeedParse->ieExtern)) {
         return;
     }
@@ -373,7 +393,11 @@ static void RecordIeNeedParse(unsigned int id, ScanInfoElem* ie, struct NeedPars
     }
     switch (id) {
         case EXT_EXIST_EID:
-            iesNeedParse->ieExtern = ie;
+            if (ie->content[0] == HDI_EID_EXT_EHT_OPERATION_80211BE) {
+                iesNeedParse->ieEhtOper = ie;
+            } else if (ie->content[0] == EXT_HE_OPER_EID) {
+                iesNeedParse->ieExtern = ie;
+            }
             break;
         case VHT_OPER_EID:
             iesNeedParse->ieVhtOper = ie;
@@ -577,6 +601,10 @@ static int HdiParseExtensionInfo(const uint8_t *pos, size_t elen,
         case HDI_EID_EXT_EHT_CAPABILITIES_80211BE:
             elems->ehtCapabilities80211Be = pos;
             elems->ehtCapabilities80211BeLen = elen;
+            break;
+        case HDI_EID_EXT_EHT_OPERATION_80211BE:
+            elems->ehtOperation80211Be = pos;
+            elems->ehtOperation80211BeLen = elen;
             break;
         default:
             return -1;
@@ -1229,6 +1257,32 @@ int GetScanResultText(const struct WifiScanResultExt *scanResult,
         if (len > 1) {
             ret = HdiTxtPrintf(pos, end - pos, "[%d %02x",
                 HDI_EID_EXTENSION, HDI_EID_EXT_HE_OPERATION);
+            if (HdiCheckError(end - pos, ret)) {
+                return -1;
+            }
+            pos += ret;
+            for (size_t i = 0; i < len - 1; i++) { // because ext tag number used one postion, len need substract 1.
+                ret = HdiTxtPrintf(pos, end - pos, "%02x", infoEle[i + HDI_POS_THIRD]);
+                if (HdiCheckError(end - pos, ret)) {
+                    return -1;
+                }
+                pos += ret;
+            }
+            ret = HdiTxtPrintf(pos, end - pos, "]");
+            if (HdiCheckError(end - pos, ret)) {
+                return -1;
+            }
+            pos += ret;
+        }
+    }
+
+    infoEle = HdiBssGetIeExt(scanResult->ie, scanResult->ieLen, HDI_EID_EXT_EHT_OPERATION_80211BE);
+    // infoEle format: First position: Tag number, second postion: Tag length, third postion: ext tag number.
+    if (infoEle) {
+        unsigned int len = infoEle[1];
+        if (len > 1) {
+            ret = HdiTxtPrintf(pos, end - pos, "[%d %02x",
+                HDI_EID_EXTENSION, HDI_EID_EXT_EHT_OPERATION_80211BE);
             if (HdiCheckError(end - pos, ret)) {
                 return -1;
             }

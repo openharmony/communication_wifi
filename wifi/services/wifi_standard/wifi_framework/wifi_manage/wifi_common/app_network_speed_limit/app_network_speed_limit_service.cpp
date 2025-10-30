@@ -267,12 +267,6 @@ bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const s
 void AppNetworkSpeedLimitService::AsyncLimitSpeed(const AsyncParamInfo &asyncParamInfo)
 {
     m_asyncSendLimit->PostAsyncTask([asyncParamInfo, this]() {
-            this->HandlePowerMode(asyncParamInfo);
-            // Handle speed limit (skip if VPN is connected)
-            if (isVpnConnected_) {
-                WIFI_LOGD("%{public}s VPN is connected, cancel speed limit setting", __FUNCTION__);
-                return;
-            }
             this->HandleRequest(asyncParamInfo);
         });
 }
@@ -302,6 +296,11 @@ void AppNetworkSpeedLimitService::SendLimitCmd2Drv(const int controlId, const in
 {
     WIFI_LOGD("enter SendLimitCmd2Drv");
     m_bgLimitRecordMap[controlId] = limitMode;
+    // Skip speed limit if VPN is connected
+    if (isVpnConnected_) {
+        WIFI_LOGD("%{public}s VPN is connected, cancel speed limit setting", __FUNCTION__);
+        return;
+    }
     m_limitSpeedMode = GetBgLimitMaxMode();
     int64_t delayTime = 0;
     // Downshifting without delay, upshifting with delay.
@@ -435,6 +434,10 @@ void AppNetworkSpeedLimitService::FilterLimitSpeedConfigs()
 
 void AppNetworkSpeedLimitService::WifiConnectStateChanged()
 {
+    // Reset power mode on WiFi disconnect
+    if (!m_isWifiConnected) {
+        ResetPowerMode();
+    }
     if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] != BG_LIMIT_OFF) {
         SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_TEMP, m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP],
             m_isHighPriorityTransmit);
@@ -460,6 +463,8 @@ bool AppNetworkSpeedLimitService::IsTopNLimitSpeedSceneInNow()
 
 void AppNetworkSpeedLimitService::ForegroundAppChangedAction(const std::string &bundleName)
 {
+    // Check and reset power mode on foreground app change
+    CheckAndResetGamePowerMode(bundleName);
     if (m_isWifiConnected && m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] != BG_LIMIT_OFF) {
         WIFI_LOGI("%{public}s high temp speed limit is running, update background app list", __FUNCTION__);
         SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_TEMP, m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP],
@@ -478,9 +483,11 @@ void AppNetworkSpeedLimitService::ForegroundAppChangedAction(const std::string &
 void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)
 {
     WIFI_LOGI("%{public}s enter game limit configs, game state is %{public}d", __FUNCTION__, networkControlInfo.state);
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
     switch (networkControlInfo.state) {
         case GameSceneId::MSG_GAME_STATE_START:
         case GameSceneId::MSG_GAME_STATE_FOREGROUND:
+            SetGamePowerMode(ifaceName, GAME_POWER_MODE_INACTIVE);
             if (AppParser::GetInstance().IsOverGameRtt(networkControlInfo.bundleName, networkControlInfo.rtt)) {
                 SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
                     networkControlInfo.uid);
@@ -491,12 +498,15 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
             break;
         case GameSceneId::MSG_GAME_STATE_BACKGROUND:
         case GameSceneId::MSG_GAME_STATE_END:
+            SetGamePowerMode(ifaceName, GAME_POWER_MODE_INACTIVE);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_OFF, GAME_BOOST_DISABLE, networkControlInfo.uid);
             break;
         case GameSceneId::MSG_GAME_ENTER_PVP_BATTLE:
+            SetGamePowerMode(ifaceName, GAME_POWER_MODE_ACTIVE);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE, networkControlInfo.uid);
             break;
         case GameSceneId::MSG_GAME_EXIT_PVP_BATTLE:
+            SetGamePowerMode(ifaceName, GAME_POWER_MODE_INACTIVE);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_3, GAME_BOOST_DISABLE, networkControlInfo.uid);
             break;
         default:
@@ -545,46 +555,6 @@ void AppNetworkSpeedLimitService::HandleNetworkConnectivityChange(int32_t bearTy
     if (preVpnState != currentVpnState) {
         WIFI_LOGI("%{public}s VPN connection state changed: %{public}d -> %{public}d",
             __FUNCTION__, preVpnState, currentVpnState);
-    }
-}
-
-void AppNetworkSpeedLimitService::HandlePowerMode(const AsyncParamInfo &asyncParamInfo)
-{
-    if (asyncParamInfo.funcName == RECEIVE_NETWORK_CONTROL &&
-        asyncParamInfo.networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_GAME) {
-        HandleGamePowerMode(asyncParamInfo.networkControlInfo);
-    } else if (asyncParamInfo.funcName == HANDLE_WIFI_CONNECT_CHANGED) {
-        if (!m_isWifiConnected) {
-            ResetPowerMode();
-        }
-    } else if (asyncParamInfo.funcName == HANDLE_FOREGROUND_APP_CHANGED) {
-        CheckAndResetGamePowerMode(asyncParamInfo.bundleName);
-    }
-}
-
-void AppNetworkSpeedLimitService::HandleGamePowerMode(const WifiNetworkControlInfo &networkControlInfo)
-{
-    WIFI_LOGI("%{public}s handle game power mode, game state is %{public}d", __FUNCTION__, networkControlInfo.state);
-    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName();
-    
-    switch (networkControlInfo.state) {
-        case GameSceneId::MSG_GAME_STATE_START:
-        case GameSceneId::MSG_GAME_STATE_FOREGROUND:
-            SetGamePowerMode(ifaceName, GAME_POWER_MODE_INACTIVE);
-            break;
-        case GameSceneId::MSG_GAME_STATE_BACKGROUND:
-        case GameSceneId::MSG_GAME_STATE_END:
-            SetGamePowerMode(ifaceName, GAME_POWER_MODE_INACTIVE);
-            break;
-        case GameSceneId::MSG_GAME_ENTER_PVP_BATTLE:
-            SetGamePowerMode(ifaceName, GAME_POWER_MODE_ACTIVE);
-            break;
-        case GameSceneId::MSG_GAME_EXIT_PVP_BATTLE:
-            SetGamePowerMode(ifaceName, GAME_POWER_MODE_INACTIVE);
-            break;
-        default:
-            WIFI_LOGE("%{public}s unknown game state: %{public}d", __FUNCTION__, networkControlInfo.state);
-            break;
     }
 }
 
@@ -644,8 +614,7 @@ void AppNetworkSpeedLimitService::CheckAndResetGamePowerMode(const std::string &
         return;
     }
     // Foreground app is not a game, but in no-sleep mode
-    WIFI_LOGW("%{public}s Escape mechanism triggered: foreground app changed to non-game [%{public}s] "
-              "but power mode is still no-sleep, resetting to normal sleep",
+    WIFI_LOGW("%{public}s Non-game app [%{public}s], resetting power mode to normal sleep",
               __FUNCTION__, bundleName.c_str());
     ResetPowerMode();
 }

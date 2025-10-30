@@ -166,10 +166,7 @@ enum ConnState {
     DISCONNECTED,
 
     /** The Wi-Fi special connection. */
-    SPECIAL_CONNECT,
-
-    /** The Wi-Fi is switching. */
-    SWITCHING,   
+    SPECIAL_CONNECT, 
 
     /** Failed to set up the Wi-Fi connection. */
     UNKNOWN
@@ -347,7 +344,7 @@ struct WifiLinkedInfo {
         centerFrequency0 = 0;
         centerFrequency1 = 0;
         connTriggerMode = -1;
-        disconnTriggerMode = ConnState::UNKNOWN;
+        disconnTriggerMode = DisconnState::UNKNOWN;
     }
 };
 
@@ -1167,6 +1164,12 @@ struct Ipv6ControlData {
     bool enableIpv6SelfCure = true;
     int txPacketThreshold = 3;
     int failCountThreshold = 3;
+};
+
+enum DisconnState{
+    UNKNOWN,
+    DISCONNECTED,
+    SWITCHING,
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -308,7 +308,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.isMloConnected = false;
     linkedInfo.isWurEnable = false;
     linkedInfo.isHiLinkNetwork = 0;
-    linkedInfo.disconnTriggerMode = ConnState::UNKNOWN;
+    linkedInfo.disconnTriggerMode = DisconnState::UNKNOWN;
     std::vector<WifiLinkedInfo> emptyMloLinkInfo;
     WifiConfigCenter::GetInstance().SaveMloLinkedInfo(emptyMloLinkInfo, m_instId);
 }
@@ -874,7 +874,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     WifiChrUtils::GetInstance().ClearSignalPollInfoArray();
     WriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, -1, "DISCONNECT");
     if (!pStaStateMachine->IsNewConnectionInProgress()) {
-        pStaStateMachine->linkedInfo.disconnTriggerMode = ConnState::DISCONNECTED;
+        pStaStateMachine->linkedInfo.disconnTriggerMode = DisconnState::DISCONNECTED;
         bool shouldStopTimer = pStaStateMachine->IsDisConnectReasonShouldStopTimer(reason);
         if (shouldStopTimer) {
             pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
@@ -905,7 +905,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         ConnState currentState = pStaStateMachine->linkedInfo.connState;
         DetailedState currentDetailState = pStaStateMachine->linkedInfo.detailedState;
         pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::DISCONNECTED);
-        pStaStateMachine->linkedInfo.disconnTriggerMode = ConnState::SWITCHING;
+        pStaStateMachine->linkedInfo.disconnTriggerMode = DisconnState::SWITCHING;
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTED,
             pStaStateMachine->linkedInfo);
         pStaStateMachine->InitWifiLinkedInfo();

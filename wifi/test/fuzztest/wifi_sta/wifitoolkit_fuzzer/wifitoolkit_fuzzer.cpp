@@ -32,6 +32,12 @@
 #include "wifi_randommac_helper.h"
 #include "wifi_asset_manager.h"
 #include "wifi_encryption_util.h"
+#include "wifi_notification_util.h"
+#include "network_selection_manager.h"
+#include "wifi_channel_helper.h"
+#include "network_selection.h"
+#include "network_selector_factory.h"
+#include "wifi_watchdog_utils.h"
 #include <mutex>
 #include <fuzzer/FuzzedDataProvider.h>
 
@@ -40,6 +46,7 @@ namespace Wifi {
 constexpr int U32_AT_SIZE_ZERO = 4;
 constexpr int WIFI_MAX_SSID_LEN = 16;
 constexpr int TWO = 2;
+constexpr int SIX = 6;
 constexpr int FORTYTHREE = 43;
 constexpr int HUNDRED = 100;
 static bool g_isInsted = false;
@@ -61,13 +68,17 @@ static std::unique_ptr<MockXmlParser> m_xmlParser = nullptr;
 static std::unique_ptr<SoftapXmlParser> m_softapXmlParser = nullptr;
 static std::unique_ptr<WifiRandomMacHelper> m_WifiRandomMacHelper = nullptr;
 static std::unique_ptr<WifiAssetManager> m_WifiAssetManager = nullptr;
-
+static std::unique_ptr<WifiNotificationUtil> m_WifiNotificationUtil = nullptr;
+static std::unique_ptr<NetworkSelectionManager> m_NetworkSelectionManager = nullptr;
+static std::unique_ptr<WifiWatchDogUtils> m_WifiWatchDogUtils = nullptr;
 void MyExit()
 {
     m_networkXmlParser.reset();
     m_appXmlParser.reset();
     m_xmlParser.reset();
     m_softapXmlParser.reset();
+    m_WifiAssetManager.reset();
+    m_WifiNotificationUtil.reset();
     sleep(3);
     printf("exiting\n");
 }
@@ -92,6 +103,8 @@ void InitParam()
         m_appXmlParser = std::make_unique<AppParser>();
         m_xmlParser = std::make_unique<MockXmlParser>();
         m_softapXmlParser = std::make_unique<SoftapXmlParser>();
+        m_WifiAssetManager = std::make_unique<WifiAssetManager>();
+        m_WifiNotificationUtil = std::make_unique<WifiNotificationUtil>();
         InitAppParserTest();
         if (m_networkXmlParser == nullptr) {
             return;
@@ -135,26 +148,32 @@ void NetworkXmlParserTest(const uint8_t* data, size_t size)
 
 void AppXmlParserTest(const uint8_t* data, size_t size)
 {
-    std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
-    char *string = nullptr;
-    if (memcpy_s(string, WIFI_MAX_SSID_LEN, data, WIFI_MAX_SSID_LEN - 1) != EOK) {
+    char buf[WIFI_MAX_SSID_LEN] = {0};
+    size_t n = size;
+    if (n > static_cast<size_t>(WIFI_MAX_SSID_LEN - 1)) {
+        n = WIFI_MAX_SSID_LEN - 1;
+    }
+    if (n > 0 && data != nullptr) {
+        if (memcpy_s(buf, sizeof(buf), data, n) != EOK) {
+            return;
+        }
+    }
+    int gameRtt = 0;
+    if (data != nullptr && size >= sizeof(gameRtt)) {
+        if (memcpy_s(&gameRtt, sizeof(gameRtt), data, sizeof(gameRtt)) != EOK) {
+            gameRtt = 0;
+        }
+    }
+    if (!m_appXmlParser) {
         return;
     }
-    int gameRtt = *reinterpret_cast<const int*>(data);
     m_appXmlParser->Init();
-    m_appXmlParser->IsLowLatencyApp(conditionName);
-    m_appXmlParser->IsWhiteListApp(conditionName);
-    m_appXmlParser->IsBlackListApp(conditionName);
-    m_appXmlParser->IsMultiLinkApp(conditionName);
-    m_appXmlParser->IsChariotApp(conditionName);
-    m_appXmlParser->IsHighTempLimitSpeedApp(conditionName);
-    m_appXmlParser->IsKeyForegroundApp(conditionName);
-    m_appXmlParser->IsKeyBackgroundLimitApp(conditionName);
-    m_appXmlParser->IsLiveStreamApp(conditionName);
-    m_appXmlParser->IsGameBackgroundLimitApp(conditionName);
+    if (!m_appXmlParser->appParserInner_) {
+        return;
+    }
+    std::string conditionName(reinterpret_cast<const char*>(data), size);
     m_appXmlParser->IsOverGameRtt(conditionName, gameRtt);
     m_appXmlParser->GetAsyncLimitSpeedDelayTime();
-    m_appXmlParser->appParserInner_->InitAppParser(string);
     m_appXmlParser->appParserInner_->ParseInternal(root_node);
     m_appXmlParser->appParserInner_->ParseAppList(root_node);
     m_appXmlParser->appParserInner_->ParseNetworkControlAppList(root_node);
@@ -171,9 +190,48 @@ void AppXmlParserTest(const uint8_t* data, size_t size)
     m_appXmlParser->appParserInner_->ParseAsyncLimitSpeedDelayTime(root_node);
     m_appXmlParser->appParserInner_->GetAppTypeAsInt(root_node);
     m_appXmlParser->appParserInner_->GetLocalFileVersion(root_node);
-    m_xmlParser->LoadConfiguration(string);
-    m_xmlParser->LoadConfigurationMemory(string);
-    ConvertStringToBool(string);
+    m_xmlParser->LoadConfiguration(buf);
+    m_xmlParser->LoadConfigurationMemory(buf);
+    ConvertStringToBool(buf);
+}
+
+void AppXmlParserTest2(const uint8_t* data, size_t size)
+{
+    char buf[WIFI_MAX_SSID_LEN] = {0};
+    size_t n = size;
+    if (n > static_cast<size_t>(WIFI_MAX_SSID_LEN - 1)) {
+        n = WIFI_MAX_SSID_LEN - 1;
+    }
+    if (n > 0 && data != nullptr) {
+        if (memcpy_s(buf, sizeof(buf), data, n) != EOK) {
+            return;
+        }
+    }
+    int gameRtt = 0;
+    if (data != nullptr && size >= sizeof(gameRtt)) {
+        if (memcpy_s(&gameRtt, sizeof(gameRtt), data, sizeof(gameRtt)) != EOK) {
+            gameRtt = 0;
+        }
+    }
+    if (!m_appXmlParser) {
+        return;
+    }
+    m_appXmlParser->Init();
+    if (!m_appXmlParser->appParserInner_) {
+        return;
+    }
+    std::string conditionName(reinterpret_cast<const char*>(data), size);
+    m_appXmlParser->IsLowLatencyApp(conditionName);
+    m_appXmlParser->IsWhiteListApp(conditionName);
+    m_appXmlParser->IsBlackListApp(conditionName);
+    m_appXmlParser->IsMultiLinkApp(conditionName);
+    m_appXmlParser->IsChariotApp(conditionName);
+    m_appXmlParser->IsHighTempLimitSpeedApp(conditionName);
+    m_appXmlParser->IsKeyForegroundApp(conditionName);
+    m_appXmlParser->IsKeyBackgroundLimitApp(conditionName);
+    m_appXmlParser->IsLiveStreamApp(conditionName);
+    m_appXmlParser->IsGameBackgroundLimitApp(conditionName);
+    m_appXmlParser->appParserInner_->InitAppParser(buf);
 }
 
 void AppParserTest(const uint8_t* data, size_t size)
@@ -269,6 +327,69 @@ void WifiencryptionutilTest()
     WifiGenerateMacRandomizationSecret(keyName, data, outPlant);
 }
 
+void WifinetworkselectionmanagerTest()
+{
+    WifiDeviceConfig deviceConfig;
+    WifiScanInfo wifiScanInfo;
+    InterScanInfo interScanInfo;
+    NetworkSelectionResult networkSelectionResult;
+    std::string autoSelectBssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    std::vector<NetworkSelection::NetworkCandidate> networkCandidates;
+    std::vector<InterScanInfo> scanInfos;
+    m_NetworkSelectionManager->SelectNetworkWithSsid(deviceConfig, autoSelectBssid);
+    m_NetworkSelectionManager->GetAllDeviceConfigs(networkCandidates, scanInfos);
+    m_NetworkSelectionManager->ConvertScanInfo(wifiScanInfo, interScanInfo);
+    m_NetworkSelectionManager->GetFilteredReasonForChr(networkCandidates);
+}
+
+void WifinotificationutilTest()
+{
+    int32_t randomInt = FDP->ConsumeIntegral<int32_t>();
+    WifiNotificationId notificationId = static_cast<WifiNotificationId>(randomInt % TWO);
+    WifiDialogType type = static_cast<WifiDialogType>(randomInt % SIX);
+    std::string bundleName = FDP->ConsumeBytesAsString(NUM_BYTES);
+    std::string abilityName = FDP->ConsumeBytesAsString(NUM_BYTES);
+    std::string navEntryKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    std::string comInfo = FDP->ConsumeBytesAsString(NUM_BYTES);
+    std::string settings = FDP->ConsumeBytesAsString(NUM_BYTES);
+    m_WifiNotificationUtil->CancelWifiNotification(notificationId);
+    m_WifiNotificationUtil->DisplaySettingWlanPage(bundleName, abilityName, navEntryKey);
+    m_WifiNotificationUtil->ShowDialog(type, comInfo);
+    m_WifiNotificationUtil->ShowSettingsDialog(type, settings);
+}
+
+void WifiWatchDogUtilsTest()
+{
+    uint64_t taskId = FDP->ConsumeIntegral<uint64_t>();
+    std::string taskInfoStr = FDP->ConsumeBytesAsString(NUM_BYTES);
+    uint32_t delayedTaskCount = FDP->ConsumeIntegral<uint32_t>();
+    bool usingHiviewDfx = FDP->ConsumeIntegral<bool>();
+    bool notResetProcess = true;
+    std::string threadName = FDP->ConsumeBytesAsString(NUM_BYTES);
+
+    const size_t kMaxTaskInfoLength = 128;
+    if (taskInfoStr.length() > kMaxTaskInfoLength) {
+        taskInfoStr = taskInfoStr.substr(0, kMaxTaskInfoLength);
+    }
+
+    if (!taskInfoStr.empty() && taskInfoStr.back() != '\0') {
+        taskInfoStr += '\0';
+    }
+
+    if (!taskInfoStr.empty() && taskInfoStr.find('\0') != std::string::npos) {
+        size_t nullPos = taskInfoStr.find('\0');
+        taskInfoStr = taskInfoStr.substr(0, nullPos);
+    }
+
+    if (!taskInfoStr.empty()) {
+        m_WifiWatchDogUtils->FfrtCallback(taskId, taskInfoStr.c_str(), delayedTaskCount);
+    } else {
+        return;
+    }
+
+    m_WifiWatchDogUtils->ResetProcess(usingHiviewDfx, threadName, notResetProcess);
+    m_WifiWatchDogUtils->ReportResetEvent(threadName);
+}
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
@@ -284,8 +405,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::AppParserTest(data, size);
     OHOS::Wifi::SoftapParserTest(data, size);
     OHOS::Wifi::WifiRandomMacHelperTest(data, size);
+    OHOS::Wifi::AppXmlParserTest2(data, size);
     OHOS::Wifi::WifiencryptionutilTest();
+    OHOS::Wifi::WifinetworkselectionmanagerTest();
     OHOS::Wifi::AssetManagerTest();
+    OHOS::Wifi::WifinotificationutilTest();
+    OHOS::Wifi::WifiWatchDogUtilsTest();
     return 0;
 }
 }

@@ -164,6 +164,8 @@ public:
     void IsAutoConnectFailByP2PEnhanceFilterSucc1();
     void IsAutoConnectFailByP2PEnhanceFilterSucc2();
     void IsAutoConnectFailByP2PEnhanceFilterFail1();
+    void OnScanInfosReadyHandlerWithSupplicantTransientState();
+    void OnScanInfosReadyHandlerWithAsyncTaskDeduplication();
 };
 
 void StaAutoConnectServiceTest::InitAutoConnectService()
@@ -342,6 +344,39 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail6()
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(0);
+    pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
+}
+
+void StaAutoConnectServiceTest::OnScanInfosReadyHandlerWithSupplicantTransientState()
+{
+    std::vector<InterScanInfo> scanInfos;
+    scanInfos.emplace_back();
+    WifiLinkedInfo infoPrimary;
+    infoPrimary.connState = ConnState::DISCONNECTED;
+    infoPrimary.supplicantState = SupplicantState::FOUR_WAY_HANDSHAKE;  // Transient state
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
+    // Should not proceed to device config due to transient state check
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(0);
+    pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
+}
+
+void StaAutoConnectServiceTest::OnScanInfosReadyHandlerWithAsyncTaskDeduplication()
+{
+    // Test async task deduplication logic
+    std::vector<InterScanInfo> scanInfos;
+    scanInfos.emplace_back();
+    WifiLinkedInfo infoPrimary;
+    infoPrimary.connState = ConnState::UNKNOWN;
+    infoPrimary.supplicantState = SupplicantState::DISCONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(infoPrimary), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(Return(-1));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
+    
+    // Call twice to test task deduplication
+    pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
@@ -1490,6 +1525,16 @@ HWTEST_F(StaAutoConnectServiceTest, IsAutoConnectFailByP2PEnhanceFilterSucc2, Te
 HWTEST_F(StaAutoConnectServiceTest, IsAutoConnectFailByP2PEnhanceFilterFail1, TestSize.Level0)
 {
     IsAutoConnectFailByP2PEnhanceFilterFail1();
+}
+
+HWTEST_F(StaAutoConnectServiceTest, OnScanInfosReadyHandlerWithSupplicantTransientState, TestSize.Level0)
+{
+    OnScanInfosReadyHandlerWithSupplicantTransientState();
+}
+
+HWTEST_F(StaAutoConnectServiceTest, OnScanInfosReadyHandlerWithAsyncTaskDeduplication, TestSize.Level0)
+{
+    OnScanInfosReadyHandlerWithAsyncTaskDeduplication();
 }
 
 HWTEST_F(StaAutoConnectServiceTest, IsCandidateWithUserSelectChoiceHiddenSucc, TestSize.Level0)

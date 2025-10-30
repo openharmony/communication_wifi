@@ -1166,7 +1166,7 @@ struct Ipv6ControlData {
     int failCountThreshold = 3;
 };
 
-enum DisconnState{
+enum DisconnState {
     UNKNOWN,
     DISCONNECTED,
     SWITCHING,

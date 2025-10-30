@@ -132,6 +132,27 @@
       },
       {
         "name": "ohos.permission.KEEP_BACKGROUND_RUNNING"
+      },
+      {
+        "name": "ohos.permission.GET_NETWORK_INFO"
+      },
+      {
+        "name": "ohos.permission.ACCESS_PROTOCOL_DFX_STATE"
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_INFO_INTERNAL"
+      },
+      {
+        "name": "ohos.permission.MANAGE_WIFI_HOTSPOT"
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_LOCAL_MAC"
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_CONFIG"
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_PEERS_MAC"
       }
     ]
   }

@@ -154,7 +154,7 @@ void AppXmlParserTest(const uint8_t* data, size_t size)
         n = WIFI_MAX_SSID_LEN - 1;
     }
     if (n > 0 && data != nullptr) {
-        if (memcpy_s(buf, WIFI_MAX_SSID_LEN, data, n) != EOK) {
+        if (memcpy_s(buf, sizeof(buf), data, n) != EOK) {
             return;
         }
     }
@@ -203,7 +203,7 @@ void AppXmlParserTest2(const uint8_t* data, size_t size)
         n = WIFI_MAX_SSID_LEN - 1;
     }
     if (n > 0 && data != nullptr) {
-        if (memcpy_s(buf, WIFI_MAX_SSID_LEN, data, n) != EOK) {
+        if (memcpy_s(buf, sizeof(buf), data, n) != EOK) {
             return;
         }
     }
@@ -337,7 +337,7 @@ void WifinetworkselectionmanagerTest()
     std::vector<NetworkSelection::NetworkCandidate> networkCandidates;
     std::vector<InterScanInfo> scanInfos;
     m_NetworkSelectionManager->SelectNetworkWithSsid(deviceConfig, autoSelectBssid);
-    m_NetworkSelectionManager->GetAllDeviceConfigs(networkCandidates,scanInfos);
+    m_NetworkSelectionManager->GetAllDeviceConfigs(networkCandidates, scanInfos);
     m_NetworkSelectionManager->ConvertScanInfo(wifiScanInfo, interScanInfo);
     m_NetworkSelectionManager->GetFilteredReasonForChr(networkCandidates);
 }
@@ -367,9 +367,9 @@ void WifiWatchDogUtilsTest()
     bool notResetProcess = true;
     std::string threadName = FDP->ConsumeBytesAsString(NUM_BYTES);
 
-    const size_t MAX_TASKINFO_LENGTH = 128;
-    if (taskInfoStr.length() > MAX_TASKINFO_LENGTH) {
-        taskInfoStr = taskInfoStr.substr(0, MAX_TASKINFO_LENGTH);
+    const size_t kMaxTaskInfoLength = 128;
+    if (taskInfoStr.length() > kMaxTaskInfoLength) {
+        taskInfoStr = taskInfoStr.substr(0, kMaxTaskInfoLength);
     }
 
     if (!taskInfoStr.empty() && taskInfoStr.back() != '\0') {

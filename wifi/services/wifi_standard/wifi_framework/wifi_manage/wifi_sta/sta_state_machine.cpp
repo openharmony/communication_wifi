@@ -308,7 +308,7 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.isMloConnected = false;
     linkedInfo.isWurEnable = false;
     linkedInfo.isHiLinkNetwork = 0;
-    linkedInfo.disconnTriggerMode = DisconnState::UNKNOWN;
+    linkedInfo.disconnTriggerMode = DisconnState::DEFAULTSTAT;
     std::vector<WifiLinkedInfo> emptyMloLinkInfo;
     WifiConfigCenter::GetInstance().SaveMloLinkedInfo(emptyMloLinkInfo, m_instId);
 }

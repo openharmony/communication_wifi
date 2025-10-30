@@ -166,7 +166,7 @@ enum ConnState {
     DISCONNECTED,
 
     /** The Wi-Fi special connection. */
-    SPECIAL_CONNECT, 
+    SPECIAL_CONNECT,
 
     /** Failed to set up the Wi-Fi connection. */
     UNKNOWN
@@ -1169,7 +1169,7 @@ struct Ipv6ControlData {
 enum DisconnState{
     UNKNOWN,
     DISCONNECTED,
-    SWITCHING,
+    SWITCHING
 };
 }  // namespace Wifi
 }  // namespace OHOS

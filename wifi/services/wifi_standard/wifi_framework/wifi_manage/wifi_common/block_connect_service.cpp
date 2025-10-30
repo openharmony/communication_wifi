@@ -132,7 +132,8 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus()
         return false;
     }
     for (auto &config : results) {
-        WifiSettings::GetInstance().ClearNetworkCandidateScanResult(config.networkId);
+        config.networkSelectionStatus.seenInLastQualifiedNetworkSelection = false;
+        WifiSettings::GetInstance().AddDeviceConfig(config);
         if ((config.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED) &&
             (config.networkSelectionStatus.networkSelectionDisableReason == DisabledReason::DISABLED_NONE)) {
             continue;

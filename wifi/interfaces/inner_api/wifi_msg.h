@@ -1169,7 +1169,7 @@ struct Ipv6ControlData {
 enum DisconnState{
     UNKNOWN,
     DISCONNECTED,
-    SWITCHING
+    SWITCHING,
 };
 }  // namespace Wifi
 }  // namespace OHOS

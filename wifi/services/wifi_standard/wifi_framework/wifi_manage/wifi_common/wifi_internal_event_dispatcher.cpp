@@ -755,7 +755,7 @@ bool WifiInternalEventDispatcher::IsStatusBarFrozen(int uid, const WifiEventCall
     // Check CONNECTING and DISCONNECTED state
     if ((msg.msgData == static_cast<int32_t>(OHOS::Wifi::ConnState::CONNECTING) ||
             msg.msgData == static_cast<int32_t>(OHOS::Wifi::ConnState::DISCONNECTED)) &&
-        msg.linkInfo.disconnTriggerMode == OHOS::Wifi::ConnState::SWITCHING &&
+        msg.linkInfo.disconnTriggerMode == OHOS::Wifi::DisconnState::SWITCHING &&
         msg.linkInfo.connTriggerMode == NETWORK_SELECTED_BY_WIFIPRO) {
             WIFI_LOGI("StatusBar freeze, msg.msgData:%{public}d, %{public}s", msg.msgData, packageName.c_str());
             return true;

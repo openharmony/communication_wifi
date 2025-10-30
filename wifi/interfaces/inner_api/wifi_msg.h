@@ -79,6 +79,12 @@ inline const std::string EAP_METHOD_AKA_PRIME = "AKA'";
 
 inline const int INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
 inline const uint32_t ENABLE_AIDFS = 7;
+enum class DisconnState {
+    DEFAULTSTAT,
+    DISCONNECTED,
+    SWITCHING,
+};
+
 enum SigLevel {
     SIG_LEVEL_0 = 0,
     SIG_LEVEL_1 = 1,
@@ -304,6 +310,8 @@ struct WifiLinkedInfo {
     int linkId;
     int centerFrequency0; /* 40M center frequency */
     int centerFrequency1; /* 160M center frequency */
+    int connTriggerMode; /* Connection Trigger Module */
+    DisconnState disconnTriggerMode;  /* Disconnection Trigger Module */
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -341,6 +349,8 @@ struct WifiLinkedInfo {
         linkId = INVALID_LINK_ID;
         centerFrequency0 = 0;
         centerFrequency1 = 0;
+        connTriggerMode = -1;
+        disconnTriggerMode = DisconnState::DEFAULTSTAT;
     }
 };
 

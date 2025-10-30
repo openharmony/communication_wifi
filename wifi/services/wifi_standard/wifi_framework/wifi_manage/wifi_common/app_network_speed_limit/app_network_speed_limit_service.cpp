@@ -266,12 +266,13 @@ bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const s
 
 void AppNetworkSpeedLimitService::AsyncLimitSpeed(const AsyncParamInfo &asyncParamInfo)
 {
-    HandlePowerModeIfNeeded(asyncParamInfo);
-    if (isVpnConnected_) {
-        WIFI_LOGD("%{public}s VPN is connected, cancel speed limit setting", __FUNCTION__);
-        return;
-    }
     m_asyncSendLimit->PostAsyncTask([asyncParamInfo, this]() {
+            this->HandlePowerMode(asyncParamInfo);
+            // Handle speed limit (skip if VPN is connected)
+            if (isVpnConnected_) {
+                WIFI_LOGD("%{public}s VPN is connected, cancel speed limit setting", __FUNCTION__);
+                return;
+            }
             this->HandleRequest(asyncParamInfo);
         });
 }
@@ -547,26 +548,17 @@ void AppNetworkSpeedLimitService::HandleNetworkConnectivityChange(int32_t bearTy
     }
 }
 
-void AppNetworkSpeedLimitService::HandlePowerModeIfNeeded(const AsyncParamInfo &asyncParamInfo)
+void AppNetworkSpeedLimitService::HandlePowerMode(const AsyncParamInfo &asyncParamInfo)
 {
     if (asyncParamInfo.funcName == RECEIVE_NETWORK_CONTROL &&
         asyncParamInfo.networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_GAME) {
-        // Power mode management for game scenarios
-        m_asyncSendLimit->PostAsyncTask([asyncParamInfo, this]() {
-            this->HandleGamePowerMode(asyncParamInfo.networkControlInfo);
-            }, "HandleGamePowerMode");
+        HandleGamePowerMode(asyncParamInfo.networkControlInfo);
     } else if (asyncParamInfo.funcName == HANDLE_WIFI_CONNECT_CHANGED) {
-        // Reset power mode on WiFi disconnect
         if (!m_isWifiConnected) {
-            m_asyncSendLimit->PostAsyncTask([this]() {
-                this->ResetPowerMode();
-                }, "ResetPowerModeOnWifiDisconnect");
+            ResetPowerMode();
         }
     } else if (asyncParamInfo.funcName == HANDLE_FOREGROUND_APP_CHANGED) {
-        // Check and reset power mode on foreground app change
-        m_asyncSendLimit->PostAsyncTask([asyncParamInfo, this]() {
-            this->CheckAndResetGamePowerMode(asyncParamInfo.bundleName);
-            }, "CheckAndResetGamePowerModeOnAppChange");
+        CheckAndResetGamePowerMode(asyncParamInfo.bundleName);
     }
 }
 

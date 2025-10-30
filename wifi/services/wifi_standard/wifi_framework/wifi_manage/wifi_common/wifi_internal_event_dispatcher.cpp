@@ -27,7 +27,8 @@
 #include "wifi_config_center.h"
 #include "wifi_settings.h"
 #endif
-
+#include "sta_define.h"
+#include "wifi_service_manager.h"
 DEFINE_WIFILOG_LABEL("WifiInternalEventDispatcher");
 
 namespace OHOS {
@@ -712,50 +713,91 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(
             WIFI_LOGD("InvokeDeviceCallbacks, msg.msgCode: %{public}d, instId: %{public}d", msg.msgCode, msg.id);
             auto remote = itr->first;
             bool isFrozen = false;
-#ifdef FEATURE_APP_FROZEN
             int uid = mStaCallBackInfo[msg.id][remote].callingUid;
             int pid = mStaCallBackInfo[msg.id][remote].callingPid;
+#ifdef FEATURE_APP_FROZEN
             isFrozen = IsAppFrozen(pid);
+#endif
             WIFI_LOGD("Check calling APP is hardwareProxied,"
                 "uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d", uid, pid, isFrozen);
-#endif
             if (mStaCallBackInfo[msg.id][remote].regCallBackEventId.count(msg.msgCode) == 0) {
                 WIFI_LOGD("InvokeDeviceCallbacks, Not registered callback event! msg.msgCode: %{public}d,"
                     "instId: %{public}d", msg.msgCode, msg.id);
                 continue;
             }
-
-            switch (msg.msgCode) {
-                case WIFI_CBK_MSG_STATE_CHANGE:
-                    callback->OnWifiStateChanged(msg.msgData);
-                    break;
-                case WIFI_CBK_MSG_CONNECTION_CHANGE:
-                    callback->OnWifiConnectionChanged(msg.msgData, msg.linkInfo);
-                    break;
-                case WIFI_CBK_MSG_RSSI_CHANGE:
-                    if (isFrozen == false) {
-                        callback->OnWifiRssiChanged(msg.msgData);
-                    }
-                    break;
-                case WIFI_CBK_MSG_STREAM_DIRECTION:
-                    if (isFrozen == false) {
-                        callback->OnStreamChanged(msg.msgData);
-                    }
-                    break;
-                case WIFI_CBK_MSG_WPS_STATE_CHANGE:
-                    callback->OnWifiWpsStateChanged(msg.msgData, msg.pinCode);
-                    break;
-                case WIFI_CBK_MSG_DEVICE_CONFIG_CHANGE:
-                    callback->OnDeviceConfigChanged(ConfigChange(msg.msgData));
-                    break;
-                case WIFI_CBK_MSG_CANDIDATE_CONNECT_CHANGE:
-                    callback->OnCandidateApprovalStatusChanged(CandidateApprovalStatus(msg.msgData));
-                    break;
-                default:
-                    WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
-                    break;
+            if (IsStatusBarFrozen(uid, msg)) {
+                continue;
             }
+            InvokeDeviceCallbacksExtral(isFrozen, msg, callback);
         }
+    }
+}
+
+bool WifiInternalEventDispatcher::IsStatusBarFrozen(int uid, const WifiEventCallbackMsg &msg)
+{
+    if (msg.msgCode != WIFI_CBK_MSG_CONNECTION_CHANGE) {
+        return false;
+    }
+    std::string packageName;
+    GetBundleNameByUid(uid, packageName);
+    // Check if the app is  (Settings or Sceneboard)
+    if (!pEnhanceService) {
+        pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    }
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s get pEnhance service failed!", __FUNCTION__);
+        return false;
+    }
+    // Check if the app is  ( 0 Settings or 1 Sceneboard)
+    if (!(pEnhanceService->GetPackageNum(packageName) == 0) && !(pEnhanceService->GetPackageNum(packageName) == 1)) {
+        return false;
+    }
+    // Check CONNECTING and DISCONNECTED state
+    if ((msg.msgData == static_cast<int32_t>(OHOS::Wifi::ConnState::CONNECTING) ||
+            msg.msgData == static_cast<int32_t>(OHOS::Wifi::ConnState::DISCONNECTED)) &&
+        msg.linkInfo.disconnTriggerMode == OHOS::Wifi::DisconnState::SWITCHING &&
+        msg.linkInfo.connTriggerMode == NETWORK_SELECTED_BY_WIFIPRO) {
+            WIFI_LOGI("StatusBar freeze, msg.msgData:%{public}d, %{public}s", msg.msgData, packageName.c_str());
+            return true;
+    }
+    return false;
+}
+
+void WifiInternalEventDispatcher::InvokeDeviceCallbacksExtral(
+    bool isFrozen, const WifiEventCallbackMsg &msg, const sptr<IWifiDeviceCallBack> callback)
+{
+    if (callback == nullptr) {
+        return;
+    }
+    switch (msg.msgCode) {
+        case WIFI_CBK_MSG_STATE_CHANGE:
+            callback->OnWifiStateChanged(msg.msgData);
+            break;
+        case WIFI_CBK_MSG_CONNECTION_CHANGE:
+            callback->OnWifiConnectionChanged(msg.msgData, msg.linkInfo);
+            break;
+        case WIFI_CBK_MSG_RSSI_CHANGE:
+            if (isFrozen == false) {
+                callback->OnWifiRssiChanged(msg.msgData);
+            }
+            break;
+        case WIFI_CBK_MSG_STREAM_DIRECTION:
+            if (isFrozen == false) {
+                callback->OnStreamChanged(msg.msgData);
+            }
+            break;
+        case WIFI_CBK_MSG_WPS_STATE_CHANGE:
+            callback->OnWifiWpsStateChanged(msg.msgData, msg.pinCode);
+            break;
+        case WIFI_CBK_MSG_DEVICE_CONFIG_CHANGE:
+            callback->OnDeviceConfigChanged(ConfigChange(msg.msgData));
+            break;
+        case WIFI_CBK_MSG_CANDIDATE_CONNECT_CHANGE:
+            callback->OnCandidateApprovalStatusChanged(CandidateApprovalStatus(msg.msgData));
+            break;
+        default:
+            WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
+            break;
     }
 }
 

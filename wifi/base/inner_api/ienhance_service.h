@@ -365,6 +365,13 @@ public:
      * @return true: in action listen, false: not in action listen
      */
     virtual bool IsInActionListenState() = 0;
+
+    /**
+     * @Description get num by package name
+     *
+     * @return : -1(not find) 0(settings) 1(sceneboard)
+     */
+    virtual int32_t GetPackageNum(std::string packageName) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

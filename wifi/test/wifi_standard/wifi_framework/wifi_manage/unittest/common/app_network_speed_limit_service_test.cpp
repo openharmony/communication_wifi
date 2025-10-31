@@ -20,6 +20,8 @@
 #include "wifi_logger.h"
 #include "app_network_speed_limit_service.h"
 #include "wifi_app_state_aware.h"
+#include "mock_wifi_config_center.h"
+#include "mock_wifi_settings.h"
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -52,6 +54,7 @@ public:
     virtual void SetUp()
     {
         LOG_SetCallback(AppNetworkSpeedLimitServiceCallback);
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName(_)).WillRepeatedly(Return("wlan0"));
     }
     virtual void TearDown() {}
 };
@@ -322,105 +325,352 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, HighPriorityTransmit, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
-HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControl_Game_VpnConnected_Intercept, TestSize.Level1)
+HWTEST_F(AppNetworkSpeedLimitServiceTest, SetGamePowerMode_WifiConnected, TestSize.Level1)
 {
-    WIFI_LOGI("ReceiveNetworkControl_Game_VpnConnected_Intercept enter");
-    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_.store(true);
-    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] = BG_LIMIT_OFF;
+    WIFI_LOGI("SetGamePowerMode_WifiConnected enter");
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
+    std::string ifaceName = "wlan0";
+
+    bool gameActive = GAME_POWER_MODE_ACTIVE;
+    AppNetworkSpeedLimitService::GetInstance().SetGamePowerMode(ifaceName, gameActive);
+
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
+
+    gameActive = GAME_POWER_MODE_INACTIVE;
+    AppNetworkSpeedLimitService::GetInstance().SetGamePowerMode(ifaceName, gameActive);
+
+    cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, SetGamePowerMode_WifiDisconnected, TestSize.Level1)
+{
+    WIFI_LOGI("SetGamePowerMode_WifiDisconnected enter");
+
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = false;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(UNKNOWN_MODE);
+    std::string ifaceName = "wlan0";
+
+    bool gameActive = GAME_POWER_MODE_ACTIVE;
+    AppNetworkSpeedLimitService::GetInstance().SetGamePowerMode(ifaceName, gameActive);
+
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(UNKNOWN_MODE, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, SetGamePowerMode_CacheOptimization, TestSize.Level1)
+{
+    WIFI_LOGI("SetGamePowerMode_CacheOptimization enter");
+
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
+    std::string ifaceName = "wlan0";
+
+    bool gameActive = GAME_POWER_MODE_ACTIVE;
+    AppNetworkSpeedLimitService::GetInstance().SetGamePowerMode(ifaceName, gameActive);
+
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
+
+    EXPECT_FALSE(g_errLog.find("SetPmMode failed") != std::string::npos);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, DealStaConnChanged_ResetGamePowerModeCache, TestSize.Level1)
+{
+    WIFI_LOGI("DealStaConnChanged_ResetGamePowerModeCache enter");
+
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NORMAL_SLEEP);
+    WifiLinkedInfo info;
+    int instId = 1;
+
+    AppNetworkSpeedLimitService::GetInstance().DealStaConnChanged(
+        OperateResState::DISCONNECT_DISCONNECTED, info, instId);
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NORMAL_SLEEP, cachedMode);
+
+    AppNetworkSpeedLimitService::GetInstance().DealStaConnChanged(
+        OperateResState::CONNECT_AP_CONNECTED, info, instId);
+    cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NORMAL_SLEEP, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, HandleWifiConnectStateChanged_OnReconnect, TestSize.Level1)
+{
+    WIFI_LOGI("HandleWifiConnectStateChanged_OnReconnect enter");
+
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    WifiNetworkControlInfo pvpInfo;
+    pvpInfo.bundleName = "com.tencent.tmgp.sgame.hw";
+    pvpInfo.sceneId = BG_LIMIT_CONTROL_ID_GAME;
+    pvpInfo.state = GameSceneId::MSG_GAME_ENTER_PVP_BATTLE;
+    pvpInfo.uid = 20010001;
+    pvpInfo.rtt = 50;
+    
+    AppNetworkSpeedLimitService::GetInstance().GameNetworkSpeedLimitConfigs(pvpInfo);
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NORMAL_SLEEP, cachedMode);
+    AppNetworkSpeedLimitService::GetInstance().HandleWifiConnectStateChanged(false);
+    sleep(1);
+
+    cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NORMAL_SLEEP, cachedMode);
+
+    AppNetworkSpeedLimitService::GetInstance().HandleWifiConnectStateChanged(true);
+    sleep(1);
+    cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NORMAL_SLEEP, cachedMode);
+    
+    WIFI_LOGI("WiFi reconnect successfully restored game power mode");
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, ResetPowerMode_Success, TestSize.Level1)
+{
+    WIFI_LOGI("ResetPowerMode_Success enter");
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
+    AppNetworkSpeedLimitService::GetInstance().ResetPowerMode();
+
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, ResetPowerMode_AlreadyNormalMode, TestSize.Level1)
+{
+    WIFI_LOGI("ResetPowerMode_AlreadyNormalMode enter");
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NORMAL_SLEEP);
+    AppNetworkSpeedLimitService::GetInstance().ResetPowerMode();
+
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NORMAL_SLEEP, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, Init_CallsResetPowerMode, TestSize.Level1)
+{
+    WIFI_LOGI("Init_CallsResetPowerMode enter");
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
+    AppNetworkSpeedLimitService::GetInstance().Init();
+
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, Init_RestoreGamePowerModeFromCachedPvpState, TestSize.Level1)
+{
+    WIFI_LOGI("Init_RestoreGamePowerModeFromCachedPvpState enter");
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
+
+    WifiNetworkControlInfo cachedPvpInfo;
+    cachedPvpInfo.bundleName = "com.tencent.tmgp.sgame.hw";
+    cachedPvpInfo.sceneId = BG_LIMIT_CONTROL_ID_GAME;
+    cachedPvpInfo.state = GameSceneId::MSG_GAME_ENTER_PVP_BATTLE;
+    cachedPvpInfo.uid = 20010001;
+    cachedPvpInfo.rtt = 50;
+    AppNetworkSpeedLimitService::GetInstance().GameNetworkSpeedLimitConfigs(cachedPvpInfo);
+    sleep(1);
+
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, Init_WifiDisconnected_ShouldResetPowerMode, TestSize.Level1)
+{
+    WIFI_LOGI("Init_WifiDisconnected_ShouldResetPowerMode enter");
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = false;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
+    AppNetworkSpeedLimitService::GetInstance().Init();
+    sleep(1);
+
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, GameNetworkSpeedLimitConfigs_EnterPvpBattle, TestSize.Level1)
+{
+    WIFI_LOGI("GameNetworkSpeedLimitConfigs_EnterPvpBattle enter");
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NORMAL_SLEEP);
+
     WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.bundleName = "com.tencent.tmgp.sgame.hw";
     networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_GAME;
-    networkControlInfo.state = MSG_GAME_STATE_START;
-    networkControlInfo.bundleName = "com.test.game";
-    networkControlInfo.uid = 10001;
-    networkControlInfo.rtt = 100;
+    networkControlInfo.state = GameSceneId::MSG_GAME_ENTER_PVP_BATTLE;
+    networkControlInfo.uid = 20010001;
+    networkControlInfo.rtt = 50;
 
-    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
-    sleep(1);
-    int curLimitMode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME];
-    EXPECT_EQ(BG_LIMIT_OFF, curLimitMode);
+    AppNetworkSpeedLimitService::GetInstance().GameNetworkSpeedLimitConfigs(networkControlInfo);
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NORMAL_SLEEP, cachedMode);
 }
 
-HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControl_VideoCall_VpnConnected_Intercept, TestSize.Level1)
+HWTEST_F(AppNetworkSpeedLimitServiceTest, GameNetworkSpeedLimitConfigs_ExitPvpBattle, TestSize.Level1)
 {
-    WIFI_LOGI("ReceiveNetworkControl_VideoCall_VpnConnected_Intercept enter");
-    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_.store(true);
-    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_VIDEO_CALL] = BG_LIMIT_OFF;
-    WifiNetworkControlInfo networkControlInfo;
-    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_VIDEO_CALL;
-    networkControlInfo.state = 1;
+    WIFI_LOGI("GameNetworkSpeedLimitConfigs_ExitPvpBattle enter");
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
 
-    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
-    sleep(1);
-    int curLimitMode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_VIDEO_CALL];
-    EXPECT_EQ(BG_LIMIT_OFF, curLimitMode);
-}
-
-HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControl_Game_VpnDisconnected_Normal, TestSize.Level1)
-{
-    WIFI_LOGI("ReceiveNetworkControl_Game_VpnDisconnected_Normal enter");
-    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_.store(false);
-    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] = BG_LIMIT_OFF;
     WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.bundleName = "com.tencent.tmgp.sgame.hw";
     networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_GAME;
-    networkControlInfo.state = MSG_GAME_STATE_START;
-    networkControlInfo.bundleName = "com.test.game";
-    networkControlInfo.uid = 10001;
-    networkControlInfo.rtt = 100;
+    networkControlInfo.state = GameSceneId::MSG_GAME_EXIT_PVP_BATTLE;
+    networkControlInfo.uid = 20010001;
 
-    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
-    sleep(1);
-    int curLimitMode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME];
-    EXPECT_NE(BG_LIMIT_OFF, curLimitMode);
+    AppNetworkSpeedLimitService::GetInstance().GameNetworkSpeedLimitConfigs(networkControlInfo);
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
 }
 
-HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControl_VideoCall_VpnDisconnected_Normal, TestSize.Level1)
+HWTEST_F(AppNetworkSpeedLimitServiceTest, GameNetworkSpeedLimitConfigs_ConsecutivePvpEnter, TestSize.Level1)
 {
-    WIFI_LOGI("ReceiveNetworkControl_VideoCall_VpnDisconnected_Normal enter");
-    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_.store(false);
-    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_VIDEO_CALL] = BG_LIMIT_OFF;
-    WifiNetworkControlInfo networkControlInfo;
-    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_VIDEO_CALL;
-    networkControlInfo.state = 1;
+    WIFI_LOGI("GameNetworkSpeedLimitConfigs_ConsecutivePvpEnter enter");
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NORMAL_SLEEP);
 
-    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
-    sleep(1);
-    int curLimitMode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_VIDEO_CALL];
-    EXPECT_EQ(BG_LIMIT_LEVEL_7, curLimitMode);
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.bundleName = "com.tencent.tmgp.sgame.hw";
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_GAME;
+    networkControlInfo.state = GameSceneId::MSG_GAME_ENTER_PVP_BATTLE;
+    networkControlInfo.uid = 20010001;
+
+    AppNetworkSpeedLimitService::GetInstance().GameNetworkSpeedLimitConfigs(networkControlInfo);
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NORMAL_SLEEP, cachedMode);
+
+    g_errLog.clear();
+    AppNetworkSpeedLimitService::GetInstance().GameNetworkSpeedLimitConfigs(networkControlInfo);
+    cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NORMAL_SLEEP, cachedMode);
 }
 
-HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControl_AudioPlayback_VpnConnected_Intercept, TestSize.Level1)
+HWTEST_F(AppNetworkSpeedLimitServiceTest, GameNetworkSpeedLimitConfigs_GameStart, TestSize.Level1)
 {
-    WIFI_LOGI("ReceiveNetworkControl_AudioPlayback_VpnConnected_Intercept enter");
-    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_.store(true);
-    size_t initialSize = AppNetworkSpeedLimitService::GetInstance().m_bgAudioPlaybackUidSet.size();
-    WifiNetworkControlInfo networkControlInfo;
-    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_AUDIO_PLAYBACK;
-    networkControlInfo.state = 1;
-    networkControlInfo.uid = 10002;
-    networkControlInfo.pid = 20002;
+    WIFI_LOGI("GameNetworkSpeedLimitConfigs_GameStart enter");
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
 
-    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
-    sleep(1);
-    size_t currentSize = AppNetworkSpeedLimitService::GetInstance().m_bgAudioPlaybackUidSet.size();
-    EXPECT_EQ(initialSize, currentSize);
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.bundleName = "com.tencent.tmgp.pubgmhd";
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_GAME;
+    networkControlInfo.state = GameSceneId::MSG_GAME_STATE_START;
+    networkControlInfo.uid = 20010002;
+    networkControlInfo.rtt = 40;
+
+    AppNetworkSpeedLimitService::GetInstance().GameNetworkSpeedLimitConfigs(networkControlInfo);
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
 }
 
-HWTEST_F(AppNetworkSpeedLimitServiceTest, ReceiveNetworkControl_AudioPlayback_VpnDisconnected_Normal, TestSize.Level1)
+HWTEST_F(AppNetworkSpeedLimitServiceTest, GameNetworkSpeedLimitConfigs_GameForeground, TestSize.Level1)
 {
-    WIFI_LOGI("ReceiveNetworkControl_AudioPlayback_VpnDisconnected_Normal enter");
-    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_.store(false);
-    AppNetworkSpeedLimitService::GetInstance().m_bgAudioPlaybackUidSet.clear();
-    size_t initialSize = AppNetworkSpeedLimitService::GetInstance().m_bgAudioPlaybackUidSet.size();
-    WifiNetworkControlInfo networkControlInfo;
-    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_AUDIO_PLAYBACK;
-    networkControlInfo.state = 1;
-    networkControlInfo.uid = 10003;
-    networkControlInfo.pid = 20003;
+    WIFI_LOGI("GameNetworkSpeedLimitConfigs_GameForeground enter");
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
 
-    AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.bundleName = "com.tencent.tmgp.sgame.hw";
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_GAME;
+    networkControlInfo.state = GameSceneId::MSG_GAME_STATE_FOREGROUND;
+    networkControlInfo.uid = 20010001;
+    networkControlInfo.rtt = 50;
+
+    AppNetworkSpeedLimitService::GetInstance().GameNetworkSpeedLimitConfigs(networkControlInfo);
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, GameNetworkSpeedLimitConfigs_GameBackground, TestSize.Level1)
+{
+    WIFI_LOGI("GameNetworkSpeedLimitConfigs_GameBackground enter");
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
+
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.bundleName = "com.tencent.tmgp.pubgmhd";
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_GAME;
+    networkControlInfo.state = GameSceneId::MSG_GAME_STATE_BACKGROUND;
+    networkControlInfo.uid = 20010002;
+
+    AppNetworkSpeedLimitService::GetInstance().GameNetworkSpeedLimitConfigs(networkControlInfo);
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, GameNetworkSpeedLimitConfigs_GameEnd, TestSize.Level1)
+{
+    WIFI_LOGI("GameNetworkSpeedLimitConfigs_GameEnd enter");
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
+
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.bundleName = "com.tencent.tmgp.sgame.hw";
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_GAME;
+    networkControlInfo.state = GameSceneId::MSG_GAME_STATE_END;
+    networkControlInfo.uid = 20010001;
+
+    AppNetworkSpeedLimitService::GetInstance().GameNetworkSpeedLimitConfigs(networkControlInfo);
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, CheckAndResetGamePowerMode_RssGameToRssGame, TestSize.Level1)
+{
+    WIFI_LOGI("CheckAndResetGamePowerMode_RssGameToRssGame enter");
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
+
+    std::string rssGameBundleName = "com.tencent.tmgp.sgame.hw";
+    AppNetworkSpeedLimitService::GetInstance().CheckAndResetGamePowerMode(rssGameBundleName);
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, CheckAndResetGamePowerMode_NonRssGameApp, TestSize.Level1)
+{
+    WIFI_LOGI("CheckAndResetGamePowerMode_NonRssGameApp enter");
+
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
+
+    std::string nonRssGameBundleName = "com.mihoyo.hyperion";
+    AppNetworkSpeedLimitService::GetInstance().CheckAndResetGamePowerMode(nonRssGameBundleName);
+
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, ForegroundAppChangedAction, TestSize.Level1)
+{
+    WIFI_LOGI("ForegroundAppChangedAction enter");
+
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(POWER_MODE_NO_SLEEP);
+
+    std::string nonGameBundleName = "com.example.testapp";
+    AppNetworkSpeedLimitService::GetInstance().ForegroundAppChangedAction(nonGameBundleName);
+
     sleep(1);
-    size_t currentSize = AppNetworkSpeedLimitService::GetInstance().m_bgAudioPlaybackUidSet.size();
-    EXPECT_EQ(initialSize + 1, currentSize);
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(POWER_MODE_NO_SLEEP, cachedMode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, GameNetworkSpeedLimitConfigs_WifiDisconnected, TestSize.Level1)
+{
+    WIFI_LOGI("GameNetworkSpeedLimitConfigs_WifiDisconnected enter");
+
+    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = false;
+    AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.store(UNKNOWN_MODE);
+
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.bundleName = "com.tencent.tmgp.sgame.hw";
+    networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_GAME;
+    networkControlInfo.state = GameSceneId::MSG_GAME_ENTER_PVP_BATTLE;
+    networkControlInfo.uid = 20010001;
+
+    AppNetworkSpeedLimitService::GetInstance().GameNetworkSpeedLimitConfigs(networkControlInfo);
+
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(UNKNOWN_MODE, cachedMode);
 }
 } // namespace Wifi
 } // namespace OHOS

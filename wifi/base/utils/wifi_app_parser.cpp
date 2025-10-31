@@ -36,6 +36,7 @@ constexpr auto XML_TAG_SECTION_HEADER_APP_KEY_FOREGROUND_LIST = "KeyAppForegroun
 constexpr auto XML_TAG_SECTION_HEADER_APP_KEY_BACKGROUND_LIMIT_LIST = "KeyBackgroundLimitListApp";
 constexpr auto XML_TAG_SECTION_HEADER_APP_LIVE_STREAM_LIST = "AppLiveStream";
 constexpr auto XML_TAG_SECTION_HEADER_APP_GAME_BACKGROUND_LIMIT_LIST = "GameBackgroundLimitListApp";
+constexpr auto XML_TAG_SECTION_HEADER_RSS_GAME_LIST = "RssGameList";
 constexpr auto XML_TAG_SECTION_HEADER_ASYNC_DELAY_TIME = "AsyncDelayTime";
 constexpr auto XML_TAG_SECTION_KEY_GAME_RTT = "mGameRtt";
 constexpr auto XML_TAG_SECTION_KEY_GAME_NAME = "gameName";
@@ -55,6 +56,7 @@ const std::unordered_map<std::string, AppType> appTypeMap = {
     { XML_TAG_SECTION_HEADER_ASYNC_DELAY_TIME, AppType::ASYNC_DELAY_TIME},
     { XML_TAG_SECTION_HEADER_APP_LIVE_STREAM_LIST, AppType::LIVE_STREAM_APP},
     { XML_TAG_SECTION_HEADER_APP_GAME_BACKGROUND_LIMIT_LIST, AppType::GAME_BACKGROUND_LIMIT_LIST_APP},
+    { XML_TAG_SECTION_HEADER_RSS_GAME_LIST, AppType::RSS_GAME_LIST_APP},
     { XML_TAG_SECTION_KEY_GAME_RTT, AppType::GAME_RTT},
 };
 
@@ -191,6 +193,7 @@ void AppParserInner::ParseNetworkControlAppList(const xmlNodePtr &innode)
     result_.m_keyBackgroundLimitListAppVec.clear();
     result_.m_liveStreamAppVec.clear();
     result_.m_gameBackgroundLimitListAppVec.clear();
+    result_.m_rssGameListAppVec.clear();
 
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetAppTypeAsInt(node)) {
@@ -202,6 +205,9 @@ void AppParserInner::ParseNetworkControlAppList(const xmlNodePtr &innode)
                 break;
             case AppType::GAME_BACKGROUND_LIMIT_LIST_APP:
                 result_.m_gameBackgroundLimitListAppVec.push_back(ParseGameBackgroundLimitListAppInfo(node));
+                break;
+            case AppType::RSS_GAME_LIST_APP:
+                result_.m_rssGameListAppVec.push_back(ParseRssGameListAppInfo(node));
                 break;
             case AppType::LIVE_STREAM_APP:
                 result_.m_liveStreamAppVec.push_back(ParseLiveStreamAppInfo(node));
@@ -373,6 +379,20 @@ GameBackgroundLimitListAppInfo AppParserInner::ParseGameBackgroundLimitListAppIn
     return appInfo;
 }
 
+RssGameListAppInfo AppParserInner::ParseRssGameListAppInfo(const xmlNodePtr &innode)
+{
+    RssGameListAppInfo appInfo{};
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    if (value == NULL) {
+        WIFI_LOGE("%{public}s xml parser RSS game app info error.", __FUNCTION__);
+        return appInfo;
+    }
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    xmlFree(value);
+    return appInfo;
+}
+
 void AppParserInner::ParseAsyncLimitSpeedDelayTime(const xmlNodePtr &innode)
 {
     xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_DELAY_TIME));
@@ -510,6 +530,13 @@ bool AppParser::IsGameBackgroundLimitApp(const std::string &bundleName) const
     std::shared_lock<std::shared_mutex> lock(appParserMutex_);
     return std::any_of(result_.m_gameBackgroundLimitListAppVec.begin(), result_.m_gameBackgroundLimitListAppVec.end(),
         [bundleName](const GameBackgroundLimitListAppInfo &app) { return app.packageName == bundleName; });
+}
+
+bool AppParser::IsRssGameApp(const std::string &bundleName) const
+{
+    std::shared_lock<std::shared_mutex> lock(appParserMutex_);
+    return std::any_of(result_.m_rssGameListAppVec.begin(), result_.m_rssGameListAppVec.end(),
+        [bundleName](const RssGameListAppInfo &app) { return app.packageName == bundleName; });
 }
 
 bool AppParser::IsOverGameRtt(const std::string &bundleName, const int gameRtt) const

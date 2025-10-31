@@ -159,193 +159,201 @@ struct HttpsSocketTest {
         TestImageDisplay({ testItem : this.testItem })
         PageTitle({ testItem : this.testItem })
       }
-      Column() {
-        // 警告提示
-        Row() {
-          Text('⚠️ ')
-            .fontSize(14)
-            .fontColor(Color.Orange)
-          Text('HTTP模块不支持网络切换时的自动重连，推荐使用 RCP HTTP验证')
-            .fontSize(12)
-            .fontColor(Color.Orange)
-        }
-        .width('100%')
-        .padding(8)
-        .backgroundColor('#FFF3E0')
-        .borderRadius(5)
-        .margin({ top: 5, bottom: 5 })
 
-        // 网络状态显示
-        Row() {
-          Text('网络状态: ')
-            .fontSize(14)
-            .fontColor(Color.Gray)
-          Text(`${this.networkStatus} (${this.networkType})`)
-            .fontSize(14)
-            .fontColor(this.networkStatus === '网络正常' ? Color.Green : Color.Orange)
-        }
-        .width('100%')
-        .margin({ bottom: 5 })
-
-        // 网络切换次数
-        if (this.networkSwitchCount > 0) {
+      Scroll() {
+        Column() {
+          // 警告提示
           Row() {
-            Text('网络切换次数: ')
+            Text('⚠️ ')
+              .fontSize(14)
+              .fontColor(Color.Orange)
+            Text('HTTP模块不支持网络切换时的自动重连，推荐使用 RCP HTTP验证')
+              .fontSize(12)
+              .fontColor(Color.Orange)
+          }
+          .width('100%')
+          .padding(8)
+          .backgroundColor('#FFF3E0')
+          .borderRadius(5)
+          .margin({ top: 5, bottom: 5 })
+
+          // 网络状态显示
+          Row() {
+            Text('网络状态: ')
               .fontSize(14)
               .fontColor(Color.Gray)
-            Text(`${this.networkSwitchCount}`)
+            Text(`${this.networkStatus} (${this.networkType})`)
               .fontSize(14)
-              .fontColor(Color.Red)
+              .fontColor(this.networkStatus === '网络正常' ? Color.Green : Color.Orange)
           }
-          .width('100%')
-          .margin({ bottom: 10 })
-        }
-
-        // HTTPS请求配置区域
-        Text('HTTPS请求配置')
-          .fontSize(18)
-          .fontWeight(FontWeight.Bold)
-          .width('100%')
-          .margin({ top: 10, bottom: 10 })
-
-        Row() {
-          Select(this.typeList)
-            .selected(this.selectIndex)
-            .value(this.selectValue)
-            .font({ size: 12, weight: 300 })
-            .fontColor('#182431')
-            .selectedOptionFont({ size: 16, weight: 400 })
-            .optionFont({ size: 16, weight: 400 })
-            .menuAlign(MenuAlignType.START, {dx:0, dy:0})
-            .borderRadius('5')
-            .width("25%")
-            .optionHeight(300)
-            .onSelect((index:number, text?: string | undefined)=>{
-              console.log(TAG, 'Select:' + index)
-              this.selectIndex = index;
-              if(text){
-                this.selectValue = text;
-                if (this.selectValue == 'GET') {
-                  this.urlValue = 'https://www.baidu.com';
-                  this.reqValue = '';
-                } else if (this.selectValue == 'POST') {
-                  this.urlValue = 'https://httpbin.org/post';
-                  this.reqValue = '{"username": "test","password": "123"}';
-                }
-              }
-            })
-          TextInput({text:this.urlValue}).width('75%').borderRadius('5')
-            .onChange((val: string) => {
-              this.urlValue = val;
-            })
-        }
-        .width('100%')
-        .margin({bottom:10})
-
-        // SSL验证配置
-        Row() {
-          Text('SSL证书验证: ')
-            .fontSize(16)
-            .width('40%')
-          Toggle({ type: ToggleType.Switch, isOn: this.sslVerify })
-            .onChange((isOn: boolean) => {
-              this.sslVerify = isOn;
-              console.log(TAG, `SSL验证: ${isOn}`);
-            })
-            .width('20%')
-          Text(this.sslVerify ? '开启' : '关闭')
-            .fontSize(14)
-            .fontColor(this.sslVerify ? Color.Green : Color.Red)
-            .width('40%')
-        }
-        .width('100%')
-        .margin({bottom:10})
-
-        // 请求体配置
-        Text('请求体配置')
-          .fontSize(16)
-          .fontWeight(FontWeight.Bold)
           .width('100%')
           .margin({ bottom: 5 })
 
-        Row() {
-          Select(this.reqTypeList)
-            .selected(this.reqSelectIndex)
-            .value(this.reqSelectValue)
-            .font({ size: 12, weight: 300 })
-            .fontColor('#182431')
-            .selectedOptionFont({ size: 16, weight: 400 })
-            .optionFont({ size: 16, weight: 400 })
-            .menuAlign(MenuAlignType.START, {dx:0, dy:0})
-            .borderRadius('5')
-            .width("25%")
-            .optionHeight(300)
-            .onSelect((index:number, text?: string | undefined)=>{
-              console.log(TAG, 'Select:' + index)
-              this.reqSelectIndex = index;
-              if(text){
-                this.reqSelectValue = text;
-              }
-            })
-          TextInput({text:this.reqValue}).width('75%').borderRadius('5')
-            .onChange((val: string) => {
-              this.reqValue = val;
-            })
-        }
-        .width('100%')
-        .margin({bottom:15})
+          // 网络切换次数
+          if (this.networkSwitchCount > 0) {
+            Row() {
+              Text('网络切换次数: ')
+                .fontSize(14)
+                .fontColor(Color.Gray)
+              Text(`${this.networkSwitchCount}`)
+                .fontSize(14)
+                .fontColor(Color.Red)
+            }
+            .width('100%')
+            .margin({ bottom: 10 })
+          }
 
-        // 发送按钮和清空按钮
-        Row() {
-          Button('发送HTTPS请求')
-            .width('45%')
-            .backgroundColor(this.isLoading ? Color.Gray : Color.Blue)
-            .enabled(!this.isLoading)
-            .onClick(() => {
-              this.sendHttpsRequest();
-            })
+          // HTTPS请求配置区域
+          Text('HTTPS请求配置')
+            .fontSize(18)
+            .fontWeight(FontWeight.Bold)
+            .width('100%')
+            .margin({ top: 10, bottom: 10 })
 
-          Button('清空响应数据')
-            .width('45%')
-            .backgroundColor(Color.Orange)
-            .onClick(() => {
-              this.clearResponse();
-            })
-        }
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
-        .margin({ bottom: 15 })
-
-        // 响应状态
-        if (this.codeValue) {
           Row() {
-            Text('响应状态: ')
-              .fontSize(16)
-              .fontWeight(FontWeight.Bold)
-            Text(this.codeValue)
-              .fontSize(16)
-              .fontColor(this.codeValue.startsWith('2') ? Color.Green : Color.Red)
+            Select(this.typeList)
+              .selected(this.selectIndex)
+              .value(this.selectValue)
+              .font({ size: 12, weight: 300 })
+              .fontColor('#182431')
+              .selectedOptionFont({ size: 16, weight: 400 })
+              .optionFont({ size: 16, weight: 400 })
+              .menuAlign(MenuAlignType.START, {dx:0, dy:0})
+              .borderRadius('5')
+              .width("25%")
+              .optionHeight(300)
+              .onSelect((index:number, text?: string | undefined)=>{
+                console.log(TAG, 'Select:' + index)
+                this.selectIndex = index;
+                if(text){
+                  this.selectValue = text;
+                  if (this.selectValue == 'GET') {
+                    this.urlValue = 'https://www.baidu.com';
+                    this.reqValue = '';
+                  } else if (this.selectValue == 'POST') {
+                    this.urlValue = 'https://httpbin.org/post';
+                    this.reqValue = '{"username": "test","password": "123"}';
+                  }
+                }
+              })
+            TextInput({text:this.urlValue}).width('75%').borderRadius('5')
+              .onChange((val: string) => {
+                this.urlValue = val;
+              })
           }
           .width('100%')
-          .margin({ bottom: 10 })
+          .margin({bottom:10})
+
+          // SSL验证配置
+          Row() {
+            Text('SSL证书验证: ')
+              .fontSize(16)
+              .width('40%')
+            Toggle({ type: ToggleType.Switch, isOn: this.sslVerify })
+              .onChange((isOn: boolean) => {
+                this.sslVerify = isOn;
+                console.log(TAG, `SSL验证: ${isOn}`);
+              })
+              .width('20%')
+            Text(this.sslVerify ? '开启' : '关闭')
+              .fontSize(14)
+              .fontColor(this.sslVerify ? Color.Green : Color.Red)
+              .width('40%')
+          }
+          .width('100%')
+          .margin({bottom:10})
+
+          // 请求体配置
+          Text('请求体配置')
+            .fontSize(16)
+            .fontWeight(FontWeight.Bold)
+            .width('100%')
+            .margin({ bottom: 5 })
+
+          Row() {
+            Select(this.reqTypeList)
+              .selected(this.reqSelectIndex)
+              .value(this.reqSelectValue)
+              .font({ size: 12, weight: 300 })
+              .fontColor('#182431')
+              .selectedOptionFont({ size: 16, weight: 400 })
+              .optionFont({ size: 16, weight: 400 })
+              .menuAlign(MenuAlignType.START, {dx:0, dy:0})
+              .borderRadius('5')
+              .width("25%")
+              .optionHeight(300)
+              .onSelect((index:number, text?: string | undefined)=>{
+                console.log(TAG, 'Select:' + index)
+                this.reqSelectIndex = index;
+                if(text){
+                  this.reqSelectValue = text;
+                }
+              })
+            TextInput({text:this.reqValue}).width('75%').borderRadius('5')
+              .onChange((val: string) => {
+                this.reqValue = val;
+              })
+          }
+          .width('100%')
+          .margin({bottom:15})
+
+          // 发送按钮和清空按钮
+          Row() {
+            Button('发送HTTPS请求')
+              .width('45%')
+              .backgroundColor(this.isLoading ? Color.Gray : Color.Blue)
+              .enabled(!this.isLoading)
+              .onClick(() => {
+                this.sendHttpsRequest();
+              })
+
+            Button('清空响应数据')
+              .width('45%')
+              .backgroundColor(Color.Orange)
+              .onClick(() => {
+                this.clearResponse();
+              })
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceBetween)
+          .margin({ bottom: 15 })
+
+          // 响应状态
+          if (this.codeValue) {
+            Row() {
+              Text('响应状态: ')
+                .fontSize(16)
+                .fontWeight(FontWeight.Bold)
+              Text(this.codeValue)
+                .fontSize(16)
+                .fontColor(this.codeValue.startsWith('2') ? Color.Green : Color.Red)
+            }
+            .width('100%')
+            .margin({ bottom: 10 })
+          }
+
+          // 响应区域
+          Text('响应数据')
+            .fontSize(16)
+            .fontWeight(FontWeight.Bold)
+            .width('100%')
+            .margin({ bottom: 5 })
+
+          TextArea({ text: this.resData })
+            .width('100%')
+            .height(300)
+            .borderRadius(5)
+            .backgroundColor(Color.White)
+            .margin({ bottom: 20 })
         }
-
-        // 响应区域
-        Text('响应数据')
-          .fontSize(16)
-          .fontWeight(FontWeight.Bold)
-          .width('100%')
-          .margin({ bottom: 5 })
-
-        TextArea({ text: this.resData })
-          .width('100%')
-          .height('45%')
-          .borderRadius(5)
-          .backgroundColor(Color.White)
+        .width('100%')
+        .padding(10)
       }
       .width('95%')
       .height('85%')
-      .padding(10)
+      .scrollable(ScrollDirection.Vertical)
+      .scrollBar(BarState.Auto)
+      .edgeEffect(EdgeEffect.Spring)
     }
     .size({ width: ConfigData.WH_100_100, height: ConfigData.WH_100_100 })
     .backgroundColor('#F5F5F5')

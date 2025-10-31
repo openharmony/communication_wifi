@@ -400,11 +400,6 @@ public:
         return pP2pStateMachine->DealCreateNewGroupWithConfig(config, freq);
     }
 
-    void WarpCancelWpsPbc()
-    {
-        pP2pStateMachine->CancelWpsPbc();
-    }
-
     void WarpUpdateGroupInfoToWpa() const
     {
         pP2pStateMachine->UpdateGroupInfoToWpa();
@@ -440,6 +435,10 @@ public:
     bool WarpHasP2pConnected()
     {
         return pP2pStateMachine->HasP2pConnected();
+    }
+    void WarpCancelWpsPbc()
+    {
+        pP2pStateMachine->CancelWpsPbc();
     }
 };
 

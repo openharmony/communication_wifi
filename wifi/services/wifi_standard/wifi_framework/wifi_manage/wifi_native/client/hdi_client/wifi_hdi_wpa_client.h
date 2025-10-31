@@ -434,7 +434,7 @@ public:
      * @param groupInterface
      * @return WifiErrorNo
      */
-    WifiErrorNo HdiP2pCancelWpsPbc(const std::string &groupInterface) const;
+    WifiErrorNo ReqP2pCancelWpsPbc(const std::string &groupInterface) const;
 
     /**
      * @Description Enable Wps Pin mode

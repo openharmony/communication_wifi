@@ -394,6 +394,5 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pCancelWpsPbcTest, TestSize.Level1)
     WifiErrorNo result = HdiP2pCancelWpsPbcTest(config);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
-
 }
 }

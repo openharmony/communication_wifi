@@ -25,6 +25,7 @@ enum P2pRemoveGroupEvent {
     P2P_REJECT,
     P2P_SET_MIRACAST_SINK_CONFIG,
     P2P_CREATE_TEMP_GROUP,
+    P2P_CANCEL_WPS_PBC,
     EVENT_MAX,
 };
 
@@ -53,6 +54,8 @@ WifiErrorNo HdiP2pSetPersistentReconnect(int status);
 WifiErrorNo HdiP2pSetWpsSecondaryDeviceType(const char *type);
 
 WifiErrorNo HdiP2pSetupWpsPbc(const char *groupIfc, const char *address);
+
+WifiErrorNo HdiP2pCancelWpsPbc(const char *groupIfc);
 
 WifiErrorNo HdiP2pSetupWpsPin(const char *groupIfc, const char *address, const char *pin, char *result);
 

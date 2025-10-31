@@ -1526,5 +1526,12 @@ HWTEST_F(WifiHdiWpaClientTest, SetMiracastSinkConfigTest, TestSize.Level1)
     WifiErrorNo result = wifiHdiWpaClient->SetMiracastSinkConfig(config);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
+
+HWTEST_F(WifiHdiWpaClientTest, P2pCancelWpsPbcTest, TestSize.Level1)
+{
+    std::string groupInterface = "p2p-p2p0-1";
+    WifiErrorNo result = wifiHdiWpaClient->ReqP2pCancelWpsPbc(groupInterface);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+}
 } // namespace Wifi
 } // namespace OHOS

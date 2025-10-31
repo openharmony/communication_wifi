@@ -65,6 +65,14 @@ public:
     WifiErrorNo StartWpsPbc(const std::string &groupInterface, const std::string &bssid) const;
 
     /**
+     * @Description Cancel WPS PBC
+     *
+     * @param groupInterface
+     * @return WifiErrorNo
+     */
+    WifiErrorNo CancelWpsPbc(const std::string &groupInterface) const;
+
+    /**
      * @Description Enable Wps Pin mode
      *
      * @param groupInterface - p2p group

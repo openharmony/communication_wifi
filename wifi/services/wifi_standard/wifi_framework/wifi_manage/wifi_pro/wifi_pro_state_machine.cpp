@@ -422,7 +422,7 @@ bool WifiProStateMachine::TrySelfCure(bool forceNoHttpCheck)
         pStaService->GetDetectNetState(lastCheckNetState);
         // issatisfy min rssi
         if (linkedInfo.rssi > SELF_CURE_RSSI_THRESHOLD 
-        && lastCheckNetState == OperateResState::CONNECT_NETWORK_DISABLED) {
+            && lastCheckNetState == OperateResState::CONNECT_NETWORK_DISABLED) {
             pSelfCureService->NotifyInternetFailureDetected(forceNoHttpCheck);
         } else {
             WIFI_LOGI("Failure to meet the conditions for selfcure.");

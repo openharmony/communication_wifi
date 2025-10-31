@@ -30,7 +30,7 @@ public:
     void SendMessage(int what, int arg1);
     void SendMessage(int what, int arg1, int arg2);
     void SendMessage(InternalMessagePtr msg);
-    void StartTimer(int timerName, int64_t interval, MsgLogLevel logLevel = MsgLogLevel::LOG_I);
+    void StartTimer(int timerName, int64_t interval, MsgLogLevel logLevel = MsgLogLevel::LOG_D);
     void StopTimer(int timerName);
     bool InitialStateMachine();
     InternalMessagePtr CreateMessage(int msgName, int param1);

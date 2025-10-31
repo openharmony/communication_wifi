@@ -1530,7 +1530,7 @@ bool WifiConfigCenter::IsAllowPcPopUp()
             LOGI("Not allow pop up dialog, device type:%{public}d", mDeviceType);
             return false;
         default:
-            LOGI("Allow pop up dialog, device type:%{public}d", mDeviceType);
+            LOGD("Allow pop up dialog, device type:%{public}d", mDeviceType);
             return true;
     }
 }

@@ -53,7 +53,7 @@ struct RcpHttpTest {
   @State networkStatus: string = '检测中...';
   @State networkType: string = '未知';
   @State sessionId: string = '';
-  
+
   private rcpSession: rcp.Session | null = null;
   private netConnection: connection.NetConnection | null = null;
 
@@ -88,13 +88,13 @@ struct RcpHttpTest {
   registerNetworkListener() {
     try {
       this.netConnection = connection.createNetConnection();
-      
+
       // 监听网络可用事件 - 默认网络切换时触发
       this.netConnection.on('netAvailable', (netHandle: connection.NetHandle) => {
         console.log(TAG, `网络切换: netId=${netHandle.netId}`);
         this.networkStatus = '网络切换';
         this.resData += `\n[系统] 检测到网络切换 (netId: ${netHandle.netId})`;
-        
+
         // 根据官方文档要求：发生默认网络切换时，重新建立 session
         this.handleNetworkSwitch();
       });
@@ -130,7 +130,7 @@ struct RcpHttpTest {
   handleNetworkSwitch() {
     console.log(TAG, '开始处理网络切换');
     this.resData += '\n[系统] 正在重建 RCP Session...';
-    
+
     // 1. 关闭旧 session
     if (this.rcpSession) {
       try {
@@ -141,7 +141,7 @@ struct RcpHttpTest {
         console.error(TAG, `关闭 Session 失败: ${JSON.stringify(error)}`);
       }
     }
-    
+
     // 2. 延迟后重新创建 session（等待新网络稳定）
     setTimeout(() => {
       this.initRcpSession();
@@ -373,14 +373,14 @@ struct RcpHttpTest {
       // 处理响应
       this.isLoading = false;
       this.codeValue = response.statusCode.toString();
-      
+
       // 构建响应数据显示
       this.resData = `请求方法: ${this.selectValue}\n`;
       this.resData += `请求URL: ${this.urlValue}\n`;
       this.resData += `\n=== 响应信息 ===\n`;
       this.resData += `状态码: ${response.statusCode}\n`;
       this.resData += `响应时间: ${duration}ms\n`;
-      
+
       // 显示响应头
       if (response.headers) {
         this.resData += `\n=== 响应头 ===\n`;
@@ -451,4 +451,3 @@ struct RcpHttpTest {
     }
   }
 }
-

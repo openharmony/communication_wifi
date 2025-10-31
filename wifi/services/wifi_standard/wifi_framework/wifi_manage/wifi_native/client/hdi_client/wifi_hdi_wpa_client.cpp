@@ -984,6 +984,11 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pSetupWpsPbc(const std::string &groupInterfac
     return HdiP2pSetupWpsPbc(groupInterface.c_str(), bssid.c_str());
 }
 
+WifiErrorNo WifiHdiWpaClient::HdiP2pCancelWpsPbc(const std::string &groupInterface) const
+{
+    return HdiP2pCancelWpsPbc(groupInterface.c_str());
+}
+
 WifiErrorNo WifiHdiWpaClient::ReqP2pSetupWpsPin(
     const std::string &groupInterface, const std::string &address, const std::string &pin, std::string &result) const
 {

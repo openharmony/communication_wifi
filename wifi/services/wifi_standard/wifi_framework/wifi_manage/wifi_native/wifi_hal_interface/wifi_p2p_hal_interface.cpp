@@ -82,6 +82,16 @@ WifiErrorNo WifiP2PHalInterface::StartWpsPbc(const std::string &groupInterface, 
     return WIFI_HAL_OPT_FAILED;
 }
 
+WifiErrorNo WifiP2PHalInterface::CancelWpsPbc(const std::string &groupInterface) const
+{
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
+    return mHdiWpaClient->ReqP2pCancelWpsPbc(groupInterface);
+#else
+    return WIFI_HAL_OPT_FAILED;
+#endif
+}
+
 WifiErrorNo WifiP2PHalInterface::StartWpsPin(
     const std::string &groupInterface, const std::string &address, const std::string &pin, std::string &result) const
 {

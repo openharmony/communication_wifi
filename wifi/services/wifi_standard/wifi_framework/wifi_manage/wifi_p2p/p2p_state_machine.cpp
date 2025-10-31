@@ -1457,10 +1457,12 @@ void P2pStateMachine::CancelWpsPbc(void)
         savedP2pConfig.GetWpsInfo().GetWpsMethod() != WpsMethod::WPS_METHOD_PBC) {
         return;
     }
+#ifdef HDI_WPA_INTERFACE_SUPPORT
     if (WifiP2PHalInterface::GetInstance(),CancelWpsPbc(group.GetInstance())
         != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("WpsPbc operation failed");
     }
+#endif
     return;
 }
 } // namespace Wifi

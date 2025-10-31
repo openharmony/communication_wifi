@@ -399,7 +399,6 @@ public:
     {
         return pP2pStateMachine->DealCreateNewGroupWithConfig(config, freq);
     }
-
     void WarpUpdateGroupInfoToWpa() const
     {
         pP2pStateMachine->UpdateGroupInfoToWpa();

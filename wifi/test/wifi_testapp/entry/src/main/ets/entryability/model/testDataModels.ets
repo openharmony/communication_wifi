@@ -430,6 +430,13 @@ const TestComposition: WifiTestComposition[] = [
     'image' : $r('app.media.wifi') ,
     'category' : Category.App
   },
+  {
+    'name' : 'TCPDUMP' ,
+    'detail' : 'TCPDUMP 开关' ,
+    'url' : 'pages/subAppTest/tcpdump' ,
+    'image' : $r('app.media.wifi') ,
+    'category' : Category.App
+  },
 
   {
     'name' : 'P2pManager' ,

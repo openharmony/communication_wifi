@@ -47,6 +47,13 @@ constexpr int MIN_RSSI_2DOT_4GHZ = -80;
 constexpr int MIN_RSSI_5GZ = -77;
 constexpr char BACKUP_CONFIG_FILE_PATH_TEST[] = CONFIG_ROOR_DIR"/backup_config_test.conf";
 static std::string g_errLog;
+extern bool IsExistInAsset(const WifiDeviceConfig &config, std::string key);
+extern void SplitString(const std::string &input, const char spChar, std::vector<std::string> &outArray);
+extern bool CheckEap(const WifiDeviceConfig &config);
+extern bool CheckWapi(const WifiDeviceConfig &config);
+extern bool IsWapiOrEap(const WifiDeviceConfig &config);
+extern bool ArrayToWifiDeviceConfig(WifiDeviceConfig &config, std::vector<std::string> &outArray);
+extern bool WifiAssetValid(const WifiDeviceConfig &config);
 void WifiSetLogCallback(const LogType type, const LogLevel level,
                         const unsigned int domain, const char *tag, const char *msg)
 {
@@ -651,9 +658,46 @@ HWTEST_F(WifiSettingsTest, UpdateWifiConfigFormCloudTest, TestSize.Level1)
     // based on the newWifiDeviceConfigs vector
     WifiDeviceConfig updatedConfig;
     WifiSettings::GetInstance().GetDeviceConfig(0, updatedConfig);
+    IsExistInAsset(config1, "test1");
     EXPECT_EQ(updatedConfig.ssid, "test1");
     EXPECT_EQ(updatedConfig.keyMgmt, "WPA-PSK");
     EXPECT_EQ(updatedConfig.preSharedKey, "123456789");
+}
+
+HWTEST_F(WifiSettingsTest, assetTest, TestSize.Level1)
+{
+    WIFI_LOGI("UpdateWifiConfigFormCloudTest enter!");
+    WifiDeviceConfig config;
+    config.networkId = 0;
+    config.ssid = "test1";
+    config.keyMgmt = "WPA-PSK";
+    config.preSharedKey = "123456789";
+    config.wifiEapConfig.eap = EAP_METHOD_TLS;
+    WifiDeviceConfig config1;
+    config1.networkId = 1;
+    config1.ssid = "test2";
+    config1.keyMgmt = "WPA-PSK";
+    config1.preSharedKey = "123456789";
+    config1.wifiEapConfig.eap = EAP_METHOD_PEAP;
+    std::string input = "123.456.789";
+    std::vector<std::string> outArray;
+    SplitString(input, '.', outArray);
+    CheckEap(config);
+    CheckEap(config1);
+    WifiDeviceConfig config2;
+    config2.networkId = 2;
+    config2.ssid = "test3";
+    config2.keyMgmt = KEY_MGMT_WAPI_PSK;
+    config2.preSharedKey = "123456789";
+    config2.wifiEapConfig.eap = EAP_METHOD_PEAP;
+    CheckWapi(config2);
+    config2.keyMgmt = KEY_MGMT_WAPI_CERT;
+    IsWapiOrEap(config2);
+    config2.keyMgmt = KEY_MGMT_EAP;
+    IsWapiOrEap(config2);
+    WifiAssetValid((config2)); 
+    std::vector<std::string> outArray1;
+    EXPECT_FALSE(ArrayToWifiDeviceConfig(config ,outArray1));
 }
 #endif
 

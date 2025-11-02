@@ -28,11 +28,7 @@ namespace OHOS {
 namespace Wifi {
 constexpr const int UNKNOWN_UID = -1;
 constexpr const int UNKNOWN_MODE = -1;
-constexpr const int POWER_MODE_NORMAL_SLEEP = 1;
-constexpr const int POWER_MODE_NO_SLEEP = 0;
 constexpr const int POWER_MODE_FREQUENCY_DEFAULT = 0;
-constexpr const bool GAME_POWER_MODE_ACTIVE = true;
-constexpr const bool GAME_POWER_MODE_INACTIVE = false;
 
 struct AsyncParamInfo {
     int controlId;
@@ -86,7 +82,7 @@ private:
     void GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
     void VideoCallNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
     void LogSpeedLimitConfigs();
-    void SetGamePowerMode(const std::string &ifaceName, bool gameActive);
+    void SetGamePowerMode(bool gameActive);
     void ResetPowerMode();
     void CheckAndResetGamePowerMode(const std::string &bundleName);
 

@@ -1032,6 +1032,8 @@ struct MloStateParam {
     uint16_t reasonCode;
 };
 
+inline const int POWER_MODE_ON = 0;
+inline const int POWER_MODE_OFF = 1;
 typedef enum {
     BG_LIMIT_CONTROL_ID_GAME = 1,
     BG_LIMIT_CONTROL_ID_STREAM,

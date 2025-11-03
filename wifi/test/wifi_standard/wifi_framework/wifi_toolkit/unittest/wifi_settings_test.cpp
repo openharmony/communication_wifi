@@ -21,6 +21,7 @@
 #include "wifi_settings.h"
 #include "wifi_logger.h"
 #include "wifi_global_func.h"
+#include "wifi_asset_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -47,13 +48,6 @@ constexpr int MIN_RSSI_2DOT_4GHZ = -80;
 constexpr int MIN_RSSI_5GZ = -77;
 constexpr char BACKUP_CONFIG_FILE_PATH_TEST[] = CONFIG_ROOR_DIR"/backup_config_test.conf";
 static std::string g_errLog;
-extern bool IsExistInAsset(const WifiDeviceConfig &config, std::string key);
-extern void SplitString(const std::string &input, const char spChar, std::vector<std::string> &outArray);
-extern bool CheckEap(const WifiDeviceConfig &config);
-extern bool CheckWapi(const WifiDeviceConfig &config);
-extern bool IsWapiOrEap(const WifiDeviceConfig &config);
-extern bool ArrayToWifiDeviceConfig(WifiDeviceConfig &config, std::vector<std::string> &outArray);
-extern bool WifiAssetValid(const WifiDeviceConfig &config);
 void WifiSetLogCallback(const LogType type, const LogLevel level,
                         const unsigned int domain, const char *tag, const char *msg)
 {
@@ -695,7 +689,7 @@ HWTEST_F(WifiSettingsTest, assetTest, TestSize.Level1)
     IsWapiOrEap(config2);
     config2.keyMgmt = KEY_MGMT_EAP;
     IsWapiOrEap(config2);
-    WifiAssetValid((config2)); 
+    WifiAssetValid(config2);
     std::vector<std::string> outArray1;
     EXPECT_FALSE(ArrayToWifiDeviceConfig(config ,outArray1));
 }

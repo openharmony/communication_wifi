@@ -24,6 +24,7 @@
 #include "wifi_config_center.h"
 #include "wifi_country_code_manager.h"
 #include "wifi_sta_hal_interface.h"
+#include "wifi_chr_adapter.h"
 #include <fstream>
 #include <cstdlib>
 
@@ -558,7 +559,7 @@ void SelfCureUtils::ReportNoInternetChrEvent()
     if (IsIpConflictDetect()) {
         networkFailReason = NetworkFailReason::IP_STATE_CONFLICT;
     }
-    WriteWifiAccessIntFailedHiSysEvent(1, networkFailReason, resetState, selfcureHistory);
+    EnhanceWriteWifiAccessIntFailedHiSysEvent(1, networkFailReason, resetState, selfcureHistory);
 }
 
 bool SelfCureUtils::IsIpv6SelfCureSupported()
@@ -590,7 +591,7 @@ bool SelfCureUtils::DisableIpv6()
     // write sys event
     std::string selfcureHistory = GetSelfCureHistory();
     int resetState = (WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered() ? 1 : 0);
-    WriteWifiAccessIntFailedHiSysEvent(static_cast<int>(EventAccessInternetFailReason::IPV6_FAILED),
+    EnhanceWriteWifiAccessIntFailedHiSysEvent(static_cast<int>(EventAccessInternetFailReason::IPV6_FAILED),
         NetworkFailReason::IPV6_STATE_UNREACHABLE, resetState, selfcureHistory);
     // Use NetManagerStandard API to disable IPv6 on WiFi interface
     int result = NetManagerStandard::NetsysController::GetInstance().SetEnableIpv6(ifName, 0);

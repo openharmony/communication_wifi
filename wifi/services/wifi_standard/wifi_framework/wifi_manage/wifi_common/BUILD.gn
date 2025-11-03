@@ -176,6 +176,7 @@ if (defined(ohos_lite)) {
       "wifi_system_ability_listerner.cpp",
       "wifi_system_timer.cpp",
       "ap_config_use.cpp",
+      "wifi_chr_adapter.cpp",
     ]
 
     deps = [
@@ -209,6 +210,7 @@ if (defined(ohos_lite)) {
       "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
       "time_service:time_client",
+      "cJSON:cjson",
     ]
     if (wifi_feature_with_encryption) {
       external_deps += [ "huks:libhukssdk" ]

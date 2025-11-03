@@ -19,6 +19,7 @@
 #include "wifi_common_util.h"
 #include "block_connect_service.h"
 #include <sys/time.h>
+#include "wifi_chr_adapter.h"
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
 
@@ -169,9 +170,9 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
         if (hasSavedConfigSeen) {
             bool isFilteredByP2P = IsAutoConnectFailByP2PEnhanceFilter(scanInfos);
             if (!failReason.empty()) {
-                WriteAutoConnectFailEvent("AUTO_SELECT_FAIL", failReason);
+                EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_FAIL", failReason);
             } else if (!isFilteredByP2P) {
-                WriteAutoConnectFailEvent("AUTO_SELECT_FAIL");
+                EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_FAIL");
             }
         }
     }
@@ -211,7 +212,7 @@ bool StaAutoConnectService::IsAutoConnectFailByP2PEnhanceFilter(const std::vecto
         }
     }
     if (!isMatched) {
-        WriteAutoConnectFailEvent("AUTO_SELECT_FAIL", "P2P_ENHANCE_FILTER");
+        EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_FAIL", "P2P_ENHANCE_FILTER");
         return true;
     }
     return false;

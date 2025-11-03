@@ -691,7 +691,7 @@ HWTEST_F(WifiSettingsTest, assetTest, TestSize.Level1)
     IsWapiOrEap(config2);
     WifiAssetValid(config2);
     std::vector<std::string> outArray1;
-    EXPECT_FALSE(ArrayToWifiDeviceConfig(config ,outArray1));
+    EXPECT_FALSE(ArrayToWifiDeviceConfig(config, outArray1));
 }
 #endif
 

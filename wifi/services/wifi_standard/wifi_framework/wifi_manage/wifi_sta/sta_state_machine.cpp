@@ -4676,7 +4676,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     WriteStaConnectIface(ifaceName);
     WifiStaHalInterface::GetInstance().ClearDeviceConfig(ifaceName);
     int wpaNetworkId = WPA_DEFAULT_NETWORKID;
-    Error ret = WifiStaHalInterface::GetInstance().GetNextNetworkId(wpaNetworkId, ifaceName);
+    ErrCode ret = WifiStaHalInterface::GetInstance().GetNextNetworkId(wpaNetworkId, ifaceName);
     if (ret != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("StartConnectToNetwork GetNextNetworkId failed!");
         WriteAssocFailHiSysEvent("GetNextNetworkId failed", ret);

@@ -75,7 +75,7 @@ public:
 
     void OnWifiRssiChanged(int rssi) override
     {
-        WIFI_LOGI("OnWifiRssiChanged event: %{public}d", rssi);
+        WIFI_LOGD("OnWifiRssiChanged event: %{public}d", rssi);
         if (wifiRssiChange == nullptr) {
             WIFI_LOGI("OnWifiConnectionChanged not registered");
             return;

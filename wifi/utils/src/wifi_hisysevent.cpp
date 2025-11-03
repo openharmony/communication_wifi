@@ -58,6 +58,11 @@ static void WriteEventBehavior(const std::string& eventType, Type... args)
     }
 }
 
+void WriteWifiStateTypeHiSysEvent(const std::string& serviceType, WifiOperType operType)
+{
+    WriteEvent("WIFI_STATE", "TYPE", serviceType, "OPER_TYPE", static_cast<int>(operType));
+}
+
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType)
 {
     WriteEvent("WIFI_STATE", "TYPE", serviceType, "OPER_TYPE", static_cast<int>(operType));

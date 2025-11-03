@@ -20,6 +20,7 @@
 #include "wifi_internal_msg.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_event_helper.h"
+#include "wifi_chr_adapter.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "i_ap_service.h"
 #endif
@@ -202,7 +203,7 @@ ErrCode WifiServiceScheduler::AutoStopStaService(int instId, int type)
             WIFI_LOGE("AutoStopStaService, set wifi mid state:%{public}d failed!", staStateBefore);
             return WIFI_OPT_FAILED;
         }
-        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::CLOSE_WIFI_FAILED), "TIME_OUT",
+        EnhanceWriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::CLOSE_WIFI_FAILED), "TIME_OUT",
             static_cast<int>(staState));
         WifiManager::GetInstance().GetWifiTogglerManager()->ForceStopWifi();
         return WIFI_OPT_FAILED;
@@ -352,7 +353,7 @@ ErrCode WifiServiceScheduler::AutoStartSemiStaService(int instId, std::string &s
         WIFI_LOGI("AutoStartSemiStaService, cur sta state is semi active.");
     }
     if (PreStartWifi(instId, staIfName) != WIFI_OPT_SUCCESS) {
-        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::ENABLE_SEMI_WIFI_FAILED),
+        EnhanceWriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::ENABLE_SEMI_WIFI_FAILED),
             "HAL_CREATE_FAILED", static_cast<int>(WifiConfigCenter::GetInstance().GetWifiMidState(instId)));
         WifiManager::GetInstance().GetWifiTogglerManager()->StopSemiWifiToggledTimer();
         return WIFI_OPT_FAILED;
@@ -362,13 +363,13 @@ ErrCode WifiServiceScheduler::AutoStartSemiStaService(int instId, std::string &s
         instId);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("AutoStartSemiStaService start wifi fail.");
-        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::ENABLE_SEMI_WIFI_FAILED),
+        EnhanceWriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::ENABLE_SEMI_WIFI_FAILED),
             "HAL_START_FAILED", static_cast<int>(WifiConfigCenter::GetInstance().GetWifiMidState(instId)));
         WifiManager::GetInstance().GetWifiTogglerManager()->StopSemiWifiToggledTimer();
         return WIFI_OPT_FAILED;
     }
     if (PostStartWifi(instId) != WIFI_OPT_SUCCESS) {
-        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::ENABLE_SEMI_WIFI_FAILED),
+        EnhanceWriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::ENABLE_SEMI_WIFI_FAILED),
             "POST_START_FAILED", static_cast<int>(WifiConfigCenter::GetInstance().GetWifiMidState(instId)));
         WifiManager::GetInstance().GetWifiTogglerManager()->StopSemiWifiToggledTimer();
         return WIFI_OPT_FAILED;
@@ -751,7 +752,7 @@ void WifiServiceScheduler::DispatchWifiOpenRes(OperateResState state, int instId
         BroadCastWifiStateChange(WifiState::ENABLED, instId);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_OPEN),
             static_cast<int>(WifiOperateState::STA_OPENED));
-        WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
+        EnhanceWriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::ENABLE);
 #if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
         IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
         if (pWifiProService != nullptr) {
@@ -765,7 +766,7 @@ void WifiServiceScheduler::DispatchWifiOpenRes(OperateResState state, int instId
     }
     if (state == OperateResState::OPEN_WIFI_FAILED) {
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
-        WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED),
+        EnhanceWriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED),
             "HAL_FAIL", static_cast<int>(staState));
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, instId);
@@ -820,7 +821,7 @@ void WifiServiceScheduler::DispatchWifiSemiActiveRes(OperateResState state, int 
         WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_SEMI_OPEN),
             static_cast<int>(WifiOperateState::STA_SEMI_OPENED));
-        WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::SEMI_ENABLE);
+        EnhanceWriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::SEMI_ENABLE);
 #if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
         IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
         if (pWifiProService != nullptr) {
@@ -850,7 +851,7 @@ void WifiServiceScheduler::DispatchWifiCloseRes(OperateResState state, int instI
         BroadCastWifiStateChange(WifiState::DISABLED, instId);
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_CLOSE),
             static_cast<int>(WifiOperateState::STA_CLOSED));
-        WriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::DISABLE);
+        EnhanceWriteWifiStateHiSysEvent(HISYS_SERVICE_TYPE_STA, WifiOperType::DISABLE);
 #if defined(FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT) && defined(FEATURE_WIFI_PRO_SUPPORT)
         IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
         if (pWifiProService != nullptr) {

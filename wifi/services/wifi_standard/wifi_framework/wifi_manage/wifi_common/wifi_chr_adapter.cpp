@@ -335,7 +335,7 @@ void EnhanceWriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int lin
         cJSON_Delete(root);
         return;
     }
-    if (!EnhanceWriteEventIpc("EVENT_ARP_DETECTION_INFO", std::string(jsonStr))) {
+    if (!EnhanceWriteEventIpc("EVENT_LINK_INFO", std::string(jsonStr))) {
     WriteLinkInfoHiSysEvent(signalLevel, rssi, band, linkSpeed);
     }
     free(jsonStr);

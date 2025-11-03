@@ -26,6 +26,13 @@ namespace OHOS {
 namespace Wifi {
 constexpr uint32_t SIZE_OF_ITEM = 13;
 constexpr int32_t USER_ID_DEFAULT = 100;
+bool IsExistInAsset(const WifiDeviceConfig &config, std::string key);
+void SplitString(const std::string &input, const char spChar, std::vector<std::string> &outArray);
+bool CheckEap(const WifiDeviceConfig &config);
+bool CheckWapi(const WifiDeviceConfig &config);
+bool IsWapiOrEap(const WifiDeviceConfig &config);
+bool ArrayToWifiDeviceConfig(WifiDeviceConfig &config, std::vector<std::string> &outArray);
+bool WifiAssetValid(const WifiDeviceConfig &config);
 class WifiAssetManager {
 public:
     WifiAssetManager();

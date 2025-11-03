@@ -4676,9 +4676,10 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     WriteStaConnectIface(ifaceName);
     WifiStaHalInterface::GetInstance().ClearDeviceConfig(ifaceName);
     int wpaNetworkId = WPA_DEFAULT_NETWORKID;
-    if (WifiStaHalInterface::GetInstance().GetNextNetworkId(wpaNetworkId, ifaceName) != WIFI_HAL_OPT_OK) {
+    Error ret = WifiStaHalInterface::GetInstance().GetNextNetworkId(wpaNetworkId, ifaceName);
+    if (ret != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("StartConnectToNetwork GetNextNetworkId failed!");
-        WriteAssocFailHiSysEvent("StartConnectToNetwork GetNextNetworkId failed : wpa block");
+        WriteAssocFailHiSysEvent("GetNextNetworkId failed", ret);
         return WIFI_OPT_FAILED;
     }
     ConvertDeviceCfg(deviceConfig, bssid);

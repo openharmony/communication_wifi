@@ -159,7 +159,7 @@ void EnhanceWriteWifiAccessIntFailedHiSysEvent(
         return;
     }
     if (!EnhanceWriteEventIpc("WIFI_ACCESS_INTERNET_FAILED", std::string(jsonStr))) {
-    WriteWifiAccessIntFailedHiSysEvent(operateRes, failCnt, selfCureResetState, selfCureHistory);
+        WriteWifiAccessIntFailedHiSysEvent(operateRes, failCnt, selfCureResetState, selfCureHistory);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -181,7 +181,7 @@ void EnhanceWriteBrowserFailedForPortalHiSysEvent(int respCode, std::string &ser
         return;
     }
     if (!EnhanceWriteEventIpc("BROWSER_FAILED_FOR_PORTAL", std::string(jsonStr))) {
-    WriteBrowserFailedForPortalHiSysEvent(respCode, server);
+        WriteBrowserFailedForPortalHiSysEvent(respCode, server);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -203,7 +203,7 @@ void EnhanceWriteAssocFailHiSysEvent(const std::string &assocFailReason, int sub
         return;
     }
     if (!EnhanceWriteEventIpc("WIFI_ASSOC_FAIL_INFO", std::string(jsonStr))) {
-    WriteAssocFailHiSysEvent(assocFailReason, subErrCode);
+        WriteAssocFailHiSysEvent(assocFailReason, subErrCode);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -225,7 +225,7 @@ void EnhanceWriteDhcpFailHiSysEvent(const std::string &dhcpFailReason, int subEr
         return;
     }
     if (!EnhanceWriteEventIpc("WIFI_DHCP_FAIL_INFO", std::string(jsonStr))) {
-    WriteDhcpFailHiSysEvent(dhcpFailReason, subErrCode);
+        WriteDhcpFailHiSysEvent(dhcpFailReason, subErrCode);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -247,7 +247,7 @@ void EnhanceWriteAutoConnectFailEvent(const std::string &failReason, const std::
         return;
     }
     if (!EnhanceWriteEventIpc("WIFI_AUTO_RECONNECT_FAILED", std::string(jsonStr))) {
-    WriteAutoConnectFailEvent(failReason, subReason);
+        WriteAutoConnectFailEvent(failReason, subReason);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -268,7 +268,7 @@ void EnhanceWriteIsInternetHiSysEvent(int isInternet)
         return;
     }
     if (!EnhanceWriteEventIpc("WIFI_KPI_INTERNET", std::string(jsonStr))) {
-    WriteIsInternetHiSysEvent(isInternet);
+        WriteIsInternetHiSysEvent(isInternet);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -289,7 +289,7 @@ void EnhanceWritePortalStateHiSysEvent(int portalState)
         return;
     }
     if (!EnhanceWriteEventIpc("EVENT_PORTAL_STATE", std::string(jsonStr))) {
-    WritePortalStateHiSysEvent(portalState);
+        WritePortalStateHiSysEvent(portalState);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -312,7 +312,7 @@ void EnhanceWriteArpInfoHiSysEvent(uint64_t arpRtt, int32_t arpFailedCount, int3
         return;
     }
     if (!EnhanceWriteEventIpc("EVENT_ARP_DETECTION_INFO", std::string(jsonStr))) {
-    WriteArpInfoHiSysEvent(arpRtt, arpFailedCount, gatewayCnt);
+        WriteArpInfoHiSysEvent(arpRtt, arpFailedCount, gatewayCnt);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -336,7 +336,7 @@ void EnhanceWriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int lin
         return;
     }
     if (!EnhanceWriteEventIpc("EVENT_LINK_INFO", std::string(jsonStr))) {
-    WriteLinkInfoHiSysEvent(signalLevel, rssi, band, linkSpeed);
+        WriteLinkInfoHiSysEvent(signalLevel, rssi, band, linkSpeed);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -364,7 +364,7 @@ void EnhanceWriteConnectTypeHiSysEvent(int connectType, bool isFirstConnect)
         return;
     }
     if (!EnhanceWriteEventIpc("_CONNECT_TYPE", std::string(jsonStr))) {
-    WriteConnectTypeHiSysEvent(connectType, isFirstConnect);
+        WriteConnectTypeHiSysEvent(connectType, isFirstConnect);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -387,7 +387,7 @@ void EnhanceWriteWifiLinkTypeHiSysEvent(const std::string &ssid, int32_t wifiLin
         return;
     }
     if (!EnhanceWriteEventIpc("EVENT_WIFI_LINK_TYPE_UPDATE", std::string(jsonStr))) {
-    WriteWifiLinkTypeHiSysEvent(ssid, wifiLinkType, triggerReason);
+        WriteWifiLinkTypeHiSysEvent(ssid, wifiLinkType, triggerReason);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -409,7 +409,7 @@ void EnhanceWriteEmlsrExitReasonHiSysEvent(const std::string &ssid, int32_t reas
         return;
     }
     if (!EnhanceWriteEventIpc("EVENT_WIFI_EMLSR_EXIT_REASON", std::string(jsonStr))) {
-    WriteEmlsrExitReasonHiSysEvent(ssid, reason);
+        WriteEmlsrExitReasonHiSysEvent(ssid, reason);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -430,7 +430,7 @@ void EnhanceWriteStaConnectIface(const std::string &ifName)
         return;
     }
     if (!EnhanceWriteEventIpc("EVENT_STA_CONNECT_IFNAME", std::string(jsonStr))) {
-    WriteStaConnectIface(ifName);
+        WriteStaConnectIface(ifName);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -451,7 +451,7 @@ void EnhanceWriteWifiWpaStateHiSysEvent(int state)
         return;
     }
     if (!EnhanceWriteEventIpc("EVENT_WPA_STATE", std::string(jsonStr))) {
-    WriteWifiWpaStateHiSysEvent(state);
+        WriteWifiWpaStateHiSysEvent(state);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -485,7 +485,7 @@ void EnhanceWritePortalAuthExpiredHisysevent(
         return;
     }
     if (!EnhanceWriteEventIpc("PORTAL_AUTH_EXPIRED", std::string(jsonStr))) {
-    WritePortalAuthExpiredHisysevent(respCode, detectNum, connTime, portalAuthTime, isNotificationClicked);
+        WritePortalAuthExpiredHisysevent(respCode, detectNum, connTime, portalAuthTime, isNotificationClicked);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -506,7 +506,7 @@ void EnhanceWriteWifiSelfcureHisysevent(int type)
         return;
     }
     if (!EnhanceWriteEventIpc("WIFI_SELFCURE", std::string(jsonStr))) {
-    WriteWifiSelfcureHisysevent(type);
+        WriteWifiSelfcureHisysevent(type);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -527,7 +527,7 @@ void EnhanceWrite3VapConflictHisysevent(int type)
         return;
     }
     if (!EnhanceWriteEventIpc("WIFI_3VAP_CONFLICT", std::string(jsonStr))) {
-    Write3VapConflictHisysevent(type);
+        Write3VapConflictHisysevent(type);
     }
     free(jsonStr);
     cJSON_Delete(root);
@@ -572,7 +572,7 @@ void EnhanceWrite5gPrefFailedHisysevent(Pref5gStatisticsInfo &info)
             return;
         }
         if (!EnhanceWriteEventIpc("WIFI_5G_PREF_FAILED", std::string(jsonStr))) {
-        Write5gPrefFailedHisysevent(info);
+            Write5gPrefFailedHisysevent(info);
         }
         free(jsonStr);
         cJSON_Delete(root);

@@ -54,6 +54,10 @@ taihe_shared_library("wifi_taihe_native") { #调用taihe_shared_library模板编
     ":run_taihe",
     "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk"
   ]
+  version_script = "libwifi_taihe.map"
+  cflags = memory_optimization_cflags
+  cflags_cc = memory_optimization_cflags_cc
+  ldflags = memory_optimization_ldflags
 }
 
 generate_static_abc("wifi_framework_abc") {                   #调用generate_static_abc编译abc

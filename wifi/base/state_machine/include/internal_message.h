@@ -291,7 +291,7 @@ private:
     int64_t mHandleTime;
 
 public:
-    MsgLogLevel msgLogLevel_ {MsgLogLevel::LOG_I};
+    MsgLogLevel msgLogLevel_ {MsgLogLevel::LOG_D};
 };
 using InternalMessagePtr = std::shared_ptr<InternalMessage>;
 class MessageManage {

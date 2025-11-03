@@ -73,7 +73,7 @@ public:
      * @param timerName - Timer Name.[in]
      * @param interval - Timer duration, in milliseconds.[in]
      */
-    virtual void StartTimer(int timerName, int64_t interval, MsgLogLevel logLevel = MsgLogLevel::LOG_I);
+    virtual void StartTimer(int timerName, int64_t interval, MsgLogLevel logLevel = MsgLogLevel::LOG_D);
 
     /**
      * @Description : Stop the timer.
@@ -205,7 +205,7 @@ public:
      * @param msgName - Message Name.[in]
      * @param delayTimeMs - Delay time, in milliseconds.[in]
      */
-    void MessageExecutedLater(int msgName, int64_t delayTimeMs, MsgLogLevel logLevel = MsgLogLevel::LOG_I);
+    void MessageExecutedLater(int msgName, int64_t delayTimeMs, MsgLogLevel logLevel = MsgLogLevel::LOG_D);
 
     /**
      * @Description : Constructs internal messages and places them in the

@@ -2458,7 +2458,7 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         if (!mIsWifiInternetCHRFlag) {
-            WriteWifiAccessIntFailedHiSysEvent(1, NetworkFailReason::DNS_STATE_UNREACHABLE, 1, "");
+            EnhanceWriteWifiAccessIntFailedHiSysEvent(1, NetworkFailReason::DNS_STATE_UNREACHABLE, 1, "");
             mIsWifiInternetCHRFlag = true;
         }
     } else {

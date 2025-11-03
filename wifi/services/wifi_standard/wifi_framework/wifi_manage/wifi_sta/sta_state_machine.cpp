@@ -4679,7 +4679,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().GetNextNetworkId(wpaNetworkId, ifaceName);
     if (ret != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("StartConnectToNetwork GetNextNetworkId failed!");
-        WriteAssocFailHiSysEvent("GetNextNetworkId failed", ret);
+        WriteAssocFailHiSysEvent("GetNextNetworkId failed", static_cast<int>(ret));
         return WIFI_OPT_FAILED;
     }
     ConvertDeviceCfg(deviceConfig, bssid);

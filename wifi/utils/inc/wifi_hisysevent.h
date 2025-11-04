@@ -144,6 +144,8 @@ struct IodStatisticInfo {
     int32_t indoorConnShortTime = 0;
 };
 
+void WriteWifiStateTypeHiSysEvent(const std::string& serviceType, WifiOperType operType);
+
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType);
 
 void WriteWifiApStateHiSysEvent(int32_t state);

@@ -367,6 +367,13 @@ public:
     virtual bool IsInActionListenState() = 0;
 
     /**
+     * @Report chr event data
+     *
+     * @return void
+     */
+    virtual void ReportChrEventData(const std::string eventname, const std::string jsonBody);
+    
+    /**
      * @Description get num by package name
      *
      * @return : -1(not find) 0(settings) 1(sceneboard)

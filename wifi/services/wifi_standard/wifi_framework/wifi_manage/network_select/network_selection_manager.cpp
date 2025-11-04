@@ -24,6 +24,7 @@
 #include "wifi_channel_helper.h"
 #include "wifi_service_manager.h"
 #include "wifi_config_center.h"
+#include "wifi_chr_adapter.h"
 
 namespace OHOS::Wifi {
 DEFINE_WIFILOG_LABEL("networkSelectionManager")
@@ -116,12 +117,12 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     std::string selectedInfo;
     if (bestNetworkCandidates.empty()) {
         if (!isSavedNetEmpty) {
-            WriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo, filteredReason, savedResult);
+            EnhanceWriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo, filteredReason, savedResult);
         }
         return false;
     } else {
         selectedInfo = GetSelectedInfoForChr(bestNetworkCandidates.at(0));
-        WriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo, filteredReason, savedResult);
+        EnhanceWriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo, filteredReason, savedResult);
     }
 
     /* Determine whether to select bestNetworkCandidates in outdoor scene */
@@ -131,10 +132,10 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
         WIFI_LOGI("bestNetworkCandidates do not satisfy outdoor select condition");
         iodStatisticInfo.outdoorFilterCnt++;
         failReason = "IOD_FILTER";
-        WriteIodHiSysEvent(iodStatisticInfo);
+        EnhanceWriteIodHiSysEvent(iodStatisticInfo);
         return false;
     }
-    WriteIodHiSysEvent(iodStatisticInfo);
+    EnhanceWriteIodHiSysEvent(iodStatisticInfo);
 
     /* if bestNetworkCandidates is not empty, assign the value of first bestNetworkCandidate
      * to the network selection result, and return true which means the network selection is successful */

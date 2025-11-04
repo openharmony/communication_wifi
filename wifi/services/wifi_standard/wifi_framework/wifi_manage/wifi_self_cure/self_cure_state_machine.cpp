@@ -35,6 +35,7 @@
 #include "wifi_country_code_manager.h"
 #include "self_cure_utils.h"
 #include "wifi_global_func.h"
+#include "wifi_chr_adapter.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -1232,7 +1233,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForStaticIp(int reques
     std::string gatewayKey = IpTools::ConvertIpv4Address(dhcpResult.gateway);
     WIFI_LOGI("begin to self cure for internet access: TRY_NEXT_DHCP_OFFER");
     pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP, true);
-    WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::GATEWAY_ABNORMAL));
+    EnhanceWriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::GATEWAY_ABNORMAL));
     RequestUseStaticIpConfig(dhcpResult);
 }
 
@@ -1272,7 +1273,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReassoc(int request
         return;
     }
     WIFI_LOGI("begin to self cure for internet access: Reassoc");
-    WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::TCP_RX_ABNORMAL));
+    EnhanceWriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::TCP_RX_ABNORMAL));
     pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC, true);
     testedSelfCureLevel_.push_back(requestCureLevel);
     isDelayedReassocSelfCure_ = false;
@@ -1535,11 +1536,11 @@ void SelfCureStateMachine::InternetSelfCureState::HandleHttpReachableAfterSelfCu
     }
 
     if (currentCureLevel == WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP) {
-        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::STATIC_IP_SELFCURE_SUCC));
+        EnhanceWriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::STATIC_IP_SELFCURE_SUCC));
     } else if (currentCureLevel == WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC) {
-        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::REASSOC_SELFCURE_SUCC));
+        EnhanceWriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::REASSOC_SELFCURE_SUCC));
     } else if (currentCureLevel == WIFI_CURE_RESET_LEVEL_HIGH_RESET) {
-        WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::RESET_SELFCURE_SUCC));
+        EnhanceWriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::RESET_SELFCURE_SUCC));
     }
 }
 
@@ -2091,11 +2092,11 @@ bool SelfCureStateMachine::CanArpReachable()
     arpChecker.Start(ifName, macAddress, ipAddress, gateway);
     for (int i = 0; i < DEFAULT_SLOW_NUM_ARP_PINGS; i++) {
         if (arpChecker.DoArpCheck(MAX_ARP_DNS_CHECK_TIME, true, arpRtt)) {
-            WriteArpInfoHiSysEvent(arpRtt, 0);
+            EnhanceWriteArpInfoHiSysEvent(arpRtt, 0);
             return true;
         }
     }
-    WriteArpInfoHiSysEvent(arpRtt, 1);
+    EnhanceWriteArpInfoHiSysEvent(arpRtt, 1);
     return false;
 }
 
@@ -2661,7 +2662,7 @@ bool SelfCureStateMachine::IfMultiGateway()
 {
     MultiGateway::GetInstance().GetGatewayAddr(instId_);
     int32_t gatewayCnt = MultiGateway::GetInstance().GetGatewayNum();
-    WriteArpInfoHiSysEvent(0, 0, gatewayCnt);
+    EnhanceWriteArpInfoHiSysEvent(0, 0, gatewayCnt);
     return MultiGateway::GetInstance().IsMultiGateway();
 }
 

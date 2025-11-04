@@ -18,6 +18,7 @@
 #include "wifi_service_manager.h"
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
+#include "wifi_chr_adapter.h"
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
 #endif
@@ -119,7 +120,7 @@ void WifiTogglerManager::StopWifiToggledTimer()
 void WifiTogglerManager::OnWifiToggledTimeOut()
 {
     WIFI_LOGE("OnWifiToggledTimeOut");
-    WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED),
+    EnhanceWriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED),
         "TIME_OUT", static_cast<int>(WifiConfigCenter::GetInstance().GetWifiMidState(INSTID_WLAN0)));
 }
 
@@ -139,7 +140,7 @@ void WifiTogglerManager::StopSemiWifiToggledTimer()
 void WifiTogglerManager::OnSemiWifiToggledTimeOut()
 {
     WIFI_LOGE("OnSemiWifiToggledTimeOut");
-    WriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::ENABLE_SEMI_WIFI_FAILED),
+    EnhanceWriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::ENABLE_SEMI_WIFI_FAILED),
         "TIME_OUT", static_cast<int>(WifiConfigCenter::GetInstance().GetWifiMidState(INSTID_WLAN0)));
 }
 

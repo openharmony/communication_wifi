@@ -23,6 +23,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_settings.h"
 #include "wifi_config_center.h"
+#include "wifi_chr_adapter.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -147,7 +148,7 @@ void WifiSensorScene::ReportLinkedQuality(int32_t rssi, int32_t instId)
             WIFI_LOGE("Invalid signal level");
             break;
     }
-    WriteIodHiSysEvent(iodStatisticInfo);
+    EnhanceWriteIodHiSysEvent(iodStatisticInfo);
 }
 
 int WifiSensorScene::GetMinRssiThres(int frequency)
@@ -176,7 +177,7 @@ void WifiSensorScene::SensorEnhCallback(int scenario)
         } else {
             iodStatisticInfo.out2InCnt++;
         }
-        WriteIodHiSysEvent(iodStatisticInfo);
+        EnhanceWriteIodHiSysEvent(iodStatisticInfo);
         scenario_ = scenario;
     }
 }

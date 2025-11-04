@@ -31,6 +31,7 @@
 #include "wifi_common_util.h"
 #include "wifi_global_func.h"
 #include "wifi_config_center.h"
+#include "wifi_chr_adapter.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -137,7 +138,7 @@ void Perf5gHandoverService::OnDisconnected()
             perf5gChrInfo_.notAdj5gNum++;
         }
     }
-    Write5gPrefFailedHisysevent(perf5gChrInfo_);
+    EnhanceWrite5gPrefFailedHisysevent(perf5gChrInfo_);
     perf5gChrInfo_.Reset();
     bssidLastConnected_ = connectedAp_->apInfo.bssid;
     linkQualityLastConnected_ = connectedAp_->apInfo.apConnectionInfo.GetLinkQualitys();

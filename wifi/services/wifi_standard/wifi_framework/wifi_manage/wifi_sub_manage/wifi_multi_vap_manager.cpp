@@ -25,6 +25,7 @@
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <netdb.h>
+#include "wifi_chr_adapter.h"
 
 DEFINE_WIFILOG_LABEL("WifiMultiVapManager");
 
@@ -54,11 +55,11 @@ bool WifiMultiVapManager::CheckCanUseSoftAp()
         bool enhanceVapAvailable = pEnhanceService->CheckEnhanceVapAvailable();
         if (!enhanceVapAvailable) {
             if (CheckP2pConnected() && !CheckEnhanceWifiConnected()) {
-                Write3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::STA_P2P_SOFTAP_CONFLICT_CNT));
+                EnhanceWrite3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::STA_P2P_SOFTAP_CONFLICT_CNT));
             } else if (!CheckP2pConnected() && CheckEnhanceWifiConnected()) {
-                Write3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::STA_HML_SOFTAP_CONFLICT_CNT));
+                EnhanceWrite3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::STA_HML_SOFTAP_CONFLICT_CNT));
             } else if (CheckP2pConnected() && CheckEnhanceWifiConnected()) {
-                Write3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::P2P_HML_SOFTAP_CONFLICT_CNT));
+                EnhanceWrite3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::P2P_HML_SOFTAP_CONFLICT_CNT));
             }
         }
         return enhanceVapAvailable;
@@ -180,9 +181,9 @@ void WifiMultiVapManager::VapConflictReport()
 {
     WIFI_LOGI("Enter VapConflictReport");
     if (CheckEnhanceWifiConnected() && !CheckP2pConnected()) {
-        Write3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::HML_SOFTAP_STA_CONFLICT_CNT));
+        EnhanceWrite3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::HML_SOFTAP_STA_CONFLICT_CNT));
     } else if (!CheckEnhanceWifiConnected() && CheckP2pConnected()) {
-        Write3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::P2P_SOFTAP_STA_CONFLICT_CNT));
+        EnhanceWrite3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::P2P_SOFTAP_STA_CONFLICT_CNT));
     }
 }
 

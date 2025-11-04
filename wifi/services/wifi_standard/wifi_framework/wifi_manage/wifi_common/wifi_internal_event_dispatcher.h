@@ -163,7 +163,7 @@ private:
     sptr<IWifiP2pCallback> mP2pSingleCallback;
     std::mutex mPidFrozenMutex;
     std::set<int> frozenPidList;
-    IEnhanceService *pEnhanceService;
+    IEnhanceService *pEnhanceService = nullptr;
 };
 }  // namespace Wifi
 }  // namespace OHOS

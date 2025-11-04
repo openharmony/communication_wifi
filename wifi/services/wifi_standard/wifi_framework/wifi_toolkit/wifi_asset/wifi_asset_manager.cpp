@@ -29,7 +29,35 @@ namespace Wifi {
 static AssetValue g_userIdValue = {.u32 = USER_ID_DEFAULT};
 static AssetValue g_trustAccountValue = {.u32 = SEC_ASSET_SYNC_TYPE_TRUSTED_ACCOUNT};
 const std::string WIFI_ASSET_NETWORK_ON_SYNC = "WifiAssetNetworkOnSync";
-static void SplitString(const std::string &input, const char spChar, std::vector<std::string> &outArray)
+bool IsExistInAsset(const WifiDeviceConfig &config, std::string key)
+{
+    std::string aliasId = config.ssid + config.keyMgmt;
+    AssetBlob alias = {
+        static_cast<uint32_t>(aliasId.length()), reinterpret_cast<uint8_t *>(const_cast<char *>(aliasId.c_str()))};
+    AssetAttr attr[] = {
+        {.tag = SEC_ASSET_TAG_ALIAS, {.blob = alias}},
+        {.tag = SEC_ASSET_TAG_RETURN_TYPE, {.u32 = SEC_ASSET_RETURN_ALL}},
+        {.tag = SEC_ASSET_TAG_USER_ID, .value = g_userIdValue},
+    };
+    AssetResultSet resultSet = {0};
+    int32_t ret = AssetQuery(attr, sizeof(attr) / sizeof(attr[0]), &resultSet);
+    if (ret == SEC_ASSET_SUCCESS && resultSet.count > 0) {
+        AssetAttr *result = AssetParseAttr(&resultSet.results[0], SEC_ASSET_TAG_SECRET);
+        if (result) {
+            std::string val = std::string(reinterpret_cast<char *>(result->value.blob.data), result->value.blob.size);
+            AssetFreeResultSet(&resultSet);
+            return val == key;
+        } else {
+            LOGE("IsExistInAsset result is nullptr ");
+        }
+    } else {
+        LOGI("IsExistInAsset ret:%{public}d, count:%{public}d", ret, static_cast<int32_t>(resultSet.count));
+    }
+    AssetFreeResultSet(&resultSet);
+    return false;
+}
+
+void SplitString(const std::string &input, const char spChar, std::vector<std::string> &outArray)
 {
     std::stringstream sstr(input);
     std::string token;
@@ -38,7 +66,7 @@ static void SplitString(const std::string &input, const char spChar, std::vector
     }
 }
 
-static bool CheckEap(const WifiDeviceConfig &config)
+bool CheckEap(const WifiDeviceConfig &config)
 {
     if (config.keyMgmt != KEY_MGMT_EAP && config.keyMgmt != KEY_MGMT_SUITE_B_192) {
         return false;
@@ -61,7 +89,7 @@ static bool CheckEap(const WifiDeviceConfig &config)
     return true;
 }
  
-static bool CheckWapi(const WifiDeviceConfig &config)
+bool CheckWapi(const WifiDeviceConfig &config)
 {
     if (config.keyMgmt == KEY_MGMT_WAPI_PSK) {
         if (config.wifiWapiConfig.wapiPskType < static_cast<int>(WapiPskType::WAPI_PSK_ASCII) ||
@@ -76,7 +104,7 @@ static bool CheckWapi(const WifiDeviceConfig &config)
     return true;
 }
  
-static bool IsWapiOrEap(const WifiDeviceConfig &config)
+bool IsWapiOrEap(const WifiDeviceConfig &config)
 {
     if (config.keyMgmt == KEY_MGMT_WAPI_CERT || config.keyMgmt == KEY_MGMT_WAPI_PSK) {
         return CheckWapi(config);
@@ -87,7 +115,7 @@ static bool IsWapiOrEap(const WifiDeviceConfig &config)
     return false;
 }
  
-static bool WifiAssetValid(const WifiDeviceConfig &config)
+bool WifiAssetValid(const WifiDeviceConfig &config)
 {
     if (config.uid != -1) {
         LOGD("WifiAssetValid WifiDeviceConfig ssid: %{public}s is not created by user, uid : %{public}d",
@@ -102,7 +130,7 @@ static bool WifiAssetValid(const WifiDeviceConfig &config)
     return true;
 }
  
-static bool ArrayToWifiDeviceConfig(WifiDeviceConfig &config, std::vector<std::string> &outArray)
+bool ArrayToWifiDeviceConfig(WifiDeviceConfig &config, std::vector<std::string> &outArray)
 {
     if (outArray.size() != SIZE_OF_ITEM) {
         LOGE("WifiAsset ArrayToWifiDeviceConfig, Error Number Tag Saved In Asset");
@@ -168,6 +196,11 @@ static int32_t WifiAssetAttrAdd(const WifiDeviceConfig &config, bool flagSync = 
     secretWifiDevice += std::to_string(config.wifiProxyconfig.manualProxyConfig.serverPort) + ";";
     secretWifiDevice += StringToHex(config.wifiProxyconfig.manualProxyConfig.exclusionObjectList) + ";";
     secretWifiDevice += std::to_string(config.version);
+    if (IsExistInAsset(config, secretWifiDevice)) {
+        LOGE("WifiAssetAttrAdd, ExistInAsset");
+        return SEC_ASSET_SUCCESS;
+    }
+
     AssetValue secret = {.blob = {static_cast<uint32_t>(secretWifiDevice.size()),
         const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(secretWifiDevice.c_str()))}};
     AssetValue aliasValue = {.blob = {static_cast<uint32_t>(aliasId.size()),

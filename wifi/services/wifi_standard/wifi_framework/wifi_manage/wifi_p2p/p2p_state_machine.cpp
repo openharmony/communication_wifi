@@ -757,6 +757,8 @@ void P2pStateMachine::NotifyUserInvitationReceivedMessage()
         WakeUpScreenSaver();
 #endif
     }
+    //Avoid the situation that the P2P trust dialog box is displayed and the WPA connects to the P2P.
+    CancelWpsPbc();
     std::string deviceName = deviceManager.GetDeviceName(savedP2pConfig.GetDeviceAddress());
     WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::P2P_WSC_PBC_DIALOG, deviceName);
 }
@@ -1446,6 +1448,22 @@ bool P2pStateMachine::HasP2pConnected(void)
 {
     WifiP2pLinkedInfo info = groupManager.GetP2pInfo();
     return info.GetConnectState() == P2pConnectedState::P2P_CONNECTED;
+}
+
+void P2pStateMachine::CancelWpsPbc(void)
+{
+    const WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
+    if (group.GetP2pGroupStatus() != P2pGroupStatus::GS_STARTED ||
+        savedP2pConfig.GetWpsInfo().GetWpsMethod() != WpsMethod::WPS_METHOD_PBC) {
+        return;
+    }
+#ifdef HDI_WPA_INTERFACE_SUPPORT
+    if (WifiP2PHalInterface::GetInstance().CancelWpsPbc(group.GetInterface())
+        != WifiErrorNo::WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("WpsPbc operation failed");
+    }
+#endif
+    return;
 }
 } // namespace Wifi
 } // namespace OHOS

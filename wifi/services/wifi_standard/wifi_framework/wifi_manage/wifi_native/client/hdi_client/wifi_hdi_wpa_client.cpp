@@ -986,8 +986,9 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pSetupWpsPbc(const std::string &groupInterfac
 
 WifiErrorNo WifiHdiWpaClient::ReqP2pCancelWpsPbc(const std::string &groupInterface) const
 {
-    if (groupInterface == nullptr) {
-        return WIFI_HAL_OPT_FAILED;
+    if (groupInterface.empty()) {
+        LOGE("ReqP2pCancelWpsPbc groupInterface is empty")
+        return WIFI_HAL_OPT_INVALID_PARAM;
     }
     return HdiP2pCancelWpsPbc(groupInterface.c_str());
 }

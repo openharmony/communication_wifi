@@ -17,11 +17,30 @@
 #define OHOS_WIFI_SCAN_IMPL
 
 #include "wifi_scan.h"
+#ifdef OHOS_ARCH_LITE
+#include "wifi_scan_proxy_lite.h"
+#else
 #include "wifi_scan_proxy.h"
+#endif
+#include "wifi_scan_callback_stub.h"
 
 namespace OHOS {
 namespace Wifi {
 class WifiScanImpl : public Wifi::WifiScan {
+#ifndef OHOS_ARCH_LITE
+private:
+    class WifiScanDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit WifiScanDeathRecipient(WifiScanImpl &scanImpl) : scanImpl_(scanImpl)
+        {}
+        ~WifiScanDeathRecipient() override = default;
+        void OnRemoteDied(const wptr<IRemoteObject> &remoteObject) override;
+ 
+    private:
+        WifiScanImpl& scanImpl_;
+    };
+#endif
+
 public:
     WifiScanImpl();
     virtual ~WifiScanImpl();
@@ -42,7 +61,6 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode Scan(bool compatible) override;
-
     /**
      * @Description Obtain the scanning result
      *
@@ -130,8 +148,21 @@ private:
 #ifdef OHOS_ARCH_LITE
     IWifiScan *client_;
 #else
+    bool SetupClientWithDeathRecipient(sptr<IRemoteObject> service);
+    void HandleRemoteDied(const wptr<IRemoteObject>& remoteObject);
+    bool RegisterDeathRecipient(const sptr<IRemoteObject>& remote);
+    void RemoveDeathRecipient();
+    void GetScanInfoFromParcel(WifiScanInfo &info, MessageParcel &inParcel);
+    ErrCode ParseScanInfosFromAshmem(sptr<Ashmem> ashmem, 
+    const std::vector<int32_t> &allSize, std::vector<WifiScanInfo> &result);
+    ErrCode ErrCodeToWifiErrCode(OHOS::ErrCode errorCode);
+
     sptr<OHOS::Wifi::IWifiScan> client_;
-#endif
+    sptr<WifiScanDeathRecipient> deathRecipient_;
+    sptr<IRemoteObject> remoteService_;
+    bool mRemoteDied;
+    static sptr<WifiScanCallbackStub> g_wifiScanCallbackStub;
+#endif   
 };
 }  // namespace Wifi
 }  // namespace OHOS

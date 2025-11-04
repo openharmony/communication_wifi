@@ -22,7 +22,6 @@
 #include "message_parcel.h"
 #include "message_option.h"
 #endif
-#include "wifi_errcode.h"
 #include "wifi_msg.h"
 #include "define.h"
 

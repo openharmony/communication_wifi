@@ -94,9 +94,20 @@ WifiScanServiceImpl::WifiScanServiceImpl(int instId) : WifiScanStub(instId)
 WifiScanServiceImpl::~WifiScanServiceImpl()
 {}
 
+#ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
+#else
+int32_t WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfoParcel &parcelInfo)
 {
     WIFI_LOGI("WifiScanServiceImpl::SetScanControlInfo");
+    ScanControlInfo info = parcelInfo.ToScanControlInfo();
+    int32_t ret = SetScanControlInfo(info);
+    return HandleScanIdlRet(ret);
+}
+int32_t WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
+#endif
+{
+    WIFI_LOGI("WifiScanServiceImpl::SetScanControlInfo (original)");
     if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetScanControlInfo:VerifySetWifiConfigPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -118,7 +129,22 @@ ErrCode WifiScanServiceImpl::SetScanControlInfo(const ScanControlInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
+#ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::Scan(bool compatible)
+#else
+int32_t WifiScanServiceImpl::Scan(bool compatible, const std::string& bundleName, int32_t &scanResultCode)
+{
+    WIFI_LOGI("Scan with bundleName: %{public}s, compatible: %{public}d", bundleName.c_str(), compatible);
+    scanResultCode = static_cast<int32_t>(WIFI_OPT_FAILED);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName(bundleName);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanInitiatorUid(GetCallingUid());
+    scanResultCode = Scan(compatible);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName("");
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanInitiatorUid(-1);
+    return HandleScanIdlRet(scanResultCode);
+}
+int32_t WifiScanServiceImpl::Scan(bool compatible)
+#endif
 {
     WIFI_LOGI("Scan, compatible:%{public}d", compatible);
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -148,7 +174,11 @@ ErrCode WifiScanServiceImpl::Scan(bool compatible)
     return PermissionVerification();
 }
 
+#ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::PermissionVerification()
+#else
+int32_t WifiScanServiceImpl::PermissionVerification()
+#endif
 {
     IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(m_instId);
     if (pService == nullptr) {
@@ -175,7 +205,24 @@ ErrCode WifiScanServiceImpl::PermissionVerification()
     return ret;
 }
 
+#ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
+#else
+int32_t WifiScanServiceImpl::AdvanceScan(const WifiScanParamsParcel &paramsParcel,
+    const std::string &bundleName)
+{
+    WIFI_LOGD("AdvanceScan (Parcel) called: bundleName=%{public}s, SSID=%{public}s",
+        bundleName.c_str(), paramsParcel.ssid.c_str());
+    WifiScanParams params = paramsParcel.ToWifiScanParams();
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName(bundleName);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanInitiatorUid(GetCallingUid());
+    int32_t ret = AdvanceScan(params);
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName("");
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanInitiatorUid(-1);
+    return HandleScanIdlRet(ret);
+}
+int32_t WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
+#endif
 {
     WIFI_LOGI("Scan with WifiScanParams, band %{public}u", params.band);
 
@@ -248,20 +295,148 @@ bool WifiScanServiceImpl::IsWifiScanAllowed(bool externFlag)
     return true;
 }
 
+#ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::IsWifiClosedScan(bool &bOpen)
+#else
+int32_t WifiScanServiceImpl::IsWifiClosedScan(bool &bOpen)
+#endif
 {
     WIFI_LOGI("IsWifiClosedScan");
+    ErrCode ret = WIFI_OPT_SUCCESS;
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsWifiClosedScan:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        ret = WIFI_OPT_PERMISSION_DENIED;
+        return HandleScanIdlRet(ret);
     }
 
     bOpen = WifiSettings::GetInstance().GetScanAlwaysState();
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible)
+#ifndef OHOS_ARCH_LITE
+void WifiScanServiceImpl::WriteInfoElementsToParcel(
+    const std::vector<WifiInfoElem> &infoElems, 
+    size_t ieSize,
+    size_t maxIeLen,
+    Parcel &outParcel)
 {
+    for (size_t j = 0; j < ieSize; j++) {
+        const auto &elem = infoElems[j];
+        outParcel.WriteUint32(elem.id);
+        size_t ieLen = elem.content.size() < maxIeLen ? elem.content.size() : maxIeLen;
+        outParcel.WriteUint32(ieLen);
+        for (size_t k = 0; k < ieLen; k++) {
+            outParcel.WriteInt32(static_cast<int>(elem.content[k]));
+        }
+    }
+}
+ 
+void WifiScanServiceImpl::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &result,
+    ScanAshmemParcel &outAshmemParcel, std::vector<uint32_t> &allSizeUint)
+{
+    WIFI_LOGI("SendScanInfo (reused logic), contentSize=%{public}d", contentSize);
+    constexpr int32_t ASH_MEM_SIZE = 1024 * 300;
+ 
+    sptr<Ashmem> ashmem = Ashmem::CreateAshmem("scaninfo", ASH_MEM_SIZE);
+    if (ashmem == nullptr || !ashmem->MapReadAndWriteAshmem()) {
+        WIFI_LOGE("Create or map ashmem failed");
+        outAshmemParcel = ScanAshmemParcel(nullptr);
+        return;
+    }
+ 
+    int offset = 0;
+    size_t maxIeSize = 256;
+    size_t maxIeLen = 1024;
+    allSizeUint.clear();
+ 
+    for (int32_t i = 0; i < contentSize; ++i) {
+        MessageParcel outParcel;
+        outParcel.WriteString(result[i].bssid);
+        outParcel.WriteString(result[i].ssid);
+        outParcel.WriteInt32(result[i].bssidType);
+        outParcel.WriteString(result[i].capabilities);
+        outParcel.WriteInt32(result[i].frequency);
+        outParcel.WriteInt32(result[i].band);
+        outParcel.WriteInt32(static_cast<int>(result[i].channelWidth));
+        outParcel.WriteInt32(result[i].centerFrequency0);
+        outParcel.WriteInt32(result[i].centerFrequency1);
+        outParcel.WriteInt32(result[i].rssi);
+        outParcel.WriteInt32(static_cast<int>(result[i].securityType));
+ 
+        size_t ieSize = result[i].infoElems.size() < maxIeSize ? result[i].infoElems.size() : maxIeSize;
+        outParcel.WriteUint32(ieSize);
+        WriteInfoElementsToParcel(result[i].infoElems, ieSize, maxIeLen, outParcel);
+ 
+        outParcel.WriteInt64(result[i].features);
+        outParcel.WriteInt64(result[i].timestamp);
+        outParcel.WriteInt32(result[i].wifiStandard);
+        outParcel.WriteInt32(result[i].maxSupportedRxLinkSpeed);
+        outParcel.WriteInt32(result[i].maxSupportedTxLinkSpeed);
+        outParcel.WriteInt32(result[i].disappearCount);
+        outParcel.WriteInt32(result[i].isHiLinkNetwork);
+        outParcel.WriteBool(result[i].isHiLinkProNetwork);
+        outParcel.WriteInt32(static_cast<int>(result[i].supportedWifiCategory));
+ 
+        int dataSize = static_cast<int>(outParcel.GetDataSize());
+        if (offset + dataSize > ASH_MEM_SIZE) {
+            WIFI_LOGW("Ashmem out of space, stop writing");
+            break;
+        }
+        allSizeUint.emplace_back(dataSize);
+        ashmem->WriteToAshmem(reinterpret_cast<void*>(outParcel.GetData()), dataSize, offset);
+        offset += dataSize;
+    }
+    outAshmemParcel = ScanAshmemParcel(ashmem);
+ 
+    ashmem->UnmapAshmem();
+}
+ 
+int32_t WifiScanServiceImpl::GetScanInfoList(bool compatible, ScanAshmemParcel &outAshmemParcel,
+    std::vector<int32_t> &allSize)
+{
+    WIFI_LOGI("New GetScanInfoList (compatible=%{public}d)", compatible);
+ 
+    allSize.clear();
+ 
+    std::vector<WifiScanInfo> result;
+    int32_t ret = GetScanInfoList(result, compatible);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Original GetScanInfoList failed, ret=%{public}d", ret);
+        return HandleScanIdlRet(ret);
+    }
+ 
+    std::sort(result.begin(), result.end(), [](const WifiScanInfo& a, const WifiScanInfo& b) {
+        return a.rssi > b.rssi;
+    });
+    int32_t size = static_cast<int>(result.size());
+    constexpr int maxSize = 200;
+    if (size > maxSize) {
+        size = maxSize;
+        WIFI_LOGW("Scan result truncated to %{public}d", maxSize);
+    }
+ 
+    std::vector<uint32_t> allSizeUint;
+    SendScanInfo(size, result, outAshmemParcel, allSizeUint);
+ 
+    for (const auto &len : allSizeUint) {
+        if (len > static_cast<uint32_t>(INT32_MAX)) {
+            WIFI_LOGE("Single scan info size exceeds INT32_MAX");
+            return HandleScanIdlRet(WIFI_OPT_FAILED);
+        }
+        allSize.emplace_back(static_cast<int32_t>(len));
+    }
+ 
+    return WIFI_OPT_SUCCESS;
+}
+#endif
+ 
+#ifdef OHOS_ARCH_LITE
+ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible)
+#else
+int32_t WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible)
+#endif
+{
+    WIFI_LOGI("mahao WifiScanServiceImpl GetScanInfoList");
     WIFI_LOGI("GetScanInfoList, compatible:%{public}d", compatible);
     int apiVersion = WifiPermissionUtils::GetApiVersion();
     if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
@@ -322,7 +497,11 @@ void WifiScanServiceImpl::UpdateScanInfoListNotInWhiteList(std::vector<WifiScanI
     }
 }
 
+#ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::ProcessScanInfoRequest()
+#else
+int32_t WifiScanServiceImpl::ProcessScanInfoRequest()
+#endif
 {
     std::string appId = "";
     std::string packageName = "";
@@ -357,8 +536,12 @@ ErrCode WifiScanServiceImpl::ProcessScanInfoRequest()
     }
     return IsAllowedThirdPartyRequest(appId);
 }
- 
+
+#ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::IsAllowedThirdPartyRequest(std::string appId)
+#else
+int32_t WifiScanServiceImpl::IsAllowedThirdPartyRequest(std::string appId)
+#endif
 {
     // Check if the App is in front
 #ifndef OHOS_ARCH_LITE
@@ -399,20 +582,24 @@ ErrCode WifiScanServiceImpl::IsAllowedThirdPartyRequest(std::string appId)
     return WIFI_OPT_SUCCESS;
 }
 
+#ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::SetScanOnlyAvailable(bool bScanOnlyAvailable)
+#else
+int32_t WifiScanServiceImpl::SetScanOnlyAvailable(bool bScanOnlyAvailable)
+#endif
 {
     WIFI_LOGD("WifiScanServiceImpl::SetScanOnlyAvailable");
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("SetScanOnlyAvailable:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleScanIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetScanOnlyAvailable:VerifySetWifiInfoPermission() PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleScanIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetScanOnlyAvailable:VerifySetWifiConfigPermission() PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleScanIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     WifiSettings::GetInstance().SetScanOnlySwitchState(bScanOnlyAvailable, m_instId);
     ErrCode errCode = WIFI_OPT_SUCCESS;
@@ -421,57 +608,108 @@ ErrCode WifiScanServiceImpl::SetScanOnlyAvailable(bool bScanOnlyAvailable)
     } else {
         errCode = WifiManager::GetInstance().GetWifiTogglerManager()->ScanOnlyToggled(0);
     }
-    return errCode;
+    return HandleScanIdlRet(errCode);
 }
 
+#ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
+#else
+int32_t WifiScanServiceImpl::GetScanOnlyAvailable(bool &bScanOnlyAvailable)
+#endif
 {
     WIFI_LOGD("WifiScanServiceImpl::GetScanOnlyAvailable");
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetScanOnlyAvailable: NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleScanIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetScanOnlyAvailable:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleScanIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetScanOnlyAvailable:VerifyGetWifiConfigPermission() PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleScanIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 
     bScanOnlyAvailable = WifiSettings::GetInstance().GetScanOnlySwitchState(m_instId);
     return WIFI_OPT_SUCCESS;
 }
 
+#ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason)
+#else
+int32_t WifiScanServiceImpl::StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason)
+#endif
 {
     WIFI_LOGD("WifiScanServiceImpl::StartWifiPnoScan");
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("StartWifiPnoScan:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleScanIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
 
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("StartWifiPnoScan:VerifySetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleScanIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("StartWifiPnoScan:VerifyWifiConnectionPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleScanIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     IScanService *pService = WifiServiceManager::GetInstance().GetScanServiceInst(m_instId);
     if (pService == nullptr) {
-        return WIFI_OPT_SCAN_NOT_OPENED;
+        return HandleScanIdlRet(WIFI_OPT_SCAN_NOT_OPENED);
     }
-    return pService->StartWifiPnoScan(isStartAction, periodMs, suspendReason);
+    ErrCode ret =  pService->StartWifiPnoScan(isStartAction, periodMs, suspendReason);
+    return HandleScanIdlRet(ret);
 }
 
 #ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,
     const std::vector<std::string> &event)
 #else
-ErrCode WifiScanServiceImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback,
+int32_t WifiScanServiceImpl::RegisterCallBack(
+    const sptr<IRemoteObject> &cbParcel, int32_t pid, int32_t tokenId, const std::vector<std::string> &event)
+{
+    WIFI_LOGI("mahao WifiScanServiceImpl RegisterCallBack");
+    WIFI_LOGD("WifiScanServiceImpl::RegisterCallBack (adapt new Stub), pid=%{public}d, tokenId=%{public}d",
+        pid, tokenId);
+    int32_t ret = WIFI_OPT_FAILED;
+ 
+    do {
+        sptr<IRemoteObject> remote = cbParcel;
+        sptr<IWifiScanCallback> callback = nullptr;
+        callback = iface_cast<IWifiScanCallback>(remote);
+        if (callback == nullptr) {
+            callback = sptr<WifiScanCallbackProxy>::MakeSptr(remote);
+            WIFI_LOGI("Create new WifiScanCallbackProxy for old logic");
+        }
+ 
+        if (mSingleCallback) {
+            ret = RegisterCallBack(callback, event);
+            continue;
+        }
+        std::unique_lock<std::mutex> lock(deathRecipientMutex);
+        if (deathRecipient_ == nullptr) {
+            deathRecipient_ = sptr<WifiScanDeathRecipient>::MakeSptr();
+        }
+        if ((remote->IsProxyObject()) &&
+            !WifiInternalEventDispatcher::GetInstance().HasScanRemote(remote, m_instId)) {
+            remote->AddDeathRecipient(deathRecipient_);
+        }
+        if (callback != nullptr) {
+            for (const auto &eventName : event) {
+                ret = WifiInternalEventDispatcher::GetInstance().AddScanCallback(
+                    remote, callback, pid, eventName, tokenId, m_instId);
+            }
+        } else {
+            WIFI_LOGE("Converted callback is null");
+        }
+    } while (0);
+ 
+    return HandleScanIdlRet(ret);
+}
+ 
+int32_t WifiScanServiceImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback,
     const std::vector<std::string> &event)
 #endif
 {
@@ -482,16 +720,20 @@ ErrCode WifiScanServiceImpl::RegisterCallBack(const sptr<IWifiScanCallback> &cal
     return WIFI_OPT_SUCCESS;
 }
 
+#ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::GetSupportedFeatures(long &features)
+#else
+int32_t WifiScanServiceImpl::GetSupportedFeatures(int64_t &features)
+#endif
 {
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleScanIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     int ret = WifiManager::GetInstance().GetSupportedFeatures(features);
     if (ret < 0) {
         WIFI_LOGE("Failed to get supported features!");
-        return WIFI_OPT_FAILED;
+        return HandleScanIdlRet(WIFI_OPT_FAILED);
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -577,5 +819,18 @@ bool WifiScanServiceImpl::IsInScanMacInfoWhiteList()
 #endif
     return false;
 }
+
+int32_t WifiScanServiceImpl::HandleScanIdlRet(int32_t originRet) {
+#ifdef OHOS_ARCH_LITE
+    return originRet;
+#else
+    if (originRet == WIFI_OPT_SUCCESS) {
+        return WIFI_OPT_SUCCESS;
+    } else {
+        return originRet + SCAN_IDL_ERROR_OFFSET;
+    }
+#endif
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

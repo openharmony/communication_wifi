@@ -75,6 +75,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
   import("//foundation/communication/wifi/wifi/wifi.gni")
+  import("//build/config/components/idl_tool/idl.gni")
 
   ################################################################################
 
@@ -112,6 +113,66 @@ if (defined(ohos_lite)) {
     }
   }
 
+  config("wifi_scan_config") {
+  include_dirs = [
+    "${target_gen_dir}",
+    "include",
+    "interfaces"
+  ]
+}
+ 
+  idl_gen_interface("wifi_scan_interface") {
+  sources = [
+    "IWifiScan.idl",
+    "IWifiScanMgr.idl",
+  ]
+ 
+  configs = [ ":wifi_sdk_header" ]
+ 
+  log_domainid = "0xD001560"
+  log_tag = "mahaoWifiIDL"
+  part_name = "wifi"
+  subsystem_name = "communication"
+}
+ 
+ohos_source_set("wifi_scan_stub") {
+    branch_protector_ret = "pac_ret"
+    sanitize = {
+      cfi = true  # Enable/disable control flow integrity detection
+      boundary_sanitize = false  # Enable boundary san detection
+      cfi_cross_dso = true  # Cross-SO CFI Checks
+      integer_overflow = false  # Enable integer overflow detection
+      ubsan = false  # Enable some Ubsan options
+      cfi_vcall_icall_only = true
+      debug = false
+    }
+    part_name = "wifi"
+    subsystem_name = "communication"
+    sources = [      
+      "src/scan_ashmem_parcel.cpp",
+      "src/scan_control_info_parcel.cpp",
+      "src/wifi_scan_info_parcel.cpp",
+      "src/wifi_scan_params_parcel.cpp",
+      "src/wifi_info_elem_parcel.cpp",
+      ]
+    output_values = get_target_outputs(":wifi_scan_interface")
+    sources += filter_include(output_values, [ "*wifi_scan_stub.cpp" ])
+    sources += filter_include(output_values, [ "*wifi_scan_mgr_stub.cpp" ])
+    public_configs = [ 
+      ":wifi_scan_config",
+      ":wifi_sdk_header"
+       ]
+ 
+    deps = [":wifi_scan_interface"]
+ 
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_single",
+      "samgr:samgr_proxy",
+      "bounds_checking_function:libsec_shared",
+    ]
+}
+ 
   ohos_source_set("wifi_device_proxy_impl") {
     branch_protector_ret = "pac_ret"
     sanitize = {
@@ -201,9 +262,18 @@ if (defined(ohos_lite)) {
     subsystem_name = "communication"
     sources = [
       "src/wifi_scan_impl.cpp",
-      "src/wifi_scan_mgr_proxy.cpp",
-      "src/wifi_scan_proxy.cpp",
+      "src/scan_ashmem_parcel.cpp",
+      "src/scan_control_info_parcel.cpp",
+      "src/wifi_scan_info_parcel.cpp",
+      "src/wifi_scan_params_parcel.cpp",
+      "src/wifi_info_elem_parcel.cpp",
     ]
+    output_values = get_target_outputs(":wifi_scan_interface")
+    sources += filter_include(output_values, [ "*wifi_scan_proxy.cpp" ])
+    sources += filter_include(output_values, [ "*wifi_scan_mgr_proxy.cpp" ])
+    print("=== 所有源文件列表 ===")
+    print(sources)
+    public_configs = [ ":wifi_scan_config" ]
 
     configs = [
       ":wifi_sdk_config",
@@ -215,6 +285,8 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
+    deps = [":wifi_scan_interface"]
+ 
     external_deps = [
       "bounds_checking_function:libsec_shared",
       "hilog:libhilog",
@@ -225,7 +297,6 @@ if (defined(ohos_lite)) {
 
   ohos_source_set("wifi_p2p_proxy_impl") {
     branch_protector_ret = "pac_ret"
-
     sanitize = {
       cfi = true  # Enable/disable control flow integrity detection
       boundary_sanitize = false  # Enable boundary san detection
@@ -338,6 +409,10 @@ if (defined(ohos_lite)) {
       ":wifi_sdk_header",
     ]
 
+    public_configs = [ 
+      ":wifi_sdk_header",
+      ":wifi_scan_config",
+      ]
     public_configs = [ ":wifi_sdk_header" ]
 
     part_name = "wifi"

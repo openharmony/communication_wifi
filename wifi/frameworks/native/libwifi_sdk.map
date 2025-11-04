@@ -169,6 +169,8 @@
             "OHOS::Wifi::Hid2dConnectConfig::SetFrequency(int)";
             "OHOS::Wifi::Hid2dConnectConfig::SetDhcpMode(OHOS::Wifi::DhcpMode)";
             "vtable for OHOS::Wifi::NetworkSelection::AndWifiFilter";
+            "VTT for OHOS::Wifi::WifiScanProxy";
+            "vtable for OHOS::Wifi::WifiScanProxy";
         };
     local:
         *;

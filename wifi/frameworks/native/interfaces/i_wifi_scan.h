@@ -18,26 +18,16 @@
 
 #ifdef OHOS_ARCH_LITE
 #include "iproxy_client.h"
-#else
-#include <string_ex.h>
-#include <iremote_broker.h>
-#include "message_parcel.h"
-#include "message_option.h"
-#endif
 #include "wifi_scan_msg.h"
 #include "wifi_errcode.h"
 #include "i_wifi_scan_callback.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
 #ifdef OHOS_ARCH_LITE
 class IWifiScan {
 public:
-#else
-class IWifiScan : public IRemoteBroker {
-public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiScan");
-#endif
     virtual ~IWifiScan()
     {}
 
@@ -105,14 +95,8 @@ public:
      */
     virtual ErrCode StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason) = 0;
 
-#ifdef OHOS_ARCH_LITE
     virtual ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,
         const std::vector<std::string> &event) = 0;
-#else
-    virtual ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback,
-        const std::vector<std::string> &event) = 0;
-#endif
-
     /**
      * @Description Get supported features
      *
@@ -128,6 +112,7 @@ public:
      */
     virtual bool IsRemoteDied(void) = 0;
 };
+#endif
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -96,6 +96,7 @@ public:
     virtual WifiErrorNo TempGroupAdd(int freq);
     virtual WifiErrorNo P2pSetTempConfig(int networkId, const HalP2pGroupConfig &config) const = 0;
     virtual WifiErrorNo SetP2pHighPerf(bool isEnable);
+    virtual WifiErrorNo CancelWpsPbc(const std::string &groupInterface) const = 0;
 };
 
 class WifiP2PHalInterface : public MockWifiP2PHalInterface {
@@ -170,6 +171,7 @@ public:
     MOCK_METHOD1(TempGroupAdd, WifiErrorNo(int freq));
     MOCK_CONST_METHOD2(P2pSetTempConfig, WifiErrorNo(int networkId, const HalP2pGroupConfig &config));
     MOCK_METHOD1(SetP2pHighPerf, WifiErrorNo(bool isEnable));
+    MOCK_CONST_METHOD1(CancelWpsPbc, WifiErrorNo(const std::string &groupInterface));
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -404,6 +404,28 @@ WifiErrorNo HdiP2pSetupWpsPbc(const char *groupIfc, const char *address)
     return WIFI_HAL_OPT_OK;
 }
 
+WifiErrorNo HdiP2pCancelWpsPbc(const char *groupIfc)
+{
+    LOGI("HdiP2pCancelWpsPbc enter");
+    pthread_mutex_lock(GetWpaObjMutex());
+    struct IWpaInterface *wpaObj = GetWpaInterface();
+    if (wpaObj == NULL) {
+        LOGE("HdiP2pCancelWpsPbc: wpaObj is null");
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+
+    int32_t result = wpaObj->DeliverP2pData(wpaObj, groupIfc, P2P_CANCEL_WPS_PBC, 0, "");
+    if (result != HDF_SUCCESS) {
+        LOGE("HdiP2pCancelWpsPbc: send failed result: %{public}d", result);
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_FAILED;
+    }
+    pthread_mutex_unlock(GetWpaObjMutex());
+    LOGI("HdiP2pCancelWpsPbc success");
+    return WIFI_HAL_OPT_OK;
+}
+
 WifiErrorNo HdiP2pSetupWpsPin(const char *groupIfc, const char *address, const char *pin, char *result)
 {
     LOGI("HdiP2pSetupWpsPin enter");

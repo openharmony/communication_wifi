@@ -387,5 +387,12 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiSetMiracastSinkConfigTest, TestSize.Level1)
     WifiErrorNo result = HdiSetMiracastSinkConfig(config);
     EXPECT_EQ(result, WIFI_HAL_OPT_OK);
 }
+
+HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pCancelWpsPbcTest, TestSize.Level1)
+{
+    const char *config = nullptr;
+    WifiErrorNo result = HdiP2pCancelWpsPbc(config);
+    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+}
 }
 }

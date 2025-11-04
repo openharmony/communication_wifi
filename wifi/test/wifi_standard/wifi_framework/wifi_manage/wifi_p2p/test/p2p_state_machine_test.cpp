@@ -435,6 +435,10 @@ public:
     {
         return pP2pStateMachine->HasP2pConnected();
     }
+    void WarpCancelWpsPbc()
+    {
+        pP2pStateMachine->CancelWpsPbc();
+    }
 };
 
 void ButtonTest(AlertDialog &dialog, std::any ctx)
@@ -996,6 +1000,12 @@ HWTEST_F(P2pStateMachineTest, WakeUpScreenSaverTest, TestSize.Level1)
 HWTEST_F(P2pStateMachineTest, HasP2pConnectedTest, TestSize.Level1)
 {
     EXPECT_FALSE(WarpHasP2pConnected());
+}
+
+HWTEST_F(P2pStateMachineTest, CancelWpsPbcTest, TestSize.Level1)
+{
+    WarpCancelWpsPbc();
+    EXPECT_FALSE(g_errLog.find("P2pStateMachine") != std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

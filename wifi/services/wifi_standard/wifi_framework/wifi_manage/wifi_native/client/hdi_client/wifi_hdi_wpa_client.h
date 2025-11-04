@@ -429,6 +429,14 @@ public:
     WifiErrorNo ReqP2pSetupWpsPbc(const std::string &groupInterface, const std::string &bssid) const;
 
     /**
+     * @Description Cancel wps pbc to the P2P
+     *
+     * @param groupInterface
+     * @return WifiErrorNo
+     */
+    WifiErrorNo ReqP2pCancelWpsPbc(const std::string &groupInterface) const;
+
+    /**
      * @Description Enable Wps Pin mode
      *
      * @param groupInterface - p2p group

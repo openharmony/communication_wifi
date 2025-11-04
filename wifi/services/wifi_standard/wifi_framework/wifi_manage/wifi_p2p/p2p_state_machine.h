@@ -434,6 +434,7 @@ private:
     void WakeUpScreenSaver();
 #endif
     bool SetTempGroupConfig(const WifiP2pConfigInternal &config) const;
+    void CancelWpsPbc();
 
 private:
     virtual void P2pConnectByShowingPin(const WifiP2pConfigInternal &config) const;

@@ -414,7 +414,12 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr
             freq = freqEnhance;
         }
     } while (0);
-    ret = WifiP2PHalInterface::GetInstance().GroupAdd(false, PERSISTENT_NET_ID, freq);
+    bool isEnableWifiAx = (info.second == FreqType::FREQUENCY_80M_11AX);
+    if (isEnableWifiAx) {
+        ret = WifiP2PHalInterface::GetInstance().GroupAdd(false, AX_NET_ID, freq);
+    } else {
+        ret = WifiP2PHalInterface::GetInstance().GroupAdd(false, PERSISTENT_NET_ID, freq);
+    }
     if (WifiErrorNo::WIFI_HAL_OPT_FAILED == ret) {
         WIFI_LOGE("p2p configure to CreateGroup failed.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateHid2dGroup, WIFI_OPT_FAILED);

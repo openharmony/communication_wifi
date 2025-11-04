@@ -55,6 +55,7 @@ typedef enum DhcpMode {
 typedef enum FreqType {
     FREQUENCY_DEFAULT = 0,
     FREQUENCY_160M = 1,
+    FREQUENCY_80M_11AX = 2,
 } FreqType;
 
 typedef enum SelfCfgType {

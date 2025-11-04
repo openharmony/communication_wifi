@@ -2125,6 +2125,9 @@ void StaStateMachine::HandlePortalNetworkPorcess()
     }
     int netId = m_NetWorkState->GetWifiNetId();
     int deviceType = WifiConfigCenter::GetInstance().GetDeviceType();
+    if (enhanceService_ != nullptr) {
+        mPortalUrl = enhanceService_->CheckPortalNet(linkedInfo.ssid, mPortalUrl);
+    }
     RecordPortalInfo();
 #ifndef SUPPORT_PORTAL_LOGIN
     AAFwk::Want want;

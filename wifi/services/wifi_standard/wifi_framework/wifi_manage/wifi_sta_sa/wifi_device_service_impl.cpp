@@ -204,7 +204,12 @@ ErrCode WifiDeviceServiceImpl::EnableSemiWifi()
         return WIFI_OPT_FORBID_AIRPLANE;
     }
 #endif
-    if ((m_instId == INSTID_WLAN0 || m_instId == INSTID_WLAN1) && IsDisableWifiProhibitedByEdm()) {
+    if (m_instId == INSTID_WLAN0 && IsDisableWifiProhibitedByEdm()) {
+        WIFI_LOGE("DisableWifi:wifi is prohibited by EDM!");
+        return WIFI_OPT_FAILED;
+    }
+    
+    if (m_instId == INSTID_WLAN0 || m_instId == INSTID_WLAN1) {
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED);
 #ifndef OHOS_ARCH_LITE
         WifiSettings::GetInstance().SetWifiToggleCaller(GetCallingPid(), m_instId);

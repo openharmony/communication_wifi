@@ -252,6 +252,7 @@ private:
 
 inline const int TEMPORARY_NET_ID = -1;
 inline const int PERSISTENT_NET_ID = -2;
+inline const int AX_NET_ID = 1;
 inline const int INVALID_NET_ID = -999;
 class WifiP2pGroupInfo {
 public:

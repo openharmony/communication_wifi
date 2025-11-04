@@ -1458,7 +1458,7 @@ void P2pStateMachine::CancelWpsPbc(void)
         return;
     }
 #ifdef HDI_WPA_INTERFACE_SUPPORT
-    if (WifiP2PHalInterface::GetInstance().CancelWpsPbc(group.GetInstance())
+    if (WifiP2PHalInterface::GetInstance().CancelWpsPbc(group.GetInterface())
         != WifiErrorNo::WIFI_HAL_OPT_OK) {
         WIFI_LOGE("WpsPbc operation failed");
     }

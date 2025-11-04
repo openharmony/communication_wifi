@@ -322,7 +322,7 @@ public:
      *
      * @return std::string
      */
-    virtual std::string CheckPortalNet(const std::string &ssid,const std::string &portalUrl) = 0;
+    virtual std::string CheckPortalNet(const std::string &ssid, const std::string &portalUrl) = 0;
 
     /**
      * @Description get limit switching network scenes

@@ -34,6 +34,14 @@ protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
 
+class SameBssidNetworkFilter final : public SimpleWifiFilter {
+public:
+    SameBssidNetworkFilter();
+    ~SameBssidNetworkFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+
 class ValidNetworkIdFilter final : public SimpleWifiFilter {
 public:
     ValidNetworkIdFilter();

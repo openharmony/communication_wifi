@@ -38,7 +38,8 @@ ScanControlInfoParcel::ScanControlInfoParcel(const ScanControlInfo &info)
     }
 }
 
-ScanControlInfo ScanControlInfoParcel::ToScanControlInfo() const {
+ScanControlInfo ScanControlInfoParcel::ToScanControlInfo() const 
+{
     ScanControlInfo info;
 
     for (const auto &parcelForbid : this->scanForbidList) {
@@ -80,9 +81,9 @@ bool ScanControlInfoParcel::Marshalling(Parcel &parcel) const
     if (!parcel.WriteUint32(scanIntervalList.size()))
         return false;
     for (const auto &item : scanIntervalList) {
-        if (!parcel.WriteInt32(item.scanScene) || 
+        if (!parcel.WriteInt32(item.scanScene) ||
             !parcel.WriteBool(item.isSingle) ||
-            !parcel.WriteInt32(item.interval) || 
+            !parcel.WriteInt32(item.interval) ||
             !parcel.WriteInt32(item.count) ||
             !parcel.WriteInt32(static_cast<int32_t>(item.scanMode)) ||
             !parcel.WriteInt32(static_cast<int32_t>(item.intervalMode))) {
@@ -105,7 +106,7 @@ ScanControlInfoParcel *ScanControlInfoParcel::Unmarshalling(Parcel &parcel)
     for (uint32_t i = 0; i < size; i++) {
         ScanForbidMode forbid;
         
-        if (!parcel.ReadInt32(forbid.scanScene) || 
+        if (!parcel.ReadInt32(forbid.scanScene) ||
             !parcel.ReadInt32(forbid.forbidTime) ||
             !parcel.ReadInt32(forbid.forbidCount)) {
             return nullptr;
@@ -126,9 +127,9 @@ ScanControlInfoParcel *ScanControlInfoParcel::Unmarshalling(Parcel &parcel)
     for (uint32_t i = 0; i < size; i++) {
         ScanIntervalMode interval;
         
-        if (!parcel.ReadInt32(interval.scanScene) || 
+        if (!parcel.ReadInt32(interval.scanScene) ||
             !parcel.ReadBool(interval.isSingle) ||
-            !parcel.ReadInt32(interval.interval) || 
+            !parcel.ReadInt32(interval.interval) ||
             !parcel.ReadInt32(interval.count)) {
             return nullptr;
         }

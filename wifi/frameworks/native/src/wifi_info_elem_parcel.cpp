@@ -17,14 +17,16 @@
 namespace OHOS {
 namespace Wifi {
 
-WifiInfoElemParcel WifiInfoElemParcel::FromWifiInfoElem(const WifiInfoElem& elem) {
+WifiInfoElemParcel WifiInfoElemParcel::FromWifiInfoElem(const WifiInfoElem& elem) 
+{
     WifiInfoElemParcel parcel;
     parcel.id = elem.id;
     parcel.content = elem.content;
     return parcel;
 }
 
-WifiInfoElem WifiInfoElemParcel::ToWifiInfoElem() const {
+WifiInfoElem WifiInfoElemParcel::ToWifiInfoElem() const 
+{
     WifiInfoElem elem;
     elem.id = this->id;
     elem.content = this->content;
@@ -48,7 +50,6 @@ bool WifiInfoElemParcel::Marshalling(Parcel &parcel) const
 WifiInfoElemParcel *WifiInfoElemParcel::Unmarshalling(Parcel &parcel)
 {
     auto elem = std::make_unique<WifiInfoElemParcel>();
-
     if (!parcel.ReadUint32(elem->id)) {
         return nullptr;
     }
@@ -57,7 +58,6 @@ WifiInfoElemParcel *WifiInfoElemParcel::Unmarshalling(Parcel &parcel)
     if (!parcel.ReadUint32(size)) {
         return nullptr;
     }
-
     elem->content.reserve(size);
 
     for (uint32_t i = 0; i < size; i++) {

@@ -153,8 +153,8 @@ private:
     bool RegisterDeathRecipient(const sptr<IRemoteObject>& remote);
     void RemoveDeathRecipient();
     void GetScanInfoFromParcel(WifiScanInfo &info, MessageParcel &inParcel);
-    ErrCode ParseScanInfosFromAshmem(sptr<Ashmem> ashmem, 
-    const std::vector<int32_t> &allSize, std::vector<WifiScanInfo> &result);
+    ErrCode ParseScanInfosFromAshmem(sptr<Ashmem> ashmem,
+        const std::vector<int32_t> &allSize, std::vector<WifiScanInfo> &result);
     ErrCode ErrCodeToWifiErrCode(OHOS::ErrCode errorCode);
 
     sptr<OHOS::Wifi::IWifiScan> client_;
@@ -162,7 +162,7 @@ private:
     sptr<IRemoteObject> remoteService_;
     bool mRemoteDied;
     static sptr<WifiScanCallbackStub> g_wifiScanCallbackStub;
-#endif   
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

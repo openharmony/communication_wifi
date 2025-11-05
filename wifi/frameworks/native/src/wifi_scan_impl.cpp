@@ -237,7 +237,7 @@ ErrCode WifiScanImpl::SetScanControlInfo(const ScanControlInfo &info)
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
 #ifdef OHOS_ARCH_LITE
-    return client_->GetSupportedFeatures(features);
+    return client_->SetScanControlInfo(info);
 #else
     OHOS::ErrCode ret = client_->SetScanControlInfo(info);
     return ErrCodeToWifiErrCode(ret);
@@ -415,7 +415,7 @@ ErrCode WifiScanImpl::GetSupportedFeatures(long &features)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
-    #ifdef OHOS_ARCH_LITE
+#ifdef OHOS_ARCH_LITE
     return client_->GetSupportedFeatures(features);
 #else
     int64_t features_int64 = 0;

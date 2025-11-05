@@ -165,6 +165,7 @@ public:
         void HandleReuqestScanInNoNet(const InternalMessagePtr msg);
         void HandleNoNetChanged();
         bool HandleHttpResultInNoNet(InternalMessagePtr msg);
+        void HandleReuqestSelfCure();
     };
 
     class WifiPortalState : public State {

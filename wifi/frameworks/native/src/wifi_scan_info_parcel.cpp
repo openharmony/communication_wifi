@@ -17,7 +17,7 @@
 namespace OHOS {
 namespace Wifi {
 
-WifiScanInfoParcel WifiScanInfoParcel::FromWifiScanInfo(const WifiScanInfo &info) 
+WifiScanInfoParcel WifiScanInfoParcel::FromWifiScanInfo(const WifiScanInfo &info)
 {
     WifiScanInfoParcel parcel;
     parcel.bssid = info.bssid;
@@ -47,7 +47,7 @@ WifiScanInfoParcel WifiScanInfoParcel::FromWifiScanInfo(const WifiScanInfo &info
     return parcel;
 }
 
-WifiScanInfo WifiScanInfoParcel::ToWifiScanInfo() const 
+WifiScanInfo WifiScanInfoParcel::ToWifiScanInfo() const
 {
     WifiScanInfo info;
     info.bssid = bssid;
@@ -129,7 +129,7 @@ WifiScanInfoParcel *WifiScanInfoParcel::Unmarshalling(Parcel &parcel)
     if (!parcel.ReadInt32(channelWidthValue)) {
         return nullptr;
     }
-    info->channelWidth = static_cast<WifiChannelWidth>(channelWidthValue); 
+    info->channelWidth = static_cast<WifiChannelWidth>(channelWidthValue);
 
     if (!parcel.ReadInt32(info->centerFrequency0) ||
         !parcel.ReadInt32(info->centerFrequency1) ||

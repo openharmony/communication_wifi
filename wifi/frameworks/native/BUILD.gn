@@ -413,7 +413,6 @@ ohos_source_set("wifi_scan_stub") {
       ":wifi_sdk_header",
       ":wifi_scan_config",
       ]
-    public_configs = [ ":wifi_sdk_header" ]
 
     part_name = "wifi"
     subsystem_name = "communication"

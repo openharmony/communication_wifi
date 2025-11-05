@@ -51,6 +51,7 @@ constexpr int64_t MAX_INTERVAL_TIME = 120 * 1000 * 1000;
 constexpr int64_t SCREEN_ON_DURATIONSECS = 30 * 1000 * 1000;
 constexpr int64_t DEFAULT_SCAN_INTERVAL_TIME = 20 * 1000 * 1000;
 constexpr int64_t POOR5G_SWITCH_2GTHRESHOLD = -76;
+constexpr int32_t DEFAULT_SELFCURE_INTERVAL = 10 * 1000; // ms
 // show reason
 std::map<WifiSwitchReason, std::string> g_switchReason = {
     {WIFI_SWITCH_REASON_NO_INTERNET, "NO_INTERNET"},
@@ -1311,12 +1312,14 @@ WifiProStateMachine::WifiNoNetState::~WifiNoNetState() {}
 void WifiProStateMachine::WifiNoNetState::GoInState()
 {
     WIFI_LOGI("WifiNoNetState GoInState function.");
+    pWifiProStateMachine_->MessageExecutedLater(EVENT_REQUEST_SELFCURE_DELAY, DEFAULT_SELFCURE_INTERVAL);
     HandleNoNetChanged();
 }
 
 void WifiProStateMachine::WifiNoNetState::GoOutState()
 {
     WIFI_LOGI("WifiNoNetState GoOutState function.");
+    pWifiProStateMachine_->StopTimer(EVENT_REQUEST_SELFCURE_DELAY);
 }
 
 bool WifiProStateMachine::WifiNoNetState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -1338,6 +1341,9 @@ bool WifiProStateMachine::WifiNoNetState::ExecuteStateMsg(InternalMessagePtr msg
         case EVENT_CHECK_WIFI_INTERNET_RESULT:
             ret = HandleHttpResultInNoNet(msg);
             break;
+        case EVENT_REQUEST_SELFCURE_DELAY:
+            HandleReuqestSelfCure();
+            ret = EXECUTED;
         default:
             return ret;
     }
@@ -1366,25 +1372,13 @@ void WifiProStateMachine::WifiNoNetState::HandleWifiNoInternet(const InternalMes
             return;
         }
         WIFI_LOGI("NoInternet X: select network fail.");
-        if (pWifiProStateMachine_->IsFirstConnectAndNonet()) {
-            WIFI_LOGI("user select and nonet, not selfcure.");
-            return;
-        }
-        if (pWifiProStateMachine_->TrySelfCure(false)) {
-            pWifiProStateMachine_->Wifi2WifiFinish();
-        }
+        HandleReuqestSelfCure();
         return;
     }
 
     WIFI_LOGI("NoNetSwitch 2: receive good ap.");
     if (!pWifiProStateMachine_->IsSatisfiedWifi2WifiCondition()) {
-        if (pWifiProStateMachine_->IsFirstConnectAndNonet()) {
-            WIFI_LOGI("user select and nonet, not selfcure.");
-            return;
-        }
-        if (pWifiProStateMachine_->TrySelfCure(false)) {
-            pWifiProStateMachine_->Wifi2WifiFinish();
-        }
+        HandleReuqestSelfCure();
         return;
     }
 
@@ -1454,6 +1448,17 @@ bool WifiProStateMachine::WifiNoNetState::HandleHttpResultInNoNet(InternalMessag
         return EXECUTED;
     }
     return NOT_EXECUTED;
+}
+
+void WifiProStateMachine::WifiNoNetState::HandleReuqestSelfCure()
+{
+    if (pWifiProStateMachine_->IsFirstConnectAndNonet()) {
+        WIFI_LOGI("user select and nonet, not selfcure.");
+        return;
+    }
+    if (pWifiProStateMachine_->TrySelfCure(false)) {
+        pWifiProStateMachine_->Wifi2WifiFinish();
+    }
 }
 /* --------------------------- state machine portal state ------------------------------ */
 WifiProStateMachine::WifiPortalState::WifiPortalState(WifiProStateMachine *pWifiProStateMachine)

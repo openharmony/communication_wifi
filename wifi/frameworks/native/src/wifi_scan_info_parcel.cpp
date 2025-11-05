@@ -17,7 +17,8 @@
 namespace OHOS {
 namespace Wifi {
 
-WifiScanInfoParcel WifiScanInfoParcel::FromWifiScanInfo(const WifiScanInfo &info) {
+WifiScanInfoParcel WifiScanInfoParcel::FromWifiScanInfo(const WifiScanInfo &info) 
+{
     WifiScanInfoParcel parcel;
     parcel.bssid = info.bssid;
     parcel.ssid = info.ssid;
@@ -46,7 +47,8 @@ WifiScanInfoParcel WifiScanInfoParcel::FromWifiScanInfo(const WifiScanInfo &info
     return parcel;
 }
 
-WifiScanInfo WifiScanInfoParcel::ToWifiScanInfo() const {
+WifiScanInfo WifiScanInfoParcel::ToWifiScanInfo() const 
+{
     WifiScanInfo info;
     info.bssid = bssid;
     info.ssid = ssid;
@@ -112,7 +114,7 @@ bool WifiScanInfoParcel::Marshalling(Parcel &parcel) const
     return true;
 }
 
-WifiScanInfoParcel *WifiScanInfoParcel::Unmarshalling(Parcel &parcel) 
+WifiScanInfoParcel *WifiScanInfoParcel::Unmarshalling(Parcel &parcel)
 {
     auto info = std::make_unique<WifiScanInfoParcel>();
 

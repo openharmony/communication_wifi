@@ -315,7 +315,7 @@ int32_t WifiScanServiceImpl::IsWifiClosedScan(bool &bOpen)
 
 #ifndef OHOS_ARCH_LITE
 void WifiScanServiceImpl::WriteInfoElementsToParcel(
-    const std::vector<WifiInfoElem> &infoElems, 
+    const std::vector<WifiInfoElem> &infoElems,
     size_t ieSize,
     size_t maxIeLen,
     Parcel &outParcel)
@@ -820,7 +820,8 @@ bool WifiScanServiceImpl::IsInScanMacInfoWhiteList()
     return false;
 }
 
-int32_t WifiScanServiceImpl::HandleScanIdlRet(int32_t originRet) {
+int32_t WifiScanServiceImpl::HandleScanIdlRet(int32_t originRet) 
+{
 #ifdef OHOS_ARCH_LITE
     return originRet;
 #else

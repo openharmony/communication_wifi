@@ -43,7 +43,7 @@ public:
 #endif
     virtual ~WifiScanServiceImpl();
  
-#ifdef OHOS_ARCH_LITE 
+#ifdef OHOS_ARCH_LITE
     ErrCode SetScanControlInfo(const ScanControlInfo &info) override;
     ErrCode Scan(bool compatible) override;
     ErrCode PermissionVerification();
@@ -97,7 +97,7 @@ private:
     void UpdateScanInfoListNotInWhiteList(std::vector<WifiScanInfo> &result);
 #ifndef OHOS_ARCH_LITE
     void UpdateScanMode();
-    void SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &result, 
+    void SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &result,
                      ScanAshmemParcel &outAshmemParcel, std::vector<uint32_t> &allSizeUint);
     void WriteInfoElementsToParcel(
         const std::vector<WifiInfoElem> &infoElems, size_t ieSize, size_t maxIeLen, Parcel &outParcel);

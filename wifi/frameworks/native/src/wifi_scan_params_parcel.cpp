@@ -21,7 +21,8 @@ WifiScanParamsParcel::WifiScanParamsParcel(const WifiScanParams &params)
     : ssid(params.ssid), bssid(params.bssid), band(params.band), freqs(params.freqs)
 {}
 
-WifiScanParams WifiScanParamsParcel::ToWifiScanParams() const {
+WifiScanParams WifiScanParamsParcel::ToWifiScanParams() const 
+{
     WifiScanParams params;
     params.ssid = this->ssid;
     params.bssid = this->bssid;
@@ -52,7 +53,6 @@ bool WifiScanParamsParcel::Marshalling(Parcel &parcel) const
 WifiScanParamsParcel *WifiScanParamsParcel::Unmarshalling(Parcel &parcel)
 {
     auto params = std::make_unique<WifiScanParamsParcel>();
-
     if (!parcel.ReadString(params->ssid) ||
         !parcel.ReadString(params->bssid) ||
         !parcel.ReadInt32(params->band)) {
@@ -65,7 +65,6 @@ WifiScanParamsParcel *WifiScanParamsParcel::Unmarshalling(Parcel &parcel)
     }
 
     params->freqs.reserve(size);
-
     for (uint32_t i = 0; i < size; i++) {
         int freq = 0;
         if (!parcel.ReadInt32(freq)) {

@@ -49,7 +49,7 @@ WifiScanImpl::WifiScanImpl() : systemAbilityId_(0), instId_(0), client_(nullptr)
 {}
 #else
 WifiScanImpl::WifiScanImpl() : systemAbilityId_(0), instId_(0), client_(nullptr), mRemoteDied(false)
-{   
+{
     deathRecipient_ = new (std::nothrow) WifiScanDeathRecipient(*this);
     if (deathRecipient_ == nullptr) {
         WIFI_LOGE("Create WifiScanDeathRecipient failed!");

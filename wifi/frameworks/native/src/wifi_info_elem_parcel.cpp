@@ -17,7 +17,7 @@
 namespace OHOS {
 namespace Wifi {
 
-WifiInfoElemParcel WifiInfoElemParcel::FromWifiInfoElem(const WifiInfoElem& elem) 
+WifiInfoElemParcel WifiInfoElemParcel::FromWifiInfoElem(const WifiInfoElem& elem)
 {
     WifiInfoElemParcel parcel;
     parcel.id = elem.id;
@@ -25,7 +25,7 @@ WifiInfoElemParcel WifiInfoElemParcel::FromWifiInfoElem(const WifiInfoElem& elem
     return parcel;
 }
 
-WifiInfoElem WifiInfoElemParcel::ToWifiInfoElem() const 
+WifiInfoElem WifiInfoElemParcel::ToWifiInfoElem() const
 {
     WifiInfoElem elem;
     elem.id = this->id;

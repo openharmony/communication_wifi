@@ -38,7 +38,7 @@ ScanControlInfoParcel::ScanControlInfoParcel(const ScanControlInfo &info)
     }
 }
 
-ScanControlInfo ScanControlInfoParcel::ToScanControlInfo() const 
+ScanControlInfo ScanControlInfoParcel::ToScanControlInfo() const
 {
     ScanControlInfo info;
 

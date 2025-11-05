@@ -436,7 +436,6 @@ ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
 int32_t WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible)
 #endif
 {
-    WIFI_LOGI("mahao WifiScanServiceImpl GetScanInfoList");
     WIFI_LOGI("GetScanInfoList, compatible:%{public}d", compatible);
     int apiVersion = WifiPermissionUtils::GetApiVersion();
     if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
@@ -474,8 +473,7 @@ int32_t WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
                         macAddrInfo);
                 WIFI_LOGD("ssid:%{private}s, bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
                     iter->ssid.c_str(), macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
-                if (!randomMacAddr.empty() &&
-                    (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
+                if (!randomMacAddr.empty() && (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                     iter->bssid = randomMacAddr;
                     iter->bssidType = RANDOM_DEVICE_ADDRESS;
                 }
@@ -820,7 +818,7 @@ bool WifiScanServiceImpl::IsInScanMacInfoWhiteList()
     return false;
 }
 
-int32_t WifiScanServiceImpl::HandleScanIdlRet(int32_t originRet) 
+int32_t WifiScanServiceImpl::HandleScanIdlRet(int32_t originRet)
 {
 #ifdef OHOS_ARCH_LITE
     return originRet;

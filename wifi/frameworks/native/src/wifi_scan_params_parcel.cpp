@@ -21,7 +21,7 @@ WifiScanParamsParcel::WifiScanParamsParcel(const WifiScanParams &params)
     : ssid(params.ssid), bssid(params.bssid), band(params.band), freqs(params.freqs)
 {}
 
-WifiScanParams WifiScanParamsParcel::ToWifiScanParams() const 
+WifiScanParams WifiScanParamsParcel::ToWifiScanParams() const
 {
     WifiScanParams params;
     params.ssid = this->ssid;

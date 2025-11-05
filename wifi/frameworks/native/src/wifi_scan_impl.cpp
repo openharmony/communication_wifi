@@ -429,7 +429,11 @@ bool WifiScanImpl::IsFeatureSupported(long feature)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
+#ifdef OHOS_ARCH_LITE
+    long tmpFeatures = 0;
+#else
     int64_t tmpFeatures = 0;
+#endif
     if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
         return false;
     }

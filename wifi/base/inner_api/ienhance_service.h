@@ -318,6 +318,13 @@ public:
     virtual void HandleBeaconLost() = 0;
 
     /**
+     * @Description CheckPortalNet
+     *
+     * @return std::string
+     */
+    virtual std::string CheckPortalNet(const std::string &ssid, const std::string &portalUrl) = 0;
+
+    /**
      * @Description get limit switching network scenes
      *
      * @return 0: not limit, 1:dual band roam

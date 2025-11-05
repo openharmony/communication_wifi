@@ -728,7 +728,9 @@ int32_t WifiScanServiceImpl::GetSupportedFeatures(int64_t &features)
         WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return HandleScanIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
-    int ret = WifiManager::GetInstance().GetSupportedFeatures(features);
+    long features_long = 0;
+    int ret = WifiManager::GetInstance().GetSupportedFeatures(features_long);
+    features = static_cast<int64_t>(features_long);
     if (ret < 0) {
         WIFI_LOGE("Failed to get supported features!");
         return HandleScanIdlRet(WIFI_OPT_FAILED);

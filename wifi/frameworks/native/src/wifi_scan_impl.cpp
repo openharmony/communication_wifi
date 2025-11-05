@@ -20,9 +20,9 @@
 #include "iservice_registry.h"
 #include "wifi_sa_manager.h"
 #include "iwifi_scan.h"
+#include "wifi_scan_mgr_proxy.h"
 #endif
 #include "wifi_logger.h"
-#include "wifi_scan_mgr_proxy.h"
 #include "wifi_hisysevent.h"
 #include "wifi_common_util.h"
 

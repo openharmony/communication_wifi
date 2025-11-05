@@ -418,7 +418,9 @@ ErrCode WifiScanImpl::GetSupportedFeatures(long &features)
     #ifdef OHOS_ARCH_LITE
     return client_->GetSupportedFeatures(features);
 #else
-    OHOS::ErrCode ret = client_->GetSupportedFeatures(features);
+    int64_t features_int64 = 0;
+    OHOS::ErrCode ret = client_->GetSupportedFeatures(features_int64);
+    features = static_cast<long>(features_int64);
     return ErrCodeToWifiErrCode(ret);
 #endif
 }
@@ -427,7 +429,7 @@ bool WifiScanImpl::IsFeatureSupported(long feature)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiScanProxy());
-    long tmpFeatures = 0;
+    int64_t tmpFeatures = 0;
     if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
         return false;
     }

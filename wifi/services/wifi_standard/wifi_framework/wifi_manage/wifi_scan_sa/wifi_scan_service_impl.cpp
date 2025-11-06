@@ -824,7 +824,11 @@ bool WifiScanServiceImpl::IsInScanMacInfoWhiteList()
     return false;
 }
 
+#ifdef OHOS_ARCH_LITE
+ErrCode WifiScanServiceImpl::HandleScanIdlRet(ErrCode originRet)
+#else
 int32_t WifiScanServiceImpl::HandleScanIdlRet(int32_t originRet)
+#endif
 {
 #ifdef OHOS_ARCH_LITE
     return originRet;

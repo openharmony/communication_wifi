@@ -58,6 +58,7 @@ public:
     ErrCode GetSupportedFeatures(long &features) override;
     ErrCode ProcessScanInfoRequest();
     ErrCode IsAllowedThirdPartyRequest(std::string appId);
+    ErrCode HandleScanIdlRet(ErrCode originRet);
 #else
     ErrCode SetScanControlInfo(const ScanControlInfoParcel &info) override;
     ErrCode Scan(bool compatible, const std::string& bundleName, int32_t &scanResultCode) override;
@@ -79,10 +80,10 @@ public:
     int32_t RegisterCallBack(const sptr<IWifiScanCallback> &callback, const std::vector<std::string> &event);
     int32_t ProcessScanInfoRequest();
     int32_t IsAllowedThirdPartyRequest(std::string appId);
+    int32_t HandleScanIdlRet(int32_t originRet);
 #endif
     bool IsRemoteDied(void);
     static void SaBasicDump(std::string& result);
-    int32_t HandleScanIdlRet(int32_t originRet);
  
 public:
 #ifndef OHOS_ARCH_LITE

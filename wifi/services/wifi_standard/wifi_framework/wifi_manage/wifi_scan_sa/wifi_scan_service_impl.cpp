@@ -463,29 +463,28 @@ int32_t WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetExternalScanInfoList(result);
     }
 #endif
-    if (!compatible) {
-    #ifdef SUPPORT_RANDOM_MAC_ADDR
-        if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED ||
-            ProcessScanInfoRequest() == WIFI_OPT_PERMISSION_DENIED) {
-            for (auto iter = result.begin(); iter != result.end(); ++iter) {
-                WifiMacAddrInfo macAddrInfo;
-                macAddrInfo.bssid = iter->bssid;
-                macAddrInfo.bssidType = iter->bssidType;
-                std::string randomMacAddr =
-                    WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
-                        macAddrInfo);
-                WIFI_LOGD("ssid:%{private}s, bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
-                    iter->ssid.c_str(), macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
-                if (!randomMacAddr.empty() && (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)){
-                    iter->bssid = randomMacAddr;
-                    iter->bssidType = RANDOM_DEVICE_ADDRESS;
-                }
-            }
-        }
-    #endif
-    } else {
+    if (compatible) {
         UpdateScanInfoListNotInWhiteList(result);
     }
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED ||
+        ProcessScanInfoRequest() == WIFI_OPT_PERMISSION_DENIED) {
+        for (auto iter = result.begin(); iter != result.end(); ++iter) {
+            WifiMacAddrInfo macAddrInfo;
+            macAddrInfo.bssid = iter->bssid;
+            macAddrInfo.bssidType = iter->bssidType;
+            std::string randomMacAddr =
+                WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::WIFI_SCANINFO_MACADDR_INFO,
+                    macAddrInfo);
+            WIFI_LOGD("ssid:%{private}s, bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
+                iter->ssid.c_str(), macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
+            if (!randomMacAddr.empty() && macAddrInfo.bssidType == REAL_DEVICE_ADDRESS) {
+                iter->bssid = randomMacAddr;
+                iter->bssidType = RANDOM_DEVICE_ADDRESS;
+            }
+        }
+    }
+#endif
     return WIFI_OPT_SUCCESS;
 }
 

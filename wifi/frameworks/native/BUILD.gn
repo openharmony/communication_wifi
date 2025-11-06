@@ -114,11 +114,7 @@ if (defined(ohos_lite)) {
   }
 
   config("wifi_scan_config") {
-  include_dirs = [
-    "${target_gen_dir}",
-    "include",
-    "interfaces"
-  ]
+  include_dirs = [ "${target_gen_dir}" ]
 }
  
   idl_gen_interface("wifi_scan_interface") {
@@ -158,7 +154,7 @@ ohos_source_set("wifi_scan_stub") {
     output_values = get_target_outputs(":wifi_scan_interface")
     sources += filter_include(output_values, [ "*wifi_scan_stub.cpp" ])
     sources += filter_include(output_values, [ "*wifi_scan_mgr_stub.cpp" ])
-    public_configs = [ 
+    configs = [ 
       ":wifi_scan_config",
       ":wifi_sdk_header"
        ]
@@ -271,13 +267,11 @@ ohos_source_set("wifi_scan_stub") {
     output_values = get_target_outputs(":wifi_scan_interface")
     sources += filter_include(output_values, [ "*wifi_scan_proxy.cpp" ])
     sources += filter_include(output_values, [ "*wifi_scan_mgr_proxy.cpp" ])
-    print("=== 所有源文件列表 ===")
-    print(sources)
-    public_configs = [ ":wifi_scan_config" ]
 
     configs = [
       ":wifi_sdk_config",
       ":wifi_sdk_header",
+      ":wifi_scan_config",
     ]
 
     defines = []
@@ -404,15 +398,10 @@ ohos_source_set("wifi_scan_stub") {
       "-Wl,-E",
     ]
 
-    configs = [
-      ":wifi_sdk_config",
-      ":wifi_sdk_header",
-    ]
-
     public_configs = [ 
       ":wifi_sdk_header",
       ":wifi_scan_config",
-      ]
+    ]
 
     part_name = "wifi"
     subsystem_name = "communication"

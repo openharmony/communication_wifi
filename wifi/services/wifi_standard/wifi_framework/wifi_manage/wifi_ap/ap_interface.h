@@ -165,6 +165,7 @@ private:
     ApMonitor m_ApMonitor;
     ApStateMachine m_ApStateMachine;
     ApService m_ApService;
+    std::mutex mutex;
 
     ApStationsManager m_ApStationsManager;
 };

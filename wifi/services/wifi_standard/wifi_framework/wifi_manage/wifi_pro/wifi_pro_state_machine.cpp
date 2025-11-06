@@ -1412,6 +1412,7 @@ void WifiProStateMachine::WifiNoNetState::HandleNoNetChanged()
     pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_NO_INTERNET);
     pWifiProStateMachine_->perf5gHandoverService_.NetworkStatusChanged(NetworkStatus::NO_INTERNET);
     WifiProChr::GetInstance().RecordWifiProStartTime(WIFI_SWITCH_REASON_NO_INTERNET);
+    isSelfCure_.store(false);
  
     // issatisfy scan
     ISelfCureService *pSelfCureService =
@@ -1456,6 +1457,11 @@ void WifiProStateMachine::WifiNoNetState::HandleReuqestSelfCure()
         WIFI_LOGI("user select and nonet, not selfcure.");
         return;
     }
+    if (isSelfCure_.load()) {
+        WIFI_LOGI("SelfCure has already been done.");
+        return;
+    }
+    isSelfCure_.store(true);
     if (pWifiProStateMachine_->TrySelfCure(false)) {
         pWifiProStateMachine_->Wifi2WifiFinish();
     }

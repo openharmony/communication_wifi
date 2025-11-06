@@ -476,8 +476,7 @@ int32_t WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
                         macAddrInfo);
                 WIFI_LOGD("ssid:%{private}s, bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
                     iter->ssid.c_str(), macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
-                if (!randomMacAddr.empty() &&	
-                    (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)){
+                if (!randomMacAddr.empty() && (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)){
                     iter->bssid = randomMacAddr;
                     iter->bssidType = RANDOM_DEVICE_ADDRESS;
                 }

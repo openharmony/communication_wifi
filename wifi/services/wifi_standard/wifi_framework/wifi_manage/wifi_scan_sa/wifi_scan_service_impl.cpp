@@ -44,7 +44,7 @@ const int USES_30 = 30; // 30 s
 const int USEM_10 = 10 * 60; // 10 min
 const int TIMES_20 = 20;
 #ifndef OHOS_ARCH_LITE
-    const int SCAN_IDL_ERROR_OFFSET = 3300000; 
+    const int SCAN_IDL_ERROR_OFFSET = 3300000;
 #endif
 constexpr int32_t MAX_SCANMACINFO_WHITELIST_LEN = 200;
 constexpr const char *FIXED_MAC = "02:00:00:00:00:00";
@@ -476,7 +476,8 @@ int32_t WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
                         macAddrInfo);
                 WIFI_LOGD("ssid:%{private}s, bssid:%{private}s, bssidType:%{public}d, randomMacAddr:%{private}s",
                     iter->ssid.c_str(), macAddrInfo.bssid.c_str(), macAddrInfo.bssidType, randomMacAddr.c_str());
-                if (!randomMacAddr.empty() && (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
+                if (!randomMacAddr.empty() &&	
+                    (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)){
                     iter->bssid = randomMacAddr;
                     iter->bssidType = RANDOM_DEVICE_ADDRESS;
                 }
@@ -839,7 +840,7 @@ int32_t WifiScanServiceImpl::HandleScanIdlRet(int32_t originRet)
     if (originRet == WIFI_OPT_SUCCESS) {
         return WIFI_OPT_SUCCESS;
     } else {
-        return originRet + ScanIdlErrorOffset;
+        return originRet + SCAN_IDL_ERROR_OFFSET;
     }
 #endif
 }

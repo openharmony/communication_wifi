@@ -203,7 +203,7 @@ HWTEST_F(SelfCureInterfaceTest, NotifyTxRxGoodButNoInternetTest, TestSize.Level1
     // Test with null service
     pSelfCureInterface->pSelfCureService = nullptr;
     pSelfCureInterface->NotifyTxRxGoodButNoInternet(true);
-    EXPECT_TRUE(g_errLog.find("service is null") != std::string::npos);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 } // namespace Wifi

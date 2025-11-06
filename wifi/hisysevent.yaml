@@ -251,11 +251,3 @@ WIFIENCRY_OR_DECRY_FAIL:
   SSID: {type: STRING, desc: network name}
   ENCRYKEYMANAGEMENT: {type: STRING, desc: ENCRY type}
   ENCRYEVENTMODULE: {type: INT32, desc: moudle name}
-
-# Disable network statistics
-WIFI_DISABLE_NETWORK:
-  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: Wifi disable network statistics}
-  NETWORK_ID: {type: INT32, desc: Network configuration ID}
-  BLOCK_DURATION: {type: INT64, desc: Block duration in seconds}
-  RESULT: {type: INT32, desc: Operation result, 0 is success, others are error codes}
-  CALL_COUNT: {type: INT32, desc: Total call count}

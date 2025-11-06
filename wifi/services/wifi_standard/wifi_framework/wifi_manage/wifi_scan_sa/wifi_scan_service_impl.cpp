@@ -432,7 +432,7 @@ int32_t WifiScanServiceImpl::GetScanInfoList(bool compatible, ScanAshmemParcel &
     return WIFI_OPT_SUCCESS;
 }
 #endif
- 
+
 #ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible)
 #else

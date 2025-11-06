@@ -79,6 +79,7 @@ public:
     }
 public:
     WifiManager wifiManager;
+    std::string value;
 };
 
 HWTEST_F(WifiManagerTest, StartUnloadStaSaTimerTest, TestSize.Level1)
@@ -640,6 +641,16 @@ HWTEST_F(WifiManagerTest, OnNativeProcessStatusChange_ApDeath, TestSize.Level1)
 {
     wifiManager.OnNativeProcessStatusChange(AP_DEATH);
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, GetScanMacInfoWhiteListByDatasharetest, TestSize.Level1)
+{
+    Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
+    std::string key = "wifi_on";
+    bool onlySettingsData = true;
+    ErrCode result = WifiDataShareHelperUtils::GetInstance().Query(uri, key, value, onlySettingsData);
+    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+    wifiManager.wifiEventSubscriberManager->GetScanMacInfoWhiteListByDatashare();
 }
 }  // namespace Wifi
 }  // namespace OHOS

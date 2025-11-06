@@ -234,8 +234,6 @@ napi_status SetValueUtf8String(const napi_env& env, const char* fieldStr, const 
 napi_status SetValueUtf8String(const napi_env& env, const std::string &fieldStr, const std::string &valueStr,
     napi_value& result)
 {
-    WIFI_LOGD("SetValueUtf8String, fieldStr: %{public}s, valueStr: %{public}s",
-        fieldStr.c_str(), valueStr.c_str());
     napi_value value;
     size_t len = valueStr.length();
     napi_status status = napi_create_string_utf8(env, valueStr.c_str(), len, &value);

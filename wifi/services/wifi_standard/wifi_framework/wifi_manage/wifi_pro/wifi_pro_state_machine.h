@@ -161,6 +161,7 @@ public:
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
         bool fullScan_ { false };
+        std::atomic<bool> isSelfCure_ { false };
         void HandleWifiNoInternet(const InternalMessagePtr msg);
         void HandleReuqestScanInNoNet(const InternalMessagePtr msg);
         void HandleNoNetChanged();

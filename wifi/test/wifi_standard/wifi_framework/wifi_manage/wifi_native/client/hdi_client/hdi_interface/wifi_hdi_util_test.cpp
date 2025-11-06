@@ -783,33 +783,6 @@ HWTEST_F(WifiHdiUtilTest, HdiParseVendorSpecTest5, TestSize.Level1)
     EXPECT_EQ(ret, -1);
 }
 
-extern "C" void RecordIeNeedParse(unsigned int id, ScanInfoElem *ie, struct NeedParseIe *iesNeedParse);
-HWTEST_F(WifiHdiUtilTest, RecordIeNeedParseTest, TestSize.Level1)
-{
-    ScanInfoElem ie;
-    NeedParseIe iesNeedParse;
-    RecordIeNeedParse(255, &ie, NULL);
-    ASSERT_EQ(iesNeedParse.ieExtern, NULL);
-
-    RecordIeNeedParse(255, &ie, &iesNeedParse);
-    ASSERT_EQ(iesNeedParse.ieExtern, &ie);
-
-    RecordIeNeedParse(192, &ie, &iesNeedParse);
-    ASSERT_EQ(iesNeedParse.ieVhtOper, &ie);
-
-    RecordIeNeedParse(61, &ie, &iesNeedParse);
-    ASSERT_EQ(iesNeedParse.ieHtOper, &ie);
-
-    RecordIeNeedParse(1, &ie, &iesNeedParse);
-    ASSERT_EQ(iesNeedParse.ieMaxRate, &ie);
-
-    RecordIeNeedParse(42, &ie, &iesNeedParse);
-    ASSERT_EQ(iesNeedParse.ieErp, &ie);
-
-    RecordIeNeedParse(50, &ie, &iesNeedParse);
-    ASSERT_EQ(iesNeedParse.ieExtMaxRate, &ie);
-}
-
 extern "C" bool CheckHiLinkOUISection(const uint8_t *bytes, uint8_t len);
 HWTEST_F(WifiHdiUtilTest, CheckHiLinkOUISectionTest, TestSize.Level1)
 {

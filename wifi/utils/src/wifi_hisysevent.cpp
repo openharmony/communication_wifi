@@ -988,6 +988,5 @@ void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo)
     free(jsonStr);
     cJSON_Delete(root);
 }
-
 }  // namespace Wifi
 }  // namespace OHOS

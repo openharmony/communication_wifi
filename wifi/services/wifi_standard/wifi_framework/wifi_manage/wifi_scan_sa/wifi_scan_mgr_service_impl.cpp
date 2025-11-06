@@ -27,6 +27,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiScanMgrServiceImpl");
 
 namespace OHOS {
 namespace Wifi {
+const int SCAN_IDL_ERROR_OFFSET = 3300000;
 std::mutex WifiScanMgrServiceImpl::g_instanceLock;
 std::mutex WifiScanMgrServiceImpl::g_scanMutex;
 sptr<WifiScanMgrServiceImpl> WifiScanMgrServiceImpl::g_instance;

@@ -84,11 +84,6 @@ public:
 #endif
     bool IsRemoteDied(void);
     static void SaBasicDump(std::string& result);
- 
-public:
-#ifndef OHOS_ARCH_LITE
-    const int SCAN_IDL_ERROR_OFFSET = 3300000;
-#endif
 
 private:
     bool Init();

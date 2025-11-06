@@ -46,76 +46,91 @@ extern "C" void DestroyApInterface(IApService *apInterface)
 
 ErrCode ApInterface::EnableHotspot()
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.EnableHotspot();
 }
 
 ErrCode ApInterface::DisableHotspot()
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.DisableHotspot();
 }
 
 ErrCode ApInterface::AddBlockList(const StationInfo &stationInfo)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.AddBlockList(stationInfo);
 }
 
 ErrCode ApInterface::DelBlockList(const StationInfo &stationInfo)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.DelBlockList(stationInfo);
 }
 
 ErrCode ApInterface::SetHotspotConfig(const HotspotConfig &hotspotConfig)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.SetHotspotConfig(hotspotConfig);
 }
 
 ErrCode ApInterface::SetHotspotIdleTimeout(int time)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.SetHotspotIdleTimeout(time);
 }
 
 ErrCode ApInterface::DisconnetStation(const StationInfo &stationInfo)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.DisconnetStation(stationInfo);
 }
 
 ErrCode ApInterface::GetStationList(std::vector<StationInfo> &result)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.GetStationList(result);
 }
 
 ErrCode ApInterface::RegisterApServiceCallbacks(const IApServiceCallbacks &callbacks)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.RegisterApServiceCallbacks(callbacks);
 }
 
 ErrCode ApInterface::GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.GetSupportedPowerModel(setPowerModelList);
 }
 
 ErrCode ApInterface::GetPowerModel(PowerModel& model)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.GetPowerModel(model);
 }
 
 ErrCode ApInterface::SetPowerModel(const PowerModel& model)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.SetPowerModel(model);
 }
 
 ErrCode ApInterface::GetHotspotMode(HotspotMode &mode)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.GetHotspotMode(mode);
 }
 
 ErrCode ApInterface::SetHotspotMode(const HotspotMode &mode)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     return m_ApService.SetHotspotMode(mode);
 }
 
 void ApInterface::OnNetCapabilitiesChanged(const int apStatus)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     m_ApService.HandleNetCapabilitiesChanged(apStatus);
     return;
 }
@@ -123,6 +138,7 @@ void ApInterface::OnNetCapabilitiesChanged(const int apStatus)
 #ifndef OHOS_ARCH_LITE
 void ApInterface::SetEnhanceService(IEnhanceService *enhanceService)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     m_ApService.SetEnhanceService(enhanceService);
     return;
 }

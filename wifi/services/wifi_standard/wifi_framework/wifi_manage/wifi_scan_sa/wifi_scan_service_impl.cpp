@@ -43,6 +43,9 @@ const int USE_SIZE_50 = 50;
 const int USES_30 = 30; // 30 s
 const int USEM_10 = 10 * 60; // 10 min
 const int TIMES_20 = 20;
+#ifndef OHOS_ARCH_LITE
+    const int SCAN_IDL_ERROR_OFFSET = 3300000; 
+#endif
 constexpr int32_t MAX_SCANMACINFO_WHITELIST_LEN = 200;
 constexpr const char *FIXED_MAC = "02:00:00:00:00:00";
 #ifdef OHOS_ARCH_LITE
@@ -836,7 +839,7 @@ int32_t WifiScanServiceImpl::HandleScanIdlRet(int32_t originRet)
     if (originRet == WIFI_OPT_SUCCESS) {
         return WIFI_OPT_SUCCESS;
     } else {
-        return originRet + SCAN_IDL_ERROR_OFFSET;
+        return originRet + ScanIdlErrorOffset;
     }
 #endif
 }

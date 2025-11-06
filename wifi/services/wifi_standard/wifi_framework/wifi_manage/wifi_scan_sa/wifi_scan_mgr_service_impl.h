@@ -40,7 +40,6 @@ public:
     ErrCode GetWifiRemote(int instId, sptr<IRemoteObject>& remote) override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     std::map<int, sptr<IRemoteObject>>& GetScanServiceMgr();
-    const int SCAN_IDL_ERROR_OFFSET = 3300000;
 
 private:
     bool Init();

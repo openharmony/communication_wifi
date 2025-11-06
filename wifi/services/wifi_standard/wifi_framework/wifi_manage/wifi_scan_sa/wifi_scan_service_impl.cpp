@@ -486,15 +486,6 @@ int32_t WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiScanServiceImpl::UpdateScanInfoListNotInWhiteList(std::vector<WifiScanInfo> &result)
-{
-    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED && !IsInScanMacInfoWhiteList()) {
-        for (auto iter = result.begin(); iter != result.end(); ++iter) {
-            iter->bssid = FIXED_MAC;
-        }
-    }
-}
-
 #ifdef OHOS_ARCH_LITE
 ErrCode WifiScanServiceImpl::ProcessScanInfoRequest()
 #else
@@ -578,6 +569,15 @@ int32_t WifiScanServiceImpl::IsAllowedThirdPartyRequest(std::string appId)
     }
     callTimestampsMap_[appId].push_back(nowTime);
     return WIFI_OPT_SUCCESS;
+}
+
+void WifiScanServiceImpl::UpdateScanInfoListNotInWhiteList(std::vector<WifiScanInfo> &result)
+{
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED && !IsInScanMacInfoWhiteList()) {
+        for (auto iter = result.begin(); iter != result.end(); ++iter) {
+            iter->bssid = FIXED_MAC;
+        }
+    }
 }
 
 #ifdef OHOS_ARCH_LITE

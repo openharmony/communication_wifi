@@ -1073,40 +1073,59 @@ void StaStateMachine::StopDhcp(bool isStopV4, bool isStopV6)
     HandlePostDhcpSetup();
 }
 
+std::string StaStateMachine::GetRandomMacForDevice(const WifiDeviceConfig &deviceConfig,
+    const std::string &bssid, const std::string &realMac)
+{
+    WifiStoreRandomMac randomMacInfo;
+    InitRandomMacInfo(deviceConfig, bssid, randomMacInfo);
+    if (randomMacInfo.peerBssid.empty()) {
+        LOGI("scanInfo has no target wifi and bssid is empty!");
+    }
+    std::string currentMac;
+    if (!MacAddress::IsValidMac(deviceConfig.macAddress) || deviceConfig.macAddress == realMac) {
+        WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
+        if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
+            currentMac = randomMacInfo.randomMac;
+        } else {
+            SetRandomMacConfig(randomMacInfo, deviceConfig, currentMac);
+            WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+        }
+    } else if (IsPskEncryption(deviceConfig.keyMgmt)) {
+        WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
+        if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
+            currentMac = randomMacInfo.randomMac;
+        } else {
+            randomMacInfo.randomMac = deviceConfig.macAddress;
+            currentMac = randomMacInfo.randomMac;
+            WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+        }
+    } else {
+        currentMac = deviceConfig.macAddress;
+    }
+    return currentMac;
+}
+
 bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::string &bssid)
 {
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
     std::string currentMac, realMac;
     WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
+    
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::RANDOMMAC &&
+        WifiSettings::GetInstance().IsRandomMacDisabled(m_instId)) {
+        int uid = GetCallingUid();
+        std::string bundleName = "";
+        GetBundleNameByUid(uid, bundleName);
+        WriteMdmHiSysEvent(deviceConfig.ssid, deviceConfig.bssid, "MDM_RESTRICTED", uid, bundleName);
+    }
+#endif
+    
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC ||
         WifiSettings::GetInstance().IsRandomMacDisabled() || ShouldUseFactoryMac(deviceConfig)) {
         currentMac = realMac;
     } else {
-        WifiStoreRandomMac randomMacInfo;
-        InitRandomMacInfo(deviceConfig, bssid, randomMacInfo);
-        if (randomMacInfo.peerBssid.empty()) {
-            LOGI("scanInfo has no target wifi and bssid is empty!");
-        }
-        if (!MacAddress::IsValidMac(deviceConfig.macAddress) || deviceConfig.macAddress == realMac) {
-            WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
-            if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
-                currentMac = randomMacInfo.randomMac;
-            } else {
-                SetRandomMacConfig(randomMacInfo, deviceConfig, currentMac);
-                WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
-            }
-        } else if (IsPskEncryption(deviceConfig.keyMgmt)) {
-            WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
-            if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
-                currentMac = randomMacInfo.randomMac;
-            } else {
-                randomMacInfo.randomMac = deviceConfig.macAddress;
-                currentMac = randomMacInfo.randomMac;
-                WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
-            }
-        } else {
-            currentMac = deviceConfig.macAddress;
-        }
+        currentMac = GetRandomMacForDevice(deviceConfig, bssid, realMac);
     }
     if (!SetMacToHal(currentMac, realMac, m_instId)) {
         return false;
@@ -4978,22 +4997,30 @@ void StaStateMachine::DealMdmRestrictedConnect(WifiDeviceConfig &config)
 
 bool StaStateMachine::WhetherRestrictedByMdm(const std::string &ssid, const std::string &bssid, bool checkBssid)
 {
+    bool isRestricted = false;
     if (checkBssid) {
-        return WifiSettings::GetInstance().FindWifiBlockListConfig(ssid, bssid, 0) ||
-        (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&
-        !WifiSettings::GetInstance().FindWifiWhiteListConfig(ssid, bssid, 0));
+        isRestricted = WifiSettings::GetInstance().FindWifiBlockListConfig(ssid, bssid, 0) ||
+            (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&
+            !WifiSettings::GetInstance().FindWifiWhiteListConfig(ssid, bssid, 0));
     } else {
         if (WifiSettings::GetInstance().FindWifiBlockListConfig(ssid, bssid, 0)) {
-            return true;
+            isRestricted = true;
         }
         if (!WifiSettings::GetInstance().WhetherSetWhiteListConfig() || bssid.empty()) {
-            return false;
+            isRestricted = false;
         }
         if (!WifiSettings::GetInstance().FindWifiWhiteListConfig(ssid, bssid)) {
-            return true;
+            isRestricted = true;
         }
-        return false;
+        isRestricted = false;
     }
+    if (isRestricted) {
+        int uid = GetCallingUid();
+        std::string bundleName = "";
+        GetBundleNameByUid(uid, bundleName);
+        WriteMdmHiSysEvent(ssid, bssid, "BLOCK_LIST", uid, bundleName);
+    }
+    return isRestricted;
 }
 #endif
 

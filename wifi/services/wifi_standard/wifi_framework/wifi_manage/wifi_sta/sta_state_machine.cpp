@@ -1678,6 +1678,9 @@ void StaStateMachine::ApLinkedState::DealWpaLinkFailEventInApLinked(InternalMess
         return;
     }
     std::string bssid = msg->GetStringFromMessage();
+    WIFI_LOGI("DealWpaLinkFailEventInApLinked bssid=%{public}s,targetRoamBssid=%{public}s,"
+        "isCurrentRoaming_=%{public}d", MacAnonymize(bssid).c_str(),
+        MacAnonymize(pStaStateMachine->targetRoamBssid).c_str(), pStaStateMachine->isCurrentRoaming_);
     if (!pStaStateMachine->isCurrentRoaming_ ||  bssid == pStaStateMachine->targetRoamBssid) {
         pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
     }

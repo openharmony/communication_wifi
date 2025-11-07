@@ -1509,9 +1509,27 @@ bool StaStateMachine::ApLinkedState::ExecuteStateMsg(InternalMessagePtr msg)
         case WIFI_SVR_CMD_STA_CSA_CHANNEL_SWITCH_EVENT:
             DealCsaChannelChanged(msg);
             break;
+        default:
+            ret = HandleExtMsg(msg);
+            break;
+    }
+    return ret;
+}
+
+bool StaStateMachine::ApLinkedState::HandleExtMsg(InternalMessagePtr msg)
+{
+    bool ret = EXECUTED;
+    switch (msg->GetMessageName()) {
         case CMD_NO_INTERNET_TIMEOUT:
             DealNoInternetTimeout();
             break;
+        case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT:
+        case WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT:
+        case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT: {
+            ret = EXECUTED;
+            DealWpaLinkFailEventInApLinked(msg);
+            break;
+        }
         default:
             ret = NOT_EXECUTED;
             break;
@@ -1651,6 +1669,20 @@ void StaStateMachine::ApLinkedState::DealNoInternetTimeout()
         pStaStateMachine->m_NetWorkState->StartWifiDetection();
     }
 #endif
+}
+
+void StaStateMachine::ApLinkedState::DealWpaLinkFailEventInApLinked(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("DealWpaLinkFailEventInApLinked InternalMessage msg is null.");
+        return;
+    }
+    std::string bssid = msg->GetStringFromMessage();
+    if (bssid != pStaStateMachine->targetRoamBssid) {
+        WIFI_LOGI("DealWpaLinkFailEventInApLinked The failed bssid is not the target roaming bssid.");
+        return;
+    }
+    pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
 }
 
 void StaStateMachine::StartDisConnectToNetwork()
@@ -3014,13 +3046,6 @@ bool StaStateMachine::ApRoamingState::ExecuteStateMsg(InternalMessagePtr msg)
             DealApRoamingStateTimeout(msg);
             break;
         }
-        case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT:
-        case WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT:
-        case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT: {
-            ret = EXECUTED;
-            DealWpaLinkFailEventInRoaming(msg);
-            break;
-        }
         default:
             WIFI_LOGI("ApRoamingState-msgCode=%d not handled.", msg->GetMessageName());
             break;
@@ -3037,20 +3062,6 @@ void StaStateMachine::ApRoamingState::DealApRoamingStateTimeout(InternalMessageP
     WIFI_LOGI("DealApRoamingStateTimeout StopTimer aproaming timer");
     pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
     pStaStateMachine->StartDisConnectToNetwork();
-    pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
-}
-
-void StaStateMachine::ApRoamingState::DealWpaLinkFailEventInRoaming(InternalMessagePtr msg)
-{
-    if (msg == nullptr) {
-        WIFI_LOGE("DealWpaLinkFailEventInRoaming InternalMessage msg is null.");
-        return;
-    }
-    std::string bssid = msg->GetStringFromMessage();
-    if (bssid != pStaStateMachine->targetRoamBssid) {
-        WIFI_LOGI("DealWpaLinkFailEventInRoaming The failed bssid is not the target roaming bssid.");
-        return;
-    }
     pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
 }
 

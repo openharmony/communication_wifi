@@ -1678,11 +1678,9 @@ void StaStateMachine::ApLinkedState::DealWpaLinkFailEventInApLinked(InternalMess
         return;
     }
     std::string bssid = msg->GetStringFromMessage();
-    if (bssid != pStaStateMachine->targetRoamBssid) {
-        WIFI_LOGI("DealWpaLinkFailEventInApLinked The failed bssid is not the target roaming bssid.");
-        return;
+    if (!pStaStateMachine->isCurrentRoaming_ ||  bssid == pStaStateMachine->targetRoamBssid) {
+        pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
     }
-    pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
 }
 
 void StaStateMachine::StartDisConnectToNetwork()

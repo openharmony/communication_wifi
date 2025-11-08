@@ -64,6 +64,7 @@ constexpr const char* WEARABLE_PRODUCT_DEVICE_TYPE = "wearable";
 constexpr const char* TABLET_PRODUCT_DEVICE_TYPE = "table";
 constexpr const char* TV_PRODUCT_DEVICE_TYPE = "tv";
 constexpr const char* PC_PRODUCT_DEVICE_TYPE = "2in1";
+constexpr const char* GLASSES_PRODUCT_DEVICE_TYPE = "glasses";
 constexpr const char* VENDOR_COUNTRY_KEY = "const.cust.custPath";
 constexpr const char* VENDOR_COUNTRY_DEFAULT = "";
 constexpr const int32_t SYS_PARAMETER_SIZE = 256;
@@ -593,6 +594,9 @@ int GetDeviceType()
         }
         if (strncmp(preValue, PC_PRODUCT_DEVICE_TYPE, PRODUCT_DEVICE_TYPE_LEN) == 0) {
             return ProductDeviceType::PC;
+        }
+        if (strncmp(preValue, GLASSES_PRODUCT_DEVICE_TYPE, PRODUCT_DEVICE_TYPE_LEN) == 0) {
+            return ProductDeviceType::GLASSES;
         }
     }
     return ProductDeviceType::DEFAULT;

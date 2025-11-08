@@ -123,7 +123,8 @@ enum class ScanLimitType {
     STA_STATE,
     ACTION_LISTEN,
     HID2D_CLONE,
-    GAME_SCENE
+    GAME_SCENE,
+    GLASSES_SCENE
 };
 }  // namespace Wifi
 }  // namespace OHOS

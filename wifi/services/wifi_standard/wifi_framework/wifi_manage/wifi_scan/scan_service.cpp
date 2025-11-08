@@ -1752,6 +1752,10 @@ ErrCode ScanService::AllowPnoScan()
         WriteScanLimitHiSysEvent("PNO_SCAN", static_cast<int>(ScanLimitType::CUSTOM_SCENE));
         return WIFI_OPT_FAILED;
     }
+    if (GetDeviceType() == ProductDeviceType::GLASSES) {
+        WriteScanLimitHiSysEvent("PNO_SCAN", static_cast<int>(ScanLimitType::GLASSES_SCENE));
+        return WIFI_OPT_FAILED;
+    }
 
 #ifndef SUPPORT_SCAN_CONTROL
     {

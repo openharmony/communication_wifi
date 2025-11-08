@@ -1717,6 +1717,10 @@ ErrCode ScanService::AllowPnoScan()
 {
     WIFI_LOGD("Enter AllowPnoScan.\n");
 
+    if (GetDeviceType() == ProductDeviceType::GLASSES) {
+        WriteScanLimitHiSysEvent("PNO_SCAN", static_cast<int>(ScanLimitType::GLASSES_SCENE));
+        return WIFI_OPT_FAILED;
+    }
     if (WifiConfigCenter::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
         WIFI_LOGW("pnoScan not allow when wifi disable");
         WriteScanLimitHiSysEvent("PNO_SCAN", static_cast<int>(ScanLimitType::WIFI_DISABLE));
@@ -1750,10 +1754,6 @@ ErrCode ScanService::AllowPnoScan()
     if (!AllowScanDuringCustomScene(ScanMode::PNO_SCAN)) {
         WIFI_LOGD("pnoScan is not allowed for forbid map");
         WriteScanLimitHiSysEvent("PNO_SCAN", static_cast<int>(ScanLimitType::CUSTOM_SCENE));
-        return WIFI_OPT_FAILED;
-    }
-    if (GetDeviceType() == ProductDeviceType::GLASSES) {
-        WriteScanLimitHiSysEvent("PNO_SCAN", static_cast<int>(ScanLimitType::GLASSES_SCENE));
         return WIFI_OPT_FAILED;
     }
 

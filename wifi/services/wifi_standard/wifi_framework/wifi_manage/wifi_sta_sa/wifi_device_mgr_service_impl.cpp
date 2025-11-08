@@ -161,12 +161,12 @@ int32_t WifiDeviceMgrServiceImpl::OnSvcCmd(int32_t fd, const std::vector<std::u1
                 " svc wifi disable: disable wifi device\n";
 
     std::lock_guard<std::mutex> lock(g_initMutex);
-    sptr<WifiDeviceServiceImpl> impl = nullptr;
+    sptr<IWifiDevice> wifiDevice = nullptr;
     if (mWifiService.find(instIdWlan0) != mWifiService.end() && mWifiService[instIdWlan0] != nullptr) {
-        impl = iface_cast<WifiDeviceServiceImpl>(mWifiService[instIdWlan0]);
+        wifiDevice = iface_cast<IWifiDevice>(mWifiService[instIdWlan0]);
     }
-    if (!impl || args.size() != 1) {
-        info = !impl ? "wifi service in invalid state\n" : "wrong parameter size\n" + info;
+    if (!wifiDevice || args.size() != 1) {
+        info = !wifiDevice ? "wifi service in invalid state\n" : "wrong parameter size\n" + info;
         if (!SaveStringToFd(fd, info)) {
             WIFI_LOGE("WiFi device save string to fd failed.");
         }
@@ -179,14 +179,14 @@ int32_t WifiDeviceMgrServiceImpl::OnSvcCmd(int32_t fd, const std::vector<std::u1
     if (cmd == "help") {
         svcResult = 0;
     } else if (cmd == "enable") {
-        if (impl->EnableWifi() == WIFI_OPT_SUCCESS) {
+        if (wifiDevice->EnableWifi() == WIFI_OPT_SUCCESS) {
             info = "wifi enable success\n";
             svcResult = 0;
         } else {
             info = "wifi enable fail\n";
         }
     } else if (cmd == "disable") {
-        if (impl->DisableWifi() == WIFI_OPT_SUCCESS) {
+        if (wifiDevice->DisableWifi() == WIFI_OPT_SUCCESS) {
             info = "wifi disable success\n";
             svcResult = 0;
         } else {

@@ -785,7 +785,7 @@ HWTEST_F(NetworkSelectionTest, IsOutdoorFilterTestWlanPage, TestSize.Level1)
     NetworkSelectionManager mgr;
     mgr.rssiCntMap_["bssid1"] = 66;
     mgr.rssiCntMap_["bssid2"] = 88;
-    WifiConfigCenter::GetInstance().SetWlanPage(true);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
 
     EXPECT_FALSE(mgr.IsOutdoorFilter(nullptr));
     EXPECT_EQ(mgr.rssiCntMap_.size(), 0);

@@ -683,6 +683,12 @@ HWTEST_F(WifiProStateMachineTest, wifiNoNetStateTrySelfCureTest02, TestSize.Leve
     EXPECT_EQ(wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_, false);
 }
 
+HWTEST_F(WifiProStateMachineTest, wifiNoNetHandleReuqestSelfCureTest01, TestSize.Level1)
+{
+    pWifiProStateMachine_->pWifiNoNetState_->HandleReuqestSelfCure();
+    EXPECT_EQ(pWifiProStateMachine_->isWifi2WifiSwitching_, false);
+}
+
 HWTEST_F(WifiProStateMachineTest, wifiNoNetStateHandleHttpResultInNoNet01, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();

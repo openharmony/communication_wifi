@@ -18,6 +18,7 @@ import { connection } from '@kit.NetworkKit'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { url } from '@kit.ArkTS'
+import { updateInitUrl, updateBindNetTime, updateBindNetSuccess } from './chr';
 
 const DOMAIN = 0x01560
 const TAG = 'Utils';
@@ -60,6 +61,7 @@ export function validateURL(urlString: string): boolean {
 export function setUrl(want: Want): void {
   if (want.parameters && want.parameters.url && validateURL(want.parameters.url as string)) {
     url_ = want.parameters.url as string;
+    updateInitUrl(url_);
     hilog.info(DOMAIN, TAG, '%{public}s', 'Succeeded set url:' + extractDomain(url_));
   } else {
     hilog.error(DOMAIN, TAG, '%{public}s', 'Failed set url:' + extractDomain(url_));
@@ -92,6 +94,7 @@ export function setNetId(want: Want): void {
 }
 
 export async function bindToNetById(context: common.UIAbilityContext) {
+  const startTime = Date.now();
   try {
     const netHandleArray: connection.NetHandle[] = await new Promise((resolve, reject) => {
       connection.getAllNets((error: BusinessError, nets: connection.NetHandle[]) => {
@@ -112,6 +115,7 @@ export async function bindToNetById(context: common.UIAbilityContext) {
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed bind net. Code:${error.code}, message:${error.message}, netId:` + netId_);
             reject(error);
           } else {
+            updateBindNetSuccess();
             hilog.info(DOMAIN, TAG, '%{public}s', 'Succeeded bind net. netId:' + netId_);
             resolve();
           }
@@ -124,6 +128,8 @@ export async function bindToNetById(context: common.UIAbilityContext) {
   } catch (error) {
     hilog.error(DOMAIN, TAG, '%{public}s', `bindToNetById process failed: ${error.message}`);
     exitApp(context);
+  } finally {
+    updateBindNetTime(Date.now() - startTime);
   }
 }
 

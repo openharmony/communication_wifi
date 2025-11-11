@@ -247,6 +247,9 @@ void WriteAutoSelectHiSysEvent(int selectType, const std::string &selectedInfo,
 void WriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info);
 
 void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo);
+
+void WriteMdmHiSysEvent(const std::string &ssid, const std::string &bssid,
+    const std::string &restrictedType, int uid, const std::string &bundleName);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

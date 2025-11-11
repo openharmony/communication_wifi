@@ -197,10 +197,10 @@ public:
         pStaStateMachine->pApRoamingState->DealApRoamingStateTimeout(msg);
     }
 
-    void DealWpaLinkFailEventInRoamingTest()
+    void DealWpaLinkFailEventInApLinkedTest()
     {
         InternalMessagePtr msg = nullptr;
-        pStaStateMachine->pApRoamingState->DealWpaLinkFailEventInRoaming(msg);
+        pStaStateMachine->pApLinkedState->DealWpaLinkFailEventInApLinked(msg);
     }
 
     void SaveDhcpResultTest()
@@ -510,9 +510,9 @@ HWTEST_F(StaStateMachineTest, DealApRoamingStateTimeoutTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
-HWTEST_F(StaStateMachineTest, DealWpaLinkFailEventInRoamingTest, TestSize.Level1)
+HWTEST_F(StaStateMachineTest, DealWpaLinkFailEventInApLinkedTest, TestSize.Level1)
 {
-    DealWpaLinkFailEventInRoamingTest();
+    DealWpaLinkFailEventInApLinkedTest();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
@@ -928,6 +928,33 @@ HWTEST_F(StaStateMachineTest, ApLinkedStateGoInStateTest01, TestSize.Level1)
     pStaStateMachine->pApLinkedState->pStaStateMachine->m_instId = INSTID_WLAN1;
     pStaStateMachine->pApLinkedState->GoInState();
 #endif
+}
+
+HWTEST_F(StaStateMachineTest, ApLinkedStateDealWpaLinkFailEventInApLinkedTest01, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    pStaStateMachine->pApLinkedState->pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
+    msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT);
+    pStaStateMachine->pApLinkedState->DealWpaLinkFailEventInApLinked(msg);
+    EXPECT_NE(pStaStateMachine->currentTpType, TEN);
+}
+
+HWTEST_F(StaStateMachineTest, ApLinkedStateDealWpaLinkFailEventInApLinkedTest02, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    pStaStateMachine->pApLinkedState->pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
+    msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT);
+    pStaStateMachine->pApLinkedState->DealWpaLinkFailEventInApLinked(msg);
+    EXPECT_NE(pStaStateMachine->currentTpType, TEN);
+}
+
+HWTEST_F(StaStateMachineTest, ApLinkedStateDealWpaLinkFailEventInApLinkedTest03, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    pStaStateMachine->pApLinkedState->pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
+    msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT);
+    pStaStateMachine->pApLinkedState->DealWpaLinkFailEventInApLinked(msg);
+    EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 
 HWTEST_F(StaStateMachineTest, StartDisConnectToNetworkTest01, TestSize.Level1)

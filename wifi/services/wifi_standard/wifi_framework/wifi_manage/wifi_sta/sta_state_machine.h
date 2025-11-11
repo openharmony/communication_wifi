@@ -294,12 +294,14 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
+        bool HandleExtMsg(InternalMessagePtr msg);
         void HandleNetWorkConnectionEvent(InternalMessagePtr msg);
         void HandleStaBssidChangedEvent(InternalMessagePtr msg);
         void HandleLinkSwitchEvent(InternalMessagePtr msg);
         void DealStartRoamCmdInApLinkedState(InternalMessagePtr msg);
         void DealCsaChannelChanged(InternalMessagePtr msg);
         void DealNoInternetTimeout();
+        void DealWpaLinkFailEventInApLinked(InternalMessagePtr msg);
     private:
         StaStateMachine *pStaStateMachine;
     };
@@ -371,7 +373,6 @@ public:
     private:
         bool HandleNetworkConnectionEvent(InternalMessagePtr msg);
         void DealApRoamingStateTimeout(InternalMessagePtr msg);
-        void DealWpaLinkFailEventInRoaming(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
     };
 

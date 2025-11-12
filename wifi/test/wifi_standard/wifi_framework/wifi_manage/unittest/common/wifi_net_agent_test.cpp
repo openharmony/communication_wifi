@@ -254,6 +254,29 @@ HWTEST_F(WifiNetAgentTest, SetNetLinkLocalRouteInfoTest001, TestSize.Level1)
     EXPECT_NE(wifiNetAgent.supplierId, TEN);
 }
 
+HWTEST_F(WifiNetAgentTest, SetNetLinkLocalRouteInfoIpv6LinkLocalTest001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
+    IpInfo wifiIpInfo;
+    IpV6Info wifiIpV6Info;
+    // Set IPv6 addresses to trigger link-local route addition
+    wifiIpV6Info.globalIpV6Address = "2001:db8::1";
+    wifiNetAgent.SetNetLinkLocalRouteInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info);
+    // Verify that IPv6 link-local route is added
+    bool hasLinkLocalRoute = false;
+    for (const auto& route : netLinkInfo->routeList_) {
+        if (route.destination_.type_ == NetManagerStandard::INetAddr::IPV6 &&
+            route.destination_.address_ == "fe80::" &&
+            route.destination_.prefixlen_ == 64 &&
+            route.gateway_.address_ == "::") {
+            hasLinkLocalRoute = true;
+            break;
+        }
+    }
+    EXPECT_FALSE(hasLinkLocalRoute);
+}
+
 HWTEST_F(WifiNetAgentTest, InitWifiNetAgentTest001, TestSize.Level1)
 {
     WifiNetAgent wifiNetAgent;
@@ -323,6 +346,75 @@ HWTEST_F(WifiNetAgentTest, RestoreWifiConnectionTest001, TestSize.Level1)
     WifiNetAgent wifiNetAgent;
     wifiNetAgent.RestoreWifiConnection();
     EXPECT_NE(wifiNetAgent.supplierId, TEN);
+}
+
+HWTEST_F(WifiNetAgentTest, SetNetLinkLocalRouteIpv6Test001, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
+    IpV6Info wifiIpV6Info;
+    wifiIpV6Info.netmask = "ffff:ffff:ffff:ffff::";  // Set a valid netmask
+    wifiIpV6Info.globalIpV6Address = "2001:db8::1";
+    wifiIpV6Info.uniqueLocalAddress1 = "fc00::1";
+    wifiIpV6Info.linkIpV6Address = "fe80::1";
+    netLinkInfo->ifaceName_ = "wlan0";  // Set interface name
+
+    wifiNetAgent.SetNetLinkLocalRouteIpv6(netLinkInfo, wifiIpV6Info);
+
+    // Verify routes are added for global, unique local, and link-local addresses
+    EXPECT_EQ(netLinkInfo->routeList_.size(), 3u);
+
+    // Check global IPv6 route
+    bool hasGlobalRoute = false;
+    for (const auto& route : netLinkInfo->routeList_) {
+        if (route.destination_.address_ == "2001:db8::" &&
+            route.destination_.prefixlen_ == 64 &&
+            route.iface_ == "wlan0" &&
+            route.gateway_.address_.empty()) {
+            hasGlobalRoute = true;
+            break;
+        }
+    }
+    EXPECT_TRUE(hasGlobalRoute);
+
+    // Check unique local route
+    bool hasUniqueLocalRoute = false;
+    for (const auto& route : netLinkInfo->routeList_) {
+        if (route.destination_.address_ == "fc00::" &&
+            route.destination_.prefixlen_ == 64 &&
+            route.iface_ == "wlan0" &&
+            route.gateway_.address_.empty()) {
+            hasUniqueLocalRoute = true;
+            break;
+        }
+    }
+    EXPECT_TRUE(hasUniqueLocalRoute);
+
+    // Check link-local route
+    bool hasLinkLocalRoute = false;
+    for (const auto& route : netLinkInfo->routeList_) {
+        if (route.destination_.address_ == "fe80::" &&
+            route.destination_.prefixlen_ == 64 &&
+            route.iface_ == "wlan0" &&
+            route.gateway_.address_.empty()) {
+            hasLinkLocalRoute = true;
+            break;
+        }
+    }
+    EXPECT_TRUE(hasLinkLocalRoute);
+}
+
+HWTEST_F(WifiNetAgentTest, SetNetLinkLocalRouteIpv6Test002, TestSize.Level1)
+{
+    WifiNetAgent wifiNetAgent;
+    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
+    IpV6Info wifiIpV6Info;
+    wifiIpV6Info.netmask = "";  // Empty netmask, should return early
+
+    wifiNetAgent.SetNetLinkLocalRouteIpv6(netLinkInfo, wifiIpV6Info);
+
+    // No routes should be added
+    EXPECT_EQ(netLinkInfo->routeList_.size(), 0u);
 }
 }
 }

@@ -710,14 +710,11 @@ void Perf5gHandoverService::LoadRelationApInfo()
 
 void RemoveRelationApDuplicates(std::vector<RelationAp> &relationAps)
 {
- 
     int32_t num = relationAps.size();
     // 1. 排序（依赖operator<）
     std::sort(relationAps.begin(), relationAps.end());
- 
     // 2. 移动重复元素到末尾（依赖operator==）
     auto last = std::unique(relationAps.begin(), relationAps.end());
- 
     // 3. 实际删除重复
     relationAps.erase(last, relationAps.end());
     WIFI_LOGI("removeRelationApDuplicates, before:%{public}d after:%{public}d",

@@ -201,6 +201,8 @@ private:
 
     void SetNetLinkHostRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo);
 
+    void SetNetLinkLocalRouteIpv6(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpV6Info &wifiIpV6Info);
+
     void SetNetLinkLocalRouteInfo(sptr<NetManagerStandard::NetLinkInfo> &netLinkInfo, IpInfo &wifiIpInfo,
         IpV6Info &wifiIpV6Info);
 

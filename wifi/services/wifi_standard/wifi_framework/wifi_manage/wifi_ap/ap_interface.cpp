@@ -28,7 +28,9 @@ ApInterface::ApInterface(int id)
 {}
 
 ApInterface::~ApInterface()
-{}
+{
+    std::lock_guard<std::mutex> lock(mutex);
+}
 
 extern "C" IApService *CreateApInterface(int id)
 {

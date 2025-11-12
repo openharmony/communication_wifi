@@ -826,5 +826,17 @@ HWTEST_F(NetworkSelectionTest, TestHighSecurityNetwork, TestSize.Level1)
     selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos, failReason);
     EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, 1);
 }
+
+HWTEST_F(NetworkSelectionTest, IsOutdoorFilterTestWlanPage, TestSize.Level1)
+{
+    NetworkSelectionManager mgr;
+    mgr.rssiCntMap_["bssid1"] = 66;
+    mgr.rssiCntMap_["bssid2"] = 88;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
+
+    EXPECT_FALSE(mgr.IsOutdoorFilter(nullptr));
+    EXPECT_EQ(mgr.rssiCntMap_.size(), 0);
+}
+
 }
 }

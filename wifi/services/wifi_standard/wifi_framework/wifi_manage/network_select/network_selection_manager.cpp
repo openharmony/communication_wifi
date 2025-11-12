@@ -287,6 +287,12 @@ std::string NetworkSelectionManager::GetSelectedInfoForChr(NetworkSelection::Net
 bool NetworkSelectionManager::IsOutdoorFilter(NetworkSelection::NetworkCandidate *networkCandidate)
 {
     std::lock_guard<std::mutex> lock(rssiCntMutex_);
+    if (WifiConfigCenter::GetInstance().IsWlanPage()) {
+        WIFI_LOGI("IsOutdoorFilter wlan setting page do not filter");
+        rssiCntMap_.clear();
+        return false;
+    }
+
     if (!WifiSensorScene::GetInstance().IsOutdoorScene()) {
         WIFI_LOGI("IsOutdoorFilter indoor scene do not filter");
         rssiCntMap_.clear();

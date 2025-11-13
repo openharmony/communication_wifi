@@ -151,7 +151,7 @@ HWTEST_F(WifiHid2dTest, Hid2dSetUpperSceneTests, TestSize.Level1)
     EXPECT_NE(Hid2dSetUpperScene(ifName, &scene), 0);
 }
 
-HWTEST_F(WifiHid2dTest, Hid2dSetGroupTypeTest, TestSize.Level1)
+HWTEST_F(WifiHid2dTest, Hid2dSetGroupTypeTests, TestSize.Level1)
 {
     GroupLiveType type = GroupLiveType::GROUPKEEPALIVE;
     Hid2dSetGroupType(type);

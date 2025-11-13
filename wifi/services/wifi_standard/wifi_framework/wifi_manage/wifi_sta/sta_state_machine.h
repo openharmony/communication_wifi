@@ -428,6 +428,7 @@ public:
         void TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToSaveIpV4ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
+        void TryToSaveIpV6ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToJumpToConnectedState(int iptype);
         void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
         void SaveDhcpResultExt(DhcpResult *dest, DhcpResult *source);

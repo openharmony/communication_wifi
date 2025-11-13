@@ -14,7 +14,6 @@
  */
 
 #include "wifi_p2p_msg.h"
-#include "wifi_logger.h"
 
 namespace OHOS {
 namespace Wifi {

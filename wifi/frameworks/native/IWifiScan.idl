@@ -1,0 +1,52 @@
+/*
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+ 
+sequenceable OHOS.IRemoteObject;
+sequenceable OHOS.Wifi.ScanControlInfoParcel; 
+sequenceable OHOS.Wifi.WifiScanParamsParcel;
+sequenceable OHOS.Wifi.WifiScanInfoParcel;
+sequenceable OHOS.Wifi.WifiInfoElemParcel;
+sequenceable OHOS.Wifi.ScanAshmemParcel;
+ 
+interface OHOS.Wifi.IWifiScanCallback;
+
+interface OHOS.Wifi.IWifiScan{
+   void SetScanControlInfo([in] ScanControlInfoParcel info);
+   void Scan([in] boolean compatible, [in] String bundleName, [out] int scanResultCode);
+   void AdvanceScan([in] WifiScanParamsParcel params, [in] String bundleName);
+   void IsWifiClosedScan([out] boolean bOpen);
+ 
+   void GetScanInfoList(
+      [in] boolean compatible,
+      [out] ScanAshmemParcel outAshmemParcel,
+      [out] List<int> allSize
+   );
+ 
+   void RegisterCallBack(
+      [in] IRemoteObject cb,
+      [in] int pid,
+      [in] int tokenId,
+      [in] String[] event
+   );
+ 
+   void GetSupportedFeatures([out] long features);
+   void SetScanOnlyAvailable([in] boolean bScanOnlyAvailable);
+   void GetScanOnlyAvailable([out] boolean bScanOnlyAvailable);
+   void StartWifiPnoScan(
+      [in] boolean isStartAction,
+      [in] int periodMs,
+      [in] int suspendReason
+   );
+}

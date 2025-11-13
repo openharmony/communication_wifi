@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "wifi_scan_proxy.h"
+#include "wifi_scan_proxy_lite.h"
 #include "define.h"
 #include "wifi_manager_service_ipc_interface_code.h"
 #include "ipc_skeleton.h"

@@ -113,7 +113,8 @@ void StartWifiPnoScanFuzzTest(const uint8_t* data, size_t size)
 void GetSupportedFeaturesFuzzTest(const uint8_t* data, size_t size)
 {
     long features = static_cast<long>(data[0]);
-    pWifiScanServiceImpl.GetSupportedFeatures(features);
+    int64_t featuresInt64 = static_cast<int64_t>(features);
+    pWifiScanServiceImpl.GetSupportedFeatures(featuresInt64);
 }
 
 void SaBasicDumpFuzzTest(const uint8_t* data, size_t size)

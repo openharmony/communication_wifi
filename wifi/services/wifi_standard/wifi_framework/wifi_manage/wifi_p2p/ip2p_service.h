@@ -386,7 +386,7 @@ public:
      * @Description Set p2p group type
      *
      * @param groupType - set group keepalive or not
-     * @return ErroCode - operation result
+     * @return ErrCode - operation result
      */
     virtual ErrCode Hid2dSetGroupType(GroupLiveType groupType) = 0;
 

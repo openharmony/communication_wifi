@@ -126,7 +126,7 @@ if (defined(ohos_lite)) {
   configs = [ ":wifi_sdk_header" ]
  
   log_domainid = "0xD001560"
-  log_tag = "mahaoWifiIDL"
+  log_tag = "WifiScanIpc"
   part_name = "wifi"
   subsystem_name = "communication"
 }

@@ -670,8 +670,7 @@ ErrCode WifiScanServiceImpl::RegisterCallBack(const std::shared_ptr<IWifiScanCal
 int32_t WifiScanServiceImpl::RegisterCallBack(
     const sptr<IRemoteObject> &cbParcel, int32_t pid, int32_t tokenId, const std::vector<std::string> &event)
 {
-    WIFI_LOGI("mahao WifiScanServiceImpl RegisterCallBack");
-    WIFI_LOGD("WifiScanServiceImpl::RegisterCallBack (adapt new Stub), pid=%{public}d, tokenId=%{public}d",
+    WIFI_LOGD("WifiScanServiceImpl::RegisterCallBack, pid=%{public}d, tokenId=%{public}d",
         pid, tokenId);
     int32_t ret = WIFI_OPT_FAILED;
  

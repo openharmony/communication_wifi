@@ -198,7 +198,7 @@ enum class  P2PInterfaceCode {
     WIFI_SVR_CMD_P2P_SET_MIRACAST_SINK_CONFIG = 0x202D,    /* Set miracast sink config */
     WIFI_SVR_CMD_P2P_GET_SUPPORT_CHANN_FOR_BAND = 0x202E,  /* Get support channels for band*/
     WIFI_SVR_CMD_SET_P2P_HIGH_PERF_MODE = 0x202F,  /* Set p2p high perf mode*/
-    WIFI_SVR_CMD_SET_P2P_GROUP_ALIVE_MODE = 0x2030, /* Set p2p group alive mode*/
+    WIFI_SVR_CMD_SET_P2P_GROUP_ALIVE_MODE = 0x2030,  /* Set p2p group alive mode*/
 
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
     WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT = 0x3000,

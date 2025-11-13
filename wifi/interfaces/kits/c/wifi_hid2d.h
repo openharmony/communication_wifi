@@ -305,7 +305,7 @@ WifiErrorCode UnregisterCfgChangCallback(void);
  * @Description Set p2p group type
  *
  * @param groupType - set group keepalive or not
- * @return ErrCode - opration result
+ * @return ErrCode - operation result
  */
 WifiErrorCode Hid2dSetGroupType(GroupLiveType groupType);
 

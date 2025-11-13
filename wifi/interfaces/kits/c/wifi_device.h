@@ -151,11 +151,12 @@ WifiErrorCode AllowAutoConnect(int32_t networkId, bool isAllowed);
  * not be auto connected.
  *
  * @param networkId Indicates the <b>networkId</b> matching the hotspot configuration to disable.
+ * @param blockDUration the duration of blocking the network, in seconds.
  * @return Returns {@link WIFI_SUCCESS} if the hotspot configuration is disabled; returns an error code defined in
  * {@link WifiErrorCode} otherwise.
  * @since 7
  */
-WifiErrorCode DisableDeviceConfig(int networkId);
+WifiErrorCode DisableDeviceConfig(int networkId, int64_t blockDuration);
 
 /**
  * @brief Enable a hotspot configuration matching a specified <b>networkId</b>. If the config is enabled, it will

@@ -684,13 +684,22 @@ static void HandleDisableConfig(int argc, const char* argv[])
 {
     Logd("enter command handler:%s", argv[CMD_IDX]);
     int nid;
+    int64_t blockDuration = -1;
     if (!GetNetworkId(argc, argv, nid)) {
         return;
     }
+    for (int i = ARG_IDX; i < argc; i++) {
+        if (strncmp(argv[i], "block=", strlen("block=")) == 0) {
+            if (sscanf_s(argv[i], "block=%" PRId64, &blockDuration) < 0) {
+                Logd("%s : sscanf_s fatch failed", __func__);
+                return;
+            }
+        }
+    }
     if (ptrWifiDevice != nullptr) {
-        ErrCode ret = ptrWifiDevice->DisableDeviceConfig(nid);
+        ErrCode ret = ptrWifiDevice->DisableDeviceConfig(nid, blockDuration);
         if (ret == WIFI_OPT_SUCCESS) {
-            Logd("%s success, nid=%d", __func__, nid);
+            Logd("%s success, nid=%d, blockDuration=%" PRId64, __func__, nid, blockDuration);
         } else {
             Logd("%s failed", __func__);
         }

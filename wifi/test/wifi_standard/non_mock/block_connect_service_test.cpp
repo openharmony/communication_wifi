@@ -116,7 +116,7 @@ HWTEST_F(BlockConnectServiceTest, updateNetworkSelectStatus_ReturnsTrueWhenSucce
     EXPECT_EQ(config.networkSelectionStatus.networkSelectionDisableReason, reason);
 }
 
-HWTEST_F(BlockConnectServiceTest, updateNetworkSelectStatus_ReturnsFalseWhenInvalidReason, TestSize.Level1)
+HWTEST_F(BlockConnectServiceTest, updateNetworkSelectStatusForWpa_ReturnsFalseWhenInvalidReason, TestSize.Level1)
 {
     // Test logic here
     int targetNetworkId = 1;
@@ -128,14 +128,14 @@ HWTEST_F(BlockConnectServiceTest, updateNetworkSelectStatus_ReturnsFalseWhenInva
  
     DisabledReason reason = DisabledReason::DISABLED_DISASSOC_REASON;
     int reasonNumder = static_cast<int>(DisconnectDetailReason::UNUSED);
-    result = BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId, reason, reasonNumder);
+    result = BlockConnectService::GetInstance().UpdateNetworkSelectStatusForWpa(targetNetworkId, reason, reasonNumder);
     EXPECT_EQ(result, false);
  
     WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
     EXPECT_EQ(config.networkSelectionStatus.status, WifiDeviceConfigStatus::ENABLED);
 }
 
-HWTEST_F(BlockConnectServiceTest, updateNetworkSelectStatus_ReturnsTrueWhenValidReason, TestSize.Level1)
+HWTEST_F(BlockConnectServiceTest, updateNetworkSelectStatusForWpa_ReturnsTrueWhenValidReason, TestSize.Level1)
 {
     // Test logic here
     int targetNetworkId = 1;
@@ -152,27 +152,27 @@ HWTEST_F(BlockConnectServiceTest, updateNetworkSelectStatus_ReturnsTrueWhenValid
  
     DisabledReason reason = DisabledReason::DISABLED_DISASSOC_REASON;
     int reasonNumder = static_cast<int>(DisconnectDetailReason::PREV_AUTH_NOT_VALID);
-    result = BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId, reason, reasonNumder);
+    result = BlockConnectService::GetInstance().UpdateNetworkSelectStatusForWpa(targetNetworkId, reason, reasonNumder);
     EXPECT_EQ(result, true);
     WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
     EXPECT_EQ(config.networkSelectionStatus.status, WifiDeviceConfigStatus::ENABLED);
- 
-    result = BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId, reason, reasonNumder);
+
+    result = BlockConnectService::GetInstance().UpdateNetworkSelectStatusForWpa(targetNetworkId, reason, reasonNumder);
     EXPECT_EQ(result, true);
     WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
     EXPECT_EQ(config.networkSelectionStatus.status, WifiDeviceConfigStatus::ENABLED);
- 
-    result = BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId, reason, reasonNumder);
+
+    result = BlockConnectService::GetInstance().UpdateNetworkSelectStatusForWpa(targetNetworkId, reason, reasonNumder);
     EXPECT_EQ(result, true);
     WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
     EXPECT_EQ(config.networkSelectionStatus.status, WifiDeviceConfigStatus::ENABLED);
- 
-    result = BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId, reason, reasonNumder);
+
+    result = BlockConnectService::GetInstance().UpdateNetworkSelectStatusForWpa(targetNetworkId, reason, reasonNumder);
     EXPECT_EQ(result, true);
     WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
     EXPECT_EQ(config.networkSelectionStatus.status, WifiDeviceConfigStatus::ENABLED);
- 
-    result = BlockConnectService::GetInstance().UpdateNetworkSelectStatus(targetNetworkId, reason, reasonNumder);
+
+    result = BlockConnectService::GetInstance().UpdateNetworkSelectStatusForWpa(targetNetworkId, reason, reasonNumder);
     EXPECT_EQ(result, true);
     WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
     EXPECT_EQ(config.networkSelectionStatus.status, WifiDeviceConfigStatus::DISABLED);

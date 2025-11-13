@@ -140,7 +140,8 @@ WifiManager配置信息包括：
 |       重新连接网络        |            reConnect            |              ()              |                   void                    |      |
 |       获取网络配置        |        getDeviceConfigs         |              ()              |          Array<WifiDeviceConfig>          |      |
 |     更新指定Wifi配置      |       updateDeviceConfig        |  (config: WifiDeviceConfig)  |                  number                   |      |
-|     禁用指定设备配置      |       disableDeviceConfig       |     (networkId: number)      |                   void                    |      |
+|     禁用指定设备配置      |       disableDeviceConfig       |     (networkId: number,       |                  void                    |      |
+|                          |                                |   blockDuration: number)      |                                           |      |
 |     移除所有网络配置      |     removeAllDeviceConfigs      |              ()              |                   void                    |      |
 |    移除指定的网络配置     |       removeDeviceConfig        |     (networkId: number)      |                   void                    |      |
 |   注册WLAN状态改变事件    |       on.wifiStateChange        |                              |       (callback: Callback<number>)        |      |
@@ -692,18 +693,24 @@ WifiManager配置信息包括：
 
 25.  禁用指定设备配置  ( disableDeviceConfig )
 
-     - 使用指导： 禁用指定的网络
+     - 使用指导： 禁用指定的网络。支持传入 blockDuration 参数：
+       - blockDuration = -1（默认）：普通禁用，网络不会自动关联。
+       - blockDuration >= 0：禁用指定时长（单位：秒），如 24*60*60*1000 表示24小时内不会自动回连。
 
      - 限制条件： 
 
-       - 参数：networkId，标识要禁用的网络。禁用的网络将不会再次关联。
+       - 参数：
+         - networkId：标识要禁用的网络。
+         - blockDuration（可选，number，单位：秒）：禁用时长，默认为-1。
+           - blockDuration = -1：禁用原因为 DISABLED_BY_WIFI_MANAGER。
+           - blockDuration >= 0：禁用原因为 USER_FORCE_DISCONNECT，禁用指定时长。
        - @throws {BusinessError} 201 - Permission denied.
-        * @throws {BusinessError} 202 - System API is not allowed called by Non-system application.
-        * @throws {BusinessError} 401 - Invalid parameters.
-        - @throws {BusinessError} 801 - Capability not supported
-        - 返回值为void
+       * @throws {BusinessError} 202 - System API is not allowed called by Non-system application.
+       * @throws {BusinessError} 401 - Invalid parameters.
+       - @throws {BusinessError} 801 - Capability not supported
+       - 返回值为void
 
-     - 验证方法： 查看设备配置信息。
+     - 验证方法： 查看设备配置信息，或验证指定时间内不会自动回连。
 
        
 

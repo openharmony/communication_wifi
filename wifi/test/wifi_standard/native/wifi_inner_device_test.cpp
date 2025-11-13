@@ -36,6 +36,7 @@ DEFINE_WIFILOG_LABEL("WifiInnerDeviceTest");
 namespace OHOS {
 namespace Wifi {
 constexpr int NETWORKID = 0;
+constexpr int BLOCK_DURATION_5_MIN = 5 * 60;
 static std::string PROTECTNAME = "test1";
 static std::string COUNTRYCODE = "86";
 static std::shared_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
@@ -127,8 +128,14 @@ HWTEST_F(WifiInnerDeviceTest, DisableDeviceConfigTest, TestSize.Level1)
 {
     WIFI_LOGE("DisableDeviceConfigTest enter!");
     EXPECT_TRUE(devicePtr != nullptr);
-    ErrCode result = devicePtr->DisableDeviceConfig(NETWORKID);
-    WIFI_LOGE("DisableDeviceConfigTest result(0x%{public}x)", result);
+    int64_t blockDuration = -1;
+    ErrCode result = devicePtr->DisableDeviceConfig(NETWORKID, blockDuration);
+    WIFI_LOGE("DisableDeviceConfigTest result(0x%{public}x), blockDuration=%" PRId64, result, blockDuration);
+    EXPECT_GE(result, WIFI_OPT_SUCCESS);
+
+    blockDuration = BLOCK_DURATION_5_MIN;
+    result = devicePtr->DisableDeviceConfig(NETWORKID, blockDuration);
+    WIFI_LOGE("DisableDeviceConfigTest result(0x%{public}x), blockDuration=%" PRId64, result, blockDuration);
     EXPECT_GE(result, WIFI_OPT_SUCCESS);
 }
 

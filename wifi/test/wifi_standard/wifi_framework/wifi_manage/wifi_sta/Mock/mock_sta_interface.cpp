@@ -141,7 +141,7 @@ ErrCode StaInterface::EnableDeviceConfig(int networkId, bool attemptEnable)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaInterface::DisableDeviceConfig(int networkId)
+ErrCode StaInterface::DisableDeviceConfig(int networkId, int64_t blockDuration)
 {
     LOGI("Enter DisableDeviceConfig.\n");
     return WIFI_OPT_SUCCESS;

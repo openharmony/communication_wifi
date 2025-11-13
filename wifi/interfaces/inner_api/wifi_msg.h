@@ -667,7 +667,8 @@ enum class DisabledReason {
     DISABLED_EAP_AKA_FAILURE = 14,
     DISABLED_DISASSOC_REASON = 15,
     DISABLED_MDM_RESTRICTED = 16,
-    NETWORK_SELECTION_DISABLED_MAX = 17
+    USER_FORCE_DISCONNECT = 17,
+    NETWORK_SELECTION_DISABLED_MAX = 18
 };
 
 struct NetworkSelectionStatus {
@@ -773,6 +774,7 @@ struct WifiNetworkControlInfo {
 struct WifiDeviceConfig {
     int instanceId;
     int networkId;
+    int64_t blockDuration;
     /* int status; @deprecated : CURRENT, using 1: DISABLED 2: ENABLED */
     /*  network selection status*/
     NetworkSelectionStatus networkSelectionStatus;
@@ -858,6 +860,7 @@ struct WifiDeviceConfig {
     {
         instanceId = 0;
         networkId = INVALID_NETWORK_ID;
+        blockDuration = -1;
         bssidType = REAL_DEVICE_ADDRESS;
         band = 0;
         channel = 0;

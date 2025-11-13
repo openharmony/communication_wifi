@@ -695,12 +695,22 @@ ErrCode StaService::EnableDeviceConfig(int networkId, bool attemptEnable) const
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode StaService::DisableDeviceConfig(int networkId) const
+ErrCode StaService::DisableDeviceConfig(int networkId, int64_t blockDuration) const
 {
-    WIFI_LOGI("Enter DisableDeviceConfig, networkid is %{public}d", networkId);
-
-    if (!BlockConnectService::GetInstance().UpdateNetworkSelectStatus(networkId,
-        DisabledReason::DISABLED_BY_WIFI_MANAGER)) {
+    WIFI_LOGI("Enter DisableDeviceConfig, networkid is %{public}d, blockDuration(sec) is %{public}" PRId64,
+        networkId, blockDuration);
+    DisabledReason reason;
+    int64_t durationUs = -1;
+    if (blockDuration == -1) {
+        reason = DisabledReason::DISABLED_BY_WIFI_MANAGER;
+    } else if (blockDuration >= 0) {
+        reason = DisabledReason::USER_FORCE_DISCONNECT;
+        durationUs = blockDuration * SECOND_TO_MICROSECOND; // convert to microseconds
+    } else {
+        WIFI_LOGE("Invalid blockDuration: %{public}" PRId64, blockDuration);
+        return WIFI_OPT_FAILED;
+    }
+    if (!BlockConnectService::GetInstance().UpdateNetworkSelectStatus(networkId, reason, durationUs)) {
         WIFI_LOGE("Disable device config failed!");
         return WIFI_OPT_FAILED;
     }
@@ -724,14 +734,14 @@ ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
     WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
     WifiSettings::GetInstance().SyncDeviceConfig();
     if (!isAllowed) {
-        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(networkId, DisabledReason::DISABLED_BY_SYSTEM);
+        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(networkId,
+            DisabledReason::DISABLED_BY_SYSTEM);
         WifiLinkedInfo linkedInfo;
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
         if (linkedInfo.networkId != networkId && pStaStateMachine->GetTargetNetworkId() != networkId) {
             WIFI_LOGI("AllowAutoConnect, networkid is not correct, linked networkid:%{public}d", linkedInfo.networkId);
             return WIFI_OPT_SUCCESS;
         }
-        Disconnect();
     } else {
         BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
     }

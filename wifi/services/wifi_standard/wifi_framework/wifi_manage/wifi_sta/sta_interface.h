@@ -197,9 +197,10 @@ public:
      * @Description Disable WI-FI device configuration
      *
      * @param networkId - device configuration's network id
+     * @param blockDuration - block duration time(in seconds)
      * @return ErrCode - success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    virtual ErrCode DisableDeviceConfig(int networkId) override;
+    virtual ErrCode DisableDeviceConfig(int networkId, int64_t blockDuration) override;
     /**
      * @Description Set whether to allow automatic connect by networkid.
      *

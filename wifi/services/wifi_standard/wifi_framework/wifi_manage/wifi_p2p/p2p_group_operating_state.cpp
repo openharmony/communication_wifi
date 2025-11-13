@@ -418,7 +418,7 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr
     if (isEnableWifiAx) {
         ret = WifiP2PHalInterface::GetInstance().GroupAdd(false, AX_NET_ID, freq);
     } else {
-        ret = WifiP2PHalInterface::GetInstance().GroupAdd(false, AX_NET_ID), freq);
+        ret = WifiP2PHalInterface::GetInstance().GroupAdd(false, AX_NET_ID, freq);
     }
     if (WifiErrorNo::WIFI_HAL_OPT_FAILED == ret) {
         WIFI_LOGE("p2p configure to CreateGroup failed.");

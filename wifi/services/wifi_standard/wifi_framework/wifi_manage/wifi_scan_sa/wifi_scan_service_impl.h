@@ -22,6 +22,7 @@
 #include "system_ability.h"
 #include "wifi_scan_stub.h"
 #include "iremote_object.h"
+#include "wifi_scan_death_recipient.h"
 #endif
 
 namespace OHOS {
@@ -41,7 +42,8 @@ public:
     explicit WifiScanServiceImpl(int instId);
 #endif
     virtual ~WifiScanServiceImpl();
-
+ 
+#ifdef OHOS_ARCH_LITE
     ErrCode SetScanControlInfo(const ScanControlInfo &info) override;
     ErrCode Scan(bool compatible) override;
     ErrCode PermissionVerification();
@@ -51,16 +53,36 @@ public:
     ErrCode SetScanOnlyAvailable(bool bScanOnlyAvailable) override;
     ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) override;
     ErrCode StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason) override;
+    ErrCode RegisterCallBack(
+        const std::shared_ptr<IWifiScanCallback> &callback, const std::vector<std::string> &event) override;
+    ErrCode GetSupportedFeatures(long &features) override;
     ErrCode ProcessScanInfoRequest();
     ErrCode IsAllowedThirdPartyRequest(std::string appId);
-#ifdef OHOS_ARCH_LITE
-    ErrCode RegisterCallBack(const std::shared_ptr<IWifiScanCallback> &callback,
-        const std::vector<std::string> &event) override;
+    ErrCode HandleScanIdlRet(ErrCode originRet);
 #else
-    ErrCode RegisterCallBack(const sptr<IWifiScanCallback> &callback, const std::vector<std::string> &event) override;
+    ErrCode SetScanControlInfo(const ScanControlInfoParcel &info) override;
+    ErrCode Scan(bool compatible, const std::string& bundleName, int32_t &scanResultCode) override;
+    ErrCode AdvanceScan(const WifiScanParamsParcel &paramsParcel, const std::string& bundleName) override;
+    ErrCode IsWifiClosedScan(bool &bOpen) override;
+    ErrCode GetScanInfoList(bool compatible, ScanAshmemParcel &outAshmemParcel, std::vector<int32_t> &allSize) override;
+    ErrCode SetScanOnlyAvailable(bool bScanOnlyAvailable) override;
+    ErrCode GetScanOnlyAvailable(bool &bScanOnlyAvailable) override;
+    ErrCode StartWifiPnoScan(bool isStartAction, int periodMs, int suspendReason) override;
+    ErrCode RegisterCallBack(const sptr<IRemoteObject> &cbParcel, int32_t pid, int32_t tokenId,
+    const std::vector<std::string> &event) override;
+    ErrCode GetSupportedFeatures(int64_t &features) override;
+ 
+    int32_t SetScanControlInfo(const ScanControlInfo &info);
+    int32_t Scan(bool compatible);
+    int32_t PermissionVerification();
+    int32_t AdvanceScan(const WifiScanParams &params);
+    int32_t GetScanInfoList(std::vector<WifiScanInfo> &result, bool compatible);
+    int32_t RegisterCallBack(const sptr<IWifiScanCallback> &callback, const std::vector<std::string> &event);
+    int32_t ProcessScanInfoRequest();
+    int32_t IsAllowedThirdPartyRequest(std::string appId);
+    int32_t HandleScanIdlRet(int32_t originRet);
 #endif
-    ErrCode GetSupportedFeatures(long &features) override;
-    bool IsRemoteDied(void) override;
+    bool IsRemoteDied(void);
     static void SaBasicDump(std::string& result);
 
 private:
@@ -71,13 +93,23 @@ private:
     void UpdateScanInfoListNotInWhiteList(std::vector<WifiScanInfo> &result);
 #ifndef OHOS_ARCH_LITE
     void UpdateScanMode();
+    void SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &result,
+                     ScanAshmemParcel &outAshmemParcel, std::vector<uint32_t> &allSizeUint);
+    void WriteInfoElementsToParcel(
+        const std::vector<WifiInfoElem> &infoElems, size_t ieSize, size_t maxIeLen, Parcel &outParcel);
 #endif
 
 private:
+
 #ifdef OHOS_ARCH_LITE
     static std::mutex g_instanceLock;
     static std::shared_ptr<WifiScanServiceImpl> g_instance;
     ServiceRunningState mState;
+#else
+    int m_instId{0};
+    bool mSingleCallback;
+    std::mutex deathRecipientMutex;
+    sptr<IRemoteObject::DeathRecipient> deathRecipient_;
 #endif
     int64_t queryScanMacInfoWhiteListTimeStamp_ = 0;
     std::string scanMacInfoWhiteListStr_;

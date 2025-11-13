@@ -461,6 +461,15 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode SetP2pHighPerf(bool isEnable) override;
+
+    /**
+     * @Description Set p2p group type
+     *
+     * @param grouptype - set group keepalive or not
+     * @return ErrCode - operation result
+     */
+    ErrCode Hid2dSetGroupType(GroupLivetype groupType) override;
+ 
 private:
     bool Init();
     ErrCode CheckCanEnableP2p(void);

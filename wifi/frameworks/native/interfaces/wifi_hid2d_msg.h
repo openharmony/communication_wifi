@@ -85,7 +85,7 @@ enum P2pBusinessType {
 enum class GroupLiveType {
     GROUPSTOPALIVE = 0,
     GROUPKEEPALIVE = 1,
-} 
+};
 
 class Hid2dConnectConfig {
 public:

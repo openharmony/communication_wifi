@@ -302,5 +302,10 @@ ErrCode P2pInterface::SetP2pHighPerf(bool isEnable)
 {
     return p2pService.SetP2pHighPerf(isEnable);
 }
+
+ErrCode P2pInterface::Hid2dSetGroupType(GroupLiveType groupType)
+{
+    retutn p2pService.Hid2dSetGroupType(groupType);
+}
 }  // namespace Wifi
 }  // namespace OHOS

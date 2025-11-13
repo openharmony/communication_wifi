@@ -298,9 +298,9 @@ private:
      * @Description Process the hid2d set group command received by the state machine
      *
      * @param msg - Message body sent by the state machine
-     * @return - bool true:handle   false:not hadle
+     * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdHid2dSetGroupType(InternalMessagePtr msg) const;    
+    virtual bool ProcessCmdHid2dSetGroupType(InternalMessagePtr msg) const;
 
 private:
     void P2pConfigInitExt(bool &result);

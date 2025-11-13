@@ -732,12 +732,12 @@ bool P2pEnabledState::ProcesscmdHid2dSetGroupType(InternalMessagePtr msg) const
         WIFI_LOGE("Failed to obtain string information");
         return EXECUTED;
     }
-    WIFI_LOGI("P2pEnableState GroupLiveType: %{public}d", type);
+    WIFI_LOGI("P2pEnabledState GroupLiveType: %{public}d", type);
     WifiP2pLinkedInfo info = GroupManager.GetP2pInfo();
 
     WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
     if (info.GetConnectState() == P2pConnectedState::P2P_CONNECTED) {
-        if(group.IsGroupOwner()) {
+        if (group.IsGroupOwner()) {
             WIFI_LOGE("SetExplicitGroup");
             group.SetExplicitGroup(static_cast<bool>(type));
             groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);

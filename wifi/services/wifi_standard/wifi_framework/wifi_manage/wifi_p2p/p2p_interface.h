@@ -393,6 +393,15 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode SetP2pHighPerf(bool isEnable) override;
+
+    /**
+     * @Description Set p2p Group type
+     *
+     * @param groupType - set group keepalive or not
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode Hid2dSetGroupType(GroupLiveType groupType) override;
+
 private:
     WifiP2pGroupManager groupManager;    /* group manager */
     WifiP2pDeviceManager deviceMgr;  /* device manager */

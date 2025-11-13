@@ -509,6 +509,7 @@ public:
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     void DealMdmRestrictedConnect(WifiDeviceConfig &config);
     bool WhetherRestrictedByMdm(const std::string &ssid, const std::string &bssid, bool checkBssid);
+    void ReportMdmRestrictedEvent(const std::string &ssid, const std::string &bssid, const std::string &restrictedType);
 #endif
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
@@ -1031,8 +1032,6 @@ private:
     void TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig, const WifiDeviceConfig &config) const;
     void SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, const WifiDeviceConfig &deviceConfig,
     std::string &currentMac);
-    std::string GetRandomMacForDevice(const WifiDeviceConfig &deviceConfig, const std::string &bssid,
-    const std::string &realMac);
     bool IsGoodSignalQuality();
     void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
     void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;

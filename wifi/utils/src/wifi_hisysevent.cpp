@@ -1013,8 +1013,7 @@ void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo)
     cJSON_Delete(root);
 }
 
-void WriteMdmHiSysEvent(const std::string &ssid, const std::string &bssid,
-    const std::string &restrictedType, int uid, const std::string &bundleName)
+void WriteMdmHiSysEvent(const MdmRestrictedInfo &mdmRestrictedInfo)
 {
     cJSON *root = cJSON_CreateObject();
     if (root == nullptr) {
@@ -1022,11 +1021,11 @@ void WriteMdmHiSysEvent(const std::string &ssid, const std::string &bssid,
         return;
     }
     
-    cJSON_AddStringToObject(root, "BUNDLE_NAME", bundleName.c_str());
-    cJSON_AddNumberToObject(root, "UID", uid);
-    cJSON_AddStringToObject(root, "SSID", SsidAnonymize(ssid).c_str());
-    cJSON_AddStringToObject(root, "BSSID", MacAnonymize(bssid).c_str());
-    cJSON_AddStringToObject(root, "RESTRICTED_TYPE", restrictedType.c_str());
+    cJSON_AddStringToObject(root, "BUNDLE_NAME", mdmRestrictedInfo.bundleName.c_str());
+    cJSON_AddNumberToObject(root, "UID", mdmRestrictedInfo.uid);
+    cJSON_AddStringToObject(root, "SSID", SsidAnonymize(mdmRestrictedInfo.ssid).c_str());
+    cJSON_AddStringToObject(root, "BSSID", MacAnonymize(mdmRestrictedInfo.bssid).c_str());
+    cJSON_AddStringToObject(root, "RESTRICTED_TYPE", mdmRestrictedInfo.restrictedType.c_str());
     
     char *jsonStr = cJSON_PrintUnformatted(root);
     if (jsonStr == nullptr) {

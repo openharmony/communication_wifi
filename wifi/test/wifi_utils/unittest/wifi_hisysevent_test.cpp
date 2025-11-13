@@ -111,12 +111,8 @@ HWTEST_F(WifiHisyseventTest, WriteIodHiSysEventTest, TestSize.Level1)
 
 HWTEST_F(WifiHisyseventTest, WriteMdmHiSysEventTest, TestSize.Level1)
 {
-    int uid = 0;
-    std::string ssid = "test";
-    std::string bssid = "a1:b2:c3:d4:e5:f6";
-    std::string bundleName = "test";
-    std::string restrictedType = "NONE";
-    WriteMdmHiSysEvent(ssid, bssid, restrictedType, uid, bundleName);
+    MdmRestrictedInfo mdmInfo;
+    WriteMdmHiSysEvent(mdmInfo);
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 }  // namespace Wifi

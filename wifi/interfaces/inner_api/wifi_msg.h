@@ -950,6 +950,15 @@ enum class WifiProtectMode {
     WIFI_PROTECT_NO_HELD = 4
 };
 
+enum class AddrTypeIpV6 {
+    ADDR_TYPE_LINK_LOCAL = 0,
+    ADDR_TYPE_GLOBAL = 1,
+    ADDR_TYPE_SUBNET = 2,
+    ADDR_TYPE_RANDOM_GLOBAL = 3,
+    ADDR_TYPE_UNIQUE_LOCAL_1 = 4,
+    ADDR_TYPE_UNIQUE_LOCAL_2 = 5
+};
+
 /* DHCP IpV6Info */
 struct IpV6Info {
     std::string linkIpV6Address;

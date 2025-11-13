@@ -3587,6 +3587,35 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
     }
 }
 
+void StaStateMachine::DhcpResultNotify::TryToSaveIpV6ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result)
+{
+    if (result == nullptr) {
+        WIFI_LOGE("TryToSaveIpV6ResultExt result nullptr.");
+        return;
+    }
+    if (!ipv6Info.linkIpV6Address.empty()) {
+        ipv6Info.IpAddrMap[ipv6Info.linkIpV6Address] = static_cast<int>(AddrTypeIpV6::ADDR_TYPE_LINK_LOCAL);
+    }
+    if (!ipv6Info.globalIpV6Address.empty()) {
+        ipv6Info.IpAddrMap[ipv6Info.globalIpV6Address] = static_cast<int>(AddrTypeIpV6::ADDR_TYPE_GLOBAL);
+    }
+    if (!ipv6Info.randGlobalIpV6Address.empty()) {
+        ipv6Info.IpAddrMap[ipv6Info.randGlobalIpV6Address] = static_cast<int>(AddrTypeIpV6::ADDR_TYPE_RANDOM_GLOBAL);
+    }
+    if (!ipv6Info.uniqueLocalAddress1.empty()) {
+        ipv6Info.IpAddrMap[ipv6Info.uniqueLocalAddress1] = static_cast<int>(AddrTypeIpV6::ADDR_TYPE_UNIQUE_LOCAL_1);
+    }
+    if (!ipv6Info.uniqueLocalAddress2.empty()) {
+        ipv6Info.IpAddrMap[ipv6Info.uniqueLocalAddress2] = static_cast<int>(AddrTypeIpV6::ADDR_TYPE_UNIQUE_LOCAL_2);
+    }
+    if (ipv6Info.primaryDns.length() > 0 && ipv6Info.primaryDns != "0") {
+        ipv6Info.dnsAddr.push_back(ipv6Info.primaryDns);
+    }
+    if (ipv6Info.secondDns.length() > 0 && ipv6Info.secondDns != "0") {
+        ipv6Info.dnsAddr.push_back(ipv6Info.secondDns);
+    }
+}
+
 void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result)
 {
     if (result == nullptr) {
@@ -3604,12 +3633,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
     ipv6Info.uniqueLocalAddress1 = result->strOptLocalAddr1;
     ipv6Info.uniqueLocalAddress2 = result->strOptLocalAddr2;
     ipv6Info.dnsAddr.clear();
-    if (ipv6Info.primaryDns.length() > 0 && ipv6Info.primaryDns != "0") {
-        ipv6Info.dnsAddr.push_back(ipv6Info.primaryDns);
-    }
-    if (ipv6Info.secondDns.length() > 0 && ipv6Info.secondDns != "0") {
-        ipv6Info.dnsAddr.push_back(ipv6Info.secondDns);
-    }
+    TryToSaveIpV6ResultExt(ipInfo, ipv6Info, result);
     if (result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
         for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
             if (std::find(ipv6Info.dnsAddr.begin(), ipv6Info.dnsAddr.end(), result->dnsList.dnsAddr[i]) ==

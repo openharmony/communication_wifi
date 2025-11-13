@@ -508,6 +508,7 @@ public:
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     void DealMdmRestrictedConnect(WifiDeviceConfig &config);
     bool WhetherRestrictedByMdm(const std::string &ssid, const std::string &bssid, bool checkBssid);
+    void ReportMdmRestrictedEvent(const std::string &ssid, const std::string &bssid, const std::string &restrictedType);
 #endif
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);

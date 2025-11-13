@@ -1928,5 +1928,37 @@ ErrCode WifiP2pProxy::SetP2pHighPerf(bool isEnable)
 
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiP2pProxy::Hid2dSetGroupType(GroupLiveType groupType)
+{
+    if (mRemoteDied) {
+        WIFI_LOGW("failed to '%{public}s',remote service is died", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(static_cast<int>(groupType));
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_P2P_GROUP_ALIVE_MODE), data, reply, option);
+    )
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d failed,error code is %{public}d",
+            static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_P2P_GROUP_ALIVE_MODE), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+
+    return WIFI_OPT_SUCCESS;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

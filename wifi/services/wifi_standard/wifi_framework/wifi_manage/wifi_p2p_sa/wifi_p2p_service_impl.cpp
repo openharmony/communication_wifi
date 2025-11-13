@@ -1672,7 +1672,7 @@ ErrCode WifiP2pServiceImpl::Hid2dSetGroupType(GroupLiveType groupType)
     }
 
     if (!WifiAuthCenter::IsNativeProcess()) {
-        WIFI_LOGE("Hid2dSetGroupType:NOT NATIV PROCESS, PERMISSION_DENIED!");
+        WIFI_LOGE("Hid2dSetGroupType:NOT NATIVE PROCESS, PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     if (!IsP2pServiceRunning()) {

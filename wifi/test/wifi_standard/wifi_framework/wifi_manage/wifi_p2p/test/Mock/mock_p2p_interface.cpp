@@ -253,7 +253,7 @@ ErrCode P2pInterface::SetP2pHighPerf(bool isEnable)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode P2pInterface::Hid2dSetGroupType(GroupAliveType type)
+ErrCode P2pInterface::Hid2dSetGroupType(GroupLiveType type)
 {
     return WIFI_OPT_SUCCESS;
 }

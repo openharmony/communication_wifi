@@ -1932,7 +1932,7 @@ ErrCode WifiP2pProxy::SetP2pHighPerf(bool isEnable)
 ErrCode WifiP2pProxy::Hid2dSetGroupType(GroupLiveType groupType)
 {
     if (mRemoteDied) {
-        WIFI_LOGW("failed to '%{public}s',remote service is died", __func__);
+        WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
@@ -1946,9 +1946,8 @@ ErrCode WifiP2pProxy::Hid2dSetGroupType(GroupLiveType groupType)
     data.WriteInt32(static_cast<int>(groupType));
     int error = Remote()->SendRequest(
         static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_P2P_GROUP_ALIVE_MODE), data, reply, option);
-    )
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d failed,error code is %{public}d",
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_P2P_GROUP_ALIVE_MODE), error);
         return WIFI_OPT_FAILED;
     }

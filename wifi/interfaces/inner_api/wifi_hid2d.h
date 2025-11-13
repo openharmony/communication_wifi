@@ -150,6 +150,15 @@ public:
      */
     virtual ErrCode Hid2dIsWideBandwidthSupported(bool &isSupport) = 0;
 };
+
+    /**
+     * @Description Set p2p group type
+     *
+     * @param groupType - set group keepalive or not
+     * @return ErroCode - operation result
+     */
+    virtual ErrCode Hid2dSetGroupType(GroupLiveType groupType) = 0;
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

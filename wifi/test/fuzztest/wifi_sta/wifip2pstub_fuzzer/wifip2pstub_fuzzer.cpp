@@ -840,6 +840,20 @@ void OnSetP2pHighPerfTest()
         datas, reply, option);
 }
 
+void OnHid2dSetGroupTypeTest()
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(
+        static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_P2P_GROUP_ALIVE_MODE),
+        datas, reply, option);
+}
+
 void WifiP2pStubFuzzTest()
 {
     OHOS::Wifi::OnDiscoverDevicesFuzzTest();

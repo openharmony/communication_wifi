@@ -225,7 +225,7 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     pP2pInterface->IncreaseSharedLink(interval);
     int channelid = static_cast<int32_t >(data[0]);
     Hid2dUpperScene scene;
-    GroupLiveType type;
+    GroupLiveType liveType = static_cast<GroupLiveType>(static_cast<int>(data[0]) % TWO);
     pP2pInterface->RegisterP2pServiceCallbacks(mP2pCallback);
     pP2pInterface->UnRegisterP2pServiceCallbacks(mP2pCallback);
     pP2pInterface->Hid2dCreateGroup(period, scanType);
@@ -233,7 +233,7 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     pP2pInterface->Hid2dRequestGcIp(groupOwnerAddress, serviceName);
     pP2pInterface->DiscoverPeers(channelid);
     pP2pInterface->Hid2dSetUpperScene(serviceName, scene);
-    pP2pInterface->Hid2dSetGroupType(type);
+    pP2pInterface->Hid2dSetGroupType(liveType);
     pP2pInterface->HandleBusinessSAException(period);
     pWifiP2pGroupManager->UpdateWpaGroup(group);
     pWifiP2pGroupManager->ClearAll();

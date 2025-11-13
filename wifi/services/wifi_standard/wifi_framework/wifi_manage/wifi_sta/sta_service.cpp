@@ -297,6 +297,7 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
         pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL);
         BlockConnectService::GetInstance().UpdateNetworkSelectStatus(config.networkId,
             DisabledReason::DISABLED_MDM_RESTRICTED);
+        pStaStateMachine->ReportMdmRestrictedEvent(config.ssid, config.bssid, "BLOCK_LIST");
         return WIFI_OPT_FAILED;
     }
 #endif
@@ -568,6 +569,7 @@ ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
         pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL);
         BlockConnectService::GetInstance().UpdateNetworkSelectStatus(config.networkId,
             DisabledReason::DISABLED_MDM_RESTRICTED);
+        pStaStateMachine->ReportMdmRestrictedEvent(config.ssid, config.bssid, "BLOCK_LIST");
         return WIFI_OPT_FAILED;
     }
 #endif
@@ -597,6 +599,7 @@ ErrCode StaService::ConnectToNetwork(int networkId, int type) const
         pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL);
         BlockConnectService::GetInstance().UpdateNetworkSelectStatus(config.networkId,
             DisabledReason::DISABLED_MDM_RESTRICTED);
+        pStaStateMachine->ReportMdmRestrictedEvent(config.ssid, config.bssid, "BLOCK_LIST");
         return WIFI_OPT_FAILED;
     }
 #endif

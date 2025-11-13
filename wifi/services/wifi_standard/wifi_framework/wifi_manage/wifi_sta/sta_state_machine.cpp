@@ -697,6 +697,7 @@ bool StaStateMachine::InitState::NotAllowConnectToNetwork(int networkId, const s
         WIFI_LOGI("NotAllowConnectToNetwork, RestrictedByMdm");
         BlockConnectService::GetInstance().UpdateNetworkSelectStatus(config.networkId,
             DisabledReason::DISABLED_MDM_RESTRICTED);
+        pStaStateMachine->ReportMdmRestrictedEvent(config.ssid, config.bssid, "BLOCK_LIST");
         return true;
     }
 #endif
@@ -1609,6 +1610,7 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
         return;
     }
     if (pStaStateMachine->WhetherRestrictedByMdm(config.ssid, config.bssid, true)) {
+        pStaStateMachine->ReportMdmRestrictedEvent(config.ssid, config.bssid, "BLOCK_LIST");
         pStaStateMachine->DealMdmRestrictedConnect(config);
         return;
     }
@@ -3172,6 +3174,7 @@ void StaStateMachine::AfterApLinkedprocess(std::string bssid)
 
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     if (WhetherRestrictedByMdm(deviceConfig.ssid, deviceConfig.bssid, true)) {
+        ReportMdmRestrictedEvent(deviceConfig.ssid, deviceConfig.bssid, "BLOCK_LIST");
         DealMdmRestrictedConnect(deviceConfig);
         return;
     }
@@ -4701,7 +4704,15 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     }
     targetNetworkId_ = networkId;
     linkSwitchDetectingFlag_ = false;
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::RANDOMMAC &&
+        WifiSettings::GetInstance().IsRandomMacDisabled(m_instId) &&
+        SetRandomMac(deviceConfig, bssid)) {
+        ReportMdmRestrictedEvent(deviceConfig.ssid, deviceConfig.bssid, "MDM_RESTRICTED");
+    }
+#else
     SetRandomMac(deviceConfig, bssid);
+#endif
     WIFI_LOGI("StartConnectToNetwork SetRandomMac targetNetworkId_:%{public}d, bssid:%{public}s", targetNetworkId_,
         MacAnonymize(bssid).c_str());
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
@@ -5033,6 +5044,21 @@ bool StaStateMachine::WhetherRestrictedByMdm(const std::string &ssid, const std:
         WriteMdmHiSysEvent(ssid, bssid, "BLOCK_LIST", uid, bundleName);
     }
     return isRestricted;
+}
+
+void StaStateMachine::ReportMdmRestrictedEvent(const std::string &ssid, const std::string &bssid,
+                                                const std::string &restrictedType)
+{
+    int uid = GetCallingUid();
+    std::string bundleName = "";
+    GetBundleNameByUid(uid, bundleName);
+    MdmRestrictedInfo mdmInfo;
+    mdmInfo.ssid = ssid;
+    mdmInfo.bssid = bssid;
+    mdmInfo.restrictedType = restrictedType;
+    mdmInfo.uid = uid;
+    mdmInfo.bundleName = bundleName;
+    WriteMdmHiSysEvent(mdmInfo);
 }
 #endif
 

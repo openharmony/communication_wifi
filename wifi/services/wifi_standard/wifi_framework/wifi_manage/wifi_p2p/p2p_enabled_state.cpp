@@ -132,7 +132,7 @@ void P2pEnabledState::InitProcessMsg()
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SET_P2P_HIGH_PERF,
         [this](InternalMessagePtr msg) { return this->ProcessSetP2pHighPerf(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_SET_GROUP_TYPE,
-        [this](const InternalMessagePtr msg) { return this->ProcesscmdHid2dSetGroupType(msg); }));
+        [this](const InternalMessagePtr msg) { return this->ProcessCmdHid2dSetGroupType(msg); }));
 }
 
 bool P2pEnabledState::ProcessCmdDisable(InternalMessagePtr msg) const
@@ -725,7 +725,7 @@ bool P2pEnabledState::ProcessSetP2pHighPerf(InternalMessagePtr msg) const
     return EXECUTED;
 }
 
-bool P2pEnabledState::ProcesscmdHid2dSetGroupType(InternalMessagePtr msg) const
+bool P2pEnabledState::ProcessCmdHid2dSetGroupType(InternalMessagePtr msg) const
 {
     GroupLiveType type;
     if (!msg->GetMessageObj(type)) {

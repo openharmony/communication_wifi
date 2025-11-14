@@ -465,7 +465,7 @@ public:
     /**
      * @Description Set p2p group type
      *
-     * @param grouptype - set group keepalive or not
+     * @param groupType - set group keepalive or not
      * @return ErrCode - operation result
      */
     ErrCode Hid2dSetGroupType(GroupLiveType groupType) override;

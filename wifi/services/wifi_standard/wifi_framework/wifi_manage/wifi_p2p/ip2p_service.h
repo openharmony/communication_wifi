@@ -389,7 +389,6 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode Hid2dSetGroupType(GroupLiveType groupType) = 0;
-
 };
 } // namespace Wifi
 } // namespace OHOS

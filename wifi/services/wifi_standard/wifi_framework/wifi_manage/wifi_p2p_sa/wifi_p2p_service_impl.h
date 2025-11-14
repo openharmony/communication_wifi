@@ -468,7 +468,7 @@ public:
      * @param grouptype - set group keepalive or not
      * @return ErrCode - operation result
      */
-    ErrCode Hid2dSetGroupType(GroupLivetype groupType) override;
+    ErrCode Hid2dSetGroupType(GroupLiveType groupType) override;
  
 private:
     bool Init();

@@ -395,7 +395,7 @@ public:
     virtual ErrCode SetP2pHighPerf(bool isEnable) override;
 
     /**
-     * @Description Set p2p Group type
+     * @Description Set p2p group type
      *
      * @param groupType - set group keepalive or not
      * @return ErrCode - operation result

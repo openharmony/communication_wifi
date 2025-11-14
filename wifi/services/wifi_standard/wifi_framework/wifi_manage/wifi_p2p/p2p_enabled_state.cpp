@@ -733,7 +733,7 @@ bool P2pEnabledState::ProcessCmdHid2dSetGroupType(InternalMessagePtr msg) const
         return EXECUTED;
     }
     WIFI_LOGI("P2pEnabledState GroupLiveType: %{public}d", type);
-    WifiP2pLinkedInfo info = GroupManager.GetP2pInfo();
+    WifiP2pLinkedInfo info = groupManager.GetP2pInfo();
 
     WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
     if (info.GetConnectState() == P2pConnectedState::P2P_CONNECTED) {

@@ -190,7 +190,7 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
         wifiCandidateInfos << "\"" << pair.first << "_" <<
             SsidAnonymize(networkCandidates.at(pair.second).wifiDeviceConfig.ssid) << "\"";
     }
-    if (!wifiCandidateConfigs.empty()) {
+    if (!wifiCandidateConfigs.empty() || !wifiDeviceConfigs.empty()) {
         WIFI_LOGI("Find savedNetworks in scanInfos: [%{public}s]\n"
                   "Find suggestion networks in scanInfos: [%{public}s]",
             wifiDevicesInfo.str().c_str(),

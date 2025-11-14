@@ -1184,7 +1184,7 @@ void WifiP2pStub::OnHid2dSetGroupType(uint32_t code, MessageParcel &data,
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
 
     int type = data.ReadInt32();
-    int ret = Hid2dSetGroupType(GroupliveType(type));
+    int ret = Hid2dSetGroupType(GroupLiveType(type));
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 }

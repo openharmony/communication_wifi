@@ -714,8 +714,19 @@ void Perf5gHandoverService::LoadRelationApInfo()
     }
 }
 
+void Perf5gHandoverService::RemoveRelationApDuplicates(std::vector<RelationAp> &relationAps)
+{
+    int32_t num = relationAps.size();
+    std::sort(relationAps.begin(), relationAps.end());
+    auto last = std::unique(relationAps.begin(), relationAps.end());
+    relationAps.erase(last, relationAps.end());
+    WIFI_LOGI("removeRelationApDuplicates, before:%{public}d after:%{public}d",
+        num, static_cast<int32_t>(relationAps.size()));
+}
+
 void Perf5gHandoverService::PrintRelationAps()
 {
+    RemoveRelationApDuplicates(relationAps_);
     std::stringstream associateInfo;
     for (auto iter : relationAps_) {
         if (associateInfo.rdbuf() ->in_avail() != 0) {

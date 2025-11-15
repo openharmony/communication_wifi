@@ -175,18 +175,30 @@ InternalMessagePtr StateMachine::CreateMessage(int msgName, int param1, int para
 
 void StateMachine::SendMessage(int msgName)
 {
+    if (pStateMachineHandler == nullptr) {
+        LOGE("SendMessage failed, pStateMachineHandler is nullptr!");
+        return;
+    }
     pStateMachineHandler->SendMessage(CreateMessage(msgName));
     return;
 }
 
 void StateMachine::SendMessage(int msgName, int param1)
 {
+    if (pStateMachineHandler == nullptr) {
+        LOGE("SendMessage failed, pStateMachineHandler is nullptr!");
+        return;
+    }
     pStateMachineHandler->SendMessage(CreateMessage(msgName, param1));
     return;
 }
 
 void StateMachine::SendMessage(int msgName, int param1, int param2)
 {
+    if (pStateMachineHandler == nullptr) {
+        LOGE("SendMessage failed, pStateMachineHandler is nullptr!");
+        return;
+    }
     pStateMachineHandler->SendMessage(CreateMessage(msgName, param1, param2));
     return;
 }

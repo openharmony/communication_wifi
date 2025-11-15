@@ -127,6 +127,10 @@ void WifiP2pStub::InitHandleMapExPart3()
         [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
             OnSetP2pHighPerf(code, data, reply, option);
         };
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_P2P_GROUP_ALIVE_MODE)] =
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
+            OnHid2dSetGroupType(code, data, reply, option);
+        };
 }
 
 void WifiP2pStub::InitHandleMap()
@@ -1170,6 +1174,17 @@ void WifiP2pStub::OnSetP2pHighPerf(
     WIFI_LOGD("run %{public}s code %{public}u, isEnable = %{public}d", __func__, code, isEnable);
 
     ErrCode ret = SetP2pHighPerf(isEnable);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+}
+
+void WifiP2pStub::OnHid2dSetGroupType(uint32_t code, MessageParcel &data,
+    MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+
+    int type = data.ReadInt32();
+    int ret = Hid2dSetGroupType(GroupLiveType(type));
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 }

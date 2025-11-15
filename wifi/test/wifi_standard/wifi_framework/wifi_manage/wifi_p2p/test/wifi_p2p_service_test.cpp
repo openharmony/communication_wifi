@@ -330,6 +330,12 @@ HWTEST_F(WifiP2pServiceTest, Hid2dCreateGroupTest001, TestSize.Level1)
     EXPECT_EQ(pWifiP2pService->Hid2dCreateGroup(frequency, type), ErrCode::WIFI_OPT_SUCCESS);
 }
 
+HWTEST_F(WifiP2pServiceTest, Hid2dSetGroupTypeTest001, TestSize.Level1)
+{
+    GroupLiveType type = GroupLiveType::GROUPKEEPALIVE;
+    EXPECT_EQ(pWifiP2pService->Hid2dSetGroupType(type), ErrCode::WIFI_OPT_SUCCESS);
+}
+
 HWTEST_F(WifiP2pServiceTest, MonitorCfgChangeTest001, TestSize.Level1)
 {
     EXPECT_EQ(pWifiP2pService->MonitorCfgChange(), ErrCode::WIFI_OPT_SUCCESS);

@@ -198,3 +198,9 @@ NO_SANITIZE("cfi") WifiErrorCode Hid2dSetUpperScene(const char ifName[IF_NAME_LE
     upperScene.bw = scene->bw;
     return GetCErrorCode(wifiHid2dPtr->Hid2dSetUpperScene(ifName, upperScene));
 }
+
+NO_SANITIZE("cfi") WifiErrorCode Hid2dSetGroupType(GroupLiveType groupType)
+{
+    CHECK_PTR_RETURN(wifiHid2dPtr, ERROR_WIFI_NOT_AVAILABLE);
+    return GetCErrorCode(wifiHid2dPtr->Hid2dSetGroupType(OHOS::Wifi::GroupLiveType(static_cast<int>(groupType))));
+}

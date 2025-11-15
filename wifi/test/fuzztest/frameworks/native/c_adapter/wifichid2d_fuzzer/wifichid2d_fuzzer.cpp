@@ -226,6 +226,12 @@ void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
     (void)Hid2dSetUpperScene(ifName, &scene);
 }
 
+void Hid2dSetGroupType(const uint8_t* data, size_t size)
+{
+    GroupLiveType type = GROUPKEEPALIVE;
+    (void)Hid2dSetGroupType(type);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {

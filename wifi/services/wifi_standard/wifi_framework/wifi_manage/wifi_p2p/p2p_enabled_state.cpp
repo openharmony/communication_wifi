@@ -131,6 +131,8 @@ void P2pEnabledState::InitProcessMsg()
         [this](InternalMessagePtr msg) { return this->ProcessSetMiracastSinkConfig(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SET_P2P_HIGH_PERF,
         [this](InternalMessagePtr msg) { return this->ProcessSetP2pHighPerf(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_SET_GROUP_TYPE,
+        [this](const InternalMessagePtr msg) { return this->ProcessCmdHid2dSetGroupType(msg); }));
 }
 
 bool P2pEnabledState::ProcessCmdDisable(InternalMessagePtr msg) const
@@ -722,5 +724,32 @@ bool P2pEnabledState::ProcessSetP2pHighPerf(InternalMessagePtr msg) const
     WifiP2PHalInterface::GetInstance().SetP2pHighPerf(isEnable);
     return EXECUTED;
 }
+
+bool P2pEnabledState::ProcessCmdHid2dSetGroupType(InternalMessagePtr msg) const
+{
+    GroupLiveType type;
+    if (!msg->GetMessageObj(type)) {
+        WIFI_LOGE("Failed to obtain string information");
+        return EXECUTED;
+    }
+    WIFI_LOGI("P2pEnabledState GroupLiveType: %{public}d", type);
+    WifiP2pLinkedInfo info = groupManager.GetP2pInfo();
+
+    WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
+    if (info.GetConnectState() == P2pConnectedState::P2P_CONNECTED) {
+        if (group.IsGroupOwner()) {
+            WIFI_LOGE("SetExplicitGroup");
+            group.SetExplicitGroup(static_cast<bool>(type));
+            groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
+        } else {
+            WIFI_LOGE("Is Not GroupOwner");
+        }
+    } else {
+        WIFI_LOGI("P2pEnabledState info.GetConnectState(): %{public}d", info.GetConnectState());
+    }
+
+    return EXECUTED;
+}
+
 } // namespace Wifi
 } // namespace OHOS

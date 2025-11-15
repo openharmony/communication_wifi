@@ -440,5 +440,13 @@ ErrCode WifiP2pImpl::SetP2pHighPerf(bool isEnable)
     RETURN_IF_FAIL(GetWifiP2pProxy());
     return client_->SetP2pHighPerf(isEnable);
 }
+
+ErrCode WifiP2pImpl::Hid2dSetGroupType(GroupLiveType groupType)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->Hid2dSetGroupType(groupType);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

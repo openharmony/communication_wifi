@@ -82,6 +82,11 @@ enum P2pBusinessType {
     P2P_TYPE_HID2D = 1,
 };
 
+enum class GroupLiveType {
+    GROUPSTOPALIVE = 0,
+    GROUPKEEPALIVE = 1,
+};
+
 class Hid2dConnectConfig {
 public:
     Hid2dConnectConfig() : m_ssid(""), m_bssid(""), m_preSharedKey(""),

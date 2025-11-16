@@ -36,12 +36,18 @@ public:
     bool IsInTempWifiBlockList(const std::string &bssid);
     bool IsFailedMultiTimes(const std::string &bssid);
     void RemoveWifiBlocklist(const std::string &bssid);
-
+    void AddPerf5gBlocklist(const std::string &bssid);
+    bool IsInPerf5gBlocklist(const std::string &bssid);
+    void RemovePerf5gBlocklist(const std::string &bssid);
+    void CleanPerf5gBlocklist();
+    bool IsOverTwiceInPerf5gBlocklist(const std::string &bssid);
 private:
     std::mutex mutex_;
     std::set<std::string> wifiBlockSet_;
     std::set<std::string> abnormalWifiBlockSet_;
     std::map<std::string, int32_t> tempWifiBlockMap_;
+    std::map<std::string, uint32_t> tempWifiBlockMap_;
+    std::unordered_map<std::string, std::pair<uint32_t, bool>> perf5gBlockMap_;
 };
 
 } // namespace Wifi

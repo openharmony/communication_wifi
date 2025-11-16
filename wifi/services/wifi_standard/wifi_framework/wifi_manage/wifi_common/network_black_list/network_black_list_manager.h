@@ -45,7 +45,6 @@ private:
     std::mutex mutex_;
     std::set<std::string> wifiBlockSet_;
     std::set<std::string> abnormalWifiBlockSet_;
-    std::map<std::string, int32_t> tempWifiBlockMap_;
     std::map<std::string, uint32_t> tempWifiBlockMap_;
     std::unordered_map<std::string, std::pair<uint32_t, bool>> perf5gBlockMap_;
 };

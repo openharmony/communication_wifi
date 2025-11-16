@@ -48,6 +48,7 @@ public:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
         void HandleWifiProSwitchChanged(const InternalMessagePtr msg);
         void HandleRemoveBlockList(const InternalMessagePtr msg);
+        void HandleRemove5GBlockList(const InternalMessagePtr msg);
     };
 
     /**

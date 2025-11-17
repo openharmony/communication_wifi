@@ -3617,6 +3617,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
     ipv6Info.uniqueLocalAddress1 = result->strOptLocalAddr1;
     ipv6Info.uniqueLocalAddress2 = result->strOptLocalAddr2;
     ipv6Info.dnsAddr.clear();
+    ipv6Info.IpAddrMap.clear();
     TryToSaveIpV6ResultExt(ipInfo, ipv6Info, result);
     if (result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
         for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {

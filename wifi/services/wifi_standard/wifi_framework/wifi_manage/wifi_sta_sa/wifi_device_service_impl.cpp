@@ -1363,7 +1363,19 @@ ErrCode WifiDeviceServiceImpl::IsWifiActive(bool &bActive)
         WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
+    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(m_instId);
+    if (pSelfCureService != nullptr && pSelfCureService->IsSelfCureOnGoing() &&
+        WifiConfigCenter::GetInstance().GetWifiSelfcureReset() == true) {
+        int uid = GetCallingUid();
+        std::string packageName = "";
+        GetBundleNameByUid(uid, packageName);
+        WIFI_LOGI("IsWifiActive, uid: %{public}d, packageName: %{public}s.", uid, packageName.c_str());
+        if (packageName == WifiSettings::GetInstance().GetPackageName("SETTINGS") ||
+            packageName == WifiSettings::GetInstance().GetPackageName("SCENEBOARD_BUNDLE")) {
+            bActive = true;
+            return WIFI_OPT_SUCCESS;
+        }
+    }
     bActive = IsStaServiceRunning();
     return WIFI_OPT_SUCCESS;
 }

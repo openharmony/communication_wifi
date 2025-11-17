@@ -34,7 +34,7 @@ const int IP_V6_ADDR_LEN = 128;
 const int MAX_STA_NUMBER = 254 - 3 + 1; /* from DhcpRange.strStartip to DhcpRange.strEndip. */
 const std::string IP_V4_MASK("255.255.255.0");
 const std::string IP_V4_DEFAULT("192.168.62.1");
-int g_DhcpCnt = 0;
+int g_dhcpCnt = 0;
 
 DhcpdInterface::DhcpdInterface()
     : mBindIpv4(Ipv4Address::invalidInetAddress), mBindIpv6(Ipv6Address::INVALID_INET6_ADDRESS)
@@ -56,8 +56,8 @@ bool DhcpdInterface::StartDhcpServerFromInterface(const std::string &ifaceName, 
     const std::string &ipAddress, bool isIpV4, const int32_t &leaseTime)
 {
     if (ifaceName.find("p2p") != std::string::npos) {
-        g_DhcpCnt++;
-        WIFI_LOGI("StartDhcpServerFromInterface g_DhcpCnt is %{public}d", g_DhcpCnt);
+        g_dhcpCnt++;
+        WIFI_LOGI("StartDhcpServerFromInterface g_dhcpCnt is %{public}d", g_dhcpCnt);
     }
     mStartDhcpServerFlag = true;
     std::vector<Ipv4Address> vecIpv4Addr;
@@ -139,10 +139,10 @@ bool DhcpdInterface::GetConnectedStationInfo(const std::string &ifaceName, std::
 bool DhcpdInterface::StopDhcp(const std::string &ifaceName)
 {
     if (ifaceName.find("p2p") != std::string::npos) {
-        g_DhcpCnt--;
-        WIFI_LOGI("StopDhcp g_DhcpCnt is %{public}d", g_DhcpCnt);
+        g_dhcpCnt--;
+        WIFI_LOGI("StopDhcp g_dhcpCnt is %{public}d", g_dhcpCnt);
     }
-    if (g_DhcpCnt > 0) {
+    if (g_dhcpCnt > 0) {
         WIFI_LOGE("reject StopDhcp");
         return true;
     }

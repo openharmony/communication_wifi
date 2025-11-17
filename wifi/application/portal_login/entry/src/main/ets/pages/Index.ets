@@ -20,11 +20,11 @@ import { common, OpenLinkOptions } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit'
 import { SymbolGlyphModifier } from '@kit.ArkUI'
 import {
-  getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet, validateURL
+  getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
+  validateURL, getIsInOOBE
 } from '../common/utils'
 import { connection } from '@kit.NetworkKit';
 import { emitter } from '@kit.BasicServicesKit';
-import settings from '@ohos.settings';
 
 const DOMAIN = 0x01560;
 const TAG = 'Pages';
@@ -91,7 +91,7 @@ struct Index {
   private sheetItemHeight = 50;
   private contextMenuWidth = 224;
   private netConnect: connection.NetConnection = connection.createNetConnection();
-  private isInOOBE: boolean = false;
+  private isInOOBE: boolean = getIsInOOBE();
   @State mode: WebDarkMode = WebDarkMode.Auto;
   @State access: boolean = true;
   @StorageProp('topRectHeight') topRectHeight: number = 0;
@@ -480,10 +480,6 @@ struct Index {
           hilog.error(DOMAIN, TAG, '%{public}s', 'on new want bindToNetById failed.');
         });
     });
-    if (settings.getValueSync(this.context, 'user_setup_complete', '0', settings.domainName.DEVICE_SHARED) === '0') {
-        hilog.info(DOMAIN, TAG, '%{public}s', 'in oobe.');
-        this.isInOOBE = true;
-    }
   }
 
   aboutToDisappear(): void {

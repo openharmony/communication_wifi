@@ -98,6 +98,8 @@ private:
     DisablePolicy CalculateDisablePolicy(DisabledReason disableReason);
     void EnableAllNetworksByEnteringSettings(std::vector<DisabledReason> enableReasons);
     void LogDisabledConfig(const WifiDeviceConfig& config);
+    void InitBlockConnectPolicies();
+    void InitValidReasons();
 #ifndef OHOS_ARCH_LITE
     void StartClearSetTimer();
     void StopClearSetTimer();

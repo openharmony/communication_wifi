@@ -82,6 +82,7 @@ Wifi2WifiIntegrator::Wifi2WifiIntegrator() : CompositeNetworkSelector("Wifi2Wifi
     andFilters->AddFilter(make_shared<SignalLevelFilter>());
     andFilters->AddFilter(make_shared<WifiSwitchThresholdFilter>());
     andFilters->AddFilter(make_shared<ValidConfigNetworkFilter>());
+    andFilters->AddFilter(make_shared<SecureNetworkFilter>());
     SetWifiFilter(andFilters);
  
     AddSubNetworkSelector(make_shared<PreferredApSelector>());
@@ -121,6 +122,7 @@ Wifi2WifiNoNetIntegrator::Wifi2WifiNoNetIntegrator() : CompositeNetworkSelector(
     andFilters->AddFilter(make_shared<NotP2pFreqAt5gFilter>());
     andFilters->AddFilter(make_shared<SignalLevelFilter>());
     andFilters->AddFilter(make_shared<ValidConfigNetworkFilter>());
+    andFilters->AddFilter(make_shared<SecureNetworkFilter>());
     SetWifiFilter(andFilters);
  
     AddSubNetworkSelector(make_shared<PreferredApSelector>());
@@ -153,6 +155,7 @@ Wifi2WifiQoeSlowIntegrator::Wifi2WifiQoeSlowIntegrator() : CompositeNetworkSelec
     andFilters->AddFilter(make_shared<SignalLevelFilter>());
     andFilters->AddFilter(make_shared<WifiSwitchThresholdQoeFilter>());
     andFilters->AddFilter(make_shared<ValidConfigNetworkFilter>());
+    andFilters->AddFilter(make_shared<SecureNetworkFilter>());
     SetWifiFilter(andFilters);
  
     AddSubNetworkSelector(make_shared<PreferredApSelector>());

@@ -219,5 +219,13 @@ public:
 protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
+
+class SecureNetworkFilter final : public SimpleWifiFilter {
+public:
+    SecureNetworkFilter();
+    ~SecureNetworkFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
 }
 #endif //OHOS_WIFI_WIFI_FILTER_H

@@ -557,6 +557,11 @@ void Perf5gHandoverService::FoundMonitorAp(int32_t relationApIndex, std::vector<
             SsidAnonymize(relationAps_[relationApIndex].apInfo_.ssid).data());
         return;
     }
+    if (!config.isSecureWifi) {
+        WIFI_LOGI("FoundMonitorAp, ssid:%{public}s insecure network",
+            SsidAnonymize(relationAps_[relationApIndex].apInfo_.ssid).data());
+        return;
+    }
     // Check if network is currently disabled (by DisableDeviceConfig)
     if (config.networkSelectionStatus.status != WifiDeviceConfigStatus::ENABLED) {
         WIFI_LOGI("FoundMonitorAp, ssid:%{public}s is disabled, cannot perform 5G handover",

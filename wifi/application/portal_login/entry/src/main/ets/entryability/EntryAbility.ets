@@ -52,7 +52,7 @@ export default class EntryAbility extends UIAbility {
   onWindowStageCreate(windowStage: window.WindowStage): void {
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onWindowStageCreate');
-        let windowClass: window.Window = windowStage.getMainWindowSync();
+    let windowClass: window.Window = windowStage.getMainWindowSync();
     if (getIsInOOBE()) {
       windowClass.maximize(window.MaximizePresentation.ENTER_IMMERSIVE);
     }

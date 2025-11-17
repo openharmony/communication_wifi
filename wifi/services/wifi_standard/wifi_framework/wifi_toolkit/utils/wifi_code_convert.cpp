@@ -41,7 +41,7 @@ bool WifiCodeConvertUtil::Utf8Check(const char *str, size_t length)
         }
         i++;
     }
-    return true;
+    return (nBytes == 0);
 }
 
 const unsigned char MASK_80 = 0x80;

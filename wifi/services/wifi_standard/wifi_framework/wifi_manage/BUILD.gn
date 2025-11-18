@@ -285,6 +285,7 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
       "window_manager:libdm_lite",
       "netmanager_base:net_conn_manager_if",
+      "ability_runtime:connection_obs_manager",
     ]
     if (defined(global_parts_info) &&
       defined(global_parts_info.telephony_core_service) &&

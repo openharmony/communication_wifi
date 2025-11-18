@@ -93,6 +93,8 @@ private:
     void UpdateScanInfoListNotInWhiteList(std::vector<WifiScanInfo> &result);
 #ifndef OHOS_ARCH_LITE
     void UpdateScanMode();
+    bool CheckAssociatedAppInForeground(const int32_t uid);
+    bool IsAppInFilterList(const std::string &packageName, const std::string &callerName);
     void SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &result,
                      ScanAshmemParcel &outAshmemParcel, std::vector<uint32_t> &allSizeUint);
     void WriteInfoElementsToParcel(

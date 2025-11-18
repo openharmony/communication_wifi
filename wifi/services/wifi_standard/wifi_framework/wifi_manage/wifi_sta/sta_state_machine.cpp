@@ -3990,7 +3990,7 @@ ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string 
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     if (bssid.empty()) {
         // user select connect
-        UserSelectConnectToNetwork(deviceConfig, ifaceName, halDeviceConfig);
+        UserSelectConnectToNetwork(config, ifaceName, halDeviceConfig);
     } else {
         // auto connect
         AutoSelectConnectToNetwork(bssid, ifaceName, halDeviceConfig);

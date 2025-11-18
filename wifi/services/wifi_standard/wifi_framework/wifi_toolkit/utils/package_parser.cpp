@@ -54,7 +54,7 @@ bool PackageXmlParser::ParseInternal(xmlNodePtr node)
             GetPackageList(subNode, mScanLimitPackage_);
         } else if (tagName == TAG_LANDSCAPE_SWITCH_LIMIT) {
             GetPackageList(subNode, mLandscapeSwitchLimitList_);
-        } else if (tagName == TAG_Scan_Foreground_Allow_LIMIT) {
+        } else if (tagName == TAG_SCAN_FOREGROUND_ALLOW_LIMIT) {
             GetPackageList(subNode, mScanForegroundAllowLimitList_);
         } else {
             WIFI_LOGI("unknow package tag.");

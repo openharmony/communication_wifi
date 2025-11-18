@@ -36,7 +36,7 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("Perf5gHandoverService");
-
+constexpr int32_t BLOCK5G_RELEASE_THRESHOLD = -60;
 Perf5gHandoverService::Perf5gHandoverService()
 {
     pDualBandRepostitory_ = std::make_shared<DualBandRepostitory>(
@@ -227,6 +227,11 @@ void Perf5gHandoverService::ScanResultUpdated(std::vector<InterScanInfo> &scanIn
     for (auto &wifiScanInfo : scanInfos) {
         if (wifiScanInfo.bssid == connectedAp_->apInfo.bssid) {
             currentApScanResult = &wifiScanInfo;
+        }
+        if (wifiScanInfo.rssi >= BLOCK5G_RELEASE_THRESHOLD &&
+            NetworkBlockListManager::GetInstance().IsInPerf5gBlocklist(wifiScanInfo.bssid)) {
+            WIFI_LOGI("Perf5gBlocklist, rssi:%{public}d remove", wifiScanInfo.rssi);
+            NetworkBlockListManager::GetInstance().RemovePerf5gBlocklist(wifiScanInfo.bssid);
         }
     }
     if (currentApScanResult == nullptr) {
@@ -544,7 +549,8 @@ void Perf5gHandoverService::AddRelationApInfo(RelationAp &relationAp)
 void Perf5gHandoverService::FoundMonitorAp(int32_t relationApIndex, std::vector<InterScanInfo> &wifiScanInfos)
 {
     if (NetworkBlockListManager::GetInstance().IsInWifiBlocklist(relationAps_[relationApIndex].apInfo_.bssid) ||
-        NetworkBlockListManager::GetInstance().IsInAbnormalWifiBlocklist(relationAps_[relationApIndex].apInfo_.bssid)) {
+        NetworkBlockListManager::GetInstance().IsInAbnormalWifiBlocklist(relationAps_[relationApIndex].apInfo_.bssid) ||
+        NetworkBlockListManager::GetInstance().IsInPerf5gBlocklist(relationAps_[relationApIndex].apInfo_.bssid)) {
         WIFI_LOGI("FoundMonitorAp, relation ap(%{public}s) in block list, can not monitor",
             MacAnonymize(relationAps_[relationApIndex].apInfo_.bssid).data());
         perf5gChrInfo_.inBlackListNum++;

@@ -46,14 +46,17 @@ void NetworkBlockListManager::AddWifiBlocklist(const std::string &bssid)
         return;
     }
 
-    WIFI_LOGI("AddWifiBlocklist, bssid:%{public}s", MacAnonymize(bssid).c_str());
     std::lock_guard<std::mutex> lock(mutex_);
+    if (wifiBlockSet_.find(bssid) != wifiBlockSet_.end()) {
+        WIFI_LOGI("AddWifiBlocklist, bssid is in block");
+        return;
+    }
+    WIFI_LOGI("AddWifiBlocklist, bssid:%{public}s", MacAnonymize(bssid).c_str());
     wifiBlockSet_.insert(bssid);
 }
 
 void NetworkBlockListManager::RemoveWifiBlocklist(const std::string &bssid)
 {
-    WIFI_LOGI("Enter RemoveWifiBlocklist");
     std::lock_guard<std::mutex> lock(mutex_);
     if (wifiBlockSet_.empty()) {
         WIFI_LOGI("RemoveWifiBlocklist, wifiBlockSet is empty");
@@ -112,13 +115,14 @@ bool NetworkBlockListManager::IsInAbnormalWifiBlocklist(const std::string &bssid
 void NetworkBlockListManager::CleanTempWifiBlockList()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    std::map<std::string, int32_t> tempMap;
+    std::map<std::string, uint32_t> tempMap;
     tempWifiBlockMap_.swap(tempMap);
 }
 
 bool NetworkBlockListManager::IsInTempWifiBlockList(const std::string &bssid)
 {
     if (tempWifiBlockMap_.empty()) {
+        WIFI_LOGI("IsInTempWifiBlockList, bssid is invalid");
         return false;
     }
 
@@ -129,6 +133,7 @@ bool NetworkBlockListManager::IsInTempWifiBlockList(const std::string &bssid)
 bool NetworkBlockListManager::IsFailedMultiTimes(const std::string &bssid)
 {
     if (bssid.empty()) {
+        WIFI_LOGI("IsFailedMultiTimes, bssid is invalid");
         return false;
     }
 
@@ -145,5 +150,85 @@ bool NetworkBlockListManager::IsFailedMultiTimes(const std::string &bssid)
     return counter >= MAX_CONNECT_FAILED_TIMES;
 }
 
-} // namespace Wifi
-} // namespace OHOS
+bool NetworkBlockListManager::IsInPerf5gBlocklist(const std::string &bssid)
+{
+    if (bssid.empty()) {
+        WIFI_LOGI("IsInPerf5gBlocklist, bssid is invalid");
+        return false;
+    }
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (perf5gBlockMap_.empty()) {
+        return false;
+    }
+
+    auto iter = perf5gBlockMap_.find(bssid);
+    if (iter != perf5gBlockMap_.end()) {
+        return iter->second.second;
+    }
+    return false;
+}
+
+void NetworkBlockListManager::AddPerf5gBlocklist(const std::string &bssid)
+{
+    if (bssid.empty()) {
+        WIFI_LOGI("AddPerf5gBlocklist, bssid is invalid");
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto iter = perf5gBlockMap_.find(bssid);
+    if (iter != perf5gBlockMap_.end()) {
+        perf5gBlockMap_[bssid].first++;
+        perf5gBlockMap_[bssid].second = true;
+    } else {
+        perf5gBlockMap_[bssid] = std::make_pair(1, true);
+    }
+    WIFI_LOGI("AddPerf5gBlocklist, bssid:%{public}s, num:%{public}d",
+        MacAnonymize(bssid).c_str(),
+        perf5gBlockMap_[bssid].first);
+    return;
+}
+
+bool NetworkBlockListManager::IsOverTwiceInPerf5gBlocklist(const std::string &bssid)
+{
+    if (bssid.empty()) {
+        WIFI_LOGI("IsOverTwiceInPerf5gBlocklist, bssid is invalid");
+        return false;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (perf5gBlockMap_.empty()) {
+        return false;
+    }
+    auto iter = perf5gBlockMap_.find(bssid);
+    if (iter != perf5gBlockMap_.end()) {
+        return iter->second.first > 1;
+    }
+    return false;
+}
+
+void NetworkBlockListManager::RemovePerf5gBlocklist(const std::string &bssid)
+{
+    if (bssid.empty()) {
+        WIFI_LOGI("RemovePerf5gBlocklist, bssid is invalid");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (perf5gBlockMap_.empty()) {
+        return;
+    }
+    auto iter = perf5gBlockMap_.find(bssid);
+    if (iter != perf5gBlockMap_.end()) {
+        iter->second.second = false;
+        WIFI_LOGI("RemovePerf5gBlocklist, bssid:%{public}s", MacAnonymize(bssid).c_str());
+    }
+}
+
+void NetworkBlockListManager::CleanPerf5gBlocklist()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::unordered_map<std::string, std::pair<uint32_t, bool>> tempPerf5gBlockMap_;
+    perf5gBlockMap_.swap(tempPerf5gBlockMap_);
+}
+}  // namespace Wifi
+}  // namespace OHOS

@@ -28,6 +28,7 @@ let httpErrorCode_ = 0;
 let errorCode_ = 0;
 let sslErrorCode_ = 0;
 let isUpload_ = false;
+let isPortalSuccess_ = 0;
 
 
 export function updateOnNewWant() {
@@ -85,27 +86,31 @@ export function updateOnSslErrorEvent(code: number) {
  
 function portalHiSysEvent() {
   hilog.info(DOMAIN, TAG, '%{public}s', 'Enter portalHiSysEvent');
-    hiSysEvent.write({
-      domain: 'COMMUNICATION',
-      name:'PORTAL_LOGIN_LOAD_INFO',
-      eventType: hiSysEvent.EventType.STATISTIC,
-      params:{
-        'IS_ON_NEW_WANT': isOnNewWant_,
-        'BIND_NET_DURATION': bindNetDuration_,
-        'IS_BIND_NET_SUCCESS': isBindNetSuccess_,
-        'INIT_URL': initUrl_,
-        'FINAL_URL': finalUrl_,
-        'HTTP_ERROR_CODE': httpErrorCode_,
-        'ERROR_CODE': errorCode_,
-        'SSL_ERROR_CODE': sslErrorCode_,
-      },
-    }, (err:BusinessError) => {
-      if(err){
-        hilog.error(DOMAIN, TAG, `code: ${err.code}, message: ${err.message}`);
-        return;
-      }
-      hilog.info(DOMAIN, TAG, `success to write event`);
-    });
+  if (httpErrorCode_ == 0 && errorCode_ == 0 &&  sslErrorCode_ == 0) {
+    isPortalSuccess_ = 1;
+  }
+  hiSysEvent.write({
+    domain: 'COMMUNICATION',
+    name:'PORTAL_LOGIN_LOAD_INFO',
+    eventType: hiSysEvent.EventType.STATISTIC,
+    params:{
+      'IS_ON_NEW_WANT': isOnNewWant_,
+      'BIND_NET_DURATION': bindNetDuration_,
+      'IS_BIND_NET_SUCCESS': isBindNetSuccess_,
+      'INIT_URL': initUrl_,
+      'FINAL_URL': finalUrl_,
+      'HTTP_ERROR_CODE': httpErrorCode_,
+      'ERROR_CODE': errorCode_,
+      'SSL_ERROR_CODE': sslErrorCode_,
+      'IS_PORTAL_SUCCESS': isPortalSuccess_,
+    },
+  }, (err:BusinessError) => {
+    if(err){
+      hilog.error(DOMAIN, TAG, `code: ${err.code}, message: ${err.message}`);
+      return;
+    }
+    hilog.info(DOMAIN, TAG, `success to write event`);
+  });
 }
  
 export function updateOnBackground() {

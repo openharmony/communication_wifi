@@ -83,6 +83,7 @@ private:
     void HandleSwitchFailed(Perf5gSwitchResult switchResult);
     void OnDisconnected();
     void RemoveRelationApDuplicates(std::vector<RelationAp> &relationAps);
+    bool IsValidAp(int32_t relationApIndex);
 };
 }
 }

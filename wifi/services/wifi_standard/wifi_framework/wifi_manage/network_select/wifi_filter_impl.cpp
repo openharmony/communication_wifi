@@ -786,4 +786,27 @@ bool WifiSwitch5GNot2GFilter::Filter(NetworkCandidate &networkCandidate)
  
     return true;
 }
+
+SecureNetworkFilter::SecureNetworkFilter() : SimpleWifiFilter("SecureNetwork") {}
+ 
+SecureNetworkFilter::~SecureNetworkFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+ 
+bool SecureNetworkFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    if (!networkCandidate.wifiDeviceConfig.isSecureWifi) {
+        WIFI_LOGI("SecureNetworkFilter, insecure network, skip candidate:%{public}s",
+            networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::NOT_SECURE_WIFI);
+        return false;
+    }
+ 
+    return true;
+}
 }

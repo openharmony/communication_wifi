@@ -1363,7 +1363,22 @@ ErrCode WifiDeviceServiceImpl::IsWifiActive(bool &bActive)
         WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
+#ifndef OHOS_ARCH_LITE
+    ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(m_instId);
+    if (pSelfCureService != nullptr && pSelfCureService->IsSelfCureOnGoing() &&
+        WifiConfigCenter::GetInstance().GetWifiSelfcureReset() == true) {
+        int uid = GetCallingUid();
+        std::string packageName = "";
+        GetBundleNameByUid(uid, packageName);
+        if (packageName == WifiSettings::GetInstance().GetPackageName("SETTINGS") ||
+            packageName == WifiSettings::GetInstance().GetPackageName("SCENEBOARD_BUNDLE")) {
+            WIFI_LOGI("Judge IsWifiActive when ResetCuring, uid: %{public}d, packageName: %{public}s.",
+                uid, packageName.c_str());
+            bActive = true;
+            return WIFI_OPT_SUCCESS;
+        }
+    }
+#endif
     bActive = IsStaServiceRunning();
     return WIFI_OPT_SUCCESS;
 }

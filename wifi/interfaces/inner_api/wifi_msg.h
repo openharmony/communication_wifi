@@ -108,6 +108,13 @@ enum GameSceneId : int {
     MSG_GAME_STATE_FOREGROUND = 4,
     MSG_GAME_STATE_BACKGROUND = 5,
 };
+
+enum AncoAppState : int {
+    ANCO_APP_STATE_UNKONWN = -1,
+    ANCO_APP_STATE_FOREGROUND = 0,
+    ANCO_APP_STATE_BACKGROUND = 1,
+    ANCO_APP_STATE_DIED = 2,
+};
  
 enum class SupplicantState {
     DISCONNECTED = 0,

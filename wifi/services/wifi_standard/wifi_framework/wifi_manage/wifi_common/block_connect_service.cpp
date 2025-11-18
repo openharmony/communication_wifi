@@ -44,6 +44,16 @@ BlockConnectService &BlockConnectService::GetInstance()
 BlockConnectService::BlockConnectService()
 {
     // Initialize any necessary variables or data structures
+    InitBlockConnectPolicies();
+    InitValidReasons();
+#ifndef OHOS_ARCH_LITE
+    CheckNeedChangePolicy();
+#endif
+    mLastConnectedApInfo = {"", -1, 0};
+}
+
+void BlockConnectService::InitBlockConnectPolicies()
+{
     blockConnectPolicies = {
         {DisabledReason::DISABLED_ASSOCIATION_REJECTION,
          DisablePolicy(5 * 60 * 1000 * 1000, 3, WifiDeviceConfigStatus::DISABLED)},
@@ -80,7 +90,10 @@ BlockConnectService::BlockConnectService()
         {DisabledReason::USER_FORCE_DISCONNECT,
          DisablePolicy(24 * 60 * 60 * 1000 * 1000, 1, WifiDeviceConfigStatus::DISABLED)}
     };
+}
 
+void BlockConnectService::InitValidReasons()
+{
     validReasons = {
         static_cast<int>(DisconnectDetailReason::UNSPECIFIED),
         static_cast<int>(DisconnectDetailReason::PREV_AUTH_NOT_VALID),
@@ -90,10 +103,6 @@ BlockConnectService::BlockConnectService()
         static_cast<int>(DisconnectDetailReason::DISASSOC_IEEE_802_1X_AUTH_FAILED),
         static_cast<int>(DisconnectDetailReason::DISASSOC_LOW_ACK)
     };
-#ifndef OHOS_ARCH_LITE
-    CheckNeedChangePolicy();
-#endif
-    mLastConnectedApInfo = {"", -1, 0};
 }
 
 // Destructor

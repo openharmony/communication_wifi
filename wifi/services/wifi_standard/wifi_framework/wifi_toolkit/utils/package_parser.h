@@ -25,6 +25,7 @@ constexpr auto TAG_CORE_PACKAGEINFO = "CorePackages";
 constexpr auto TAG_ACL_AUTH = "AclAuthPackages";
 constexpr auto TAG_SCAN_LIMIT = "ScanLimitPackages";
 constexpr auto TAG_LANDSCAPE_SWITCH_LIMIT = "LandscapeSwitchLimitList";
+constexpr auto TAG_Scan_Foreground_Allow_LIMIT = "ScanForegroundAllowLimitList";
 constexpr auto PARAM_NAME = "name";
 constexpr auto PARAM_APPID = "appid";
 
@@ -41,6 +42,7 @@ public:
     void GetAclAuthPackages(std::vector<PackageInfo> &packageList);
     void GetScanLimitPackages(std::vector<PackageInfo> &packageList);
     void GetLandscapeSwitchLimitList(std::vector<PackageInfo> &packageList);
+    void GetScanForegroundAllowLimitList(std::vector<PackageInfo> &packageList);
 
 private:
     bool ParseInternal(xmlNodePtr node) override;
@@ -54,6 +56,7 @@ private:
     std::vector<PackageInfo> mAclAuthList;
     std::vector<PackageInfo> mScanLimitPackage_;
     std::vector<PackageInfo> mLandscapeSwitchLimitList_;
+    std::vector<PackageInfo> mScanForegroundAllowLimitList_;
 };
 }
 }

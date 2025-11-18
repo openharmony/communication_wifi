@@ -21,6 +21,7 @@
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
 #include "wifi_internal_event_dispatcher.h"
+#include "connection_observer_client.h"
 #endif
 #include "wifi_internal_msg.h"
 #include "wifi_logger.h"
@@ -773,12 +774,64 @@ void WifiScanServiceImpl::UpdateScanMode()
     int uid = GetCallingUid();
     std::string packageName = "";
     GetBundleNameByUid(uid, packageName);
-    if (WifiAppStateAware::GetInstance().IsForegroundApp(uid)
-        || packageName == WifiSettings::GetInstance().GetPackageName("SETTINGS")) {
+    bool isForeground = WifiAppStateAware::GetInstance().IsForegroundApp(uid)
+        || packageName == WifiSettings::GetInstance().GetPackageName("SETTINGS");
+
+    WIFI_LOGI("Wifi caller - uid: %{public}d, packageName: %{public}s, isForeground: %{public}s",
+        uid, packageName.c_str(), isForeground ? "true" : "false");
+
+    if (!isForeground) {
+        if (CheckAssociatedAppInForeground(uid)) {
+            isForeground = true;
+            WIFI_LOGI("CheckAssociatedAppInForeground, Treat as foreground");
+        }
+    }
+    if (isForeground) {
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppRunningState(ScanMode::APP_FOREGROUND_SCAN);
+        WIFI_LOGI("Set APP_FOREGROUND_SCAN for uid: %{public}d, package: %{public}s", uid, packageName.c_str());
     } else {
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppRunningState(ScanMode::APP_BACKGROUND_SCAN);
+        WIFI_LOGI("Set APP_BACKGROUND_SCAN for uid: %{public}d, package: %{public}s", uid, packageName.c_str());
     }
+}
+
+bool WifiScanServiceImpl::CheckAssociatedAppInForeground(const int32_t uid)
+{
+    std::vector<AbilityRuntime::ConnectionData> connectionData;
+    int32_t ret = AbilityRuntime::ConnectionObserverClient::GetInstance().GetConnectionData(connectionData);
+    if (ret != 0) {
+        WIFI_LOGE("get connection data failed: %{public}d", ret);
+        return false;
+    }
+
+    for (auto it = connectionData.begin(); it != connectionData.end(); it++) {
+        if (it->extensionUid != uid) {
+            continue;
+        }
+        if (WifiAppStateAware::GetInstance().IsForegroundApp(it->callerUid) &&
+            IsAppInFilterList("ScanForegroundAllowLimitList", it->callerName)) {
+            WIFI_LOGI("The Wifi caller is called by foreground app(callerUid: %{public}d, packageName: %{public}s)",
+                it->callerUid,
+                it->callerName.c_str());
+            return true;
+        }
+    }
+    return false;
+}
+
+bool WifiScanServiceImpl::IsAppInFilterList(const std::string &packageName, const std::string &callerName)
+{
+    std::vector<PackageInfo> specialList;
+    if (WifiSettings::GetInstance().GetPackageInfoByName(packageName, specialList) != 0) {
+        WIFI_LOGE("ProcessSwitchInfoRequest GetPackageInfoByName failed");
+        return false;
+    }
+    for (auto iter = specialList.begin(); iter != specialList.end(); iter++) {
+        if (iter->name == callerName) {
+            return true;
+        }
+    }
+    return false;
 }
 #endif
 

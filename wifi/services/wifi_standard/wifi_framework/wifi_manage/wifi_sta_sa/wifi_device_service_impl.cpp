@@ -1363,6 +1363,7 @@ ErrCode WifiDeviceServiceImpl::IsWifiActive(bool &bActive)
         WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
         return WIFI_OPT_PERMISSION_DENIED;
     }
+#ifndef OHOS_ARCH_LITE
     ISelfCureService *pSelfCureService = WifiServiceManager::GetInstance().GetSelfCureServiceInst(m_instId);
     if (pSelfCureService != nullptr && pSelfCureService->IsSelfCureOnGoing() &&
         WifiConfigCenter::GetInstance().GetWifiSelfcureReset() == true) {
@@ -1376,6 +1377,7 @@ ErrCode WifiDeviceServiceImpl::IsWifiActive(bool &bActive)
             return WIFI_OPT_SUCCESS;
         }
     }
+#endif
     bActive = IsStaServiceRunning();
     return WIFI_OPT_SUCCESS;
 }

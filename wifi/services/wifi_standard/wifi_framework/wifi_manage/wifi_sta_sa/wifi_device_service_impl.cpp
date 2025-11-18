@@ -1370,9 +1370,10 @@ ErrCode WifiDeviceServiceImpl::IsWifiActive(bool &bActive)
         int uid = GetCallingUid();
         std::string packageName = "";
         GetBundleNameByUid(uid, packageName);
-        WIFI_LOGI("IsWifiActive, uid: %{public}d, packageName: %{public}s.", uid, packageName.c_str());
         if (packageName == WifiSettings::GetInstance().GetPackageName("SETTINGS") ||
             packageName == WifiSettings::GetInstance().GetPackageName("SCENEBOARD_BUNDLE")) {
+            WIFI_LOGI("Judge IsWifiActive when ResetCuring, uid: %{public}d, packageName: %{public}s.",
+                uid, packageName.c_str());
             bActive = true;
             return WIFI_OPT_SUCCESS;
         }

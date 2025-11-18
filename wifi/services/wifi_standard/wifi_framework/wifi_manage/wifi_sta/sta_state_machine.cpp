@@ -3916,6 +3916,9 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
     for (auto &scanInfo : scanInfoList) {
         std::string deviceKeyMgmt;
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
+        if (!halDeviceConfig.bssid.empty() && halDeviceConfig.bssid != scanInfo.bssid) {
+            continue;
+        }
         if (config.ssid == scanInfo.ssid
             && ((deviceKeyMgmt == "WPA-PSK+SAE" && deviceKeyMgmt.find(config.keyMgmt) != std::string::npos)
                 || (config.keyMgmt == deviceKeyMgmt))) { // 混合加密目前只支持WPA-PSK+SAE，此处特殊处理
@@ -3953,7 +3956,7 @@ std::string StaStateMachine::GetSuitableKeyMgmtForWpaMixed(const WifiDeviceConfi
     return KEY_MGMT_WPA_PSK;
 }
 
-ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid) const
+ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid)
 {
     WIFI_LOGI("Enter ConvertDeviceCfg.\n");
     WifiHalDeviceConfig halDeviceConfig;
@@ -3984,15 +3987,20 @@ ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string 
     }
     WIFI_LOGI("ConvertDeviceCfg SetDeviceConfig selected network ssid=%{public}s, bssid=%{public}s, instId=%{public}d",
         SsidAnonymize(halDeviceConfig.ssid).c_str(), MacAnonymize(halDeviceConfig.bssid).c_str(), m_instId);
-    ConvertSsidToOriginalSsid(config, halDeviceConfig);
-
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    if (bssid.empty()) {
+        // user select connect
+        UserSelectConnectToNetwork(deviceConfig, ifaceName, halDeviceConfig);
+    } else {
+        // auto connect
+        AutoSelectConnectToNetwork(bssid, ifaceName, halDeviceConfig);
+    }
+    ConvertSsidToOriginalSsid(config, halDeviceConfig);
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(WPA_DEFAULT_NETWORKID, halDeviceConfig, ifaceName) !=
         WIFI_HAL_OPT_OK) {
         WIFI_LOGE("ConvertDeviceCfg SetDeviceConfig failed!");
         return WIFI_OPT_FAILED;
     }
-
     if (SetExternalSim("wlan0", halDeviceConfig.eapConfig.eap, WIFI_EAP_OPEN_EXTERNAL_SIM)) {
         WIFI_LOGE("StaStateMachine::ConvertDeviceCfg: failed to set external_sim");
         return WIFI_OPT_FAILED;
@@ -4663,17 +4671,18 @@ void StaStateMachine::DealReassociateCmd(InternalMessagePtr msg)
     }
 }
 
-void StaStateMachine::UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& ifaceName)
+void StaStateMachine::UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& ifaceName,
+    WifiHalDeviceConfig& halDeviceConfig)
 {
     if (!deviceConfig.userSelectBssid.empty()) {
         WIFI_LOGI("SetBssid userSelectBssid=%{public}s", MacAnonymize(deviceConfig.userSelectBssid).c_str());
-        WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, deviceConfig.userSelectBssid, ifaceName);
+        halDeviceConfig.bssid = deviceConfig.userSelectBssid;
     } else {
         std::string autoSelectBssid;
         std::unique_ptr<NetworkSelectionManager> networkSelectionManager = std::make_unique<NetworkSelectionManager>();
         networkSelectionManager->SelectNetworkWithSsid(deviceConfig, autoSelectBssid);
         WIFI_LOGI("SetBssid autoSelectBssid=%{public}s", MacAnonymize(autoSelectBssid).c_str());
-        WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, autoSelectBssid, ifaceName);
+        halDeviceConfig.bssid = autoSelectBssid;
     }
     deviceConfig.userSelectBssid = "";
     WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
@@ -4681,10 +4690,11 @@ void StaStateMachine::UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig,
     return;
 }
 
-void StaStateMachine::AutoSelectConnectToNetwork(const std::string& bssid, std::string& ifaceName)
+void StaStateMachine::AutoSelectConnectToNetwork(const std::string& bssid, std::string& ifaceName,
+    WifiHalDeviceConfig& halDeviceConfig)
 {
     WIFI_LOGI("SetBssid bssid=%{public}s", MacAnonymize(bssid).c_str());
-    WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid, ifaceName);
+    halDeviceConfig.bssid = bssid;
     return;
 }
 
@@ -4740,14 +4750,6 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     wifiDataReportService_->InitReportApAllInfo();
 #endif
 #endif
-    if (bssid.empty()) {
-        // user select connect
-        UserSelectConnectToNetwork(deviceConfig, ifaceName);
-    } else {
-        // auto connect
-        AutoSelectConnectToNetwork(bssid, ifaceName);
-    }
-
     if (WifiStaHalInterface::GetInstance().Connect(WPA_DEFAULT_NETWORKID, ifaceName) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("Connect failed!");
         InvokeOnStaConnChanged(OperateResState::CONNECT_SELECT_NETWORK_FAILED, linkedInfo);

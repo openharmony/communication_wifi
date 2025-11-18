@@ -810,11 +810,11 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
 
     config.keyMgmtBitset |= (1 << uindex);
     if (config.keyMgmt == KEY_MGMT_WPA_PSK) {
-        uindex = static_cast<unsigned int>(FindKeyMgmtPosition(KEY_MGMT_SAE));
+        index = FindKeyMgmtPosition(KEY_MGMT_SAE);	
         config.keyMgmtBitset |= (1 << uindex);
     }
     if (config.keyMgmt == KEY_MGMT_SAE) {
-        uindex = static_cast<unsigned int>(FindKeyMgmtPosition(KEY_MGMT_WPA_PSK));
+        index = FindKeyMgmtPosition(KEY_MGMT_WPA_PSK);	
         config.keyMgmtBitset |= (1 << uindex);
     }
 }

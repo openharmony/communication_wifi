@@ -2653,6 +2653,19 @@ HWTEST_F(StaStateMachineTest, DealSignalPollResultTest, TestSize.Level1)
 }
 
 /**
+ * @tc.name: DealSignalPollResultTestPollPeriod1s
+ * @tc.desc: DealSignalPollResult()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(StaStateMachineTest, DealSignalPollResultTestPollPeriod1s, TestSize.Level1)
+{
+    pStaStateMachine->staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY_WITH_TASK;
+    pStaStateMachine->DealSignalPollResult();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+
+/**
  * @tc.name: HandleForegroundAppChangedActionTest
  * @tc.desc: HandleForegroundAppChangedAction()
  * @tc.type: FUNC

@@ -126,6 +126,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
 constexpr int32_t MAX_NO_INTERNET_CNT = 3;
+constexpr uint32_t PKT_DIR_RPT_CNT = 3;
 
 const std::map<int, int> wpa3FailreasonMap {
     {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
@@ -4329,6 +4330,19 @@ int StaStateMachine::UpdateLinkInfoRssi(int inRssi)
     return outRssi;
 }
 
+void StaStateMachine::DealSignalPacketChangedByTime(WifiSignalPollInfo &signalInfo)
+{
+    if (staSignalPollDelayTime_ == STA_SIGNAL_POLL_DELAY_WITH_TASK) {
+        if (pktDirCnt_ % PKT_DIR_RPT_CNT == 0) {
+            DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
+        }
+        pktDirCnt_++;
+    } else {
+        DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
+        pktDirCnt_ = 0;
+    }
+}
+
 void StaStateMachine::DealSignalPollResult()
 {
     WifiSignalPollInfo signalInfo;
@@ -4381,7 +4395,7 @@ void StaStateMachine::DealSignalPollResult()
 #endif
 #endif
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
+    DealSignalPacketChangedByTime(signalInfo);
     JudgeEnableSignalPoll(signalInfo);
 }
 

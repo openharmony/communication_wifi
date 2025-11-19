@@ -3913,12 +3913,20 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
 {
     std::vector<WifiScanInfo> scanInfoList;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
+    if (!halDeviceConfig.bssid.empty()) {
+        for (auto &scanInfo : scanInfoList) {
+            if (halDeviceConfig.bssid == scanInfo.bssid) {
+                AppendFastTransitionKeyMgmt(scanInfo, halDeviceConfig);
+                halDeviceConfig.ssid = scanInfo.oriSsid;
+                WIFI_LOGI("BssidMatchConvertSsid back to oriSsid:%{public}s, keyMgmt:%{public}s",
+                    SsidAnonymize(halDeviceConfig.ssid).c_str(), halDeviceConfig.keyMgmt.c_str());
+                return;
+            }
+        }
+    }
     for (auto &scanInfo : scanInfoList) {
         std::string deviceKeyMgmt;
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
-        if (!halDeviceConfig.bssid.empty() && halDeviceConfig.bssid != scanInfo.bssid) {
-            continue;
-        }
         if (config.ssid == scanInfo.ssid
             && ((deviceKeyMgmt == "WPA-PSK+SAE" && deviceKeyMgmt.find(config.keyMgmt) != std::string::npos)
                 || (config.keyMgmt == deviceKeyMgmt))) { // 混合加密目前只支持WPA-PSK+SAE，此处特殊处理

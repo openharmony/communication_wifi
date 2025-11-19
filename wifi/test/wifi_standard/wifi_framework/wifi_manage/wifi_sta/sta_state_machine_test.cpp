@@ -3074,5 +3074,11 @@ HWTEST_F(StaStateMachineTest, DealDisconnectEventInLinkStateTest01, TestSize.Lev
     pStaStateMachine->pLinkState->DealDisconnectEventInLinkState(msg);
     EXPECT_TRUE(currentState == pStaStateMachine->linkedInfo.connState);
 }
+
+HWTEST_F(StaStateMachineTest, NotAllowConnectToNetworkTest01, TestSize.Level1)
+{
+    pStaStateMachine->targetNetworkId_ = 0;
+    EXPECT_FALSE(pStaStateMachine->pInitState->NotAllowConnectToNetwork(1, RANDOMMAC_BSSID, NETWORK_SELECTED_BY_AUTO));
+}
 } // namespace Wifi
 } // namespace OHOS

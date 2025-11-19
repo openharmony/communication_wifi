@@ -2421,6 +2421,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
         lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
+        StopTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION));
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::HAS_INTERNET, updatePortalAuthTime);
         if (getCurrentWifiDeviceConfig().isPortal) {
             StartDetectTimer(DETECT_TYPE_PERIODIC);
@@ -2518,7 +2519,14 @@ void StaStateMachine::PublishPortalNitificationAndLogin()
     if (shouldShowNotification) {
         if (selfCureService_ == nullptr || !selfCureService_->IsSelfCureOnGoing()) {
             WIFI_LOGI("%{public}s, ShowPortalNitification", __func__);
-            ShowPortalNitification();
+            if (lastCheckNetState_ == OperateResState::CONNECT_NETWORK_ENABLED) {
+                WIFI_LOGI("%{public}s, ShowPortalNitification delay", __func__);
+                StartTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION), PORTAL_NOTIFICATION_TIMEOUT);
+                StartDetectTimer(DETECT_TYPE_DEFAULT);
+            } else {
+                WIFI_LOGI("%{public}s, ShowPortalNitification", __func__);
+                ShowPortalNitification();
+            }
         }
     }
 #endif
@@ -2720,6 +2728,11 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
         case CMD_START_NETCHECK : {
             ret = EXECUTED;
             DealNetworkCheck(msg);
+            break;
+        }
+        case CMD_SHOW_PORTAL_NOTIFICATION : {
+            ret = EXECUTED;
+            pStaStateMachine->ShowPortalNitification();
             break;
         }
         case WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT: {

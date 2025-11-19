@@ -736,7 +736,7 @@ void Perf5gHandoverService::LoadRelationApInfo()
 
 void Perf5gHandoverService::RemoveRelationApDuplicates(std::vector<RelationAp> &relationAps)
 {
-    int32_t num = relationAps.size();
+    int32_t num = static_cast<int32_t>(relationAps.size());
     std::sort(relationAps.begin(), relationAps.end());
     auto last = std::unique(relationAps.begin(), relationAps.end());
     relationAps.erase(last, relationAps.end());

@@ -1381,6 +1381,7 @@ bool WifiProStateMachine::WifiNoNetState::ExecuteStateMsg(InternalMessagePtr msg
         case EVENT_REQUEST_SELFCURE_DELAY:
             HandleReuqestSelfCure();
             ret = EXECUTED;
+            break;
         default:
             return ret;
     }

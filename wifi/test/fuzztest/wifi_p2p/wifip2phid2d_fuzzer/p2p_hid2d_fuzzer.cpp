@@ -25,6 +25,7 @@
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
+constexpr int32_t STATE_NUM = 3;
 
 void ClearSharedLinkCountFuzzerTest()
 {
@@ -41,7 +42,7 @@ void IncreaseSharedLinkFuzzerTest()
 void IncreaseSharedLinkFuzzerTest1(FuzzedDataProvider& FDP)
 {
     SharedLinkManager pShareManager;
-    int uid = FDP.ConsumeIntegral<int>(-1 ,1);
+    int uid = FDP.ConsumeIntegral<int>(0, STATE_NUM);
     pShareManager.SetGroupUid(uid);
     pShareManager.IncreaseSharedLink();
 }
@@ -69,7 +70,7 @@ void ClearUidCountFuzzerTest(const uint8_t *data, size_t size)
 void CheckNeedRemoveGroupFuzzerTest(FuzzedDataProvider& FDP)
 {
     SharedLinkManager pShareManager;
-    int uid = FDP.ConsumeIntegral<int>(-1 ,1);
+    int uid = FDP.ConsumeIntegral<int>(0, STATE_NUM);
     pShareManager.CheckNeedRemoveGroup(uid);
 }
 
@@ -77,7 +78,7 @@ void GetGroupUidFuzzerTest(FuzzedDataProvider& FDP)
 {
     SharedLinkManager pShareManager;
     
-    int uid = FDP.ConsumeIntegral<int>(-1 ,1);
+    int uid = FDP.ConsumeIntegral<int>(0, STATE_NUM);
     pShareManager.GetGroupUid(callingUid);
 }
 

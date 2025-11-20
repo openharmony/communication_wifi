@@ -2519,7 +2519,6 @@ void StaStateMachine::PublishPortalNitificationAndLogin()
 
     if (shouldShowNotification) {
         if (selfCureService_ == nullptr || !selfCureService_->IsSelfCureOnGoing()) {
-            WIFI_LOGI("%{public}s, ShowPortalNitification", __func__);
             if (lastCheckNetState_ == OperateResState::CONNECT_NETWORK_ENABLED) {
                 WIFI_LOGI("%{public}s, ShowPortalNitification delay", __func__);
                 StartTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION), PORTAL_NOTIFICATION_TIMEOUT);

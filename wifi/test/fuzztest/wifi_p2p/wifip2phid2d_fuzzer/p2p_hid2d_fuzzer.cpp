@@ -42,7 +42,7 @@ void IncreaseSharedLinkFuzzerTest()
 void IncreaseSharedLinkFuzzerTest1(FuzzedDataProvider& FDP)
 {
     SharedLinkManager pShareManager;
-    int uid = FDP.ConsumeIntegral<int>(0, STATE_NUM);
+    int uid = FDP.ConsumeIntegralInRange<int>(0, STATE_NUM);
     pShareManager.SetGroupUid(uid);
     pShareManager.IncreaseSharedLink();
 }
@@ -70,7 +70,7 @@ void ClearUidCountFuzzerTest(const uint8_t *data, size_t size)
 void CheckNeedRemoveGroupFuzzerTest(FuzzedDataProvider& FDP)
 {
     SharedLinkManager pShareManager;
-    int uid = FDP.ConsumeIntegral<int>(0, STATE_NUM);
+    int uid = FDP.ConsumeIntegralInRange<int>(0, STATE_NUM);
     pShareManager.CheckNeedRemoveGroup(uid);
 }
 
@@ -78,7 +78,7 @@ void GetGroupUidFuzzerTest(FuzzedDataProvider& FDP)
 {
     SharedLinkManager pShareManager;
     
-    int uid = FDP.ConsumeIntegral<int>(0, STATE_NUM);
+    int callingUid = FDP.ConsumeIntegralInRange<int>(0, STATE_NUM);
     pShareManager.GetGroupUid(callingUid);
 }
 

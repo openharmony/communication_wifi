@@ -177,6 +177,12 @@ public:
         EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, RANDOMMAC_BSSID));
     }
 
+    void ConvertDeviceCfgFail3()
+    {
+        WifiDeviceConfig config;
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, ""));
+    }
+
     void StartWifiProcessSuccess()
     {
         EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(testing::AtLeast(1));
@@ -2124,6 +2130,11 @@ HWTEST_F(StaStateMachineTest, ConvertDeviceCfgFail1, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, ConvertDeviceCfgFail2, TestSize.Level1)
 {
     ConvertDeviceCfgFail2();
+}
+
+HWTEST_F(StaStateMachineTest, ConvertDeviceCfgFail3, TestSize.Level1)
+{
+    ConvertDeviceCfgFail3();
 }
 
 HWTEST_F(StaStateMachineTest, StartWifiProcessSuccess, TestSize.Level1)

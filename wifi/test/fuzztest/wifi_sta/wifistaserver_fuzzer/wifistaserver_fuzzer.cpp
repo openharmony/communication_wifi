@@ -48,11 +48,13 @@ constexpr int ID = 123;
 constexpr int WORK_ID = 10;
 static bool g_isInsted = false;
 constexpr int STATE = 20;
+constexpr int32_t STATE_NUM = 3;
 const int MODEL_ID_1001 = 1001;
 const int MODEL_ID_1002 = 1002;
 const int MODEL_ID_1003 = 1003;
 const int MODEL_ID_1004 = 1004;
 const int MODEL_ID_1005 = 1005;
+static const int32_t NUM_BYTES = 1;
 static std::unique_ptr<StaInterface> pStaInterface = nullptr;
 static std::unique_ptr<StaAutoConnectService> pStaAutoConnectService = nullptr;
 static std::unique_ptr<StaService> pStaService = nullptr;
@@ -128,12 +130,6 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     int index = 0;
     int networkId = static_cast<int>(data[index++]);
     int uid = static_cast<int>(data[index++]);
-    constexpr int blockDurationSize = sizeof(int64_t);
-    int64_t blockDuration = -1;
-    if (index + blockDurationSize <= static_cast<int>(size)) {
-        blockDuration = *reinterpret_cast<const int64_t*>(&data[index]);
-        index += blockDurationSize;
-    }
     bool attemptEnable = (static_cast<int>(data[0]) % TWO) ? true : false;
     bool isRemoveAll = (static_cast<int>(data[0]) % TWO) ? true : false;
     bool isAllowed = (static_cast<int>(data[0]) % TWO) ? true : false;
@@ -169,7 +165,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->RemoveDevice(networkId);
     pStaInterface->RemoveAllDevice();
     pStaInterface->EnableDeviceConfig(networkId, attemptEnable);
-    pStaInterface->DisableDeviceConfig(networkId, blockDuration);
+    pStaInterface->DisableDeviceConfig(networkId);
     pStaInterface->StartWps(sconfig);
     pStaInterface->CancelWps();
     std::vector<InterScanInfo> results;
@@ -244,7 +240,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->StartConnectToBssid(networkId, config.bssid);
     pStaService->ReAssociate();
     pStaService->EnableDeviceConfig(networkId, attemptEnable);
-    pStaService->DisableDeviceConfig(networkId, blockDuration);
+    pStaService->DisableDeviceConfig(networkId);
     pStaService->Disconnect();
     pStaService->StartWps(sconfig);
     pStaService->CancelWps();
@@ -325,10 +321,10 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfo);
 }
 
-void RegisterDeviceAppraisalTest()
+void RegisterDeviceAppraisalTest(FuzzedDataProvider& FDP)
 {
     StaDeviceAppraisal *appraisal = nullptr;
-    int priority = TWO;
+    int priority = FDP.ConsumeIntegralInRange<int>(0, STATE_NUM);;
     pStaAutoConnectService->RegisterDeviceAppraisal(appraisal, priority);
 }
 
@@ -367,13 +363,13 @@ void AllowAutoSelectDeviceTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->AllowAutoSelectDevice(scanInfo, info);
 }
 
-void StaAutoConnectServiceFuzzTest(const uint8_t* data, size_t size)
+void StaAutoConnectServiceFuzzTest(FuzzedDataProvider& FDP)
 {
-    std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
+    std::string conditionName = FDP.ConsumeBytesAsString(NUM_BYTES);
     pStaAutoConnectService->RegisterAutoJoinCondition(conditionName, []() {return true;});
 }
 
-void RegisterStaServiceCallbackFuzzTest()
+void RegisterStaServiceCallbackFuzzTest(const uint8_t* data, size_t size)
 {
     StaServiceCallback callbacks;
     WifiStaServerManager wifiStaServerManager;
@@ -652,15 +648,17 @@ extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
-{
+{  
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
     FuzzedDataProvider FDP(data, size);
+    OHOS::Wifi::RegisterDeviceAppraisalTest(FDP);
+    OHOS::Wifi::StaAutoConnectServiceFuzzTest(FDP);
     OHOS::Wifi::StaServerFuzzTest(data, size);
     OHOS::Wifi::StaAutoServerFuzzTest(data, size);
     OHOS::Wifi::AllowAutoSelectDeviceTest(data, size);
-    OHOS::Wifi::StaAutoConnectServiceFuzzTest(data, size);
+    OHOS::Wifi::RegisterStaServiceCallbackFuzzTest(data, size);
     OHOS::Wifi::StaInterfaceFuzzTest(data, size);
     OHOS::Wifi::ConnectToCandidateConfigTest(data, size);
     OHOS::Wifi::UpdateEapConfigTest(data, size);
@@ -675,10 +673,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::SimAkaAuthFuzzTest(data, size);
     OHOS::Wifi::SecurityDetectFuzzTest(data, size);
     OHOS::Wifi::SecurityDetectFuzzTest02(data, size);
-    OHOS::Wifi::ConvertStringTest();
-    OHOS::Wifi::RegisterStaServiceCallbackFuzzTest();
-    OHOS::Wifi::RegisterDeviceAppraisalTest();
     OHOS::Wifi::RegisterStaServiceCallbackTest();
+    OHOS::Wifi::ConvertStringTest();
     return 0;
 }
 }

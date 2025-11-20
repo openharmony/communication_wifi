@@ -234,7 +234,7 @@ void AppXmlParserTest2(const uint8_t* data, size_t size)
     m_appXmlParser->appParserInner_->InitAppParser(buf);
 }
 
-void AppParserTest(const uint8_t* data, size_t size)
+void AppParserTest()
 {
     m_xmlParser->Parse();
     m_xmlParser->GetNameValue(root_node);
@@ -246,7 +246,7 @@ void AppParserTest(const uint8_t* data, size_t size)
     m_xmlParser->IsDocValid(root_node);
 }
 
-void SoftapParserTest(const uint8_t* data, size_t size)
+void SoftapParserTest()
 {
     m_softapXmlParser->ParseInternal(root_node);
     m_softapXmlParser->GotoSoftApNode(root_node);
@@ -402,10 +402,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::InitParam();
     OHOS::Wifi::NetworkXmlParserTest(data, size);
     OHOS::Wifi::AppXmlParserTest(data, size);
-    OHOS::Wifi::AppParserTest(data, size);
-    OHOS::Wifi::SoftapParserTest(data, size);
     OHOS::Wifi::WifiRandomMacHelperTest(data, size);
     OHOS::Wifi::AppXmlParserTest2(data, size);
+    OHOS::Wifi::AppParserTest();
+    OHOS::Wifi::SoftapParserTest();
     OHOS::Wifi::WifiencryptionutilTest();
     OHOS::Wifi::WifinetworkselectionmanagerTest();
     OHOS::Wifi::AssetManagerTest();

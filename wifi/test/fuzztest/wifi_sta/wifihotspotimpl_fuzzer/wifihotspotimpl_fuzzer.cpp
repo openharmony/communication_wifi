@@ -77,14 +77,14 @@ int IsHotspotDualBandSupportedFuzzTest(const uint8_t* data, size_t size)
     return 0;
 }
 
-int IsOpenSoftApAllowedFuzzTest(const uint8_t* data, size_t size)
+int IsOpenSoftApAllowedFuzzTest(FuzzedDataProvider& FDP)
 {
-    bool status = true;
+    bool status = FDP.ConsumeBool();;
     pWifiHotspotServiceImpl->IsOpenSoftApAllowed(status);
     return 0;
 }
 
-void SetHotspotConfigFuzzTest(const uint8_t* data, size_t size)
+void SetHotspotConfigFuzzTest(FuzzedDataProvider& FDP)
 {
     Init();
     std::vector<int32_t> band_2G_channel = { 1, 2, 3, 4, 5, 6, 7 };
@@ -119,16 +119,16 @@ void DisassociateStaFuzzTest(const uint8_t* data, size_t size)
     pWifiHotspotServiceImpl->SetPowerModel(model);
 }
 
-void RegisterCallBackFuzzTest(const uint8_t* data, size_t size)
+void RegisterCallBackFuzzTest()
 {
     const sptr<IWifiHotspotCallback> callback;
     const std::vector<std::string> event;
     pWifiHotspotServiceImpl->RegisterCallBack(callback, event);
 }
 
-void StationsInfoDumpFuzzTest()
+void StationsInfoDumpFuzzTest(FuzzedDataProvider& FDP)
 {
-    std::string result;
+    std::string result = FDP.ConsumeBytesAsString(NUM_BYTES);
     pWifiHotspotServiceImpl->StationsInfoDump(result);
 }
 
@@ -163,18 +163,17 @@ void IsValidHotspotConfigFuzzTest(const uint8_t* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    FuzzedDataProvider fdp(data, size);
-    OHOS::Wifi::FDP = &fdp;
+    FuzzedDataProvider FDP(data, size);
+    OHOS::Wifi::SetHotspotConfigFuzzTest(FDP);
+    OHOS::Wifi::StationsInfoDumpFuzzTest(FDP);
+    OHOS::Wifi::IsOpenSoftApAllowedFuzzTest(FDP);
     OHOS::Wifi::TransRandomToRealMacFuzzTest(data, size);
     OHOS::Wifi::IsHotspotDualBandSupportedFuzzTest(data, size);
-    OHOS::Wifi::IsOpenSoftApAllowedFuzzTest(data, size);
-    OHOS::Wifi::SetHotspotConfigFuzzTest(data, size);
     OHOS::Wifi::SetHotspotIdleTimeoutFuzzTest(data, size);
     OHOS::Wifi::DisassociateStaFuzzTest(data, size);
-    OHOS::Wifi::RegisterCallBackFuzzTest(data, size);
     OHOS::Wifi::CfgCheckIpAddressFuzzTest(data, size);
     OHOS::Wifi::IsValidHotspotConfigFuzzTest(data, size);
-    OHOS::Wifi::StationsInfoDumpFuzzTest();
+    OHOS::Wifi::RegisterCallBackFuzzTest();
     return 0;
 }
 }

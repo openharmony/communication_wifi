@@ -15,11 +15,12 @@
 
 #include "disconnect_fuzzer.h"
 #include "wifi_device.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace Wifi {
     std::shared_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-    bool DisconnectFuzzerTest(const uint8_t* data, size_t size)
+    bool DisconnectFuzzerTest()
     {
         if (devicePtr == nullptr) {
             return false;
@@ -33,7 +34,8 @@ namespace Wifi {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::Wifi::DisconnectFuzzerTest(data, size);
+    FuzzedDataProvider FDP(data, size);
+    OHOS::Wifi::DisconnectFuzzerTest();
     return 0;
 }
 

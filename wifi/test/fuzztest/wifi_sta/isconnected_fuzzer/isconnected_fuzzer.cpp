@@ -15,13 +15,14 @@
 
 #include "isconnected_fuzzer.h"
 #include "wifi_device.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace Wifi {
     std::shared_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-    bool IsConnectedFuzzerTest(const uint8_t* data, size_t size)
+    bool IsConnectedFuzzerTest(FuzzedDataProvider& FDP)
     {
-        bool isconnected = false;
+        bool isconnected = FDP.ConsumeBool();
         if (devicePtr == nullptr) {
             return false;
         }
@@ -34,7 +35,8 @@ namespace Wifi {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::Wifi::IsConnectedFuzzerTest(data, size);
+    FuzzedDataProvider FDP(data, size);
+    OHOS::Wifi::IsConnectedFuzzerTest(FDP);
     return 0;
 }
 

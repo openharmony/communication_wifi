@@ -15,7 +15,6 @@
 
 #include "disconnect_fuzzer.h"
 #include "wifi_device.h"
-#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace Wifi {
@@ -34,7 +33,6 @@ namespace Wifi {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    FuzzedDataProvider FDP(data, size);
     OHOS::Wifi::DisconnectFuzzerTest();
     return 0;
 }

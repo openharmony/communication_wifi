@@ -104,9 +104,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return 0;
     }
     OHOS::Wifi::WifiHid2dServiceUtilsFuzzerTest(data, size);
-    IncreaseSharedLinkFuzzerTest1(FDP);
-    CheckNeedRemoveGroupFuzzerTest(FDP);
-    GetGroupUidFuzzerTest(FDP);
+    OHOS::Wifi::IncreaseSharedLinkFuzzerTest1(FDP);
+    OHOS::Wifi::CheckNeedRemoveGroupFuzzerTest(FDP);
+    OHOS::Wifi::GetGroupUidFuzzerTest(FDP);
     OHOS::Wifi::IpPoolFuzzerTest();
     OHOS::Wifi::IncreaseSharedLinkFuzzerTest();
     OHOS::Wifi::ClearSharedLinkCountFuzzerTest();

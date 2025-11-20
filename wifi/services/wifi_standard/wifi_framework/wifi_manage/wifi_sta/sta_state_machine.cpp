@@ -2445,6 +2445,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         lastCheckNetState_ = OperateResState::CONNECT_NETWORK_DISABLED;
+        StopTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION));
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
 // if wifipro is open, wifipro will notify selfcure no internet, if not, sta should notify
 #ifndef FEATURE_WIFI_PRO_SUPPORT

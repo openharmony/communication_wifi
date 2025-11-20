@@ -34,6 +34,7 @@ namespace OHOS {
 namespace Wifi {
 constexpr int TWO = 2;
 constexpr int U32_AT_SIZE_ZERO = 4;
+static const int32_t NUM_BYTES = 1;
 
 OHOS::Wifi::WifiScanServiceImpl pWifiScanServiceImpl;
 WifiScanMgrServiceImpl pWifiScanMgrServiceImpl;

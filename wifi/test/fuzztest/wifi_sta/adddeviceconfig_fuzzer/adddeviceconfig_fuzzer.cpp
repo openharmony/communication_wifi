@@ -15,11 +15,13 @@
 
 #include "adddeviceconfig_fuzzer.h"
 #include "wifi_device.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace Wifi {
+    constexpr int NUM_BYTES = 1;
     std::shared_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-    bool AddDeviceConfigFuzzerTest(const uint8_t* data, size_t size)
+    bool AddDeviceConfigFuzzerTest(FuzzedDataProvider& FDP)
     {
         if (devicePtr == nullptr) {
             return false;
@@ -28,10 +30,10 @@ namespace Wifi {
         WifiDeviceConfig config;
         int addResult;
         bool isCandidate = false;
-        config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-        config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-        config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-        config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+        config.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        config.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        config.preSharedKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+        config.keyMgmt = FDP.ConsumeBytesAsString(NUM_BYTES);
         devicePtr->AddDeviceConfig(config, addResult, isCandidate);
         return true;
     }
@@ -41,6 +43,7 @@ namespace Wifi {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::Wifi::AddDeviceConfigFuzzerTest(data, size);
+    FuzzedDataProvider FDP(data, size);
+    OHOS::Wifi::AddDeviceConfigFuzzerTest(FDP);
     return 0;
 }

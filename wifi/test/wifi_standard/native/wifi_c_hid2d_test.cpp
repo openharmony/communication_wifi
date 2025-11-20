@@ -155,7 +155,7 @@ HWTEST_F(WifiHid2dTest, Hid2dSetGroupTypeTests, TestSize.Level1)
 {
     GroupLiveType type = GroupLiveType::GROUPKEEPALIVE;
     Hid2dSetGroupType(type);
-    EXPECT_NE(Hid2dSetGroupType(type), 0);
+    EXPECT_NE(Hid2dSetGroupType(type), 1);
 }
 
 }

@@ -1045,6 +1045,7 @@ private:
     void PublishPortalNitificationAndLogin();
     OHOS::ErrCode StartPortalLogin(int netId, std::string url, int deviceType);
     void RecordPortalInfo();
+    void DealSignalPacketChangedByTime(WifiSignalPollInfo &signalInfo);
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
@@ -1102,6 +1103,7 @@ private:
      set to true when linkswitch start, to false when linkswitch duration 2s later
     */
     bool linkSwitchDetectingFlag_{false};
+    uint32_t pktDirCnt_ = 0;
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
     WifiDataReportService *wifiDataReportService_ = nullptr;

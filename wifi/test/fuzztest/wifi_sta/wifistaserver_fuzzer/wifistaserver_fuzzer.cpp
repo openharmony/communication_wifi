@@ -32,6 +32,7 @@
 #include "sta_service.h"
 #include "wifi_internal_msg.h"
 #include "wifi_telephony_utils.h"
+#include <fuzzer/FuzzedDataProvider.h>
 #include <mutex>
 
 namespace OHOS {
@@ -324,7 +325,7 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfo);
 }
 
-void RegisterDeviceAppraisalTest(const uint8_t* data, size_t size)
+void RegisterDeviceAppraisalTest()
 {
     StaDeviceAppraisal *appraisal = nullptr;
     int priority = TWO;
@@ -372,7 +373,7 @@ void StaAutoConnectServiceFuzzTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->RegisterAutoJoinCondition(conditionName, []() {return true;});
 }
 
-void RegisterStaServiceCallbackFuzzTest(const uint8_t* data, size_t size)
+void RegisterStaServiceCallbackFuzzTest()
 {
     StaServiceCallback callbacks;
     WifiStaServerManager wifiStaServerManager;
@@ -399,7 +400,7 @@ void StaInterfaceFuzzTest(const uint8_t* data, size_t size)
     #endif
 }
 
-void RegisterStaServiceCallbackTest(const uint8_t* data, size_t size)
+void RegisterStaServiceCallbackTest()
 {
     std::vector<StaServiceCallback> callbacks;
     WifiStaServerManager wifiStaServerManager;
@@ -424,7 +425,7 @@ void ConnectToCandidateConfigTest(const uint8_t* data, size_t size)
     pStaService->ConnectToCandidateConfig(uid, networkId);
 }
 
-void ConvertStringTest(const uint8_t* data, size_t size)
+void ConvertStringTest()
 {
     std::u16string wideText;
     WifiTelephonyUtils::ConvertString(wideText);
@@ -655,16 +656,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
+    FuzzedDataProvider FDP(data, size);
     OHOS::Wifi::StaServerFuzzTest(data, size);
     OHOS::Wifi::StaAutoServerFuzzTest(data, size);
-    OHOS::Wifi::RegisterDeviceAppraisalTest(data, size);
     OHOS::Wifi::AllowAutoSelectDeviceTest(data, size);
     OHOS::Wifi::StaAutoConnectServiceFuzzTest(data, size);
-    OHOS::Wifi::RegisterStaServiceCallbackFuzzTest(data, size);
     OHOS::Wifi::StaInterfaceFuzzTest(data, size);
-    OHOS::Wifi::RegisterStaServiceCallbackTest(data, size);
     OHOS::Wifi::ConnectToCandidateConfigTest(data, size);
-    OHOS::Wifi::ConvertStringTest(data, size);
     OHOS::Wifi::UpdateEapConfigTest(data, size);
     OHOS::Wifi::AddDeviceConfigTest(data, size);
     OHOS::Wifi::ConnectToNetworkTest(data, size);
@@ -677,6 +675,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::SimAkaAuthFuzzTest(data, size);
     OHOS::Wifi::SecurityDetectFuzzTest(data, size);
     OHOS::Wifi::SecurityDetectFuzzTest02(data, size);
+    OHOS::Wifi::ConvertStringTest();
+    OHOS::Wifi::RegisterStaServiceCallbackFuzzTest();
+    OHOS::Wifi::RegisterDeviceAppraisalTest();
+    OHOS::Wifi::RegisterStaServiceCallbackTest();
     return 0;
 }
 }

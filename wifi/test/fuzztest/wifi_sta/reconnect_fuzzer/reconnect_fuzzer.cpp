@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace Wifi {
     std::shared_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-    bool ReConnectFuzzerTest(const uint8_t* data, size_t size)
+    bool ReConnectFuzzerTest()
     {
         if (devicePtr == nullptr) {
             return false;
@@ -34,7 +34,7 @@ namespace Wifi {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::Wifi::ReConnectFuzzerTest(data, size);
+    OHOS::Wifi::ReConnectFuzzerTest();
     return 0;
 }
 

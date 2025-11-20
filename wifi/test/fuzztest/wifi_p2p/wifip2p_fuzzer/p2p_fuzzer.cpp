@@ -17,6 +17,7 @@
 #include "wifi_p2p_group_manager.h"
 #include "wifi_p2p_device_manager.h"
 #include "wifi_log.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -26,6 +27,7 @@
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
+static const int32_t NUM_BYTES = 1;
 
 /* Group Manager */
 void RemoveGroupFuzzerTest(const uint8_t *data, size_t size)
@@ -88,14 +90,14 @@ void GetGroupNetworkIdFuzzerTest(const uint8_t *data, size_t size)
     pGroupManager.GetGroupNetworkId(device);
 }
 
-void GetGroupNetworkIdFuzzerTest1(const uint8_t *data, size_t size)
+void GetGroupNetworkIdFuzzerTest1(FuzzedDataProvider& FDP)
 {
     WifiP2pGroupInfo pGroupInfo;
-    pGroupInfo.SetNetworkId(static_cast<int>(data[0]));
-    pGroupInfo.SetGroupName(std::string(reinterpret_cast<const char *>(data), size));
+    pGroupInfo.SetNetworkId(FDP.ConsumeIntegral<int>());
+    pGroupInfo.SetGroupName(FDP.ConsumeBytesAsString(NUM_BYTES));
     WifiP2pDevice device;
-    device.SetDeviceAddress(std::string(reinterpret_cast<const char *>(data), size));
-    std::string mDeviceAddress = std::string(reinterpret_cast<const char *>(data), size);
+    device.SetDeviceAddress(FDP.ConsumeBytesAsString(NUM_BYTES));
+    std::string mDeviceAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
 
     WifiP2pGroupManager pGroupManager;
     pGroupManager.AddGroup(pGroupInfo);
@@ -203,20 +205,20 @@ void RemoveMacAddrPairInfoFuzzerTest(const uint8_t *data, size_t size)
 }
 
 /* Device Manager */
-void InitializeFuzzerTest(const uint8_t *data, size_t size)
+void InitializeFuzzerTest()
 {
     WifiP2pDeviceManager pDeviceManager;
     pDeviceManager.Initialize();
 }
 
-void AddDeviceFuzzerTest(const uint8_t *data, size_t size)
+void AddDeviceFuzzerTest()
 {
     WifiP2pDevice device;
     WifiP2pDeviceManager pDeviceManager;
     pDeviceManager.AddDevice(device);
 }
 
-void UpdateDeviceFuzzerTest(const uint8_t *data, size_t size)
+void UpdateDeviceFuzzerTest()
 {
     WifiP2pDevice device;
     WifiP2pDeviceManager pDeviceManager;
@@ -234,7 +236,7 @@ void UpdateDeviceFuzzerTest1(const uint8_t *data, size_t size)
     pDeviceManager.UpdateDevice(device);
 }
 
-void UpdateDeviceSupplicantInfFuzzerTest(const uint8_t *data, size_t size)
+void UpdateDeviceSupplicantInfFuzzerTest()
 {
     WifiP2pDevice device;
     WifiP2pDeviceManager pDeviceManager;
@@ -252,7 +254,7 @@ void UpdateDeviceSupplicantInfFuzzerTest1(const uint8_t *data, size_t size)
     pDeviceManager.UpdateDeviceSupplicantInf(device);
 }
 
-void UpdateDeviceGroupCapFuzzerTest(const uint8_t *data, size_t size)
+void UpdateDeviceGroupCapFuzzerTest()
 {
     std::string mDeviceAddress = std::string(reinterpret_cast<const char *>(data), size);
     uint32_t cap = 1;
@@ -260,7 +262,7 @@ void UpdateDeviceGroupCapFuzzerTest(const uint8_t *data, size_t size)
     pDeviceManager.UpdateDeviceGroupCap("", cap);
 }
 
-void UpdateDeviceGroupCapFuzzerTest1(const uint8_t *data, size_t size)
+void UpdateDeviceGroupCapFuzzerTest1()
 {
     WifiP2pDevice device;
     device.SetDeviceAddress("0x11:0x22:0x33:0x44:0x55");
@@ -272,21 +274,21 @@ void UpdateDeviceGroupCapFuzzerTest1(const uint8_t *data, size_t size)
     pDeviceManager.UpdateDeviceGroupCap(mDeviceAddress, cap);
 }
 
-void UpdateDeviceGroupCapFuzzerTest2(const uint8_t *data, size_t size)
+void UpdateDeviceGroupCapFuzzerTest2()
 {
     WifiP2pDevice device;
     WifiP2pDeviceManager pDeviceManager;
     pDeviceManager.UpdateDeviceGroupCap(device);
 }
 
-void UpdateDeviceStatusFuzzerTest(const uint8_t *data, size_t size)
+void UpdateDeviceStatusFuzzerTest()
 {
     P2pDeviceStatus status = static_cast<P2pDeviceStatus>(0);
     WifiP2pDeviceManager pDeviceManager;
     pDeviceManager.UpdateDeviceStatus("", status);
 }
 
-void UpdateDeviceStatusFuzzerTest1(const uint8_t *data, size_t size)
+void UpdateDeviceStatusFuzzerTest1()
 {
     WifiP2pDevice device;
     device.SetDeviceAddress("0x11:0x22:0x33:0x44:0x55");
@@ -298,14 +300,14 @@ void UpdateDeviceStatusFuzzerTest1(const uint8_t *data, size_t size)
     pDeviceManager.UpdateDeviceStatus(mDeviceAddress, status);
 }
 
-void UpdateDeviceStatusFuzzerTest2(const uint8_t *data, size_t size)
+void UpdateDeviceStatusFuzzerTest2()
 {
     WifiP2pDevice device;
     WifiP2pDeviceManager pDeviceManager;
     pDeviceManager.UpdateDeviceStatus(device);
 }
 
-void UpdateAllDeviceStatusFuzzerTest(const uint8_t *data, size_t size)
+void UpdateAllDeviceStatusFuzzerTest()
 {
     WifiP2pDevice device;
     device.SetDeviceAddress("0x11:0x22:0x33:0x44:0x55");
@@ -317,7 +319,7 @@ void UpdateAllDeviceStatusFuzzerTest(const uint8_t *data, size_t size)
     pDeviceManager.UpdateAllDeviceStatus(status);
 }
 
-void GetDevicesFuzzerTest(const uint8_t *data, size_t size)
+void GetDevicesFuzzerTest()
 {
     WifiP2pDevice device;
     device.SetDeviceAddress("0x11:0x22:0x33:0x44:0x55");
@@ -342,7 +344,6 @@ void WifiP2pGroupManagerFuzzerTest(const uint8_t *data, size_t size)
     RemoveClientFromGroupFuzzerTest(data, size);
     GetNetworkIdFromClientsFuzzerTest(data, size);
     GetGroupNetworkIdFuzzerTest(data, size);
-    GetGroupNetworkIdFuzzerTest1(data, size);
     GetGroupOwnerAddrFuzzerTest(data, size);
     IsIncludeFuzzerTest(data, size);
     RefreshGroupsFromCurrentGroupFuzzerTest(data, size);
@@ -352,34 +353,36 @@ void WifiP2pGroupManagerFuzzerTest(const uint8_t *data, size_t size)
     UpdateGroupsNetworkFuzzerTest1(data, size);
     AddMacAddrPairInfoFuzzerTest(data, size);
     RemoveMacAddrPairInfoFuzzerTest(data, size);
+    GetDeviceNameFuzzerTest(data, size);
+    UpdateDeviceSupplicantInfFuzzerTest1(data, size);
+    UpdateDeviceFuzzerTest1(data, size);
 }
 
-void WifiP2pDeviceManagerFuzzerTest(const uint8_t *data, size_t size)
+void WifiP2pDeviceManagerFuzzerTest()
 {
-    InitializeFuzzerTest(data, size);
-    AddDeviceFuzzerTest(data, size);
-    UpdateDeviceFuzzerTest(data, size);
-    UpdateDeviceFuzzerTest1(data, size);
-    UpdateDeviceSupplicantInfFuzzerTest(data, size);
-    UpdateDeviceSupplicantInfFuzzerTest1(data, size);
-    UpdateDeviceGroupCapFuzzerTest(data, size);
-    UpdateDeviceGroupCapFuzzerTest1(data, size);
-    UpdateDeviceGroupCapFuzzerTest2(data, size);
-    UpdateDeviceStatusFuzzerTest(data, size);
-    UpdateDeviceStatusFuzzerTest1(data, size);
-    UpdateDeviceStatusFuzzerTest2(data, size);
-    UpdateAllDeviceStatusFuzzerTest(data, size);
-    GetDevicesFuzzerTest(data, size);
-    GetDeviceNameFuzzerTest(data, size);
+    InitializeFuzzerTest();
+    AddDeviceFuzzerTest();
+    UpdateDeviceFuzzerTest();
+    UpdateDeviceSupplicantInfFuzzerTest();
+    UpdateDeviceGroupCapFuzzerTest();
+    UpdateDeviceGroupCapFuzzerTest1();
+    UpdateDeviceGroupCapFuzzerTest2();
+    UpdateDeviceStatusFuzzerTest();
+    UpdateDeviceStatusFuzzerTest1();
+    UpdateDeviceStatusFuzzerTest2();
+    UpdateAllDeviceStatusFuzzerTest();
+     GetDevicesFuzzerTest();  
 }
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
+    GetGroupNetworkIdFuzzerTest1(FDP);
     OHOS::Wifi::WifiP2pGroupManagerFuzzerTest(data, size);
-    OHOS::Wifi::WifiP2pDeviceManagerFuzzerTest(data, size);
+    OHOS::Wifi::WifiP2pDeviceManagerFuzzerTest();
     return 0;
 }
 }

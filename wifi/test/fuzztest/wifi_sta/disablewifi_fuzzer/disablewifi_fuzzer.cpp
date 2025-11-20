@@ -19,7 +19,7 @@
 namespace OHOS {
 namespace Wifi {
     std::shared_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-    bool DisableWifiFuzzerTest(const uint8_t* data, size_t size)
+    bool DisableWifiFuzzerTest()
     {
         if (devicePtr == nullptr) {
             return false;
@@ -33,7 +33,7 @@ namespace Wifi {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::Wifi::DisableWifiFuzzerTest(data, size);
+    OHOS::Wifi::DisableWifiFuzzerTest();
     return 0;
 }
 

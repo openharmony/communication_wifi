@@ -15,11 +15,12 @@
 
 #include "reassociate_fuzzer.h"
 #include "wifi_device.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace Wifi {
     std::shared_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-    bool ReAssociateFuzzerTest(const uint8_t* data, size_t size)
+    bool ReAssociateFuzzerTest()
     {
         if (devicePtr == nullptr) {
             return false;
@@ -33,7 +34,8 @@ namespace Wifi {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::Wifi::ReAssociateFuzzerTest(data, size);
+    FuzzedDataProvider FDP(data, size);
+    OHOS::Wifi::ReAssociateFuzzerTest();
     return 0;
 }
 

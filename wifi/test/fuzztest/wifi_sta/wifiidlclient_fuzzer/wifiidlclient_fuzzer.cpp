@@ -60,8 +60,7 @@ void OnIWifiIfaceTest(FuzzedDataProvider& FDP)
     char ifname[] = "OHOS_wifi";
     int32_t datas = FDP.ConsumeIntegral<int32_t>();
     GetName(ifname, datas);
-
-    int32_t type =FDP.ConsumeIntegral<int32_t>();
+    int32_t type = FDP.ConsumeIntegral<int32_t>();
     GetType(&type);
 }
 

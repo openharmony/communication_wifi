@@ -381,6 +381,14 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode SetP2pHighPerf(bool isEnable) = 0;
+
+    /**
+     * @Description Set p2p group type
+     *
+     * @param groupType - set group keepalive or not
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode Hid2dSetGroupType(GroupLiveType groupType) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

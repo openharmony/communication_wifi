@@ -18,6 +18,7 @@
 #include "mock_wifi_settings.h"
 #include "network_selection_utils.h"
 #include "mock_wifi_config_center.h"
+#include "wifi_sensor_scene.h"
 
 using ::testing::_;
 using ::testing::Return;
@@ -71,7 +72,7 @@ HWTEST_F(WifiFilterImplTest, RssiWifiFilter24gReturnFalse, TestSize.Level1) {
     scanInfo1.rssi = -82;
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
     networkCandidate1.wifiDeviceConfig.networkId = 1;
-
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(false));
     auto signalStrengthWifiFilter = std::make_shared<NetworkSelection::SignalStrengthWifiFilter>();
     EXPECT_FALSE(signalStrengthWifiFilter->DoFilter(networkCandidate1));
 }
@@ -84,7 +85,7 @@ HWTEST_F(WifiFilterImplTest, RssiWifiFilter24gReturnTrue, TestSize.Level1) {
     scanInfo2.frequency = 2407;
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo2);
     networkCandidate2.wifiDeviceConfig.networkId = 2;
-
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(false));
     auto signalStrengthWifiFilter = std::make_shared<NetworkSelection::SignalStrengthWifiFilter>();
     EXPECT_TRUE(signalStrengthWifiFilter->DoFilter(networkCandidate2));
 }
@@ -97,7 +98,7 @@ HWTEST_F(WifiFilterImplTest, RssiWifiFilter5gReturnFalse, TestSize.Level1) {
     scanInfo1.rssi = -82;
     NetworkSelection::NetworkCandidate networkCandidate1(scanInfo1);
     networkCandidate1.wifiDeviceConfig.networkId = 3;
-
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(false));
     auto signalStrengthWifiFilter = std::make_shared<NetworkSelection::SignalStrengthWifiFilter>();
     EXPECT_FALSE(signalStrengthWifiFilter->DoFilter(networkCandidate1));
 }
@@ -110,7 +111,21 @@ HWTEST_F(WifiFilterImplTest, RssiWifiFilter5gReturnTrue, TestSize.Level1) {
     scanInfo2.frequency = 5820;
     NetworkSelection::NetworkCandidate networkCandidate2(scanInfo2);
     networkCandidate2.wifiDeviceConfig.networkId = 4;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(false));
+    auto signalStrengthWifiFilter = std::make_shared<NetworkSelection::SignalStrengthWifiFilter>();
+    EXPECT_TRUE(signalStrengthWifiFilter->DoFilter(networkCandidate2));
+}
 
+HWTEST_F(WifiFilterImplTest, RssiWifiFilterWlanReturnTrue, TestSize.Level1) {
+    InterScanInfo scanInfo2;
+    scanInfo2.bssid = "11:11:11:11:11:22";
+    scanInfo2.ssid = "x";
+    scanInfo2.rssi = -75;
+    scanInfo2.frequency = 5820;
+    NetworkSelection::NetworkCandidate networkCandidate2(scanInfo2);
+    networkCandidate2.wifiDeviceConfig.networkId = 4;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
+    WifiSensorScene::GetInstance().scenario_ = 1;
     auto signalStrengthWifiFilter = std::make_shared<NetworkSelection::SignalStrengthWifiFilter>();
     EXPECT_TRUE(signalStrengthWifiFilter->DoFilter(networkCandidate2));
 }

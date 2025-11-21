@@ -44,6 +44,16 @@ BlockConnectService &BlockConnectService::GetInstance()
 BlockConnectService::BlockConnectService()
 {
     // Initialize any necessary variables or data structures
+    InitBlockConnectPolicies();
+    InitValidReasons();
+#ifndef OHOS_ARCH_LITE
+    CheckNeedChangePolicy();
+#endif
+    mLastConnectedApInfo = {"", -1, 0};
+}
+
+void BlockConnectService::InitBlockConnectPolicies()
+{
     blockConnectPolicies = {
         {DisabledReason::DISABLED_ASSOCIATION_REJECTION,
          DisablePolicy(5 * 60 * 1000 * 1000, 3, WifiDeviceConfigStatus::DISABLED)},
@@ -77,8 +87,13 @@ BlockConnectService::BlockConnectService()
          DisablePolicy(-1, 1, WifiDeviceConfigStatus::PERMEMANTLY_DISABLED)},
         {DisabledReason::DISABLED_DISASSOC_REASON,
          DisablePolicy(5 * 60 * 1000 * 1000, 5, WifiDeviceConfigStatus::DISABLED)},
+        {DisabledReason::USER_FORCE_DISCONNECT,
+         DisablePolicy(24 * 60 * 60 * 1000 * 1000, 1, WifiDeviceConfigStatus::DISABLED)}
     };
+}
 
+void BlockConnectService::InitValidReasons()
+{
     validReasons = {
         static_cast<int>(DisconnectDetailReason::UNSPECIFIED),
         static_cast<int>(DisconnectDetailReason::PREV_AUTH_NOT_VALID),
@@ -88,10 +103,6 @@ BlockConnectService::BlockConnectService()
         static_cast<int>(DisconnectDetailReason::DISASSOC_IEEE_802_1X_AUTH_FAILED),
         static_cast<int>(DisconnectDetailReason::DISASSOC_LOW_ACK)
     };
-#ifndef OHOS_ARCH_LITE
-    CheckNeedChangePolicy();
-#endif
-    mLastConnectedApInfo = {"", -1, 0};
 }
 
 // Destructor
@@ -143,14 +154,20 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus()
             LogDisabledConfig(config);
             continue;
         }
+        int64_t blockTime = policy.disableTime;
+        if (config.networkSelectionStatus.networkSelectionDisableReason == DisabledReason::USER_FORCE_DISCONNECT) {
+            blockTime = config.blockDuration;
+        }
         if (policy.disableStatus == WifiDeviceConfigStatus::ENABLED ||
             (config.networkSelectionStatus.networkDisableTimeStamp > 0 &&
-            timestamp - config.networkSelectionStatus.networkDisableTimeStamp >= policy.disableTime)) {
+            timestamp - config.networkSelectionStatus.networkDisableTimeStamp >= blockTime)) {
             config.networkSelectionStatus.status = WifiDeviceConfigStatus::ENABLED;
             config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_NONE;
             config.networkSelectionStatus.networkDisableTimeStamp = -1;
             config.networkSelectionStatus.networkDisableCount = 0;
+            config.blockDuration = -1;
             WifiSettings::GetInstance().AddDeviceConfig(config);
+            WIFI_LOGI("NetworkId %{public}d blockDuration expired, auto enabled.", config.networkId);
         }
         LogDisabledConfig(config);
     }
@@ -172,6 +189,7 @@ bool BlockConnectService::EnableNetworkSelectStatus(int targetNetworkId)
     targetNetwork.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_NONE;
     targetNetwork.networkSelectionStatus.networkDisableTimeStamp = -1;
     targetNetwork.networkSelectionStatus.networkDisableCount = 0;
+    targetNetwork.blockDuration = -1;
     WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
     WIFI_LOGI("EnableNetworkSelectStatus %{public}d %{public}s enabled",
         targetNetworkId, SsidAnonymize(targetNetwork.ssid).c_str());
@@ -190,11 +208,12 @@ DisablePolicy BlockConnectService::CalculateDisablePolicy(DisabledReason disable
 }
 
 // Clear the blocklist information of a target network with reason for wpa_supplicant disconnection
-bool BlockConnectService::UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason, int wpaReason)
+bool BlockConnectService::UpdateNetworkSelectStatusForWpa(int targetNetworkId, DisabledReason disableReason,
+    int wpaReason)
 {
     // Implement the logic to clear the blocklist information of a target network
     // Return true if successful, false otherwise
-    WIFI_LOGD("ENTER updateNetworkSelectStatus");
+    WIFI_LOGD("ENTER updateNetworkSelectStatusForWpa");
     if (disableReason == DisabledReason::DISABLED_DISASSOC_REASON) {
         if (std::find(validReasons.begin(), validReasons.end(), wpaReason) == validReasons.end()) {
             return false;
@@ -260,7 +279,8 @@ bool BlockConnectService::ClearBlockConnectForMdmRestrictedList()
 #endif
 
 // Clear the blocklist information of a target network
-bool BlockConnectService::UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason)
+bool BlockConnectService::UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason,
+    int64_t blockDuration)
 {
     // Implement the logic to clear the blocklist information of a target network
     // Return true if successful, false otherwise
@@ -280,6 +300,7 @@ bool BlockConnectService::UpdateNetworkSelectStatus(int targetNetworkId, Disable
         targetNetwork.networkSelectionStatus.networkSelectionDisableReason = disableReason;
         targetNetwork.networkSelectionStatus.networkDisableTimeStamp = -1;
         targetNetwork.networkSelectionStatus.networkDisableCount = 0;
+        targetNetwork.blockDuration = -1;
         return true;
     }
     if (targetNetwork.networkSelectionStatus.networkSelectionDisableReason == disableReason) {
@@ -294,9 +315,10 @@ bool BlockConnectService::UpdateNetworkSelectStatus(int targetNetworkId, Disable
         targetNetwork.networkSelectionStatus.networkSelectionDisableReason = disableReason;
     }
     targetNetwork.networkSelectionStatus.networkDisableTimeStamp = timestamp;
+    targetNetwork.blockDuration = blockDuration;
     WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
-    WIFI_LOGI("updateNetworkSelectStatus networkId %{public}d %{public}s %{public}d",
-        targetNetworkId, SsidAnonymize(targetNetwork.ssid).c_str(), disableReason);
+    WIFI_LOGI("updateNetworkSelectStatus networkId %{public}d %{public}s %{public}d blockDuration %{public}" PRId64,
+        targetNetworkId, SsidAnonymize(targetNetwork.ssid).c_str(), disableReason, blockDuration);
     return true;
 }
 

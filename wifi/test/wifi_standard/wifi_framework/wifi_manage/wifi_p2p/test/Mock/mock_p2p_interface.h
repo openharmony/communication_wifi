@@ -71,6 +71,7 @@ public:
     virtual ErrCode SetMiracastSinkConfig(const std::string& config);
     virtual ErrCode NotifyRemoteDie(int uid);
     virtual ErrCode SetP2pHighPerf(bool isEnable);
+    virtual ErrCode Hid2dSetGroupType(GroupLiveType type);
 };
 }  // namespace Wifi
 }  // namespace OHOS

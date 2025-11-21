@@ -1661,5 +1661,32 @@ ErrCode WifiP2pServiceImpl::SetP2pHighPerf(bool isEnable)
     }
     return pService->SetP2pHighPerf(isEnable);
 }
+
+ErrCode WifiP2pServiceImpl::Hid2dSetGroupType(GroupLiveType groupType)
+{
+    int callingUid = GetCallingUid();
+    WIFI_LOGI("Uid %{public}d Hid2dSetGroupType", callingUid);
+    if (callingUid != SOFT_BUS_SERVICE_UID) {
+        WIFI_LOGE("%{public}s, permission denied! uid = %{public}d", __func__, callingUid);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("Hid2dSetGroupType:NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (!IsP2pServiceRunning()) {
+        WIFI_LOGE("P2pService is not running!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+
+    IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pService == nullptr) {
+        WIFI_LOGE("Get p2p service failed!");
+        return WIFI_OPT_P2P_NOT_OPENED;
+    }
+    return pService->Hid2dSetGroupType(groupType);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

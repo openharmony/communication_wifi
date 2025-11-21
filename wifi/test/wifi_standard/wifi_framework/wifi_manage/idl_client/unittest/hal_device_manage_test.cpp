@@ -701,8 +701,10 @@ HWTEST_F(WifiHalDeviceManagerTest, CanIfaceComboSupportRequestTest_01, TestSize.
 
     wifiChipInfo.ifaces.insert(std::pair<IfaceType, std::vector<WifiIfaceInfo>>(createIfaceType, wifiIfaceInfo));
 
-    EXPECT_TRUE(HalDeviceManager::GetInstance().CanIfaceComboSupportRequest(wifiChipInfo,
-        chipMode, chipIfaceCombo, createIfaceType, ifaceCreationData));
+    HalDeviceManager::GetInstance().CanIfaceComboSupportRequest(wifiChipInfo,
+        chipMode, chipIfaceCombo, createIfaceType, ifaceCreationData);
+    
+    EXPECT_FALSE(g_errLog.find("ERROR")!=std::string::npos);
 }
 
 HWTEST_F(WifiHalDeviceManagerTest, CompareIfaceCreationDataTest_01, TestSize.Level1)

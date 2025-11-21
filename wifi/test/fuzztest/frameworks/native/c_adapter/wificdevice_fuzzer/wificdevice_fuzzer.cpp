@@ -51,7 +51,8 @@ static void RemoveDeviceTest()
 static void DisableDeviceConfigTest()
 {
     int networkId = FDP->ConsumeIntegral<int>();
-    DisableDeviceConfig(networkId);
+    int64_t blockDuration = FDP->ConsumeIntegral<int64_t>();
+    DisableDeviceConfig(networkId, blockDuration);
 }
 static void EnableDeviceConfigTest()
 {

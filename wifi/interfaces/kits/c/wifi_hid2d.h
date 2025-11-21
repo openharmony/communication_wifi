@@ -87,6 +87,11 @@ typedef enum RecommendStatus {
     RS_FAILURE
 } RecommendStatus;
 
+typedef enum GroupLiveType {
+    GROUPSTOPALIVE = 0,
+    GROUPKEEPALIVE = 1,
+} GroupLiveType;
+
 typedef struct Hid2dConnectConfig {
     /** Service set ID (SSID). */
     char ssid[MAX_SSID_LEN];
@@ -295,6 +300,15 @@ WifiErrorCode RegisterCfgChangCallback(const WifiCfgChangCallback callback);
  * @return WifiErrorCode - operate result
  */
 WifiErrorCode UnregisterCfgChangCallback(void);
+
+/**
+ * @Description Set p2p group type
+ *
+ * @param groupType - set group keepalive or not
+ * @return ErrCode - operation result
+ */
+WifiErrorCode Hid2dSetGroupType(GroupLiveType groupType);
+
 #ifdef __cplusplus
 }
 #endif

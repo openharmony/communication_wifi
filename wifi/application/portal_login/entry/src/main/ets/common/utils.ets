@@ -27,6 +27,7 @@ const MAX_URL_LENGTH = 2048;
 let url_: string = '';
 let netId_: number = -1;
 let shouldShowBrowseItem_: boolean = true;
+let isInOOBE_: boolean = false;
 
 export function setShouldShowBrowseItem(want: Want): void {
   if (want.parameters) {
@@ -35,6 +36,14 @@ export function setShouldShowBrowseItem(want: Want): void {
   } else {
     hilog.error(DOMAIN, TAG, '%{public}s', 'Failed set shouldShowBrowseItem');
   }
+}
+
+export function setIsInOOBE(isInOOBE: boolean): void {
+  isInOOBE_ = isInOOBE;
+}
+ 
+export function getIsInOOBE(): boolean {
+  return isInOOBE_;
 }
 
 export function shouldShowBrowseItem(): boolean {

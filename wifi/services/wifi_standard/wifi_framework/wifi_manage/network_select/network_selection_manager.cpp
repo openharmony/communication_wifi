@@ -190,7 +190,7 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
         wifiCandidateInfos << "\"" << pair.first << "_" <<
             SsidAnonymize(networkCandidates.at(pair.second).wifiDeviceConfig.ssid) << "\"";
     }
-    if (!wifiCandidateConfigs.empty()) {
+    if (!wifiCandidateConfigs.empty() || !wifiDeviceConfigs.empty()) {
         WIFI_LOGI("Find savedNetworks in scanInfos: [%{public}s]\n"
                   "Find suggestion networks in scanInfos: [%{public}s]",
             wifiDevicesInfo.str().c_str(),
@@ -287,6 +287,12 @@ std::string NetworkSelectionManager::GetSelectedInfoForChr(NetworkSelection::Net
 bool NetworkSelectionManager::IsOutdoorFilter(NetworkSelection::NetworkCandidate *networkCandidate)
 {
     std::lock_guard<std::mutex> lock(rssiCntMutex_);
+    if (WifiConfigCenter::GetInstance().IsWlanPage()) {
+        WIFI_LOGI("IsOutdoorFilter wlan setting page do not filter");
+        rssiCntMap_.clear();
+        return false;
+    }
+
     if (!WifiSensorScene::GetInstance().IsOutdoorScene()) {
         WIFI_LOGI("IsOutdoorFilter indoor scene do not filter");
         rssiCntMap_.clear();

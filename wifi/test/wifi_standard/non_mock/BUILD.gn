@@ -76,6 +76,7 @@ ohos_unittest("wifi_non_mock_unittest") {
   ]
 
   external_deps = [
+    "ability_base:configuration",
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:wantagent_innerkits",

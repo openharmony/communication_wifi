@@ -35,6 +35,7 @@
 #include "self_cure_state_machine.h"
 #include "self_cure_utils.h"
 #include "ip_qos_monitor.h"
+#include "network_black_list_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -121,7 +122,7 @@ HWTEST_F(WifiProStateMachineTest, IsReachWifiScanThresholdTest03, TestSize.Level
     // The wifi signal is equal to 3 bars, and there are switching records within 14 days
     int32_t signalLevel = SIG_LEVEL_3;
     WifiLinkedInfo wifiLinkedInfo;
-    wifiLinkedInfo.supplicantState = SupplicantState::INVALID;
+    wifiLinkedInfo.networkId = 1;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<0>(wifiLinkedInfo), Return(0)));
     pWifiProStateMachine_->pCurrWifiInfo_ = std::make_shared<WifiLinkedInfo>(wifiLinkedInfo);
@@ -683,6 +684,12 @@ HWTEST_F(WifiProStateMachineTest, wifiNoNetStateTrySelfCureTest02, TestSize.Leve
     EXPECT_EQ(wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_, false);
 }
 
+HWTEST_F(WifiProStateMachineTest, wifiNoNetHandleReuqestSelfCureTest01, TestSize.Level1)
+{
+    pWifiProStateMachine_->pWifiNoNetState_->HandleReuqestSelfCure();
+    EXPECT_EQ(pWifiProStateMachine_->isWifi2WifiSwitching_, false);
+}
+
 HWTEST_F(WifiProStateMachineTest, wifiNoNetStateHandleHttpResultInNoNet01, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
@@ -777,5 +784,26 @@ HWTEST_F(WifiProStateMachineTest, wifiPortalStateExecuteStateMsgTest09, TestSize
     EXPECT_EQ(wifiPortalState_->ExecuteStateMsg(msg), false);
 }
 
+HWTEST_F(WifiProStateMachineTest, wifiproblocklistTest01, TestSize.Level1)
+{
+    std::string bssid1 = "123456";
+    std::string bssid3 = "123457-5G";
+    pWifiProStateMachine_->badBssid_ = bssid1;
+    pWifiProStateMachine_->Handle5GWifiTo2GWifi();
+    NetworkBlockListManager::GetInstance().AddWifiBlocklist(bssid1);
+    NetworkBlockListManager::GetInstance().IsFailedMultiTimes(bssid1);
+    NetworkBlockListManager::GetInstance().IsInTempWifiBlockList(bssid1);
+    NetworkBlockListManager::GetInstance().AddAbnormalWifiBlocklist(bssid1);
+    NetworkBlockListManager::GetInstance().IsInWifiBlocklist(bssid1);
+    NetworkBlockListManager::GetInstance().CleanAbnormalWifiBlocklist();
+    NetworkBlockListManager::GetInstance().CleanTempWifiBlockList();
+    NetworkBlockListManager::GetInstance().IsInAbnormalWifiBlocklist(bssid1);
+    NetworkBlockListManager::GetInstance().RemoveWifiBlocklist(bssid1);
+    NetworkBlockListManager::GetInstance().AddPerf5gBlocklist(bssid3);
+    NetworkBlockListManager::GetInstance().IsOverTwiceInPerf5gBlocklist(bssid3);
+    NetworkBlockListManager::GetInstance().RemovePerf5gBlocklist(bssid3);
+    NetworkBlockListManager::GetInstance().CleanPerf5gBlocklist();
+    EXPECT_EQ(NetworkBlockListManager::GetInstance().IsInPerf5gBlocklist(bssid3), false);
+}
 } // namespace Wifi
 } // namespace OHOS

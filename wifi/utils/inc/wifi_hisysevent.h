@@ -144,6 +144,14 @@ struct IodStatisticInfo {
     int32_t indoorConnShortTime = 0;
 };
 
+struct MdmRestrictedInfo {
+    std::string ssid = "";
+    std::string bssid = "";
+    std::string restrictedType = "";
+    int uid = 0;
+    std::string bundleName = "";
+};
+
 void WriteWifiStateTypeHiSysEvent(const std::string& serviceType, WifiOperType operType);
 
 void WriteWifiStateHiSysEvent(const std::string& serviceType, WifiOperType operType);
@@ -248,8 +256,7 @@ void WriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info);
 
 void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo);
 
-void WriteMdmHiSysEvent(const std::string &ssid, const std::string &bssid,
-    const std::string &restrictedType, int uid, const std::string &bundleName);
+void WriteMdmHiSysEvent(const MdmRestrictedInfo &mdmRestrictedInfo);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

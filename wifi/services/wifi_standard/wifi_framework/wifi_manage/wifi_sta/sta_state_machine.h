@@ -68,6 +68,7 @@ constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 constexpr int CMD_LINK_SWITCH_DETECT_TIMEOUT = 0x07;
 constexpr int CMD_NO_INTERNET_TIMEOUT = 0x08;
 constexpr int CMD_IPV6_DELAY_TIMEOUT = 0x09;
+constexpr int CMD_SHOW_PORTAL_NOTIFICATION = 0x10;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
@@ -117,6 +118,8 @@ constexpr int RSSI_OFFSET_DEFAULT = 5;
 constexpr int RSSI_OFFSET_MAX = 10;
 
 constexpr unsigned int BIT_MLO_CONNECT = 0x80;
+
+constexpr int PORTAL_NOTIFICATION_TIMEOUT = 3 * 1000;
 
 #define DNS_IP_ADDR_LEN 15
 #define WIFI_FIRST_DNS_NAME "const.wifi.wifi_first_dns"
@@ -428,6 +431,7 @@ public:
         void TryToSaveIpV4Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToSaveIpV4ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
+        void TryToSaveIpV6ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToJumpToConnectedState(int iptype);
         void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
         void SaveDhcpResultExt(DhcpResult *dest, DhcpResult *source);
@@ -508,6 +512,7 @@ public:
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     void DealMdmRestrictedConnect(WifiDeviceConfig &config);
     bool WhetherRestrictedByMdm(const std::string &ssid, const std::string &bssid, bool checkBssid);
+    void ReportMdmRestrictedEvent(const std::string &ssid, const std::string &bssid, const std::string &restrictedType);
 #endif
 #ifndef OHOS_ARCH_LITE
     void SetEnhanceService(IEnhanceService* enhanceService);
@@ -588,7 +593,7 @@ private:
      --=* @param config -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid) const;
+    ErrCode ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid);
 
     /**
      * @Description  Save the current connected state into WifiLinkedInfo.
@@ -619,14 +624,16 @@ private:
      *
      * @param deviceConfig - Ap device config information
      */
-    void UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& ifaceName);
+    void UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& ifaceName,
+        WifiHalDeviceConfig& halDeviceConfig);
 
     /**
      * @Description Auto select connect to network.
      *
      * @param bssid - the bssid of network which is going to be connected.
      */
-    void AutoSelectConnectToNetwork(const std::string& bssid, std::string& ifaceName);
+    void AutoSelectConnectToNetwork(const std::string& bssid, std::string& ifaceName,
+        WifiHalDeviceConfig& halDeviceConfig);
 
     /**
      * @Description  Disconnect network
@@ -1030,8 +1037,6 @@ private:
     void TransHalDeviceConfig(WifiHalDeviceConfig &halDeviceConfig, const WifiDeviceConfig &config) const;
     void SetRandomMacConfig(WifiStoreRandomMac &randomMacInfo, const WifiDeviceConfig &deviceConfig,
     std::string &currentMac);
-    std::string GetRandomMacForDevice(const WifiDeviceConfig &deviceConfig, const std::string &bssid,
-    const std::string &realMac);
     bool IsGoodSignalQuality();
     void AppendFastTransitionKeyMgmt(const WifiScanInfo &scanInfo, WifiHalDeviceConfig &halDeviceConfig) const;
     void ConvertSsidToOriginalSsid(const WifiDeviceConfig &config, WifiHalDeviceConfig &halDeviceConfig) const;
@@ -1045,6 +1050,7 @@ private:
     void PublishPortalNitificationAndLogin();
     OHOS::ErrCode StartPortalLogin(int netId, std::string url, int deviceType);
     void RecordPortalInfo();
+    void DealSignalPacketChangedByTime(WifiSignalPollInfo &signalInfo);
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;
@@ -1102,6 +1108,7 @@ private:
      set to true when linkswitch start, to false when linkswitch duration 2s later
     */
     bool linkSwitchDetectingFlag_{false};
+    uint32_t pktDirCnt_ = 0;
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
     WifiDataReportService *wifiDataReportService_ = nullptr;

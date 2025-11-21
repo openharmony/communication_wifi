@@ -155,7 +155,22 @@ HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_005, TestSize.Level1)
     pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4);
     EXPECT_NE(pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4), true);
 }
-
+/**
+ * @tc.name: StartDhcpServer_006
+ * @tc.desc: StartDhcpServer wifh ipAddress fail
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(DhcpdInterfaceTest, StartDhcpServer_006, TestSize.Level1)
+{
+    WIFI_LOGI("StartDhcpServer_006 enter");
+    bool isIpV4 = true;
+    std::string ifaceName = "p2p-p2p-0";
+    Ipv4Address ipv4(Ipv4Address::invalidInetAddress);
+    Ipv6Address ipv6(Ipv6Address::INVALID_INET6_ADDRESS);
+    pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4);
+    EXPECT_NE(pDhcpdInterface->StartDhcpServerFromInterface(ifaceName, ipv4, ipv6, "", isIpV4), true);
+}
 /**
  * @tc.name: SetDhcpEventFunc_004
  * @tc.desc: SetDhcpEventFunc

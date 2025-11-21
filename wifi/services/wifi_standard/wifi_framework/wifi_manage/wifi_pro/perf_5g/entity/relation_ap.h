@@ -35,6 +35,20 @@ public:
     void UpdateTriggerScanRssiThreshold(int currentApRssi);
     bool CanTriggerScan(int currentApEstimatedRssi);
     void IsSelectedSwitch();
+    bool operator<(const RelationAp &other) const
+    {
+        if (apInfo_.ssid != other.apInfo_.ssid)
+            return apInfo_.ssid < other.apInfo_.ssid;
+        if (apInfo_.keyMgmt != other.apInfo_.keyMgmt)
+            return apInfo_.keyMgmt < other.apInfo_.keyMgmt;
+        return apInfo_.bssid < other.apInfo_.bssid;
+    }
+ 
+    bool operator==(const RelationAp &other) const
+    {
+        return (apInfo_.ssid == other.apInfo_.ssid) && (apInfo_.keyMgmt == other.apInfo_.keyMgmt) &&
+               (apInfo_.bssid == other.apInfo_.bssid);
+    }
 public:
     ApInfo apInfo_;
     RelationInfo relationInfo_;

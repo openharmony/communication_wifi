@@ -552,5 +552,13 @@ ErrCode WifiP2pService::SetP2pHighPerf(bool isEnable)
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_P2P_HIGH_PERF), isEnable);
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiP2pService::Hid2dSetGroupType(GroupLiveType groupType)
+{
+    WIFI_LOGI("Hid2dSetGroupType");
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_HID2D_SET_GROUP_TYPE), groupType);
+    return WIFI_OPT_SUCCESS;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

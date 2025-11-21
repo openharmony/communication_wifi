@@ -71,10 +71,11 @@ SignalStrengthWifiFilter::~SignalStrengthWifiFilter()
 bool SignalStrengthWifiFilter::Filter(NetworkCandidate &networkCandidate)
 {
     auto &scanInfo = networkCandidate.interScanInfo;
-#ifndef OHOS_ARCH_LITE
-    int rssiThreshold = WifiSensorScene::GetInstance().GetMinRssiThres(scanInfo.frequency);
-#else
     auto rssiThreshold = scanInfo.frequency < MIN_5GHZ_BAND_FREQUENCY ? MIN_RSSI_VALUE_24G : MIN_RSSI_VALUE_5G;
+#ifndef OHOS_ARCH_LITE
+    if (!WifiConfigCenter::GetInstance().IsWlanPage()) {
+        rssiThreshold = WifiSensorScene::GetInstance().GetMinRssiThres(scanInfo.frequency);
+    }
 #endif
     if (scanInfo.rssi < rssiThreshold) {
         networkCandidate.filtedReason[filterName].insert(FiltedReason::POOR_SIGNAL);
@@ -780,6 +781,29 @@ bool WifiSwitch5GNot2GFilter::Filter(NetworkCandidate &networkCandidate)
  
     if (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) &&
         interScanInfo.band == static_cast<int>(BandType::BAND_2GHZ)) {
+        return false;
+    }
+ 
+    return true;
+}
+
+SecureNetworkFilter::SecureNetworkFilter() : SimpleWifiFilter("SecureNetwork") {}
+ 
+SecureNetworkFilter::~SecureNetworkFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("filteredNetworkCandidates in %{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+ 
+bool SecureNetworkFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    if (!networkCandidate.wifiDeviceConfig.isSecureWifi) {
+        WIFI_LOGI("SecureNetworkFilter, insecure network, skip candidate:%{public}s",
+            networkCandidate.ToString().c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::NOT_SECURE_WIFI);
         return false;
     }
  

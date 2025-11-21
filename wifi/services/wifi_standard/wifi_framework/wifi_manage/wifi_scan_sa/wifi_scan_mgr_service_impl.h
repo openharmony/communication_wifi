@@ -19,7 +19,6 @@
 #ifndef OHOS_ARCH_LITE
 #include "iremote_object.h"
 #include "system_ability.h"
-#include "wifi_errcode.h"
 #include "wifi_scan_mgr_stub.h"
 #include "wifi_scan_stub.h"
 
@@ -38,7 +37,7 @@ public:
     static sptr<WifiScanMgrServiceImpl> GetInstance();
     void OnStart() override;
     void OnStop() override;
-    sptr<IRemoteObject> GetWifiRemote(int instId) override;
+    ErrCode GetWifiRemote(int instId, sptr<IRemoteObject>& remote) override;
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     std::map<int, sptr<IRemoteObject>>& GetScanServiceMgr();
 

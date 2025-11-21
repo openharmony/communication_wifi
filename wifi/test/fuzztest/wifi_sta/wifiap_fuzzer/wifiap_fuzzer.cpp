@@ -363,7 +363,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::GetHotspotModeFuzzTest(FDP);
     OHOS::Wifi::SetHotspotModeFuzzTest(FDP);
     OHOS::Wifi::WifiApFuzzTest(FDP);
-    OHOS::Wifi::WifiApFuzzTest01()
+    OHOS::Wifi::WifiApFuzzTest01();
 
     return 0;
 }

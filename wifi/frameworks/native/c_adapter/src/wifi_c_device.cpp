@@ -290,7 +290,7 @@ WifiErrorCode AllowAutoConnect(int32_t networkId, bool isAllowed)
     return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
 }
 
-WifiErrorCode DisableDeviceConfig(int networkId)
+WifiErrorCode DisableDeviceConfig(int networkId, int64_t blockDuration)
 {
     return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
 }

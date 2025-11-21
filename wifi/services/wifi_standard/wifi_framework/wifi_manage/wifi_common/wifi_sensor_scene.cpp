@@ -32,10 +32,6 @@ DEFINE_WIFILOG_LABEL("WifiSensorScene");
 constexpr int SCENARIO_UNKNOWN = -1;
 constexpr int SCENARIO_OUTDOOR = 1;
 
-constexpr int MIN_5GHZ_BAND_FREQUENCY = 5000;
-
-constexpr int MIN_RSSI_VALUE_24G = -80;
-constexpr int MIN_RSSI_VALUE_5G = -77;
 constexpr int MIN_RSSI_VALUE_OUTDOOR_24G = -75;
 constexpr int MIN_RSSI_VALUE_OUTDOOR_5G = -72;
 constexpr int CONN_RSSI_CNT = 10;

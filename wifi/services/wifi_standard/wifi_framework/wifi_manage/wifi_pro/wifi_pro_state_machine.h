@@ -48,6 +48,7 @@ public:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
         void HandleWifiProSwitchChanged(const InternalMessagePtr msg);
         void HandleRemoveBlockList(const InternalMessagePtr msg);
+        void HandleRemove5GBlockList(const InternalMessagePtr msg);
     };
 
     /**
@@ -161,10 +162,12 @@ public:
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
         bool fullScan_ { false };
+        std::atomic<bool> isSelfCure_ { false };
         void HandleWifiNoInternet(const InternalMessagePtr msg);
         void HandleReuqestScanInNoNet(const InternalMessagePtr msg);
         void HandleNoNetChanged();
         bool HandleHttpResultInNoNet(InternalMessagePtr msg);
+        void HandleReuqestSelfCure();
     };
 
     class WifiPortalState : public State {
@@ -238,6 +241,7 @@ private:
     int32_t currentRssi_ { 0 };
     std::string currentBssid_;
     std::string currentSsid_;
+    std::int32_t currentBand_ {static_cast<int>(BandType::BAND_NONE)};
     std::shared_ptr<WifiLinkedInfo> pCurrWifiInfo_ { nullptr };
     std::shared_ptr<WifiDeviceConfig> pCurrWifiDeviceConfig_ { nullptr };
     bool isWifi2WifiSwitching_ { false };
@@ -257,7 +261,7 @@ private:
     void Wifi2WifiFinish();
     bool IsCallingInCs();
     void UpdateWifiSwitchTimeStamp();
-    void HandleWifi2WifiSucsess(int64_t blackListTime);
+    void HandleWifi2WifiSucsess();
     void HandleWifi2WifiFailed();
     void FastScan(std::vector<WifiScanInfo> &scanInfoList);
     bool TrySelfCure(bool forceNoHttpCheck);
@@ -270,6 +274,7 @@ private:
     bool IsAllowScan(bool hasSwitchRecord);
     bool IsFirstConnectAndNonet();
     bool IsKeepCurrWifiConnectedExtral();
+    void Handle5GWifiTo2GWifi();
 };
 } // namespace Wifi
 } // namespace OHOS

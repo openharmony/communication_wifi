@@ -58,10 +58,10 @@ public:
     bool EnableNetworkSelectStatus(int targetNetworkId);
 
     // Clear the blocklist information of a target network with reason for wpa_supplicant disconnection
-    bool UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason, int wpaReason);
+    bool UpdateNetworkSelectStatusForWpa(int targetNetworkId, DisabledReason disableReason, int wpaReason);
     
     // Clear the blocklist information of a target network
-    bool UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason);
+    bool UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason, int64_t blockDuration = -1);
 
     // Check if the given BSSID has frequent disconnects with the last connected network
     // false - Not frequent disconnect true - Frequent disconnect
@@ -98,6 +98,8 @@ private:
     DisablePolicy CalculateDisablePolicy(DisabledReason disableReason);
     void EnableAllNetworksByEnteringSettings(std::vector<DisabledReason> enableReasons);
     void LogDisabledConfig(const WifiDeviceConfig& config);
+    void InitBlockConnectPolicies();
+    void InitValidReasons();
 #ifndef OHOS_ARCH_LITE
     void StartClearSetTimer();
     void StopClearSetTimer();

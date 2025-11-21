@@ -177,6 +177,12 @@ public:
         EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, RANDOMMAC_BSSID));
     }
 
+    void ConvertDeviceCfgFail3()
+    {
+        WifiDeviceConfig config;
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, ""));
+    }
+
     void StartWifiProcessSuccess()
     {
         EXPECT_CALL(WifiManager::GetInstance(), DealStaOpenRes(_, _)).Times(testing::AtLeast(1));
@@ -799,7 +805,7 @@ public:
     void GetIpStateStateExeMsgFail()
     {
         EXPECT_CALL(BlockConnectService::GetInstance(),
-        UpdateNetworkSelectStatus(_, _))
+        UpdateNetworkSelectStatus(_, _, _))
         .WillRepeatedly(Return(-1));
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         StaStateMachine staStateMachine;
@@ -2126,6 +2132,11 @@ HWTEST_F(StaStateMachineTest, ConvertDeviceCfgFail2, TestSize.Level1)
     ConvertDeviceCfgFail2();
 }
 
+HWTEST_F(StaStateMachineTest, ConvertDeviceCfgFail3, TestSize.Level1)
+{
+    ConvertDeviceCfgFail3();
+}
+
 HWTEST_F(StaStateMachineTest, StartWifiProcessSuccess, TestSize.Level1)
 {
     StartWifiProcessSuccess();
@@ -2653,6 +2664,19 @@ HWTEST_F(StaStateMachineTest, DealSignalPollResultTest, TestSize.Level1)
 }
 
 /**
+ * @tc.name: DealSignalPollResultTestPollPeriod1s
+ * @tc.desc: DealSignalPollResult()
+ * @tc.type: FUNC
+ * @tc.require: issue
+*/
+HWTEST_F(StaStateMachineTest, DealSignalPollResultTestPollPeriod1s, TestSize.Level1)
+{
+    pStaStateMachine->staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY_WITH_TASK;
+    pStaStateMachine->DealSignalPollResult();
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+
+/**
  * @tc.name: HandleForegroundAppChangedActionTest
  * @tc.desc: HandleForegroundAppChangedAction()
  * @tc.type: FUNC
@@ -3078,6 +3102,12 @@ HWTEST_F(StaStateMachineTest, DealDisconnectEventInLinkStateTest01, TestSize.Lev
     pStaStateMachine->pLinkState->pStaStateMachine->targetNetworkId_ = 0;
     pStaStateMachine->pLinkState->DealDisconnectEventInLinkState(msg);
     EXPECT_TRUE(currentState == pStaStateMachine->linkedInfo.connState);
+}
+
+HWTEST_F(StaStateMachineTest, NotAllowConnectToNetworkTest01, TestSize.Level1)
+{
+    pStaStateMachine->targetNetworkId_ = 0;
+    EXPECT_FALSE(pStaStateMachine->pInitState->NotAllowConnectToNetwork(1, RANDOMMAC_BSSID, NETWORK_SELECTED_BY_AUTO));
 }
 } // namespace Wifi
 } // namespace OHOS

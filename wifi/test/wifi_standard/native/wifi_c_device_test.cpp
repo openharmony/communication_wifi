@@ -38,6 +38,7 @@ namespace OHOS {
 namespace Wifi {
 
 constexpr int NETWORK_ID = 15;
+constexpr int BLOCK_DURATION_5_MIN = 5 * 60;
 constexpr int FREQUENCY = 2437;
 constexpr int TIMESTAMP = -750366468;
 constexpr int RSSI = 2;
@@ -194,7 +195,10 @@ public:
     void DisableDeviceConfigSuccess()
     {
         int networkId = NETWORK_ID;
-        EXPECT_TRUE(DisableDeviceConfig(networkId) != WIFI_SUCCESS);
+        int64_t blockDuration = -1;
+        EXPECT_TRUE(DisableDeviceConfig(networkId, blockDuration) != WIFI_SUCCESS);
+        blockDuration = BLOCK_DURATION_5_MIN;
+        EXPECT_TRUE(DisableDeviceConfig(networkId, blockDuration) != WIFI_SUCCESS);
     }
 
     void EnableDeviceConfigSuccess()

@@ -108,6 +108,13 @@ enum GameSceneId : int {
     MSG_GAME_STATE_FOREGROUND = 4,
     MSG_GAME_STATE_BACKGROUND = 5,
 };
+
+enum AncoAppState : int {
+    ANCO_APP_STATE_UNKONWN = -1,
+    ANCO_APP_STATE_FOREGROUND = 0,
+    ANCO_APP_STATE_BACKGROUND = 1,
+    ANCO_APP_STATE_DIED = 2,
+};
  
 enum class SupplicantState {
     DISCONNECTED = 0,
@@ -667,7 +674,8 @@ enum class DisabledReason {
     DISABLED_EAP_AKA_FAILURE = 14,
     DISABLED_DISASSOC_REASON = 15,
     DISABLED_MDM_RESTRICTED = 16,
-    NETWORK_SELECTION_DISABLED_MAX = 17
+    USER_FORCE_DISCONNECT = 17,
+    NETWORK_SELECTION_DISABLED_MAX = 18
 };
 
 struct NetworkSelectionStatus {
@@ -773,6 +781,7 @@ struct WifiNetworkControlInfo {
 struct WifiDeviceConfig {
     int instanceId;
     int networkId;
+    int64_t blockDuration;
     /* int status; @deprecated : CURRENT, using 1: DISABLED 2: ENABLED */
     /*  network selection status*/
     NetworkSelectionStatus networkSelectionStatus;
@@ -858,6 +867,7 @@ struct WifiDeviceConfig {
     {
         instanceId = 0;
         networkId = INVALID_NETWORK_ID;
+        blockDuration = -1;
         bssidType = REAL_DEVICE_ADDRESS;
         band = 0;
         channel = 0;
@@ -948,6 +958,15 @@ enum class WifiProtectMode {
     WIFI_PROTECT_FULL_HIGH_PERF = 2,
     WIFI_PROTECT_FULL_LOW_LATENCY = 3,
     WIFI_PROTECT_NO_HELD = 4
+};
+
+enum class AddrTypeIpV6 {
+    ADDR_TYPE_LINK_LOCAL = 0,
+    ADDR_TYPE_GLOBAL = 1,
+    ADDR_TYPE_SUBNET = 2,
+    ADDR_TYPE_RANDOM_GLOBAL = 3,
+    ADDR_TYPE_UNIQUE_LOCAL_1 = 4,
+    ADDR_TYPE_UNIQUE_LOCAL_2 = 5
 };
 
 /* DHCP IpV6Info */

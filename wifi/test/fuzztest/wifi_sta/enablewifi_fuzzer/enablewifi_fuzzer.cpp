@@ -15,38 +15,38 @@
 
 #include "enablewifi_fuzzer.h"
 #include "wifi_device.h"
-
+#include <fuzzer/FuzzedDataProvider.h>
 namespace OHOS {
 namespace Wifi {
+    static const int32_t NUM_BYTES = 1;
     std::shared_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
-    bool EnableWifiFuzzerTest(const uint8_t* data, size_t size)
+    bool EnableWifiFuzzerTest(FuzzedDataProvider& FDP)
     {
         WifiLinkedInfo info;
-        std::string get_countryCode = std::string(reinterpret_cast<const char*>(data), size);
-        std::string set_countryCode = std::string(reinterpret_cast<const char*>(data), size);
+        std::string get_countryCode = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string set_countryCode = FDP.ConsumeBytesAsString(NUM_BYTES);
         int addResult;
 
         WifiDeviceConfig config;
-        config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-        config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-        config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-        config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+        config.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        config.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        config.preSharedKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+        config.keyMgmt = FDP.ConsumeBytesAsString(NUM_BYTES);
 
-        if (size >= sizeof(WifiLinkedInfo)) {
-            int index = 0;
-            info.networkId = static_cast<int>(data[index++]);
-            info.rssi = static_cast<int>(data[index++]);
-            info.band = static_cast<int>(data[index++]);
-            info.linkSpeed = static_cast<int>(data[index++]);
-            info.frequency = static_cast<int>(data[index++]);
-            info.macType = static_cast<int>(data[index++]);
-            info.ssid = std::string(reinterpret_cast<const char*>(data), size);
-            info.bssid = std::string(reinterpret_cast<const char*>(data), size);
-            info.macAddress = std::string(reinterpret_cast<const char*>(data), size);
-        }
+        info.networkId = FDP.ConsumeIntegral<int>();
+        info.rssi = FDP.ConsumeIntegral<int>();
+        info.band = FDP.ConsumeIntegral<int>();
+        info.linkSpeed = FDP.ConsumeIntegral<int>();
+        info.frequency = FDP.ConsumeIntegral<int>();
+        info.macType = FDP.ConsumeIntegral<int>();
+        info.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        info.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        info.macAddress = FDP.ConsumeIntegral<int>();
+
         if (devicePtr == nullptr) {
             return false;
         }
+
         bool isCandidate = false;
         devicePtr->EnableWifi();
         devicePtr->RemoveAllDevice();
@@ -64,7 +64,7 @@ namespace Wifi {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::Wifi::EnableWifiFuzzerTest(data, size);
+    FuzzedDataProvider FDP (data, size);
+    OHOS::Wifi::EnableWifiFuzzerTest(FDP);
     return 0;
 }
-

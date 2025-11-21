@@ -570,6 +570,53 @@ HWTEST_F(StaStateMachineTest, TryToSaveIpV6ResultAddrListTest, TestSize.Level1)
     EXPECT_EQ(ipv6Info.IpAddrMap["2001:db8::2"], 2);
 }
 
+HWTEST_F(StaStateMachineTest, TryToSaveIpV6ResultExtTest, TestSize.Level1)
+{
+    IpInfo ipInfo;
+    IpV6Info ipv6Info;
+    DhcpResult result;
+    // Test null result
+    pStaStateMachine->pDhcpResultNotify->TryToSaveIpV6ResultExt(ipInfo, ipv6Info, nullptr);
+    // Test with addresses
+    ipv6Info.linkIpV6Address = "fe80::1";
+    ipv6Info.globalIpV6Address = "2001:db8::1";
+    ipv6Info.randGlobalIpV6Address = "2001:db8::2";
+    ipv6Info.uniqueLocalAddress1 = "fc00::1";
+    ipv6Info.uniqueLocalAddress2 = "fc00::2";
+    ipv6Info.primaryDns = "2001:db8::53";
+    ipv6Info.secondDns = "2001:db8::54";
+    pStaStateMachine->pDhcpResultNotify->TryToSaveIpV6ResultExt(ipInfo, ipv6Info, &result);
+    // Check IpAddrMap
+    EXPECT_EQ(ipv6Info.IpAddrMap.size(), 5u);
+    EXPECT_EQ(ipv6Info.IpAddrMap["fe80::1"], static_cast<int>(AddrTypeIpV6::ADDR_TYPE_LINK_LOCAL));
+    EXPECT_EQ(ipv6Info.IpAddrMap["2001:db8::1"], static_cast<int>(AddrTypeIpV6::ADDR_TYPE_GLOBAL));
+    EXPECT_EQ(ipv6Info.IpAddrMap["2001:db8::2"], static_cast<int>(AddrTypeIpV6::ADDR_TYPE_RANDOM_GLOBAL));
+    EXPECT_EQ(ipv6Info.IpAddrMap["fc00::1"], static_cast<int>(AddrTypeIpV6::ADDR_TYPE_UNIQUE_LOCAL_1));
+    EXPECT_EQ(ipv6Info.IpAddrMap["fc00::2"], static_cast<int>(AddrTypeIpV6::ADDR_TYPE_UNIQUE_LOCAL_2));
+    // Check dnsAddr
+    EXPECT_EQ(ipv6Info.dnsAddr.size(), 2u);
+    EXPECT_EQ(ipv6Info.dnsAddr[0], "2001:db8::53");
+    EXPECT_EQ(ipv6Info.dnsAddr[1], "2001:db8::54");
+    // Test empty addresses
+    ipv6Info.linkIpV6Address = "";
+    ipv6Info.globalIpV6Address = "";
+    ipv6Info.randGlobalIpV6Address = "";
+    ipv6Info.uniqueLocalAddress1 = "";
+    ipv6Info.uniqueLocalAddress2 = "";
+    ipv6Info.primaryDns = "";
+    ipv6Info.secondDns = "";
+    ipv6Info.IpAddrMap.clear();
+    ipv6Info.dnsAddr.clear();
+    pStaStateMachine->pDhcpResultNotify->TryToSaveIpV6ResultExt(ipInfo, ipv6Info, &result);
+    EXPECT_EQ(ipv6Info.IpAddrMap.size(), 0u);
+    EXPECT_EQ(ipv6Info.dnsAddr.size(), 0u);
+    // Test invalid DNS
+    ipv6Info.primaryDns = "0";
+    ipv6Info.secondDns = "0";
+    pStaStateMachine->pDhcpResultNotify->TryToSaveIpV6ResultExt(ipInfo, ipv6Info, &result);
+    EXPECT_EQ(ipv6Info.dnsAddr.size(), 0u);
+}
+
 HWTEST_F(StaStateMachineTest, SetConnectMethodTest, TestSize.Level1)
 {
     SetConnectMethodTest();

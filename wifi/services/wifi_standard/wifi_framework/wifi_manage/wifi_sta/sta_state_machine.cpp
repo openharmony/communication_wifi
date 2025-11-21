@@ -126,6 +126,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define MAX_AUTN_STR_LEN (2 * UMTS_AUTH_CHALLENGE_AUTN_LEN)
 
 constexpr int32_t MAX_NO_INTERNET_CNT = 3;
+constexpr uint32_t PKT_DIR_RPT_CNT = 3;
 
 const std::map<int, int> wpa3FailreasonMap {
     {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
@@ -687,7 +688,8 @@ bool StaStateMachine::InitState::NotAllowConnectToNetwork(int networkId, const s
         return true;
     }
 
-    if (config.hiddenSSID && NotExistInScanList(config)) {
+    if (config.hiddenSSID && NotExistInScanList(config) &&
+        !pStaStateMachine->selfCureService_->IsSelfCureL2Connecting()) {
         DealHiddenSsidConnectMiss(networkId);
         return true;
     }
@@ -697,6 +699,7 @@ bool StaStateMachine::InitState::NotAllowConnectToNetwork(int networkId, const s
         WIFI_LOGI("NotAllowConnectToNetwork, RestrictedByMdm");
         BlockConnectService::GetInstance().UpdateNetworkSelectStatus(config.networkId,
             DisabledReason::DISABLED_MDM_RESTRICTED);
+        pStaStateMachine->ReportMdmRestrictedEvent(config.ssid, config.bssid, "BLOCK_LIST");
         return true;
     }
 #endif
@@ -881,7 +884,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         }
         int curNetworkId = (pStaStateMachine->linkedInfo.networkId == INVALID_NETWORK_ID) ?
             pStaStateMachine->targetNetworkId_ : pStaStateMachine->linkedInfo.networkId;
-        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(curNetworkId,
+        BlockConnectService::GetInstance().UpdateNetworkSelectStatusForWpa(curNetworkId,
             DisabledReason::DISABLED_DISASSOC_REASON, reason);
         if (BlockConnectService::GetInstance().IsFrequentDisconnect(bssid, reason, locallyGenerated)) {
             BlockConnectService::GetInstance().UpdateNetworkSelectStatus(curNetworkId,
@@ -1073,59 +1076,40 @@ void StaStateMachine::StopDhcp(bool isStopV4, bool isStopV6)
     HandlePostDhcpSetup();
 }
 
-std::string StaStateMachine::GetRandomMacForDevice(const WifiDeviceConfig &deviceConfig,
-    const std::string &bssid, const std::string &realMac)
-{
-    WifiStoreRandomMac randomMacInfo;
-    InitRandomMacInfo(deviceConfig, bssid, randomMacInfo);
-    if (randomMacInfo.peerBssid.empty()) {
-        LOGI("scanInfo has no target wifi and bssid is empty!");
-    }
-    std::string currentMac;
-    if (!MacAddress::IsValidMac(deviceConfig.macAddress) || deviceConfig.macAddress == realMac) {
-        WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
-        if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
-            currentMac = randomMacInfo.randomMac;
-        } else {
-            SetRandomMacConfig(randomMacInfo, deviceConfig, currentMac);
-            WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
-        }
-    } else if (IsPskEncryption(deviceConfig.keyMgmt)) {
-        WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
-        if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
-            currentMac = randomMacInfo.randomMac;
-        } else {
-            randomMacInfo.randomMac = deviceConfig.macAddress;
-            currentMac = randomMacInfo.randomMac;
-            WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
-        }
-    } else {
-        currentMac = deviceConfig.macAddress;
-    }
-    return currentMac;
-}
-
 bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::string &bssid)
 {
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
     std::string currentMac, realMac;
     WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
-    
-#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
-    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::RANDOMMAC &&
-        WifiSettings::GetInstance().IsRandomMacDisabled(m_instId)) {
-        int uid = GetCallingUid();
-        std::string bundleName = "";
-        GetBundleNameByUid(uid, bundleName);
-        WriteMdmHiSysEvent(deviceConfig.ssid, deviceConfig.bssid, "MDM_RESTRICTED", uid, bundleName);
-    }
-#endif
-    
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC ||
         WifiSettings::GetInstance().IsRandomMacDisabled() || ShouldUseFactoryMac(deviceConfig)) {
         currentMac = realMac;
     } else {
-        currentMac = GetRandomMacForDevice(deviceConfig, bssid, realMac);
+        WifiStoreRandomMac randomMacInfo;
+        InitRandomMacInfo(deviceConfig, bssid, randomMacInfo);
+        if (randomMacInfo.peerBssid.empty()) {
+            LOGI("scanInfo has no target wifi and bssid is empty!");
+        }
+        if (!MacAddress::IsValidMac(deviceConfig.macAddress) || deviceConfig.macAddress == realMac) {
+            WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
+            if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
+                currentMac = randomMacInfo.randomMac;
+            } else {
+                SetRandomMacConfig(randomMacInfo, deviceConfig, currentMac);
+                WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+            }
+        } else if (IsPskEncryption(deviceConfig.keyMgmt)) {
+            WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
+            if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
+                currentMac = randomMacInfo.randomMac;
+            } else {
+                randomMacInfo.randomMac = deviceConfig.macAddress;
+                currentMac = randomMacInfo.randomMac;
+                WifiSettings::GetInstance().AddRandomMac(randomMacInfo);
+            }
+        } else {
+            currentMac = deviceConfig.macAddress;
+        }
     }
     if (!SetMacToHal(currentMac, realMac, m_instId)) {
         return false;
@@ -1609,6 +1593,7 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
         return;
     }
     if (pStaStateMachine->WhetherRestrictedByMdm(config.ssid, config.bssid, true)) {
+        pStaStateMachine->ReportMdmRestrictedEvent(config.ssid, config.bssid, "BLOCK_LIST");
         pStaStateMachine->DealMdmRestrictedConnect(config);
         return;
     }
@@ -2438,6 +2423,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
         lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
+        StopTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION));
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::HAS_INTERNET, updatePortalAuthTime);
         if (getCurrentWifiDeviceConfig().isPortal) {
             StartDetectTimer(DETECT_TYPE_PERIODIC);
@@ -2461,6 +2447,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
         InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
         lastCheckNetState_ = OperateResState::CONNECT_NETWORK_DISABLED;
+        StopTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION));
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
 // if wifipro is open, wifipro will notify selfcure no internet, if not, sta should notify
 #ifndef FEATURE_WIFI_PRO_SUPPORT
@@ -2534,8 +2521,14 @@ void StaStateMachine::PublishPortalNitificationAndLogin()
 
     if (shouldShowNotification) {
         if (selfCureService_ == nullptr || !selfCureService_->IsSelfCureOnGoing()) {
-            WIFI_LOGI("%{public}s, ShowPortalNitification", __func__);
-            ShowPortalNitification();
+            if (lastCheckNetState_ == OperateResState::CONNECT_NETWORK_ENABLED) {
+                WIFI_LOGI("%{public}s, ShowPortalNitification delay", __func__);
+                StartTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION), PORTAL_NOTIFICATION_TIMEOUT);
+                StartDetectTimer(DETECT_TYPE_DEFAULT);
+            } else {
+                WIFI_LOGI("%{public}s, ShowPortalNitification", __func__);
+                ShowPortalNitification();
+            }
         }
     }
 #endif
@@ -2737,6 +2730,11 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
         case CMD_START_NETCHECK : {
             ret = EXECUTED;
             DealNetworkCheck(msg);
+            break;
+        }
+        case CMD_SHOW_PORTAL_NOTIFICATION : {
+            ret = EXECUTED;
+            pStaStateMachine->ShowPortalNitification();
             break;
         }
         case WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT: {
@@ -3172,6 +3170,7 @@ void StaStateMachine::AfterApLinkedprocess(std::string bssid)
 
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     if (WhetherRestrictedByMdm(deviceConfig.ssid, deviceConfig.bssid, true)) {
+        ReportMdmRestrictedEvent(deviceConfig.ssid, deviceConfig.bssid, "BLOCK_LIST");
         DealMdmRestrictedConnect(deviceConfig);
         return;
     }
@@ -3587,6 +3586,35 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
     }
 }
 
+void StaStateMachine::DhcpResultNotify::TryToSaveIpV6ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result)
+{
+    if (result == nullptr) {
+        WIFI_LOGE("TryToSaveIpV6ResultExt result nullptr.");
+        return;
+    }
+    if (!ipv6Info.linkIpV6Address.empty()) {
+        ipv6Info.IpAddrMap[ipv6Info.linkIpV6Address] = static_cast<int>(AddrTypeIpV6::ADDR_TYPE_LINK_LOCAL);
+    }
+    if (!ipv6Info.globalIpV6Address.empty()) {
+        ipv6Info.IpAddrMap[ipv6Info.globalIpV6Address] = static_cast<int>(AddrTypeIpV6::ADDR_TYPE_GLOBAL);
+    }
+    if (!ipv6Info.randGlobalIpV6Address.empty()) {
+        ipv6Info.IpAddrMap[ipv6Info.randGlobalIpV6Address] = static_cast<int>(AddrTypeIpV6::ADDR_TYPE_RANDOM_GLOBAL);
+    }
+    if (!ipv6Info.uniqueLocalAddress1.empty()) {
+        ipv6Info.IpAddrMap[ipv6Info.uniqueLocalAddress1] = static_cast<int>(AddrTypeIpV6::ADDR_TYPE_UNIQUE_LOCAL_1);
+    }
+    if (!ipv6Info.uniqueLocalAddress2.empty()) {
+        ipv6Info.IpAddrMap[ipv6Info.uniqueLocalAddress2] = static_cast<int>(AddrTypeIpV6::ADDR_TYPE_UNIQUE_LOCAL_2);
+    }
+    if (ipv6Info.primaryDns.length() > 0 && ipv6Info.primaryDns != "0") {
+        ipv6Info.dnsAddr.push_back(ipv6Info.primaryDns);
+    }
+    if (ipv6Info.secondDns.length() > 0 && ipv6Info.secondDns != "0") {
+        ipv6Info.dnsAddr.push_back(ipv6Info.secondDns);
+    }
+}
+
 void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result)
 {
     if (result == nullptr) {
@@ -3604,12 +3632,8 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
     ipv6Info.uniqueLocalAddress1 = result->strOptLocalAddr1;
     ipv6Info.uniqueLocalAddress2 = result->strOptLocalAddr2;
     ipv6Info.dnsAddr.clear();
-    if (ipv6Info.primaryDns.length() > 0 && ipv6Info.primaryDns != "0") {
-        ipv6Info.dnsAddr.push_back(ipv6Info.primaryDns);
-    }
-    if (ipv6Info.secondDns.length() > 0 && ipv6Info.secondDns != "0") {
-        ipv6Info.dnsAddr.push_back(ipv6Info.secondDns);
-    }
+    ipv6Info.IpAddrMap.clear();
+    TryToSaveIpV6ResultExt(ipInfo, ipv6Info, result);
     if (result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
         for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
             if (std::find(ipv6Info.dnsAddr.begin(), ipv6Info.dnsAddr.end(), result->dnsList.dnsAddr[i]) ==
@@ -3904,6 +3928,17 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
 {
     std::vector<WifiScanInfo> scanInfoList;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
+    if (!halDeviceConfig.bssid.empty()) {
+        for (auto &scanInfo : scanInfoList) {
+            if (halDeviceConfig.bssid == scanInfo.bssid) {
+                AppendFastTransitionKeyMgmt(scanInfo, halDeviceConfig);
+                halDeviceConfig.ssid = scanInfo.oriSsid;
+                WIFI_LOGI("BssidMatchConvertSsid back to oriSsid:%{public}s, keyMgmt:%{public}s",
+                    SsidAnonymize(halDeviceConfig.ssid).c_str(), halDeviceConfig.keyMgmt.c_str());
+                return;
+            }
+        }
+    }
     for (auto &scanInfo : scanInfoList) {
         std::string deviceKeyMgmt;
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
@@ -3944,7 +3979,7 @@ std::string StaStateMachine::GetSuitableKeyMgmtForWpaMixed(const WifiDeviceConfi
     return KEY_MGMT_WPA_PSK;
 }
 
-ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid) const
+ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid)
 {
     WIFI_LOGI("Enter ConvertDeviceCfg.\n");
     WifiHalDeviceConfig halDeviceConfig;
@@ -3975,15 +4010,20 @@ ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string 
     }
     WIFI_LOGI("ConvertDeviceCfg SetDeviceConfig selected network ssid=%{public}s, bssid=%{public}s, instId=%{public}d",
         SsidAnonymize(halDeviceConfig.ssid).c_str(), MacAnonymize(halDeviceConfig.bssid).c_str(), m_instId);
-    ConvertSsidToOriginalSsid(config, halDeviceConfig);
-
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    if (bssid.empty()) {
+        // user select connect
+        UserSelectConnectToNetwork(config, ifaceName, halDeviceConfig);
+    } else {
+        // auto connect
+        AutoSelectConnectToNetwork(bssid, ifaceName, halDeviceConfig);
+    }
+    ConvertSsidToOriginalSsid(config, halDeviceConfig);
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(WPA_DEFAULT_NETWORKID, halDeviceConfig, ifaceName) !=
         WIFI_HAL_OPT_OK) {
         WIFI_LOGE("ConvertDeviceCfg SetDeviceConfig failed!");
         return WIFI_OPT_FAILED;
     }
-
     if (SetExternalSim("wlan0", halDeviceConfig.eapConfig.eap, WIFI_EAP_OPEN_EXTERNAL_SIM)) {
         WIFI_LOGE("StaStateMachine::ConvertDeviceCfg: failed to set external_sim");
         return WIFI_OPT_FAILED;
@@ -4277,8 +4317,9 @@ void StaStateMachine::SetSupportedWifiCategory()
         linkedInfo.isMloConnected = false;
     }
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    WIFI_LOGI("%{public}s supportedWifiCategory:%{public}d, isMloConnected:%{public}d", __FUNCTION__,
-        static_cast<int>(linkedInfo.supportedWifiCategory), linkedInfo.isMloConnected);
+    WIFI_LOGI("%{public}s supportedWifiCategory:%{public}d, isMloConnected:%{public}d, isHiLinkPro:%{public}d",
+        __FUNCTION__, static_cast<int>(linkedInfo.supportedWifiCategory),
+        linkedInfo.isMloConnected, linkedInfo.isHiLinkProNetwork);
 }
 
 void StaStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
@@ -4317,6 +4358,19 @@ int StaStateMachine::UpdateLinkInfoRssi(int inRssi)
         outRssi = INVALID_RSSI_VALUE;
     }
     return outRssi;
+}
+
+void StaStateMachine::DealSignalPacketChangedByTime(WifiSignalPollInfo &signalInfo)
+{
+    if (staSignalPollDelayTime_ == STA_SIGNAL_POLL_DELAY_WITH_TASK) {
+        if (pktDirCnt_ % PKT_DIR_RPT_CNT == 0) {
+            DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
+        }
+        pktDirCnt_++;
+    } else {
+        DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
+        pktDirCnt_ = 0;
+    }
 }
 
 void StaStateMachine::DealSignalPollResult()
@@ -4371,7 +4425,7 @@ void StaStateMachine::DealSignalPollResult()
 #endif
 #endif
     WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
-    DealSignalPacketChanged(signalInfo.txPackets, signalInfo.rxPackets);
+    DealSignalPacketChangedByTime(signalInfo);
     JudgeEnableSignalPoll(signalInfo);
 }
 
@@ -4653,17 +4707,18 @@ void StaStateMachine::DealReassociateCmd(InternalMessagePtr msg)
     }
 }
 
-void StaStateMachine::UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& ifaceName)
+void StaStateMachine::UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& ifaceName,
+    WifiHalDeviceConfig& halDeviceConfig)
 {
     if (!deviceConfig.userSelectBssid.empty()) {
         WIFI_LOGI("SetBssid userSelectBssid=%{public}s", MacAnonymize(deviceConfig.userSelectBssid).c_str());
-        WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, deviceConfig.userSelectBssid, ifaceName);
+        halDeviceConfig.bssid = deviceConfig.userSelectBssid;
     } else {
         std::string autoSelectBssid;
         std::unique_ptr<NetworkSelectionManager> networkSelectionManager = std::make_unique<NetworkSelectionManager>();
         networkSelectionManager->SelectNetworkWithSsid(deviceConfig, autoSelectBssid);
         WIFI_LOGI("SetBssid autoSelectBssid=%{public}s", MacAnonymize(autoSelectBssid).c_str());
-        WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, autoSelectBssid, ifaceName);
+        halDeviceConfig.bssid = autoSelectBssid;
     }
     deviceConfig.userSelectBssid = "";
     WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
@@ -4671,10 +4726,11 @@ void StaStateMachine::UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig,
     return;
 }
 
-void StaStateMachine::AutoSelectConnectToNetwork(const std::string& bssid, std::string& ifaceName)
+void StaStateMachine::AutoSelectConnectToNetwork(const std::string& bssid, std::string& ifaceName,
+    WifiHalDeviceConfig& halDeviceConfig)
 {
     WIFI_LOGI("SetBssid bssid=%{public}s", MacAnonymize(bssid).c_str());
-    WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, bssid, ifaceName);
+    halDeviceConfig.bssid = bssid;
     return;
 }
 
@@ -4701,7 +4757,15 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     }
     targetNetworkId_ = networkId;
     linkSwitchDetectingFlag_ = false;
+#ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
+    if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::RANDOMMAC &&
+        WifiSettings::GetInstance().IsRandomMacDisabled(m_instId) &&
+        SetRandomMac(deviceConfig, bssid)) {
+        ReportMdmRestrictedEvent(deviceConfig.ssid, deviceConfig.bssid, "MDM_RESTRICTED");
+    }
+#else
     SetRandomMac(deviceConfig, bssid);
+#endif
     WIFI_LOGI("StartConnectToNetwork SetRandomMac targetNetworkId_:%{public}d, bssid:%{public}s", targetNetworkId_,
         MacAnonymize(bssid).c_str());
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
@@ -4722,14 +4786,6 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     wifiDataReportService_->InitReportApAllInfo();
 #endif
 #endif
-    if (bssid.empty()) {
-        // user select connect
-        UserSelectConnectToNetwork(deviceConfig, ifaceName);
-    } else {
-        // auto connect
-        AutoSelectConnectToNetwork(bssid, ifaceName);
-    }
-
     if (WifiStaHalInterface::GetInstance().Connect(WPA_DEFAULT_NETWORKID, ifaceName) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("Connect failed!");
         InvokeOnStaConnChanged(OperateResState::CONNECT_SELECT_NETWORK_FAILED, linkedInfo);
@@ -5009,30 +5065,37 @@ void StaStateMachine::DealMdmRestrictedConnect(WifiDeviceConfig &config)
 
 bool StaStateMachine::WhetherRestrictedByMdm(const std::string &ssid, const std::string &bssid, bool checkBssid)
 {
-    bool isRestricted = false;
     if (checkBssid) {
-        isRestricted = WifiSettings::GetInstance().FindWifiBlockListConfig(ssid, bssid, 0) ||
-            (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&
-            !WifiSettings::GetInstance().FindWifiWhiteListConfig(ssid, bssid, 0));
+        return WifiSettings::GetInstance().FindWifiBlockListConfig(ssid, bssid, 0) ||
+        (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&
+        !WifiSettings::GetInstance().FindWifiWhiteListConfig(ssid, bssid, 0));
     } else {
         if (WifiSettings::GetInstance().FindWifiBlockListConfig(ssid, bssid, 0)) {
-            isRestricted = true;
+            return true;
         }
         if (!WifiSettings::GetInstance().WhetherSetWhiteListConfig() || bssid.empty()) {
-            isRestricted = false;
+            return false;
         }
         if (!WifiSettings::GetInstance().FindWifiWhiteListConfig(ssid, bssid)) {
-            isRestricted = true;
+            return true;
         }
-        isRestricted = false;
+        return false;
     }
-    if (isRestricted) {
-        int uid = GetCallingUid();
-        std::string bundleName = "";
-        GetBundleNameByUid(uid, bundleName);
-        WriteMdmHiSysEvent(ssid, bssid, "BLOCK_LIST", uid, bundleName);
-    }
-    return isRestricted;
+}
+
+void StaStateMachine::ReportMdmRestrictedEvent(const std::string &ssid, const std::string &bssid,
+                                                const std::string &restrictedType)
+{
+    int uid = GetCallingUid();
+    std::string bundleName = "";
+    GetBundleNameByUid(uid, bundleName);
+    MdmRestrictedInfo mdmInfo;
+    mdmInfo.ssid = ssid;
+    mdmInfo.bssid = bssid;
+    mdmInfo.restrictedType = restrictedType;
+    mdmInfo.uid = uid;
+    mdmInfo.bundleName = bundleName;
+    WriteMdmHiSysEvent(mdmInfo);
 }
 #endif
 

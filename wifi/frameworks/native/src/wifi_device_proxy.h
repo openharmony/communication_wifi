@@ -169,9 +169,10 @@ public:
      * @Description Disable Wi-Fi device configuration.
      *
      * @param networkId - device config's network id
+     * @param blockDuration - block duration time(in seconds)
      * @return ErrCode - operation result
      */
-    ErrCode DisableDeviceConfig(int networkId) override;
+    ErrCode DisableDeviceConfig(int networkId, int64_t blockDuration) override;
 
     /**
      * @Description Set whether to allow automatic connect by networkid.

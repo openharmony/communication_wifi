@@ -23,6 +23,9 @@ namespace OHOS {
 namespace Wifi {
 
 const int DEFAULT_MIN_RSSI = -140;
+constexpr int MIN_5GHZ_BAND_FREQUENCY = 5000;
+constexpr int MIN_RSSI_VALUE_24G = -80;
+constexpr int MIN_RSSI_VALUE_5G = -77;
 
 enum ConnScene {
     UNKNOW_SCENE = 0,

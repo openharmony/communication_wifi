@@ -36,7 +36,7 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("Perf5gHandoverService");
-
+constexpr int32_t BLOCK5G_RELEASE_THRESHOLD = -60;
 Perf5gHandoverService::Perf5gHandoverService()
 {
     pDualBandRepostitory_ = std::make_shared<DualBandRepostitory>(
@@ -227,6 +227,11 @@ void Perf5gHandoverService::ScanResultUpdated(std::vector<InterScanInfo> &scanIn
     for (auto &wifiScanInfo : scanInfos) {
         if (wifiScanInfo.bssid == connectedAp_->apInfo.bssid) {
             currentApScanResult = &wifiScanInfo;
+        }
+        if (wifiScanInfo.rssi >= BLOCK5G_RELEASE_THRESHOLD &&
+            NetworkBlockListManager::GetInstance().IsInPerf5gBlocklist(wifiScanInfo.bssid)) {
+            WIFI_LOGI("Perf5gBlocklist, rssi:%{public}d remove", wifiScanInfo.rssi);
+            NetworkBlockListManager::GetInstance().RemovePerf5gBlocklist(wifiScanInfo.bssid);
         }
     }
     if (currentApScanResult == nullptr) {
@@ -544,23 +549,14 @@ void Perf5gHandoverService::AddRelationApInfo(RelationAp &relationAp)
 void Perf5gHandoverService::FoundMonitorAp(int32_t relationApIndex, std::vector<InterScanInfo> &wifiScanInfos)
 {
     if (NetworkBlockListManager::GetInstance().IsInWifiBlocklist(relationAps_[relationApIndex].apInfo_.bssid) ||
-        NetworkBlockListManager::GetInstance().IsInAbnormalWifiBlocklist(relationAps_[relationApIndex].apInfo_.bssid)) {
+        NetworkBlockListManager::GetInstance().IsInAbnormalWifiBlocklist(relationAps_[relationApIndex].apInfo_.bssid) ||
+        NetworkBlockListManager::GetInstance().IsInPerf5gBlocklist(relationAps_[relationApIndex].apInfo_.bssid)) {
         WIFI_LOGI("FoundMonitorAp, relation ap(%{public}s) in block list, can not monitor",
             MacAnonymize(relationAps_[relationApIndex].apInfo_.bssid).data());
         perf5gChrInfo_.inBlackListNum++;
         return;
     }
-    WifiDeviceConfig config;
-    WifiSettings::GetInstance().GetDeviceConfig(relationAps_[relationApIndex].apInfo_.networkId, config);
-    if (!config.isAllowAutoConnect) {
-        WIFI_LOGI("FoundMonitorAp, ssid:%{public}s not allow autoconnect",
-            SsidAnonymize(relationAps_[relationApIndex].apInfo_.ssid).data());
-        return;
-    }
-    if (relationAps_[relationApIndex].apInfo_.networkStatus != NetworkStatus::HAS_INTERNET) {
-        WIFI_LOGI("FoundMonitorAp, no internet(%{public}d), can not monitor",
-            relationAps_[relationApIndex].apInfo_.networkStatus);
-        perf5gChrInfo_.notInternetRela5gNum++;
+    if (!IsValidAp(relationApIndex)) {
         return;
     }
     for (const auto &wifiScanInfo : wifiScanInfos) {
@@ -582,6 +578,36 @@ void Perf5gHandoverService::FoundMonitorAp(int32_t relationApIndex, std::vector<
         }
     }
 }
+
+bool Perf5gHandoverService::IsValidAp(int32_t relationApIndex)
+{
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(relationAps_[relationApIndex].apInfo_.networkId, config);
+    if (!config.isAllowAutoConnect) {
+        WIFI_LOGI("FoundMonitorAp, ssid:%{public}s not allow autoconnect",
+            SsidAnonymize(relationAps_[relationApIndex].apInfo_.ssid).data());
+        return false;
+    }
+    if (!config.isSecureWifi) {
+        WIFI_LOGI("FoundMonitorAp, ssid:%{public}s insecure network",
+            SsidAnonymize(relationAps_[relationApIndex].apInfo_.ssid).data());
+        return false;
+    }
+    // Check if network is currently disabled (by DisableDeviceConfig)
+    if (config.networkSelectionStatus.status != WifiDeviceConfigStatus::ENABLED) {
+        WIFI_LOGI("FoundMonitorAp, ssid:%{public}s is disabled, cannot perform 5G handover",
+            SsidAnonymize(relationAps_[relationApIndex].apInfo_.ssid).data());
+        return false;
+    }
+    if (relationAps_[relationApIndex].apInfo_.networkStatus != NetworkStatus::HAS_INTERNET) {
+        WIFI_LOGI("FoundMonitorAp, no internet(%{public}d), can not monitor",
+            relationAps_[relationApIndex].apInfo_.networkStatus);
+        perf5gChrInfo_.notInternetRela5gNum++;
+        return false;
+    }
+    return true;
+}
+
 void Perf5gHandoverService::UnloadScanController()
 {
     if (pWifiScanController_ != nullptr) {
@@ -708,8 +734,19 @@ void Perf5gHandoverService::LoadRelationApInfo()
     }
 }
 
+void Perf5gHandoverService::RemoveRelationApDuplicates(std::vector<RelationAp> &relationAps)
+{
+    int32_t num = static_cast<int32_t>(relationAps.size());
+    std::sort(relationAps.begin(), relationAps.end());
+    auto last = std::unique(relationAps.begin(), relationAps.end());
+    relationAps.erase(last, relationAps.end());
+    WIFI_LOGI("removeRelationApDuplicates, before:%{public}d after:%{public}d",
+        num, static_cast<int32_t>(relationAps.size()));
+}
+
 void Perf5gHandoverService::PrintRelationAps()
 {
+    RemoveRelationApDuplicates(relationAps_);
     std::stringstream associateInfo;
     for (auto iter : relationAps_) {
         if (associateInfo.rdbuf() ->in_avail() != 0) {

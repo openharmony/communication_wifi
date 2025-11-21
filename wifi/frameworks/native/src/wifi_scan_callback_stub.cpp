@@ -19,6 +19,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
+#include "wifi_errcode.h"
 
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanCallbackStub");
 namespace OHOS {

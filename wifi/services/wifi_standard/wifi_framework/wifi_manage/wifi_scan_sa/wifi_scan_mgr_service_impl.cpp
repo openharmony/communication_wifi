@@ -27,6 +27,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiScanMgrServiceImpl");
 
 namespace OHOS {
 namespace Wifi {
+const int SCAN_IDL_ERROR_OFFSET = 3300000;
 std::mutex WifiScanMgrServiceImpl::g_instanceLock;
 std::mutex WifiScanMgrServiceImpl::g_scanMutex;
 sptr<WifiScanMgrServiceImpl> WifiScanMgrServiceImpl::g_instance;
@@ -108,14 +109,15 @@ bool WifiScanMgrServiceImpl::Init()
     return true;
 }
 
-sptr<IRemoteObject> WifiScanMgrServiceImpl::GetWifiRemote(int instId)
+int32_t WifiScanMgrServiceImpl::GetWifiRemote(int instId, sptr<IRemoteObject>& remote)
 {
     std::lock_guard<std::mutex> lock(g_scanMutex);
     auto iter = mWifiService.find(instId);
     if (iter != mWifiService.end()) {
-        return mWifiService[instId];
+        remote = iter->second;
+        return WIFI_OPT_SUCCESS;
     }
-    return nullptr;
+    return  WIFI_OPT_FAILED + SCAN_IDL_ERROR_OFFSET;
 }
 
 std::map<int, sptr<IRemoteObject>>& WifiScanMgrServiceImpl::GetScanServiceMgr()

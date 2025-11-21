@@ -17,6 +17,7 @@ import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.Ab
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { setUrl, setNetId, setShouldShowBrowseItem, setIsInOOBE, getIsInOOBE } from '../common/utils';
+import { updateOnNewWant, updateOnBackground } from '../common/chr';
 import { emitter } from '@kit.BasicServicesKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import settings from '@ohos.settings';

@@ -324,7 +324,8 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
 void RegisterDeviceAppraisalTest(FuzzedDataProvider& FDP)
 {
     StaDeviceAppraisal *appraisal = nullptr;
-    int priority = FDP.ConsumeIntegralInRange<int>(0, STATE_NUM);;
+    int priority;
+    priority = FDP.ConsumeIntegralInRange<int>(0, STATE_NUM);
     pStaAutoConnectService->RegisterDeviceAppraisal(appraisal, priority);
 }
 

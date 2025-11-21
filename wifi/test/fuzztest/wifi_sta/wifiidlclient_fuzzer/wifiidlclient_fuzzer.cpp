@@ -174,7 +174,7 @@ void OnIWifiHotSpotIfaceTest(FuzzedDataProvider& FDP)
     SetCountryCode(code, id);
 
     unsigned char mac[] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
-    int lenmac = FDP.ConsumeIntegral<int>(); 
+    int lenmac = FDP.ConsumeIntegral<int>();
     SetMacFilter(mac, lenmac, id);
     DelMacFilter(mac, lenmac, id);
     DisassociateSta(mac, lenmac, id);

@@ -22,7 +22,10 @@ import { SymbolGlyphModifier } from '@kit.ArkUI';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
   validateURL, getIsInOOBE
-} from '../common/utils'
+} from '../common/utils';
+import {
+  updateFinalUrl,updateOnHttpErrorReceive,updateOnErrorReceive,updateOnSslErrorEvent,updateAboutToDisappear
+} from '../common/chr';
 import { connection } from '@kit.NetworkKit';
 import { emitter } from '@kit.BasicServicesKit';
 

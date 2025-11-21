@@ -254,7 +254,7 @@ void UpdateDeviceSupplicantInfFuzzerTest1(const uint8_t *data, size_t size)
     pDeviceManager.UpdateDeviceSupplicantInf(device);
 }
 
-void UpdateDeviceGroupCapFuzzerTest()
+void UpdateDeviceGroupCapFuzzerTest(const uint8_t *data, size_t size)
 {
     std::string mDeviceAddress = std::string(reinterpret_cast<const char *>(data), size);
     uint32_t cap = 1;
@@ -348,6 +348,7 @@ void WifiP2pGroupManagerFuzzerTest(const uint8_t *data, size_t size)
     IsIncludeFuzzerTest(data, size);
     RefreshGroupsFromCurrentGroupFuzzerTest(data, size);
     RefreshCurrentGroupFromGroupsFuzzerTest(data, size);
+    UpdateDeviceGroupCapFuzzerTest(data, size);
 
     UpdateGroupsNetworkFuzzerTest(data, size);
     UpdateGroupsNetworkFuzzerTest1(data, size);
@@ -364,7 +365,6 @@ void WifiP2pDeviceManagerFuzzerTest()
     AddDeviceFuzzerTest();
     UpdateDeviceFuzzerTest();
     UpdateDeviceSupplicantInfFuzzerTest();
-    UpdateDeviceGroupCapFuzzerTest();
     UpdateDeviceGroupCapFuzzerTest1();
     UpdateDeviceGroupCapFuzzerTest2();
     UpdateDeviceStatusFuzzerTest();

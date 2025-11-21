@@ -79,7 +79,7 @@ int IsHotspotDualBandSupportedFuzzTest(const uint8_t* data, size_t size)
 
 int IsOpenSoftApAllowedFuzzTest(FuzzedDataProvider& FDP)
 {
-    bool status = FDP.ConsumeBool();;
+    bool status = FDP.ConsumeBool();
     pWifiHotspotServiceImpl->IsOpenSoftApAllowed(status);
     return 0;
 }

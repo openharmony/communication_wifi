@@ -165,7 +165,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->RemoveDevice(networkId);
     pStaInterface->RemoveAllDevice();
     pStaInterface->EnableDeviceConfig(networkId, attemptEnable);
-    pStaInterface->DisableDeviceConfig(networkId);
+     pStaInterface->DisableDeviceConfig(networkId, blockDuration);
     pStaInterface->StartWps(sconfig);
     pStaInterface->CancelWps();
     std::vector<InterScanInfo> results;

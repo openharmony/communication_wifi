@@ -37,7 +37,7 @@ ErrCode ScanInterface::UnInit()
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanInterface::Scan(bool externFlag, ScanType scanType)
+ErrCode ScanInterface::Scan(bool externFlag, ScanType scanType, int scanStyle)
 {
     WIFI_LOGI("Enter ScanInterface::Scan\n");
     return WIFI_OPT_SUCCESS;

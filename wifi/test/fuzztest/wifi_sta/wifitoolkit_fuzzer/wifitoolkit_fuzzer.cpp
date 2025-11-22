@@ -115,13 +115,13 @@ void InitParam()
     return;
 }
 
-void NetworkXmlParserTest(const uint8_t* data, size_t size)
+void NetworkXmlParserTest()
 {
     WifiDeviceConfig config;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.ssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP->ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP->ConsumeBytesAsString(NUM_BYTES);
 
     m_networkXmlParser->GetIpConfig(root_node);
     m_networkXmlParser->GetConfigNameAsInt(root_node);
@@ -234,7 +234,7 @@ void AppXmlParserTest2(const uint8_t* data, size_t size)
     m_appXmlParser->appParserInner_->InitAppParser(buf);
 }
 
-void AppParserTest(const uint8_t* data, size_t size)
+void AppParserTest()
 {
     m_xmlParser->Parse();
     m_xmlParser->GetNameValue(root_node);
@@ -246,7 +246,7 @@ void AppParserTest(const uint8_t* data, size_t size)
     m_xmlParser->IsDocValid(root_node);
 }
 
-void SoftapParserTest(const uint8_t* data, size_t size)
+void SoftapParserTest()
 {
     m_softapXmlParser->ParseInternal(root_node);
     m_softapXmlParser->GotoSoftApNode(root_node);
@@ -260,10 +260,9 @@ void SoftapParserTest(const uint8_t* data, size_t size)
 void WifiRandomMacHelperTest(const uint8_t* data, size_t size)
 {
     int index = 0;
-    unsigned long long addr1 = static_cast<unsigned long long>(data[index++]);
     unsigned long long random = static_cast<unsigned long long>(data[index++]);
-    std::string content = std::string(reinterpret_cast<const char*>(data), size);
-    std::string randomMacAddr = std::string(reinterpret_cast<const char*>(data), size);
+    std::string content = FDP->ConsumeBytesAsString(NUM_BYTES);
+    std::string randomMacAddr = FDP->ConsumeBytesAsString(NUM_BYTES);
     std::vector<uint8_t> outPlant;
     std::vector<uint8_t> byte;
     std::vector<uint8_t> bytes;
@@ -277,10 +276,18 @@ void WifiRandomMacHelperTest(const uint8_t* data, size_t size)
     m_WifiRandomMacHelper->LongLongToBytes(value, outPlant);
     m_WifiRandomMacHelper->BytesToLonglong(byte);
     m_WifiRandomMacHelper->BytesArrayToString(bytes);
-    m_WifiRandomMacHelper->StringAddrFromLongAddr(addr1, randomMacAddr);
     m_WifiRandomMacHelper->LongAddrFromByteAddr(addr);
     m_WifiRandomMacHelper->GenerateRandomMacAddressByLong(random, randomMacAddr);
 }
+
+void WifiRandomMacHelperTest01(const uint8_t* data, size_t size)
+{
+    int index = 0;
+    unsigned long long addr1 = static_cast<unsigned long long>(data[index++]);
+    std::string randomMacAddr = FDP->ConsumeBytesAsString(NUM_BYTES);
+    m_WifiRandomMacHelper->StringAddrFromLongAddr(addr1, randomMacAddr);
+}
+
 
 void AssetManagerTest()
 {
@@ -400,12 +407,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     FuzzedDataProvider fdp(data, size);
     OHOS::Wifi::FDP = &fdp;
     OHOS::Wifi::InitParam();
-    OHOS::Wifi::NetworkXmlParserTest(data, size);
     OHOS::Wifi::AppXmlParserTest(data, size);
-    OHOS::Wifi::AppParserTest(data, size);
-    OHOS::Wifi::SoftapParserTest(data, size);
     OHOS::Wifi::WifiRandomMacHelperTest(data, size);
+    OHOS::Wifi::WifiRandomMacHelperTest01(data, size);
     OHOS::Wifi::AppXmlParserTest2(data, size);
+    OHOS::Wifi::NetworkXmlParserTest();
+    OHOS::Wifi::AppParserTest();
+    OHOS::Wifi::SoftapParserTest();
     OHOS::Wifi::WifiencryptionutilTest();
     OHOS::Wifi::WifinetworkselectionmanagerTest();
     OHOS::Wifi::AssetManagerTest();

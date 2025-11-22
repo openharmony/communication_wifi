@@ -72,6 +72,7 @@ declare_args() {
   wifi_feature_auto_enable_support = false
   wifi_feature_with_ipv6_selfcure = true
   wifi_feature_with_dynamic_adjust_wifi_power_save = false
+  wifi_feature_with_lp_scan = false
 }
 
 memory_optimization_cflags = [

@@ -272,6 +272,10 @@ if (defined(ohos_lite)) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
 
+    if (wifi_feature_with_lp_scan) {
+        defines += [ "SUPPORT_LP_SCAN" ]
+    }
+ 
     external_deps = [
       "ability_base:want",
       "ability_runtime:app_manager",

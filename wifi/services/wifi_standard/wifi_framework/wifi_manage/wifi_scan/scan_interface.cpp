@@ -66,19 +66,21 @@ ErrCode ScanInterface::UnInit()
 }
 
 // scanType takes precedence over externFlag, when scanType is not SCAN_DEFAULT, externFlag invalid
-ErrCode ScanInterface::Scan(bool externFlag, ScanType scanType)
+ErrCode ScanInterface::Scan(bool externFlag, ScanType scanType, int scanStyle)
 {
-    WIFI_LOGI("Enter ScanInterface::Scan\n");
+    WIFI_LOGI("Enter ScanInterface::Scan, scanType:%{public}d, scanStyle:%{public}d\n",
+        static_cast<int>(scanType), static_cast<int>(scanStyle));
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     if (scanType != ScanType::SCAN_DEFAULT) {
-        return pScanService->Scan(scanType);
+        return pScanService->Scan(scanType, scanStyle);
     }
-    return pScanService->Scan(externFlag ? ScanType::SCAN_TYPE_EXTERN : ScanType::SCAN_TYPE_NATIVE_EXTERN);
+    return pScanService->Scan(externFlag ? ScanType::SCAN_TYPE_EXTERN : ScanType::SCAN_TYPE_NATIVE_EXTERN, scanStyle);
 }
-
+ 
 // scanType takes precedence over externFlag, when scanType is not SCAN_DEFAULT, externFlag invalid
-ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams, bool externFlag, ScanType scanType)
+ErrCode ScanInterface::ScanWithParam(const WifiScanParams &wifiScanParams, bool externFlag,
+    ScanType scanType)
 {
     WIFI_LOGI("Enter ScanInterface::ScanWithParam\n");
     std::lock_guard<std::mutex> lock(mutex);

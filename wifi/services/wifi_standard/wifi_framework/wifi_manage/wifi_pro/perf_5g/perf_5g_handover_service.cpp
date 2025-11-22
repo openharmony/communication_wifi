@@ -512,8 +512,9 @@ void Perf5gHandoverService::StopMonitor()
         monitorApIndexs_.clear();
     }
 }
-void Perf5gHandoverService::ActiveScan(int32_t rssi)
+void Perf5gHandoverService::ActiveScan(int32_t rssi, int scanStyle)
 {
+    WIFI_LOGI("Enter ActiveScan, rssi: %{public}d, scanStyle: %{public}d", rssi, scanStyle);
     if (pWifiScanController_ == nullptr) {
         return;
     }
@@ -525,8 +526,8 @@ void Perf5gHandoverService::ActiveScan(int32_t rssi)
             needScanInMonitor = true;
         }
     }
-    if (pWifiScanController_->TryToScan(rssi, needScanInMonitor, connectedAp_->apInfo.frequency, monitorFreqs)
-        && inMonitor_) {
+    if (pWifiScanController_->TryToScan(rssi, needScanInMonitor, connectedAp_->apInfo.frequency,
+        monitorFreqs, scanStyle) && inMonitor_) {
         perf5gChrInfo_.monitorActiveScanNum++;
     }
 }
@@ -682,7 +683,25 @@ void Perf5gHandoverService::RssiUpdate(int32_t rssi)
     if (connectedAp_->canNotPerf) {
         return;
     }
-    ActiveScan(rssi);
+    int scanStyle = SCAN_DEFAULT_TYPE;
+#ifdef SUPPORT_LP_SCAN
+    isLpScanSupported_ = OHOS::system::GetBoolParameter("lpscan", false);
+    scanStyle = isLpScanSupported_ && !HasHiddenNetworkSsid() ? SCAN_TYPE_LOW_PRIORITY : SCAN_DEFAULT_TYPE;
+#endif
+    ActiveScan(rssi, scanStyle);
+}
+bool Perf5gHandoverService::HasHiddenNetworkSsid()
+{
+    for (auto &ap : relationAps_) {
+        WifiDeviceConfig config;
+        if (WifiSettings::GetInstance().GetDeviceConfig(ap.apInfo_.networkId, config) != 0) {
+            continue;
+        }
+        if (config.hiddenSSID) {
+            return true;
+        }
+    }
+    return false;
 }
 void Perf5gHandoverService::GetNoExistRelationInfo(std::vector<WifiDeviceConfig> &wifiDeviceConfigs,
     std::vector<InterScanInfo> &wifiScanInfos, std::unordered_set<std::string> &noExistRelationBssidSet,

@@ -174,6 +174,7 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     scanInfoList.features = static_cast<int64_t>(data[0]);
     int appId = static_cast<int>(data[0]);
     time_t now = time(nullptr);
+    int scanStyle = SCAN_DEFAULT_TYPE;
     std::vector<InterScanInfo> infoList;
     infoList.push_back(scanInfoList);
     pScanService->StoreRequestScanConfig(scanConfig, interConfig);
@@ -182,7 +183,7 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     pScanService->HandleNetworkQualityChanged(appId);
     pScanService->DisconnectedTimerScan();
     pScanService->HandleDisconnectedScanTimeout();
-    pScanService->AllowExternScan();
+    pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle);
     pScanService->HandleCustomStatusChanged(appId, appId);
     pScanService->IsPackageInTrustList(config.ssid, appId, config.bssid);
     ScanStatusReport scanReport;
@@ -217,7 +218,7 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     pScanService->SetStaCurrentTime();
     ScanType scanType = static_cast<ScanType>(static_cast<int>(data[0]) % THREE);
     pScanService->ApplyTrustListPolicy(scanType);
-    pScanService->AllowExternScan();
+    pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle);
     pScanService->HandleDisconnectedScanTimeout();
     pScanService->DisconnectedTimerScan();
     pScanService->HandleCustomStatusChanged(appId, appId);
@@ -235,8 +236,8 @@ void StoreRequestScanConfigFuzzTest(const uint8_t* data, size_t size)
     pScanService->SystemScanDisconnectedPolicy(appId, appId);
     pScanService->SetNetworkInterfaceUpDown(true);
     pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_CHECK_PORTAL);
-    pScanService->AllowSystemTimerScan();
-    pScanService->AllowExternScan();
+    pScanService->AllowSystemTimerScan(ScanType::SCAN_TYPE_SYSTEMTIMER, scanStyle);
+    pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle);
     pScanService->GetScanControlInfo();
     pScanService->HandleDisconnectedScanTimeout();
     pScanService->EndPnoScan();
@@ -259,12 +260,14 @@ void AllowExternScanByForbidFuzzTest(const uint8_t* data, size_t size)
 {
     int staScene = static_cast<int>(data[0]);
     int appId = static_cast<int>(data[0]);
+    int scanStyle = SCAN_DEFAULT_TYPE;
     ScanMode scanMode = static_cast<ScanMode>(static_cast<int>(data[0]) % SIZE);
     pScanService->AllowScanDuringScanning(scanMode);
     pScanService->AllowScanByMovingFreeze(scanMode);
     pScanService->IsMovingFreezeState(scanMode);
     pScanService->AllowExternScanByIntervalMode(appId, staScene, scanMode);
     pScanService->SystemScanByInterval(appId, staScene, appId);
+    pScanService->Allow5GApScan(ScanType::SCAN_TYPE_5G_AP, scanStyle);
 }
 
 void GetAllowBandFreqsControlInfoFuzzTest(const uint8_t* data, size_t size)
@@ -287,6 +290,7 @@ void GetAllowBandFreqsControlInfoFuzzTest(const uint8_t* data, size_t size)
 void BeginPnoScanFuzzTest(const uint8_t* data, size_t size)
 {
     int maxNumberSpatialStreams = static_cast<int>(data[0]);
+    int scanStyle = SCAN_DEFAULT_TYPE;
     InterScanInfo scanInfoList;
     scanInfoList.channelWidth = static_cast<WifiChannelWidth>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);
     scanInfoList.wifiMode = static_cast<int>(data[0]);
@@ -296,8 +300,8 @@ void BeginPnoScanFuzzTest(const uint8_t* data, size_t size)
     pScanService->HandleAutoConnectStateChanged(true);
     pScanService->HandleSystemScanTimeout();
     pScanService->RestartPnoScanTimeOut();
-    pScanService->AllowExternScan();
-    pScanService->AllowPnoScan();
+    pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle);
+    pScanService->AllowPnoScan(ScanType::SCAN_TYPE_PNO, scanStyle);
     pScanService->SetScanTrustMode();
     pScanService->ClearScanTrustSceneIds();
     pScanService->IsMovingFreezeScaned();

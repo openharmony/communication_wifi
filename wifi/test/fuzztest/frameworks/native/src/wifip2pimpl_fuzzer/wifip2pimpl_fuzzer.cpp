@@ -36,7 +36,7 @@ namespace Wifi {
                 std::string networkName = FDP.ConsumeBytesAsString(NUM_BYTES);
                 std::string mDeviceAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
                 std::string primaryDeviceType = FDP.ConsumeBytesAsString(NUM_BYTES);
-                std::string secondaryDeviceType =FDP.ConsumeBytesAsString(NUM_BYTES);
+                std::string secondaryDeviceType = FDP.ConsumeBytesAsString(NUM_BYTES);
                 unsigned int supportWpsConfigMethods = FDP.ConsumeIntegral<int>();
                 int deviceCapabilitys = FDP.ConsumeIntegral<int>();
                 int groupCapabilitys = FDP.ConsumeIntegral<int>();

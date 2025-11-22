@@ -129,6 +129,14 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
 {
     FuzzedDataProvider FDP(data, size);
     int index = 0;
+    int networkId = static_cast<int>(data[index++]);	
+    int uid = static_cast<int>(data[index++]);	
+    constexpr int blockDurationSize = sizeof(int64_t);	
+    int64_t blockDuration = -1;	
+    if (index + blockDurationSize <= static_cast<int>(size)) {	
+        blockDuration = *reinterpret_cast<const int64_t*>(&data[index]);	
+        index += blockDurationSize;	
+    }
     int networkId = FDP.ConsumeIntegral<int>();
     int uid = FDP.ConsumeIntegral<int>();
     bool attemptEnable = FDP.ConsumeBool();
@@ -166,7 +174,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->RemoveDevice(networkId);
     pStaInterface->RemoveAllDevice();
     pStaInterface->EnableDeviceConfig(networkId, attemptEnable);
-    pStaInterface->DisableDeviceConfig(networkId);
+    pStaInterface->DisableDeviceConfig(networkId, blockDuration);
     pStaInterface->StartWps(sconfig);
     pStaInterface->CancelWps();
     std::vector<InterScanInfo> results;
@@ -241,7 +249,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->StartConnectToBssid(networkId, config.bssid);
     pStaService->ReAssociate();
     pStaService->EnableDeviceConfig(networkId, attemptEnable);
-    pStaService->DisableDeviceConfig(networkId);
+    pStaInterface->DisableDeviceConfig(networkId, blockDuration);
     pStaService->Disconnect();
     pStaService->StartWps(sconfig);
     pStaService->CancelWps();

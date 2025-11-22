@@ -30,6 +30,7 @@
 namespace OHOS {
 namespace Wifi {
 FuzzedDataProvider *FDP = nullptr;
+static const int32_t NUM_BYTES = 1;
 constexpr int BAND_WIFI_TYPES = 6;
 constexpr int IDLE_TIME_OUT_MAX = 60;
 constexpr int IPADDR_SEG_NUMS = 4;

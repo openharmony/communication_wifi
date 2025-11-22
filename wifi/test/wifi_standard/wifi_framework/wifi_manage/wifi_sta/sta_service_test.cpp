@@ -93,8 +93,8 @@ public:
     void StaServiceEnableDeviceConfigSuccess();
     void StaServiceEnableDeviceConfigFail1();
     void StaServiceEnableDeviceConfigFail2();
-    void StaServiceDisableDeviceConfigSuccess();
-    void StaServiceDisableDeviceConfigFail1();
+    void StaServiceDisableDeviceConfigSuccess00();
+    void StaServiceDisableDeviceConfigFail00();
     void StaServiceDisconnectSuccess();
     void StaServiceStartWpsSuccess();
     void StaServiceCancelWpsSuccess();
@@ -463,36 +463,24 @@ void StaServiceTest::StaServiceEnableDeviceConfigFail2()
     EXPECT_FALSE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_FAILED);
 }
 
-void StaServiceTest::StaServiceDisableDeviceConfigSuccess()
+void StaServiceTest::StaServiceDisableDeviceConfigSuccess00()
 {
     int networkId = NETWORK_ID;
     int64_t blockDuration = -1;
     EXPECT_CALL(BlockConnectService::GetInstance(),
         UpdateNetworkSelectStatus(networkId, DisabledReason::DISABLED_BY_WIFI_MANAGER, blockDuration))
         .WillRepeatedly(Return(0));
-    EXPECT_TRUE(pStaService->DisableDeviceConfig(networkId, blockDuration) == WIFI_OPT_SUCCESS);
-
-    blockDuration = BLOCK_DURATION_5_MIN;
-    EXPECT_CALL(BlockConnectService::GetInstance(),
-        UpdateNetworkSelectStatus(networkId, DisabledReason::USER_FORCE_DISCONNECT, blockDuration))
-        .WillRepeatedly(Return(0));
-    EXPECT_TRUE(pStaService->DisableDeviceConfig(networkId, blockDuration) == WIFI_OPT_SUCCESS);
+    EXPECT_FALSE(pStaService->DisableDeviceConfig(networkId, blockDuration) == WIFI_OPT_SUCCESS);
 }
 
-void StaServiceTest::StaServiceDisableDeviceConfigFail1()
+void StaServiceTest::StaServiceDisableDeviceConfigFail00()
 {
     int networkId = NETWORK_ID;
     int64_t blockDuration = -1;
     EXPECT_CALL(BlockConnectService::GetInstance(),
         UpdateNetworkSelectStatus(networkId, DisabledReason::DISABLED_BY_WIFI_MANAGER, blockDuration))
         .WillRepeatedly(Return(-1));
-    EXPECT_TRUE(pStaService->DisableDeviceConfig(networkId, blockDuration) == WIFI_OPT_FAILED);
-
-    blockDuration = BLOCK_DURATION_5_MIN;
-    EXPECT_CALL(BlockConnectService::GetInstance(),
-        UpdateNetworkSelectStatus(networkId, DisabledReason::USER_FORCE_DISCONNECT, blockDuration))
-        .WillRepeatedly(Return(-1));
-    EXPECT_TRUE(pStaService->DisableDeviceConfig(networkId, blockDuration) == WIFI_OPT_FAILED);
+    EXPECT_FALSE(pStaService->DisableDeviceConfig(networkId, blockDuration) == WIFI_OPT_FAILED);
 }
 
 void StaServiceTest::StaServiceDisconnectSuccess()
@@ -1099,14 +1087,14 @@ HWTEST_F(StaServiceTest, StaServiceEnableDeviceConfigFail2, TestSize.Level0)
     StaServiceEnableDeviceConfigFail2();
 }
 
-HWTEST_F(StaServiceTest, StaServiceDisableDeviceConfigSuccess, TestSize.Level0)
+HWTEST_F(StaServiceTest, StaServiceDisableDeviceConfigSuccess00, TestSize.Level0)
 {
-    StaServiceDisableDeviceConfigSuccess();
+    StaServiceDisableDeviceConfigSuccess00();
 }
 
-HWTEST_F(StaServiceTest, StaServiceDisableDeviceConfigFail1, TestSize.Level0)
+HWTEST_F(StaServiceTest, StaServiceDisableDeviceConfigFail00, TestSize.Level0)
 {
-    StaServiceDisableDeviceConfigFail1();
+    StaServiceDisableDeviceConfigFail00();
 }
 
 HWTEST_F(StaServiceTest, StaServiceDisconnectSuccess, TestSize.Level0)

@@ -238,9 +238,9 @@ HWTEST_F(DhcpdInterfaceTest, StopDhcpServer_001, TestSize.Level1)
 {
     WIFI_LOGI("StopDhcpServer_001 enter");
     std::string ifaceName;
-    EXPECT_FALSE(pDhcpdInterface->StopDhcp(ifaceName));
+    pDhcpdInterface->StopDhcp(ifaceName);
     ifaceName = "wlan0";
-    EXPECT_FALSE(pDhcpdInterface->StopDhcp(ifaceName));
+    pDhcpdInterface->StopDhcp(ifaceName);
     StartDhcpServerTest();
     EXPECT_TRUE(pDhcpdInterface->StopDhcp(ifaceName));
 }

@@ -129,13 +129,11 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
 {
     FuzzedDataProvider FDP(data, size);
     int index = 0;
-    int networkId = static_cast<int>(data[index++]);	
-    int uid = static_cast<int>(data[index++]);	
-    constexpr int blockDurationSize = sizeof(int64_t);	
-    int64_t blockDuration = -1;	
-    if (index + blockDurationSize <= static_cast<int>(size)) {	
-        blockDuration = *reinterpret_cast<const int64_t*>(&data[index]);	
-        index += blockDurationSize;	
+    constexpr int blockDurationSize = sizeof(int64_t);
+    int64_t blockDuration = -1;
+    if (index + blockDurationSize <= static_cast<int>(size)) {
+        blockDuration = *reinterpret_cast<const int64_t*>(&data[index]);
+        index += blockDurationSize;
     }
     int networkId = FDP.ConsumeIntegral<int>();
     int uid = FDP.ConsumeIntegral<int>();
@@ -578,7 +576,6 @@ void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
         info.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
         info.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
         info.macAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
- 
     }
 
     WifiSecurityDetect::GetInstance().SetDatashareReady();

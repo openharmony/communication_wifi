@@ -339,7 +339,6 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanTy
  
     if (ScanControlInner(scanType, scanConfig.scanStyle) != WIFI_OPT_SUCCESS) {
         return WIFI_OPT_FAILED;
- 
     }
  
     if ((params.band < static_cast<int>(SCAN_BAND_UNSPECIFIED)) ||
@@ -367,6 +366,7 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanTy
         WIFI_LOGE("GetHiddenNetworkSsidList failed.\n");
     }
 #endif
+
     scanConfig.scanBand = static_cast<ScanBandType>(params.band);
     scanConfig.scanFreqs.assign(params.freqs.begin(), params.freqs.end());
     scanConfig.ssid = params.ssid;

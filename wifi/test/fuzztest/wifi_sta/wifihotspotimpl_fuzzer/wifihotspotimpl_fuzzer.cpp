@@ -91,7 +91,7 @@ void SetHotspotConfigFuzzTest(FuzzedDataProvider& FDP)
     std::vector<int32_t> band_5G_channel = { 149, 168, 169 };
     ChannelsTable node{{ BandType::BAND_2GHZ, band_2G_channel }, { BandType::BAND_5GHZ, band_5G_channel }};
     HotspotConfig config;
-    config.apBandWidth = FDP->ConsumeIntegral<int>();
+    config.apBandWidth = FDP.ConsumeIntegral<int>();
     WifiChannelHelper::GetInstance().SetValidChannels(node);
     pWifiHotspotServiceImpl->SetHotspotConfig(config);
 }

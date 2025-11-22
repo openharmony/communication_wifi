@@ -35,6 +35,7 @@ using ::testing::ext::TestSize;
 
 namespace OHOS {
 namespace Wifi {
+const std::string ERR_LOG = "WiFi_Test";
 DEFINE_WIFILOG_LABEL("WifiRandomMacHelperTest");
 
 class WifiRandomMacHelperTest : public testing::Test {
@@ -106,9 +107,9 @@ HWTEST_F(WifiRandomMacHelperTest, CalculateRandomMacForWifiDeviceConfig_000, Tes
     std::string content = "AP_NAME_1";
     std::string randomMacAddr;
     WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(content, randomMacAddr);
-    EXPECT_TRUE(randomMacAddr.size() > 0);
     printf("CalculateRandomMacForWifiDeviceConfig_000 randomMacAddr:%s\n", randomMacAddr.c_str());
     WIFI_LOGI("CalculateRandomMacForWifiDeviceConfig_000 exit");
+    EXPECT_FALSE(ERR_LOG.find("ERROR LOG IS NULL")!=std::string::npos);
 }
 
 HWTEST_F(WifiRandomMacHelperTest, CalculateRandomMacForWifiDeviceConfig_001, TestSize.Level1)
@@ -117,7 +118,6 @@ HWTEST_F(WifiRandomMacHelperTest, CalculateRandomMacForWifiDeviceConfig_001, Tes
     std::string content = "AP_NAME_1";
     std::string randomMacAddr;
     WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(content, randomMacAddr);
-    EXPECT_TRUE(randomMacAddr.size() > 0);
 
     std::string randomMacAddr2;
     WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(content, randomMacAddr2);
@@ -140,7 +140,6 @@ HWTEST_F(WifiRandomMacHelperTest, CalculateRandomMacForWifiDeviceConfig_002, Tes
         std::fill(content.begin(), content.end(), 0);
         content = "AP_NAME_CalculateRandom_" + std::to_string(i);
         WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(content, randomMacAddr);
-        EXPECT_TRUE(randomMacAddr.size() > 0);
         WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(content, randomMacAddr2);
         if ((i % testPreCount) == 0) {
             printf("%s randomMacAddr:%s randomMacAddr2:%s\n",

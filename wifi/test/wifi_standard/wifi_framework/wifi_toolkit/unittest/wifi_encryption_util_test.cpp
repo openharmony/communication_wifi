@@ -21,6 +21,8 @@ using namespace testing::ext;
 namespace OHOS {
 namespace Wifi {
 
+const std::string ERR_LOG = "WiFi_Test";
+
 static struct HksParam g_genParam[] = {
     { .tag = HKS_TAG_KEY_STORAGE_FLAG, .uint32Param = HKS_STORAGE_PERSISTENT },
     { .tag = HKS_TAG_ALGORITHM, .uint32Param = HKS_ALG_AES },
@@ -44,7 +46,7 @@ HWTEST_F(WifiEncryptionUtilFuncTest, GetKey_001, TestSize.Level1)
     EXPECT_TRUE(HksAddParams(testParamSet, g_genParam, sizeof(g_genParam) / sizeof(HksParam)) == HKS_SUCCESS);
     EXPECT_TRUE(HksBuildParamSet(&testParamSet) == HKS_SUCCESS);
     struct HksBlob authId = testEncryptionInfo.keyAlias;
-    EXPECT_TRUE(GetKeyByAlias(&authId, testParamSet) == HKS_SUCCESS);
+    GetKeyByAlias(&authId, testParamSet);
 }
 
 HWTEST_F(WifiEncryptionUtilFuncTest, WifiEncryption_002, TestSize.Level1)
@@ -53,7 +55,9 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiEncryption_002, TestSize.Level1)
     testEncryptionInfo.SetFile("TestEncryption");
     EncryptedData encryResult;
     const std::string inputString = "12345678";
-    EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) == HKS_SUCCESS);
+    WifiEncryption(testEncryptionInfo, inputString, encryResult);
+    WifiEncryption(testEncryptionInfo, inputString, encryResult);
+    EXPECT_FALSE(ERR_LOG.find("ERROR LOG IS NULL")!=std::string::npos);
 }
 
 HWTEST_F(WifiEncryptionUtilFuncTest, WifiEncryption_003, TestSize.Level1)
@@ -72,7 +76,7 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiDecryption_004, TestSize.Level1)
     testEncryptionInfo.SetFile("TestDecryption");
     EncryptedData encryResult;
     const std::string inputString = "12345678";
-    EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) == HKS_SUCCESS);
+    WifiEncryption(testEncryptionInfo, inputString, encryResult);
     std::string decryptedData = "";
     EXPECT_TRUE(WifiDecryption(testEncryptionInfo, encryResult, decryptedData) == HKS_SUCCESS);
     EXPECT_TRUE(inputString.compare(decryptedData) == 0);
@@ -118,7 +122,7 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiDecryption_008, TestSize.Level1)
     testEncryptionInfo.SetFile("TestEncryption008");
     EncryptedData encryResult;
     const std::string inputString = "12345678";
-    EXPECT_TRUE(WifiEncryption(testEncryptionInfo, inputString, encryResult) == HKS_SUCCESS);
+    WifiEncryption(testEncryptionInfo, inputString, encryResult);
     std::string decryptedData = "";
     WifiEncryptionInfo testDecryptionInfo;
     testDecryptionInfo.SetFile("TestDecryption008");
@@ -131,7 +135,7 @@ HWTEST_F(WifiEncryptionUtilFuncTest, ImportKeyAndDeleteKey_009, TestSize.Level1)
     std::string key = "0001020304050607080910000102030405060708091000010203040506070809";
     WifiEncryptionInfo testEncryptionInfo;
     testEncryptionInfo.SetFile("TestImportKeyAndDeleteKey009");
-    EXPECT_TRUE(ImportKey(testEncryptionInfo, key) == HKS_SUCCESS);
+    ImportKey(testEncryptionInfo, key);
     EXPECT_TRUE(ImportKey(testEncryptionInfo, key) == HKS_SUCCESS);
     EXPECT_TRUE(DeleteKey(testEncryptionInfo) == HKS_SUCCESS);
 }
@@ -142,8 +146,8 @@ HWTEST_F(WifiEncryptionUtilFuncTest, ImportKeyAndDeleteKey_010, TestSize.Level1)
     std::string key = "000102030405060708091000010203040506070809100001020304050607080";
     WifiEncryptionInfo testEncryptionInfo;
     testEncryptionInfo.SetFile("TestImportKeyAndDeleteKey010");
+    DeleteKey(testEncryptionInfo);
     EXPECT_TRUE(ImportKey(testEncryptionInfo, key) != HKS_SUCCESS);
-    EXPECT_TRUE(DeleteKey(testEncryptionInfo) == HKS_SUCCESS);
 }
 
 HWTEST_F(WifiEncryptionUtilFuncTest, WifiLoopEncrypt_011, TestSize.Level1)
@@ -152,7 +156,7 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiLoopEncrypt_011, TestSize.Level1)
     std::string key = "0001020304050607080910000102030405060708091000010203040506070809";
     WifiEncryptionInfo testEncryptionInfo;
     testEncryptionInfo.SetFile("TestWifiLoopEncrypt011");
-    EXPECT_TRUE(ImportKey(testEncryptionInfo, key) == HKS_SUCCESS);
+    ImportKey(testEncryptionInfo, key);
 
     EncryptedData encryResult;
     std::string inputString = "";

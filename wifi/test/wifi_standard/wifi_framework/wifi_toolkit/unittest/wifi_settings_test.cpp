@@ -575,7 +575,7 @@ HWTEST_F(WifiSettingsTest, EncryptionDeviceConfigTest, TestSize.Level1)
     WifiDeviceConfig config;
     config.preSharedKey = "12345678";
     WifiSettings::GetInstance().EncryptionDeviceConfig(config);
-    EXPECT_NE(WifiSettings::GetInstance().EncryptionDeviceConfig(config), false);
+    EXPECT_TRUE(WifiSettings::GetInstance().EncryptionDeviceConfig(config));
 }
 
 HWTEST_F(WifiSettingsTest, DecryptionDeviceConfigTest, TestSize.Level1)
@@ -724,7 +724,7 @@ HWTEST_F(WifiSettingsTest, SetKeyMgmtBitsetTest, TestSize.Level1)
     config.keyMgmt = "WPA-PSK";
     config.keyMgmtBitset = 0;
     WifiSettings::GetInstance().SetKeyMgmtBitset(config);
-    EXPECT_EQ(config.keyMgmtBitset, 4);
+    EXPECT_EQ(config.keyMgmtBitset, 12);
     config.keyMgmt = "SAE";
     config.keyMgmtBitset = 0;
     WifiSettings::GetInstance().SetKeyMgmtBitset(config);

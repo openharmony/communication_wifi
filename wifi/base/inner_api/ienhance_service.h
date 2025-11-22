@@ -386,6 +386,13 @@ public:
      * @return : -1(not find) 0(settings) 1(sceneboard)
      */
     virtual int32_t GetPackageNum(std::string packageName) = 0;
+
+    /**
+     * @Description fold status
+     *
+     * @return success: 0, failed: -1
+     */
+    virtual void OnFoldStateChanged(const int foldStatus) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

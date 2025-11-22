@@ -56,7 +56,6 @@ HWTEST_F(WifiEncryptionUtilFuncTest, WifiEncryption_002, TestSize.Level1)
     EncryptedData encryResult;
     const std::string inputString = "12345678";
     WifiEncryption(testEncryptionInfo, inputString, encryResult);
-    WifiEncryption(testEncryptionInfo, inputString, encryResult);
     EXPECT_FALSE(ERR_LOG.find("ERROR LOG IS NULL")!=std::string::npos);
 }
 

@@ -580,7 +580,7 @@ void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
         info.macAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
  
     }
- 
+
     WifiSecurityDetect::GetInstance().SetDatashareReady();
     WifiSecurityDetect::GetInstance().RegisterSecurityDetectObserver();
     WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, 0);
@@ -658,7 +658,7 @@ extern "C" int LLVMFuzzerInitialize(int *argc, char ***argv)
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
-{  
+{
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }

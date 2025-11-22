@@ -274,7 +274,6 @@ private:
     bool IsSatisfiedWifi2WifiCondition();
     bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
     ErrCode FullScan(int scanStyle = SCAN_DEFAULT_TYPE);
-    ErrCode FullScan();
     void ProcessSwitchResult(const InternalMessagePtr msg);
     bool InLandscapeSwitchLimitList();
     bool IsAllowScan(bool hasSwitchRecord);

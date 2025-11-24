@@ -1889,6 +1889,7 @@ void WifiSettings::InitPackageInfoConfig()
     std::vector<PackageInfo> scanLimitPackage;
     std::vector<PackageInfo> landscapeSwitchLimitList;
     std::vector<PackageInfo> scanForegroundAllowLimitList;
+    std::vector<PackageInfo> scanBackgroundAllowLimitList;
     xmlParser->GetScanControlPackages(scanControlPackageMap);
     xmlParser->GetCandidateFilterPackages(candidateList);
     xmlParser->GetCorePackages(variableMap);
@@ -1896,6 +1897,7 @@ void WifiSettings::InitPackageInfoConfig()
     xmlParser->GetScanLimitPackages(scanLimitPackage);
     xmlParser->GetLandscapeSwitchLimitList(landscapeSwitchLimitList);
     xmlParser->GetScanForegroundAllowLimitList(scanForegroundAllowLimitList);
+    xmlParser->GetScanBackgroundAllowLimitList(scanBackgroundAllowLimitList);
     
     std::unique_lock<std::mutex> lock(mPackageConfMutex);
     mPackageInfoMap.insert(scanControlPackageMap.begin(), scanControlPackageMap.end());
@@ -1905,6 +1907,7 @@ void WifiSettings::InitPackageInfoConfig()
     mPackageInfoMap.insert_or_assign("ScanLimitPackages", scanLimitPackage);
     mPackageInfoMap.insert_or_assign("LandscapeSwitchLimitList", landscapeSwitchLimitList);
     mPackageInfoMap.insert_or_assign("ScanForegroundAllowLimitList", scanForegroundAllowLimitList);
+    mPackageInfoMap.insert_or_assign("ScanBackgroundAllowLimitList", scanBackgroundAllowLimitList);
 #endif
 }
 

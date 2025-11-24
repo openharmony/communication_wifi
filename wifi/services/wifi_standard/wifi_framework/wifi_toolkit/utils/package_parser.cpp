@@ -40,6 +40,7 @@ bool PackageXmlParser::ParseInternal(xmlNodePtr node)
     mScanLimitPackage_.clear();
     mLandscapeSwitchLimitList_.clear();
     mScanForegroundAllowLimitList_.clear();
+    mScanBackgroundAllowLimitList_.clear();
     for (xmlNodePtr subNode = node->children; subNode != nullptr; subNode = subNode->next) {
         std::string tagName = GetNodeValue(subNode);
         if (tagName == TAG_SCAN_CONTROL) {
@@ -56,6 +57,8 @@ bool PackageXmlParser::ParseInternal(xmlNodePtr node)
             GetPackageList(subNode, mLandscapeSwitchLimitList_);
         } else if (tagName == TAG_SCAN_FOREGROUND_ALLOW_LIMIT) {
             GetPackageList(subNode, mScanForegroundAllowLimitList_);
+        } else if (tagName == TAG_SCAN_BACKGROUND_ALLOW_LIMIT) {
+            GetPackageList(subNode, mScanBackgroundAllowLimitList_);
         } else {
             WIFI_LOGI("unknow package tag.");
         }
@@ -131,6 +134,10 @@ void PackageXmlParser::GetLandscapeSwitchLimitList(std::vector<PackageInfo> &pac
 void PackageXmlParser::GetScanForegroundAllowLimitList(std::vector<PackageInfo> &packageList)
 {
     packageList = mScanForegroundAllowLimitList_;
+}
+void PackageXmlParser::GetScanBackgroundAllowLimitList(std::vector<PackageInfo> &packageList)
+{
+    packageList = mScanBackgroundAllowLimitList_;
 }
 }
 }

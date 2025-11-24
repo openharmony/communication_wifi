@@ -23,7 +23,6 @@
 #include "app_network_speed_limit_service.h"
 #include "wifi_logger.h"
 
-
 namespace OHOS {
 namespace Wifi {
 

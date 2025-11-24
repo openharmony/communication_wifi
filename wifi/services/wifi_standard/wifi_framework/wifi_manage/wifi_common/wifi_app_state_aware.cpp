@@ -22,6 +22,8 @@
 #include "wifi_service_manager.h"
 #include "app_network_speed_limit_service.h"
 #include "wifi_logger.h"
+#include "connection_observer_client.h"
+#include "wifi_settings.h"
 
 namespace OHOS {
 namespace Wifi {

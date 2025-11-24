@@ -21,7 +21,6 @@
 #include "wifi_internal_event_dispatcher_lite.h"
 #else
 #include "wifi_internal_event_dispatcher.h"
-#include "connection_observer_client.h"
 #endif
 #include "wifi_internal_msg.h"
 #include "wifi_logger.h"

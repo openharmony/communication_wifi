@@ -23,8 +23,6 @@
 #include "wifi_event_handler.h"
 #include "wifi_errcode.h"
 #include "appmgr/application_state_observer_stub.h"
-#include "connection_observer_client.h"
-#include "wifi_settings.h"
 
 namespace OHOS {
 namespace Wifi {

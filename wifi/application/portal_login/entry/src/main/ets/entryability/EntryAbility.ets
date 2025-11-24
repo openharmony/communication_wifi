@@ -17,6 +17,7 @@ import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.Ab
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { setUrl, setNetId, setShouldShowBrowseItem, setIsInOOBE, getIsInOOBE } from '../common/utils';
+import { updateOnNewWant, updateOnBackground } from '../common/chr';
 import { emitter } from '@kit.BasicServicesKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import settings from '@ohos.settings';
@@ -39,6 +40,7 @@ export default class EntryAbility extends UIAbility {
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onNewWant');
+    updateOnNewWant();
     setUrl(want);
     setNetId(want);
     setShouldShowBrowseItem(want);
@@ -97,6 +99,7 @@ export default class EntryAbility extends UIAbility {
 
   onBackground(): void {
     // Ability has back to background
+    updateOnBackground();
     hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onBackground');
   }
 }

@@ -594,12 +594,11 @@ void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
 
 void SecurityDetectFuzzTest02(FuzzedDataProvider& FDP)
 {
-    int randomInt = FDP.ConsumeIntegral<int>();
     int networkId = 0;
     int modelId = 0;
     std::string devId = FDP.ConsumeBytesAsString(NUM_BYTES);
     std::string param = FDP.ConsumeBytesAsString(NUM_BYTES);
-    int rawvalue = randomInt % FIVE;
+    int rawvalue = FDP.ConsumeIntegral<int>() % FIVE;
 SecurityModelResult model;
 switch (rawvalue) {
     case ZERO:

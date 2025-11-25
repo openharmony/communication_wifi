@@ -38,7 +38,7 @@ ohos_taihe("run_taihe") {
 taihe_shared_library("wifiManager_taihe_native") { #调用taihe_shared_library模板编译so
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
-    boundary_sanitize = true  # Enable boundary san detection
+    boundary_sanitize = false  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
     debug = false
   }

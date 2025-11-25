@@ -81,7 +81,8 @@ enum class WifiScanFailReason {
     HDI_SERVICE_DIED,
     HDI_SCAN_FAIL,
     HDI_PNO_SCAN_FAIL,
-    HDI_GET_SCAN_INFOS_FAIL
+    HDI_GET_SCAN_INFOS_FAIL,
+    SERVICE_REGISTERCALLBACK_FAIL
 };
 
 struct Pref5gStatisticsInfo {

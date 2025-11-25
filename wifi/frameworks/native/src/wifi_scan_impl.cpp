@@ -407,6 +407,10 @@ ErrCode WifiScanImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback, 
     sptr<IRemoteObject> remoteObj = g_wifiScanCallbackStub->AsObject();
     sptr<IRemoteObject>& cb = remoteObj;
     OHOS::ErrCode ret = client_->RegisterCallBack(cb, pid, tokenId, event);
+    if (ret > SCAN_IDL_ERROR_OFFSET) {
+        ret = WIFI_OPT_SUCCESS;
+        WriteWifiScanApiFailHiSysEvent(GetBundleName(), WifiScanFailReason::SERVICE_REGISTERCALLBACK_FAIL);
+    }
     return ErrCodeToWifiErrCode(ret);
 }
 #endif

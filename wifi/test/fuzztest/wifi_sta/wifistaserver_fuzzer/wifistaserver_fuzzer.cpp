@@ -32,6 +32,7 @@
 #include "sta_service.h"
 #include "wifi_internal_msg.h"
 #include "wifi_telephony_utils.h"
+#include <fuzzer/FuzzedDataProvider.h>
 #include <mutex>
 
 namespace OHOS {
@@ -47,11 +48,13 @@ constexpr int ID = 123;
 constexpr int WORK_ID = 10;
 static bool g_isInsted = false;
 constexpr int STATE = 20;
+constexpr int32_t STATE_NUM = 3;
 const int MODEL_ID_1001 = 1001;
 const int MODEL_ID_1002 = 1002;
 const int MODEL_ID_1003 = 1003;
 const int MODEL_ID_1004 = 1004;
 const int MODEL_ID_1005 = 1005;
+static const int32_t NUM_BYTES = 1;
 static std::unique_ptr<StaInterface> pStaInterface = nullptr;
 static std::unique_ptr<StaAutoConnectService> pStaAutoConnectService = nullptr;
 static std::unique_ptr<StaService> pStaService = nullptr;
@@ -124,36 +127,37 @@ public:
 
 void StaServerFuzzTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     int index = 0;
-    int networkId = static_cast<int>(data[index++]);
-    int uid = static_cast<int>(data[index++]);
     constexpr int blockDurationSize = sizeof(int64_t);
     int64_t blockDuration = -1;
     if (index + blockDurationSize <= static_cast<int>(size)) {
         blockDuration = *reinterpret_cast<const int64_t*>(&data[index]);
         index += blockDurationSize;
     }
-    bool attemptEnable = (static_cast<int>(data[0]) % TWO) ? true : false;
-    bool isRemoveAll = (static_cast<int>(data[0]) % TWO) ? true : false;
-    bool isAllowed = (static_cast<int>(data[0]) % TWO) ? true : false;
-    std::string cmd = std::string(reinterpret_cast<const char*>(data), size);
-    std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
-    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
-    ConfigChange value = static_cast<ConfigChange>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);
+    int networkId = FDP.ConsumeIntegral<int>();
+    int uid = FDP.ConsumeIntegral<int>();
+    bool attemptEnable = FDP.ConsumeBool();
+    bool isRemoveAll = FDP.ConsumeBool();
+    bool isAllowed = FDP.ConsumeBool();
+    std::string cmd = FDP.ConsumeBytesAsString(NUM_BYTES);
+    std::string conditionName = FDP.ConsumeBytesAsString(NUM_BYTES);
+    FilterTag filterTag = static_cast<FilterTag>(FDP.ConsumeIntegral<int>() % FIVE);
+    ConfigChange value = static_cast<ConfigChange>(FDP.ConsumeIntegral<int>() % U32_AT_SIZE_ZERO);
     WpsConfig sconfig;
-    sconfig.pin = std::string(reinterpret_cast<const char*>(data), size);
-    sconfig.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    sconfig.setup = static_cast<SetupMethod>(static_cast<int>(data[0]) % FIVE);
+    sconfig.pin = FDP.ConsumeBytesAsString(NUM_BYTES);
+    sconfig.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    sconfig.setup = static_cast<SetupMethod>(FDP.ConsumeIntegral<int>() % FIVE);
     WifiDeviceConfig config;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
-    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    config.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.eap = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.clientCert = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.privateKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.certEntry.push_back(FDP.ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.encryptedData = FDP.ConsumeBytesAsString(NUM_BYTES);
     pStaInterface->ConnectToNetwork(networkId);
     pStaInterface->ConnectToDevice(config);
     pStaInterface->ReConnect();
@@ -243,7 +247,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->StartConnectToBssid(networkId, config.bssid);
     pStaService->ReAssociate();
     pStaService->EnableDeviceConfig(networkId, attemptEnable);
-    pStaService->DisableDeviceConfig(networkId, blockDuration);
+    pStaInterface->DisableDeviceConfig(networkId, blockDuration);
     pStaService->Disconnect();
     pStaService->StartWps(sconfig);
     pStaService->CancelWps();
@@ -263,34 +267,34 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
 
 void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
 {
-    std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
-    bool attemptEnable = (static_cast<int>(data[0]) % TWO) ? true : false;
-    int frequency = static_cast<int>(data[0]);
+    FuzzedDataProvider FDP(data, size);
+    std::string conditionName = FDP.ConsumeBytesAsString(NUM_BYTES);
+    bool attemptEnable = FDP.ConsumeBool();
+    int frequency = FDP.ConsumeIntegral<int>();
     InterScanInfo scanInfoList;
-    scanInfoList.channelWidth = static_cast<WifiChannelWidth>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);
-    scanInfoList.wifiMode = static_cast<int>(data[0]);
-    scanInfoList.timestamp = static_cast<int64_t>(data[0]);
-    scanInfoList.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    scanInfoList.rssi = static_cast<int>(data[0]);
-    scanInfoList.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    scanInfoList.capabilities = std::string(reinterpret_cast<const char*>(data), size);
-    scanInfoList.frequency = static_cast<int>(data[0]);
-    scanInfoList.features = static_cast<int64_t>(data[0]);
+    scanInfoList.channelWidth = static_cast<WifiChannelWidth>(FDP.ConsumeIntegral<int>() % U32_AT_SIZE_ZERO);
+    scanInfoList.wifiMode = FDP.ConsumeIntegral<int>();
+    scanInfoList.timestamp = FDP.ConsumeIntegral<int64_t>();
+    scanInfoList.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    scanInfoList.rssi = FDP.ConsumeIntegral<int>();
+    scanInfoList.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    scanInfoList.capabilities = FDP.ConsumeBytesAsString(NUM_BYTES);
+    scanInfoList.frequency = FDP.ConsumeIntegral<int>();
+    scanInfoList.features = FDP.ConsumeIntegral<int64_t>();
     std::vector<InterScanInfo> scanInfo;
     scanInfo.push_back(scanInfoList);
     WifiLinkedInfo info;
     if (size >= sizeof(WifiLinkedInfo)) {
-        int index = 0;
-        info.networkId = static_cast<int>(data[index++]);
-        info.rssi = static_cast<int>(data[index++]);
-        info.band = static_cast<int>(data[index++]);
-        info.linkSpeed = static_cast<int>(data[index++]);
-        info.frequency = static_cast<int>(data[index++]);
-        info.macType = static_cast<int>(data[index++]);
-        info.ssid = std::string(reinterpret_cast<const char*>(data), size);
-        info.bssid = std::string(reinterpret_cast<const char*>(data), size);
-        info.macAddress = std::string(reinterpret_cast<const char*>(data), size);
-        info.detailedState = static_cast<DetailedState>(static_cast<int>(data[0]) % STATE);
+        info.networkId = FDP.ConsumeIntegral<int>();
+        info.rssi = FDP.ConsumeIntegral<int>();
+        info.band = FDP.ConsumeIntegral<int>();
+        info.linkSpeed = FDP.ConsumeIntegral<int>();
+        info.frequency = FDP.ConsumeIntegral<int>();
+        info.macType = FDP.ConsumeIntegral<int>();
+        info.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        info.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        info.macAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
+        info.detailedState = static_cast<DetailedState>(FDP.ConsumeIntegral<int>() % STATE);
     }
 
     WifiDeviceConfig config;
@@ -324,37 +328,37 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfo);
 }
 
-void RegisterDeviceAppraisalTest(const uint8_t* data, size_t size)
+void RegisterDeviceAppraisalTest(FuzzedDataProvider& FDP)
 {
     StaDeviceAppraisal *appraisal = nullptr;
-    int priority = TWO;
+    int priority = FDP.ConsumeIntegralInRange<int>(0, STATE_NUM);
     pStaAutoConnectService->RegisterDeviceAppraisal(appraisal, priority);
 }
 
 void AllowAutoSelectDeviceTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     InterScanInfo scanInfoList;
-    scanInfoList.channelWidth = static_cast<WifiChannelWidth>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);
-    scanInfoList.wifiMode = static_cast<int>(data[0]);
-    scanInfoList.timestamp = static_cast<int64_t>(data[0]);
-    scanInfoList.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    scanInfoList.rssi = static_cast<int>(data[0]);
-    scanInfoList.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    scanInfoList.capabilities = std::string(reinterpret_cast<const char*>(data), size);
-    scanInfoList.features = static_cast<int64_t>(data[0]);
+    scanInfoList.channelWidth = static_cast<WifiChannelWidth>(FDP.ConsumeIntegral<int>() % U32_AT_SIZE_ZERO);
+    scanInfoList.wifiMode = FDP.ConsumeIntegral<int>();
+    scanInfoList.timestamp = FDP.ConsumeIntegral<int64_t>();
+    scanInfoList.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    scanInfoList.rssi = FDP.ConsumeIntegral<int>();
+    scanInfoList.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    scanInfoList.capabilities = FDP.ConsumeBytesAsString(NUM_BYTES);
+    scanInfoList.features = FDP.ConsumeIntegral<int64_t>();
     std::vector<InterScanInfo> scanInfo;
     scanInfo.push_back(scanInfoList);
     WifiLinkedInfo info;
     if (size >= sizeof(WifiLinkedInfo)) {
-        int index = 0;
-        info.networkId = static_cast<int>(data[index++]);
-        info.rssi = static_cast<int>(data[index++]);
-        info.band = static_cast<int>(data[index++]);
-        info.linkSpeed = static_cast<int>(data[index++]);
-        info.macType = static_cast<int>(data[index++]);
-        info.ssid = std::string(reinterpret_cast<const char*>(data), size);
-        info.bssid = std::string(reinterpret_cast<const char*>(data), size);
-        info.macAddress = std::string(reinterpret_cast<const char*>(data), size);
+        info.networkId = FDP.ConsumeIntegral<int>();
+        info.rssi = FDP.ConsumeIntegral<int>();
+        info.band = FDP.ConsumeIntegral<int>();
+        info.linkSpeed = FDP.ConsumeIntegral<int>();
+        info.macType = FDP.ConsumeIntegral<int>();
+        info.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        info.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        info.macAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
     }
     info.detailedState = DetailedState::WORKING;
     pStaAutoConnectService->AllowAutoSelectDevice(scanInfo, info);
@@ -366,13 +370,13 @@ void AllowAutoSelectDeviceTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->AllowAutoSelectDevice(scanInfo, info);
 }
 
-void StaAutoConnectServiceFuzzTest(const uint8_t* data, size_t size)
+void StaAutoConnectServiceFuzzTest(FuzzedDataProvider& FDP)
 {
-    std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
+    std::string conditionName = FDP.ConsumeBytesAsString(NUM_BYTES);
     pStaAutoConnectService->RegisterAutoJoinCondition(conditionName, []() {return true;});
 }
 
-void RegisterStaServiceCallbackFuzzTest(const uint8_t* data, size_t size)
+void RegisterStaServiceCallbackFuzzTest()
 {
     StaServiceCallback callbacks;
     WifiStaServerManager wifiStaServerManager;
@@ -382,11 +386,11 @@ void RegisterStaServiceCallbackFuzzTest(const uint8_t* data, size_t size)
     pStaService->UnRegisterStaServiceCallback(callbacks);
 }
 
-void StaInterfaceFuzzTest(const uint8_t* data, size_t size)
+void StaInterfaceFuzzTest(FuzzedDataProvider& FDP)
 {
-    std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
-    std::string filterName = std::string(reinterpret_cast<const char*>(data), size);
-    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
+    std::string conditionName = FDP.ConsumeBytesAsString(NUM_BYTES);
+    std::string filterName = FDP.ConsumeBytesAsString(NUM_BYTES);
+    FilterTag filterTag = static_cast<FilterTag>(FDP.ConsumeIntegral<int>() % FIVE);
     FilterBuilder filterBuilder = [](auto &compositeWifiFilter) {};
     AppExecFwk::AppStateData appData;
     std::vector<WifiRestrictedInfo> wifiRestrictedInfoList;
@@ -399,7 +403,7 @@ void StaInterfaceFuzzTest(const uint8_t* data, size_t size)
     #endif
 }
 
-void RegisterStaServiceCallbackTest(const uint8_t* data, size_t size)
+void RegisterStaServiceCallbackTest()
 {
     std::vector<StaServiceCallback> callbacks;
     WifiStaServerManager wifiStaServerManager;
@@ -408,94 +412,91 @@ void RegisterStaServiceCallbackTest(const uint8_t* data, size_t size)
     pStaService->RegisterStaServiceCallback(callbacks);
 }
 
-void ConnectToCandidateConfigTest(const uint8_t* data, size_t size)
+void ConnectToCandidateConfigTest(FuzzedDataProvider& FDP)
 {
     WifiDeviceConfig config;
-    int index = 0;
-    int uid = static_cast<int>(data[index++]);
-    int networkId = static_cast<int>(data[index++]);
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    int uid = FDP.ConsumeIntegral<int>();
+    int networkId = FDP.ConsumeIntegral<int>();
+    config.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP.ConsumeBytesAsString(NUM_BYTES);
     config.uid = ID;
     config.networkId = WORK_ID;
     WifiSettings::GetInstance().AddDeviceConfig(config);
     pStaService->ConnectToCandidateConfig(uid, networkId);
 }
 
-void ConvertStringTest(const uint8_t* data, size_t size)
+void ConvertStringTest()
 {
     std::u16string wideText;
     WifiTelephonyUtils::ConvertString(wideText);
 }
 
-void UpdateEapConfigTest(const uint8_t* data, size_t size)
+void UpdateEapConfigTest(FuzzedDataProvider& FDP)
 {
     WifiDeviceConfig config;
-    int index = 0;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
-    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    config.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.eap = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.clientCert = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.privateKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.certEntry.push_back(FDP.ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.encryptedData = FDP.ConsumeBytesAsString(NUM_BYTES);
     std::vector<std::string> eapMethod = {"SIM", "AKA", "AKA"};
-    config.wifiEapConfig.eap = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.eap = FDP.ConsumeBytesAsString(NUM_BYTES);
     pStaService->UpdateEapConfig(config, config.wifiEapConfig);
 }
 
-void AddDeviceConfigTest(const uint8_t* data, size_t size)
+void AddDeviceConfigTest(FuzzedDataProvider& FDP)
 {
     WifiDeviceConfig config;
-    int index = 0;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP.ConsumeBytesAsString(NUM_BYTES);
     std::string EapMethod = "TLS";
     config.wifiEapConfig.eap = EapMethod;
-    config.wifiEapConfig.clientCert = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.privateKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.wifiEapConfig.certEntry.push_back(static_cast<uint8_t>(data[index++]));
-    config.wifiEapConfig.encryptedData = std::string(reinterpret_cast<const char*>(data), size);
+    config.wifiEapConfig.clientCert = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.privateKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.wifiEapConfig.certEntry.push_back(FDP.ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.encryptedData = FDP.ConsumeBytesAsString(NUM_BYTES);
     pStaService->AddDeviceConfig(config);
 }
 
-void ConnectToNetworkTest(const uint8_t* data, size_t size)
+void ConnectToNetworkTest(FuzzedDataProvider& FDP)
 {
     WifiDeviceConfig config;
     int networkId = 0;
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP.ConsumeBytesAsString(NUM_BYTES);
     config.networkId = 0;
     WifiSettings::GetInstance().AddDeviceConfig(config);
     pStaService->ConnectToNetwork(networkId);
 }
 
-void StartRoamToNetworkTest(const uint8_t* data, size_t size)
+void StartRoamToNetworkTest(FuzzedDataProvider& FDP)
 {
     WifiDeviceConfig config;
     int networkId = 0;
-    std::string staBssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.ssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    std::string staBssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.preSharedKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP.ConsumeBytesAsString(NUM_BYTES);
     config.networkId = 0;
     WifiSettings::GetInstance().AddDeviceConfig(config);
     pStaService->StartConnectToBssid(networkId, staBssid);
 }
 
-void StaServiceFuzzTest(const uint8_t* data, size_t size)
+void StaServiceFuzzTest(FuzzedDataProvider& FDP)
 {
-    std::string conditionName = std::string(reinterpret_cast<const char*>(data), size);
-    std::string ditionName = std::string(reinterpret_cast<const char*>(data), size);
+    std::string conditionName = FDP.ConsumeBytesAsString(NUM_BYTES);
+    std::string ditionName = FDP.ConsumeBytesAsString(NUM_BYTES);
     AppExecFwk::AppStateData appData;
     pStaService->EnableStaService();
     pStaService->DisableStaService();
@@ -504,38 +505,41 @@ void StaServiceFuzzTest(const uint8_t* data, size_t size)
     pStaService->HandleForegroundAppChangedAction(appData);
 }
 
-void RegisterFilterBuilderFuzzTest(const uint8_t* data, size_t size)
+void RegisterFilterBuilderFuzzTest(FuzzedDataProvider& FDP)
 {
-    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
-    std::string filterName = std::string(reinterpret_cast<const char*>(data), size);
+    int randomInt = FDP.ConsumeIntegral<int>();
+    FilterTag filterTag = static_cast<FilterTag>(randomInt % FIVE);
+    std::string filterName = FDP.ConsumeBytesAsString(NUM_BYTES);
     FilterBuilder filterBuilder = [](auto &compositeWifiFilter) {};
     pStaService->RegisterFilterBuilder(filterTag, filterName, filterBuilder);
 }
-
-void DeregisterFilterBuilderFuzzTest(const uint8_t* data, size_t size)
+ 
+void DeregisterFilterBuilderFuzzTest(FuzzedDataProvider& FDP)
 {
-    FilterTag filterTag = static_cast<FilterTag>(static_cast<int>(data[0]) % FIVE);
-    std::string filterName = std::string(reinterpret_cast<const char*>(data), size);
+    int randomInt = FDP.ConsumeIntegral<int>();
+    FilterTag filterTag = static_cast<FilterTag>(randomInt % FIVE);
+    std::string filterName = FDP.ConsumeBytesAsString(NUM_BYTES);
     pStaService->DeregisterFilterBuilder(filterTag, filterName);
 }
 
 void GetImsiFuzzTest(const uint8_t* data, size_t size)
 {
-    int index = 0;
-    int slotId = static_cast<int>(data[index++]);
-    int mncLen = static_cast<int>(data[index++]);
+    FuzzedDataProvider FDP(data, size);
+    int slotId = FDP.ConsumeIntegral<int>();
+    int mncLen = FDP.ConsumeIntegral<int>();
     std::string imsi = std::string(reinterpret_cast<const char*>(data), size);
+ 
     WifiTelephonyUtils::GetPlmn(slotId);
     pStaService->GetMcc(imsi);
     pStaService->GetMnc(imsi, mncLen);
     WifiTelephonyUtils::GetImsi(slotId);
 }
 
-void TelephonyUtilsFuzzTest(const uint8_t* data)
+void TelephonyUtilsFuzzTest(FuzzedDataProvider& FDP)
 {
-    int index = 0;
-    int slotId = static_cast<int>(data[index++]);
-    int eapSubId = static_cast<int>(data[index++]);
+    int slotId = FDP.ConsumeIntegral<int>();
+    int eapSubId = FDP.ConsumeIntegral<int>();
+ 
     WifiTelephonyUtils::GetDefaultId(slotId);
     WifiTelephonyUtils::GetSimCardState(slotId);
     WifiTelephonyUtils::IsMultiSimEnabled();
@@ -543,38 +547,37 @@ void TelephonyUtilsFuzzTest(const uint8_t* data)
     WifiTelephonyUtils::GetSlotId(eapSubId);
 }
 
-void SimAkaAuthFuzzTest(const uint8_t* data, size_t size)
+void SimAkaAuthFuzzTest(FuzzedDataProvider& FDP)
 {
-    int index = 0;
-    std::string nonce = std::string(reinterpret_cast<const char*>(data), size);
-    WifiTelephonyUtils::AuthType authType = static_cast<WifiTelephonyUtils::AuthType>(data[index++]);
-    int32_t eapSubId = static_cast<int32_t>(data[index++]);
+    int32_t randomInt = FDP.ConsumeIntegral<int32_t>();
+    std::string nonce = FDP.ConsumeBytesAsString(NUM_BYTES);
+    WifiTelephonyUtils::AuthType authType = static_cast<WifiTelephonyUtils::AuthType>(randomInt % TWO);
+    int32_t eapSubId = FDP.ConsumeIntegral<int32_t>();
     SimAkaAuth(nonce, authType, eapSubId);
 }
 
 void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
 {
-    int index = 0;
-    int wifiStandard = static_cast<int>(data[index++]);
+    FuzzedDataProvider FDP(data, size);
+    int wifiStandard = FDP.ConsumeIntegral<int>();
     WifiLinkedInfo info;
     cJSON *root = cJSON_CreateObject();
     if (root == NULL) {
         return;
     }
-    std::string key = std::string(reinterpret_cast<const char*>(data), size);
-
-    if (size >= sizeof(WifiLinkedInfo)) {
-        int indexInner = 0;
-        info.networkId = static_cast<int>(data[indexInner++]);
-        info.rssi = static_cast<int>(data[indexInner++]);
-        info.band = static_cast<int>(data[indexInner++]);
-        info.linkSpeed = static_cast<int>(data[indexInner++]);
-        info.macType = static_cast<int>(data[indexInner++]);
-        info.ssid = std::string(reinterpret_cast<const char*>(data), size);
-        info.bssid = std::string(reinterpret_cast<const char*>(data), size);
-        info.macAddress = std::string(reinterpret_cast<const char*>(data), size);
-    }
+    std::string key = FDP.ConsumeBytesAsString(NUM_BYTES);
  
+    if (size >= sizeof(WifiLinkedInfo)) {
+        info.networkId = FDP.ConsumeIntegral<int>();
+        info.rssi = FDP.ConsumeIntegral<int>();
+        info.band = FDP.ConsumeIntegral<int>();
+        info.linkSpeed = FDP.ConsumeIntegral<int>();
+        info.macType = FDP.ConsumeIntegral<int>();
+        info.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        info.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        info.macAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
+    }
+
     WifiSecurityDetect::GetInstance().SetDatashareReady();
     WifiSecurityDetect::GetInstance().RegisterSecurityDetectObserver();
     WifiSecurityDetect::GetInstance().DealStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, info, 0);
@@ -589,13 +592,13 @@ void SecurityDetectFuzzTest(const uint8_t* data, size_t size)
     cJSON_Delete(root);
 }
 
-void SecurityDetectFuzzTest02(const uint8_t* data, size_t size)
+void SecurityDetectFuzzTest02(FuzzedDataProvider& FDP)
 {
     int networkId = 0;
     int modelId = 0;
-    std::string devId = std::string(reinterpret_cast<const char*>(data), size);
-    std::string param = std::string(reinterpret_cast<const char*>(data), size);
-    int rawvalue = static_cast<int>(data[0]) % FIVE;
+    std::string devId = FDP.ConsumeBytesAsString(NUM_BYTES);
+    std::string param = FDP.ConsumeBytesAsString(NUM_BYTES);
+    int rawvalue = FDP.ConsumeIntegral<int>() % FIVE;
 SecurityModelResult model;
 switch (rawvalue) {
     case ZERO:
@@ -634,7 +637,7 @@ switch (rawvalue) {
         model.param = "unknown";
         model.result = "unknown";
     }
-    bool result = (static_cast<int>(data[0]) % TWO) ? true : false;
+    bool result = FDP.ConsumeBool();
     WifiSecurityDetect::GetInstance().SetChangeNetworkid(networkId);
     WifiSecurityDetect::GetInstance().IsSecurityDetectTimeout(networkId);
     WifiSecurityDetect::GetInstance().SecurityDetectResult(devId, modelId, param, result);
@@ -655,28 +658,29 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
+    FuzzedDataProvider FDP(data, size);
     OHOS::Wifi::StaServerFuzzTest(data, size);
     OHOS::Wifi::StaAutoServerFuzzTest(data, size);
-    OHOS::Wifi::RegisterDeviceAppraisalTest(data, size);
     OHOS::Wifi::AllowAutoSelectDeviceTest(data, size);
-    OHOS::Wifi::StaAutoConnectServiceFuzzTest(data, size);
-    OHOS::Wifi::RegisterStaServiceCallbackFuzzTest(data, size);
-    OHOS::Wifi::StaInterfaceFuzzTest(data, size);
-    OHOS::Wifi::RegisterStaServiceCallbackTest(data, size);
-    OHOS::Wifi::ConnectToCandidateConfigTest(data, size);
-    OHOS::Wifi::ConvertStringTest(data, size);
-    OHOS::Wifi::UpdateEapConfigTest(data, size);
-    OHOS::Wifi::AddDeviceConfigTest(data, size);
-    OHOS::Wifi::ConnectToNetworkTest(data, size);
-    OHOS::Wifi::StartRoamToNetworkTest(data, size);
-    OHOS::Wifi::StaServiceFuzzTest(data, size);
-    OHOS::Wifi::RegisterFilterBuilderFuzzTest(data, size);
-    OHOS::Wifi::DeregisterFilterBuilderFuzzTest(data, size);
     OHOS::Wifi::GetImsiFuzzTest(data, size);
-    OHOS::Wifi::TelephonyUtilsFuzzTest(data);
-    OHOS::Wifi::SimAkaAuthFuzzTest(data, size);
     OHOS::Wifi::SecurityDetectFuzzTest(data, size);
-    OHOS::Wifi::SecurityDetectFuzzTest02(data, size);
+    OHOS::Wifi::RegisterDeviceAppraisalTest(FDP);
+    OHOS::Wifi::StaAutoConnectServiceFuzzTest(FDP);
+    OHOS::Wifi::StaInterfaceFuzzTest(FDP);
+    OHOS::Wifi::ConnectToCandidateConfigTest(FDP);
+    OHOS::Wifi::UpdateEapConfigTest(FDP);
+    OHOS::Wifi::AddDeviceConfigTest(FDP);
+    OHOS::Wifi::ConnectToNetworkTest(FDP);
+    OHOS::Wifi::StartRoamToNetworkTest(FDP);
+    OHOS::Wifi::StaServiceFuzzTest(FDP);
+    OHOS::Wifi::RegisterFilterBuilderFuzzTest(FDP);
+    OHOS::Wifi::DeregisterFilterBuilderFuzzTest(FDP);
+    OHOS::Wifi::TelephonyUtilsFuzzTest(FDP);
+    OHOS::Wifi::SimAkaAuthFuzzTest(FDP);
+    OHOS::Wifi::SecurityDetectFuzzTest02(FDP);
+    OHOS::Wifi::RegisterStaServiceCallbackFuzzTest();
+    OHOS::Wifi::RegisterStaServiceCallbackTest();
+    OHOS::Wifi::ConvertStringTest();
     return 0;
 }
 }

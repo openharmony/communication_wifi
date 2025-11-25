@@ -26,17 +26,22 @@
 #include "wifi_internal_msg.h"
 #include "wifi_p2p_service.h"
 #include "wifi_p2p_group_manager.h"
+#include "wifi_p2p_service.h"
+#include "p2p_inviting_state.h"
 #include <mutex>
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace Wifi {
 constexpr int THREE = 3;
 constexpr int TWO = 2;
 constexpr int U32_AT_SIZE_ZERO = 4;
+static const int32_t NUM_BYTES = 1;
 static bool g_isInsted = false;
 static std::unique_ptr<P2pInterface> pP2pInterface = nullptr;
 static std::unique_ptr<WifiP2pGroupManager> pWifiP2pGroupManager = nullptr;
 static std::unique_ptr<WifiP2pService> pWifiP2pService = nullptr;
+static std::unique_ptr<P2pInvitingState> pP2pInvitingState = nullptr;
 IP2pServiceCallbacks mP2pCallback;
 
 void MyExit()
@@ -103,18 +108,19 @@ public:
 
 void P2pServerFuzzTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
+    int32_t randomInt = FDP.ConsumeIntegral<int32_t>();
     WifiP2pDevice device;
     WifiP2pServiceRequest request;
     if (size >= THREE) {
-        int index = 0;
-        std::string deviceName = std::string(reinterpret_cast<const char*>(data), size);
-        std::string networkName = std::string(reinterpret_cast<const char*>(data), size);
-        std::string mDeviceAddress = std::string(reinterpret_cast<const char*>(data), size);
-        std::string primaryDeviceType = std::string(reinterpret_cast<const char*>(data), size);
-        std::string secondaryDeviceType = std::string(reinterpret_cast<const char*>(data), size);
-        unsigned int supportWpsConfigMethods = static_cast<unsigned int>(data[index++]);
-        int deviceCapabilitys = static_cast<int>(data[index++]);
-        int groupCapabilitys = static_cast<int>(data[index++]);
+        std::string deviceName = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string networkName = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string mDeviceAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string primaryDeviceType = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string secondaryDeviceType = FDP.ConsumeBytesAsString(NUM_BYTES);
+        unsigned int supportWpsConfigMethods = FDP.ConsumeIntegral<unsigned int>();
+        int deviceCapabilitys = FDP.ConsumeIntegral<int>();
+        int groupCapabilitys = FDP.ConsumeIntegral<int>();
         device.SetDeviceName(deviceName);
         device.SetNetworkName(networkName);
         device.SetDeviceAddress(mDeviceAddress);
@@ -127,42 +133,39 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
 
     WifiP2pConfig config;
     if (size >= THREE) {
-        int index2 = 0;
-        std::string mDeviceAddress = std::string(reinterpret_cast<const char*>(data), size);
-        std::string passphrase = std::string(reinterpret_cast<const char*>(data), size);
-        std::string groupName = std::string(reinterpret_cast<const char*>(data), size);
-        int groupOwnerIntent = static_cast<int>(data[index2++]);
-        int deviceAddressType = static_cast<int>(data[index2++]);
-        int netId = static_cast<int>(data[index2++]);
-
-        config.SetDeviceAddress(mDeviceAddress);
-        config.SetDeviceAddressType(deviceAddressType);
+        std::string mDeviceAddress01 = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string passphrase01 = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string groupName01 = FDP.ConsumeBytesAsString(NUM_BYTES);
+        int groupOwnerIntent01 = FDP.ConsumeIntegral<int>();
+        int deviceAddressType01 = FDP.ConsumeIntegral<int>();
+        int netId = FDP.ConsumeIntegral<int>();
+        config.SetDeviceAddress(mDeviceAddress01);
+        config.SetDeviceAddressType(deviceAddressType01);
         config.SetNetId(netId);
-        config.SetPassphrase(passphrase);
-        config.SetGroupOwnerIntent(groupOwnerIntent);
-        config.SetGroupName(groupName);
+        config.SetPassphrase(passphrase01);
+        config.SetGroupOwnerIntent(groupOwnerIntent01);
+        config.SetGroupName(groupName01);
     }
 
     WifiP2pGroupInfo group;
     if (size >= THREE) {
-        std::string passphrase = std::string(reinterpret_cast<const char*>(data), size);
-        std::string interface = std::string(reinterpret_cast<const char*>(data), size);
-        std::string groupName = std::string(reinterpret_cast<const char*>(data), size);
-        int frequency = static_cast<int>(data[0]);
+        std::string passphrase02 = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string interface02 = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string groupName02 = FDP.ConsumeBytesAsString(NUM_BYTES);
+        int frequency = FDP.ConsumeIntegral<int>();
 
-        group.SetPassphrase(passphrase);
-        group.SetInterface(interface);
-        group.SetGroupName(groupName);
+        group.SetPassphrase(passphrase02);
+        group.SetInterface(interface02);
+        group.SetGroupName(groupName02);
         group.SetFrequency(frequency);
     }
 
     WifiP2pWfdInfo wfdInfo;
     if (size >= THREE) {
-        int index1 = 0;
-        bool wfdEnabled = (static_cast<int>(data[0]) % TWO) ? true : false;
-        int deviceInfo = static_cast<int>(data[index1++]);
-        int ctrlPort = static_cast<int>(data[index1++]);
-        int maxThroughput =  static_cast<int>(data[index1++]);
+        bool wfdEnabled = FDP.ConsumeBool();
+        int deviceInfo = FDP.ConsumeIntegral<int>();
+        int ctrlPort = FDP.ConsumeIntegral<int>();
+        int maxThroughput =  FDP.ConsumeIntegral<int>();
         wfdInfo.SetWfdEnabled(wfdEnabled);
         wfdInfo.SetDeviceInfo(deviceInfo);
         wfdInfo.SetCtrlPort(ctrlPort);
@@ -170,25 +173,25 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     }
 
     WifiP2pServiceInfo srvInfo;
-    std::string serviceName = std::string(reinterpret_cast<const char*>(data), size);
-    std::string mDeviceAddress = std::string(reinterpret_cast<const char*>(data), size);
+    std::string serviceName = FDP.ConsumeBytesAsString(NUM_BYTES);
+    std::string mDeviceAddress02 = FDP.ConsumeBytesAsString(NUM_BYTES);
     srvInfo.SetServiceName(serviceName);
-    srvInfo.SetDeviceAddress(mDeviceAddress);
+    srvInfo.SetDeviceAddress(mDeviceAddress02);
     WifiP2pLinkedInfo linkedInfo;
-    bool isP2pGroupOwner = (static_cast<int>(data[0]) % TWO) ? true : false;
-    std::string groupOwnerAddress = std::string(reinterpret_cast<const char*>(data), size);
+    bool isP2pGroupOwner = FDP.ConsumeBool();
+    std::string groupOwnerAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
     linkedInfo.SetIsGroupOwner(isP2pGroupOwner);
     linkedInfo.SetIsGroupOwnerAddress(groupOwnerAddress);
-    int period = static_cast<int>(data[0]);
-    int interval = static_cast<int>(data[0]);
-    FreqType scanType = static_cast<FreqType>(static_cast<int>(data[0]) % TWO);
-    DhcpMode dhcpMode = static_cast<DhcpMode>(static_cast<int>(data[0]) % THREE);
+    int period = FDP.ConsumeIntegral<int>();
+    int interval = FDP.ConsumeIntegral<int>();
+    FreqType scanType = static_cast<FreqType>(randomInt % TWO);
+    DhcpMode dhcpMode = static_cast<DhcpMode>(randomInt % THREE);
     Hid2dConnectConfig hidConfig;
     hidConfig.SetDhcpMode(dhcpMode);
     hidConfig.SetFrequency(interval);
     hidConfig.SetPreSharedKey(serviceName);
     hidConfig.SetBssid(groupOwnerAddress);
-    hidConfig.SetSsid(mDeviceAddress);
+    hidConfig.SetSsid(mDeviceAddress02);
 
     pP2pInterface->DiscoverDevices();
     pP2pInterface->StopDiscoverDevices();
@@ -223,9 +226,9 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     pP2pInterface->GetP2pRecommendChannel();
     pP2pInterface->DecreaseSharedLink(interval);
     pP2pInterface->IncreaseSharedLink(interval);
-    int channelid = static_cast<int32_t >(data[0]);
+    int channelid = FDP.ConsumeIntegral<int>();
     Hid2dUpperScene scene;
-    GroupLiveType liveType = static_cast<GroupLiveType>(static_cast<int>(data[0]) % TWO);
+    GroupLiveType liveType = static_cast<GroupLiveType>(FDP.ConsumeIntegral<int>() % TWO);
     pP2pInterface->RegisterP2pServiceCallbacks(mP2pCallback);
     pP2pInterface->UnRegisterP2pServiceCallbacks(mP2pCallback);
     pP2pInterface->Hid2dCreateGroup(period, scanType);
@@ -238,10 +241,10 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     pWifiP2pGroupManager->UpdateWpaGroup(group);
     pWifiP2pGroupManager->ClearAll();
     pWifiP2pGroupManager->RemoveGroup(group);
-    pWifiP2pGroupManager->RemoveClientFromGroup(interval, mDeviceAddress);
+    pWifiP2pGroupManager->RemoveClientFromGroup(interval, mDeviceAddress02);
     pWifiP2pGroupManager->GetNetworkIdFromClients(device);
     pWifiP2pGroupManager->GetGroupNetworkId(device);
-    pWifiP2pGroupManager->GetGroupNetworkId(device, mDeviceAddress);
+    pWifiP2pGroupManager->GetGroupNetworkId(device, mDeviceAddress02);
     pWifiP2pGroupManager->GetGroupOwnerAddr(interval);
     pWifiP2pGroupManager->IsInclude(interval);
     pWifiP2pGroupManager->RefreshCurrentGroupFromGroups();
@@ -249,7 +252,7 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
     std::map<int, WifiP2pGroupInfo> wpaGroups;
     wpaGroups.insert(std::make_pair(interval, group));
     pWifiP2pGroupManager->UpdateGroupsNetwork(wpaGroups);
-    WifiMacAddrInfoType type = static_cast<WifiMacAddrInfoType>(static_cast<int>(data[0]) % U32_AT_SIZE_ZERO);
+    WifiMacAddrInfoType type = static_cast<WifiMacAddrInfoType>(randomInt % U32_AT_SIZE_ZERO);
     pWifiP2pGroupManager->AddMacAddrPairInfo(type, group);
     pWifiP2pGroupManager->SetCurrentGroup(type, group);
     pWifiP2pGroupManager->RemoveMacAddrPairInfo(type, group);
@@ -257,16 +260,24 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
 
 void P2pServerFuzzTest01(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
+    if (pWifiP2pService == nullptr) {
+        return;
+    }
+    bool isAccept = FDP.ConsumeBool();
+    bool isEnable = FDP.ConsumeBool();
+    int uid = FDP.ConsumeIntegral<int>();
     std::vector<StationInfo> result;
+    std::string config1;
+    IpAddrInfo ipInfo;
     WifiP2pConfig config;
     if (size >= THREE) {
-        int index2 = 0;
-        std::string mDeviceAddress = std::string(reinterpret_cast<const char*>(data), size);
-        std::string passphrase = std::string(reinterpret_cast<const char*>(data), size);
-        std::string groupName = std::string(reinterpret_cast<const char*>(data), size);
-        int groupOwnerIntent = static_cast<int>(data[index2++]);
-        int deviceAddressType = static_cast<int>(data[index2++]);
-        int netId = static_cast<int>(data[index2++]);
+        std::string mDeviceAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string passphrase = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string groupName = FDP.ConsumeBytesAsString(NUM_BYTES);
+        int groupOwnerIntent = FDP.ConsumeIntegral<int>();
+        int deviceAddressType = FDP.ConsumeIntegral<int>();
+        int netId = FDP.ConsumeIntegral<int>();
 
         config.SetDeviceAddress(mDeviceAddress);
         config.SetDeviceAddressType(deviceAddressType);
@@ -275,10 +286,30 @@ void P2pServerFuzzTest01(const uint8_t* data, size_t size)
         config.SetGroupOwnerIntent(groupOwnerIntent);
         config.SetGroupName(groupName);
     }
-    pWifiP2pService->EnableP2p();
-    pWifiP2pService->DisableP2p();
     pWifiP2pService->CreateRptGroup(config);
     pWifiP2pService->GetRptStationsList(result);
+    pWifiP2pService->SetGcIpAddress(ipInfo);
+    pWifiP2pService->NotifyWscDialogConfirmResult(isAccept);
+    pWifiP2pService->SetMiracastSinkConfig(config1);
+    pWifiP2pService->NotifyRemoteDie(uid);
+    pWifiP2pService->SetP2pHighPerf(isEnable);
+}
+
+void WifiP2pGroupManagerFuzzTest(const uint8_t* data, size_t size)
+{
+    FuzzedDataProvider FDP(data, size);
+    WifiP2pGroupInfo group;
+    if (size >= THREE) {
+        std::string passphrase = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string interface = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string groupName = FDP.ConsumeBytesAsString(NUM_BYTES);
+        int frequency = FDP.ConsumeIntegral<int>();
+        group.SetPassphrase(passphrase);
+        group.SetInterface(interface);
+        group.SetGroupName(groupName);
+        group.SetFrequency(frequency);
+    }
+    pWifiP2pGroupManager->AddOrUpdateGroup(group);
 }
 
 /* Fuzzer entry point */
@@ -287,9 +318,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
+    FuzzedDataProvider FDP(data, size);
     OHOS::Wifi::InitParam();
     OHOS::Wifi::P2pServerFuzzTest(data, size);
     OHOS::Wifi::P2pServerFuzzTest01(data, size);
+    OHOS::Wifi::WifiP2pGroupManagerFuzzTest(data, size);
     return 0;
 }
 }

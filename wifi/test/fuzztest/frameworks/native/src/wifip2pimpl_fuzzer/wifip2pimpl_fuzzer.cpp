@@ -24,48 +24,50 @@
 
 namespace OHOS {
 namespace Wifi {
+    static const int32_t NUM_BYTES = 1;
     static std::shared_ptr<WifiP2p> WifiP2pPtr = WifiP2p::GetInstance(WIFI_P2P_ABILITY_ID);
     void RequestServiceTest(const uint8_t* data, size_t size)
     {
+        FuzzedDataProvider FDP (data, size);
         WifiP2pDevice device;
         WifiP2pServiceRequest request;
         if (size >= THREE) {
-            int index = 0;
-            std::string deviceName = std::string(reinterpret_cast<const char*>(data), size);
-            std::string networkName = std::string(reinterpret_cast<const char*>(data), size);
-            std::string mDeviceAddress = std::string(reinterpret_cast<const char*>(data), size);
-            std::string primaryDeviceType = std::string(reinterpret_cast<const char*>(data), size);
-            std::string secondaryDeviceType = std::string(reinterpret_cast<const char*>(data), size);
-            unsigned int supportWpsConfigMethods = static_cast<unsigned int>(data[index++]);
-            int deviceCapabilitys = static_cast<int>(data[index++]);
-            int groupCapabilitys = static_cast<int>(data[index++]);
-            device.SetDeviceName(deviceName);
-            device.SetNetworkName(networkName);
-            device.SetDeviceAddress(mDeviceAddress);
-            device.SetPrimaryDeviceType(primaryDeviceType);
-            device.SetSecondaryDeviceType(secondaryDeviceType);
-            device.SetWpsConfigMethod(supportWpsConfigMethods);
-            device.SetDeviceCapabilitys(deviceCapabilitys);
-            device.SetGroupCapabilitys(groupCapabilitys);
-        }
-        WifiP2pPtr->RequestService(device, request);
-    }
+                std::string deviceName = FDP.ConsumeBytesAsString(NUM_BYTES);
+                std::string networkName = FDP.ConsumeBytesAsString(NUM_BYTES);
+                std::string mDeviceAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
+                std::string primaryDeviceType = FDP.ConsumeBytesAsString(NUM_BYTES);
+                std::string secondaryDeviceType = FDP.ConsumeBytesAsString(NUM_BYTES);
+                unsigned int supportWpsConfigMethods = FDP.ConsumeIntegral<int>();
+                int deviceCapabilitys = FDP.ConsumeIntegral<int>();
+                int groupCapabilitys = FDP.ConsumeIntegral<int>();
+                device.SetDeviceName(deviceName);
+                device.SetNetworkName(networkName);
+                device.SetDeviceAddress(mDeviceAddress);
+                device.SetPrimaryDeviceType(primaryDeviceType);
+                device.SetSecondaryDeviceType(secondaryDeviceType);
+                device.SetWpsConfigMethod(supportWpsConfigMethods);
+                device.SetDeviceCapabilitys(deviceCapabilitys);
+                device.SetGroupCapabilitys(groupCapabilitys);
 
-    void PutLocalP2pServiceTest(const uint8_t* data, size_t size)
+                WifiP2pPtr->RequestService(device, request);
+            }
+        }
+
+    void PutLocalP2pServiceTest(FuzzedDataProvider& FDP)
     {
         WifiP2pServiceInfo srvInfo;
-        std::string serviceName = std::string(reinterpret_cast<const char*>(data), size);
-        std::string mDeviceAddress = std::string(reinterpret_cast<const char*>(data), size);
+        std::string serviceName = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string mDeviceAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
         srvInfo.SetServiceName(serviceName);
         srvInfo.SetDeviceAddress(mDeviceAddress);
         WifiP2pPtr->PutLocalP2pService(srvInfo);
     }
 
-    void DeleteLocalP2pServiceTest(const uint8_t* data, size_t size)
+    void DeleteLocalP2pServiceTest(FuzzedDataProvider& FDP)
     {
         WifiP2pServiceInfo srvInfo;
-        std::string serviceName = std::string(reinterpret_cast<const char*>(data), size);
-        std::string mDeviceAddress = std::string(reinterpret_cast<const char*>(data), size);
+        std::string serviceName = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string mDeviceAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
         srvInfo.SetServiceName(serviceName);
         srvInfo.SetDeviceAddress(mDeviceAddress);
         WifiP2pPtr->DeleteLocalP2pService(srvInfo);
@@ -78,10 +80,18 @@ namespace Wifi {
         }
         WifiP2pLinkedInfo linkedInfo;
         bool isP2pGroupOwner = (static_cast<int>(data[0]) % TWO) ? true : false;
-        std::string groupOwnerAddress = std::string(reinterpret_cast<const char*>(data), size);
         linkedInfo.SetIsGroupOwner(isP2pGroupOwner);
-        linkedInfo.SetIsGroupOwnerAddress(groupOwnerAddress);
         WifiP2pPtr->QueryP2pLinkedInfo(linkedInfo);
+    }
+
+    void QueryP2pLinkedInfoTest01(const uint8_t* data, size_t size)
+    {
+        if (size == 0) {
+            return;
+        }
+        WifiP2pLinkedInfo linkedInfo;
+        std::string groupOwnerAddress = std::string(reinterpret_cast<const char*>(data), size);
+        linkedInfo.SetIsGroupOwnerAddress(groupOwnerAddress);
     }
 
     void GetP2pDiscoverStatusTest(const uint8_t* data, size_t size)
@@ -132,13 +142,13 @@ namespace Wifi {
 
     void SetP2pWfdInfoTest(const uint8_t* data, size_t size)
     {
+        FuzzedDataProvider FDP(data, size);
         WifiP2pWfdInfo wfdInfo;
         if (size >= FOUR) {
-            int index = 0;
-            bool wfdEnabled = (static_cast<int>(data[index++]) % TWO) ? true : false;
-            int deviceInfo = static_cast<int>(data[index++]);
-            int ctrlPort = static_cast<int>(data[index++]);
-            int maxThroughput =  static_cast<int>(data[index++]);
+            bool wfdEnabled = FDP.ConsumeBool();
+            int deviceInfo = FDP.ConsumeIntegral<int>();
+            int ctrlPort = FDP.ConsumeIntegral<int>();
+            int maxThroughput =  FDP.ConsumeIntegral<int>();
             wfdInfo.SetWfdEnabled(wfdEnabled);
             wfdInfo.SetDeviceInfo(deviceInfo);
             wfdInfo.SetCtrlPort(ctrlPort);
@@ -150,16 +160,15 @@ namespace Wifi {
 
     bool WifiHotSpotImplFuzzTest(const uint8_t* data, size_t size)
     {
-        RequestServiceTest(data, size);
-        PutLocalP2pServiceTest(data, size);
-        DeleteLocalP2pServiceTest(data, size);
         QueryP2pLinkedInfoTest(data, size);
+        QueryP2pLinkedInfoTest01(data, size);
         GetP2pDiscoverStatusTest(data, size);
         QueryP2pServicesTest(data, size);
         GetSupportedFeaturesTest(data, size);
         IsFeatureSupportedTest(data, size);
         SetP2pDeviceNameTest(data, size);
         SetP2pWfdInfoTest(data, size);
+        RequestServiceTest(data, size);
         return true;
     }
 }  // namespace Wifi
@@ -168,6 +177,10 @@ namespace Wifi {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP (data, size);
+    
+    OHOS::Wifi::PutLocalP2pServiceTest(FDP);
+    OHOS::Wifi::DeleteLocalP2pServiceTest(FDP);
     OHOS::Wifi::WifiHotSpotImplFuzzTest(data, size);
     return 0;
 }

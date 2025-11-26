@@ -4760,13 +4760,11 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     linkSwitchDetectingFlag_ = false;
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::RANDOMMAC &&
-        WifiSettings::GetInstance().IsRandomMacDisabled(m_instId) &&
-        SetRandomMac(deviceConfig, bssid)) {
+        WifiSettings::GetInstance().IsRandomMacDisabled(m_instId)) {
         ReportMdmRestrictedEvent(deviceConfig.ssid, deviceConfig.bssid, "MDM_RESTRICTED");
     }
-#else
-    SetRandomMac(deviceConfig, bssid);
 #endif
+    SetRandomMac(deviceConfig, bssid);
     WIFI_LOGI("StartConnectToNetwork SetRandomMac targetNetworkId_:%{public}d, bssid:%{public}s", targetNetworkId_,
         MacAnonymize(bssid).c_str());
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);

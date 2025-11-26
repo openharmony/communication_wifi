@@ -17,12 +17,15 @@ import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { i18n, resourceManager  } from '@kit.LocalizationKit';
 import { common, OpenLinkOptions } from '@kit.AbilityKit';
-import { BusinessError } from '@kit.BasicServicesKit'
-import { SymbolGlyphModifier } from '@kit.ArkUI'
+import { BusinessError } from '@kit.BasicServicesKit';
+import { SymbolGlyphModifier } from '@kit.ArkUI';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
   validateURL, getIsInOOBE
-} from '../common/utils'
+} from '../common/utils';
+import {
+  updateFinalUrl,updateOnHttpErrorReceive,updateOnErrorReceive,updateOnSslErrorEvent,updateAboutToDisappear
+} from '../common/chr';
 import { connection } from '@kit.NetworkKit';
 import { emitter } from '@kit.BasicServicesKit';
 
@@ -326,9 +329,9 @@ struct Index {
         .domStorageAccess(true)
         .overviewModeAccess(false)
         .onOverrideUrlLoading((request) => {
-          const url = request.getRequestUrl();
-          if (validateURL(url) && !url.startsWith('http') && !url.startsWith('https')) {
-            (this.getUIContext().getHostContext() as common.UIAbilityContext).openLink(url)
+          this.webUrl = request.getRequestUrl();
+          if (validateURL(this.webUrl) && !this.webUrl.startsWith('http') && !this.webUrl.startsWith('https')) {
+            (this.getUIContext().getHostContext() as common.UIAbilityContext).openLink(this.webUrl)
               .then(() => {
                 hilog.info(DOMAIN, TAG, 'open link success.');               
               }).catch((err: BusinessError) => {
@@ -357,6 +360,7 @@ struct Index {
           }
         })
         .onPageBegin(() => {
+          updateFinalUrl(this.webUrl);
           this.loadProgress = 0;
         })
         .onProgressChange((event) => {
@@ -380,17 +384,20 @@ struct Index {
         })
         .onHttpErrorReceive((event) => {
           if (event) {
+            updateOnHttpErrorReceive(event.response.getResponseCode());
             hilog.info(DOMAIN, TAG, 'getResponseCode:' + event.response.getResponseCode());
           }
         })
         .onErrorReceive((event) => {
           if (event) {
+            updateOnErrorReceive(event.error.getErrorCode());
             hilog.info(DOMAIN, TAG, 'getErrorInfo:' + event.error.getErrorInfo());
             hilog.info(DOMAIN, TAG, 'getErrorCode:' + event.error.getErrorCode());
           }
         })
         .onSslErrorEventReceive((event) => {
-          hilog.info(DOMAIN, TAG, 'Ssl Error');
+          updateOnSslErrorEvent(event.error);
+          hilog.info(DOMAIN, TAG, 'Ssl Error:' + event.error);
           AlertDialog.show({
             title: $r('app.string.continue_visit'),
             message: $r('app.string.ssl_normal_error_msg'),
@@ -483,6 +490,7 @@ struct Index {
   }
 
   aboutToDisappear(): void {
+    updateAboutToDisappear();
     emitter.off('WANT_UPDATE');
   }
 }

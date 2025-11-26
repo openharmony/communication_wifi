@@ -1540,6 +1540,10 @@ void WifiFoldStateListener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
         if (pService != nullptr) {
             pService->OnFoldStateChanged(static_cast<int>(foldStatus));
         }
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnFoldStateChanged(static_cast<int>(foldStatus));
+        }
     }
 }
 

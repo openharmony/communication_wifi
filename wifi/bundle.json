@@ -187,9 +187,6 @@
                     "name": "//foundation/communication/wifi/wifi/frameworks/cj:cj_wifi_ffi"
                 },
                 {
-                    "name": "//foundation/communication/wifi/wifi/frameworks/ets/taihe/wifi:copy_wifi"
-                },
-                {
                     "name": "//foundation/communication/wifi/wifi/frameworks/ets/taihe/wifiManager:copy_wifiManager"
                 }
             ],

@@ -2644,13 +2644,23 @@ std::string WifiSettings::GetDefaultApSsid()
 {
     std::string ssid;
 #ifdef INIT_LIB_ENABLE
-    std::string marketName = GetMarketName();
-    std::string brandName = GetBrand();
-    if (marketName.empty() || brandName.empty()) {
-        LOGE("Get market name or brand name is empty");
+    const char* marketptr = GetMarketName();
+    const char* brandPtr = GetBrand();
+ 
+    if (brandPtr == nullptr || marketptr == nullptr) {
+        LOGE(" GetMarketName() or GetBrand() returned null pointer");
         ssid = "OHOS_" + GetRandomStr(RANDOM_STR_LEN);
         return ssid;
     }
+    std::string marketName(marketptr);
+    std::string brandName(brandPtr);
+ 
+    if ( marketName.empty()|| brandName.empty()) {
+        LOGE("GetMarketName() GetBrand() or returned empty string");
+        ssid = "OHOS_" + GetRandomStr(RANDOM_STR_LEN);
+        return ssid;
+    }
+ 
     brandName += " ";
     size_t pos = marketName.find(brandName);
     if (pos != std::string::npos) {
@@ -2658,13 +2668,13 @@ std::string WifiSettings::GetDefaultApSsid()
     } else {
         ssid = marketName;
     }
-
+ 
     if (ssid.empty()) {
         LOGE("ssid is empty and use random generation");
         ssid = "OHOS_" + GetRandomStr(RANDOM_STR_LEN);
         return ssid;
     }
-
+ 
     const std::string ellipsis = "...";
     if (ssid.length() > MAX_SSID_LEN) {
         LOGE("ssid is larger than 32, use ellipsis");

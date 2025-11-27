@@ -441,11 +441,6 @@ public:
     }
 };
 
-void ButtonTest(AlertDialog &dialog, std::any ctx)
-{
-    printf("button callback, input = %s\n", dialog.GetInputBox("input pin").c_str());
-}
-
 HWTEST_F(P2pStateMachineTest, HandlerDiscoverPeers, TestSize.Level1)
 {
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pFind(DISC_TIMEOUT_S))

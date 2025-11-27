@@ -80,7 +80,7 @@ void AuthorizingNegotiationRequestState::HandleInternalConnUserAccept(InternalMe
         }
         WpsInfo wpsPin = wps;
         wpsPin.SetPin(inputPin);
-        WIFI_LOGI("INPUT PIN: [%{private}s] ", wpsPin.GetPin().c_str());
+        WIFI_LOGI("INPUT PIN: [%{public}s] ", wpsPin.GetPin().c_str());
         p2pStateMachine.savedP2pConfig.SetWpsInfo(wpsPin);
     }
 
@@ -101,6 +101,7 @@ void AuthorizingNegotiationRequestState::HandleInternalConnUserConfirm()
     p2pStateMachine.savedP2pConfig.SetWpsInfo(wps);
 
     std::string pin;
+    WIFI_LOGE("HandleInternalConnUserConfirm pin. %{public}s", pin.c_str());
     if (WifiErrorNo::WIFI_HAL_OPT_OK !=
         WifiP2PHalInterface::GetInstance().Connect(p2pStateMachine.savedP2pConfig, false, pin)) {
         WIFI_LOGE("fail to connect.");

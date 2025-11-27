@@ -338,7 +338,14 @@ public:
      * @param isAccept if user accept to projection screen
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    void NotifyWscDialogConfirmResult(bool isAccept) override;
+    void NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPincode) override;
+
+    /**
+     * @Description Notify user accept result to p2p service
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    void NotifyWscDisplayConfirmResult() override;
 
     /**
      * @Description Set miracast sink config

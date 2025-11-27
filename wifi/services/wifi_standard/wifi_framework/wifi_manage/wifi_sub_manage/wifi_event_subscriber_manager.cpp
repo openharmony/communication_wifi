@@ -921,7 +921,7 @@ void NotificationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEve
     } else if (action == WIFI_EVENT_DIALOG_ACCEPT) {
         int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
         WIFI_LOGI("dialogType[%{public}d]", dialogType);
-        OnReceiveDialogAcceptEvent(dialogType);
+        OnReceiveDialogAcceptEvent(dialogType, eventData);
     } else if (action == WIFI_EVENT_DIALOG_REJECT) {
         int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
         bool noAction = eventData.GetWant().GetBoolParam("noAction", false);
@@ -952,7 +952,7 @@ void NotificationEventSubscriber::OnReceiveNotificationEvent(int notificationId)
     }
 }
 
-void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType)
+void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType, const OHOS::EventFwk::CommonEventData &eventData)
 {
     if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
         NotifyCandidateApprovalStatus(CandidateApprovalStatus::USER_ACCEPT);
@@ -979,12 +979,19 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType)
         }
     }
 #ifdef FEATURE_P2P_SUPPORT
-    if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_PBC_DIALOG)) {
-        WIFI_LOGI("OnReceiveNotification P2P_WSC_PBC_DIALOG Accept");
+    if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_PBC_DIALOG) ||
+        dialogType == static_cast<int>(WifiDialogType::P2P_WSC_KEYPAD_DIALOG)) {
+        std::string inputPinCode = eventData.GetWant().GetStringParam("inputPinCode");
+        WIFI_LOGI("OnReceiveDialogAcceptEvent inputPinCode:%{public}s", inputPinCode.c_str());
 
         IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
         if (p2pService != nullptr) {
-            p2pService->NotifyWscDialogConfirmResult(true);
+            p2pService->NotifyWscDialogConfirmResult(true, inputPinCode);
+        }
+    } else if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_DISPLAY_DIALOG) {
+        IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+        if (p2pService != nullptr) {
+            p2pService->NotifyWscDisplayConfirmResult();
         }
     }
 #endif
@@ -1016,7 +1023,7 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType, boo
         WIFI_LOGI("OnReceiveNotification P2P_WSC_PBC_DIALOG Reject");
         IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
         if (p2pService != nullptr) {
-            p2pService->NotifyWscDialogConfirmResult(false);
+            p2pService->NotifyWscDialogConfirmResult(false, "");
         }
     }
 #endif

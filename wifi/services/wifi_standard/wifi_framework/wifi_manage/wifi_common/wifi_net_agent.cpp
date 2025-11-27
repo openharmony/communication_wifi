@@ -428,7 +428,7 @@ void WifiNetAgent::SetNetLinkLocalRouteIpv6(sptr<NetManagerStandard::NetLinkInfo
     if (wifiIpV6Info.netmask.empty()) {
         return;
     }
-    unsigned int ipv6PrefixLength = IpTools::GetIPV6MaskLength(wifiIpV6Info.netmask);
+    unsigned int ipv6PrefixLength = static_cast<unsigned int>(IpTools::GetIPV6MaskLength(wifiIpV6Info.netmask));
     sptr<NetManagerStandard::Route> ipv6route = sptr<NetManagerStandard::Route>::MakeSptr();
     if (ipv6route == nullptr) {
         WIFI_LOGE("%{public}s ipv6route is null", __func__);

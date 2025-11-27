@@ -182,6 +182,24 @@ ErrCode AppNetworkSpeedLimitService::GetAppList(std::vector<AppExecFwk::RunningP
     return WIFI_OPT_SUCCESS;
 }
 
+int AppNetworkSpeedLimitService::GetAncoAppList(std::vector<WifiNetworkControlInfo>& ancoAppList, bool getFgAppFlag)
+{
+    if (getFgAppFlag) {
+        for (auto iter = m_AncoAppInfos.begin(); iter != m_AncoAppInfos.end(); ++iter) {
+            if (iter->second.state == AncoAppState::ANCO_APP_STATE_FOREGROUND) {
+                ancoAppList.push_back(iter->second);
+            }
+        }
+    } else {
+        for (auto iter = m_AncoAppInfos.begin(); iter != m_AncoAppInfos.end(); ++iter) {
+            if (iter->second.state == AncoAppState::ANCO_APP_STATE_BACKGROUND) {
+                ancoAppList.push_back(iter->second);
+            }
+        }
+    }
+    return 0;
+}
+
 bool AppNetworkSpeedLimitService::CheckNetWorkCanBeLimited(const int controlId)
 {
     switch (controlId) {
@@ -215,9 +233,11 @@ void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int enable)
         return;
     }
     std::vector<AppExecFwk::RunningProcessInfo> bgAppList;
+    std::vector<WifiNetworkControlInfo> bgAncoAppList;
     if (GetAppList(bgAppList, false) < 0) {
         WIFI_LOGE("Get background app list fail.");
     }
+    GetAncoAppList(bgAncoAppList, false);
     for (auto &record : m_bgLimitRecordMap) {
         if (!CheckNetWorkCanBeLimited(record.first) || record.second == BG_LIMIT_OFF) {
             continue;
@@ -228,15 +248,24 @@ void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int enable)
                 m_bgPidSet.insert(iter->pid_);
             }
         }
+        for (auto iter = bgAncoAppList.begin(); iter != bgAncoAppList.end(); ++iter) {
+            if (IsLimitSpeedBgApp(record.first, iter->bundleName, enable)) {
+                m_bgUidSet.insert(iter->uid);
+            }
+        }
     }
     std::vector<AppExecFwk::RunningProcessInfo> fgAppList;
+    std::vector<WifiNetworkControlInfo> fgAncoAppList;
     if (GetAppList(fgAppList, true) < 0) {
         WIFI_LOGE("Get foreground app list fail.");
     }
+    GetAncoAppList(fgAncoAppList, true);
     for (auto iter = fgAppList.begin(); iter != fgAppList.end(); ++iter) {
         m_fgUidSet.insert(iter->uid_);
     }
-
+    for (auto iter = fgAncoAppList.begin(); iter != fgAncoAppList.end(); ++iter) {
+        m_fgUidSet.insert(iter->uid);
+    }
     FilterLimitSpeedConfigs();
 }
 
@@ -268,7 +297,7 @@ void AppNetworkSpeedLimitService::AsyncLimitSpeed(const AsyncParamInfo &asyncPar
 {
     m_asyncSendLimit->PostAsyncTask([asyncParamInfo, this]() {
             this->HandleRequest(asyncParamInfo);
-        });
+    });
 }
 
 void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParamInfo)
@@ -286,6 +315,7 @@ void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParam
         } else if (asyncParamInfo.networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_VIDEO_CALL) {
             VideoCallNetworkSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
         } else {
+            UpdateAncoAppInfos(asyncParamInfo.networkControlInfo);
             UpdateNoSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
         }
     }
@@ -377,6 +407,36 @@ void AppNetworkSpeedLimitService::ReceiveNetworkControlInfo(const WifiNetworkCon
     asyncParamInfo.funcName = __FUNCTION__;
     asyncParamInfo.networkControlInfo = networkControlInfo;
     AsyncLimitSpeed(asyncParamInfo);
+}
+
+void AppNetworkSpeedLimitService::UpdateAncoAppInfos(const WifiNetworkControlInfo &networkControlInfo)
+{
+    if (networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_KEY_FG_APP) {
+        int uid = networkControlInfo.uid;
+        if (m_AncoAppInfos.find(uid) == m_AncoAppInfos.end()) {
+            if (networkControlInfo.state != AncoAppState::ANCO_APP_STATE_DIED) {
+                m_AncoAppInfos.insert({networkControlInfo.uid, networkControlInfo});
+            }
+        } else {
+            if (networkControlInfo.state == AncoAppState::ANCO_APP_STATE_DIED) {
+                m_AncoAppInfos.erase(uid);
+            } else if (m_AncoAppInfos[uid].state != networkControlInfo.state) {
+                m_AncoAppInfos[uid].state = networkControlInfo.state;
+            }
+        }
+        std::vector<int> ancoAppUids;
+        std::vector<int> ancoAppStates;
+        std::vector<std::string> ancoAppBundleNames;
+        for (auto &[uid, appInfo] : m_AncoAppInfos) {
+            ancoAppUids.push_back(uid);
+            ancoAppStates.push_back(appInfo.state);
+            ancoAppBundleNames.push_back(appInfo.bundleName);
+        }
+        WIFI_LOGI("%{public}s uidSet: %{public}s; state: %{public}s, bundleNames: %{public}s", __FUNCTION__,
+        JoinVecToString(std::vector<int>(ancoAppUids.begin(), ancoAppUids.end()), ",").c_str(),
+        JoinVecToString(std::vector<int>(ancoAppStates.begin(), ancoAppStates.end()), ",").c_str(),
+        JoinVecToString(std::vector<std::string>(ancoAppBundleNames.begin(), ancoAppBundleNames.end()), ",").c_str());
+    }
 }
 
 void AppNetworkSpeedLimitService::UpdateNoSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)

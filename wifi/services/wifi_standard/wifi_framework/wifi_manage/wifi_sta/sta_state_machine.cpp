@@ -1062,16 +1062,12 @@ void StaStateMachine::StopDhcp(bool isStopV4, bool isStopV6)
     pDhcpResultNotify->Clear();
     if (isStopV4) {
         StopDhcpClient(ifname.c_str(), false, true);
-        IpInfo ipInfo;
-        WifiConfigCenter::GetInstance().SaveIpInfo(ipInfo, m_instId);
 #ifdef OHOS_ARCH_LITE
         IfConfig::GetInstance().FlushIpAddr(WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId), IPTYPE_IPV4);
 #endif
     }
     if (isStopV6) {
         StopDhcpClient(ifname.c_str(), true, false);
-        IpV6Info ipV6Info;
-        WifiConfigCenter::GetInstance().SaveIpV6Info(ipV6Info, m_instId);
     }
     HandlePostDhcpSetup();
 }
@@ -3802,7 +3798,11 @@ void StaStateMachine::DhcpResultNotify::Clear()
 {
     std::unique_lock<std::mutex> lock(dhcpResultMutex);
     ClearDhcpResult(&DhcpIpv4Result);
+    IpInfo ipInfo;
+    WifiConfigCenter::GetInstance().SaveIpInfo(ipInfo, pStaStateMachine->m_instId);
     ClearDhcpResult(&DhcpIpv6Result);
+    IpV6Info ipV6Info;
+    WifiConfigCenter::GetInstance().SaveIpV6Info(ipV6Info, pStaStateMachine->m_instId);
     ClearDhcpResult(&DhcpOfferInfo);
     isDhcpIpv4Success = false;
     isDhcpIpv6Success = false;

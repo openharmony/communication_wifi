@@ -233,10 +233,10 @@ void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int enable)
     if (GetAppList(fgAppList, true) < 0) {
         WIFI_LOGE("Get foreground app list fail.");
     }
-    
     for (auto iter = fgAppList.begin(); iter != fgAppList.end(); ++iter) {
         m_fgUidSet.insert(iter->uid_);
     }
+
     FilterLimitSpeedConfigs();
 }
 

@@ -67,7 +67,6 @@ private:
     void FilterLimitSpeedConfigs();
     int GetBgLimitMaxMode();
     ErrCode GetAppList(std::vector<AppExecFwk::RunningProcessInfo> &appList, bool getFgAppFlag);
-    int GetAncoAppList(std::vector<WifiNetworkControlInfo>& bgAncoAppList, bool getFgAppFlag);
     bool CheckNetWorkCanBeLimited(const int controlId);
     void UpdateSpeedLimitConfigs(const int enable);
     void UpdateNoSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
@@ -86,7 +85,6 @@ private:
     void SetGamePowerMode(bool gameActive);
     void ResetPowerMode();
     void CheckAndResetGamePowerMode(const std::string &bundleName);
-    void UpdateAncoAppInfos(const WifiNetworkControlInfo &networkControlInfo);
 
 private:
     StaServiceCallback m_staCallback;
@@ -105,7 +103,6 @@ private:
     std::unordered_set<int> m_bgAudioPlaybackPidSet;
     std::unordered_set<int> m_additionalWindowUidSet;
     std::unordered_set<int> m_additionalWindowPidSet;
-    std::unordered_map<int, WifiNetworkControlInfo> m_AncoAppInfos;
     std::unique_ptr<WifiEventHandler> m_asyncSendLimit = nullptr;
     int64_t m_delayTime;
     std::atomic<bool> isVpnConnected_ = false;

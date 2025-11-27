@@ -19,7 +19,8 @@
 #include "wifi_logger.h"
 #include "self_cure_common.h"
 #include "wifi_internal_msg.h"
-
+#include "mock_wifi_config_center.h"
+#include "mock_wifi_settings.h"
 using ::testing::_;
 using ::testing::AtLeast;
 using ::testing::DoAll;
@@ -191,9 +192,195 @@ HWTEST_F(SelfCureServiceTest, NotifyInternetFailureDetectedTest, TestSize.Level1
 HWTEST_F(SelfCureServiceTest, NotifyIpv6FailureDetectedTest, TestSize.Level1)
 {
     // Test IPv6 failure detection notification
-    bool result = pSelfCureService->NotifyIpv6FailureDetected();
+    bool result = pSelfCureService->NotifyIpv6FailureDetected(true);
     EXPECT_EQ(result, false);
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(SelfCureServiceTest, NotifyIpv6FailureDetected_WifiNotConnected, TestSize.Level1)
+{
+    // Mock WiFi not connected
+    WifiLinkedInfo info;
+    info.connState = ConnState::DISCONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(info), Return(0)));
+    bool result = pSelfCureService->NotifyIpv6FailureDetected(true);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(SelfCureServiceTest, NotifyIpv6FailureDetected_StaticIpv6Configured, TestSize.Level1)
+{
+    // Mock static IPv6 configured
+    WifiLinkedInfo info;
+    info.connState = ConnState::CONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(info), Return(0)));
+    WifiDeviceConfig config;
+    config.wifiIpConfig.assignMethod = AssignIpMethod::STATIC;
+    config.wifiIpConfig.staticIpAddress.ipAddress.address.family = 1; // IPv6
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+    bool result = pSelfCureService->NotifyIpv6FailureDetected(true);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(SelfCureServiceTest, NotifyIpv6FailureDetected_NoValidIpv4, TestSize.Level1)
+{
+    // Mock no valid IPv4 address
+    WifiLinkedInfo info;
+    info.connState = ConnState::CONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(info), Return(0)));
+    WifiDeviceConfig config;
+    config.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+    IpInfo ipInfo;
+    ipInfo.ipAddress = 0; // No IPv4
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
+    bool result = pSelfCureService->NotifyIpv6FailureDetected(true);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(SelfCureServiceTest, NotifyIpv6FailureDetected_RssiTooLow, TestSize.Level1)
+{
+    // Mock RSSI too low
+    WifiLinkedInfo info;
+    info.connState = ConnState::CONNECTED;
+    info.rssi = MIN_VAL_LEVEL_2_5G - 1; // Too low
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(info), Return(0)));
+    WifiDeviceConfig config;
+    config.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+    IpInfo ipInfo;
+    ipInfo.ipAddress = IpTools::ConvertIpv4Address("192.168.0.2"); // Valid IPv4
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
+    bool result = pSelfCureService->NotifyIpv6FailureDetected(true);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(SelfCureServiceTest, NotifyIpv6FailureDetected_RssiLowAndIpv4Bad, TestSize.Level1)
+{
+    // Mock RSSI low and IPv4 bad
+    WifiLinkedInfo info;
+    info.connState = ConnState::CONNECTED;
+    info.rssi = MIN_VAL_LEVEL_3_5 - 1; // Low
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(info), Return(0)));
+    WifiDeviceConfig config;
+    config.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+    IpInfo ipInfo;
+    ipInfo.ipAddress = IpTools::ConvertIpv4Address("192.168.0.2"); // Valid IPv4
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
+    bool result = pSelfCureService->NotifyIpv6FailureDetected(false); // IPv4 bad
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(SelfCureServiceTest, NotifyIpv6FailureDetected_Ipv6AlreadyDisabled_SingleBand, TestSize.Level1)
+{
+    // Mock IPv6 already disabled on single band
+    WifiLinkedInfo info;
+    info.connState = ConnState::CONNECTED;
+    info.rssi = MIN_VAL_LEVEL_2_5G + 1; // Good
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(info), Return(0)));
+    WifiDeviceConfig config;
+    config.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+    IpInfo ipInfo;
+    ipInfo.ipAddress = IpTools::ConvertIpv4Address("192.168.0.2");
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
+    // No wlan1
+    WifiLinkedInfo info2;
+    info2.connState = ConnState::DISCONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, 1))
+        .WillOnce(DoAll(SetArgReferee<0>(info2), Return(0)));
+    bool result = pSelfCureService->NotifyIpv6FailureDetected(true);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(SelfCureServiceTest, NotifyIpv6FailureDetected_Ipv6AlreadyDisabled_DualBand, TestSize.Level1)
+{
+    // Mock IPv6 already disabled on both interfaces
+    WifiLinkedInfo info;
+    info.connState = ConnState::CONNECTED;
+    info.rssi = MIN_VAL_LEVEL_2_5G + 1;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(info), Return(0)));
+    WifiDeviceConfig config;
+    config.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+    IpInfo ipInfo;
+    ipInfo.ipAddress = IpTools::ConvertIpv4Address("192.168.0.2");
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
+    // Has wlan1
+    WifiLinkedInfo info2;
+    info2.connState = ConnState::CONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, 1))
+        .WillOnce(DoAll(SetArgReferee<0>(info2), Return(0)));
+    bool result = pSelfCureService->NotifyIpv6FailureDetected(true);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(SelfCureServiceTest, NotifyIpv6FailureDetected_SuccessDisableIpv6, TestSize.Level1)
+{
+    // Mock successful IPv6 disable
+    WifiLinkedInfo info;
+    info.connState = ConnState::CONNECTED;
+    info.rssi = MIN_VAL_LEVEL_2_5G + 1;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(info), Return(0)));
+    WifiDeviceConfig config;
+    config.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+    IpInfo ipInfo;
+    ipInfo.ipAddress = IpTools::ConvertIpv4Address("192.168.0.2");
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
+    // No wlan1
+    WifiLinkedInfo info2;
+    info2.connState = ConnState::DISCONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, 1))
+        .WillOnce(DoAll(SetArgReferee<0>(info2), Return(0)));
+    bool result = pSelfCureService->NotifyIpv6FailureDetected(true);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(SelfCureServiceTest, NotifyIpv6FailureDetected_FailDisableIpv6, TestSize.Level1)
+{
+    // Mock failed IPv6 disable
+    WifiLinkedInfo info;
+    info.connState = ConnState::CONNECTED;
+    info.rssi = MIN_VAL_LEVEL_2_5G + 1;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(info), Return(0)));
+    WifiDeviceConfig config;
+    config.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+    IpInfo ipInfo;
+    ipInfo.ipAddress = IpTools::ConvertIpv4Address("192.168.0.2");
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(ipInfo), Return(0)));
+    // No wlan1
+    WifiLinkedInfo info2;
+    info2.connState = ConnState::DISCONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, 1))
+        .WillOnce(DoAll(SetArgReferee<0>(info2), Return(0)));
+    bool result = pSelfCureService->NotifyIpv6FailureDetected(true);
+    EXPECT_EQ(result, false);
 }
 
 HWTEST_F(SelfCureServiceTest, SetTxRxGoodButNoInternetTest, TestSize.Level1)

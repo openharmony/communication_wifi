@@ -178,7 +178,7 @@ void IpQosMonitor::HandleIpv6TcpPktsResp(const std::vector<int64_t> &elems)
         }
         
         // Notify SelfCure service about IPv6 connection failure to trigger IPv6 disable mechanism
-        ErrCode result = pSelfCureService->NotifyIpv6FailureDetected();
+        ErrCode result = pSelfCureService->NotifyIpv6FailureDetected(GetTxRxStatus());
         if (result == WIFI_OPT_SUCCESS) {
             WIFI_LOGI("%{public}s: IPv6 failure notified to SelfCure successfully after %{public}d failures",
                 __FUNCTION__, mIpv6FailedCounter);

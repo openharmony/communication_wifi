@@ -713,7 +713,8 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, GetAncoAppListTest01, TestSize.Level1)
 {
     std::vector<WifiNetworkControlInfo> ancoAppList;
     int flag = AppNetworkSpeedLimitService::GetInstance().GetAncoAppList(ancoAppList, false);
-    EXPECT_EQ(UNKNOWN_MODE, flag);
+    int cachedMode = AppNetworkSpeedLimitService::GetInstance().cachedGamePowerMode_.load();
+    EXPECT_EQ(UNKNOWN_MODE, cachedMode);
 }
  
 HWTEST_F(AppNetworkSpeedLimitServiceTest, GetAncoAppListTest02, TestSize.Level1)

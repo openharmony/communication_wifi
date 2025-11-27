@@ -433,9 +433,9 @@ void AppNetworkSpeedLimitService::UpdateAncoAppInfos(const WifiNetworkControlInf
             ancoAppBundleNames.push_back(appInfo.bundleName);
         }
         WIFI_LOGI("%{public}s uidSet: %{public}s; state: %{public}s, bundleNames: %{public}s", __FUNCTION__,
-        JoinVecToString(std::vector<int>(ancoAppUids.begin(), ancoAppUids.end()), ",").c_str(),
-        JoinVecToString(std::vector<int>(ancoAppStates.begin(), ancoAppStates.end()), ",").c_str(),
-        JoinVecToString(std::vector<std::string>(ancoAppBundleNames.begin(), ancoAppBundleNames.end()), ",").c_str());
+            JoinVecToString(std::vector<int>(ancoAppUids.begin(), ancoAppUids.end()), ",").c_str(),
+            JoinVecToString(std::vector<int>(ancoAppStates.begin(), ancoAppStates.end()), ",").c_str(),
+            JoinVecToString(std::vector<std::string>(ancoAppBundleNames.begin(), ancoAppBundleNames.end()), ",").c_str());
     }
 }
  

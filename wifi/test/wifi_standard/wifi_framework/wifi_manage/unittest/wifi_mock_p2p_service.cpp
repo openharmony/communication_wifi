@@ -436,6 +436,11 @@ void WifiMockP2pService::NotifyWscDialogConfirmResult(bool isAccept)
     return;
 }
 
+void WifiMockP2pService::NotifyWscDisplayConfirmResult()
+{
+    return;
+}
+
 ErrCode WifiMockP2pService::SetMiracastSinkConfig(const std::string& config)
 {
     return WIFI_OPT_SUCCESS;

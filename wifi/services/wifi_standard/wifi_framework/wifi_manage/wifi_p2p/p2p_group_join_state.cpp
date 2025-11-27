@@ -53,7 +53,7 @@ bool P2pGroupJoinState::ExecuteStateMsg(InternalMessagePtr msg)
                 }
                 WpsInfo wpsPin = wps;
                 wpsPin.SetPin(inputPin);
-                WIFI_LOGI("INPUT PIN: [%{private}s] ", wpsPin.GetPin().c_str());
+                WIFI_LOGI("INPUT PIN: [%{public}s] ", wpsPin.GetPin().c_str());
                 p2pStateMachine.savedP2pConfig.SetWpsInfo(wpsPin);
             }
             if (WifiErrorNo::WIFI_HAL_OPT_OK != WifiP2PHalInterface::GetInstance().P2pStopFind()) {

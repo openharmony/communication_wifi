@@ -38,7 +38,6 @@
 #include "p2p_idle_state.h"
 #include "p2p_inviting_state.h"
 #include "provision_discovery_state.h"
-#include "abstract_ui.h"
 #include "wifi_hid2d_service_utils.h"
 #include "dhcp_c_api.h"
 #include "p2p_group_remove_state.h"

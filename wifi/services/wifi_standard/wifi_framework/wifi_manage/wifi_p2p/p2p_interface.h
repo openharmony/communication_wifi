@@ -371,6 +371,13 @@ public:
     void NotifyWscDialogConfirmResult(bool isAccept) override;
 
     /**
+     * @Description Notify user accept result to p2p service
+     *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+    void NotifyWscDisplayConfirmResult() override;
+
+    /**
      * @Description Set miracast sink config
      *
      * @param config - miracast config

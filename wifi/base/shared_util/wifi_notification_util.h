@@ -54,7 +54,9 @@ enum WifiDialogType {
     CANDIDATE_CONNECT = 2,
     AUTO_IDENTIFY_CONN = 3,
     P2P_WSC_PBC_DIALOG = 4,
-    SETTINGS_AUTO_IDENTIFY_CONN = 5
+    SETTINGS_AUTO_IDENTIFY_CONN = 5,
+    P2P_WSC_DISPLAY_DIALOG = 6,
+    P2P_WSC_KEYPAD_DIALOG = 7
 };
 
 class WifiNotificationUtil {
@@ -72,6 +74,8 @@ public:
     void ShowDialog(WifiDialogType type, std::string comInfo = "");
 
     void ShowSettingsDialog(WifiDialogType type, std::string settings);
+
+    void AddP2pParam(WifiDialogType type, std::string comInfo, nlohmann::json &param);
 
 private:
     std::atomic<bool> isPortalNtfPublished {false};

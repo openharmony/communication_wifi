@@ -21,6 +21,7 @@
 #include "system_ability_definition.h"
 #include "wifi_notification_util.h"
 #include "wifi_logger.h"
+#include <sstream>
 
 namespace OHOS {
 namespace Wifi {
@@ -169,6 +170,7 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
             cJSON_AddStringToObject(param, "wifi5gSsid", comInfo.c_str());
             break;
         case P2P_WSC_PBC_DIALOG:
+        case P2P_WSC_KEYPAD_DIALOG:
             cJSON_AddStringToObject(param, "p2pDeviceName", comInfo.c_str());
             break;
         case CANDIDATE_CONNECT:
@@ -236,6 +238,33 @@ void WifiNotificationUtil::ShowSettingsDialog(WifiDialogType type, std::string s
         AAFwk::ExtensionManagerClient::GetInstance().ConnectServiceExtensionAbility(want, connection, nullptr, -1);
     WIFI_LOGI("connect service extension ability result = %{public}d", ret);
     IPCSkeleton::SetCallingIdentity(identity);
+}
+
+void WifiNotificationUtil::AddP2pParam(WifiDialogType type, std::string comInfo, nlohmann::json &param)
+{
+    WIFI_LOGD("AddP2pParam comInfo %{public}s", comInfo.c_str());
+    std::istringstream strStream(comInfo);
+    std::string deviceName;
+    std::string pinCode;
+    switch (type) {
+        case P2P_WSC_PBC_DIALOG:
+        case P2P_WSC_KEYPAD_DIALOG:
+            param["p2pDeviceName"] = comInfo;
+            break;
+        case P2P_WSC_DISPLAY_DIALOG:
+            if (std::getline(strStream, pinCode, '_') && std::getline(strStream, deviceName)) {
+            param["p2pDeviceName"] = deviceName;
+            param["p2pPinCode"] = pinCode;
+            } else {
+                WIFI_LOGE("AddP2pParam comInfo %{public}s", comInfo.c_str());
+                break;
+            }
+            WIFI_LOGI("deviceName %{public}s, pinCode %{public}s", deviceName.c_str(), pinCode.c_str());
+            break;
+        default:
+            break;
+    }
+    WIFI_LOGD("param comInfo %{public}s", param.dump().c_str());
 }
 
 void UIExtensionAbilityConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,

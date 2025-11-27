@@ -43,9 +43,10 @@ public:
     void StopSelfCureWifi(int32_t status);
     bool CheckSelfCureWifiResult(int event);
     bool IsWifiSelfcureDone();
-    bool NotifyIpv6FailureDetected();
+    bool NotifyIpv6FailureDetected(bool isIpv4Good);
     void SetTxRxGoodButNoInternet(bool isTxRxGoodButNoInternet);
 private:
+    bool CheckIpv6SelfCureNeedStart(bool isIpv4Good);
     void RegisterP2pEnhanceCallback();
     void P2pEnhanceStateChange(const std::string &ifName, int32_t state, int32_t frequency);
 private:

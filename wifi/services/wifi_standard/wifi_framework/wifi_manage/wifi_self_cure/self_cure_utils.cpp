@@ -562,6 +562,23 @@ void SelfCureUtils::ReportNoInternetChrEvent()
     EnhanceWriteWifiAccessIntFailedHiSysEvent(1, networkFailReason, resetState, selfcureHistory);
 }
 
+void SelfCureUtils::ReportIpv6ChrEvent()
+{
+    WIFI_LOGI("ReportIpv6ChrEvent enter");
+    int64_t nowTime = GetElapsedMicrosecondsSinceBoot();
+    if (lastReportIpv6Time_ > 0 &&
+        (nowTime - lastReportIpv6Time_) < IPV6_CHR_EVENT_MIN_INTERVAL) {
+        WIFI_LOGD("ReportIpv6ChrEvent too frequently, return");
+        return;
+    }
+    lastReportIpv6Time_ = nowTime;
+    // write sys event
+    std::string selfcureHistory = GetSelfCureHistory();
+    int resetState = (WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered() ? 1 : 0);
+    EnhanceWriteWifiAccessIntFailedHiSysEvent(static_cast<int>(EventAccessInternetFailReason::IPV6_FAILED),
+        NetworkFailReason::IPV6_STATE_FAILED_DISABLE, resetState, selfcureHistory);
+}
+
 bool SelfCureUtils::IsIpv6SelfCureSupported()
 {
 #ifdef FEATURE_IPV6_SELF_CURE
@@ -574,34 +591,35 @@ bool SelfCureUtils::IsIpv6SelfCureSupported()
 #endif
 }
 
-bool SelfCureUtils::HasIpv6Disabled()
+bool SelfCureUtils::HasIpv6Disabled(int instId)
 {
-    return ipv6Disabled_;
+    return ipv6Disabled_[instId];
 }
 
-void SelfCureUtils::SetIpv6Disabled(bool disabled)
+void SelfCureUtils::SetIpv6Disabled(bool disabled, int instId)
 {
-    ipv6Disabled_ = disabled;
+    ipv6Disabled_[instId] = disabled;
 }
 
-bool SelfCureUtils::DisableIpv6()
+bool SelfCureUtils::DisableIpv6(int instId)
 {
-    WIFI_LOGI("Attempting to disable IPv6");
-    std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName();
+    WIFI_LOGI("Attempting to disable IPv6 on instance %{public}d", instId);
+    std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
     // write sys event
     std::string selfcureHistory = GetSelfCureHistory();
     int resetState = (WifiConfigCenter::GetInstance().GetWifiSelfcureResetEntered() ? 1 : 0);
     EnhanceWriteWifiAccessIntFailedHiSysEvent(static_cast<int>(EventAccessInternetFailReason::IPV6_FAILED),
-        NetworkFailReason::IPV6_STATE_UNREACHABLE, resetState, selfcureHistory);
+        instId == 0 ? NetworkFailReason::IPV6_STATE_UNREACHABLE : NetworkFailReason::IPV6_STATE_UNREACHABLE_WLAN1,
+        resetState, selfcureHistory);
     // Use NetManagerStandard API to disable IPv6 on WiFi interface
     int result = NetManagerStandard::NetsysController::GetInstance().SetEnableIpv6(ifName, 0);
     if (result == 0) {
         WIFI_LOGI("IPv6 disabled successfully on interface %{public}s", ifName.c_str());
-        SetIpv6Disabled(true);
+        SetIpv6Disabled(true, instId);
         return true;
     } else {
         WIFI_LOGE("Failed to disable IPv6 on interface %{public}s, result: %{public}d", ifName.c_str(), result);
-        SetIpv6Disabled(false);
+        SetIpv6Disabled(false, instId);
         return false;
     }
 }

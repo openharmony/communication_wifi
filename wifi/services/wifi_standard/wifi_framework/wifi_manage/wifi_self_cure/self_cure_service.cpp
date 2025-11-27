@@ -234,9 +234,13 @@ void SelfCureService::P2pEnhanceStateChange(const std::string &ifName, int32_t s
     }
 }
 
-bool SelfCureService::NotifyIpv6FailureDetected()
+bool SelfCureService::CheckIpv6SelfCureNeedStart(bool isIpv4Good)
 {
-    WIFI_LOGI("Enter NotifyIpv6FailureDetected");
+    // Check if the system supports IPv6 self-cure functionality
+    if (!SelfCureUtils::GetInstance().IsIpv6SelfCureSupported()) {
+        WIFI_LOGI("IPv6 self-cure not supported, ignore IPv6 failure");
+        return false;
+    }
     // Check WiFi connection state, only handle IPv6 failure when connected
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
@@ -244,12 +248,6 @@ bool SelfCureService::NotifyIpv6FailureDetected()
         WIFI_LOGI("WiFi not connected, ignore IPv6 failure");
         return false;
     }
-
-    if (SelfCureUtils::GetInstance().HasIpv6Disabled()) {
-        WIFI_LOGI("IPv6 already disabled, ignore IPv6 failure");
-        return false;
-    }
-
     // Check if static IPv6 is configured
     WifiDeviceConfig wificonfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, wificonfig, m_instId) == 0 &&
@@ -259,28 +257,69 @@ bool SelfCureService::NotifyIpv6FailureDetected()
         return false;
     }
 
+    IpInfo ipInfo;
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo);
+    // Check if has valid ipv4 address
+    if (ipInfo.ipAddress == 0) {
+        WIFI_LOGI("No valid IPv4 address, ignore IPv6 failure");
+        return false;
+    }
+
     int currentRssi = linkedInfo.rssi;
     // Check if RSSI is too low
-    if (currentRssi < MIN_VAL_LEVEL_3_5) {
+    if (currentRssi < MIN_VAL_LEVEL_2_5G) {
         WIFI_LOGI("RSSI too low (%{public}d), ignore IPv6 failure", currentRssi);
         return false;
     }
+    // For dual-band routers, ignore IPv6 failure if RSSI is very low and IPv4 is also bad
+    if (currentRssi < MIN_VAL_LEVEL_3_5 && !isIpv4Good) {
+        WIFI_LOGI("RSSI too low (%{public}d) and ipv4 bad, ignore IPv6 failure", currentRssi);
+        return false;
+    }
+    return true;
+}
 
-    // Check if the system supports IPv6 self-cure functionality
-    if (!SelfCureUtils::GetInstance().IsIpv6SelfCureSupported()) {
-        WIFI_LOGI("IPv6 self-cure not supported, ignore IPv6 failure");
+bool SelfCureService::NotifyIpv6FailureDetected(bool isIpv4Good)
+{
+    WIFI_LOGI("Enter NotifyIpv6FailureDetected");
+    if (!CheckIpv6SelfCureNeedStart(isIpv4Good)) {
+        return false;
+    }
+    bool hasWlan1 = false;
+    // check if the device has wlan1 interface (dual-band)
+    WifiLinkedInfo linkedInfo2;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo2, 1);
+    if (linkedInfo2.connState == ConnState::CONNECTED) {
+        hasWlan1 = true;
+        WIFI_LOGI("Device has wlan1 interface, connected to dual-band router");
+    }
+
+    if (SelfCureUtils::GetInstance().HasIpv6Disabled(0) && !hasWlan1) {
+        WIFI_LOGI("IPv6 already disabled, ignore IPv6 failure");
+        SelfCureUtils::GetInstance().ReportIpv6ChrEvent();
         return false;
     }
 
-    // Disable IPv6 to avoid potential connection issues
-    bool result = SelfCureUtils::GetInstance().DisableIpv6();
-    if (result) {
-        WIFI_LOGI("IPv6 disabled successfully due to connection failure");
-        return true;
-    } else {
-        WIFI_LOGE("Failed to disable IPv6");
+    if (SelfCureUtils::GetInstance().HasIpv6Disabled(0) &&
+        SelfCureUtils::GetInstance().HasIpv6Disabled(1) && hasWlan1) {
+        WIFI_LOGI("IPv6 already disabled on both interfaces, ignore IPv6 failure");
+        SelfCureUtils::GetInstance().ReportIpv6ChrEvent();
+        return false;
     }
-    return false;
+
+    bool ret = false;
+    if (!SelfCureUtils::GetInstance().HasIpv6Disabled(0)) {
+        // Disable IPv6 to avoid potential connection issues
+        bool result = SelfCureUtils::GetInstance().DisableIpv6(0);
+        ret = ret || result;
+    }
+
+    if (hasWlan1 && !SelfCureUtils::GetInstance().HasIpv6Disabled(1)) {
+        // Disable IPv6 on wlan1 as well
+        bool result = SelfCureUtils::GetInstance().DisableIpv6(1);
+        ret = ret || result;
+    }
+    return ret;
 }
 } //namespace Wifi
 } //namespace OHOS

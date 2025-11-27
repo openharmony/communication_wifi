@@ -188,7 +188,7 @@ HWTEST_F(SelfCureInterfaceTest, NotifyIpv6FailureDetectedTest, TestSize.Level1)
 {
     // Test with null service
     pSelfCureInterface->pSelfCureService = nullptr;
-    EXPECT_EQ(WIFI_OPT_FAILED, pSelfCureInterface->NotifyIpv6FailureDetected());
+    EXPECT_EQ(WIFI_OPT_FAILED, pSelfCureInterface->NotifyIpv6FailureDetected(true));
 }
 
 HWTEST_F(SelfCureInterfaceTest, NotifyTxRxGoodButNoInternetTest, TestSize.Level1)

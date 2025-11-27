@@ -132,7 +132,7 @@ public:
      *
      * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    ErrCode NotifyIpv6FailureDetected() override;
+    ErrCode NotifyIpv6FailureDetected(bool isIpv4Good) override;
  
     /**
      * @Description Notify that tx/rx is good but network is actually not

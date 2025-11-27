@@ -115,7 +115,7 @@ enum AncoAppState : int {
     ANCO_APP_STATE_BACKGROUND = 1,
     ANCO_APP_STATE_DIED = 2,
 };
-
+ 
 enum class SupplicantState {
     DISCONNECTED = 0,
     INTERFACE_DISABLED = 1,

@@ -115,7 +115,7 @@ Wifi2WifiNoNetIntegrator::Wifi2WifiNoNetIntegrator() : CompositeNetworkSelector(
 {
     auto andFilters = make_shared<AndWifiFilter>();
     andFilters->AddFilter(make_shared<ValidNetworkIdFilter>());
-    andFilters->AddFilter(make_shared<NotCurrentNetworkFilter>());
+    andFilters->AddFilter(make_shared<SameBssidNetworkFilter>());
     andFilters->AddFilter(make_shared<NotNetworkBlackListFilter>());
     ExternalWifiCommonBuildManager::GetInstance().BuildFilter(TagType::NOT_P2P_ENHANCE_FREQ_AT_5G_FILTER_TAG,
         *andFilters);

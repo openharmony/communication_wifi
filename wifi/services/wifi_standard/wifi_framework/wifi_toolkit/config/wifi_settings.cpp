@@ -2655,7 +2655,7 @@ std::string WifiSettings::GetDefaultApSsid()
     std::string marketName(marketptr);
     std::string brandName(brandPtr);
  
-    if ( marketName.empty()|| brandName.empty()) {
+    if (marketName.empty() || brandName.empty()) {
         LOGE("GetMarketName() GetBrand() or returned empty string");
         ssid = "OHOS_" + GetRandomStr(RANDOM_STR_LEN);
         return ssid;

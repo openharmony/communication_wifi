@@ -265,7 +265,9 @@ void ConfigStaticIpv4(const ::ohos::wifiManager::WifiDeviceConfig &config, WifiD
     const int dnsNum = 2;
     if (bool(config.staticIp)) {
         ::ohos::wifiManager::IpConfig ipConfig = *(config.staticIp);
-        cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4 = static_cast<unsigned int>(ipConfig.ipAddress);
+        cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4 =
+            static_cast<unsigned int>(ipConfig.ipAddress);
+
         cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family = 0;
         cppConfig.wifiIpConfig.staticIpAddress.gateway.addressIpv4 = static_cast<unsigned int>(ipConfig.gateway);
         cppConfig.wifiIpConfig.staticIpAddress.ipAddress.prefixLength = ipConfig.prefixLength;
@@ -273,9 +275,11 @@ void ConfigStaticIpv4(const ::ohos::wifiManager::WifiDeviceConfig &config, WifiD
             WIFI_LOGE("ConfigStaticIpv4, It needs dns servers or dns too much.");
             return;
         }
-        cppConfig.wifiIpConfig.staticIpAddress.dnsServer1.addressIpv4 = static_cast<unsigned int>(ipConfig.dnsServers[0]);
+        cppConfig.wifiIpConfig.staticIpAddress.dnsServer1.addressIpv4 =
+            static_cast<unsigned int>(ipConfig.dnsServers[0]);
         if (ipConfig.dnsServers.size() == dnsNum) {
-            cppConfig.wifiIpConfig.staticIpAddress.dnsServer2.addressIpv4 = static_cast<unsigned int>(ipConfig.dnsServers[1]);
+            cppConfig.wifiIpConfig.staticIpAddress.dnsServer2.addressIpv4 =
+                static_cast<unsigned int>(ipConfig.dnsServers[1]);
         }
     }
 }

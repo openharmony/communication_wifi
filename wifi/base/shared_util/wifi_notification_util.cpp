@@ -171,7 +171,8 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
             break;
         case P2P_WSC_PBC_DIALOG:
         case P2P_WSC_KEYPAD_DIALOG:
-            cJSON_AddStringToObject(param, "p2pDeviceName", comInfo.c_str());
+        case P2P_WSC_DISPLAY_DIALOG:
+            AddP2pParam(type, comInfo, param);
             break;
         case CANDIDATE_CONNECT:
             cJSON_AddStringToObject(param, "targetSsid", comInfo.c_str());
@@ -249,17 +250,17 @@ void WifiNotificationUtil::AddP2pParam(WifiDialogType type, std::string comInfo,
     switch (type) {
         case P2P_WSC_PBC_DIALOG:
         case P2P_WSC_KEYPAD_DIALOG:
-            param["p2pDeviceName"] = comInfo;
+            cJSON_AddStringToObject(param, "p2pDeviceName", comInfo.c_str());
             break;
         case P2P_WSC_DISPLAY_DIALOG:
             if (std::getline(strStream, pinCode, '_') && std::getline(strStream, deviceName)) {
-            param["p2pDeviceName"] = deviceName;
-            param["p2pPinCode"] = pinCode;
+                cJSON_AddStringToObject(param, "p2pDeviceName", deviceName.c_str());
+                cJSON_AddStringToObject(param, "p2pPinCode", pinCode.c_str());
             } else {
                 WIFI_LOGE("AddP2pParam comInfo %{public}s", comInfo.c_str());
                 break;
             }
-            WIFI_LOGI("deviceName %{public}s, pinCode %{public}s", deviceName.c_str(), pinCode.c_str());
+            WIFI_LOGD("deviceName %{public}s, pinCode %{public}s", deviceName.c_str(), pinCode.c_str());
             break;
         default:
             break;

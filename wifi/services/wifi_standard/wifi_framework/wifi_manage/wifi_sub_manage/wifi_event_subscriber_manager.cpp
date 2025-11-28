@@ -983,7 +983,7 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType,
     if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_PBC_DIALOG) ||
         dialogType == static_cast<int>(WifiDialogType::P2P_WSC_KEYPAD_DIALOG)) {
         std::string inputPinCode = eventData.GetWant().GetStringParam("inputPinCode");
-        WIFI_LOGI("OnReceiveDialogAcceptEvent inputPinCode:%{public}s", inputPinCode.c_str());
+        WIFI_LOGI("OnReceiveDialogAcceptEvent inputPinCode:%{private}s", inputPinCode.c_str());
 
         IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
         if (p2pService != nullptr) {

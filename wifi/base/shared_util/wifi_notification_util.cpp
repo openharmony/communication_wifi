@@ -241,7 +241,7 @@ void WifiNotificationUtil::ShowSettingsDialog(WifiDialogType type, std::string s
     IPCSkeleton::SetCallingIdentity(identity);
 }
 
-void WifiNotificationUtil::AddP2pParam(WifiDialogType type, std::string comInfo, nlohmann::json &param)
+void WifiNotificationUtil::AddP2pParam(WifiDialogType type, std::string comInfo, cJSON *param)
 {
     WIFI_LOGD("AddP2pParam comInfo %{private}s", comInfo.c_str());
     std::istringstream strStream(comInfo);

@@ -522,7 +522,7 @@ ErrCode WifiP2pService::SetGcIpAddress(const IpAddrInfo& ipInfo)
 
 void WifiP2pService::NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPincode)
 {
-    WIFI_LOGI("Notify user auth response:%{public}d, inputPincode:%{public}s", isAccept, inputPincode.c_str());
+    WIFI_LOGI("Notify user auth response:%{private}d, inputPincode:%{private}s", isAccept, inputPincode.c_str());
     if (isAccept) {
         p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT),
             inputPincode);

@@ -726,11 +726,8 @@ void OnGetChangeDeviceConfigFuzzTest()
         return;
     }
 
-    size_t readSize = std::min(
-        static_cast<size_t>(FDP->remaining_bytes()),
-        MAX_INPUT_SIZE
-    );
-
+    size_t readSize = std::min(static_cast<size_t>(FDP->remaining_bytes()),MAX_INPUT_SIZE);
+    
     std::string tmpBuffer;
     if (readSize > 0) {
         tmpBuffer = FDP->ConsumeBytesAsString(readSize);

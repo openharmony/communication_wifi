@@ -952,7 +952,8 @@ void NotificationEventSubscriber::OnReceiveNotificationEvent(int notificationId)
     }
 }
 
-void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType, const OHOS::EventFwk::CommonEventData &eventData)
+void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType,
+    const OHOS::EventFwk::CommonEventData &eventData)
 {
     if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
         NotifyCandidateApprovalStatus(CandidateApprovalStatus::USER_ACCEPT);

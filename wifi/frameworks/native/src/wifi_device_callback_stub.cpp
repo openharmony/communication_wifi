@@ -96,6 +96,7 @@ void WifiDeviceCallBackStub::RegisterUserCallBack(const sptr<IWifiDeviceCallBack
         WIFI_LOGE("RegisterUserCallBack:callBack %{public}s reaches number limit!", callBack->name.c_str());
         return;
     }
+    std::lock_guard<std::mutex> lock(callbackMutex_);
     callbackMap_[callBack->name] = callBack;
 }
 
@@ -127,8 +128,12 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
     } else {
         mState_ = false;
     }
-
-    for (auto& pair : callbackMap_) {
+    std::map<std::string, sptr<IWifiDeviceCallBack>> tmpCallbackMap;
+    {
+        std::lock_guard<std::mutex> lock(callbackMutex_);
+        tmpCallbackMap = callbackMap_;
+    }
+    for (auto& pair : tmpCallbackMap) {
         if (pair.second) {
             pair.second->OnWifiStateChanged(state);
         }
@@ -139,7 +144,12 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiStateChanged(int state)
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiConnectionChanged(int state, const WifiLinkedInfo &info)
 {
     WIFI_LOGI("OnWifiConnectionChanged, state:%{public}d!", state);
-    for (auto& pair : callbackMap_) {
+    std::map<std::string, sptr<IWifiDeviceCallBack>> tmpCallbackMap;
+    {
+        std::lock_guard<std::mutex> lock(callbackMutex_);
+        tmpCallbackMap = callbackMap_;
+    }
+    for (auto& pair : tmpCallbackMap) {
         if (pair.second) {
             pair.second->OnWifiConnectionChanged(state, info);
         }
@@ -150,7 +160,12 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiConnectionChanged(int stat
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
 {
     WIFI_LOGI("OnWifiRssiChanged, rssi:%{public}d!", rssi);
-    for (auto& pair : callbackMap_) {
+    std::map<std::string, sptr<IWifiDeviceCallBack>> tmpCallbackMap;
+    {
+        std::lock_guard<std::mutex> lock(callbackMutex_);
+        tmpCallbackMap = callbackMap_;
+    }
+    for (auto& pair : tmpCallbackMap) {
         if (pair.second) {
             pair.second->OnWifiRssiChanged(rssi);
         }
@@ -161,7 +176,12 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiRssiChanged(int rssi)
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state, const std::string &pinCode)
 {
     WIFI_LOGI("OnWifiWpsStateChanged, state:%{public}d!", state);
-    for (auto& pair : callbackMap_) {
+    std::map<std::string, sptr<IWifiDeviceCallBack>> tmpCallbackMap;
+    {
+        std::lock_guard<std::mutex> lock(callbackMutex_);
+        tmpCallbackMap = callbackMap_;
+    }
+    for (auto& pair : tmpCallbackMap) {
         if (pair.second) {
             pair.second->OnWifiWpsStateChanged(state, pinCode);
         }
@@ -171,7 +191,12 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnWifiWpsStateChanged(int state,
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnStreamChanged(int direction)
 {
     WIFI_LOGD("OnStreamChanged, direction:%{public}d!", direction);
-    for (auto& pair : callbackMap_) {
+    std::map<std::string, sptr<IWifiDeviceCallBack>> tmpCallbackMap;
+    {
+        std::lock_guard<std::mutex> lock(callbackMutex_);
+        tmpCallbackMap = callbackMap_;
+    }
+    for (auto& pair : tmpCallbackMap) {
         if (pair.second) {
             pair.second->OnStreamChanged(direction);
         }
@@ -181,7 +206,12 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnStreamChanged(int direction)
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnDeviceConfigChanged(ConfigChange value)
 {
     WIFI_LOGI("OnDeviceConfigChanged, value:%{public}d!", value);
-    for (auto& pair : callbackMap_) {
+    std::map<std::string, sptr<IWifiDeviceCallBack>> tmpCallbackMap;
+    {
+        std::lock_guard<std::mutex> lock(callbackMutex_);
+        tmpCallbackMap = callbackMap_;
+    }
+    for (auto& pair : tmpCallbackMap) {
         if (pair.second) {
             pair.second->OnDeviceConfigChanged(value);
         }
@@ -191,7 +221,12 @@ NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnDeviceConfigChanged(ConfigChan
 NO_SANITIZE("cfi") void WifiDeviceCallBackStub::OnCandidateApprovalStatusChanged(CandidateApprovalStatus status)
 {
     WIFI_LOGI("OnCandidateApprovalStatusChanged, status:%{public}d!", static_cast<int>(status));
-    for (auto& pair : callbackMap_) {
+    std::map<std::string, sptr<IWifiDeviceCallBack>> tmpCallbackMap;
+    {
+        std::lock_guard<std::mutex> lock(callbackMutex_);
+        tmpCallbackMap = callbackMap_;
+    }
+    for (auto& pair : tmpCallbackMap) {
         if (pair.second) {
             pair.second->OnCandidateApprovalStatusChanged(status);
         }

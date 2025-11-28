@@ -107,6 +107,7 @@ P2pStateMachine::~P2pStateMachine()
         delete pDhcpResultNotify;
         pDhcpResultNotify = nullptr;
     }
+}
 
 void P2pStateMachine::Initialize()
 {

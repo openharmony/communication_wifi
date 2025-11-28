@@ -721,7 +721,7 @@ void P2pStateMachine::NotifyUserInvitationSentMessage(const std::string &pin, co
     }
     std::string deviceName = deviceManager.GetDeviceName(peerAddress);
     std::string comInfo = pin + "_" + deviceName;
-    WIFI_LOGI(ShowDialog coninfo %{public}s, comInfo.c_str());
+    WIFI_LOGD(ShowDialog coninfo %{public}s, comInfo.c_str());
     WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_DISPLAY_DIALOG,
         comInfo);
 }
@@ -736,7 +736,7 @@ void P2pStateMachine::NotifyUserProvDiscShowPinRequestMessage(const std::string 
     }
     std::string deviceName = deviceManager.GetDeviceName(peerAddress);
     std::string comInfo = pin + "_" + deviceName;
-    WIFI_LOGI(ShowDialog coninfo %{public}s, comInfo.c_str());
+    WIFI_LOGD(ShowDialog coninfo %{public}s, comInfo.c_str());
     WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_DISPLAY_DIALOG,
         comInfo);
 }
@@ -757,7 +757,7 @@ void P2pStateMachine::NotifyUserInvitationReceivedMessage()
         WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_PBC_DIALOG, deviceName);
     } else if (wpsInfo == WpsMethod::WPS_METHOD_DISPLAY) {
         WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_DISPLAY_DIALOG,
-            deviceName + savedP2pConfig.GetWpsInfo().GetPin());
+        savedP2pConfig.GetWpsInfo().GetPin() + '_' + deviceName);
     } else if (wpsInfo == WpsMethod::WPS_METHOD_KEYPAD) {
         WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_KEYPAD_DIALOG, deviceName);
     }

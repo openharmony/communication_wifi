@@ -721,7 +721,7 @@ void P2pStateMachine::NotifyUserInvitationSentMessage(const std::string &pin, co
     }
     std::string deviceName = deviceManager.GetDeviceName(peerAddress);
     std::string comInfo = pin + "_" + deviceName;
-    WIFI_LOGD(ShowDialog coninfo %{public}s, comInfo.c_str());
+    WIFI_LOGD(ShowDialog comInfo %{private}s, comInfo.c_str());
     WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_DISPLAY_DIALOG,
         comInfo);
 }
@@ -736,7 +736,7 @@ void P2pStateMachine::NotifyUserProvDiscShowPinRequestMessage(const std::string 
     }
     std::string deviceName = deviceManager.GetDeviceName(peerAddress);
     std::string comInfo = pin + "_" + deviceName;
-    WIFI_LOGD(ShowDialog coninfo %{public}s, comInfo.c_str());
+    WIFI_LOGD(ShowDialog comInfo %{private}s, comInfo.c_str());
     WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_DISPLAY_DIALOG,
         comInfo);
 }

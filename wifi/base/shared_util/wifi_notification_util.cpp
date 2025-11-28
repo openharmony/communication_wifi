@@ -243,7 +243,7 @@ void WifiNotificationUtil::ShowSettingsDialog(WifiDialogType type, std::string s
 
 void WifiNotificationUtil::AddP2pParam(WifiDialogType type, std::string comInfo, nlohmann::json &param)
 {
-    WIFI_LOGD("AddP2pParam comInfo %{public}s", comInfo.c_str());
+    WIFI_LOGD("AddP2pParam comInfo %{private}s", comInfo.c_str());
     std::istringstream strStream(comInfo);
     std::string deviceName;
     std::string pinCode;
@@ -257,15 +257,15 @@ void WifiNotificationUtil::AddP2pParam(WifiDialogType type, std::string comInfo,
                 cJSON_AddStringToObject(param, "p2pDeviceName", deviceName.c_str());
                 cJSON_AddStringToObject(param, "p2pPinCode", pinCode.c_str());
             } else {
-                WIFI_LOGE("AddP2pParam comInfo %{public}s", comInfo.c_str());
+                WIFI_LOGE("AddP2pParam comInfo %{private}s", comInfo.c_str());
                 break;
             }
-            WIFI_LOGD("deviceName %{public}s, pinCode %{public}s", deviceName.c_str(), pinCode.c_str());
+            WIFI_LOGD("deviceName %{private}s, pinCode %{private}s", deviceName.c_str(), pinCode.c_str());
             break;
         default:
             break;
     }
-    WIFI_LOGD("param comInfo %{public}s", param.dump().c_str());
+    WIFI_LOGD("param comInfo %{private}s", param.dump().c_str());
 }
 
 void UIExtensionAbilityConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,

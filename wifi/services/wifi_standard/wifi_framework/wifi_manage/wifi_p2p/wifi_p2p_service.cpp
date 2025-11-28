@@ -525,7 +525,7 @@ void WifiP2pService::NotifyWscDialogConfirmResult(bool isAccept, const std::stri
     WIFI_LOGI("Notify user auth response:%{public}d, inputPincode:%{public}s", isAccept, inputPincode.c_str());
     if (isAccept) {
         p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT),
-        inputPincode);
+            inputPincode);
     } else {
         p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
     }

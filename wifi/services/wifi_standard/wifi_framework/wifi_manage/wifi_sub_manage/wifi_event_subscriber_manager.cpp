@@ -989,7 +989,7 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType,
         if (p2pService != nullptr) {
             p2pService->NotifyWscDialogConfirmResult(true, inputPinCode);
         }
-    } else if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_DISPLAY_DIALOG) {
+    } else if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_DISPLAY_DIALOG)) {
         IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
         if (p2pService != nullptr) {
             p2pService->NotifyWscDisplayConfirmResult();

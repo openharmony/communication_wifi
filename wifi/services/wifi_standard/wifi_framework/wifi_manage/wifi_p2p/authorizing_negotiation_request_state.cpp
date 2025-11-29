@@ -100,7 +100,6 @@ void AuthorizingNegotiationRequestState::HandleInternalConnUserConfirm()
     wps.SetWpsMethod(WpsMethod::WPS_METHOD_DISPLAY);
     p2pStateMachine.savedP2pConfig.SetWpsInfo(wps);
     std::string pin = wps.GetPin();
-
     if (WifiErrorNo::WIFI_HAL_OPT_OK !=
         WifiP2PHalInterface::GetInstance().Connect(p2pStateMachine.savedP2pConfig, false, pin)) {
         WIFI_LOGE("fail to connect.");

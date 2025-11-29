@@ -1344,6 +1344,9 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
     info.linkId = reply.ReadInt32();
     info.centerFrequency0 = reply.ReadInt32();
     info.centerFrequency1 = reply.ReadInt32();
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    info.riskType = static_cast<WifiRiskType>(reply.ReadInt32());
+#endif
 }
 
 void WifiDeviceProxy::ReadWifiSignalPollInfo(MessageParcel &reply, std::vector<WifiSignalPollInfo> &wifiSignalPollInfos)
@@ -2537,7 +2540,7 @@ ErrCode WifiDeviceProxy::GetWifiDetailState(WifiDetailState &state)
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiDeviceProxy::ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config)
+void WifiDeviceProxy::ReadDeviceBasicConfig(MessageParcel &reply, WifiDeviceConfig &config)
 {
     config.networkId = reply.ReadInt32();
     config.bssid = reply.ReadString();
@@ -2547,6 +2550,11 @@ void WifiDeviceProxy::ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &c
     config.band = reply.ReadInt32();
     config.channel = reply.ReadInt32();
     config.frequency = reply.ReadInt32();
+}
+
+void WifiDeviceProxy::ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &config)
+{
+    ReadDeviceBasicConfig(reply, config);
     config.level = reply.ReadInt32();
     config.isPasspoint = reply.ReadBool();
     config.isEphemeral = reply.ReadBool();
@@ -2587,6 +2595,9 @@ void WifiDeviceProxy::ReadDeviceConfig(MessageParcel &reply, WifiDeviceConfig &c
     config.noInternetAccess = reply.ReadBool();
     config.isAllowAutoConnect = reply.ReadBool();
     config.isSecureWifi = reply.ReadBool();
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    config.riskType = WifiRiskType(reply.ReadInt32());
+#endif
 }
 
 ErrCode WifiDeviceProxy::GetDeviceConfig(const int &networkId, WifiDeviceConfig &config)

@@ -70,6 +70,7 @@ static void ClearWifiDeviceConfig(WifiDeviceConfig &item)
     item.isAllowAutoConnect = true;
     item.isSecureWifi = true;
     item.lastDetectTime = -1;
+    item.lastDisconnectTime = -1;
     return;
 }
 
@@ -213,6 +214,8 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
         item.isSecureWifi = (CheckDataLegal(tmpValue) != 0);
     } else if (key == "lastDetectTime") {
         item.lastDetectTime = CheckDataLegal(tmpValue);
+    } else if (key == "lastDisconnectTime") {
+        item.lastDisconnectTime = CheckDataLegal(tmpValue);
     } else {
         return -1;
     }
@@ -641,6 +644,7 @@ static std::string OutPutWifiDeviceConfigExtral(WifiDeviceConfig &item)
     ss << "    " <<"isAllowAutoConnect=" << item.isAllowAutoConnect << std::endl;
     ss << "    " <<"isSecureWifi=" << item.isSecureWifi << std::endl;
     ss << "    " <<"lastDetectTime=" << item.lastDetectTime << std::endl;
+    ss << "    " <<"lastDisconnectTime=" << item.lastDisconnectTime << std::endl;
     return ss.str();
 }
 
@@ -1839,6 +1843,7 @@ static void ClearWifiBackupConfig(WifiBackupConfig &item)
     item.networkStatusHistory = 0;
     item.isPortal = false;
     item.lastHasInternetTime = -1;
+    item.lastDisconnectTime = -1;
     item.noInternetAccess = false;
     item.preSharedKey.clear();
     std::string().swap(item.preSharedKey);
@@ -1905,6 +1910,8 @@ static int SetWifiBackupConfig(WifiBackupConfig &item, const std::string &key, c
         item.isPortal = CheckDataLegal(tmpValue);
     } else if (key == "lastHasInternetTime") {
         item.lastHasInternetTime = CheckDataLegal(tmpValue);
+    } else if (key == "lastDisconnectTime") {
+        item.lastDisconnectTime = CheckDataLegal(tmpValue);
     } else if (key == "noInternetAccess") {
         item.noInternetAccess = CheckDataLegal(tmpValue);
     } else if (key == "preSharedKey") {
@@ -1954,6 +1961,7 @@ static std::string OutPutWifiBackupConfig(WifiBackupConfig &item)
     ss << "    " <<"noInternetAccess=" << item.noInternetAccess << std::endl;
     ss << "    " <<"preSharedKey=" << item.preSharedKey << std::endl;
     ss << "    " <<"isAllowAutoConnect=" << item.isAllowAutoConnect << std::endl;
+    ss << "    " <<"lastDisconnectTime=" << item.lastDisconnectTime << std::endl;
     ss << "    " <<"wepTxKeyIndex=" << item.wepTxKeyIndex << std::endl;
     for (int i = 0; i < WEPKEYS_SIZE; ++i) {
         ss << "    " <<"wepKeys_" << i << "=" << item.wepKeys[i] << std::endl;

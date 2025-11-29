@@ -73,6 +73,13 @@ enum class WifiSecurity {
     INVALID = -1
 };
 
+enum class WifiRiskType {
+    NORMAL = 0,
+    OPEN = 1,
+    CLONE_ATTACK = 2,
+    INVALID = -1
+};
+
 enum class WifiChannelWidth {
     WIDTH_20MHZ = 0,
     WIDTH_40MHZ = 1,
@@ -172,6 +179,7 @@ struct WifiScanInfo {
     int isHiLinkNetwork;
     bool isHiLinkProNetwork;
     WifiCategory supportedWifiCategory;
+    WifiRiskType riskType;
     WifiScanInfo()
     {
         bssidType = REAL_DEVICE_ADDRESS;
@@ -190,6 +198,7 @@ struct WifiScanInfo {
         isHiLinkNetwork = 0;
         isHiLinkProNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
+        riskType = WifiRiskType::INVALID;
     }
 
     void GetDeviceMgmt(std::string &mgmt) const

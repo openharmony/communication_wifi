@@ -56,6 +56,7 @@ enum FiltedReason {
     LESS_THAN_8RSSI,
     NOT_HML_FREQ_AT_5G,
     NOT_SECURE_WIFI,
+    LONG_TIME_UNUSED_OPEN_NETWORK,
 };
 
 struct FiltedReasonComparator {

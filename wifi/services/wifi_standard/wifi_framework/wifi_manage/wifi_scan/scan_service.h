@@ -425,6 +425,15 @@ private:
      * @param interConfig - Internal Scanning Result[in]
      */
     void ConvertScanInfo(WifiScanInfo &scanInfo, const InterScanInfo &interInfo);
+
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    /**
+     * @Description get risktype of each wifi based on the entire scan list.
+     * @param scanInfos - Scanning Result list
+     */
+    void GetWifiRiskType(std::vector<InterScanInfo> &scanInfos);
+#endif
+    
     /**
      * @Description Merge scan result
      *

@@ -50,8 +50,9 @@ struct WifiScanInfoParcel : public Parcelable {
     int isHiLinkNetwork;
     bool isHiLinkProNetwork;
     WifiCategory supportedWifiCategory;
-
+    WifiRiskType riskType;
     bool Marshalling(Parcel &parcel) const override;
+    static bool ReadBasicFields(Parcel &parcel, WifiScanInfoParcel *info);
     static WifiScanInfoParcel *Unmarshalling(Parcel &parcel);
 };
 }  // namespace Wifi

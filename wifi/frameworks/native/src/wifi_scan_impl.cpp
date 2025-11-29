@@ -324,6 +324,9 @@ void WifiScanImpl::GetScanInfoFromParcel(WifiScanInfo &info, MessageParcel &inPa
     info.isHiLinkNetwork = inParcel.ReadInt32();
     info.isHiLinkProNetwork = inParcel.ReadBool();
     info.supportedWifiCategory = static_cast<WifiCategory>(inParcel.ReadInt32());
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    info.riskType = static_cast<WifiRiskType>(inParcel.ReadInt32());
+#endif
 }
  
 ErrCode WifiScanImpl::ParseScanInfosFromAshmem(

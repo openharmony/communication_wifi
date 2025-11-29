@@ -44,6 +44,9 @@ AutoConnectIntegrator::AutoConnectIntegrator() : CompositeNetworkSelector(
     auto filters = make_shared<AndWifiFilter>();
     filters->AddFilter(make_shared<HiddenWifiFilter>());
     filters->AddFilter(make_shared<SignalStrengthWifiFilter>());
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    filters->AddFilter(make_shared<LongUnusedOpenWifiFilter>());
+#endif
     if (OHOS::system::GetParameter("ohos.boot.advsecmode.state", "0") != "0") {
         filters->AddFilter(make_shared<WeakAlgorithmWifiFilter>());
     }

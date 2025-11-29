@@ -146,6 +146,11 @@ static void ParseDeviceConfigs(IpcIo *reply, std::vector<WifiDeviceConfig> &resu
         (void)ReadInt32(reply, &config.wifiWapiConfig.wapiPskType);
         (void)ReadBool(reply, &config.isAllowAutoConnect);
         (void)ReadBool(reply, &config.isSecureWifi);
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+        int riskTypeValue = 0;
+        (void)ReadInt32(reply, &riskTypeValue);
+        config.riskType = WifiRiskType(riskTypeValue);
+#endif
         result.emplace_back(config);
         std::string().swap(config.preSharedKey);
     }

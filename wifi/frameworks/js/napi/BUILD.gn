@@ -57,6 +57,9 @@ ohos_shared_library("wifi") {
   if (wifi_feature_with_random_mac_addr) {
     defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
   }
+  if (wifi_feature_with_local_security_detect) {
+    defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
+  }
 
   external_deps = [
     "ability_runtime:app_context",
@@ -187,6 +190,9 @@ ohos_shared_library("wifimanager") {
 
   if (wifi_feature_with_random_mac_addr) {
     defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+  }
+  if (wifi_feature_with_local_security_detect) {
+    defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
   }
 
   external_deps = [

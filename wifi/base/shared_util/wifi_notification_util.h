@@ -16,6 +16,7 @@
 #ifndef WIFI_NOTIFICATION_UTIL_H
 #define WIFI_NOTIFICATION_UTIL_H
 #include "ability_connect_callback_stub.h"
+#include "cJSON.h"
 #include "ipc_skeleton.h"
 #include "want.h"
 #include "want_params_wrapper.h"

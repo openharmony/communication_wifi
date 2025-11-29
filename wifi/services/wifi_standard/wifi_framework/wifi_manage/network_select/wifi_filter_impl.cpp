@@ -34,6 +34,9 @@ constexpr int POOR_PORTAL_RECHECK_DELAYED_SECONDS = 2 * RECHECK_DELAYED_SECONDS;
 constexpr int32_t MIN_SIGNAL_LEVEL_INTERVAL = 2;
 constexpr int32_t SIGNAL_LEVEL_THREE = 3;
 constexpr int32_t MIN_RSSI_INTERVAL = 8;
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+constexpr int LONG_TIME_UNUSED_THRESHOLD = 15 * 24 * 60 * 60;
+#endif
 }
 
 HiddenWifiFilter::HiddenWifiFilter() : SimpleWifiFilter("notHidden") {}
@@ -83,6 +86,46 @@ bool SignalStrengthWifiFilter::Filter(NetworkCandidate &networkCandidate)
     }
     return true;
 }
+
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+LongUnusedOpenWifiFilter::LongUnusedOpenWifiFilter(): SimpleWifiFilter("LongUnusedOpenWifi") {}
+
+LongUnusedOpenWifiFilter::~LongUnusedOpenWifiFilter()
+{
+    if (!filteredNetworkCandidates.empty()) {
+        WIFI_LOGI("%{public}s: %{public}s",
+                  filterName.c_str(),
+                  NetworkSelectionUtils::GetNetworkCandidatesInfo(filteredNetworkCandidates).c_str());
+    }
+}
+
+bool LongUnusedOpenWifiFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    if (networkCandidate.interScanInfo.securityType != WifiSecurity::OPEN) {
+        // 非open网络允许自动回连
+        return true;
+    }
+    if (networkCandidate.interScanInfo.riskType == WifiRiskType::NORMAL) {
+        // 若open网络风险类型为NORMAL，说明在白名单中。此时也允许自动回连
+        return true;
+    }
+    auto lastDisconnectTime = networkCandidate.wifiDeviceConfig.lastDisconnectTime;
+    auto now = time(nullptr);
+    if (now < 0) {
+        WIFI_LOGW("time return invalid!\n.");
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::TIME_INVALID);
+        return false;
+    }
+    auto elapsed = now - lastDisconnectTime;
+    if (elapsed > LONG_TIME_UNUSED_THRESHOLD) {
+        // 大于回连阈值(15天)的open网络，不允许自动回连
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::LONG_TIME_UNUSED_OPEN_NETWORK);
+        return false;
+    }
+    // 小于回连阈值(15天)的open网络，允许自动回连
+    return true;
+}
+#endif
 
 SavedWifiFilter::SavedWifiFilter() : SimpleWifiFilter("savedWifiFilter") {}
 

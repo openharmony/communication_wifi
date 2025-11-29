@@ -158,6 +158,11 @@ ohos_source_set("wifi_scan_stub") {
       ":wifi_scan_config",
       ":wifi_sdk_header"
        ]
+    
+    defines = []
+    if (wifi_feature_with_local_security_detect) {
+      defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
+    }
  
     deps = [":wifi_scan_interface"]
  
@@ -196,6 +201,9 @@ ohos_source_set("wifi_scan_stub") {
     defines = []
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+    }
+    if (wifi_feature_with_local_security_detect) {
+      defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
     }
 
     external_deps = [
@@ -277,6 +285,9 @@ ohos_source_set("wifi_scan_stub") {
     defines = []
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+    }
+    if (wifi_feature_with_local_security_detect) {
+      defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
     }
 
     deps = [":wifi_scan_interface"]

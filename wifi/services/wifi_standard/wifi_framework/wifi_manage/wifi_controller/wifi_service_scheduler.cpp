@@ -39,6 +39,9 @@
 #ifdef WIFI_SECURITY_DETECT_ENABLE
 #include "wifi_security_detect.h"
 #endif
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+#include "wifi_local_security_detect.h"
+#endif
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
 #endif
@@ -594,6 +597,13 @@ ErrCode WifiServiceScheduler::InitStaServiceExtral(IStaService *pService, int in
     errCode = pService->RegisterStaServiceCallback(WifiSecurityDetect::GetInstance().GetStaCallback());
     if (errCode != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("WifiSecurityDetect register callback failed, ret=%{public}d!", static_cast<int>(errCode));
+        return WIFI_OPT_FAILED;
+    }
+#endif
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    errCode = pService->RegisterStaServiceCallback(WifiLocalSecurityDetect::GetInstance().GetStaCallback());
+    if (errCode != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("WifiLocalSecurityDetect register callback failed, ret=%{public}d!", static_cast<int>(errCode));
         return WIFI_OPT_FAILED;
     }
 #endif

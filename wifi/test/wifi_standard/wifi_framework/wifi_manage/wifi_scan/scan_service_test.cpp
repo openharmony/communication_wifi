@@ -35,6 +35,12 @@ constexpr int FREQ_2_DOT_4_GHZ = 2450;
 constexpr int FREQ_5_GHZ = 5200;
 constexpr int TWO = 2;
 constexpr int FOUR = 4;
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+// 仅用作消除取数组下标codex魔鬼数字告警
+constexpr int ZERO = 0;
+constexpr int ONE = 1;
+constexpr int THREE = 3;
+#endif
 constexpr int FAILEDNUM = 6;
 constexpr int STANDER = 5;
 constexpr int STATUS = 17;
@@ -498,7 +504,89 @@ public:
         std::vector<InterScanInfo> scanInfoList;
         pScanService->ReportScanInfos(scanInfoList);
     }
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    void GetWifiRiskTypeEmptyInput()
+    {
+        std::vector<InterScanInfo> scanInfos;
+        pScanService->GetWifiRiskType(scanInfos);
+        EXPECT_TRUE(scanInfos.empty());
+    }
 
+    void GetWifiRiskTypeSkipEmptySsid()
+    {
+        std::vector<InterScanInfo> scanInfos;
+        InterScanInfo wifi1;
+        wifi1.ssid = "";
+        wifi1.bssid = "00:11:22:33:44:55";
+        wifi1.securityType = WifiSecurity::OPEN;
+        scanInfos.push_back(wifi1);
+        pScanService->GetWifiRiskType(scanInfos);
+        EXPECT_EQ(scanInfos[ZERO].riskType, WifiRiskType::OPEN);
+    }
+
+    void GetWifiRiskTypeCloneAttack()
+    {
+        std::vector<InterScanInfo> scanInfos;
+        InterScanInfo wifi1;
+        wifi1.ssid = "TestSSID";
+        wifi1.bssid = "00:11:22:33:44:55";
+        wifi1.securityType = WifiSecurity::PSK;
+        scanInfos.push_back(wifi1);
+
+        InterScanInfo wifi2;
+        wifi2.ssid = "TestSSID";
+        wifi2.bssid = "00:11:22:33:44:55";
+        wifi2.securityType = WifiSecurity::OPEN;
+        scanInfos.push_back(wifi2);
+
+        InterScanInfo wifi3;
+        wifi3.ssid = "OtherSSID";
+        wifi3.bssid = "00:11:22:33:44:55";
+        wifi3.securityType = WifiSecurity::PSK;
+        scanInfos.push_back(wifi3);
+
+        InterScanInfo wifi4;
+        wifi4.ssid = "OtherSSID";
+        wifi4.bssid = "00:11:22:33:44:BC";
+        wifi4.securityType = WifiSecurity::OPEN;
+        scanInfos.push_back(wifi4);
+
+        pScanService->GetWifiRiskType(scanInfos);
+
+        EXPECT_EQ(scanInfos[ZERO].riskType, WifiRiskType::CLONE_ATTACK);
+        EXPECT_EQ(scanInfos[ONE].riskType, WifiRiskType::CLONE_ATTACK);
+        EXPECT_EQ(scanInfos[TWO].riskType, WifiRiskType::NORMAL);
+        EXPECT_EQ(scanInfos[THREE].riskType, WifiRiskType::OPEN);
+    }
+
+    void GetWifiRiskTypeEdgeCase()
+    {
+        std::vector<InterScanInfo> scanInfos;
+        InterScanInfo wifi1;
+        wifi1.ssid = "";
+        wifi1.bssid = "00:11:22:33:44:55";
+        wifi1.securityType = WifiSecurity::OPEN;
+        scanInfos.push_back(wifi1);
+
+        InterScanInfo wifi2;
+        wifi2.ssid = "";
+        wifi2.bssid = "00:11:22:33:44:55";
+        wifi2.securityType = WifiSecurity::PSK;
+        scanInfos.push_back(wifi2);
+
+        InterScanInfo wifi3;
+        wifi3.ssid = "OtherSSID";
+        wifi3.bssid = "00:11:22:33:44:55";
+        wifi3.securityType = WifiSecurity::PSK;
+        scanInfos.push_back(wifi3);
+
+        pScanService->GetWifiRiskType(scanInfos);
+
+        EXPECT_EQ(scanInfos[ZERO].riskType, WifiRiskType::OPEN);
+        EXPECT_EQ(scanInfos[ONE].riskType, WifiRiskType::NORMAL);
+        EXPECT_EQ(scanInfos[TWO].riskType, WifiRiskType::NORMAL);
+    }
+#endif
     void BeginPnoScanSuccess1()
     {
         pScanService->isPnoScanBegined = false;
@@ -2112,7 +2200,27 @@ HWTEST_F(ScanServiceTest, StoreUserScanInfoSuccess2, TestSize.Level1)
 {
     StoreUserScanInfoSuccess2();
 }
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+HWTEST_F(ScanServiceTest, GetWifiRiskTypeEmptyInput, TestSize.Level1)
+{
+    GetWifiRiskTypeEmptyInput();
+}
 
+HWTEST_F(ScanServiceTest, GetWifiRiskTypeSkipEmptySsid, TestSize.Level1)
+{
+    GetWifiRiskTypeSkipEmptySsid();
+}
+
+HWTEST_F(ScanServiceTest, GetWifiRiskTypeCloneAttack, TestSize.Level1)
+{
+    GetWifiRiskTypeCloneAttack();
+}
+
+HWTEST_F(ScanServiceTest, GetWifiRiskTypeEdgeCase, TestSize.Level1)
+{
+    GetWifiRiskTypeEdgeCase();
+}
+#endif
 HWTEST_F(ScanServiceTest, ReportScanInfosSuccess, TestSize.Level1)
 {
     ReportScanInfosSuccess();

@@ -271,6 +271,9 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
+    if (wifi_feature_with_local_security_detect) {
+      defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
+    }
 
     external_deps = [
       "ability_base:want",
@@ -339,6 +342,9 @@ if (defined(ohos_lite)) {
     }
     if (wifi_feature_wifi_pro_ctrl) {
       defines += [ "FEATURE_WIFI_PRO_SUPPORT" ]
+    }
+    if (wifi_feature_with_local_security_detect) {
+      defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
     }
     deps = [
       ":wifi_manager_service",
@@ -651,6 +657,13 @@ if (defined(ohos_lite)) {
       sources += [ 
         "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect.cpp",
         "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_security_detect_observer.cpp",
+      ]
+    }
+
+    if (wifi_feature_with_local_security_detect) {
+      defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
+      sources += [ 
+        "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_local_security_detect.cpp",
       ]
     }
 

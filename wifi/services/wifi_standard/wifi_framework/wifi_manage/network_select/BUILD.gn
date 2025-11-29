@@ -131,8 +131,14 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/utils:wifi_utils",
     ]
 
+    defines = []
+
     if (wifi_feature_network_selection) {
-      defines = [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
+      defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
+    }
+
+    if (wifi_feature_with_local_security_detect) {
+      defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
     }
 
     external_deps = [

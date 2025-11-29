@@ -562,7 +562,7 @@ void Perf5gHandoverService::FoundMonitorAp(int32_t relationApIndex, std::vector<
     for (const auto &wifiScanInfo : wifiScanInfos) {
         std::string scanKeyMgmt = "";
         wifiScanInfo.GetDeviceMgmt(scanKeyMgmt);
-        if (!(wifiScanInfo.ssid == relationAps_[relationApIndex].apInfo_.ssid &&
+        if (!(wifiScanInfo.bssid == relationAps_[relationApIndex].apInfo_.bssid &&
                 WifiConfigCenter::GetInstance().IsSameKeyMgmt(
                     scanKeyMgmt, relationAps_[relationApIndex].apInfo_.keyMgmt))) {
             continue;

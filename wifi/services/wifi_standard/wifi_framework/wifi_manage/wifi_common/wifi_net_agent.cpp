@@ -322,6 +322,13 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
             return a.second < b.second;
         });
     for (const auto &addr : ipv6Addr) {
+        if (addr.first.empty()) {
+            continue;
+        }
+        // Skip link-local address fe80::/10 to avoid adding it to netlink info
+        if (addr.second == static_cast<int>(AddrTypeIpV6::ADDR_TYPE_LINK_LOCAL)) {
+            continue;
+        }
         netIpv6Addr->address_ = addr.first;
         netLinkInfo->netAddrList_.push_back(*netIpv6Addr);
         LOGI("SetNetLinkIPInfo ipv6 address:%{public}s type:%{public}d",

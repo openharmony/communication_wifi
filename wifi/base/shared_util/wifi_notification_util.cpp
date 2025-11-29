@@ -14,7 +14,6 @@
  */
 
 #include "ability_manager_ipc_interface_code.h"
-#include "cJSON.h"
 #include "extension_manager_client.h"
 #include "iservice_registry.h"
 #include "message_parcel.h"

@@ -110,6 +110,14 @@ HWTEST_F(WifiSettingsTest, SetDeviceAfterConnectTest, TestSize.Level1)
     EXPECT_EQ(result, WIFI_OPT_RETURN);
 }
 
+HWTEST_F(WifiSettingsTest, SetDeviceAfterDisconnectTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetDeviceAfterDisconnectTest enter!");
+    int result = WifiSettings::GetInstance().SetDeviceAfterDisconnect(NETWORK_ID);
+    WIFI_LOGE("SetDeviceAfterDisconnectTest result(%{public}d)", result);
+    EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
 HWTEST_F(WifiSettingsTest, GetCandidateConfigTest, TestSize.Level1)
 {
     WIFI_LOGE("GetCandidateConfigTest enter!");

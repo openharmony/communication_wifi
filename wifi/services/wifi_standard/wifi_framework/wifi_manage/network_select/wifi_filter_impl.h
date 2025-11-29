@@ -114,6 +114,16 @@ protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
 
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+class LongUnusedOpenWifiFilter final : public SimpleWifiFilter {
+public:
+    LongUnusedOpenWifiFilter();
+    ~LongUnusedOpenWifiFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+#endif
+
 class SavedWifiFilter final : public SimpleWifiFilter {
 public:
     SavedWifiFilter();

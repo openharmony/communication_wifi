@@ -25,6 +25,7 @@
 #include <vector>
 #include "ip_tools.h"
 #include "wifi_scan_msg.h"
+#include "inter_scan_info.h"
 #include "securec.h"
 
 namespace OHOS {
@@ -319,6 +320,7 @@ struct WifiLinkedInfo {
     int centerFrequency1; /* 160M center frequency */
     int connTriggerMode; /* Connection Trigger Module */
     DisconnState disconnTriggerMode;  /* Disconnection Trigger Module */
+    WifiRiskType riskType;
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -358,6 +360,7 @@ struct WifiLinkedInfo {
         centerFrequency1 = 0;
         connTriggerMode = -1;
         disconnTriggerMode = DisconnState::DEFAULTSTAT;
+        riskType = WifiRiskType::INVALID;
     }
 };
 
@@ -862,6 +865,8 @@ struct WifiDeviceConfig {
     bool isAllowAutoConnect { true };
     bool isSecureWifi { true };
     time_t lastDetectTime;
+    time_t lastDisconnectTime;
+    WifiRiskType riskType;
 
     WifiDeviceConfig()
     {
@@ -902,6 +907,8 @@ struct WifiDeviceConfig {
         everConnected = false;
         acceptUnvalidated = false;
         lastDetectTime = -1;
+        lastDisconnectTime = -1;
+        riskType = WifiRiskType::INVALID;
     }
 };
 

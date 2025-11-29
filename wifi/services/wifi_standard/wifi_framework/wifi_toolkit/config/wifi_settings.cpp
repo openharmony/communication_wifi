@@ -557,6 +557,17 @@ int WifiSettings::SetDeviceAfterConnect(int networkId)
     return 0;
 }
 
+int WifiSettings::SetDeviceAfterDisconnect(int networkId)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.lastDisconnectTime = time(0);
+    return 0;
+}
+
 int WifiSettings::SetDeviceRandomizedMacSuccessEver(int networkId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);

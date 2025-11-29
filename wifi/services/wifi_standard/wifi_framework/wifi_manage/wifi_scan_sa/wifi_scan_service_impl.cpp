@@ -333,6 +333,21 @@ void WifiScanServiceImpl::WriteInfoElementsToParcel(
         }
     }
 }
+
+void WifiScanServiceImpl::WriteBasicInfoToParcel(MessageParcel &outParcel, WifiScanInfo &result)
+{
+    outParcel.WriteString(result.bssid);
+    outParcel.WriteString(result.ssid);
+    outParcel.WriteInt32(result.bssidType);
+    outParcel.WriteString(result.capabilities);
+    outParcel.WriteInt32(result.frequency);
+    outParcel.WriteInt32(result.band);
+    outParcel.WriteInt32(static_cast<int>(result.channelWidth));
+    outParcel.WriteInt32(result.centerFrequency0);
+    outParcel.WriteInt32(result.centerFrequency1);
+    outParcel.WriteInt32(result.rssi);
+    outParcel.WriteInt32(static_cast<int>(result.securityType));
+}
  
 void WifiScanServiceImpl::SendScanInfo(int32_t contentSize, std::vector<WifiScanInfo> &result,
     ScanAshmemParcel &outAshmemParcel, std::vector<uint32_t> &allSizeUint)
@@ -354,17 +369,7 @@ void WifiScanServiceImpl::SendScanInfo(int32_t contentSize, std::vector<WifiScan
  
     for (int32_t i = 0; i < contentSize; ++i) {
         MessageParcel outParcel;
-        outParcel.WriteString(result[i].bssid);
-        outParcel.WriteString(result[i].ssid);
-        outParcel.WriteInt32(result[i].bssidType);
-        outParcel.WriteString(result[i].capabilities);
-        outParcel.WriteInt32(result[i].frequency);
-        outParcel.WriteInt32(result[i].band);
-        outParcel.WriteInt32(static_cast<int>(result[i].channelWidth));
-        outParcel.WriteInt32(result[i].centerFrequency0);
-        outParcel.WriteInt32(result[i].centerFrequency1);
-        outParcel.WriteInt32(result[i].rssi);
-        outParcel.WriteInt32(static_cast<int>(result[i].securityType));
+        WriteBasicInfoToParcel(outParcel, result[i]);
  
         size_t ieSize = result[i].infoElems.size() < maxIeSize ? result[i].infoElems.size() : maxIeSize;
         outParcel.WriteUint32(ieSize);
@@ -379,6 +384,9 @@ void WifiScanServiceImpl::SendScanInfo(int32_t contentSize, std::vector<WifiScan
         outParcel.WriteInt32(result[i].isHiLinkNetwork);
         outParcel.WriteBool(result[i].isHiLinkProNetwork);
         outParcel.WriteInt32(static_cast<int>(result[i].supportedWifiCategory));
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+        outParcel.WriteInt32(static_cast<int>(result[i].riskType));
+#endif
  
         int dataSize = static_cast<int>(outParcel.GetDataSize());
         if (offset + dataSize > ASH_MEM_SIZE) {

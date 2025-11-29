@@ -63,7 +63,99 @@ HWTEST_F(WifiFilterImplTest, HiddenWifiFilterReturnTrue, TestSize.Level1) {
     auto hiddenWifiFilter = std::make_shared<NetworkSelection::HiddenWifiFilter>();
     EXPECT_TRUE(hiddenWifiFilter->DoFilter(networkCandidate1));
 }
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+//系统时间可能获取失败
+HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterOpenNotStale, TestSize.Level1)
+{
+    InterScanInfo scanInfo;
+    scanInfo.bssid = "00:11:22:33:44:55";
+    scanInfo.ssid = "OpenNetwork";
+    scanInfo.securityType = WifiSecurity::OPEN;
+    scanInfo.riskType = WifiRiskType::OPEN;
+    NetworkSelection::NetworkCandidate networkCandidate(scanInfo);
+    time_t now = time(nullptr);
+    if (now == (time_t)(-1)) {
+        GTEST_SKIP() << "time() returned invalid value, skipping test.";
+        return;
+    }
+    networkCandidate.wifiDeviceConfig.lastDisconnectTime = now - 1 * 24 * 60 * 60; //1天前断开
+    networkCandidate.wifiDeviceConfig.networkId = 1;
+    
+    auto longUnusedOpenWifiFilter = std::make_shared<NetworkSelection::LongUnusedOpenWifiFilter>();
+    EXPECT_TRUE(longUnusedOpenWifiFilter->DoFilter(networkCandidate));
+}
 
+HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterNonOpen, TestSize.Level1)
+{
+    InterScanInfo scanInfo;
+    scanInfo.bssid = "00:11:22:33:44:55";
+    scanInfo.ssid = "WPA2Network";
+    scanInfo.securityType = WifiSecurity::PSK;
+    scanInfo.riskType = WifiRiskType::NORMAL;
+    NetworkSelection::NetworkCandidate networkCandidate(scanInfo);
+    time_t now = time(nullptr);
+    if (now == (time_t)(-1)) {
+        // time()返回非法值，跳过测试或标记为失败
+        GTEST_SKIP() << "time() returned invalid value, skipping test.";
+        return;
+    }
+    networkCandidate.wifiDeviceConfig.lastDisconnectTime = now - 20 * 24 * 60 * 60;
+    networkCandidate.wifiDeviceConfig.networkId = 1;
+    
+    auto longUnusedOpenWifiFilter = std::make_shared<NetworkSelection::LongUnusedOpenWifiFilter>();
+    EXPECT_TRUE(longUnusedOpenWifiFilter->DoFilter(networkCandidate));
+}
+
+HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterOpenStale, TestSize.Level1)
+{
+    InterScanInfo scanInfo;
+    scanInfo.bssid = "00:11:22:33:44:55";
+    scanInfo.ssid = "OldOpenNetwork";
+    scanInfo.securityType = WifiSecurity::OPEN;
+    scanInfo.riskType = WifiRiskType::OPEN;
+    NetworkSelection::NetworkCandidate networkCandidate(scanInfo);
+    time_t now = time(nullptr);
+    if (now == (time_t)(-1)) {
+        // time()返回非法值，跳过测试或标记为失败
+        GTEST_SKIP() << "time() returned invalid value, skipping test.";
+        return;
+    }
+    networkCandidate.wifiDeviceConfig.lastDisconnectTime = now - (15 * 24 * 60 * 60 + 1000); //超过阈值
+    networkCandidate.wifiDeviceConfig.networkId = 1;
+    
+    auto longUnusedOpenWifiFilter = std::make_shared<NetworkSelection::LongUnusedOpenWifiFilter>();
+    EXPECT_FALSE(longUnusedOpenWifiFilter->DoFilter(networkCandidate));
+}
+
+HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterNeverConnected, TestSize.Level1)
+{
+    InterScanInfo scanInfo;
+    scanInfo.bssid = "00:11:22:33:44:55";
+    scanInfo.ssid = "NewOpenNetwork";
+    scanInfo.securityType = WifiSecurity::OPEN;
+    scanInfo.riskType = WifiRiskType::OPEN;
+    NetworkSelection::NetworkCandidate networkCandidate(scanInfo);
+    networkCandidate.wifiDeviceConfig.lastDisconnectTime = -1;
+    networkCandidate.wifiDeviceConfig.networkId = 1;
+    
+    auto longUnusedOpenWifiFilter = std::make_shared<NetworkSelection::LongUnusedOpenWifiFilter>();
+    EXPECT_FALSE(longUnusedOpenWifiFilter->DoFilter(networkCandidate));
+}
+
+HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterInWhiteList, TestSize.Level1)
+{
+    InterScanInfo scanInfo;
+    scanInfo.bssid = "00:11:22:33:44:55";
+    scanInfo.ssid = "SafeNetwork";
+    scanInfo.securityType = WifiSecurity::OPEN;
+    scanInfo.riskType = WifiRiskType::NORMAL;
+    NetworkSelection::NetworkCandidate networkCandidate(scanInfo);
+    networkCandidate.wifiDeviceConfig.networkId = 1;
+    
+    auto longUnusedOpenWifiFilter = std::make_shared<NetworkSelection::LongUnusedOpenWifiFilter>();
+    EXPECT_TRUE(longUnusedOpenWifiFilter->DoFilter(networkCandidate));
+}
+#endif
 HWTEST_F(WifiFilterImplTest, RssiWifiFilter24gReturnFalse, TestSize.Level1) {
     InterScanInfo scanInfo1;
     scanInfo1.bssid = "11:11:11:11:11:77";

@@ -199,6 +199,9 @@ static ErrCode NativeScanInfosToJsObj(const napi_env& env,
             && each.isHiLinkNetwork <= EXTERNAL_HILINK_MAX_VALUE) ? true : false);
         SetValueBool(env, "isHiLinkNetwork", isHiLinkNetwork, eachObj);
         SetValueBool(env, "isHiLinkProNetwork", each.isHiLinkProNetwork, eachObj);
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+        SetValueInt32(env, "riskType", static_cast<int>(each.riskType), eachObj);
+#endif
         napi_status status = napi_set_element(env, arrayResult, idx++, eachObj);
         if (status != napi_ok) {
             WIFI_LOGE("Wifi napi set element error: %{public}d, idx: %{public}d", status, idx - 1);
@@ -1229,6 +1232,9 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
         && linkedInfo.isHiLinkNetwork <= EXTERNAL_HILINK_MAX_VALUE) ? true : false), result);
     SetValueBool(env, "isHiLinkProNetwork", static_cast<bool>(linkedInfo.isHiLinkProNetwork), result);
     SetValueInt32(env, "wifiLinkType", static_cast<int>(linkedInfo.wifiLinkType), result);
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    SetValueInt32(env, "riskType", static_cast<int>(linkedInfo.riskType), result);
+#endif
 }
 
 /* This interface has not been fully implemented */
@@ -1678,6 +1684,9 @@ static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceCon
     WapiConfigToJs(env, vecDeviceConfigs[idx], result);
     SetValueBool(env, "isAutoConnectAllowed", vecDeviceConfigs[idx].isAllowAutoConnect, result);
     SetValueBool(env, "isSecureWifi", vecDeviceConfigs[idx].isSecureWifi, result);
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    SetValueInt32(env, "riskType", static_cast<int>(vecDeviceConfigs[idx].riskType), result);
+#endif
 
     status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {

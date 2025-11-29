@@ -93,6 +93,7 @@ ohos_unittest("wifi_scan_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/rdb",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan/Mock",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/",
@@ -140,6 +141,12 @@ ohos_unittest("wifi_scan_unittest") {
     "FEATURE_SELF_CURE_SUPPORT",
     "FEATURE_STA_SUPPORT",
   ]
+
+  if (wifi_feature_with_local_security_detect) {
+    defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
+    sources += [ "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_security_detect/wifi_local_security_detect.cpp" ]
+  }
+
   external_deps = [
     "ability_base:want",
     "ability_base:zuri",
@@ -168,6 +175,7 @@ ohos_unittest("wifi_scan_unittest") {
     "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
     "netmanager_base:net_native_manager_if",
+    "netmanager_base:netsys_controller",
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

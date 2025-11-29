@@ -360,6 +360,13 @@ public:
     virtual bool CheckScanInfo(bool isGetScanInfoList, int uid = 0) = 0;
 
     /**
+     * @Description CheckScanInfoInUnsafeWiFiWhiteList
+     * @param wifiInfo - InterScanInfo struct
+     * @return bool - whether this WiFi is in WhiteList.
+     */
+    virtual bool CheckScanInfoInUnsafeWiFiWhiteList(InterScanInfo &wifiInfo) = 0;
+    
+    /**
      * @Description get ipv6 control ability
      *
      * @return Ipv6ControlData Ipv6 data info

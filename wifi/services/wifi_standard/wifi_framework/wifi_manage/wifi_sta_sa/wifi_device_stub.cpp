@@ -591,6 +591,9 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteBool(config.noInternetAccess);
     reply.WriteBool(config.isAllowAutoConnect);
     reply.WriteBool(config.isSecureWifi);
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    reply.WriteInt32((int)config.riskType);
+#endif
     return;
 }
 
@@ -971,6 +974,9 @@ void WifiDeviceStub::WriteWifiLinkedInfo(MessageParcel &reply, const WifiLinkedI
     reply.WriteInt32(wifiInfo.linkId);
     reply.WriteInt32(wifiInfo.centerFrequency0);
     reply.WriteInt32(wifiInfo.centerFrequency1);
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    reply.WriteInt32(static_cast<int>(wifiInfo.riskType));
+#endif
 }
 
 void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)

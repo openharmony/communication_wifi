@@ -139,6 +139,10 @@ void ScanService::ConvertScanInfo(WifiScanInfo &scanInfo, const InterScanInfo &i
 {
 }
 
+void ScanService::GetWifiRiskType(std::vector<InterScanInfo> &scanInfos)
+{
+}
+
 void ScanService::MergeScanResult(std::vector<WifiScanInfo> &results, std::vector<WifiScanInfo> &storeInfoList)
 {
 }

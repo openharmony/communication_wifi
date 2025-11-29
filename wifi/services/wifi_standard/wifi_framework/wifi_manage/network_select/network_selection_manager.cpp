@@ -77,6 +77,9 @@ void NetworkSelectionManager::ConvertScanInfo(WifiScanInfo &wifiScanInfo, InterS
     interScanInfo.band = wifiScanInfo.band;
     interScanInfo.isHiLinkNetwork = wifiScanInfo.isHiLinkNetwork;
     interScanInfo.supportedWifiCategory = wifiScanInfo.supportedWifiCategory;
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    interScanInfo.riskType = wifiScanInfo.riskType;
+#endif
 }
 
 bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelectionResult,

@@ -1363,6 +1363,9 @@ void WifiConfigCenter::UpdateLinkedInfo(int instId)
             if (iter->isHiLinkNetwork == HILINK_PRO_NETWORK) {
                 mWifiLinkedInfo[instId].isHiLinkProNetwork = true;
             }
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+            mWifiLinkedInfo[instId].riskType = iter->riskType;
+#endif
             break;
         }
     }

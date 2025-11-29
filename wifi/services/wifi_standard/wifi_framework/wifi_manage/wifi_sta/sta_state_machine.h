@@ -1109,6 +1109,7 @@ private:
     */
     bool linkSwitchDetectingFlag_{false};
     uint32_t pktDirCnt_ = 0;
+    int connectMethod_ = -1;
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
     WifiDataReportService *wifiDataReportService_ = nullptr;

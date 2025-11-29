@@ -185,6 +185,7 @@ public:
     virtual WifiNetworkControlInfo GetNetworkControlInfo() = 0;
     virtual void SetDfsControlData(DfsControlData dfsControlData) = 0;
     virtual DfsControlData GetDfsControlData() = 0;
+    virtual bool IsSameKeyMgmt(std::string scanKeyMgmt, std::string keyMgmt);
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -350,6 +351,7 @@ public:
     MOCK_METHOD0(GetNetworkControlInfo, WifiNetworkControlInfo());
     MOCK_METHOD1(SetDfsControlData, void(DfsControlData dfsControlData));
     MOCK_METHOD0(GetDfsControlData, DfsControlData());
+    MOCK_METHOD2(IsSameKeyMgmt, bool(std::string scanKeyMgmt, std::string keyMgmt));
 private:
     WifiConfigCenter();
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;

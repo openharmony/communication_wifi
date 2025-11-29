@@ -560,7 +560,11 @@ void Perf5gHandoverService::FoundMonitorAp(int32_t relationApIndex, std::vector<
         return;
     }
     for (const auto &wifiScanInfo : wifiScanInfos) {
-        if (wifiScanInfo.bssid != relationAps_[relationApIndex].apInfo_.bssid) {
+        std::string scanKeyMgmt = "";
+        wifiScanInfo.GetDeviceMgmt(scanKeyMgmt);
+        if (!(wifiScanInfo.ssid == relationAps_[relationApIndex].apInfo_.ssid &&
+                WifiConfigCenter::GetInstance().IsSameKeyMgmt(
+                    scanKeyMgmt, relationAps_[relationApIndex].apInfo_.keyMgmt))) {
             continue;
         }
         bool hasMonitor = false;
@@ -700,11 +704,8 @@ void Perf5gHandoverService::GetNoExistRelationInfo(std::vector<WifiDeviceConfig>
                 continue;
             }
             bool isSameSsidConnectedAp = (connectedAp_->apInfo.ssid == wifiDeviceConfig.ssid &&
-                connectedAp_->apInfo.keyMgmt == wifiDeviceConfig.keyMgmt);
-            isSameSsidConnectedAp =
-                isSameSsidConnectedAp && (wifiScanInfo.ssid == wifiDeviceConfig.ssid &&
-                (scanResultKmgmt == wifiDeviceConfig.keyMgmt || (scanResultKmgmt.compare("WPA-PSK+SAE") == 0 &&
-                scanResultKmgmt.find(wifiDeviceConfig.keyMgmt) != std::string::npos)));
+                                          WifiConfigCenter::GetInstance().IsSameKeyMgmt(
+                                              connectedAp_->apInfo.keyMgmt, wifiDeviceConfig.keyMgmt));
             if (isSameSsidConnectedAp) {
                 noExistRelationBssidSet.insert(wifiScanInfo.bssid);
                 RelationAp relationAp;

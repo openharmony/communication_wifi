@@ -258,6 +258,8 @@ void WriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info);
 void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo);
 
 void WriteMdmHiSysEvent(const MdmRestrictedInfo &mdmRestrictedInfo);
+
+void WriteWifiConfigStatusHiSysEvent(const std::string &packageName, WifiConfigReportType reportType);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

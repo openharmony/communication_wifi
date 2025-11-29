@@ -45,6 +45,7 @@
 #include "wifi_randommac_helper.h"
 #include "wifi_sta_hal_interface.h"
 #include "block_connect_service.h"
+#include "wifi_hisysevent.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -639,6 +640,7 @@ ErrCode WifiDeviceServiceImpl::AddDeviceConfig(const WifiDeviceConfig &config, i
         return WIFI_OPT_FAILED;
     }
     result = retNetworkId;
+    ReportWifiConfigStatus(WifiConfigReportType::ADD);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -728,6 +730,7 @@ ErrCode WifiDeviceServiceImpl::UpdateDeviceConfig(const WifiDeviceConfig &config
         return WIFI_OPT_FAILED;
     }
     result = retNetworkId;
+    ReportWifiConfigStatus(WifiConfigReportType::UPDATE);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -756,7 +759,12 @@ ErrCode WifiDeviceServiceImpl::RemoveDevice(int networkId)
     if (pService == nullptr) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
-    return pService->RemoveDevice(networkId);
+
+    ErrCode result = pService->RemoveDevice(networkId);
+    if (result == WIFI_OPT_SUCCESS) {
+        ReportWifiConfigStatus(WifiConfigReportType::DELETE);
+    }
+    return result;
 }
 
 ErrCode WifiDeviceServiceImpl::RemoveAllDevice()
@@ -2782,6 +2790,20 @@ ErrCode WifiDeviceServiceImpl::SetRandomMacDisabled(bool isRandomMacDisabled)
     return WIFI_OPT_SUCCESS;
 #else
     return WIFI_OPT_NOT_SUPPORTED;
+#endif
+}
+
+void WifiDeviceServiceImpl::ReportWifiConfigStatus(WifiConfigReportType reportType)
+{
+#ifndef OHOS_ARCH_LITE
+    std::string packageName;
+    int uid = GetCallingUid();
+    if (GetBundleNameByUid(uid, packageName) != WIFI_OPT_SUCCESS) {
+        packageName = "uid_" + std::to_string(uid);
+    }
+    WriteWifiConfigStatusHiSysEvent(packageName, reportType);
+#else
+    return;
 #endif
 }
 }  // namespace Wifi

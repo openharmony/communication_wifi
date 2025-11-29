@@ -142,9 +142,9 @@ bool NetworkBlockListManager::IsFailedMultiTimes(const std::string &bssid)
     auto iter = tempWifiBlockMap_.find(bssid);
     if (iter != tempWifiBlockMap_.end()) {
         counter++;
-        iter->second = counter;
+        iter->second = static_cast<uint32_t>(counter);
     } else {
-        tempWifiBlockMap_[bssid] = counter;
+        tempWifiBlockMap_[bssid] = static_cast<uint32_t>(counter);
     }
 
     return counter >= MAX_CONNECT_FAILED_TIMES;

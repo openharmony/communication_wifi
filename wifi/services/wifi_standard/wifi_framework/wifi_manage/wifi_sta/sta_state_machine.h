@@ -1044,6 +1044,9 @@ private:
     void TryModifyPortalAttribute(SystemNetWorkState netState);
     void ChangePortalAttribute(bool isNeedChange, WifiDeviceConfig &config);
     void UpdateHiLinkAttribute();
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    void UpdateRiskTypeAttribute();
+#endif
     void LogSignalInfo(WifiSignalPollInfo &signalInfo);
     void HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime);
     void EnableScreenOffSignalPoll(int delayTime);

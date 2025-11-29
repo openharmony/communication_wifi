@@ -110,6 +110,9 @@ if (defined(ohos_lite)) {
     ]
 
     defines = [ "STA_INSTANCE_MAX_NUM=$wifi_feature_with_sta_num" ]
+    if (wifi_feature_with_local_security_detect) {
+      defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
+    }
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }

@@ -40,6 +40,9 @@ WifiScanInfoParcel WifiScanInfoParcel::FromWifiScanInfo(const WifiScanInfo &info
     parcel.isHiLinkNetwork = info.isHiLinkNetwork;
     parcel.isHiLinkProNetwork = info.isHiLinkProNetwork;
     parcel.supportedWifiCategory = info.supportedWifiCategory;
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    parcel.riskType = info.riskType;
+#endif
 
     for (const auto &elem : info.infoElems) {
         parcel.infoElems.push_back(WifiInfoElemParcel::FromWifiInfoElem(elem));
@@ -70,6 +73,9 @@ WifiScanInfo WifiScanInfoParcel::ToWifiScanInfo() const
     info.isHiLinkNetwork = isHiLinkNetwork;
     info.isHiLinkProNetwork = isHiLinkProNetwork;
     info.supportedWifiCategory = supportedWifiCategory;
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    info.riskType = riskType;
+#endif
 
     for (const auto &elemParcel : infoElems) {
         info.infoElems.push_back(elemParcel.ToWifiInfoElem());
@@ -110,14 +116,19 @@ bool WifiScanInfoParcel::Marshalling(Parcel &parcel) const
         !parcel.WriteInt32(static_cast<int32_t>(supportedWifiCategory))) {
         return false;
     }
-
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    if (!parcel.WriteInt32(static_cast<int32_t>(riskType))) {
+        return false;
+    }
+#endif
     return true;
 }
 
-WifiScanInfoParcel *WifiScanInfoParcel::Unmarshalling(Parcel &parcel)
+bool WifiScanInfoParcel::ReadBasicFields(Parcel &parcel, WifiScanInfoParcel *info)
 {
-    auto info = std::make_unique<WifiScanInfoParcel>();
-
+    if (!info) {
+        return false;
+    }
     parcel.ReadString(info->bssid);
     parcel.ReadString(info->ssid);
     parcel.ReadInt32(info->bssidType);
@@ -127,16 +138,25 @@ WifiScanInfoParcel *WifiScanInfoParcel::Unmarshalling(Parcel &parcel)
 
     int32_t channelWidthValue = 0;
     if (!parcel.ReadInt32(channelWidthValue)) {
-        return nullptr;
+        return false;
     }
     info->channelWidth = static_cast<WifiChannelWidth>(channelWidthValue);
 
     if (!parcel.ReadInt32(info->centerFrequency0) ||
         !parcel.ReadInt32(info->centerFrequency1) ||
         !parcel.ReadInt32(info->rssi)) {
-        return nullptr;
+        return false;
     }
 
+    return true;
+}
+
+WifiScanInfoParcel *WifiScanInfoParcel::Unmarshalling(Parcel &parcel)
+{
+    auto info = std::make_unique<WifiScanInfoParcel>();
+    if (!ReadBasicFields(parcel, info.get())) {
+        return nullptr;
+    }
     int32_t securityTypeValue = 0;
     if (!parcel.ReadInt32(securityTypeValue)) {
         return nullptr;
@@ -169,7 +189,13 @@ WifiScanInfoParcel *WifiScanInfoParcel::Unmarshalling(Parcel &parcel)
         return nullptr;
     }
     info->supportedWifiCategory = static_cast<WifiCategory>(categoryValue);
-      
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    int32_t riskTypeValue = 0;
+    if (!parcel.ReadInt32(riskTypeValue)) {
+        return nullptr;
+    }
+    info->riskType = static_cast<WifiRiskType>(riskTypeValue);
+#endif
     return info.release();
 }
 

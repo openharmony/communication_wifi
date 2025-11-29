@@ -228,6 +228,10 @@ if (defined(ohos_lite)) {
       external_deps += [ "data_share:datashare_consumer" ]
     }
     
+    if (wifi_feature_with_local_security_detect) {
+      defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
+    }
+    
     if (defined(global_parts_info) &&
         defined(global_parts_info.telephony_core_service) &&
         defined(global_parts_info.telephony_cellular_data)) {

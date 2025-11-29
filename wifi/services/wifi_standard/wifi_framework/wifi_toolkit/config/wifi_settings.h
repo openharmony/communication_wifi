@@ -189,6 +189,8 @@ public:
 
     int SetDeviceAfterConnect(int networkId);
 
+    int SetDeviceAfterDisconnect(int networkId);
+
     int SetDeviceRandomizedMacSuccessEver(int networkId);
 
     int SetDeviceEverConnected(int networkId);

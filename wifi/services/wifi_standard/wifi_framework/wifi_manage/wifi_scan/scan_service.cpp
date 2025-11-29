@@ -711,6 +711,10 @@ void ScanService::HandleCommonScanInfo(
 void ScanService::HandleScanResults(std::vector<int> &requestIndexList, std::vector<InterScanInfo> &scanInfoList,
     bool &fullScanStored)
 {
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    //fill wifiRiskType based on whole scanInfoList
+    GetWifiRiskType(scanInfoList);
+#endif
     bool needReportScanResult = false;
     for (std::vector<int>::iterator reqIter = requestIndexList.begin(); reqIter != requestIndexList.end(); ++reqIter) {
         ScanConfigMap::iterator configIter = scanConfigMap.find(*reqIter);
@@ -785,7 +789,40 @@ void ScanService::ConvertScanInfo(WifiScanInfo &scanInfo, const InterScanInfo &i
     scanInfo.isHiLinkNetwork = interInfo.isHiLinkNetwork;
     scanInfo.isHiLinkProNetwork = interInfo.isHiLinkProNetwork;
     scanInfo.supportedWifiCategory = interInfo.supportedWifiCategory;
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    scanInfo.riskType = interInfo.riskType;
+#endif
 }
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+void ScanService::GetWifiRiskType(std::vector<InterScanInfo> &scanInfos)
+{
+    if (scanInfos.size() == 0) {
+        return;
+    }
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    std::unordered_map<std::string, int> ssidBssidCount;
+    for (const auto& wifi : scanInfos) {
+        if (wifi.ssid.empty()) {
+            continue;
+        }
+        std::string key = wifi.ssid + "--" + wifi.bssid;
+        ssidBssidCount[key]++;
+    }
+    for (auto& wifi : scanInfos) {
+        std::string key = wifi.ssid + "--" + wifi.bssid;
+        if (ssidBssidCount[key] > 1) {
+            wifi.riskType = WifiRiskType::CLONE_ATTACK;
+            continue;
+        }
+        if (wifi.securityType == WifiSecurity::OPEN) {
+            wifi.riskType = pEnhanceService != nullptr && pEnhanceService->CheckScanInfoInUnsafeWiFiWhiteList(wifi) \
+            ? WifiRiskType::NORMAL : WifiRiskType::OPEN;
+        } else {
+            wifi.riskType = WifiRiskType::NORMAL;
+        }
+    }
+}
+#endif
 
 void ScanService::MergeScanResult(std::vector<WifiScanInfo> &results, std::vector<WifiScanInfo> &storeInfoList)
 {

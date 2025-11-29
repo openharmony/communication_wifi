@@ -310,6 +310,9 @@ void StaStateMachine::InitWifiLinkedInfo()
     linkedInfo.isWurEnable = false;
     linkedInfo.isHiLinkNetwork = 0;
     linkedInfo.disconnTriggerMode = DisconnState::DEFAULTSTAT;
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    linkedInfo.riskType = WifiRiskType::INVALID;
+#endif
     std::vector<WifiLinkedInfo> emptyMloLinkInfo;
     WifiConfigCenter::GetInstance().SaveMloLinkedInfo(emptyMloLinkInfo, m_instId);
 }
@@ -553,6 +556,9 @@ void StaStateMachine::InitState::HandleNetworkConnectionEvent(InternalMessagePtr
     /* Save linkedinfo */
     pStaStateMachine->linkedInfo.networkId = pStaStateMachine->targetNetworkId_;
     pStaStateMachine->AfterApLinkedprocess(bssid);
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    pStaStateMachine->UpdateRiskTypeAttribute();
+#endif
     WifiConfigCenter::GetInstance().SaveLinkedInfo(pStaStateMachine->linkedInfo, pStaStateMachine->m_instId);
     pStaStateMachine->lastSignalLevel_ = INVALID_SIGNAL_LEVEL;   // Reset signal level when first start signal poll
     pStaStateMachine->DealSignalPollResult();
@@ -5590,6 +5596,12 @@ void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLi
             }
             break;
         case OperateResState::DISCONNECT_DISCONNECTED:
+            // record lastDisconnectTime
+            if (WifiSettings::GetInstance().SetDeviceAfterDisconnect(info.networkId) == 0) {
+                WifiSettings::GetInstance().SyncDeviceConfig();
+            } else {
+                WIFI_LOGI("SetDeviceAfterDisconnect failed...");
+            }
             WriteWifiConnectionHiSysEvent(static_cast<int>(WifiConnectionType::DISCONNECT), "");
             if (m_instId == INSTID_WLAN0) {
 #ifndef OHOS_ARCH_LITE
@@ -5702,6 +5714,19 @@ void StaStateMachine::UpdateHiLinkAttribute()
         }
     }
 }
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+void StaStateMachine::UpdateRiskTypeAttribute()
+{
+    std::vector<WifiScanInfo> wifiScanInfoList;
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(wifiScanInfoList);
+    for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
+        if (iter->bssid == linkedInfo.bssid) {
+            linkedInfo.riskType = iter->riskType;
+            break;
+        }
+    }
+}
+#endif
 void StaStateMachine::LogSignalInfo(WifiSignalPollInfo &signalInfo)
 {
     WIFI_LOGI("SignalPoll,bssid:%{public}s,ssid:%{public}s,networkId:%{public}d,band:%{public}d,freq:%{public}d,"

@@ -115,5 +115,11 @@ HWTEST_F(WifiHisyseventTest, WriteMdmHiSysEventTest, TestSize.Level1)
     WriteMdmHiSysEvent(mdmInfo);
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
+
+HWTEST_F(WifiHisyseventTest, WriteWifiConfigStatusHiSysEventTest, TestSize.Level1)
+{
+    WriteWifiConfigStatusHiSysEvent("test_package", WifiConfigReportType::ADD);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -1036,5 +1036,25 @@ void WriteMdmHiSysEvent(const MdmRestrictedInfo &mdmRestrictedInfo)
     free(jsonStr);
     cJSON_Delete(root);
 }
+
+void WriteWifiConfigStatusHiSysEvent(const std::string &packageName, WifiConfigReportType reportType)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(root, "PACKAGE_NAME", packageName.c_str());
+    cJSON_AddNumberToObject(root, "OPER_TYPE", static_cast<int>(reportType));
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_CONFIG_OPER_STAT", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
 }  // namespace Wifi
 }  // namespace OHOS

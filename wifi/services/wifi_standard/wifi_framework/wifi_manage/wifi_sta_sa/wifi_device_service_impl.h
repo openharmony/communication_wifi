@@ -244,6 +244,7 @@ private:
     void StopUnloadStaTimer(void) override;
 #endif
     bool IsDisableWifiProhibitedByEdm(void);
+    void ReportWifiConfigStatus(WifiConfigReportType reportType);
 
     private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;

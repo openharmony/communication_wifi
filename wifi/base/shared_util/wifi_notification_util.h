@@ -75,7 +75,7 @@ public:
 
     void ShowSettingsDialog(WifiDialogType type, std::string settings);
 
-    void AddP2pParam(WifiDialogType type, std::string comInfo, nlohmann::json &param);
+    void AddP2pParam(WifiDialogType type, std::string comInfo, cJSON *param);
 
 private:
     std::atomic<bool> isPortalNtfPublished {false};

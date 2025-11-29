@@ -430,7 +430,7 @@ private:
     virtual ErrCode RemoveClientInfo(std::string mac);
     virtual bool IsMatchClientDevice(std::vector<GcInfo> &gcInfos, WifiP2pDevice &device, GcInfo &gcInfo);
 #ifndef OHOS_ARCH_LITE
-    void WakeUpScreenSaver();
+    void WakeUpScreenSaver() const;
 #endif
     bool SetTempGroupConfig(const WifiP2pConfigInternal &config) const;
     void CancelWpsPbc();

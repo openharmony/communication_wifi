@@ -151,6 +151,7 @@ ohos_unittest("wifi_p2p_test") {
     "ability_base:want",
     "ability_runtime:wantagent_innerkits",
     "c_utils:utils",
+    "cJSON:cjson",
     "dhcp:dhcp_sdk",
     "googletest:gmock_main",
     "googletest:gtest_main",

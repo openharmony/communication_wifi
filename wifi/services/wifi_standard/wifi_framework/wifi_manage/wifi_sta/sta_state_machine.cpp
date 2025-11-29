@@ -1446,6 +1446,7 @@ StaStateMachine::ApLinkedState::~ApLinkedState()
 void StaStateMachine::ApLinkedState::GoInState()
 {
     WIFI_LOGI("ApLinkedState GoInState function.");
+    pStaStateMachine->SetConnectMethod(pStaStateMachine->connectMethod_);
     if ((WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE) &&
         (pStaStateMachine->isAudioOn_ == AUDIO_OFF)) {
         pStaStateMachine->enableSignalPoll = false;
@@ -2981,6 +2982,7 @@ void StaStateMachine::DealHiLinkDataToWpa(InternalMessagePtr msg)
             std::string cmd;
             msg->GetMessageObj(cmd);
             HilinkSetMacAddress(cmd);
+            connectMethod_ = NETWORK_SELECTED_BY_HILINK;
             WIFI_LOGI("DealHiLinkMacDeliver start shell cmd, cmd = %{public}s", MacAnonymize(cmd).c_str());
             WifiStaHalInterface::GetInstance().ShellCmd("wlan0", cmd);
             break;
@@ -4188,6 +4190,7 @@ void StaStateMachine::SetConnectMethod(int connectMethod)
         case NETWORK_SELECTED_BY_AUTO:
             isConnectFromUser = AUTO_CONNECT;
             break;
+        case NETWORK_SELECTED_BY_HILINK:
         case NETWORK_SELECTED_BY_USER:
             isConnectFromUser = USER_CONNECT;
             break;
@@ -4790,7 +4793,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         InvokeOnStaConnChanged(OperateResState::CONNECT_SELECT_NETWORK_FAILED, linkedInfo);
         return WIFI_OPT_FAILED;
     }
-    SetConnectMethod(connTriggerMode);
+    connectMethod_ = connTriggerMode;
     WifiConfigCenter::GetInstance().EnableNetwork(networkId, connTriggerMode == NETWORK_SELECTED_BY_USER, m_instId);
     return WIFI_OPT_SUCCESS;
 }

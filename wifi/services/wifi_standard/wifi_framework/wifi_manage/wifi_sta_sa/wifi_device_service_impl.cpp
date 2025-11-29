@@ -2805,5 +2805,6 @@ void WifiDeviceServiceImpl::ReportWifiConfigStatus(WifiConfigReportType reportTy
 #else
     return;
 #endif
+}
 }  // namespace Wifi
 }  // namespace OHOS

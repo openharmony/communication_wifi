@@ -97,7 +97,7 @@ public:
      *
      * @return ErrCode - success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual ErrCode NotifyIpv6FailureDetected() = 0;
+    virtual ErrCode NotifyIpv6FailureDetected(bool isIpv4Good) = 0;
 
     /**
      * @Description Notify that tx/rx is good but network is actually not

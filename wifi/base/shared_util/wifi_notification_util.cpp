@@ -265,7 +265,6 @@ void WifiNotificationUtil::AddP2pParam(WifiDialogType type, std::string comInfo,
         default:
             break;
     }
-    WIFI_LOGD("param comInfo %{private}s", param.dump().c_str());
 }
 
 void UIExtensionAbilityConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,

@@ -22,19 +22,37 @@ namespace Wifi {
     static const int32_t NUM_BYTES = 1;
     std::shared_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
     bool ConnectToDeviceFuzzerTest(FuzzedDataProvider& FDP)
-    {
-        if (devicePtr == nullptr) {
-            return false;
-        }
-
-        WifiDeviceConfig config;
-        config.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
-        config.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
-        config.preSharedKey = FDP.ConsumeBytesAsString(NUM_BYTES);
-        config.keyMgmt = FDP.ConsumeBytesAsString(NUM_BYTES);
-        devicePtr->ConnectToDevice(config);
-        return true;
+{
+    if (devicePtr == nullptr) {
+        return false;
     }
+
+    WifiDeviceConfig config;
+
+    config.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    if (config.ssid.empty()) {
+        config.ssid = "";
+    }
+
+    config.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    if (config.bssid.empty()) {
+        config.bssid = "";
+    }
+
+    config.preSharedKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+    if (config.preSharedKey.empty()) {
+        config.preSharedKey = "";
+    }
+
+    config.keyMgmt = FDP.ConsumeBytesAsString(NUM_BYTES);
+    if (config.keyMgmt.empty()) {
+        config.keyMgmt = "";
+    }
+
+    devicePtr->ConnectToDevice(config);
+
+    return true;
+}
 }  // namespace Wifi
 }  // namespace OHOS
 

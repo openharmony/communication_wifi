@@ -1592,6 +1592,25 @@ bool WifiConfigCenter::GetBrowserState()
     return browserOn_;
 }
 
+bool WifiConfigCenter::IsSameKeyMgmt(std::string scanKeyMgmt, std::string keyMgmt)
+{
+    LOGI("IsSamekeyMgmt scanKeyMgmt:%{public}s, keyMgmt:%{public}s", scanKeyMgmt.c_str(), keyMgmt.c_str());
+    if (scanKeyMgmt != "WPA-PSK+SAE") {
+        if (scanKeyMgmt == keyMgmt) {
+            return true;
+        }
+        if (scanKeyMgmt == "SAE" && keyMgmt == "WPA-PSK") {
+            return true;
+        }
+        if (keyMgmt == "SAE" && scanKeyMgmt == "WPA-PSK") {
+            return true;
+        }
+    } else {
+        return IsSameKeyMgmt("SAE", keyMgmt) || IsSameKeyMgmt("WPA-PSK", keyMgmt);
+    }
+    return false;
+}
+
 #ifndef OHOS_ARCH_LITE
 void WifiConfigCenter::SetScreenDispalyState(int32_t orientation)
 {

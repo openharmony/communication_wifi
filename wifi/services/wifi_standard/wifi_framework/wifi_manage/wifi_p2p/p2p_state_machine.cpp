@@ -757,7 +757,7 @@ void P2pStateMachine::NotifyUserInvitationReceivedMessage()
         WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_PBC_DIALOG, deviceName);
     } else if (wpsInfo == WpsMethod::WPS_METHOD_DISPLAY) {
         WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_DISPLAY_DIALOG,
-        savedP2pConfig.GetWpsInfo().GetPin() + '_' + deviceName);
+            savedP2pConfig.GetWpsInfo().GetPin() + '_' + deviceName);
     } else if (wpsInfo == WpsMethod::WPS_METHOD_KEYPAD) {
         WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_KEYPAD_DIALOG, deviceName);
     }

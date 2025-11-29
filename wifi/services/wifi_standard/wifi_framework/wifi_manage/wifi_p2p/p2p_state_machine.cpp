@@ -721,8 +721,8 @@ void P2pStateMachine::NotifyUserInvitationSentMessage(const std::string &pin, co
     }
     std::string deviceName = deviceManager.GetDeviceName(peerAddress);
     std::string comInfo = pin + "_" + deviceName;
-    WIFI_LOGD(ShowDialog comInfo %{private}s, comInfo.c_str());
-    WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_DISPLAY_DIALOG,
+    WIFI_LOGD("ShowDialog comInfo %{private}s", comInfo.c_str());
+    WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::P2P_WSC_DISPLAY_DIALOG,
         comInfo);
 }
 
@@ -736,8 +736,8 @@ void P2pStateMachine::NotifyUserProvDiscShowPinRequestMessage(const std::string 
     }
     std::string deviceName = deviceManager.GetDeviceName(peerAddress);
     std::string comInfo = pin + "_" + deviceName;
-    WIFI_LOGD(ShowDialog comInfo %{private}s, comInfo.c_str());
-    WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_DISPLAY_DIALOG,
+    WIFI_LOGD("ShowDialog comInfo %{private}s", comInfo.c_str());
+    WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::P2P_WSC_DISPLAY_DIALOG,
         comInfo);
 }
 
@@ -754,12 +754,12 @@ void P2pStateMachine::NotifyUserInvitationReceivedMessage()
     std::string deviceName = deviceManager.GetDeviceName(savedP2pConfig.GetDeviceAddress());
     WpsMethod wpsInfo = savedP2pConfig.GetWpsInfo().GetWpsMethod();
     if (wpsInfo == WpsMethod::WPS_METHOD_PBC) {
-        WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_PBC_DIALOG, deviceName);
+        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::P2P_WSC_PBC_DIALOG, deviceName);
     } else if (wpsInfo == WpsMethod::WPS_METHOD_DISPLAY) {
-        WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_DISPLAY_DIALOG,
+        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::P2P_WSC_DISPLAY_DIALOG,
             savedP2pConfig.GetWpsInfo().GetPin() + '_' + deviceName);
     } else if (wpsInfo == WpsMethod::WPS_METHOD_KEYPAD) {
-        WifiNotificationUtil::GetInstence().ShowDialog(WifiDialogType::P2P_WSC_KEYPAD_DIALOG, deviceName);
+        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::P2P_WSC_KEYPAD_DIALOG, deviceName);
     }
 }
 
@@ -1428,7 +1428,7 @@ bool P2pStateMachine::P2pReject(const std::string mac) const
 }
 
 #ifndef OHOS_ARCH_LITE
-void P2pStateMachine::WakeUpScreenSaver()
+void P2pStateMachine::WakeUpScreenSaver() const
 {
     auto &powerMgr = PowerMgr::PowerMgrClient::GetInstance();
     if (!powerMgr.IsScreenOn()) {

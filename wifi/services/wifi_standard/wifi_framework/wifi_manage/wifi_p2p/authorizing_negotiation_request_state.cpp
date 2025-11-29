@@ -99,7 +99,6 @@ void AuthorizingNegotiationRequestState::HandleInternalConnUserConfirm()
     WpsInfo wps = p2pStateMachine.savedP2pConfig.GetWpsInfo();
     wps.SetWpsMethod(WpsMethod::WPS_METHOD_DISPLAY);
     p2pStateMachine.savedP2pConfig.SetWpsInfo(wps);
-
     std::string pin = wps.GetPin();
 
     if (WifiErrorNo::WIFI_HAL_OPT_OK !=

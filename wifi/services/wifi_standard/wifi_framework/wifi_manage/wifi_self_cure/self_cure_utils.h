@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Wifi {
 constexpr int VEC_POS_3 = 3;
 constexpr int GET_NEXT_IP_MAC_CNT = 10;
-
+constexpr int64_t IPV6_CHR_EVENT_MIN_INTERVAL = 30 * 60 * 1000 * 1000; // 30 minutes
 inline constexpr const char* CONST_WIFI_DNSCURE_IPCFG = "const.wifi.dnscure_ipcfg";
 class SelfCureUtils {
 public:
@@ -54,9 +54,10 @@ public:
     std::string GetSelfCureHistory();
     void ReportNoInternetChrEvent();
     bool IsIpv6SelfCureSupported();
-    bool DisableIpv6();
-    bool HasIpv6Disabled();
-    void SetIpv6Disabled(bool disabled);
+    bool DisableIpv6(int instId = 0);
+    bool HasIpv6Disabled(int instId = 0);
+    void SetIpv6Disabled(bool disabled, int instId = 0);
+    void ReportIpv6ChrEvent();
 private:
     class SelfCureDnsResultCallback : public NetManagerStandard::NetsysDnsReportCallback {
     public:
@@ -71,8 +72,8 @@ private:
     };
 
 private:
-
-    std::atomic<bool> ipv6Disabled_ = false;
+    std::atomic<int64_t> lastReportIpv6Time_ = 0;
+    std::atomic<bool> ipv6Disabled_[2] = {false, false};
     sptr<SelfCureDnsResultCallback> dnsResultCallback_{nullptr};
 };
 } // namespace Wifi

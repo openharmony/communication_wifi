@@ -405,6 +405,12 @@ enum class WifiDeviceConfigStatus {
     UNKNOWN
 };
 
+enum class WifiConfigReportType {
+    ADD,
+    DELETE,
+    UPDATE
+};
+
 enum class AssignIpMethod { DHCP, STATIC, UNASSIGNED };
 
 enum class ConfigChange {

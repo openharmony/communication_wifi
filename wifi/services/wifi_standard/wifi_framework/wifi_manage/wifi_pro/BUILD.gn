@@ -122,11 +122,7 @@ ohos_static_library("wifi_pro") {
   if (wifi_feature_network_selection) {
     defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
   }
-
-  if (wifi_feature_with_lp_scan) {
-    defines += [ "SUPPORT_LP_SCAN" ]
-  }
-
+  
   defines += [ "FEATURE_SELF_CURE_SUPPORT" ]
 
   if (defined(global_parts_info) &&

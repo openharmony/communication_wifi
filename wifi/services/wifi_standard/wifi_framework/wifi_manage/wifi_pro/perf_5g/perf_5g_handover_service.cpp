@@ -687,18 +687,15 @@ void Perf5gHandoverService::RssiUpdate(int32_t rssi)
     if (connectedAp_->canNotPerf) {
         return;
     }
-    int scanStyle = SCAN_DEFAULT_TYPE;
-#ifdef SUPPORT_LP_SCAN
-    isLpScanSupported_ = OHOS::system::GetBoolParameter("lpscan", false);
-    scanStyle = isLpScanSupported_ && !HasHiddenNetworkSsid() ? SCAN_TYPE_LOW_PRIORITY : SCAN_DEFAULT_TYPE;
-#endif
+    int scanStyle = WifiConfigCenter::GetInstance().GetLpScanAbility() && !HasHiddenNetworkSsid() ?
+        SCAN_TYPE_LOW_PRIORITY : SCAN_DEFAULT_TYPE;
     ActiveScan(rssi, scanStyle);
 }
 bool Perf5gHandoverService::HasHiddenNetworkSsid()
 {
     for (auto &ap : relationAps_) {
         WifiDeviceConfig config;
-        if (WifiSettings::GetInstance().GetDeviceConfig(ap.apInfo_.networkId, config) != 0) {
+        if (WifiSettings::GetInstance().GetDeviceConfig(ap.apInfo_.networkId, config) < 0) {
             continue;
         }
         if (config.hiddenSSID) {

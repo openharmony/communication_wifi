@@ -86,12 +86,8 @@ void AdvanceScanFuzzTest()
 void IsWifiScanAllowedFuzzTest(const uint8_t* data, size_t size)
 {
     bool status = (static_cast<int>(data[0]) % TWO) ? true : false;
-#ifdef SUPPORT_LP_SCAN
     int scanStyle = SCAN_DEFAULT_TYPE;
     pWifiScanServiceImpl.IsWifiScanAllowed(scanStyle, status);
-#else
-    pWifiScanServiceImpl.IsWifiScanAllowed(status);
-#endif
 }
 
 void GetScanInfoListFuzzTest(const uint8_t* data, size_t size)

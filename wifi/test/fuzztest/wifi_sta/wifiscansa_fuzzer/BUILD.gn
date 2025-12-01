@@ -78,10 +78,7 @@ ohos_fuzztest("WifiScansaFuzzTest") {
     "HDI_WPA_INTERFACE_SUPPORT",
     "HDI_CHIP_INTERFACE_SUPPORT",
   ]
- 
-  if (wifi_feature_with_lp_scan) {
-    defines += [ "SUPPORT_LP_SCAN" ]
-  }
+
   if (is_asan || use_clang_coverage) {
     defines += [ "DTFUZZ_TEST" ]
   }

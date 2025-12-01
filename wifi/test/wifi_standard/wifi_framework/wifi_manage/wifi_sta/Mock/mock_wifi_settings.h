@@ -127,6 +127,7 @@ public:
     virtual void SetDeviceNameApSsid(std::string ssid) = 0;
     virtual bool IsRandomMacDisabled(int instId = 0) = 0;
     virtual int SetRandomMacDisabled(bool isRandomMacDisabled, int instId = 0) = 0;
+    virtual int GetPackageInfoByName(std::string name, std::vector<PackageInfo> &packageInfo) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -233,6 +234,7 @@ public:
     MOCK_METHOD1(SetDeviceNameApSsid, void(std::string ssid));
     MOCK_METHOD1(IsRandomMacDisabled, bool(int instId));
     MOCK_METHOD2(SetRandomMacDisabled, int(bool isRandomMacDisabled, int instId));
+    MOCK_METHOD2(GetPackageInfoByName, int(std::string name, std::vector<PackageInfo> &packageInfo));
 };
 }  // namespace OHOS
 }  // namespace Wifi

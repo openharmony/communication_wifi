@@ -150,6 +150,7 @@ ohos_unittest("wifi_sub_manage_unittest") {
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "ability_runtime:extension_manager",
+    "ability_runtime:connection_obs_manager",
     "ability_runtime:wantagent_innerkits",
     "access_token:libaccesstoken_sdk",
     "bundle_framework:appexecfwk_base",

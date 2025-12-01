@@ -151,6 +151,7 @@ ohos_unittest("wifi_controller_unittest") {
     "ability_base:zuri",
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
+    "ability_runtime:connection_obs_manager",
     "ability_runtime:wantagent_innerkits",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",

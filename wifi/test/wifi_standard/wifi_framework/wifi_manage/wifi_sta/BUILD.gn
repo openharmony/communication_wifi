@@ -74,13 +74,13 @@ local_base_sources = [
   "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_sta_hal_interface.cpp",
   "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_supplicant_hal_interface.cpp",
   "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta/Mock/net_conn_client.cpp",
-  "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
   "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_chr_adapter.cpp",
   "Mock/mock_block_connect_service.cpp",
   "Mock/mock_dhcp_service.cpp",
   "Mock/mock_if_config.cpp",
   "Mock/mock_state_machine.cpp",
   "Mock/mock_wifi_chip_hal_interface.cpp",
+  "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
   "Mock/mock_wifi_settings.cpp",
 ]
 
@@ -161,6 +161,7 @@ local_base_external_deps = [
   "ability_runtime:ability_manager",
   "ability_runtime:app_manager",
   "ability_runtime:extension_manager",
+  "ability_runtime:connection_obs_manager",
   "ability_runtime:wantagent_innerkits",
   "access_token:libaccesstoken_sdk",
   "bundle_framework:appexecfwk_base",

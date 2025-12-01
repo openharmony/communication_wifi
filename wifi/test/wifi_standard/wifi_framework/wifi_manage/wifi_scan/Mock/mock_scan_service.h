@@ -27,7 +27,7 @@ public:
     bool InitScanService(const IScanSerivceCallbacks &iScanSerivceCallbacks);
     void UnInitScanService();
     void RegisterScanCallbacks(const IScanSerivceCallbacks &iScanSerivceCallbacks);
-    ErrCode Scan(ScanType scanType);
+    ErrCode Scan(ScanType scanType, int scanStyle = SCAN_DEFAULT_TYPE);
     ErrCode ScanWithParam(const WifiScanParams &params, ScanType scanType);
     void SystemScanProcess(bool scanAtOnce);
     void SystemSingleScanProcess();

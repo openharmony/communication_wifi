@@ -44,6 +44,16 @@ namespace Wifi {
 #define SCAN_SCENE_ALL 254 /* all Scenario */
 #define SCAN_SCENE_MAX 255 /* invalid value */
 
+/* ScanStyle */
+#ifdef SUPPORT_LP_SCAN
+inline const int SCAN_TYPE_LOW_PRIORITY = 1 << 0;
+#endif
+inline const int SCAN_TYPE_LOW_SPAN = 1 << 8;
+inline const int SCAN_TYPE_LOW_POWER = 9;
+inline const int SCAN_TYPE_HIGH_ACCURACY = 0;
+inline const int SCAN_TYPE_INVALID = 0xFF;
+inline const int SCAN_DEFAULT_TYPE = SCAN_TYPE_HIGH_ACCURACY;
+
 /* Scanning mode of the control policy */
 enum class ScanMode {
     APP_FOREGROUND_SCAN = 0, /* Scan initiated by the foreground application */
@@ -145,7 +155,7 @@ struct WifiScanParams {
     WifiScanParams()
     {
         band = 0;
-        scanStyle = 0xFF;
+        scanStyle = SCAN_DEFAULT_TYPE;
     }
 };
 

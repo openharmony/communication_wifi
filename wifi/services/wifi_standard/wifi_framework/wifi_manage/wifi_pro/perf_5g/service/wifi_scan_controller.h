@@ -28,7 +28,7 @@ public:
     explicit WifiScanController(std::vector<std::shared_ptr<IDualBandScanStrategy>> scanStrategys);
     ~WifiScanController() override;
     bool TryToScan(int rssi, bool needScanInMonitor, int connectedApFreq,
-        std::unordered_set<int> &monitorApFreqs) override;
+        std::unordered_set<int> &monitorApFreqs, int scanStyle = SCAN_DEFAULT_TYPE) override;
     bool IsFastScan() override;
     bool IsActiveScansExhausted() override;
 private:
@@ -40,7 +40,7 @@ public:
     StrongRssiScanStrategy();
     ~StrongRssiScanStrategy() override;
     bool TryToScan(int rssi, bool needScanInMonitor, int connectedApFreq,
-        std::unordered_set<int> &monitorApFreqs) override;
+        std::unordered_set<int> &monitorApFreqs, int scanStyle = SCAN_DEFAULT_TYPE) override;
     bool IsFastScan() override;
     bool IsActiveScansExhausted() override;
 private:
@@ -54,7 +54,7 @@ public:
     PeriodicScanStrategy();
     ~PeriodicScanStrategy() override;
     bool TryToScan(int rssi, bool needScanInMonitor, int connectedApFreq,
-        std::unordered_set<int> &monitorApFreqs) override;
+        std::unordered_set<int> &monitorApFreqs, int scanStyle = SCAN_DEFAULT_TYPE) override;
     bool IsFastScan() override;
     bool IsActiveScansExhausted() override;
 private:

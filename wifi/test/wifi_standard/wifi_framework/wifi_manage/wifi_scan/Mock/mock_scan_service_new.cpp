@@ -70,7 +70,7 @@ void ScanService::HandleInnerEventReport(ScanInnerEventType innerEvent)
     return;
 }
 
-ErrCode ScanService::Scan(ScanType scanType)
+ErrCode ScanService::Scan(ScanType scanType, int scanStyle)
 {
     return WIFI_OPT_SUCCESS;
 }
@@ -286,27 +286,27 @@ void ScanService::GetScanControlInfo()
     return;
 }
 
-ErrCode ScanService::AllowExternScan()
+ErrCode ScanService::AllowExternScan(ScanType scanType, int &scanStyle)
 {
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanService::AllowSystemTimerScan()
+ErrCode ScanService::AllowSystemTimerScan(ScanType scanType, int &scanStyle)
 {
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanService::AllowPnoScan()
+ErrCode ScanService::AllowPnoScan(ScanType scanType, int &scanStyle)
 {
     return WIFI_OPT_SUCCESS;
 }
 
-bool ScanService::AllowSystemSingleScan()
+Error ScanService::AllowSystemSingleScan(ScanType scanType, int &scanStyle)
 {
-    return true;
+    return WIFI_OPT_SUCCESS;
 }
 
-ErrCode ScanService::AllowScanByType(ScanType scanType)
+ErrCode ScanService::AllowScanByType(ScanType scanType, int &scanStyle)
 {
     return WIFI_OPT_SUCCESS;
 }
@@ -501,12 +501,12 @@ bool ScanService::AllowScanByMovingFreeze(ScanMode appRunMode)
     return true;
 }
 
-bool ScanService::AllowScanByHid2dState()
+bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
 {
     return true;
 }
 
-bool ScanService::AllowScanByGameScene()
+bool ScanService::AllowScanByGameScene(ScanType scanType, int &scanStyle)
 {
     return true;
 }

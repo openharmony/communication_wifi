@@ -16,6 +16,7 @@
 #ifndef OHOS_WIFI_PRO_PERF_5G_I_DUAL_BAND_SCAN_STRATEGY_H
 #define OHOS_WIFI_PRO_PERF_5G_I_DUAL_BAND_SCAN_STRATEGY_H
 #include <unordered_set>
+#include "wifi_scan_msg.h"
 namespace OHOS {
 namespace Wifi {
 
@@ -23,7 +24,7 @@ class IDualBandScanStrategy {
 public:
     virtual ~IDualBandScanStrategy() = default;
     virtual bool TryToScan(int rssi, bool needScanInMonitor, int connectedApFreq,
-        std::unordered_set<int> &monitorApFreqs) = 0;
+        std::unordered_set<int> &monitorApFreqs, int scanStyle = SCAN_DEFAULT_TYPE) = 0;
     virtual bool IsFastScan() = 0;
     virtual bool IsActiveScansExhausted() = 0;
 };

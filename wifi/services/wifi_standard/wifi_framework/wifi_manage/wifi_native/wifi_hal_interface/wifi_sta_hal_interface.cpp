@@ -231,6 +231,8 @@ WifiErrorNo WifiStaHalInterface::Scan(const std::string &ifaceName, const WifiHa
     ScanParams scanParams;
     scanParams.ssids = scanParam.hiddenNetworkSsid;
     scanParams.freqs = scanParam.scanFreqs;
+    scanParams.fastConnectFlag = static_cast<uint8_t>(scanParam.scanStyle);
+    LOGI("call WifiStaHalInterface::%{public}d!", scanParams.fastConnectFlag);
     if (!HalDeviceManager::GetInstance().Scan(ifaceName, scanParams)) {
         return WIFI_HAL_OPT_FAILED;
     }

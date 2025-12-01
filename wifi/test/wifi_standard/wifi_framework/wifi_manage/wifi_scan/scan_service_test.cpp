@@ -269,7 +269,7 @@ public:
         ScanConfig scanConfig;
         scanConfig.scanBand = SCAN_BAND_BOTH_WITH_DFS;
         scanConfig.scanType = ScanType::SCAN_TYPE_EXTERN;
-        scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
+        scanConfig.scanStyle = SCAN_DEFAULT_TYPE;
         EXPECT_EQ(true, pScanService->SingleScan(scanConfig));
     }
 
@@ -278,7 +278,7 @@ public:
         ScanConfig scanConfig;
         scanConfig.scanBand = SCAN_BAND_UNSPECIFIED;
         scanConfig.scanType = ScanType::SCAN_TYPE_EXTERN;
-        scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
+        scanConfig.scanStyle = SCAN_DEFAULT_TYPE;
         scanConfig.scanFreqs.push_back(0);
         EXPECT_EQ(true, pScanService->SingleScan(scanConfig));
     }
@@ -288,7 +288,7 @@ public:
         ScanConfig scanConfig;
         scanConfig.scanBand = SCAN_BAND_24_GHZ;
         scanConfig.scanType = ScanType::SCAN_TYPE_EXTERN;
-        scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
+        scanConfig.scanStyle = SCAN_DEFAULT_TYPE;
         EXPECT_EQ(true, pScanService->SingleScan(scanConfig));
     }
 
@@ -297,7 +297,7 @@ public:
         ScanConfig scanConfig;
         scanConfig.scanBand = SCAN_BAND_UNSPECIFIED;
         scanConfig.scanType = ScanType::SCAN_TYPE_EXTERN;
-        scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
+        scanConfig.scanStyle = SCAN_DEFAULT_TYPE;
         EXPECT_EQ(false, pScanService->SingleScan(scanConfig));
     }
 
@@ -306,7 +306,7 @@ public:
         ScanConfig scanConfig;
         scanConfig.scanBand = static_cast<ScanBandType>(-1);
         scanConfig.scanType = ScanType::SCAN_TYPE_EXTERN;
-        scanConfig.scanStyle = SCAN_TYPE_HIGH_ACCURACY;
+        scanConfig.scanStyle = SCAN_DEFAULT_TYPE;
         EXPECT_EQ(false, pScanService->SingleScan(scanConfig));
     }
 
@@ -869,12 +869,14 @@ public:
     
     void AllowExternScanSuccess()
     {
-        pScanService->AllowExternScan();
+        int scanStyle = SCAN_DEFAULT_TYPE;
+        pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle);
     }
 
     void AllowExternScanFail1()
     {
         int staScene = 0;
+        int scanStyle = SCAN_DEFAULT_TYPE;
         StoreScanConfig cfg;
         pScanService->scanConfigMap.emplace(staScene, cfg);
 
@@ -884,20 +886,22 @@ public:
         forbidMode.scanMode = scanMode;
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
 
-        pScanService->AllowExternScan();
+        pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle);
     }
 
     void AllowExternScanFail2()
     {
+        int scanStyle = SCAN_DEFAULT_TYPE;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppRunningState())
             .WillRepeatedly(Return(ScanMode::SYS_FOREGROUND_SCAN));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
-        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_SUCCESS);
+        EXPECT_EQ(pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle), WIFI_OPT_SUCCESS);
     }
 
     void AllowExternScanFail3()
     {
         ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        int scanStyle = SCAN_DEFAULT_TYPE;
         ScanForbidMode forbidMode;
         forbidMode.scanScene = SCAN_SCENE_CONNECTED;
         forbidMode.scanMode = scanMode;
@@ -908,14 +912,15 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAppRunningState())
             .WillRepeatedly(Return(ScanMode::SYS_FOREGROUND_SCAN));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetThermalLevel()).WillRepeatedly(Return(FOUR));
-        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_SUCCESS);
+        EXPECT_EQ(pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle), WIFI_OPT_SUCCESS);
     }
 
     void AllowExternScanFail4()
     {
         pScanService->disableScanFlag = true;
+        int scanStyle = SCAN_DEFAULT_TYPE;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetThermalLevel(TWO)).Times(AtLeast(0));
-        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
+        EXPECT_EQ(pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle), WIFI_OPT_FAILED);
     }
 
     void AllowSystemTimerScanSuccess()
@@ -923,22 +928,25 @@ public:
         ScanIntervalMode mode;
         mode.scanScene = SCAN_SCENE_ALL;
         mode.scanMode = ScanMode::SYSTEM_TIMER_SCAN;
+        int scanStyle = SCAN_DEFAULT_TYPE;
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
-        pScanService->AllowSystemTimerScan();
+        pScanService->AllowSystemTimerScan(ScanType::SCAN_TYPE_SYSTEMTIMER, scanStyle);
     }
 
     void AllowSystemTimerScanFail1()
     {
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
-        pScanService->AllowSystemTimerScan();
+        int scanStyle = SCAN_DEFAULT_TYPE;
+        pScanService->AllowSystemTimerScan(ScanType::SCAN_TYPE_SYSTEMTIMER, scanStyle);
     }
 
     void AllowSystemTimerScanFail3()
     {
         pScanService->staStatus = FREQ_2_DOT_4_GHZ;
-        EXPECT_EQ(pScanService->AllowSystemTimerScan(), WIFI_OPT_FAILED);
+        int scanStyle = SCAN_DEFAULT_TYPE;
+        EXPECT_EQ(pScanService->AllowSystemTimerScan(ScanType::SCAN_TYPE_SYSTEMTIMER, scanStyle), WIFI_OPT_FAILED);
     }
 
     void AllowSystemTimerScanFail5()
@@ -950,6 +958,7 @@ public:
         }
         pScanService->customSceneTimeMap.emplace(staScene, now);
         ScanMode scanMode = ScanMode::SYSTEM_TIMER_SCAN;
+        int scanStyle = SCAN_DEFAULT_TYPE;
         ScanForbidMode forbidMode;
         forbidMode.scanScene = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
         forbidMode.scanMode = scanMode;
@@ -958,17 +967,18 @@ public:
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
         pScanService->staStatus = static_cast<int>(OperateResState::CLOSE_WIFI_FAILED);
         pScanService->scanTrustMode = false;
-        EXPECT_EQ(pScanService->AllowSystemTimerScan(), WIFI_OPT_FAILED);
+        EXPECT_EQ(pScanService->AllowSystemTimerScan(ScanType::SCAN_TYPE_SYSTEMTIMER, scanStyle), WIFI_OPT_FAILED);
     }
 
     void AllowPnoScanSuccess()
     {
         ScanIntervalMode mode;
         mode.scanScene = SCAN_SCENE_ALL;
+        int scanStyle = SCAN_DEFAULT_TYPE;
         mode.scanMode = ScanMode::PNO_SCAN;
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
-        pScanService->AllowPnoScan();
+        pScanService->AllowPnoScan(ScanType::SCAN_TYPE_PNO, scanStyle);
     }
 
     void GetStaSceneSuccess1()
@@ -1838,16 +1848,18 @@ public:
 
     void AllowScanByHid2dStateTest()
     {
+        int scanStyle = SCAN_DEFAULT_TYPE;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D));
-        EXPECT_TRUE(pScanService->AllowScanByHid2dState() == true);
+        EXPECT_TRUE(pScanService->AllowScanByHid2dState(ScanType::SCAN_TYPE_EXTERN, scanStyle) == true);
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetP2pBusinessType(P2pBusinessType::P2P_TYPE_CLASSIC));
-        EXPECT_TRUE(pScanService->AllowScanByHid2dState() == true);
+        EXPECT_TRUE(pScanService->AllowScanByHid2dState(ScanType::SCAN_TYPE_EXTERN, scanStyle) == true);
     }
 
     void AllowScanByGameSceneTest()
     {
+        int scanStyle = SCAN_DEFAULT_TYPE;
         pScanService->staStatus = static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED);
-        EXPECT_TRUE(pScanService->AllowScanByGameScene() == true);
+        EXPECT_TRUE(pScanService->AllowScanByGameScene(ScanType::SCAN_TYPE_EXTERN, scanStyle) == true);
     }
 
     void AllowCustomSceneCheckTest1()

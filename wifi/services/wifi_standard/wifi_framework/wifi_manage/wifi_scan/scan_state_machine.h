@@ -32,10 +32,6 @@
 
 namespace OHOS {
 namespace Wifi {
-inline const int SCAN_TYPE_LOW_SPAN = 0;
-inline const int SCAN_TYPE_LOW_POWER = 1;
-inline const int SCAN_TYPE_HIGH_ACCURACY = 2;
-inline const int SCAN_TYPE_INVALID = 0xFF;
 inline const int MAX_WAIT_SCAN_RESULT_TIME = 5 * 1000;
 inline const int SCAN_24GHZ_MAX_FREQUENCY = 2500;
 inline const int SCAN_5GHZ_MIN_FREQUENCY = 5000;

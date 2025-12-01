@@ -45,9 +45,7 @@ namespace Wifi {
 #define SCAN_SCENE_MAX 255 /* invalid value */
 
 /* ScanStyle */
-#ifdef SUPPORT_LP_SCAN
 inline const int SCAN_TYPE_LOW_PRIORITY = 1 << 0;
-#endif
 inline const int SCAN_TYPE_LOW_SPAN = 1 << 8;
 inline const int SCAN_TYPE_LOW_POWER = 9;
 inline const int SCAN_TYPE_HIGH_ACCURACY = 0;

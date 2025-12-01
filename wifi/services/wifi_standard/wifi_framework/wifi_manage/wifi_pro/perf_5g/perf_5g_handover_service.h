@@ -42,12 +42,16 @@ public:
     void HandleSignalInfoChange(InternalMessagePtr msg);
     void QoeUpdate(InternalMessagePtr msg);
     void OnDisconnectedExternal();
+    bool HasHiddenNetworkSsid();
+    void LoadRelationApInfo();
+ 
+public:
+    std::shared_ptr<DualBandRepostitory> pDualBandRepostitory_ = nullptr;
+    std::shared_ptr<ConnectedAp> connectedAp_ = nullptr;
 private:
     std::mutex mPerf5gMutex;
-    std::shared_ptr<ConnectedAp> connectedAp_ = nullptr;
     std::vector<RelationAp> relationAps_;
     std::vector<int32_t> monitorApIndexs_;
-    std::shared_ptr<DualBandRepostitory> pDualBandRepostitory_ = nullptr;
     std::shared_ptr<CandidateRelationApInfo> selectRelationAp_ = nullptr;
     std::shared_ptr<WifiScanController> pWifiScanController_ = nullptr;
     std::string bssidLastConnected_;
@@ -55,9 +59,6 @@ private:
     bool inMonitor_ = false;
     Pref5gStatisticsInfo perf5gChrInfo_;
     std::atomic<bool> isNewBssidConnected_ = true;
-#ifdef SUPPORT_LP_SCAN
-    bool isLpScanSupported_ = false;
-#endif
     void UpdateCurrentApInfo(InterScanInfo &wifiScanInfo);
     void UpdateRelationApInfo(std::vector<WifiDeviceConfig> &wifiDeviceConfigs, std::vector<InterScanInfo> &scanInfos);
     void GetCandidateRelationApInfo(std::vector<CandidateRelationApInfo> &candidateRelationApInfos,
@@ -80,13 +81,11 @@ private:
     void GetNoExistRelationInfo(std::vector<WifiDeviceConfig> &wifiDeviceConfigs,
         std::vector<InterScanInfo> &wifiScanInfos, std::unordered_set<std::string> &noExistRelationBssidSet,
         std::vector<RelationAp> &sameSsidAps, std::unordered_set<std::string> &existRelationBssidSet);
-    void LoadRelationApInfo();
     void PrintRelationAps();
     void InitConnectedAp(WifiLinkedInfo &wifiLinkedInfo, WifiDeviceConfig &wifiDeviceConfig);
     void HandleSwitchFailed(Perf5gSwitchResult switchResult);
     void OnDisconnected();
     void RemoveRelationApDuplicates(std::vector<RelationAp> &relationAps);
-    bool HasHiddenNetworkSsid();
     bool IsValidAp(int32_t relationApIndex);
 };
 }

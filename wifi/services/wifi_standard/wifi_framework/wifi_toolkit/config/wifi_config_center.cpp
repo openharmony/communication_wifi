@@ -1595,6 +1595,16 @@ bool WifiConfigCenter::GetBrowserState()
     return browserOn_;
 }
 
+void WifiConfigCenter::SetLpScanAbility(bool isSupportLpScan)
+{
+    isSupportLpScan_ = isSupportLpScan;
+}
+ 
+bool WifiConfigCenter::GetLpScanAbility()
+{
+    return isSupportLpScan_;
+}
+
 bool WifiConfigCenter::IsSameKeyMgmt(std::string scanKeyMgmt, std::string keyMgmt)
 {
     LOGI("IsSamekeyMgmt scanKeyMgmt:%{public}s, keyMgmt:%{public}s", scanKeyMgmt.c_str(), keyMgmt.c_str());

@@ -281,13 +281,10 @@ ErrCode ScanService::Scan(ScanType scanType, int scanStyle)
         WIFI_LOGE("Scan service has not started.\n");
         return WIFI_OPT_FAILED;
     }
-#ifdef SUPPORT_LP_SCAN
-    isLpScanSupported_ = OHOS::system::GetBoolParameter("lpscan", false);
-    if (!isLpScanSupported_ && scanStyle == SCAN_TYPE_LOW_PRIORITY) {
-        WIFI_LOGE("scanStyle is %{public}d, but chip do not support LP scan.\n", scanStyle);
+    if (!WifiConfigCenter::GetInstance().GetLpScanAbility() && scanStyle == SCAN_TYPE_LOW_PRIORITY) {
+        WIFI_LOGE("scanStyle is %{public}d, but do not support LP scan.\n", scanStyle);
         return WIFI_OPT_FAILED;
     }
-#endif
  
     if (ScanControlInner(scanType, scanStyle) != WIFI_OPT_SUCCESS) {
         return WIFI_OPT_FAILED;
@@ -302,11 +299,11 @@ ErrCode ScanService::Scan(ScanType scanType, int scanStyle)
 #ifndef OHOS_ARCH_LITE
     uid = GetCallingUid();
 #endif
-#ifndef SUPPORT_LP_SCAN
-    if (uid != LOCATOR_SA_UID && !GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
-        WIFI_LOGE("GetHiddenNetworkSsidList failed.\n");
+    if (scanStyle != SCAN_TYPE_LOW_PRIORITY) {
+        if (uid != LOCATOR_SA_UID && !GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
+            WIFI_LOGE("GetHiddenNetworkSsidList failed.\n");
+        }
     }
-#endif
  
     scanConfig.scanBand = SCAN_BAND_BOTH_WITH_DFS;
     scanConfig.fullScanFlag = true;
@@ -323,13 +320,12 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanTy
 {
     WIFI_LOGI("Enter ScanWithParam, freqs num:%{public}d.\n", (int)params.freqs.size());
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanType(scanType);
-#ifdef SUPPORT_LP_SCAN
-    isLpScanSupported_ = OHOS::system::GetBoolParameter("lpscan", false);
-    if (!isLpScanSupported_ && params.scanStyle == SCAN_TYPE_LOW_PRIORITY) {
+ 
+    if (!WifiConfigCenter::GetInstance().GetLpScanAbility() && params.scanStyle == SCAN_TYPE_LOW_PRIORITY) {
         WIFI_LOGE("scanStyle is %{public}d, but do not support LP scan.\n", params.scanStyle);
         return WIFI_OPT_FAILED;
     }
-#endif
+
     ScanConfig scanConfig;
     scanConfig.scanStyle = params.scanStyle;
     if (!scanStartedFlag) {
@@ -355,18 +351,19 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanTy
  
     scanConfig.fullScanFlag = params.ssid.empty() && params.bssid.empty() &&
         (params.band == static_cast<int>(SCAN_BAND_BOTH_WITH_DFS));
-#ifndef SUPPORT_LP_SCAN 
-    if (!params.ssid.empty()) {
-        scanConfig.hiddenNetworkSsid.push_back(params.ssid);
-    } else if (!GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
-        /*
-         * Invoke the interface provided by the configuration center to obtain the
-         * hidden network list.
-         */
-        WIFI_LOGE("GetHiddenNetworkSsidList failed.\n");
-    }
-#endif
 
+    if (scanConfig.scanStyle != SCAN_TYPE_LOW_PRIORITY) {
+        if (!params.ssid.empty()) {
+            scanConfig.hiddenNetworkSsid.push_back(params.ssid);
+        } else if (!GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
+            /*
+            * Invoke the interface provided by the configuration center to obtain the
+            * hidden network list.
+            */
+            WIFI_LOGE("GetHiddenNetworkSsidList failed.\n");
+        }
+    }
+    
     scanConfig.scanBand = static_cast<ScanBandType>(params.band);
     scanConfig.scanFreqs.assign(params.freqs.begin(), params.freqs.end());
     scanConfig.ssid = params.ssid;
@@ -394,11 +391,9 @@ ErrCode ScanService::ScanControlInner(ScanType scanType, int &scanStyle)
             return rlt;
         }
     } else if (scanType == ScanType::SCAN_TYPE_HIDDEN_AP) {
-#ifdef SUPPORT_LP_SCAN
         if (scanStyle == SCAN_TYPE_LOW_PRIORITY) {
             return WIFI_OPT_FAILED;
         }
-#endif
         return WIFI_OPT_SUCCESS;
     } else {
         if (!AllowScanByDisableScanCtrl()) {
@@ -1462,10 +1457,11 @@ void ScanService::StartSingleScanWithoutControl(int freq, int scanStyle)
     params.freqs.push_back(freq);
  
     ScanConfig scanConfig;
-    if (!GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
-        WIFI_LOGE("GetHiddenNetworkSsidList failed.\n");
+    if (scanStyle != SCAN_TYPE_LOW_PRIORITY) {
+        if (!GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
+            WIFI_LOGE("GetHiddenNetworkSsidList failed.\n");
+        }
     }
- 
     scanConfig.scanBand = static_cast<ScanBandType>(params.band);
     scanConfig.scanFreqs.assign(params.freqs.begin(), params.freqs.end());
     scanConfig.ssid = params.ssid;
@@ -1679,13 +1675,11 @@ ErrCode ScanService::AllowExternScan(ScanType scanType, int &scanStyle)
 ErrCode ScanService::AllowSystemTimerScan(ScanType scanType, int &scanStyle)
 {
     WIFI_LOGI("Enter AllowSystemTimerScan.\n");
-#ifdef SUPPORT_LP_SCAN
     if (scanStyle == SCAN_TYPE_LOW_PRIORITY) {
         WIFI_LOGW("Not allow LP scan in system timer scan");
         WriteScanLimitHiSysEvent("SYSTEM_SCAN", static_cast<int>(ScanLimitType::LP_SCANSTYLE));
         return WIFI_OPT_FAILED;
     }
-#endif
     if (WifiConfigCenter::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
         WIFI_LOGW("system timer scan not allow when wifi disable");
         WriteScanLimitHiSysEvent("SYSTEM_SCAN", static_cast<int>(ScanLimitType::WIFI_DISABLE));
@@ -1715,6 +1709,12 @@ ErrCode ScanService::AllowSystemTimerScan(ScanType scanType, int &scanStyle)
         WriteScanLimitHiSysEvent("SYSTEM_SCAN", static_cast<int>(ScanLimitType::STA_STATE));
         return WIFI_OPT_SCAN_NEXT_PERIOD;
     }
+
+    return AllowSystemTimerScanExtra(scanType, scanStyle);
+}
+ 
+ErrCode ScanService::AllowSystemTimerScanExtra(ScanType scanType, int &scanStyle)
+{
 
     int staScene = GetStaScene();
     /* Determines whether to allow scanning based on the STA status. */
@@ -1777,13 +1777,11 @@ ErrCode ScanService::AllowSystemTimerScan(ScanType scanType, int &scanStyle)
 ErrCode ScanService::AllowPnoScan(ScanType scanType, int &scanStyle)
 {
     WIFI_LOGD("Enter AllowPnoScan.\n");
-#ifdef SUPPORT_LP_SCAN
     if (scanStyle == SCAN_TYPE_LOW_PRIORITY) {
         WIFI_LOGW("Not allow LP scan in PNO");
         WriteScanLimitHiSysEvent("PNO_SCAN", static_cast<int>(ScanLimitType::LP_SCANSTYLE));
         return WIFI_OPT_FAILED;
     }
-#endif
     if (GetDeviceType() == ProductDeviceType::GLASSES) {
         WriteScanLimitHiSysEvent("PNO_SCAN", static_cast<int>(ScanLimitType::GLASSES_SCENE));
         return WIFI_OPT_FAILED;
@@ -2814,15 +2812,12 @@ bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
         WIFI_LOGW("Scan is not allowed in csat hid2d.");
         RecordScanLimitInfo(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
             ScanLimitType::HID2D_CAST);
-#ifdef SUPPORT_LP_SCAN
-        isLpScanSupported_ = OHOS::system::GetBoolParameter("lpscan", false);
-        if (isLpScanSupported_ && (scanType != ScanType::SCAN_TYPE_PNO &&
+        if (WifiConfigCenter::GetInstance().GetLpScanAbility() && (scanType != ScanType::SCAN_TYPE_PNO &&
             scanType != ScanType::SCAN_TYPE_SYSTEMTIMER)) {
             scanStyle = SCAN_TYPE_LOW_PRIORITY;
-            WIFI_LOGW("LP Scan is allowed in cast hid2d.");
+            WIFI_LOGI("LP Scan is allowed in cast hid2d.");
             return true;
         }
-#endif
         WIFI_LOGW("Scan is not allowed in cast hid2d.");
         return false;
     } else if ((miracastScene.scene & 0x07) > 0) {
@@ -2867,16 +2862,13 @@ bool ScanService::AllowScanByGameScene(ScanType scanType, int &scanStyle)
     WifiNetworkControlInfo NetworkControlInfo = WifiConfigCenter::GetInstance().GetNetworkControlInfo();
     if (NetworkControlInfo.state == GameSceneId::MSG_GAME_ENTER_PVP_BATTLE ||
         NetworkControlInfo.state == GameSceneId::MSG_GAME_STATE_FOREGROUND) {
-#ifdef SUPPORT_LP_SCAN
-        isLpScanSupported_ = OHOS::system::GetBoolParameter("lpscan", false);
-        if (isLpScanSupported_ && (scanType != ScanType::SCAN_TYPE_PNO &&
+        if (WifiConfigCenter::GetInstance().GetLpScanAbility() && (scanType != ScanType::SCAN_TYPE_PNO &&
             scanType != ScanType::SCAN_TYPE_SYSTEMTIMER)) {
-            WIFI_LOGI("Lp scan is allowed by Game Scene");
             scanStyle = SCAN_TYPE_LOW_PRIORITY;
+            WIFI_LOGI("LP Scan is allowed in cast hid2d.");
             return true;
         }
-#endif
-        WIFI_LOGI("Interval scan is not allowed in GameScene condition AllowScanByGameScene = %{public}d",
+        WIFI_LOGW("Interval scan is not allowed in GameScene condition AllowScanByGameScene = %{public}d",
             NetworkControlInfo.state);
         return false;
     }

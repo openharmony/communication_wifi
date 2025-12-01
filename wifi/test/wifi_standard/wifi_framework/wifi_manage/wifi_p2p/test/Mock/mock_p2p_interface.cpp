@@ -233,7 +233,7 @@ ErrCode P2pInterface::GetRptStationsList(std::vector<StationInfo> &result)
     return WIFI_OPT_SUCCESS;
 }
 
-void P2pInterface::NotifyWscDialogConfirmResult(bool isAccept)
+void P2pInterface::NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPincode)
 {
     return;
 }

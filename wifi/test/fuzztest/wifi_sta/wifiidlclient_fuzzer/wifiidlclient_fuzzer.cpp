@@ -29,42 +29,42 @@
 #include "i_wifi_supplicant_iface.h"
 #include "wifi_idl_client.h"
 #include "wifi_log.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace Wifi {
-void OnIWifiTest(const uint8_t* data, size_t size)
+void OnIWifiTest()
 {
     Start();
     Stop();
     NotifyClear();
 }
 
-void OnIWifiChipTest(const uint8_t* data, size_t size)
+void OnIWifiChipTest(FuzzedDataProvider& FDP)
 {
-    bool isSupport = true;
+    bool isSupport = FDP.ConsumeBool();
     IsChipSupportDbdc(&isSupport);
     IsChipSupportCsa(&isSupport);
     IsChipSupportRadarDetect(&isSupport);
     IsChipSupportDfsChannel(&isSupport);
     IsChipSupportIndoorChannel(&isSupport);
 
-    int32_t id = 1;
+    int32_t id = FDP.ConsumeIntegral<int32_t>();
     GetChipId(&id);
     ConfigComboModes(id);
     GetComboModes(&id);
 }
 
-void OnIWifiIfaceTest(const uint8_t* data, size_t size)
+void OnIWifiIfaceTest(FuzzedDataProvider& FDP)
 {
     char ifname[] = "OHOS_wifi";
-    int32_t datas = 0;
+    int32_t datas = FDP.ConsumeIntegral<int32_t>();
     GetName(ifname, datas);
-
-    int32_t type = 0;
+    int32_t type = FDP.ConsumeIntegral<int32_t>();
     GetType(&type);
 }
 
-void OnIWifiP2pIfaceTest(const uint8_t* data, size_t size)
+void OnIWifiP2pIfaceTest(FuzzedDataProvider& FDP)
 {
     P2pStart();
     P2pStop();
@@ -74,7 +74,7 @@ void OnIWifiP2pIfaceTest(const uint8_t* data, size_t size)
     P2pStopFind();
     P2pCancelConnect();
 
-    int datas = 0;
+    int datas = FDP.ConsumeIntegral<int>();
     P2pSetRandomMac(datas);
     P2pRemoveNetwork(datas);
     P2pSetWfdEnable(datas);
@@ -104,8 +104,8 @@ void OnIWifiP2pIfaceTest(const uint8_t* data, size_t size)
     char deviceAddress[] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
     P2pGetDeviceAddress(deviceAddress, datas);
 
-    int data1 = 1;
-    int data2 = 2;
+    int data1 = FDP.ConsumeIntegral<int>();
+    int data2 = FDP.ConsumeIntegral<int>();
     P2pSetExtListen(datas, data1, data2);
     P2pSetListenChannel(data1, data2);
     P2pAddGroup(datas, data1, data2);
@@ -113,18 +113,18 @@ void OnIWifiP2pIfaceTest(const uint8_t* data, size_t size)
     P2pReinvoke(datas, chardata);
 }
 
-void OnIWifiStaIfaceTest(const uint8_t* data, size_t size)
+void OnIWifiStaIfaceTest(FuzzedDataProvider& FDP)
 {
     SaveNetworkConfig();
     StopPnoScan();
     StopWps();
     WpaBlocklistClear();
 
-    bool mode = false;
+    bool mode = FDP.ConsumeBool();
     SetSuspendMode(mode);
     SetPowerMode(mode);
 
-    int networkId = 0;
+    int networkId = FDP.ConsumeIntegral<int>();
     RemoveNetwork(networkId);
     AddNetwork(&networkId);
     EnableNetwork(networkId);
@@ -133,16 +133,16 @@ void OnIWifiStaIfaceTest(const uint8_t* data, size_t size)
     GetScanInfos(&networkId);
 
     unsigned char mac[] = {0x55, 0x44, 0x33, 0x22, 0x11, 0x00};
-    int lenmac = 6;
+    int lenmac = FDP.ConsumeIntegral<int>();
     GetDeviceMacAddress(mac, &lenmac);
     SetScanningMacAddress(mac, lenmac);
     DeauthLastRoamingBssid(mac, lenmac);
 
-    const int porttype = 1;
+    const int porttype = FDP.ConsumeIntegral<int>();
     SetAssocMacAddr(mac, lenmac, porttype);
 }
 
-void OnIWifiSupplicantIfaceTest(const uint8_t* data, size_t size)
+void OnIWifiSupplicantIfaceTest(FuzzedDataProvider& FDP)
 {
     StartSupplicant();
     StopSupplicant();
@@ -152,21 +152,21 @@ void OnIWifiSupplicantIfaceTest(const uint8_t* data, size_t size)
     Reassociate();
     Disconnect();
 
-    int networkId = 1;
+    int networkId = FDP.ConsumeIntegral<int>();
     Connect(networkId);
 
-    int enable = 1;
+    int enable = FDP.ConsumeIntegral<int>();
     SetPowerSave(enable);
 }
 
-void OnIWifiHotSpotIfaceTest(const uint8_t* data, size_t size)
+void OnIWifiHotSpotIfaceTest(FuzzedDataProvider& FDP)
 {
-    int id = 0;
+    int id = FDP.ConsumeIntegral<int>();
     char ifaceName[] = "p2p0";
     StartSoftAp(id, ifaceName);
     StopSoftAp(id);
 
-    int model = 1;
+    int model = FDP.ConsumeIntegral<int>();
     WpaSetPowerModel(model, id);
     WpaGetPowerModel(&model, id);
 
@@ -174,13 +174,13 @@ void OnIWifiHotSpotIfaceTest(const uint8_t* data, size_t size)
     SetCountryCode(code, id);
 
     unsigned char mac[] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55};
-    int lenmac = 6;
+    int lenmac = FDP.ConsumeIntegral<int>();
     SetMacFilter(mac, lenmac, id);
     DelMacFilter(mac, lenmac, id);
     DisassociateSta(mac, lenmac, id);
 }
 
-void OnWifiIdlClientTest(const uint8_t* data, size_t size)
+void OnWifiIdlClientTest(FuzzedDataProvider& FDP)
 {
     WifiIdlClient wifiClient;
     wifiClient.ExitAllClient();
@@ -207,7 +207,7 @@ void OnWifiIdlClientTest(const uint8_t* data, size_t size)
     wifiClient.ReqP2pFlushService();
     wifiClient.ReqP2pSaveConfig();
 
-    int networkId = 1;
+    int networkId = FDP.ConsumeIntegral<int>();
     wifiClient.ReqConnect(networkId);
     wifiClient.RemoveDevice(networkId);
     wifiClient.ReqEnableNetwork(networkId);
@@ -215,23 +215,25 @@ void OnWifiIdlClientTest(const uint8_t* data, size_t size)
     wifiClient.ReqP2pRemoveNetwork(networkId);
 }
 
-bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
+bool DoSomethingInterestingWithMyAPI(FuzzedDataProvider& FDP)
 {
-    OnIWifiTest(data, size);
-    OnIWifiChipTest(data, size);
-    OnIWifiIfaceTest(data, size);
-    OnIWifiP2pIfaceTest(data, size);
-    OnIWifiStaIfaceTest(data, size);
-    OnIWifiSupplicantIfaceTest(data, size);
-    OnIWifiHotSpotIfaceTest(data, size);
-    OnWifiIdlClientTest(data, size);
+    FuzzedDataProvider FDP(data, size);
+    OnIWifiTest();
+    OnIWifiChipTest(FDP);
+    OnIWifiIfaceTest(FDP);
+    OnIWifiP2pIfaceTest(FDP);
+    OnIWifiStaIfaceTest(FDP);
+    OnIWifiSupplicantIfaceTest(FDP);
+    OnIWifiHotSpotIfaceTest(FDP);
+    OnWifiIdlClientTest(FDP);
     return true;
 }
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::Wifi::DoSomethingInterestingWithMyAPI(data, size);
+    FuzzedDataProvider FDP(data, size);
+    OHOS::Wifi::DoSomethingInterestingWithMyAPI(FDP);
     return 0;
 }
 }

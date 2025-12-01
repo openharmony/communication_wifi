@@ -759,6 +759,8 @@ void ConcreteMangerMachine::HandleSelfcureResetSta(InternalMessagePtr msg)
     ret = WifiServiceScheduler::GetInstance().AutoStartStaService(id, ifaceName, RESET_STA_TYPE_SELFCURE);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("HandleSelfcureResetSta AutoStartStaService failed ret =%{public}d \n", ret);
+        WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, INSTID_WLAN0);
+        SwitchState(pIdleState);
         return;
     }
 }

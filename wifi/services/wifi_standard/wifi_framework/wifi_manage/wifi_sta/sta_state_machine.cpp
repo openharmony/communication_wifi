@@ -1766,14 +1766,18 @@ void StaStateMachine::GetIpState::GoInState()
         assignMethod = config.wifiIpConfig.assignMethod;
     }
     bool isStaticIpv6 = false;
+    bool isStaticIpv4 = false;
     // static ipv6 does not need dhcp
     WifiDeviceConfig wificonfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, wificonfig,
-        pStaStateMachine->m_instId) == 0 &&
-        wificonfig.wifiIpConfig.assignMethod ==  AssignIpMethod::STATIC &&
-        wificonfig.wifiIpConfig.staticIpAddress.ipAddress.address.family == 1) {
-        WIFI_LOGI("Static IPv6 stop DHCP.\n");
-        isStaticIpv6 = true;
+        pStaStateMachine->m_instId) == 0 && wificonfig.wifiIpConfig.assignMethod ==  AssignIpMethod::STATIC) {
+        if (wificonfig.wifiIpConfig.staticIpAddress.ipAddress.address.family == 1) {
+            WIFI_LOGI("Static IPv6 stop DHCP for ipv6.\n");
+            isStaticIpv6 = true;
+        } else if (wificonfig.wifiIpConfig.staticIpAddress.ipAddress.address.family == 0) {
+            WIFI_LOGI("Static IPv4 stop DHCP for ipv4.\n");
+            isStaticIpv4 = true;
+        }
     }
 
     HandleStaticIpv6(isStaticIpv6);
@@ -1800,7 +1804,7 @@ void StaStateMachine::GetIpState::GoInState()
             pStaStateMachine->linkedInfo.bssid.c_str(), pStaStateMachine->linkedInfo.bssid.size()) == EOK) {
             config.prohibitUseCacheIp = IsProhibitUseCacheIp();
         }
-        config.isStaticIpv4 = assignMethod == AssignIpMethod::STATIC;
+        config.isStaticIpv4 = isStaticIpv4;
         config.bIpv6 = !isStaticIpv6;
         config.bSpecificNetwork = pStaStateMachine->IsSpecificNetwork();
         if (strncpy_s(config.ifname, sizeof(config.ifname), ifname.c_str(), ifname.length()) != EOK) {
@@ -1813,7 +1817,8 @@ void StaStateMachine::GetIpState::GoInState()
             "IsSpecificNetwork %{public}d", pStaStateMachine->currentTpType, dhcpRet, pStaStateMachine->isRoam,
             pStaStateMachine->m_instId, config.bSpecificNetwork);
         if (dhcpRet == 0) {
-            if (!config.isStaticIpv4) {
+            // start timer to deal with dhcp timeout when not static ip
+            if (!isStaticIpv4 && !isStaticIpv6) {
                 WIFI_LOGI("StartTimer CMD_START_GET_DHCP_IP_TIMEOUT 30s");
                 pStaStateMachine->StartTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT),
                     STA_SIGNAL_START_GET_DHCP_IP_DELAY);

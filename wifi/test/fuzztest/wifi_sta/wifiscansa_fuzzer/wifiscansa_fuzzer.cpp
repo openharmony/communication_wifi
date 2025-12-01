@@ -28,11 +28,13 @@
 #include "wifi_settings.h"
 #include "wifi_toggler_manager.h"
 #include "wifi_errcode.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace Wifi {
 constexpr int TWO = 2;
 constexpr int U32_AT_SIZE_ZERO = 4;
+static const int32_t NUM_BYTES = 1;
 
 OHOS::Wifi::WifiScanServiceImpl pWifiScanServiceImpl;
 WifiScanMgrServiceImpl pWifiScanMgrServiceImpl;
@@ -122,9 +124,9 @@ void GetSupportedFeaturesFuzzTest(const uint8_t* data, size_t size)
     pWifiScanServiceImpl.GetSupportedFeatures(featuresInt64);
 }
 
-void SaBasicDumpFuzzTest(const uint8_t* data, size_t size)
+void SaBasicDumpFuzzTest(FuzzedDataProvider& FDP)
 {
-    std::string result;
+    std::string result = FDP.ConsumeBytesAsString(NUM_BYTES);
     pWifiScanServiceImpl.SaBasicDump(result);
 }
 
@@ -157,7 +159,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
-
+    FuzzedDataProvider FDP(data, size);
+    OHOS::Wifi::SaBasicDumpFuzzTest(FDP);
     OHOS::Wifi::SetScanControlInfoFuzzTest();
     OHOS::Wifi::ScanFuzzTest(data, size);
     OHOS::Wifi::AdvanceScanFuzzTest();
@@ -166,7 +169,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::SetScanOnlyAvailableFuzzTest(data, size);
     OHOS::Wifi::StartWifiPnoScanFuzzTest(data, size);
     OHOS::Wifi::GetSupportedFeaturesFuzzTest(data, size);
-    OHOS::Wifi::SaBasicDumpFuzzTest(data, size);
     OHOS::Wifi::RegisterCallBackFuzzTest(data, size);
     OHOS::Wifi::WifiScanServiceImplFuzzTest(data, size);
     OHOS::Wifi::WifiScanMgrServiceImplFuzzTest(data, size);

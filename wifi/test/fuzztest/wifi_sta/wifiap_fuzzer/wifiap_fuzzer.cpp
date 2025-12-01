@@ -32,14 +32,13 @@
 #include "ap_stations_manager.h"
 #include "wifi_ap_nat_manager.h"
 #include "mock_wifi_ap_service.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace Wifi {
-constexpr int TWO = 2;
 constexpr int THREE = 3;
 constexpr int U32_AT_SIZE_ZERO = 4;
 constexpr int SIX = 6;
-FuzzedDataProvider *FDP = nullptr;
 static const int32_t NUM_BYTES = 1;
 
 MockPendant *pMockPendant = new MockPendant();
@@ -52,7 +51,7 @@ std::shared_ptr<ApRootState> pApRootState = std::make_shared<ApRootState>();
 std::shared_ptr<ApStationsManager> pApStationsManager = std::make_shared<ApStationsManager>();
 std::shared_ptr<WifiApNatManager> pWifiApNatManager = std::make_shared<WifiApNatManager>();
 
-void UpdateApChannelConfigFuzzTest(const uint8_t* data, size_t size)
+void UpdateApChannelConfigFuzzTest()
 {
     HotspotConfig apConfig;
     apConfig.SetBand(BandType::BAND_2GHZ);
@@ -62,25 +61,26 @@ void UpdateApChannelConfigFuzzTest(const uint8_t* data, size_t size)
     pApConfigUse->UpdateApChannelConfig(apConfig);
 }
 
-void GetBestChannelFor2GFuzzTest(const uint8_t* data, size_t size)
+void GetBestChannelFor2GFuzzTest()
 {
     pApConfigUse->GetBestChannelFor2G();
 }
 
-void GetBestChannelFor5GFuzzTest(const uint8_t* data, size_t size)
+void GetBestChannelFor5GFuzzTest()
 {
     HotspotConfig apConfig;
     apConfig.SetBandWidth(AP_BANDWIDTH_DEFAULT);
     pApConfigUse->GetBestChannelFor5G(apConfig);
 }
 
-void GetChannelFromDrvOrXmlByBandFuzzTest(const uint8_t* data, size_t size)
+void GetChannelFromDrvOrXmlByBandFuzzTest(FuzzedDataProvider& FDP)
 {
-    BandType bandType = static_cast<BandType>(static_cast<int>(data[0]) % SIX);
+    int randomInt = FDP.ConsumeIntegral<int>();
+    BandType bandType = static_cast<BandType>(randomInt % SIX);
     pApConfigUse->GetChannelFromDrvOrXmlByBand(bandType);
 }
 
-void FilterIndoorChannelFuzzTest(const uint8_t* data, size_t size)
+void FilterIndoorChannelFuzzTest()
 {
     std::vector<int> channels = {36, 40, 44, 48, 52, 56};
     pApConfigUse->FilterIndoorChannel(channels);
@@ -88,32 +88,33 @@ void FilterIndoorChannelFuzzTest(const uint8_t* data, size_t size)
     pApConfigUse->FilterIndoorChannel(channels1);
 }
 
-void Filter165ChannelFuzzTest(const uint8_t* data, size_t size)
+void Filter165ChannelFuzzTest()
 {
     std::vector<int> channels = {36, 165};
     pApConfigUse->Filter165Channel(channels);
 }
 
-void JudgeDbacWithP2pFuzzTest(const uint8_t* data, size_t size)
+void JudgeDbacWithP2pFuzzTest()
 {
     HotspotConfig apConfig;
     apConfig.SetBand(BandType::BAND_2GHZ);
     pApConfigUse->JudgeDbacWithP2p(apConfig);
 }
 
-void GetIndoorChanByCountryCodeFuzzTest(const uint8_t* data, size_t size)
+void GetIndoorChanByCountryCodeFuzzTest(FuzzedDataProvider& FDP)
 {
-    std::string countryCode = std::string(reinterpret_cast<const char*>(data), size);
+    std::string countryCode = FDP.ConsumeBytesAsString(NUM_BYTES);
     pApConfigUse->GetIndoorChanByCountryCode(countryCode);
 }
 
-void GetPreferredChannelByBandFuzzTest(const uint8_t* data, size_t size)
+void GetPreferredChannelByBandFuzzTest(FuzzedDataProvider& FDP)
 {
-    BandType bandType = static_cast<BandType>(static_cast<int>(data[0]) % SIX);
+    int randomInt = FDP.ConsumeIntegral<int>();
+    BandType bandType = static_cast<BandType>(randomInt % SIX);
     pApConfigUse->GetPreferredChannelByBand(bandType);
 }
 
-void WifiApRootStateFuzzTest(const uint8_t* data, size_t size)
+void WifiApRootStateFuzzTest()
 {
     pApRootState->GoInState();
     pApRootState->GoOutState();
@@ -128,13 +129,13 @@ void WifiApRootStateFuzzTest(const uint8_t* data, size_t size)
     pApRootState->ExecuteStateMsg(msg);
 }
 
-void BlockListAndStationFuzzTest()
+void BlockListAndStationFuzzTest(FuzzedDataProvider& FDP)
 {
     StationInfo staInfo;
-    staInfo.deviceName = FDP->ConsumeBytesAsString(NUM_BYTES);
-    staInfo.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
-    staInfo.bssidType = FDP->ConsumeIntegral<int>();
-    staInfo.ipAddr = FDP->ConsumeBytesAsString(NUM_BYTES);
+    staInfo.deviceName = FDP.ConsumeBytesAsString(NUM_BYTES);
+    staInfo.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    staInfo.bssidType = FDP.ConsumeIntegral<int>();
+    staInfo.ipAddr = FDP.ConsumeBytesAsString(NUM_BYTES);
  
     pApStationsManager->AddBlockList(staInfo);
     pApStationsManager->DelBlockList(staInfo);
@@ -144,18 +145,18 @@ void BlockListAndStationFuzzTest()
     pApStationsManager->DelAssociationStation(staInfo);
 }
 
-void EnableAllBlockListFuzzTest(const uint8_t* data, size_t size)
+void EnableAllBlockListFuzzTest()
 {
     pApStationsManager->EnableAllBlockList();
 }
 
-void StationLeaveFuzzTest(const uint8_t* data, size_t size)
+void StationLeaveFuzzTest(FuzzedDataProvider& FDP)
 {
-    std::string mac = std::string(reinterpret_cast<const char*>(data), size);
+    std::string mac = FDP.ConsumeBytesAsString(NUM_BYTES);
     pApStationsManager->StationLeave(mac);
 }
 
-void GetAllConnectedStationsFuzzTest(const uint8_t* data, size_t size)
+void GetAllConnectedStationsFuzzTest()
 {
     std::vector<std::string> staMacList;
     std::vector<std::string> staMacListCom;
@@ -166,34 +167,34 @@ void GetAllConnectedStationsFuzzTest(const uint8_t* data, size_t size)
     pApStationsManager->GetAllConnectedStations();
 }
 
-void EnableInterfaceNatFuzzTest(const uint8_t* data, size_t size)
+void EnableInterfaceNatFuzzTest(FuzzedDataProvider& FDP)
 {
-    bool enable = (static_cast<int>(data[0]) % TWO) ? true : false;
-    std::string inInterfaceName = std::string(reinterpret_cast<const char*>(data), size);
-    std::string outInterfaceName = std::string(reinterpret_cast<const char*>(data), size);
+    bool enable = FDP.ConsumeBool();
+    std::string inInterfaceName = FDP.ConsumeBytesAsString(NUM_BYTES);
+    std::string outInterfaceName = FDP.ConsumeBytesAsString(NUM_BYTES);
     pWifiApNatManager->EnableInterfaceNat(enable, inInterfaceName, outInterfaceName);
 }
 
-void SetForwardingFuzzTest(const uint8_t* data, size_t size)
+void SetForwardingFuzzTest(FuzzedDataProvider& FDP)
 {
-    bool enable = (static_cast<int>(data[0]) % TWO) ? true : false;
+    bool enable = FDP.ConsumeBool();
     pWifiApNatManager->SetForwarding(enable);
 }
 
-void WriteDataToFileFuzzTest(const uint8_t* data, size_t size)
+void WriteDataToFileFuzzTest(FuzzedDataProvider& FDP)
 {
     std::string fileName = "wlan0";
-    std::string content = std::string(reinterpret_cast<const char*>(data), size);
+    std::string content = FDP.ConsumeBytesAsString(NUM_BYTES);
     pWifiApNatManager->WriteDataToFile(fileName, content);
 }
 
-void EnableHotspotFuzzTest(const uint8_t* data, size_t size)
+void EnableHotspotFuzzTest()
 {
     pApService->EnableHotspot();
     pApInterface->EnableHotspot();
 }
 
-void SetHotspotConfigFuzzTest(const uint8_t* data, size_t size)
+void SetHotspotConfigFuzzTest()
 {
     HotspotConfig apConfig;
     apConfig.SetChannel(1);
@@ -203,85 +204,85 @@ void SetHotspotConfigFuzzTest(const uint8_t* data, size_t size)
     pApInterface->SetHotspotConfig(apConfig);
 }
 
-void SetHotspotIdleTimeoutFuzzTest(const uint8_t* data, size_t size)
+void SetHotspotIdleTimeoutFuzzTest(FuzzedDataProvider& FDP)
 {
-    int time = static_cast<int>(data[0]);
+    int time = FDP.ConsumeIntegral<int>();
     pApService->SetHotspotIdleTimeout(time);
     pApInterface->SetHotspotIdleTimeout(time);
 }
 
-void AddBlockListFuzzTest(const uint8_t* data, size_t size)
+void AddBlockListFuzzTest(FuzzedDataProvider& FDP)
 {
     StationInfo stationInfo;
-    int index = 0;
-    stationInfo.deviceName = std::string(reinterpret_cast<const char*>(data), size);
-    stationInfo.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    stationInfo.bssidType = static_cast<int>(data[index++]);
-    stationInfo.ipAddr = std::string(reinterpret_cast<const char*>(data), size);
+    stationInfo.deviceName = FDP.ConsumeBytesAsString(NUM_BYTES);
+    stationInfo.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    stationInfo.bssidType = FDP.ConsumeIntegral<int>();
+    stationInfo.ipAddr = FDP.ConsumeBytesAsString(NUM_BYTES);
     pApService->AddBlockList(stationInfo);
     pApInterface->AddBlockList(stationInfo);
 }
 
-void DelBlockListFuzzTest(const uint8_t* data, size_t size)
+void DelBlockListFuzzTest(FuzzedDataProvider& FDP)
 {
     StationInfo stationInfo;
-    int index = 0;
-    stationInfo.deviceName = std::string(reinterpret_cast<const char*>(data), size);
-    stationInfo.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    stationInfo.bssidType = static_cast<int>(data[index++]);
-    stationInfo.ipAddr = std::string(reinterpret_cast<const char*>(data), size);
+    stationInfo.deviceName = FDP.ConsumeBytesAsString(NUM_BYTES);
+    stationInfo.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    stationInfo.bssidType = FDP.ConsumeIntegral<int>();
+    stationInfo.ipAddr = FDP.ConsumeBytesAsString(NUM_BYTES);
     pApService->DelBlockList(stationInfo);
     pApInterface->DelBlockList(stationInfo);
 }
 
-void DisconnetStationFuzzTest(const uint8_t* data, size_t size)
+void DisconnetStationFuzzTest(FuzzedDataProvider& FDP)
 {
     StationInfo stationInfo;
-    int index = 0;
-    stationInfo.deviceName = std::string(reinterpret_cast<const char*>(data), size);
-    stationInfo.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    stationInfo.bssidType = static_cast<int>(data[index++]);
-    stationInfo.ipAddr = std::string(reinterpret_cast<const char*>(data), size);
+    stationInfo.deviceName = FDP.ConsumeBytesAsString(NUM_BYTES);
+    stationInfo.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    stationInfo.bssidType = FDP.ConsumeIntegral<int>();
+    stationInfo.ipAddr = FDP.ConsumeBytesAsString(NUM_BYTES);
     pApService->DisconnetStation(stationInfo);
     pApInterface->DisconnetStation(stationInfo);
 }
 
-void GetStationListFuzzTest(const uint8_t* data, size_t size)
+void GetStationListFuzzTest()
 {
     std::vector<StationInfo> result;
     pApService->GetStationList(result);
     pApInterface->GetStationList(result);
+    pApService->DisableHotspot();
 }
 
-void RegisterApServiceCallbacksFuzzTest(const uint8_t* data, size_t size)
+void RegisterApServiceCallbacksFuzzTest()
 {
     IApServiceCallbacks callbacks;
     pApService->RegisterApServiceCallbacks(callbacks);
     pApInterface->RegisterApServiceCallbacks(callbacks);
 }
 
-void GetSupportedPowerModelFuzzTest(const uint8_t* data, size_t size)
+void GetSupportedPowerModelFuzzTest()
 {
     std::set<PowerModel> setPowerModelList;
     pApService->GetSupportedPowerModel(setPowerModelList);
     pApInterface->GetSupportedPowerModel(setPowerModelList);
 }
 
-void GetPowerModelFuzzTest(const uint8_t* data, size_t size)
+void GetPowerModelFuzzTest(FuzzedDataProvider& FDP)
 {
-    PowerModel model = static_cast<PowerModel>(static_cast<int>(data[0]) % THREE);
+    int randomInt = FDP.ConsumeIntegral<int>();
+    PowerModel model = static_cast<PowerModel>(randomInt % THREE);
     pApService->GetPowerModel(model);
     pApInterface->GetPowerModel(model);
 }
 
-void SetPowerModelFuzzTest(const uint8_t* data, size_t size)
+void SetPowerModelFuzzTest(FuzzedDataProvider& FDP)
 {
-    PowerModel model = static_cast<PowerModel>(static_cast<int>(data[0]) % THREE);
+    int randomInt = FDP.ConsumeIntegral<int>();
+    PowerModel model = static_cast<PowerModel>(randomInt % THREE);
     pApService->SetPowerModel(model);
     pApInterface->SetPowerModel(model);
 }
 
-void WifiApIdleStateFuzzTest(const uint8_t* data, size_t size)
+void WifiApIdleStateFuzzTest()
 {
     pApIdleState->GoInState();
     pApIdleState->GoOutState();
@@ -292,33 +293,51 @@ void WifiApIdleStateFuzzTest(const uint8_t* data, size_t size)
     pApIdleState->ExecuteStateMsg(msg);
 }
 
-void GetHotspotModeFuzzTest(const uint8_t* data, size_t size)
+void GetHotspotModeFuzzTest(FuzzedDataProvider& FDP)
 {
-    HotspotMode model = static_cast<HotspotMode>(static_cast<int>(data[0]) % THREE);
+    int randomInt = FDP.ConsumeIntegral<int>();
+    HotspotMode model = static_cast<HotspotMode>(randomInt % THREE);
     pApInterface->GetHotspotMode(model);
     pApService->GetHotspotMode(model);
 }
 
-void SetHotspotModeFuzzTest(const uint8_t* data, size_t size)
+void SetHotspotModeFuzzTest(FuzzedDataProvider& FDP)
 {
-    HotspotMode model = static_cast<HotspotMode>(static_cast<int>(data[0]) % THREE);
+    int randomInt = FDP.ConsumeIntegral<int>();
+    HotspotMode model = static_cast<HotspotMode>(randomInt % THREE);
     pApInterface->SetHotspotMode(model);
     pApService->SetHotspotMode(model);
 }
 
-void WifiApFuzzTest(const uint8_t* data, size_t size)
+void WifiApFuzzTest(FuzzedDataProvider& FDP)
 {
-    int index = 0;
-    int apStatus = static_cast<int>(data[index++]);
-    bool enable = (static_cast<int>(data[0]) % TWO) ? true : false;
-    std::string wifiCountryCode = std::string(reinterpret_cast<const char*>(data), size);
-    std::string outInterfaceName = std::string(reinterpret_cast<const char*>(data), size);
+    int apStatus = FDP.ConsumeIntegral<int>();
+    bool enable = FDP.ConsumeBool();
+    std::string outInterfaceName = FDP.ConsumeBytesAsString(NUM_BYTES);
     pWifiApNatManager->SetInterfaceRoute(enable);
     pWifiApNatManager->SetInterfaceNat(enable, outInterfaceName);
-    pApService->DisableHotspot();
     pApService->HandleNetCapabilitiesChanged(apStatus);
-    pApService->m_apObserver->OnWifiCountryCodeChanged(wifiCountryCode);
 }
+
+void WifiApFuzzTest01()
+{
+    UpdateApChannelConfigFuzzTest();
+    GetBestChannelFor2GFuzzTest();
+    GetBestChannelFor5GFuzzTest();
+    FilterIndoorChannelFuzzTest();
+    Filter165ChannelFuzzTest();
+    JudgeDbacWithP2pFuzzTest();
+    WifiApRootStateFuzzTest();
+    EnableAllBlockListFuzzTest();
+    GetAllConnectedStationsFuzzTest();
+    EnableHotspotFuzzTest();
+    SetHotspotConfigFuzzTest();
+    GetStationListFuzzTest();
+    RegisterApServiceCallbacksFuzzTest();
+    GetSupportedPowerModelFuzzTest();
+    WifiApIdleStateFuzzTest();
+}
+
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
@@ -326,40 +345,26 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
-    FuzzedDataProvider fdp(data, size);
-    OHOS::Wifi::FDP = &fdp;
-    OHOS::Wifi::UpdateApChannelConfigFuzzTest(data, size);
-    OHOS::Wifi::GetBestChannelFor2GFuzzTest(data, size);
-    OHOS::Wifi::GetBestChannelFor5GFuzzTest(data, size);
-    OHOS::Wifi::GetChannelFromDrvOrXmlByBandFuzzTest(data, size);
-    OHOS::Wifi::FilterIndoorChannelFuzzTest(data, size);
-    OHOS::Wifi::Filter165ChannelFuzzTest(data, size);
-    OHOS::Wifi::JudgeDbacWithP2pFuzzTest(data, size);
-    OHOS::Wifi::GetIndoorChanByCountryCodeFuzzTest(data, size);
-    OHOS::Wifi::GetPreferredChannelByBandFuzzTest(data, size);
-    OHOS::Wifi::BlockListAndStationFuzzTest();
-    OHOS::Wifi::WifiApRootStateFuzzTest(data, size);
-    OHOS::Wifi::EnableAllBlockListFuzzTest(data, size);
-    OHOS::Wifi::StationLeaveFuzzTest(data, size);
-    OHOS::Wifi::GetAllConnectedStationsFuzzTest(data, size);
-    OHOS::Wifi::EnableInterfaceNatFuzzTest(data, size);
-    OHOS::Wifi::SetForwardingFuzzTest(data, size);
-    OHOS::Wifi::WriteDataToFileFuzzTest(data, size);
-    OHOS::Wifi::EnableHotspotFuzzTest(data, size);
-    OHOS::Wifi::SetHotspotConfigFuzzTest(data, size);
-    OHOS::Wifi::SetHotspotIdleTimeoutFuzzTest(data, size);
-    OHOS::Wifi::AddBlockListFuzzTest(data, size);
-    OHOS::Wifi::DelBlockListFuzzTest(data, size);
-    OHOS::Wifi::DisconnetStationFuzzTest(data, size);
-    OHOS::Wifi::GetStationListFuzzTest(data, size);
-    OHOS::Wifi::RegisterApServiceCallbacksFuzzTest(data, size);
-    OHOS::Wifi::GetSupportedPowerModelFuzzTest(data, size);
-    OHOS::Wifi::GetPowerModelFuzzTest(data, size);
-    OHOS::Wifi::SetPowerModelFuzzTest(data, size);
-    OHOS::Wifi::WifiApIdleStateFuzzTest(data, size);
-    OHOS::Wifi::GetHotspotModeFuzzTest(data, size);
-    OHOS::Wifi::SetHotspotModeFuzzTest(data, size);
-    OHOS::Wifi::WifiApFuzzTest(data, size);
+    FuzzedDataProvider FDP(data, size);
+    OHOS::Wifi::GetChannelFromDrvOrXmlByBandFuzzTest(FDP);
+    OHOS::Wifi::GetIndoorChanByCountryCodeFuzzTest(FDP);
+    OHOS::Wifi::GetPreferredChannelByBandFuzzTest(FDP);
+    OHOS::Wifi::BlockListAndStationFuzzTest(FDP);
+    OHOS::Wifi::StationLeaveFuzzTest(FDP);
+    OHOS::Wifi::EnableInterfaceNatFuzzTest(FDP);
+    OHOS::Wifi::SetForwardingFuzzTest(FDP);
+    OHOS::Wifi::WriteDataToFileFuzzTest(FDP);
+    OHOS::Wifi::SetHotspotIdleTimeoutFuzzTest(FDP);
+    OHOS::Wifi::AddBlockListFuzzTest(FDP);
+    OHOS::Wifi::DelBlockListFuzzTest(FDP);
+    OHOS::Wifi::DisconnetStationFuzzTest(FDP);
+    OHOS::Wifi::GetPowerModelFuzzTest(FDP);
+    OHOS::Wifi::SetPowerModelFuzzTest(FDP);
+    OHOS::Wifi::GetHotspotModeFuzzTest(FDP);
+    OHOS::Wifi::SetHotspotModeFuzzTest(FDP);
+    OHOS::Wifi::WifiApFuzzTest(FDP);
+    OHOS::Wifi::WifiApFuzzTest01();
+
     return 0;
 }
 }

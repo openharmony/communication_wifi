@@ -1715,7 +1715,6 @@ ErrCode ScanService::AllowSystemTimerScan(ScanType scanType, int &scanStyle)
  
 ErrCode ScanService::AllowSystemTimerScanExtra(ScanType scanType, int &scanStyle)
 {
-
     int staScene = GetStaScene();
     /* Determines whether to allow scanning based on the STA status. */
     if (staScene == SCAN_SCENE_MAX) {

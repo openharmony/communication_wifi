@@ -274,6 +274,7 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_local_security_detect) {
       defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
     }
+
     external_deps = [
       "ability_base:want",
       "ability_runtime:app_manager",

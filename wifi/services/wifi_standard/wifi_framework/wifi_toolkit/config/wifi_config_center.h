@@ -374,7 +374,8 @@ public:
     void SetDfsControlData(DfsControlData dfsControlData);
  
     DfsControlData GetDfsControlData();
-    
+
+    bool IsSameKeyMgmt(std::string scanKeyMgmt, std::string keyMgmt);
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description set screen state

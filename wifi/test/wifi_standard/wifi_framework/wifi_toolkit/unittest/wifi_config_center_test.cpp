@@ -447,5 +447,11 @@ HWTEST_F(WifiConfigCenterTest, IsAllowPcPopUpTest, TestSize.Level1)
     WifiConfigCenter::GetInstance().SetDeviceType(ProductDeviceType::PC);
     EXPECT_EQ(WifiConfigCenter::GetInstance().IsAllowPcPopUp(), false);
 }
+
+HWTEST_F(WifiConfigCenterTest, IsSameKeyMgmtTest, TestSize.Level1)
+{
+    WifiConfigCenter::GetInstance().IsSameKeyMgmt("WPA-PSK", "SAE");
+    EXPECT_EQ(WifiConfigCenter::GetInstance().IsSameKeyMgmt("WPA-PSK+SAE", "WPA-PSK"), true);
+}
 }  // namespace Wifi
 }  // namespace OHOS

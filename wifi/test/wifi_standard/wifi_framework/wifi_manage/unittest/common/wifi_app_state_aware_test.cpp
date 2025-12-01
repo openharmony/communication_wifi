@@ -189,3 +189,18 @@ HWTEST_F(WifiAppStateAwareTest, OnForegroundApplicationChangedTest001, TestSize.
     appStateData->uid = -1;
     appStateObserver.OnForegroundApplicationChanged(*appStateData);
 }
+
+HWTEST_F(WifiAppStateAwareTest, CheckAssociatedAppInForegroundTest001, TestSize.Level1)
+{
+    WifiAppStateAware wifiAppStateAware;
+    int32_t testUid = 1000;
+    EXPECT_FALSE(wifiAppStateAware.CheckAssociatedAppInForeground(testUid));
+}
+ 
+HWTEST_F(WifiAppStateAwareTest, IsAppInFilterListTest001, TestSize.Level1)
+{
+    WifiAppStateAware wifiAppStateAware;
+    std::string packageName = "Test";
+    std::string callerName = "com.test.caller.nonfilter";
+    EXPECT_FALSE(wifiAppStateAware.IsAppInFilterList(packageName, callerName));
+}

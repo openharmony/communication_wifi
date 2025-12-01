@@ -805,11 +805,25 @@ void WifiScanServiceImpl::UpdateScanMode()
     int uid = GetCallingUid();
     std::string packageName = "";
     GetBundleNameByUid(uid, packageName);
-    if (WifiAppStateAware::GetInstance().IsForegroundApp(uid)
-        || packageName == WifiSettings::GetInstance().GetPackageName("SETTINGS")) {
+    bool isForeground = WifiAppStateAware::GetInstance().IsForegroundApp(uid)
+        || packageName == WifiSettings::GetInstance().GetPackageName("SETTINGS");
+
+    WIFI_LOGI("Wifi caller - uid: %{public}d, packageName: %{public}s, isForeground: %{public}s",
+        uid, packageName.c_str(), isForeground ? "true" : "false");
+
+    if (WifiAppStateAware::GetInstance().IsAppInFilterList("ScanBackgroundAllowLimitList", packageName)
+        && !isForeground) {
+        if (WifiAppStateAware::GetInstance().CheckAssociatedAppInForeground(uid)) {
+            isForeground = true;
+            WIFI_LOGI("CheckAssociatedAppInForeground, Treat as foreground");
+        }
+    }
+    if (isForeground) {
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppRunningState(ScanMode::APP_FOREGROUND_SCAN);
+        WIFI_LOGI("Set APP_FOREGROUND_SCAN for uid: %{public}d, package: %{public}s", uid, packageName.c_str());
     } else {
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppRunningState(ScanMode::APP_BACKGROUND_SCAN);
+        WIFI_LOGI("Set APP_BACKGROUND_SCAN for uid: %{public}d, package: %{public}s", uid, packageName.c_str());
     }
 }
 #endif

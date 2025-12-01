@@ -22,6 +22,8 @@
 #include "wifi_service_manager.h"
 #include "app_network_speed_limit_service.h"
 #include "wifi_logger.h"
+#include "connection_observer_client.h"
+#include "wifi_settings.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -214,6 +216,44 @@ std::string WifiAppStateAware::GetRunningProcessNameByPid(const int uid, const i
         iter++;
     }
     return processName;
+}
+
+bool WifiAppStateAware::CheckAssociatedAppInForeground(const int32_t uid)
+{
+    std::vector<AbilityRuntime::ConnectionData> connectionData;
+    int32_t ret = AbilityRuntime::ConnectionObserverClient::GetInstance().GetConnectionData(connectionData);
+    if (ret != 0) {
+        WIFI_LOGE("get connection data failed: %{public}d", ret);
+        return false;
+    }
+ 
+    for (auto it = connectionData.begin(); it != connectionData.end(); it++) {
+        if (it->extensionUid != uid) {
+            continue;
+        }
+        if (IsForegroundApp(it->callerUid) && IsAppInFilterList("ScanForegroundAllowLimitList", it->callerName)) {
+            WIFI_LOGI("The Wifi caller is called by foreground app(callerUid: %{public}d, packageName: %{public}s)",
+                it->callerUid,
+                it->callerName.c_str());
+            return true;
+        }
+    }
+    return false;
+}
+ 
+bool WifiAppStateAware::IsAppInFilterList(const std::string &packageName, const std::string &callerName)
+{
+    std::vector<PackageInfo> specialList;
+    if (WifiSettings::GetInstance().GetPackageInfoByName(packageName, specialList) != 0) {
+        WIFI_LOGE("ProcessSwitchInfoRequest GetPackageInfoByName failed");
+        return false;
+    }
+    for (auto iter = specialList.begin(); iter != specialList.end(); iter++) {
+        if (iter->name == callerName) {
+            return true;
+        }
+    }
+    return false;
 }
 
 void AppStateObserver::OnAppStarted(const AppExecFwk::AppStateData &appStateData)

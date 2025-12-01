@@ -64,13 +64,11 @@ ohos_unittest("WifiApServiceTest") {
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_sta_hal_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_supplicant_hal_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_hal_device_manage.cpp",
-    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
     "../../wifi_manage/wifi_sta/Mock/mock_dhcp_service.cpp",
     "./Mock/mock_ap_state_machine.cpp",
     "./Mock/mock_network_interface.cpp",
     "./Mock/mock_system_interface.cpp",
     "./Mock/mock_wifi_ap_hal_interface.cpp",
-    "./Mock/mock_wifi_settings.cpp",
     "./Mock/operator_overload.cpp",
     "ap_config_use_test.cpp",
     "ap_idle_state_test.cpp",
@@ -82,6 +80,8 @@ ohos_unittest("WifiApServiceTest") {
     "ap_stations_manager_test.cpp",
     "global_test.cpp",
     "wifi_ap_nat_manager_test.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
+    "./Mock/mock_wifi_settings.cpp",
   ]
   include_dirs = [
     "./",

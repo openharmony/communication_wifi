@@ -47,6 +47,8 @@ public:
     bool IsForegroundApp(int32_t uid);
     bool IsForegroundApp(const std::string &bundleName);
     std::string GetRunningProcessNameByPid(const int uid, const int pid);
+    bool CheckAssociatedAppInForeground(const int32_t uid);
+    bool IsAppInFilterList(const std::string &packageName, const std::string &callerName);
 private:
     void RegisterAppStateChangedCallback(const int64_t delayTime = 0);
     std::mutex mutex_ {};

@@ -65,6 +65,7 @@ ohos_unittest("base_unittest") {
   external_deps = [
     "ability_runtime:ability_manager",
     "c_utils:utils",
+    "cJSON:cjson",
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hicollie:libhicollie",

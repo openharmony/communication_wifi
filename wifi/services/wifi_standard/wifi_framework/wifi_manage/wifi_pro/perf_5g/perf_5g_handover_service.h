@@ -55,6 +55,9 @@ private:
     bool inMonitor_ = false;
     Pref5gStatisticsInfo perf5gChrInfo_;
     std::atomic<bool> isNewBssidConnected_ = true;
+#ifdef SUPPORT_LP_SCAN
+    bool isLpScanSupported_ = false;
+#endif
     void UpdateCurrentApInfo(InterScanInfo &wifiScanInfo);
     void UpdateRelationApInfo(std::vector<WifiDeviceConfig> &wifiDeviceConfigs, std::vector<InterScanInfo> &scanInfos);
     void GetCandidateRelationApInfo(std::vector<CandidateRelationApInfo> &candidateRelationApInfos,
@@ -65,7 +68,7 @@ private:
     void ClearDeletedRelationAp(std::vector<WifiDeviceConfig> &wifiDeviceConfigs);
     void StartMonitor();
     void StopMonitor();
-    void ActiveScan(int32_t rssi);
+    void ActiveScan(int32_t rssi, int scanStyle = SCAN_DEFAULT_TYPE);
     void AddRelationApInfo(RelationAp &relationAp);
     void FoundMonitorAp(int32_t relationApIndex, std::vector<InterScanInfo> &wifiScanInfos);
     void UnloadScanController();
@@ -83,6 +86,7 @@ private:
     void HandleSwitchFailed(Perf5gSwitchResult switchResult);
     void OnDisconnected();
     void RemoveRelationApDuplicates(std::vector<RelationAp> &relationAps);
+    bool HasHiddenNetworkSsid();
     bool IsValidAp(int32_t relationApIndex);
 };
 }

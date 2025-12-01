@@ -145,6 +145,7 @@ public:
         void HandleScanResultInHasNet(const InternalMessagePtr msg);
         void HandleScanResultInHasNetInner(const std::vector<InterScanInfo> &scanInfos);
         void TryStartScan(bool hasSwitchRecord, int32_t signalLevel);
+        void TryToLimitTimerScan(int &rssiLevelScanedCounter, bool hasSwitchRecord, int32_t scanInterval);
         void WifiHasNetStateInit();
         void RequestHttpDetect(bool forceHttpDetect);
         void ParseQoeInfoAndRequestDetect();
@@ -251,6 +252,10 @@ private:
     WifiProState currentState_ {WIFI_DEFAULT};
     bool mHttpDetectedAllowed_ { false } ;
     Perf5gHandoverService perf5gHandoverService_;
+    /* LP scan */
+#ifdef SUPPORT_LP_SCAN
+    bool enableLpScan_ = false;
+#endif
     bool IsKeepCurrWifiConnected();
     bool IsReachWifiScanThreshold(int32_t signalLevel);
     bool HasWifiSwitchRecord();
@@ -268,7 +273,7 @@ private:
     bool SelectNetwork(NetworkSelectionResult &networkSelectionResult, const std::vector<InterScanInfo> &scanInfos);
     bool IsSatisfiedWifi2WifiCondition();
     bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
-    ErrCode FullScan();
+    ErrCode FullScan(int scanStyle = SCAN_DEFAULT_TYPE);
     void ProcessSwitchResult(const InternalMessagePtr msg);
     bool InLandscapeSwitchLimitList();
     bool IsAllowScan(bool hasSwitchRecord);

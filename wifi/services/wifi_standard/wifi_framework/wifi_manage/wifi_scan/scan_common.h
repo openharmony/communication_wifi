@@ -59,7 +59,7 @@ struct ScanConfig {
         fullScanFlag = false;
         scanType = ScanType::SCAN_TYPE_SYSTEMTIMER;
         scanningWithParamFlag = false;
-        scanStyle = 0xFF;
+        scanStyle = SCAN_DEFAULT_TYPE;
     }
 };
 

@@ -27,14 +27,14 @@ WifiScanController::WifiScanController(std::vector<std::shared_ptr<IDualBandScan
 WifiScanController::~WifiScanController()
 {}
 bool WifiScanController::TryToScan(int rssi, bool needScanInMonitor, int connectedApFreq,
-    std::unordered_set<int> &monitorApFreqs)
+    std::unordered_set<int> &monitorApFreqs, int scanStyle)
 {
     if (scanStrategys_.empty()) {
         WIFI_LOGI("WifiScanController::TryToScanv, scanStrategys is empty");
         return false;
     }
     for (auto &scanStrategy : scanStrategys_) {
-        if (scanStrategy->TryToScan(rssi, needScanInMonitor, connectedApFreq, monitorApFreqs)) {
+        if (scanStrategy->TryToScan(rssi, needScanInMonitor, connectedApFreq, monitorApFreqs, scanStyle)) {
             return true;
         }
     }
@@ -66,7 +66,7 @@ StrongRssiScanStrategy::StrongRssiScanStrategy()
 StrongRssiScanStrategy::~StrongRssiScanStrategy()
 {}
 bool StrongRssiScanStrategy::TryToScan(int rssi, bool needScanInMonitor, int connectedApFreq,
-    std::unordered_set<int> &monitorApFreqs)
+    std::unordered_set<int> &monitorApFreqs, int scanStyle)
 {
     if (rssi < strongRssiRange_.back()) {
         return false;
@@ -89,7 +89,7 @@ bool StrongRssiScanStrategy::TryToScan(int rssi, bool needScanInMonitor, int con
         if (pScanService == nullptr) {
             return false;
         }
-        auto result = pScanService->Scan(true, ScanType::SCAN_TYPE_5G_AP);
+        auto result = pScanService->Scan(true, ScanType::SCAN_TYPE_5G_AP, scanStyle);
         if (result == WIFI_OPT_SUCCESS) {
             strongRssiScanCount_[strongRssiRangeIndex]++;
             return true;
@@ -119,7 +119,7 @@ PeriodicScanStrategy::PeriodicScanStrategy() : scanNumCount_(0)
 PeriodicScanStrategy::~PeriodicScanStrategy()
 {}
 bool PeriodicScanStrategy::TryToScan(int rssi, bool needScanInMonitor, int connectedApFreq,
-    std::unordered_set<int> &monitorApFreqs)
+    std::unordered_set<int> &monitorApFreqs, int scanStyle)
 {
     if (IsActiveScansExhausted()) {
         return false;
@@ -146,6 +146,7 @@ bool PeriodicScanStrategy::TryToScan(int rssi, bool needScanInMonitor, int conne
         scanFreqs.push_back(connectedApFreq);
         WifiScanParams wifiScanParams;
         wifiScanParams.freqs = scanFreqs;
+        wifiScanParams.scanStyle = scanStyle;
         scanResult = pScanService->ScanWithParam(wifiScanParams, true, ScanType::SCAN_TYPE_5G_AP);
     } else {
         scanResult = pScanService->Scan(true, ScanType::SCAN_TYPE_5G_AP);

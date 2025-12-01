@@ -78,12 +78,14 @@ public:
 
     void AllowExternScanSuccess()
     {
-        pScanService->AllowExternScan();
+        int scanStyle = SCAN_DEFAULT_TYPE;
+        pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle);
     }
 
     void AllowExternScanFail1()
     {
         int staScene = 0;
+        int scanStyle = SCAN_DEFAULT_TYPE;
         StoreScanConfig cfg;
         pScanService->scanConfigMap.emplace(staScene, cfg);
         ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
@@ -92,17 +94,19 @@ public:
         forbidMode.scanMode = scanMode;
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
 
-        pScanService->AllowExternScan();
+        pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle);
     }
 
     void AllowExternScanFail2()
     {
-        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_SUCCESS);
+        int scanStyle = SCAN_DEFAULT_TYPE;
+        EXPECT_EQ(pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle), WIFI_OPT_SUCCESS);
     }
 
     void AllowExternScanFail3()
     {
         ScanMode scanMode = ScanMode::SYS_FOREGROUND_SCAN;
+        int scanStyle = SCAN_DEFAULT_TYPE;
         ScanForbidMode forbidMode;
         forbidMode.scanScene = SCAN_SCENE_CONNECTED;
         forbidMode.scanMode = scanMode;
@@ -110,13 +114,14 @@ public:
         forbidMode.forbidCount = 0;
         pScanService->scanControlInfo.scanForbidList.push_back(forbidMode);
         pScanService->staStatus = STATUS;
-        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_SUCCESS);
+        EXPECT_EQ(pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle), WIFI_OPT_SUCCESS);
     }
 
     void AllowExternScanFail4()
     {
         pScanService->disableScanFlag = true;
-        EXPECT_EQ(pScanService->AllowExternScan(), WIFI_OPT_FAILED);
+        int scanStyle = SCAN_DEFAULT_TYPE;
+        EXPECT_EQ(pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle), WIFI_OPT_FAILED);
     }
 };
 

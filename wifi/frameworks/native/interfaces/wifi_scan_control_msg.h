@@ -59,6 +59,7 @@ struct WifiScanDeviceInfo {
     bool isSystemApp;
     ScanMode scanMode;
     ScanType scanType;
+    int scanStyle;
     Hid2dInfo hid2dInfo;
     ScanControlInfo scanControlInfo;
     std::vector<PackageInfo> scan_thermal_trust_list;
@@ -79,6 +80,7 @@ struct WifiScanDeviceInfo {
         noChargerState = MODE_STATE_CLOSE;
         scanMode = ScanMode::SCAN_MODE_MAX;
         scanType = ScanType::SCAN_DEFAULT;
+        scanStyle = SCAN_DEFAULT_TYPE;
         isAbsFreezeScaned = false;
         staSceneForbidCount = 0;
         externScan = false;
@@ -124,7 +126,10 @@ enum class ScanLimitType {
     ACTION_LISTEN,
     HID2D_CLONE,
     GAME_SCENE,
-    GLASSES_SCENE
+    GLASSES_SCENE,
+#ifdef SUPPORT_LP_SCAN
+    LP_SCANSTYLE,
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

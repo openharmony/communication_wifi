@@ -394,7 +394,7 @@ void WifiProStateMachine::FastScan(std::vector<WifiScanInfo> &scanInfoList)
     for (auto iter : scanInfoList) {
         params.freqs.push_back(iter.frequency);
     }
-    params.scanStyle = 0;
+
     IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(instId_);
     if (pScanService == nullptr ||
         pScanService->ScanWithParam(params, true, ScanType::SCAN_TYPE_WIFIPRO) != WIFI_OPT_SUCCESS) {
@@ -540,7 +540,7 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
     return true;
 }
 
-ErrCode WifiProStateMachine::FullScan()
+ErrCode WifiProStateMachine::FullScan(int scanStyle)
 {
     WIFI_LOGD("start Fullscan");
     int32_t signalLevel = WifiProUtils::GetSignalLevel(instId_);
@@ -557,6 +557,14 @@ ErrCode WifiProStateMachine::FullScan()
         return WIFI_OPT_FAILED;
     }
     WifiProChr::GetInstance().RecordScanChrCnt(CHR_EVENT_WIFIPRO_FULL_SCAN_CNT);
+#ifdef SUPPORT_LP_SCAN
+    enableLpScan_ = OHOS::system::GetBoolParameter("lpscan", false);
+    if (enableLpScan_ && scanStyle == SCAN_TYPE_LOW_PRIORITY) {
+        WIFI_LOGI("Wifi2WifiHasNet starts Lp full scan.");
+        return pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO, SCAN_TYPE_LOW_PRIORITY);
+    }
+#endif
+    WIFI_LOGI("Wifi2WifiHasNet starts full scan.");
     return pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO);
 }
 
@@ -1164,28 +1172,16 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
         pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW) {
         WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
                   "rssiLevel4ScanedCounter_:%{public}d.", signalLevel, rssiLevel4ScanedCounter_);
-        ret = pWifiProStateMachine_->FullScan();
-        if (ret == WIFI_OPT_SUCCESS) {
-            rssiLevel4ScanedCounter_++;
-        }
-        pWifiProStateMachine_->MessageExecutedLater(EVENT_REQUEST_SCAN_DELAY, hasSwitchRecord, scanInterval);
+        TryToLimitTimerScan(rssiLevel4ScanedCounter_, hasSwitchRecord, scanInterval);
     } else if ((signalLevel == SIG_LEVEL_2 || signalLevel == SIG_LEVEL_3) &&
                rssiLevel2Or3ScanedCounter_ < scanMaxCounter) {
         WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
             "rssiLevel2Or3ScanedCounter:%{public}d.", signalLevel, rssiLevel2Or3ScanedCounter_);
-        auto ret = pWifiProStateMachine_->FullScan();
-        if (ret == WIFI_OPT_SUCCESS) {
-            rssiLevel2Or3ScanedCounter_++;
-        }
-        pWifiProStateMachine_->MessageExecutedLater(EVENT_REQUEST_SCAN_DELAY, hasSwitchRecord, scanInterval);
+        TryToLimitTimerScan(rssiLevel2Or3ScanedCounter_, hasSwitchRecord, scanInterval);
     } else if ((signalLevel < SIG_LEVEL_2) && (rssiLevel0Or1ScanedCounter_ < scanMaxCounter)) {
         WIFI_LOGI("TryStartScan, start scan, signalLevel:%{public}d,"
             "rssiLevel0Or1ScanedCounter:%{public}d.", signalLevel, rssiLevel0Or1ScanedCounter_);
-        auto ret = pWifiProStateMachine_->FullScan();
-        if (ret == WIFI_OPT_SUCCESS) {
-            rssiLevel0Or1ScanedCounter_++;
-        }
-        pWifiProStateMachine_->MessageExecutedLater(EVENT_REQUEST_SCAN_DELAY, hasSwitchRecord, scanInterval);
+        TryToLimitTimerScan(rssiLevel0Or1ScanedCounter_, hasSwitchRecord, scanInterval);
     } else {
         WIFI_LOGI("TryStartScan, do not scan, signalLevel:%{public}d,scanMaxCounter:%{public}d.",
             signalLevel, scanMaxCounter);
@@ -1199,6 +1195,24 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
     }
 }
 
+void WifiProStateMachine::WifiHasNetState::TryToLimitTimerScan(int &rssiLevelScanedCounter, bool hasSwitchRecord,
+    int32_t scanInterval)
+{
+    int scanStyle = SCAN_DEFAULT_TYPE;
+#ifdef SUPPORT_LP_SCAN
+    pWifiProStateMachine_->enableLpScan_ = OHOS::system::GetBoolParameter("lpscan", false);
+    if (pWifiProStateMachine_->enableLpScan_) {
+        scanStyle = SCAN_TYPE_LOW_PRIORITY;
+    }
+#endif
+    auto ret = rssiLevelScanedCounter % 2 == 0 ?
+        pWifiProStateMachine_->FullScan() : pWifiProStateMachine_->FullScan(scanStyle);
+    if (ret == WIFI_OPT_SUCCESS) {
+        rssiLevelScanedCounter++;
+    }
+    pWifiProStateMachine_->MessageExecutedLater(EVENT_REQUEST_SCAN_DELAY, hasSwitchRecord, scanInterval);
+}
+ 
 void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const InternalMessagePtr msg)
 {
     if (msg == nullptr) {

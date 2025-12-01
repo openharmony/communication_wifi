@@ -269,6 +269,7 @@ void P2pServerFuzzTest01(const uint8_t* data, size_t size)
     int uid = FDP.ConsumeIntegral<int>();
     std::vector<StationInfo> result;
     std::string config1;
+    std::string config2;
     IpAddrInfo ipInfo;
     WifiP2pConfig config;
     if (size >= THREE) {
@@ -289,7 +290,8 @@ void P2pServerFuzzTest01(const uint8_t* data, size_t size)
     pWifiP2pService->CreateRptGroup(config);
     pWifiP2pService->GetRptStationsList(result);
     pWifiP2pService->SetGcIpAddress(ipInfo);
-    pWifiP2pService->NotifyWscDialogConfirmResult(isAccept);
+    pWifiP2pService->NotifyWscDialogConfirmResult(isAccept, config2);
+    pWifiP2pService->NotifyWscDisplayConfirmResult();
     pWifiP2pService->SetMiracastSinkConfig(config1);
     pWifiP2pService->NotifyRemoteDie(uid);
     pWifiP2pService->SetP2pHighPerf(isEnable);

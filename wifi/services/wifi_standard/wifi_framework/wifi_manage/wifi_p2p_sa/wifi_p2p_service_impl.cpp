@@ -1232,7 +1232,7 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
 
     uint32_t passLen = config.GetPreSharedKey().length();
     if (passLen < WIFI_P2P_PASSPHRASE_MIN_LEN || passLen > WIFI_P2P_PASSPHRASE_MAX_LEN) {
-        WIFI_LOGE("password is invalid");
+        WIFI_LOGE("password is invalid, %{public}d", passLen);
         return WIFI_OPT_P2P_INVALID_PASSWORD;
     }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_HID2D_REQUEST);

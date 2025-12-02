@@ -220,6 +220,9 @@ public:
         bool NotAllowConnectToNetwork(int networkId, const std::string& bssid, int connTriggerMode);
         bool NotExistInScanList(WifiDeviceConfig &config);
         void DealHiddenSsidConnectMiss(int networkId);
+#ifdef OHOS_ARCH_LITE
+        bool GrsNetworkProbe();
+#endif
         StaStateMachine *pStaStateMachine;
     };
 

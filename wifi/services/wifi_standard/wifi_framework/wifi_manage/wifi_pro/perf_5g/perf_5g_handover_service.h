@@ -47,9 +47,9 @@ public:
  
 public:
     std::shared_ptr<DualBandRepostitory> pDualBandRepostitory_ = nullptr;
-    std::shared_ptr<ConnectedAp> connectedAp_ = nullptr;
 private:
     std::mutex mPerf5gMutex;
+    std::shared_ptr<ConnectedAp> connectedAp_ = nullptr;
     std::vector<RelationAp> relationAps_;
     std::vector<int32_t> monitorApIndexs_;
     std::shared_ptr<CandidateRelationApInfo> selectRelationAp_ = nullptr;
@@ -59,6 +59,7 @@ private:
     bool inMonitor_ = false;
     Pref5gStatisticsInfo perf5gChrInfo_;
     std::atomic<bool> isNewBssidConnected_ = true;
+    const int apMaxNum_ = 20;
     void UpdateCurrentApInfo(InterScanInfo &wifiScanInfo);
     void UpdateRelationApInfo(std::vector<WifiDeviceConfig> &wifiDeviceConfigs, std::vector<InterScanInfo> &scanInfos);
     void GetCandidateRelationApInfo(std::vector<CandidateRelationApInfo> &candidateRelationApInfos,

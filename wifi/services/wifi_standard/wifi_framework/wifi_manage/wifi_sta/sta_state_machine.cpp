@@ -2704,7 +2704,7 @@ void StaStateMachine::LinkedState::GoInState()
 #ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
     DealWifiPowerSaveWhenWifiConnected();
 #endif
-#ifdef OHOS_ARCH_LITE
+#ifndef OHOS_ARCH_LITE
     WIFI_LOGI("Start requesting GRS network detection");
     if (GrsNetworkProbe()) {
         WIFI_LOGI("GrsNetworkProbe is success");
@@ -2807,10 +2807,10 @@ bool StaStateMachine::LinkedState::ProcessMessageByMacros(InternalMessagePtr msg
     return ret;
 }
 
-#ifdef OHOS_ARCH_LITE
+#ifndef OHOS_ARCH_LITE
 bool StaStateMachine::LinkedState::GrsNetworkProbe()
 {
-    if (enhanceService_ != nullptr) {
+    if (pStaStateMachine->enhanceService_ != nullptr) {
         return pStaStateMachine->enhanceService_->GrsProbe();
     } else {
         return false;

@@ -1031,7 +1031,7 @@ void WifiProStateMachine::WifiHasNetState::WifiHasNetStateInit()
     netDisableDetectCount_ = 0;
     pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
     qoeScaning_ = false;
-    isLpScanTriggered = false;
+    isLpScanTriggered_ = false;
     pWifiProStateMachine_->currentState_ = WifiProState::WIFI_HASNET;
     // Remove the network monitoring function of wifipro itself
     pWifiProStateMachine_->perf5gHandoverService_.NetworkStatusChanged(NetworkStatus::HAS_INTERNET);
@@ -1042,7 +1042,7 @@ void WifiProStateMachine::WifiHasNetState::GoOutState()
     WIFI_LOGI("WifiHasNetState GoOutState function.");
     pWifiProStateMachine_->StopTimer(EVENT_CMD_INTERNET_STATUS_DETECT_INTERVAL);
     pWifiProStateMachine_->isFirstDectectHasNet_ = true;
-    isLpScanTriggered = false;
+    isLpScanTriggered_ = false;
     return;
 }
 
@@ -1190,7 +1190,7 @@ void WifiProStateMachine::WifiHasNetState::TryStartScan(bool hasSwitchRecord, in
     }
 }
 
-void WifiProStateMachine::WifiHasNetState::StartScanWithDynamicStrategy(int &rssiLevelScanedCounter,
+void WifiProStateMachine::WifiHasNetState::StartScanWithDynamicStrategy(int32_t &rssiLevelScanedCounter,
     bool hasSwitchRecord, int32_t scanInterval)
 {
     auto ret = IsSatisfiedLpScanCondition() ? ExecuteDynamicScan(rssiLevelScanedCounter) :
@@ -1210,7 +1210,7 @@ bool WifiProStateMachine::WifiHasNetState::IsSatisfiedLpScanCondition()
     return pWifiProStateMachine_->perf5gHandoverService_.HasHiddenNetworkSsid() ? false : true;
 }
  
-ErrCode WifiProStateMachine::WifiHasNetState::ExecuteDynamicScan(int &rssiLevelScanedCounter)
+ErrCode WifiProStateMachine::WifiHasNetState::ExecuteDynamicScan(int rssiLevelScanedCounter)
 {
     auto ret = WIFI_OPT_FAILED;
     const int two = 2;
@@ -1226,20 +1226,24 @@ ErrCode WifiProStateMachine::WifiHasNetState::ExecuteDynamicScan(int &rssiLevelS
  
 ErrCode WifiProStateMachine::WifiHasNetState::StartLpScan()
 {
-    WIFI_LOGI("start LP scan in HasNet./n");
+    WIFI_LOGI("start LP scan in HasNet.\n");
     WifiScanParams params;
-    std::shared_ptr<ConnectedAp> connectedAp = pWifiProStateMachine_->perf5gHandoverService_.connectedAp_;
-    auto &wifiChannelHelper = WifiChannelHelper::GetInstance();
-    if (wifiChannelHelper.IsValid24GHz(connectedAp->apInfo.frequency)) {
-        wifiChannelHelper.GetAvailableScanFreqs(ScanBandType::SCAN_BAND_5_GHZ, params.freqs);
-    } else if (wifiChannelHelper.IsValid5GHz(connectedAp->apInfo.frequency)) {
-        wifiChannelHelper.GetAvailableScanFreqs(ScanBandType::SCAN_BAND_24_GHZ, params.freqs);
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    isConnected24G_ = WifiChannelHelper::GetInstance().IsValid24GHz(linkedInfo.frequency);
+    isConnected5G_ = WifiChannelHelper::GetInstance().IsValid5GHz(linkedInfo.frequency);
+    if (isConnected24G_) {
+        WifiChannelHelper::GetInstance().GetAvailableScanFreqs(ScanBandType::SCAN_BAND_5_GHZ_WITH_DFS,
+            params.freqs);
+    } else if (isConnected5G_) {
+        WifiChannelHelper::GetInstance().GetAvailableScanFreqs(ScanBandType::SCAN_BAND_24_GHZ,
+            params.freqs);
     } else {
         WIFI_LOGE("Get scan frequence failed! Current frequence is not 2.4G or 5G.");
         return WIFI_OPT_FAILED;
     }
-    params.scanStyle = SCAN_TYPE_LOW_PRIORITY;
  
+    params.scanStyle = SCAN_TYPE_LOW_PRIORITY;
     IScanService *pScanService =
         WifiServiceManager::GetInstance().GetScanServiceInst(pWifiProStateMachine_->instId_);
     if (pScanService == nullptr ||
@@ -1247,7 +1251,7 @@ ErrCode WifiProStateMachine::WifiHasNetState::StartLpScan()
         WIFI_LOGE("start Lp scan failed!");
         return WIFI_OPT_FAILED;
     }
-    isLpScanTriggered = true;
+    isLpScanTriggered_ = true;
     return WIFI_OPT_SUCCESS;
 }
  
@@ -1257,20 +1261,31 @@ ErrCode WifiProStateMachine::WifiHasNetState::ScanByPerf5gTable(const std::vecto
     std::vector<WifiScanInfo> results;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(results);
  
-    std::vector<std::string> bssids;
-    std::shared_ptr<ConnectedAp> connectedAp = pWifiProStateMachine_->perf5gHandoverService_.connectedAp_;
-    auto &wifiChannelHelper = WifiChannelHelper::GetInstance();
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
  
-    bool isConnected24G = wifiChannelHelper.IsValid24GHz(connectedAp->apInfo.frequency);
-    bool isConnected5G = wifiChannelHelper.IsValid5GHz(connectedAp->apInfo.frequency);
+    isConnected24G_ = WifiChannelHelper::GetInstance().IsValid24GHz(linkedInfo.frequency);
+    isConnected5G_ = WifiChannelHelper::GetInstance().IsValid5GHz(linkedInfo.frequency);
  
     std::set<RelationAp> allRelationAps;
-    const auto getRelationBssid = [isConnected24G](RelationInfo& relationInfo) -> std::string& {
-        return isConnected24G ? relationInfo.bssid24g_ : relationInfo.relationBssid5g_;
+    const auto getRelationBssid = [this](RelationInfo& relationInfo) -> std::string& {
+        return this->isConnected24G_ ? relationInfo.bssid24g_ : relationInfo.relationBssid5g_;
     };
+ 
+    int apNum = apMaxNum_;
     for (auto &scanInfo : results) {
-        if ((isConnected24G && wifiChannelHelper.IsValid5GHz(scanInfo.frequency)) ||
-            (isConnected5G && wifiChannelHelper.IsValid24GHz(scanInfo.frequency))) {
+        if (apNum-- == 0) {
+            break;
+        }
+        WifiDeviceConfig config;
+        std::string mgmt;
+        scanInfo.GetDeviceMgmt(mgmt);
+        if (WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, mgmt, config,
+            pWifiProStateMachine_->instId_) < 0) {
+            continue;
+        }
+        if ((isConnected24G_ && WifiChannelHelper::GetInstance().IsValid5GHz(scanInfo.frequency)) ||
+            (isConnected5G_ && WifiChannelHelper::GetInstance().IsValid24GHz(scanInfo.frequency))) {
             std::vector<RelationAp> relationAps;
             pWifiProStateMachine_->perf5gHandoverService_.pDualBandRepostitory_->LoadRelationApInfo(
                 scanInfo.bssid, relationAps, getRelationBssid);
@@ -1327,8 +1342,8 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
         return;
     }
     qoeSwitch_ = false;
-    if (isLpScanTriggered) {
-        isLpScanTriggered = false;
+    if (isLpScanTriggered_) {
+        isLpScanTriggered_ = false;
         ScanByPerf5gTable(scanInfos);
     } else {
         HandleScanResultInHasNetInner(scanInfos);

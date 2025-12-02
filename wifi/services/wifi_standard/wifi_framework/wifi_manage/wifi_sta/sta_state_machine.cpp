@@ -2812,6 +2812,8 @@ bool StaStateMachine::LinkedState::GrsNetworkProbe()
 {
     if (enhanceService_ != nullptr) {
         return pStaStateMachine->enhanceService_->GrsProbe();
+    } else {
+        return false;
     }
 }
 #endif

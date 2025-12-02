@@ -26,6 +26,7 @@
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "wifi_sta_hal_interface.h"
+#include "wifi_event_subscriber_manager.h"
 
 using ::testing::_;
 using ::testing::AtLeast;
@@ -471,14 +472,14 @@ HWTEST_F(WifiManagerTest, UnRegisterNetworkStateChangeEventTest, TestSize.Level1
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
-HWTEST_F(WifiManagerTest, RegisterWifiScanChangeEventTest, TestSize.Level1)
+HWTEST_F(WifiManagerTest, RegisterWifiScanChangeEventTest01, TestSize.Level1)
 {
     WIFI_LOGI("RegisterWifiScanChangeEventTest enter!");
     wifiManager.wifiEventSubscriberManager->RegisterWifiScanChangeEvent();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
-HWTEST_F(WifiManagerTest, UnRegisterWifiScanChangeEventTest, TestSize.Level1)
+HWTEST_F(WifiManagerTest, UnRegisterWifiScanChangeEventTest01, TestSize.Level1)
 {
     WIFI_LOGI("UnRegisterWifiScanChangeEventTest enter!");
     wifiManager.wifiEventSubscriberManager->UnRegisterWifiScanChangeEvent();
@@ -651,6 +652,147 @@ HWTEST_F(WifiManagerTest, GetScanMacInfoWhiteListByDatasharetest, TestSize.Level
     ErrCode result = WifiDataShareHelperUtils::GetInstance().Query(uri, key, value, onlySettingsData);
     EXPECT_EQ(result, WIFI_OPT_SUCCESS);
     wifiManager.wifiEventSubscriberManager->GetScanMacInfoWhiteListByDatashare();
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterNetworkConnSubscriberTest, TestSize.Level1)
+{
+    sptr<NetworkConnSubscriber> networkConnSubscriber_ = nullptr;
+    networkConnSubscriber_ = sptr<NetworkConnSubscriber>::MakeSptr();
+    wifiManager.wifiEventSubscriberManager->UnRegisterNetworkConnSubscriber();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, RegisterNetworkConnSubscriberTest01, TestSize.Level1)
+{
+    sptr<NetworkConnSubscriber> networkConnSubscriber_ = nullptr;
+    wifiManager.wifiEventSubscriberManager->RegisterNetworkConnSubscriber();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, RegisterNetworkConnSubscriberTest02, TestSize.Level1)
+{
+    sptr<NetworkConnSubscriber> networkConnSubscriber_ = nullptr;
+    wifiManager.wifiEventSubscriberManager->RegisterNetworkConnSubscriber();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, RegisterNetworkConnSubscriberTest03, TestSize.Level1)
+{
+    sptr<NetworkConnSubscriber> networkConnSubscriber_ = nullptr;
+    networkConnSubscriber_ = sptr<NetworkConnSubscriber>::MakeSptr();
+    wifiManager.wifiEventSubscriberManager->RegisterNetworkConnSubscriber();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterFoldStatusListenerTest, TestSize.Level1)
+{
+    sptr<Rosen::DisplayManagerLite::IFoldStatusListener> foldStatusListener_ = nullptr;
+    wifiManager.wifiEventSubscriberManager->UnRegisterFoldStatusListener();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, RegisterFoldStatusListenerTest, TestSize.Level1)
+{
+    wifiManager.wifiEventSubscriberManager->RegisterFoldStatusListener();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, UnregisterDisplayListenerTest, TestSize.Level1)
+{
+    sptr<Rosen::DisplayManagerLite::IDisplayListener> displayStatusListener_ = nullptr;
+    wifiManager.wifiEventSubscriberManager->UnregisterDisplayListener();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, RegisterDisplayListenerTest, TestSize.Level1)
+{
+    sptr<Rosen::DisplayManagerLite::IDisplayListener> displayStatusListener_ = nullptr;
+    wifiManager.wifiEventSubscriberManager->RegisterDisplayListener();
+
+    displayStatusListener_ = new(std::nothrow) WifiDisplayStateListener();
+    wifiManager.wifiEventSubscriberManager->RegisterDisplayListener();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterDataShareReadyEventTest, TestSize.Level1)
+{
+    uint32_t dataShareReadyTimerId_{1};
+    wifiManager.wifiEventSubscriberManager->UnRegisterDataShareReadyEvent();
+
+    dataShareReadyTimerId_ = 0;
+    std::shared_ptr<DataShareReadySubscriber> dataShareReadySubscriber_ = nullptr;
+    wifiManager.wifiEventSubscriberManager->UnRegisterDataShareReadyEvent();
+
+    dataShareReadyTimerId_ = 1;
+    OHOS::EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
+    OHOS::EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    dataShareReadySubscriber_ = std::make_shared<DataShareReadySubscriber>(subscriberInfo);
+    wifiManager.wifiEventSubscriberManager->UnRegisterDataShareReadyEvent();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterSettingsEnterEventTest, TestSize.Level1)
+{
+    uint32_t settingsTimerId{0};
+    std::shared_ptr<SettingsEnterSubscriber> settingsEnterSubscriber_ = nullptr;
+    wifiManager.wifiEventSubscriberManager->UnRegisterSettingsEnterEvent();
+
+    settingsTimerId = 1;
+    wifiManager.wifiEventSubscriberManager->UnRegisterSettingsEnterEvent();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, RegisterSettingsEnterEventTest, TestSize.Level1)
+{
+    uint32_t settingsTimerId{0};
+    std::shared_ptr<SettingsEnterSubscriber> settingsEnterSubscriber_ = nullptr;
+    wifiManager.wifiEventSubscriberManager->RegisterSettingsEnterEvent();
+
+    settingsTimerId = 1;
+    wifiManager.wifiEventSubscriberManager->RegisterSettingsEnterEvent();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterWifiScanChangeEventTest02, TestSize.Level1)
+{
+    uint32_t wifiScanChangeTimerId{1};
+    wifiManager.wifiEventSubscriberManager->UnRegisterWifiScanChangeEvent();
+
+    wifiScanChangeTimerId = 1;
+    std::shared_ptr<WifiScanEventChangeSubscriber> wifiScanEventChangeSubscriber_ = nullptr;
+    wifiManager.wifiEventSubscriberManager->UnRegisterWifiScanChangeEvent();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, RegisterWifiScanChangeEventTest02, TestSize.Level1)
+{
+    uint32_t wifiScanChangeTimerId{1};
+    wifiManager.wifiEventSubscriberManager->RegisterWifiScanChangeEvent();
+
+    wifiScanChangeTimerId = 0;
+    wifiManager.wifiEventSubscriberManager->RegisterWifiScanChangeEvent();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, UnRegisterNotificationEventTest, TestSize.Level1)
+{
+    uint32_t notificationTimerId{1};
+    wifiManager.wifiEventSubscriberManager->UnRegisterNotificationEvent();
+
+    notificationTimerId = 0;
+    wifiManager.wifiEventSubscriberManager->UnRegisterNotificationEvent();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
+}
+
+HWTEST_F(WifiManagerTest, RegisterNotificationEventTest, TestSize.Level1)
+{
+    uint32_t notificationTimerId{1};
+    wifiManager.wifiEventSubscriberManager->RegisterNotificationEvent();
+
+    notificationTimerId = 0;
+    wifiManager.wifiEventSubscriberManager->RegisterNotificationEvent();
+    EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
 }
 }  // namespace Wifi
 }  // namespace OHOS

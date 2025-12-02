@@ -401,7 +401,6 @@ public:
      * @return success: 0, failed: -1
      */
     virtual void OnFoldStateChanged(const int foldStatus) = 0;
-
     /**
      * @Description check lp scan ability
      *

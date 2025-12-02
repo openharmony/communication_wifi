@@ -140,7 +140,10 @@ public:
         int netDisableDetectCount_ { 0 };
         bool qoeSwitch_  { false } ;
         bool qoeScaning_  { false } ;
-        bool isLpScanTriggered {false};
+        bool isLpScanTriggered_ {false};
+        bool isConnected24G_ = false;
+        bool isConnected5G_ = false;
+        const int apMaxNum_ {20};
         void HandleRssiChangedInHasNet(const InternalMessagePtr msg);
         void HandleReuqestScanInHasNet(const InternalMessagePtr msg);
         void HandleScanResultInHasNet(const InternalMessagePtr msg);

@@ -129,5 +129,9 @@ public:
 protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
+class SameSsidMultiBssidIntegrator : public SimpleNetworkSelector {
+public:
+    SameSsidMultiBssidIntegrator();
+};
 }
 #endif

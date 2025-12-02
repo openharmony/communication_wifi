@@ -593,7 +593,7 @@ private:
      --=* @param config -The Network info(in)
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
-    ErrCode ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid);
+    ErrCode ConvertDeviceCfg(WifiDeviceConfig &config, std::string& apBssid, std::string& ifaceName);
 
     /**
      * @Description  Save the current connected state into WifiLinkedInfo.
@@ -625,15 +625,7 @@ private:
      * @param deviceConfig - Ap device config information
      */
     void UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& ifaceName,
-        WifiHalDeviceConfig& halDeviceConfig);
-
-    /**
-     * @Description Auto select connect to network.
-     *
-     * @param bssid - the bssid of network which is going to be connected.
-     */
-    void AutoSelectConnectToNetwork(const std::string& bssid, std::string& ifaceName,
-        WifiHalDeviceConfig& halDeviceConfig);
+        std::string& apBssid);
 
     /**
      * @Description  Disconnect network
@@ -1054,6 +1046,7 @@ private:
     OHOS::ErrCode StartPortalLogin(int netId, std::string url, int deviceType);
     void RecordPortalInfo();
     void DealSignalPacketChangedByTime(WifiSignalPollInfo &signalInfo);
+    bool HasMultiBssidAp(const WifiDeviceConfig &config);
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;

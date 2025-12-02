@@ -149,6 +149,32 @@ int32_t WifiNotificationUtil::StartAbility(OHOS::AAFwk::Want& want)
     return reply.ReadInt32();
 }
 
+static void AddP2pParam(WifiDialogType type, std::string comInfo, cJSON *param)
+{
+    WIFI_LOGD("AddP2pParam comInfo %{private}s", comInfo.c_str());
+    std::string deviceName;
+    std::string pinCode;
+    std::string::size_type codePos = comInfo.find("_");
+    switch (type) {
+        case P2P_WSC_PBC_DIALOG:
+        case P2P_WSC_KEYPAD_DIALOG:
+            cJSON_AddStringToObject(param, "p2pDeviceName", comInfo.c_str());
+            break;
+        case P2P_WSC_DISPLAY_DIALOG:
+            if (codePos != std::string::npos) {
+                deviceName = comInfo.substr(0, codePos);
+                pinCode = comInfo.substr(codePos + 1);
+                cJSON_AddStringToObject(param, "p2pDeviceName", deviceName.c_str());
+                cJSON_AddStringToObject(param, "p2pPinCode", pinCode.c_str());
+            } else {
+                WIFI_LOGE("AddP2pParam get pin code fail: %{private}s", comInfo.c_str());
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
 {
     WIFI_LOGI("ShowDialog, type=%{public}d", static_cast<int32_t>(type));
@@ -238,32 +264,6 @@ void WifiNotificationUtil::ShowSettingsDialog(WifiDialogType type, std::string s
         AAFwk::ExtensionManagerClient::GetInstance().ConnectServiceExtensionAbility(want, connection, nullptr, -1);
     WIFI_LOGI("connect service extension ability result = %{public}d", ret);
     IPCSkeleton::SetCallingIdentity(identity);
-}
-
-void WifiNotificationUtil::AddP2pParam(WifiDialogType type, std::string comInfo, cJSON *param)
-{
-    WIFI_LOGD("AddP2pParam comInfo %{private}s", comInfo.c_str());
-    std::istringstream strStream(comInfo);
-    std::string deviceName;
-    std::string pinCode;
-    switch (type) {
-        case P2P_WSC_PBC_DIALOG:
-        case P2P_WSC_KEYPAD_DIALOG:
-            cJSON_AddStringToObject(param, "p2pDeviceName", comInfo.c_str());
-            break;
-        case P2P_WSC_DISPLAY_DIALOG:
-            if (std::getline(strStream, pinCode, '_') && std::getline(strStream, deviceName)) {
-                cJSON_AddStringToObject(param, "p2pDeviceName", deviceName.c_str());
-                cJSON_AddStringToObject(param, "p2pPinCode", pinCode.c_str());
-            } else {
-                WIFI_LOGE("AddP2pParam comInfo %{private}s", comInfo.c_str());
-                break;
-            }
-            WIFI_LOGD("deviceName %{private}s, pinCode %{private}s", deviceName.c_str(), pinCode.c_str());
-            break;
-        default:
-            break;
-    }
 }
 
 void UIExtensionAbilityConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,

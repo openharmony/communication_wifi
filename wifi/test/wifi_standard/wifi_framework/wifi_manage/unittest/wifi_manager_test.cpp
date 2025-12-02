@@ -716,14 +716,14 @@ HWTEST_F(WifiManagerTest, RegisterDisplayListenerTest, TestSize.Level1)
 
 HWTEST_F(WifiManagerTest, UnRegisterDataShareReadyEventTest, TestSize.Level1)
 {
-    uint32_t dataShareReadyTimerId_{1};
+    wifiManager.wifiEventSubscriberManager->dataShareReadyTimerId_ = 1;
     wifiManager.wifiEventSubscriberManager->UnRegisterDataShareReadyEvent();
 
-    dataShareReadyTimerId_ = 0;
+    wifiManager.wifiEventSubscriberManager->dataShareReadyTimerId_ = 0;
     std::shared_ptr<DataShareReadySubscriber> dataShareReadySubscriber_ = nullptr;
     wifiManager.wifiEventSubscriberManager->UnRegisterDataShareReadyEvent();
 
-    dataShareReadyTimerId_ = 1;
+    wifiManager.wifiEventSubscriberManager->dataShareReadyTimerId_ = 1;
     OHOS::EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
     OHOS::EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
@@ -734,32 +734,32 @@ HWTEST_F(WifiManagerTest, UnRegisterDataShareReadyEventTest, TestSize.Level1)
 
 HWTEST_F(WifiManagerTest, UnRegisterSettingsEnterEventTest, TestSize.Level1)
 {
-    uint32_t settingsTimerId{0};
+    wifiManager.wifiEventSubscriberManager-> settingsTimerId = 0;
     std::shared_ptr<SettingsEnterSubscriber> settingsEnterSubscriber_ = nullptr;
     wifiManager.wifiEventSubscriberManager->UnRegisterSettingsEnterEvent();
 
-    settingsTimerId = 1;
+    wifiManager.wifiEventSubscriberManager->settingsTimerId = 1;
     wifiManager.wifiEventSubscriberManager->UnRegisterSettingsEnterEvent();
     EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, RegisterSettingsEnterEventTest, TestSize.Level1)
 {
-    uint32_t settingsTimerId{0};
+    wifiManager.wifiEventSubscriberManager->settingsTimerId = 0;
     std::shared_ptr<SettingsEnterSubscriber> settingsEnterSubscriber_ = nullptr;
     wifiManager.wifiEventSubscriberManager->RegisterSettingsEnterEvent();
 
-    settingsTimerId = 1;
+    wifiManager.wifiEventSubscriberManager->settingsTimerId = 1;
     wifiManager.wifiEventSubscriberManager->RegisterSettingsEnterEvent();
     EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, UnRegisterWifiScanChangeEventTest02, TestSize.Level1)
 {
-    uint32_t wifiScanChangeTimerId{1};
+    wifiManager.wifiEventSubscriberManager-> wifiScanChangeTimerId = 1;
     wifiManager.wifiEventSubscriberManager->UnRegisterWifiScanChangeEvent();
 
-    wifiScanChangeTimerId = 1;
+    wifiManager.wifiEventSubscriberManager->wifiScanChangeTimerId = 0;
     std::shared_ptr<WifiScanEventChangeSubscriber> wifiScanEventChangeSubscriber_ = nullptr;
     wifiManager.wifiEventSubscriberManager->UnRegisterWifiScanChangeEvent();
     EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
@@ -767,30 +767,30 @@ HWTEST_F(WifiManagerTest, UnRegisterWifiScanChangeEventTest02, TestSize.Level1)
 
 HWTEST_F(WifiManagerTest, RegisterWifiScanChangeEventTest02, TestSize.Level1)
 {
-    uint32_t wifiScanChangeTimerId{1};
+    wifiManager.wifiEventSubscriberManager-> wifiScanChangeTimerId = 1;
     wifiManager.wifiEventSubscriberManager->RegisterWifiScanChangeEvent();
 
-    wifiScanChangeTimerId = 0;
+    wifiManager.wifiEventSubscriberManager->wifiScanChangeTimerId = 0;
     wifiManager.wifiEventSubscriberManager->RegisterWifiScanChangeEvent();
     EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, UnRegisterNotificationEventTest, TestSize.Level1)
 {
-    uint32_t notificationTimerId{1};
+    wifiManager.wifiEventSubscriberManager-> notificationTimerId = 1;
     wifiManager.wifiEventSubscriberManager->UnRegisterNotificationEvent();
 
-    notificationTimerId = 0;
+    wifiManager.wifiEventSubscriberManager->notificationTimerId = 0;
     wifiManager.wifiEventSubscriberManager->UnRegisterNotificationEvent();
     EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, RegisterNotificationEventTest, TestSize.Level1)
 {
-    uint32_t notificationTimerId{1};
+    wifiManager.wifiEventSubscriberManager-> notificationTimerId = 1;
     wifiManager.wifiEventSubscriberManager->RegisterNotificationEvent();
 
-    notificationTimerId = 0;
+    wifiManager.wifiEventSubscriberManager->notificationTimerId = 0;
     wifiManager.wifiEventSubscriberManager->RegisterNotificationEvent();
     EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
 }

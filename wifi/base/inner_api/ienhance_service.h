@@ -25,6 +25,7 @@ namespace Wifi {
 enum SettingsDialogClickType {
     SETTINGS_5G_AUTO_IDENTIFY_CONN = 0
 };
+
 using P2pEnhanceCallback = std::function<void(const std::string &, int32_t, int32_t)>;
 using SensorEnhanceCallback = std::function<void(int)>;
 using MovementEnhanceCallback = std::function<void(int32_t movementType, int32_t movementValue)>;
@@ -400,6 +401,12 @@ public:
      * @return success: 0, failed: -1
      */
     virtual void OnFoldStateChanged(const int foldStatus) = 0;
+    /**
+     * @Description check lp scan ability
+     *
+     * @return bool
+     */
+    virtual bool IsSupportLpScanAbility() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

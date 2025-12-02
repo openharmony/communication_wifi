@@ -47,6 +47,7 @@ public:
  
 public:
     std::shared_ptr<DualBandRepostitory> pDualBandRepostitory_ = nullptr;
+
 private:
     std::mutex mPerf5gMutex;
     std::shared_ptr<ConnectedAp> connectedAp_ = nullptr;

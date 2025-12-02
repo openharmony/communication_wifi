@@ -199,11 +199,7 @@ int32_t WifiScanServiceImpl::PermissionVerification()
 #endif
  
     int scanStyle = SCAN_DEFAULT_TYPE;
-#ifdef SUPPORT_LP_SCAN
     if (!IsWifiScanAllowed(scanStyle, externFlag)) {
-#else
-    if (!IsWifiScanAllowed(externFlag)) {
-#endif
         WIFI_LOGE("Scan not allowed!");
         return WIFI_OPT_FAILED;
     }
@@ -264,12 +260,8 @@ int32_t WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
     }
 #endif
  
-#ifdef SUPPORT_LP_SCAN
     WifiScanParams paramsCopy = params;
     if (!IsWifiScanAllowed(paramsCopy.scanStyle, externFlag)) {
-#else
-    if (!IsWifiScanAllowed(externFlag)) {
-#endif
         WIFI_LOGE("Scan not allowed!");
         return WIFI_OPT_FAILED;
     }
@@ -279,18 +271,10 @@ int32_t WifiScanServiceImpl::AdvanceScan(const WifiScanParams &params)
             GetScanDeviceInfo().GetScanInitiatorName(), WifiScanFailReason::SCAN_SERVICE_NOT_RUNNING);
         return WIFI_OPT_SCAN_NOT_OPENED;
     }
-#ifdef SUPPORT_LP_SCAN
     return pService->ScanWithParam(paramsCopy, externFlag);
-#else
-    return pService->ScanWithParam(params, externFlag);
-#endif
 }
 
-#ifdef SUPPORT_LP_SCAN
 bool WifiScanServiceImpl::IsWifiScanAllowed(int &scanStyle, bool externFlag)
-#else
-bool WifiScanServiceImpl::IsWifiScanAllowed(bool externFlag)
-#endif
 {
     WifiScanDeviceInfo scanInfo;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(scanInfo);
@@ -313,9 +297,7 @@ bool WifiScanServiceImpl::IsWifiScanAllowed(bool externFlag)
         scanInfo.externScan = externFlag;
         scanInfo.isSystemApp = WifiAuthCenter::IsSystemAccess();
         bool allowScan = pEnhanceService->IsScanAllowed(scanInfo);
-#ifdef SUPPORT_LP_SCAN
         scanStyle = scanInfo.scanStyle;
-#endif
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->SaveScanDeviceInfo(scanInfo);
         return allowScan;
     }

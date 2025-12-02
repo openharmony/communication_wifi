@@ -105,6 +105,9 @@ public:
     virtual int GetScreenState() const = 0;
     virtual void SetBrowserState(bool browser) = 0;
     virtual bool GetBrowserState() = 0;
+    virtual void SetLpScanAbility(bool isSupportLpScan) = 0;
+    virtual bool GetLpScanAbility() = 0;
+    virtual int SetHid2dUpperScene(int uid, const Hid2dUpperScene &scene) = 0;
     virtual void SetWlanPage(bool isWlanPage) = 0;
     virtual bool IsWlanPage() const = 0;
     virtual void SetThermalLevel(const int &level) = 0;
@@ -270,6 +273,9 @@ public:
     MOCK_METHOD1(SetScreenState, void(const int &state));
     MOCK_METHOD1(SetBrowserState, void(bool));
     MOCK_METHOD0(GetBrowserState, bool());
+    MOCK_METHOD1(SetLpScanAbility, void(bool));
+    MOCK_METHOD0(GetLpScanAbility, bool());
+    MOCK_METHOD2(SetHid2dUpperScene, int(int, const Hid2dUpperScene &));
     MOCK_CONST_METHOD0(GetScreenState, int());
     MOCK_METHOD1(SetWlanPage, void(bool isWlanPage));
     MOCK_CONST_METHOD0(IsWlanPage, bool());

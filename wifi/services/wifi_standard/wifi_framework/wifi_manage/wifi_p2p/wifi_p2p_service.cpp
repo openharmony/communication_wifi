@@ -225,12 +225,22 @@ ErrCode WifiP2pService::DeleteGroup(const WifiP2pGroupInfo &group)
 
 ErrCode WifiP2pService::P2pConnect(const WifiP2pConfig &config)
 {
-    WIFI_LOGI("P2pConnect");
+    WIFI_LOGI("P2pConnect, method is %{public}d", dev.GetWpsConfigMethod());
     int callingUid = IPCSkeleton::GetCallingUid();
     WifiConfigCenter::GetInstance().SaveP2pCreatorUid(callingUid);
     WifiP2pConfigInternal configInternal(config);
     WpsInfo wps;
-    wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
+    WifiP2pDevice dev = deviceManager.GetDevices(config.GetDeviceAddress());
+    WIFI_LOGI("p2pconnect method is %{public}d", dev.GetWpsConfigMethod());
+    if ((dev.GetWpsConfigMethod() & static_cast<unsigned int>(WpsConfigMethod::WPS_CFG_PUSHBUTTON)) != 0) {
+        wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
+    } else if ((dev.GetWpsConfigMethod() &
+        static_cast<unsigned int>(WpsConfigMethod::WPS_CFG_DISPLAY)) != 0 ||
+        (dev.GetWpsConfigMethod() & static_cast<unsigned int>(WpsConfigMethod::WPS_CFG_KEYPAD)) != 0) {
+        wps.SetWpsMethod(WpsMethod::WPS_METHOD_KEYPAD);
+    } else {
+        wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
+    }
     configInternal.SetWpsInfo(wps);
     p2pStateMachine.SetIsNeedDhcp(DHCPTYPE::DHCP_P2P);
     const std::any info = configInternal;

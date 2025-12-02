@@ -127,7 +127,6 @@ ohos_shared_library("wifi_p2p_service") {
     "ability_runtime:wantagent_innerkits",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
-    "cJSON:cjson",
     "dhcp:dhcp_sdk",
     "hilog:libhilog",
     "ipc:ipc_core",

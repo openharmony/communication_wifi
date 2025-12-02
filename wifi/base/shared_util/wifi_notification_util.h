@@ -16,7 +16,6 @@
 #ifndef WIFI_NOTIFICATION_UTIL_H
 #define WIFI_NOTIFICATION_UTIL_H
 #include "ability_connect_callback_stub.h"
-#include "cJSON.h"
 #include "ipc_skeleton.h"
 #include "want.h"
 #include "want_params_wrapper.h"
@@ -75,8 +74,6 @@ public:
     void ShowDialog(WifiDialogType type, std::string comInfo = "");
 
     void ShowSettingsDialog(WifiDialogType type, std::string settings);
-
-    void AddP2pParam(WifiDialogType type, std::string comInfo, cJSON *param);
 
 private:
     std::atomic<bool> isPortalNtfPublished {false};

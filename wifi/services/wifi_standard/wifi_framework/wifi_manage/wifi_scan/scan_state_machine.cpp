@@ -919,6 +919,7 @@ void ScanStateMachine::ClearRunningScanSettings()
     runningScanSettings.hiddenNetworkSsid.clear();
     runningScanSettings.scanFreqs.clear();
     runningFullScanFlag = false;
+    runningScanSettings.scanStyle = 0xFF;
     return;
 }
 
@@ -1286,21 +1287,14 @@ void ScanStateMachine::GetWaitingIndexList(std::vector<int> &waitingIndexList)
 bool ScanStateMachine::VerifyScanStyle(int scanStyle)
 {
     return (
-        scanStyle == SCAN_TYPE_LOW_SPAN ||
-        scanStyle == SCAN_TYPE_LOW_POWER ||
-        scanStyle == SCAN_TYPE_HIGH_ACCURACY
-#ifdef SUPPORT_LP_SCAN
-        || scanStyle == SCAN_TYPE_LOW_PRIORITY
-#endif
-        );
+        scanStyle == SCAN_TYPE_LOW_SPAN || scanStyle == SCAN_TYPE_LOW_POWER ||
+        scanStyle == SCAN_TYPE_HIGH_ACCURACY || scanStyle == SCAN_TYPE_LOW_PRIORITY);
 }
 
 bool ScanStateMachine::ActiveScanStyle(int scanStyle)
 {
     switch (runningScanSettings.scanStyle) {
-#ifdef SUPPORT_LP_SCAN
         case SCAN_TYPE_LOW_PRIORITY:
-#endif
         case SCAN_TYPE_LOW_SPAN:
         case SCAN_TYPE_LOW_POWER:
             return scanStyle != SCAN_TYPE_HIGH_ACCURACY;
@@ -1315,9 +1309,7 @@ bool ScanStateMachine::ActiveScanStyle(int scanStyle)
 int ScanStateMachine::MergeScanStyle(int currentScanStyle, int newScanStyle)
 {
     switch (currentScanStyle) {
-#ifdef SUPPORT_LP_SCAN
         case SCAN_TYPE_LOW_PRIORITY:
-#endif
         case SCAN_TYPE_LOW_SPAN:
         case SCAN_TYPE_LOW_POWER:
             return newScanStyle;

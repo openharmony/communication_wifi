@@ -88,11 +88,7 @@ public:
 private:
     bool Init();
     bool IsScanServiceRunning();
-#ifdef SUPPORT_LP_SCAN
     bool IsWifiScanAllowed(int &scanStyle, bool externFlag = true);
-#else
-    bool IsWifiScanAllowed(bool externFlag = true);
-#endif
     bool IsInScanMacInfoWhiteList();
     void UpdateScanInfoListNotInWhiteList(std::vector<WifiScanInfo> &result);
 #ifndef OHOS_ARCH_LITE

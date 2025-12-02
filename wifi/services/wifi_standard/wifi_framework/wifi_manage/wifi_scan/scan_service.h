@@ -396,9 +396,6 @@ private:
     bool isChipsetInfoObtained;
     std::atomic<int> currSingleScanCount {0};
     int lastP2pEnhanceState {0};
-#ifdef SUPPORT_LP_SCAN
-    bool isLpScanSupported_ = false;
-#endif
     /**
      * @Description Obtains the frequency of a specified band.
      *
@@ -592,6 +589,13 @@ private:
      * @return success: true, failed: false
      */
     ErrCode AllowSystemTimerScan(ScanType scanType, int &scanStyle);
+    /**
+     * @Description Extra determine whether to allow scheduled system scanning.
+     *
+     * @param scanStyle - Type of scan to trigger the WiFi chip
+     * @return success: true, failed: false
+     */
+    ErrCode AllowSystemTimerScanExtra(ScanType scanType, int &scanStyle);
     /**
      * @Description Determines whether to allow PNO scanning based on the scanning policy.
      *

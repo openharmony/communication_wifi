@@ -168,7 +168,8 @@ public:
         WifiDeviceConfig config;
         config.keyMgmt = "WEP";
         config.ssid = "123";
-        EXPECT_EQ(WIFI_OPT_FAILED, pStaStateMachine->ConvertDeviceCfg(config, temp.bssid));
+        std::string ifname = "wlan0";
+        EXPECT_EQ(WIFI_OPT_FAILED, pStaStateMachine->ConvertDeviceCfg(config, temp.bssid, ifname));
     }
 
     void GetGsmAuthResponseWithoutLengthTest()
@@ -320,7 +321,8 @@ public:
         WifiDeviceConfig config;
         config.keyMgmt = "SAE";
         config.ssid = "123";
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, temp.bssid));
+        std::string ifname = "wlan0";
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, temp.bssid, ifname));
     }
 
     void SetExternalSimTest1()
@@ -1075,7 +1077,8 @@ HWTEST_F(StaStateMachineTest, ConvertDeviceCfgTest01, TestSize.Level1)
     wifiScanInfo.capabilities = "PSK+SAE";
     scanInfoList.push_back(wifiScanInfo);
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->SaveScanInfoList(scanInfoList);
-    pStaStateMachine->ConvertDeviceCfg(config, wifiScanInfo.ssid);
+    std::string ifname = "wlan0";
+    pStaStateMachine->ConvertDeviceCfg(config, wifiScanInfo.ssid, ifname);
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 

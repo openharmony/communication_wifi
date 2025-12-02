@@ -422,4 +422,16 @@ bool PreferredApSelector::Filter(NetworkCandidate &networkCandidate)
     TryNominate(networkCandidate);
     return false;
 }
+
+SameSsidMultiBssidIntegrator::SameSsidMultiBssidIntegrator() : SimpleNetworkSelector(
+    "SameSsidMultiBssidIntegrator")
+{
+    auto filters = make_shared<AndWifiFilter>();
+    filters->AddFilter(make_shared<BlackListNetworkSelector>());
+    SetWifiFilter(filters);
+    auto comparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
+    comparator->AddScorer(make_shared<SavedNetworkScorer>("SameSsidMultiBssidNetworkScorer"));
+    SetWifiComparator(comparator);
+}
+
 }

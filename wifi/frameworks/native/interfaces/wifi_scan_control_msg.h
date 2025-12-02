@@ -127,9 +127,7 @@ enum class ScanLimitType {
     HID2D_CLONE,
     GAME_SCENE,
     GLASSES_SCENE,
-#ifdef SUPPORT_LP_SCAN
     LP_SCANSTYLE,
-#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

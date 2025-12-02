@@ -400,6 +400,13 @@ public:
      * @return success: 0, failed: -1
      */
     virtual void OnFoldStateChanged(const int foldStatus) = 0;
+
+    /**
+     * @Description perform network probing using GRS
+     *
+     * @return bool - network probing result
+     */
+    virtual bool GrsProbe() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

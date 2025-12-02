@@ -776,7 +776,7 @@ void P2pStateMachine::P2pConnectByShowingPin(const WifiP2pConfigInternal &config
         return;
     }
 
-    std::string pin;
+    std::string pin = config.GetWpsInfo().GetPin();
     if (WifiErrorNo::WIFI_HAL_OPT_OK !=
         WifiP2PHalInterface::GetInstance().Connect(config, device.IsGroupOwner(), pin)) {
         WIFI_LOGE("Connection failed.");

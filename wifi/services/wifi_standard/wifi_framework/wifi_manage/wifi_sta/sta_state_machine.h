@@ -220,9 +220,6 @@ public:
         bool NotAllowConnectToNetwork(int networkId, const std::string& bssid, int connTriggerMode);
         bool NotExistInScanList(WifiDeviceConfig &config);
         void DealHiddenSsidConnectMiss(int networkId);
-#ifndef OHOS_ARCH_LITE
-        bool GrsNetworkProbe();
-#endif
         StaStateMachine *pStaStateMachine;
     };
 
@@ -361,6 +358,9 @@ public:
         void DealWifiPowerSaveWhenScreenStatusNotify(InternalMessagePtr msg);
         void DealWifiPowerSaveWhenBatteryStatusNotify(InternalMessagePtr msg);
         void DealWifiPowerSaveWhenWifiConnected();
+#endif
+#ifndef OHOS_ARCH_LITE
+        bool GrsNetworkProbe();
 #endif
         StaStateMachine *pStaStateMachine;
     };

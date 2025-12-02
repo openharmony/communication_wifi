@@ -151,7 +151,7 @@ public:
         void TryStartScan(bool hasSwitchRecord, int32_t signalLevel);
         void StartScanWithDynamicStrategy(int32_t &rssiLevelScanedCounter, bool hasSwitchRecord, int32_t scanInterval);
         bool IsSatisfiedLpScanCondition();
-        ErrCode ExecuteDynamicScan(int &rssiLevelScanedCounter);
+        ErrCode ExecuteDynamicScan(int rssiLevelScanedCounter);
         ErrCode StartLpScan();
         ErrCode ScanByPerf5gTable(const std::vector<InterScanInfo> &scanInfos);
         void WifiHasNetStateInit();

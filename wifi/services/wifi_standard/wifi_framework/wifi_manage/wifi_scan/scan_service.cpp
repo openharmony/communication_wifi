@@ -2864,7 +2864,7 @@ bool ScanService::AllowScanByGameScene(ScanType scanType, int &scanStyle)
         if (WifiConfigCenter::GetInstance().GetLpScanAbility() && (scanType != ScanType::SCAN_TYPE_PNO &&
             scanType != ScanType::SCAN_TYPE_SYSTEMTIMER)) {
             scanStyle = SCAN_TYPE_LOW_PRIORITY;
-            WIFI_LOGI("LP Scan is allowed in cast hid2d.");
+            WIFI_LOGI("LP Scan is allowed in GameScene.");
             return true;
         }
         WIFI_LOGW("Interval scan is not allowed in GameScene condition AllowScanByGameScene = %{public}d",

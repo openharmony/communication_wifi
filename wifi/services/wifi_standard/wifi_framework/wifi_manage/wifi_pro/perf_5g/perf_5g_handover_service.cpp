@@ -693,7 +693,11 @@ void Perf5gHandoverService::RssiUpdate(int32_t rssi)
 }
 bool Perf5gHandoverService::HasHiddenNetworkSsid()
 {
+    int apNum = apMaxNum_;
     for (auto &ap : relationAps_) {
+        if (apNum-- == 0) {
+            break;
+        }
         WifiDeviceConfig config;
         if (WifiSettings::GetInstance().GetDeviceConfig(ap.apInfo_.networkId, config) < 0) {
             continue;

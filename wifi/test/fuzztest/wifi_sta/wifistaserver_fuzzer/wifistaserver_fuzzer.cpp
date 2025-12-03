@@ -156,7 +156,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     config.wifiEapConfig.eap = FDP.ConsumeBytesAsString(NUM_BYTES);
     config.wifiEapConfig.clientCert = FDP.ConsumeBytesAsString(NUM_BYTES);
     config.wifiEapConfig.privateKey = FDP.ConsumeBytesAsString(NUM_BYTES);
-    config.wifiEapConfig.certEntry.push_back(FDP.ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.certEntry = FDP.ConsumeBytes<uint8_t>(NUM_BYTES);
     config.wifiEapConfig.encryptedData = FDP.ConsumeBytesAsString(NUM_BYTES);
     pStaInterface->ConnectToNetwork(networkId);
     pStaInterface->ConnectToDevice(config);
@@ -194,7 +194,7 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->AllowAutoConnect(networkId, isAllowed);
     pStaInterface->EnableStaService();
     pStaInterface->StartConnectToUserSelectNetwork(networkId, config.bssid);
-    TagType tagType = static_cast<TagType>(data[index++]);
+    TagType tagType = static_cast<TagType>(FDP.ConsumeIntegral<int>() % TWO);
     std::string tagName;
     CommonBuilder commonBuilder;
     pStaInterface->RegisterCommonBuilder(tagType, tagName, commonBuilder);
@@ -300,8 +300,8 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     WifiDeviceConfig config;
     config.bssid = scanInfoList.bssid;
     config.ssid = scanInfoList.ssid;
-    config.preSharedKey = std::string(reinterpret_cast<const char*>(data), size);
-    config.keyMgmt = std::string(reinterpret_cast<const char*>(data), size);
+    config.preSharedKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP.ConsumeBytesAsString(NUM_BYTES);
     std::vector<std::string> blocklistBssids;
     std::vector<StaServiceCallback> callbacks;
     NetworkSelectionResult candidate;
@@ -443,7 +443,7 @@ void UpdateEapConfigTest(FuzzedDataProvider& FDP)
     config.wifiEapConfig.eap = FDP.ConsumeBytesAsString(NUM_BYTES);
     config.wifiEapConfig.clientCert = FDP.ConsumeBytesAsString(NUM_BYTES);
     config.wifiEapConfig.privateKey = FDP.ConsumeBytesAsString(NUM_BYTES);
-    config.wifiEapConfig.certEntry.push_back(FDP.ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.certEntry = FDP.ConsumeBytes<uint8_t>(NUM_BYTES);
     config.wifiEapConfig.encryptedData = FDP.ConsumeBytesAsString(NUM_BYTES);
     std::vector<std::string> eapMethod = {"SIM", "AKA", "AKA"};
     config.wifiEapConfig.eap = FDP.ConsumeBytesAsString(NUM_BYTES);
@@ -461,7 +461,7 @@ void AddDeviceConfigTest(FuzzedDataProvider& FDP)
     config.wifiEapConfig.eap = EapMethod;
     config.wifiEapConfig.clientCert = FDP.ConsumeBytesAsString(NUM_BYTES);
     config.wifiEapConfig.privateKey = FDP.ConsumeBytesAsString(NUM_BYTES);
-    config.wifiEapConfig.certEntry.push_back(FDP.ConsumeIntegral<uint8_t>());
+    config.wifiEapConfig.certEntry = FDP.ConsumeBytes<uint8_t>(NUM_BYTES);
     config.wifiEapConfig.encryptedData = FDP.ConsumeBytesAsString(NUM_BYTES);
     pStaService->AddDeviceConfig(config);
 }

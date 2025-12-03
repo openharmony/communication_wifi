@@ -427,6 +427,7 @@ ErrCode CjEventRegister::RegisterDeviceEvents(const std::vector<std::string>& ev
         WIFI_LOGE("Register sta event get instance failed!");
         return WIFI_OPT_FAILED;
     }
+    cjWifiDeviceCallback->name = "CjWifiDeviceCallback";
     return g_cjWifiStaPtr->RegisterCallBack(cjWifiDeviceCallback, event);
 }
 
@@ -436,6 +437,7 @@ ErrCode CjEventRegister::RegisterScanEvents(const std::vector<std::string>& even
         WIFI_LOGE("Register scan event get instance failed!");
         return WIFI_OPT_FAILED;
     }
+    cjWifiScanCallback->name = "CjWifiScanCallback";
     return g_cjWifiScanPtr->RegisterCallBack(cjWifiScanCallback, event);
 }
 

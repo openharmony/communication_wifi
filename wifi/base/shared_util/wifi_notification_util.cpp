@@ -162,8 +162,8 @@ static void AddP2pParam(WifiDialogType type, std::string comInfo, cJSON *param)
             break;
         case P2P_WSC_DISPLAY_DIALOG:
             if (codePos != std::string::npos) {
-                deviceName = comInfo.substr(0, codePos);
-                pinCode = comInfo.substr(codePos + 1);
+                pinCode = comInfo.substr(0, codePos);
+                deviceName = comInfo.substr(codePos + 1);
                 cJSON_AddStringToObject(param, "p2pDeviceName", deviceName.c_str());
                 cJSON_AddStringToObject(param, "p2pPinCode", pinCode.c_str());
             } else {

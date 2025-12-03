@@ -417,12 +417,7 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         WIFI_LOGE("P2pService is not running!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(INSTID_WLAN1);
-    if (staState == WifiOprMidState::RUNNING) {
-        WIFI_LOGI("SetWifiToggledState DISABLED");
-        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED, INSTID_WLAN1);
-        WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, 1);
-    }
+    CheckAndStopDualWifi();
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
         WIFI_LOGE("Get P2P service failed!");
@@ -551,36 +546,10 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WifiP2pConfig updateConfig = config;
-#ifdef SUPPORT_RANDOM_MAC_ADDR
-    if (MacAddress::IsValidMac(config.GetDeviceAddress())) {
-        if (config.GetDeviceAddressType() > REAL_DEVICE_ADDRESS) {
-            WIFI_LOGE("%{public}s: invalid bssidType:%{public}d",
-                __func__, config.GetDeviceAddressType());
-            return WIFI_OPT_INVALID_PARAM;
-        }
-        WifiMacAddrInfo macAddrInfo;
-        macAddrInfo.bssid = config.GetDeviceAddress();
-        macAddrInfo.bssidType = config.GetDeviceAddressType();
-        std::string randomMacAddr =
-            WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
-        if (randomMacAddr.empty()) {
-            WIFI_LOGW("no record found, bssid:%{private}s, bssidType:%{public}d",
-                macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
-        } else {
-            WIFI_LOGI("%{public}s: find the record, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
-                __func__, config.GetDeviceAddress().c_str(), config.GetDeviceAddressType(), randomMacAddr.c_str());
-            /* random MAC address are translated into real MAC address */
-            if (config.GetDeviceAddressType() == RANDOM_DEVICE_ADDRESS) {
-                updateConfig.SetDeviceAddress(randomMacAddr);
-                updateConfig.SetDeviceAddressType(REAL_DEVICE_ADDRESS);
-                WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
-                    __func__, updateConfig.GetDeviceAddress().c_str(), updateConfig.GetDeviceAddressType());
-            }
-        }
-    } else {
-        WIFI_LOGW("invalid mac address");
+    ErrCode ret = ConvertMac(updateConfig, config);
+    if (ret != WIFI_OPT_SUCCESS) {
+        return ret;
     }
-#endif
 
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
@@ -588,6 +557,7 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_CNT));
+    CheckAndStopDualWifi();
     return pService->P2pConnect(updateConfig);
 }
 
@@ -1686,6 +1656,51 @@ ErrCode WifiP2pServiceImpl::Hid2dSetGroupType(GroupLiveType groupType)
         return WIFI_OPT_P2P_NOT_OPENED;
     }
     return pService->Hid2dSetGroupType(groupType);
+}
+
+void WifiP2pServiceImpl::CheckAndStopDualWifi(void)
+{
+    WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(INSTID_WLAN1);
+    if (staState == WifiOprMidState::RUNNING) {
+        WIFI_LOGI("SetWifiToggledState DISABLED");
+        WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_DISABLED, INSTID_WLAN1);
+        WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(0, 1);
+    }
+}
+
+ErrCode WifiP2pServiceImpl::ConvertMac(WifiP2pConfig &updateConfig, const WifiP2pConfig &config)
+{
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    if (MacAddress::IsValidMac(config.GetDeviceAddress())) {
+        if (config.GetDeviceAddressType() > REAL_DEVICE_ADDRESS) {
+            WIFI_LOGE("%{public}s: invalid bssidType:%{public}d",
+                __func__, config.GetDeviceAddressType());
+            return WIFI_OPT_INVALID_PARAM;
+        }
+        WifiMacAddrInfo macAddrInfo;
+        macAddrInfo.bssid = config.GetDeviceAddress();
+        macAddrInfo.bssidType = config.GetDeviceAddressType();
+        std::string randomMacAddr =
+            WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::P2P_DEVICE_MACADDR_INFO, macAddrInfo);
+        if (randomMacAddr.empty()) {
+            WIFI_LOGW("no record found, bssid:%{private}s, bssidType:%{public}d",
+                macAddrInfo.bssid.c_str(), macAddrInfo.bssidType);
+        } else {
+            WIFI_LOGI("%{public}s: find the record, bssid:%{private}s, bssidType:%{public}d, randomMac:%{private}s",
+                __func__, config.GetDeviceAddress().c_str(), config.GetDeviceAddressType(), randomMacAddr.c_str());
+            /* random MAC address are translated into real MAC address */
+            if (config.GetDeviceAddressType() == RANDOM_DEVICE_ADDRESS) {
+                updateConfig.SetDeviceAddress(randomMacAddr);
+                updateConfig.SetDeviceAddressType(REAL_DEVICE_ADDRESS);
+                WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    __func__, updateConfig.GetDeviceAddress().c_str(), updateConfig.GetDeviceAddressType());
+            }
+        }
+    } else {
+        WIFI_LOGW("invalid mac address");
+    }
+#endif
+    return WIFI_OPT_SUCCESS;
 }
 
 }  // namespace Wifi

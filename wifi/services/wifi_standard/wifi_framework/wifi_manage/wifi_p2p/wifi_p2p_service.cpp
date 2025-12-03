@@ -225,7 +225,6 @@ ErrCode WifiP2pService::DeleteGroup(const WifiP2pGroupInfo &group)
 
 ErrCode WifiP2pService::P2pConnect(const WifiP2pConfig &config)
 {
-    WIFI_LOGI("P2pConnect, method is %{public}d", dev.GetWpsConfigMethod());
     int callingUid = IPCSkeleton::GetCallingUid();
     WifiConfigCenter::GetInstance().SaveP2pCreatorUid(callingUid);
     WifiP2pConfigInternal configInternal(config);

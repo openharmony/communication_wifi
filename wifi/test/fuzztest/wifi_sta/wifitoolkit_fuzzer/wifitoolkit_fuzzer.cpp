@@ -259,15 +259,16 @@ void SoftapParserTest()
 
 void WifiRandomMacHelperTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     int index = 0;
     unsigned long long random = static_cast<unsigned long long>(data[index++]);
-    std::string content = FDP->ConsumeBytesAsString(NUM_BYTES);
-    std::string randomMacAddr = FDP->ConsumeBytesAsString(NUM_BYTES);
+    std::string content = FDP.ConsumeBytesAsString(NUM_BYTES);
+    std::string randomMacAddr = FDP.ConsumeBytesAsString(NUM_BYTES);
     std::vector<uint8_t> outPlant;
     std::vector<uint8_t> byte;
     std::vector<uint8_t> bytes;
     std::vector<uint8_t> addr;
-    bool value = (static_cast<int>(data[0]) % TWO) ? true : false;
+    bool value = FDP.ConsumeBool();
     #ifdef SUPPORT_LOCAL_RANDOM_MAC
     m_WifiRandomMacHelper->CalculateRandomMacForWifiDeviceConfig(content, randomMacAddr);
     #endif

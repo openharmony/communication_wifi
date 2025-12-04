@@ -67,7 +67,8 @@ public:
     virtual ErrCode DisableRandomMac(int setmode);
     virtual ErrCode CreateRptGroup(const WifiP2pConfig &config);
     virtual ErrCode GetRptStationsList(std::vector<StationInfo> &result);
-    virtual void NotifyWscDialogConfirmResult(bool isAccept);
+    virtual void NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPincode);
+    virtual void NotifyWscDisplayConfirmResult();
     virtual ErrCode SetMiracastSinkConfig(const std::string& config);
     virtual ErrCode NotifyRemoteDie(int uid);
     virtual ErrCode SetP2pHighPerf(bool isEnable);

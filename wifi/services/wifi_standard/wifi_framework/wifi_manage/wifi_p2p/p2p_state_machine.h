@@ -38,7 +38,6 @@
 #include "p2p_idle_state.h"
 #include "p2p_inviting_state.h"
 #include "provision_discovery_state.h"
-#include "abstract_ui.h"
 #include "wifi_hid2d_service_utils.h"
 #include "dhcp_c_api.h"
 #include "p2p_group_remove_state.h"
@@ -431,7 +430,7 @@ private:
     virtual ErrCode RemoveClientInfo(std::string mac);
     virtual bool IsMatchClientDevice(std::vector<GcInfo> &gcInfos, WifiP2pDevice &device, GcInfo &gcInfo);
 #ifndef OHOS_ARCH_LITE
-    void WakeUpScreenSaver();
+    void WakeUpScreenSaver() const;
 #endif
     bool SetTempGroupConfig(const WifiP2pConfigInternal &config) const;
     void CancelWpsPbc();

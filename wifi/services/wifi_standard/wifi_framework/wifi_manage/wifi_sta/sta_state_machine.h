@@ -359,6 +359,9 @@ public:
         void DealWifiPowerSaveWhenBatteryStatusNotify(InternalMessagePtr msg);
         void DealWifiPowerSaveWhenWifiConnected();
 #endif
+#ifndef OHOS_ARCH_LITE
+        bool GrsNetworkProbe();
+#endif
         StaStateMachine *pStaStateMachine;
     };
     /**

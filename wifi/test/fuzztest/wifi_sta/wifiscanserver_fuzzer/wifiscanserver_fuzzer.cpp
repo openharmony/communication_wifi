@@ -142,13 +142,13 @@ void AddScanMessageBodyFuzzTest(FuzzedDataProvider& FDP)
 
 void StoreRequestScanConfigFuzzTest(FuzzedDataProvider& FDP)
 {
-    int randomInt = FDP.ConsumeIntegral<int>();
     StoreScanConfig config;
     config.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
     config.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
     config.fullScanFlag = FDP.ConsumeBool();
     int appId = FDP.ConsumeIntegral<int>();
     time_t now = time(nullptr);
+    int scanStyle = SCAN_DEFAULT_TYPE;
     std::vector<InterScanInfo> infoList;
     pScanService->StoreFullScanInfo(config, infoList);
     pScanService->HandleStaStatusChanged(appId);
@@ -156,9 +156,9 @@ void StoreRequestScanConfigFuzzTest(FuzzedDataProvider& FDP)
     pScanService->HandleCustomStatusChanged(appId, appId);
     pScanService->IsPackageInTrustList(config.ssid, appId, config.bssid);
     ScanIntervalMode scanIntervalMode;
-    scanIntervalMode.intervalMode = static_cast<IntervalMode>(randomInt % U32_AT_SIZE_ZERO);
+    scanIntervalMode.intervalMode = static_cast<IntervalMode>(FDP.ConsumeIntegral<int>() % U32_AT_SIZE_ZERO);
     scanIntervalMode.isSingle =  FDP.ConsumeBool();
-    scanIntervalMode.scanMode = static_cast<ScanMode>(randomInt % SIZE);
+    scanIntervalMode.scanMode = static_cast<ScanMode>(FDP.ConsumeIntegral<int>() % SIZE);
     scanIntervalMode.scanScene = FDP.ConsumeIntegral<int>();
     scanIntervalMode.interval = FDP.ConsumeIntegral<int>();
     scanIntervalMode.count = FDP.ConsumeIntegral<int>();
@@ -172,10 +172,10 @@ void StoreRequestScanConfigFuzzTest(FuzzedDataProvider& FDP)
     pScanService->AllowSingleAppScanByInterval(appId, scanIntervalMode);
     pScanService->SystemScanByInterval(appId, appId, appId);
     pScanService->PnoScanByInterval(appId, now, appId, appId);
-    ScanType scanType = static_cast<ScanType>(randomInt % THREE);
+    ScanType scanType = static_cast<ScanType>(FDP.ConsumeIntegral<int>() % THREE);
     pScanService->ApplyTrustListPolicy(scanType);
     pScanService->HandleCustomStatusChanged(appId, appId);
-    int status =  (randomInt % SIZE + 17);
+    int status =  (FDP.ConsumeIntegral<int>() % SIZE + 17);
     pScanService->HandleNetworkQualityChanged(status);
     pScanService->HandleNetworkQualityChanged(status);
     WifiConfigCenter::GetInstance().SetScanGenieState(MODE_STATE_CLOSE);
@@ -189,6 +189,9 @@ void StoreRequestScanConfigFuzzTest(FuzzedDataProvider& FDP)
     pScanService->ReportScanFinishEvent(appId);
     pScanService->StoreUserScanInfo(config, infoList);
     pScanService->Scan(ScanType::SCAN_TYPE_NATIVE_EXTERN);
+    pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle);
+    pScanService->AllowSystemTimerScan(ScanType::SCAN_TYPE_SYSTEMTIMER, scanStyle);
+    pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle);
 }
 
 void StoreRequestScanConfigFuzzTest02(FuzzedDataProvider& FDP)
@@ -262,12 +265,8 @@ void StoreRequestScanConfigFuzzTest03(FuzzedDataProvider& FDP)
     pScanService->InitChipsetInfo();
     pScanService->DisconnectedTimerScan();
     pScanService->HandleDisconnectedScanTimeout();
-    pScanService->AllowExternScan();
-    pScanService->AllowExternScan();
     pScanService->HandleDisconnectedScanTimeout();
     pScanService->DisconnectedTimerScan();
-    pScanService->AllowSystemTimerScan();
-    pScanService->AllowExternScan();
     pScanService->GetScanControlInfo();
     pScanService->HandleDisconnectedScanTimeout();
     pScanService->EndPnoScan();
@@ -291,6 +290,7 @@ void AllowExternScanByForbidFuzzTest(FuzzedDataProvider& FDP)
     bool disable = FDP.ConsumeBool();
     const std::string ifName;
     std::vector<int> scanFreqs;
+    int scanStyle = SCAN_DEFAULT_TYPE;
     ScanMode scanMode = static_cast<ScanMode>(randomInt % SIZE);
     pScanService->AllowScanDuringScanning(scanMode);
     pScanService->AllowScanByMovingFreeze(scanMode);
@@ -306,7 +306,7 @@ void AllowExternScanByForbidFuzzTest(FuzzedDataProvider& FDP)
     pScanService->SelectTheFreqToSingleScan(lastStaFreq, p2pFreq, p2pEnhanceFreq);
     pScanService->StartSingleScanWithoutControl(freq);
     pScanService->RestartSystemScanTimeOut();
-    pScanService->Allow5GApScan();
+    pScanService->Allow5GApScan(ScanType::SCAN_TYPE_5G_AP, scanStyle);
     pScanService->GetSavedNetworkFreq(scanFreqs);
 }
 
@@ -332,6 +332,7 @@ void GetAllowBandFreqsControlInfoFuzzTest(FuzzedDataProvider& FDP)
 void BeginPnoScanFuzzTest(FuzzedDataProvider& FDP)
 {
     int randomInt = FDP.ConsumeIntegral<int>();
+    int scanStyle = SCAN_DEFAULT_TYPE;
     int maxNumberSpatialStreams = FDP.ConsumeIntegral<int>();
     InterScanInfo scanInfoList;
     scanInfoList.channelWidth = static_cast<WifiChannelWidth>(randomInt % U32_AT_SIZE_ZERO);
@@ -342,8 +343,8 @@ void BeginPnoScanFuzzTest(FuzzedDataProvider& FDP)
     pScanService->HandleAutoConnectStateChanged(true);
     pScanService->HandleSystemScanTimeout();
     pScanService->RestartPnoScanTimeOut();
-    pScanService->AllowExternScan();
-    pScanService->AllowPnoScan();
+    pScanService->AllowExternScan(ScanType::SCAN_TYPE_EXTERN, scanStyle);
+    pScanService->AllowPnoScan(ScanType::SCAN_TYPE_PNO, scanStyle);
     pScanService->SetScanTrustMode();
     pScanService->ClearScanTrustSceneIds();
     pScanService->IsMovingFreezeScaned();

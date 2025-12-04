@@ -373,7 +373,7 @@ void WifiProChr::WriteWifiProSysEvent()
     }
  
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_PRO_STATISTICS", "EVENT_VALUE", std::string(jsonStr));
-    free(jsonStr);
+    cJSON_free(jsonStr);
     cJSON_Delete(root);
 }
 

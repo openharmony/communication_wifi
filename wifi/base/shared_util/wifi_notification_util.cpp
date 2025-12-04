@@ -212,7 +212,7 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
         return;
     }
     std::string cmdData(cjsonStr);
-    free(cjsonStr);
+    cJSON_free(cjsonStr);
     cJSON_Delete(param);
     sptr<UIExtensionAbilityConnection> connection(
         new (std::nothrow) UIExtensionAbilityConnection(cmdData, "com.ohos.locationdialog", "WifiUIExtAbility"));
@@ -247,7 +247,7 @@ void WifiNotificationUtil::ShowSettingsDialog(WifiDialogType type, std::string s
         return;
     }
     std::string cmdData(cjsonStr);
-    free(cjsonStr);
+    cJSON_free(cjsonStr);
     cJSON_Delete(param);
     if (settings.empty()) {
         WIFI_LOGI("settings name is null");

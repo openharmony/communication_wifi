@@ -407,6 +407,13 @@ public:
      * @return bool
      */
     virtual bool IsSupportLpScanAbility() = 0;
+
+    /**
+     * @Description perform network probing using GRS
+     *
+     * @return bool - network probing result
+     */
+    virtual bool GrsProbe() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

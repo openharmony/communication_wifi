@@ -162,25 +162,33 @@ public:
     {
         WifiDeviceConfig config;
         config.keyMgmt = "WEP";
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, RANDOMMAC_BSSID));
+        std::string apBssid = RANDOMMAC_BSSID;
+        std::string ifname = "wlan0";
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, apBssid, ifname));
     }
 
     void ConvertDeviceCfgFail1()
     {
         WifiDeviceConfig config;
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, RANDOMMAC_BSSID));
+        std::string apBssid = RANDOMMAC_BSSID;
+        std::string ifname = "wlan0";
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, apBssid, ifname));
     }
 
     void ConvertDeviceCfgFail2()
     {
         WifiDeviceConfig config;
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, RANDOMMAC_BSSID));
+        std::string apBssid = RANDOMMAC_BSSID;
+        std::string ifname = "wlan0";
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, apBssid, ifname));
     }
 
     void ConvertDeviceCfgFail3()
     {
         WifiDeviceConfig config;
-        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, ""));
+        std::string apBssid = "";
+        std::string ifname = "wlan0";
+        EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, apBssid, ifname));
     }
 
     void StartWifiProcessSuccess()
@@ -3108,6 +3116,13 @@ HWTEST_F(StaStateMachineTest, NotAllowConnectToNetworkTest01, TestSize.Level1)
 {
     pStaStateMachine->targetNetworkId_ = 0;
     EXPECT_FALSE(pStaStateMachine->pInitState->NotAllowConnectToNetwork(1, RANDOMMAC_BSSID, NETWORK_SELECTED_BY_AUTO));
+}
+
+HWTEST_F(StaStateMachineTest, HasMultiBssidApTest01, TestSize.Level1)
+{
+    WifiDeviceConfig config;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
+    EXPECT_FALSE(pStaStateMachine->HasMultiBssidAp(config));
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -68,6 +68,12 @@ public:
      * @return the network selector
      */
     std::unique_ptr<NetworkSelection::INetworkSelector> CreateWifi2WifiQoeSlowNetworkSelector();
+
+    /**
+     * the function to create user connect networkSelector
+     * @return the network selector
+     */
+    std::unique_ptr<NetworkSelection::INetworkSelector> CreateUserConnectNetworkSelector();
 private:
     HandleFuncMap handleFuncMap;
 };

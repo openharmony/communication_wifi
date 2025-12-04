@@ -31,7 +31,7 @@ NetworkSelectorFactory::NetworkSelectorFactory()
     handleFuncMap[static_cast<uint32_t>(NetworkSelectType::WIFI2WIFI_QOE_BAD)] =
         &NetworkSelectorFactory::CreateWifi2WifiQoeSlowNetworkSelector;
     handleFuncMap[static_cast<uint32_t>(NetworkSelectType::USER_CONNECT)] =
-        &NetworkSelectorFactory::CreateAutoConnectNetworkSelector;
+        &NetworkSelectorFactory::CreateUserConnectNetworkSelector;
     handleFuncMap[static_cast<uint32_t>(NetworkSelectType::WIFI2WIFI_PORTAL)] =
         &NetworkSelectorFactory::CreateWifi2WifiNoNetNetworkSelector;
 }
@@ -65,5 +65,10 @@ std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::Crea
 std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::CreateWifi2WifiQoeSlowNetworkSelector()
 {
     return std::make_unique<NetworkSelection::Wifi2WifiQoeSlowIntegrator>();
+}
+
+std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::CreateUserConnectNetworkSelector()
+{
+    return std::make_unique<NetworkSelection::SameSsidMultiBssidIntegrator>();
 }
 } // namespace OHOS::Wifi

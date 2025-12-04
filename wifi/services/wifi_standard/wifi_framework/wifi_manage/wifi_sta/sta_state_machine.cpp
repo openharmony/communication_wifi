@@ -3993,7 +3993,7 @@ std::string StaStateMachine::GetSuitableKeyMgmtForWpaMixed(const WifiDeviceConfi
     return KEY_MGMT_WPA_PSK;
 }
 
-ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string bssid)
+ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string& apBssid, std::string& ifaceName)
 {
     WIFI_LOGI("Enter ConvertDeviceCfg.\n");
     WifiHalDeviceConfig halDeviceConfig;
@@ -4002,9 +4002,10 @@ ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string 
         /* for wep */
         halDeviceConfig.authAlgorithms = 0x02;
     }
+    halDeviceConfig.bssid = apBssid;
 
     if (config.keyMgmt == KEY_MGMT_WPA_PSK || config.keyMgmt == KEY_MGMT_SAE) {
-        halDeviceConfig.keyMgmt = GetSuitableKeyMgmtForWpaMixed(config, bssid);
+        halDeviceConfig.keyMgmt = GetSuitableKeyMgmtForWpaMixed(config, halDeviceConfig.bssid);
         if (config.keyMgmt != halDeviceConfig.keyMgmt) {
             config.keyMgmt = halDeviceConfig.keyMgmt;
             WifiSettings::GetInstance().AddDeviceConfig(config);
@@ -4024,14 +4025,6 @@ ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string 
     }
     WIFI_LOGI("ConvertDeviceCfg SetDeviceConfig selected network ssid=%{public}s, bssid=%{public}s, instId=%{public}d",
         SsidAnonymize(halDeviceConfig.ssid).c_str(), MacAnonymize(halDeviceConfig.bssid).c_str(), m_instId);
-    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
-    if (bssid.empty()) {
-        // user select connect
-        UserSelectConnectToNetwork(config, ifaceName, halDeviceConfig);
-    } else {
-        // auto connect
-        AutoSelectConnectToNetwork(bssid, ifaceName, halDeviceConfig);
-    }
     ConvertSsidToOriginalSsid(config, halDeviceConfig);
     if (WifiStaHalInterface::GetInstance().SetDeviceConfig(WPA_DEFAULT_NETWORKID, halDeviceConfig, ifaceName) !=
         WIFI_HAL_OPT_OK) {
@@ -4723,29 +4716,21 @@ void StaStateMachine::DealReassociateCmd(InternalMessagePtr msg)
 }
 
 void StaStateMachine::UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& ifaceName,
-    WifiHalDeviceConfig& halDeviceConfig)
+    std::string& apBssid)
 {
     if (!deviceConfig.userSelectBssid.empty()) {
         WIFI_LOGI("SetBssid userSelectBssid=%{public}s", MacAnonymize(deviceConfig.userSelectBssid).c_str());
-        halDeviceConfig.bssid = deviceConfig.userSelectBssid;
+        apBssid = deviceConfig.userSelectBssid;
     } else {
         std::string autoSelectBssid;
         std::unique_ptr<NetworkSelectionManager> networkSelectionManager = std::make_unique<NetworkSelectionManager>();
         networkSelectionManager->SelectNetworkWithSsid(deviceConfig, autoSelectBssid);
         WIFI_LOGI("SetBssid autoSelectBssid=%{public}s", MacAnonymize(autoSelectBssid).c_str());
-        halDeviceConfig.bssid = autoSelectBssid;
+        apBssid = autoSelectBssid;
     }
     deviceConfig.userSelectBssid = "";
     WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
-    return;
-}
-
-void StaStateMachine::AutoSelectConnectToNetwork(const std::string& bssid, std::string& ifaceName,
-    WifiHalDeviceConfig& halDeviceConfig)
-{
-    WIFI_LOGI("SetBssid bssid=%{public}s", MacAnonymize(bssid).c_str());
-    halDeviceConfig.bssid = bssid;
     return;
 }
 
@@ -4757,11 +4742,8 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     }
     if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
         BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
-#ifndef OHOS_ARCH_LITE
-        BlockConnectService::GetInstance().ReleaseUnusableBssidSet();
 #ifdef WIFI_SECURITY_DETECT_ENABLE
         WifiSecurityDetect::GetInstance().SetChangeNetworkid(networkId);
-#endif
 #endif
         WifiSettings::GetInstance().SetUserConnectChoice(networkId);
     }
@@ -4770,6 +4752,11 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         WIFI_LOGE("StartConnectToNetwork get GetDeviceConfig failed!");
         return WIFI_OPT_FAILED;
     }
+#ifndef OHOS_ARCH_LITE
+    if (connTriggerMode == NETWORK_SELECTED_BY_USER && !HasMultiBssidAp(deviceConfig)) {
+        BlockConnectService::GetInstance().ReleaseUnusableBssidSet();
+    }
+#endif
     targetNetworkId_ = networkId;
     linkSwitchDetectingFlag_ = false;
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
@@ -4778,10 +4765,17 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         ReportMdmRestrictedEvent(deviceConfig.ssid, deviceConfig.bssid, "MDM_RESTRICTED");
     }
 #endif
-    SetRandomMac(deviceConfig, bssid);
-    WIFI_LOGI("StartConnectToNetwork SetRandomMac targetNetworkId_:%{public}d, bssid:%{public}s", targetNetworkId_,
-        MacAnonymize(bssid).c_str());
+    std::string apBssid = bssid;
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
+    if (apBssid.empty()) {
+        // user select connect
+        UserSelectConnectToNetwork(deviceConfig, ifaceName, apBssid);
+    } else {
+        WIFI_LOGI("SetBssid bssid=%{public}s", MacAnonymize(apBssid).c_str());
+    }
+    SetRandomMac(deviceConfig, apBssid);
+    WIFI_LOGI("StartConnectToNetwork SetRandomMac targetNetworkId_:%{public}d, bssid:%{public}s", targetNetworkId_,
+        MacAnonymize(apBssid).c_str());
     EnhanceWriteWifiConnectionInfoHiSysEvent(networkId);
     EnhanceWriteConnectTypeHiSysEvent(connTriggerMode, deviceConfig.lastConnectTime <= 0);
     EnhanceWriteStaConnectIface(ifaceName);
@@ -4793,7 +4787,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         WriteAssocFailHiSysEvent("GetNextNetworkId failed", static_cast<int>(ret));
         return WIFI_OPT_FAILED;
     }
-    ConvertDeviceCfg(deviceConfig, bssid);
+    ConvertDeviceCfg(deviceConfig, apBssid, ifaceName);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
     wifiDataReportService_->InitReportApAllInfo();
@@ -5752,6 +5746,24 @@ void StaStateMachine::LogSignalInfo(WifiSignalPollInfo &signalInfo)
 int32_t StaStateMachine::GetTargetNetworkId()
 {
     return targetNetworkId_;
+}
+
+bool StaStateMachine::HasMultiBssidAp(const WifiDeviceConfig &config)
+{
+    std::vector<WifiScanInfo> wifiScanInfoList;
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(wifiScanInfoList);
+    int32_t bssidCount = 0;
+    for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
+        std::string deviceKeyMgmt;
+        iter->GetDeviceMgmt(deviceKeyMgmt);
+        if (iter->ssid == config.ssid && WifiSettings::GetInstance().InKeyMgmtBitset(config, deviceKeyMgmt)) {
+            bssidCount++;
+        }
+        if (bssidCount > 1) {
+            return true;
+        }
+    }
+    return false;
 }
 } // namespace Wifi
 } // namespace OHOS

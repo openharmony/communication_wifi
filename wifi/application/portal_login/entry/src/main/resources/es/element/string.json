@@ -23,7 +23,7 @@
         },
         {
             "name":"contextmenu_open_in_browser",
-            "value":"Abrir con Navegador",
+            "value":"Abrir en Navegador",
             "attr":{
                 "priority":"translate"
             }

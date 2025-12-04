@@ -1024,7 +1024,7 @@ std::string WifiSettings::SetBackupReplyCode(int replyCode)
     std::string result;
     if (jsonStr != nullptr) {
         result = jsonStr;
-        free(jsonStr);
+        cJSON_free(jsonStr);
     }
  
     cJSON_Delete(root);

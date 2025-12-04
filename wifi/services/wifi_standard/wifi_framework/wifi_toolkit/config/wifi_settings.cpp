@@ -866,6 +866,7 @@ int WifiSettings::ReloadDeviceConfig()
         WifiDeviceConfig &item = tmp[i];
         SetKeyMgmtBitset(item);
         item.networkId = mNetworkId++;
+        SyncAfterDecryped(item);
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
     LOGI("ReloadDeviceConfig load deviceConfig size: %{public}d", static_cast<int>(mWifiDeviceConfig.size()));

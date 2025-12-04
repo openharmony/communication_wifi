@@ -366,15 +366,13 @@ public:
      * @Description Notify user accept result to p2p service
      *
      * @param isAccept if user accept to projection screen
-     * @param inputPinCode pin code of user input
-     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     * @param inputPinCode the pin code of user input
      */
     void NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPinCode) override;
 
     /**
-     * @Description Notify user accept result to p2p service
+     * @Description Notify the result of user click confirm when showing display dialog to p2p service
      *
-     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     void NotifyWscDisplayConfirmResult() override;
 

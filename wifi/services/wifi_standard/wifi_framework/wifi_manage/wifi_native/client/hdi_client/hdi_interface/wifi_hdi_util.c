@@ -222,20 +222,23 @@ static int HexStringToString(const char *str, char *out)
     return 0;
 }
 
-static bool GetChanWidthCenterFreqEht(ScanInfo *pcmd, ScanInfoElem* infoElem)
+static void SetEhtInfoExist(ScanInfo *pcmd, struct NeedParseIe* iesNeedParse)
 {
-    if ((pcmd == NULL) || (infoElem == NULL)) {
+    if ((pcmd == NULL) || (iesNeedParse == NULL)) {
         LOGE("pcmd or iesNeedParse is NULL.");
-        return false;
+        return;
     }
+    if (iesNeedParse->ieEhtOper == NULL) {
+        return;
+    }
+    ScanInfoElem* infoElem = iesNeedParse->ieEhtOper;
     if ((infoElem->content == NULL) || ((unsigned int)infoElem->size < (EHT_OPER_BASIC_LEN + 1))) {
-        return false;
+        return;
     }
     if (infoElem->content[0] != HDI_EID_EXT_EHT_OPERATION_80211BE) {
-        return false;
+        return;
     }
     pcmd->isEhtInfoExist = 1;
-    return true;
 }
 
 static bool GetChanWidthCenterFreqVht(ScanInfo *pcmd, ScanInfoElem* infoElem)
@@ -357,9 +360,6 @@ static void GetChanWidthCenterFreq(ScanInfo *pcmd, struct NeedParseIe* iesNeedPa
         return;
     }
 
-    if ((iesNeedParse->ieEhtOper != NULL) && GetChanWidthCenterFreqEht(pcmd, iesNeedParse->ieEhtOper)) {
-        return;
-    }
     if ((iesNeedParse->ieExtern != NULL) && GetChanWidthCenterFreqHe(pcmd, iesNeedParse->ieExtern)) {
         return;
     }
@@ -478,6 +478,7 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         RecordIeNeedParse(infoElemsTemp[infoElemsSize].id, &infoElemsTemp[infoElemsSize], &iesNeedParse);
         ++infoElemsSize;
     }
+    SetEhtInfoExist(pcmd, &iesNeedParse);
     GetChanWidthCenterFreq(pcmd, &iesNeedParse);
 
     // clear old infoElems first

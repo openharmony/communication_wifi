@@ -1059,5 +1059,17 @@ HWTEST_F(WifiHdiUtilTest, RouterSupportHiLinkByWifiInfoTest, TestSize.Level1)
     result = RouterSupportHiLinkByWifiInfo(start, len);
     EXPECT_FALSE(result);
 }
+
+extern "C" void SetEhtInfoExist(ScanInfo *pcmd, struct NeedParseIe* iesNeedParse);
+HWTEST_F(WifiHdiUtilTest, SetEhtInfoExistTest, TestSize.Level1)
+{
+    ScanInfo pcmd;
+    struct NeedParseIe iesNeedParse;
+    SetEhtInfoExist(nullptr, nullptr);
+    SetEhtInfoExist(&pcmd, nullptr);
+    SetEhtInfoExist(nullptr, &iesNeedParse);
+    SetEhtInfoExist(&pcmd, &iesNeedParse);
+    EXPECT_NE(pcmd.ieSize, TEN);
+}
 }
 }

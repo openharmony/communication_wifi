@@ -44,7 +44,6 @@ void P2pDisabledState::GoInState()
             delete p2pStateMachine.pDhcpResultNotify;
             p2pStateMachine.pDhcpResultNotify = nullptr;
         }
-        AbstractUI::GetInstance().UnInit();
     }
     p2pStateMachine.serviceManager.ClearAll();
     deviceManager.ClearAll();

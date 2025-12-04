@@ -149,6 +149,32 @@ int32_t WifiNotificationUtil::StartAbility(OHOS::AAFwk::Want& want)
     return reply.ReadInt32();
 }
 
+static void AddP2pParam(WifiDialogType type, std::string comInfo, cJSON *param)
+{
+    WIFI_LOGD("AddP2pParam comInfo %{private}s", comInfo.c_str());
+    std::string deviceName;
+    std::string pinCode;
+    std::string::size_type codePos = comInfo.find("_");
+    switch (type) {
+        case P2P_WSC_PBC_DIALOG:
+        case P2P_WSC_KEYPAD_DIALOG:
+            cJSON_AddStringToObject(param, "p2pDeviceName", comInfo.c_str());
+            break;
+        case P2P_WSC_DISPLAY_DIALOG:
+            if (codePos != std::string::npos) {
+                pinCode = comInfo.substr(0, codePos);
+                deviceName = comInfo.substr(codePos + 1);
+                cJSON_AddStringToObject(param, "p2pDeviceName", deviceName.c_str());
+                cJSON_AddStringToObject(param, "p2pPinCode", pinCode.c_str());
+            } else {
+                WIFI_LOGE("AddP2pParam get pin code fail: %{private}s", comInfo.c_str());
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
 {
     WIFI_LOGI("ShowDialog, type=%{public}d", static_cast<int32_t>(type));
@@ -169,7 +195,9 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
             cJSON_AddStringToObject(param, "wifi5gSsid", comInfo.c_str());
             break;
         case P2P_WSC_PBC_DIALOG:
-            cJSON_AddStringToObject(param, "p2pDeviceName", comInfo.c_str());
+        case P2P_WSC_KEYPAD_DIALOG:
+        case P2P_WSC_DISPLAY_DIALOG:
+            AddP2pParam(type, comInfo, param);
             break;
         case CANDIDATE_CONNECT:
             cJSON_AddStringToObject(param, "targetSsid", comInfo.c_str());

@@ -14,7 +14,6 @@
  */
 
 #include "wifi_p2p_service.h"
-#include "abstract_ui.h"
 #include "ipc_skeleton.h"
 #include "p2p_define.h"
 #include "wifi_channel_helper.h"
@@ -226,12 +225,21 @@ ErrCode WifiP2pService::DeleteGroup(const WifiP2pGroupInfo &group)
 
 ErrCode WifiP2pService::P2pConnect(const WifiP2pConfig &config)
 {
-    WIFI_LOGI("P2pConnect");
     int callingUid = IPCSkeleton::GetCallingUid();
     WifiConfigCenter::GetInstance().SaveP2pCreatorUid(callingUid);
     WifiP2pConfigInternal configInternal(config);
     WpsInfo wps;
-    wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
+    WifiP2pDevice dev = deviceManager.GetDevices(config.GetDeviceAddress());
+    WIFI_LOGI("p2pconnect method is %{public}d", dev.GetWpsConfigMethod());
+    if ((dev.GetWpsConfigMethod() & static_cast<unsigned int>(WpsConfigMethod::WPS_CFG_PUSHBUTTON)) != 0) {
+        wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
+    } else if ((dev.GetWpsConfigMethod() &
+        static_cast<unsigned int>(WpsConfigMethod::WPS_CFG_DISPLAY)) != 0 ||
+        (dev.GetWpsConfigMethod() & static_cast<unsigned int>(WpsConfigMethod::WPS_CFG_KEYPAD)) != 0) {
+        wps.SetWpsMethod(WpsMethod::WPS_METHOD_KEYPAD);
+    } else {
+        wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
+    }
     configInternal.SetWpsInfo(wps);
     p2pStateMachine.SetIsNeedDhcp(DHCPTYPE::DHCP_P2P);
     const std::any info = configInternal;
@@ -521,14 +529,21 @@ ErrCode WifiP2pService::SetGcIpAddress(const IpAddrInfo& ipInfo)
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiP2pService::NotifyWscDialogConfirmResult(bool isAccept)
+void WifiP2pService::NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPincode)
 {
-    WIFI_LOGI("Notify user auth response:%{public}d", isAccept);
+    WIFI_LOGI("Notify user auth response:%{private}d, inputPincode:%{private}s", isAccept, inputPincode.c_str());
     if (isAccept) {
-        p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT));
+        p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT),
+            inputPincode);
     } else {
         p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
     }
+}
+
+void WifiP2pService::NotifyWscDisplayConfirmResult()
+{
+    WIFI_LOGI("Notify WscDialogConfirm");
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_CONFIRM));
 }
 
 ErrCode WifiP2pService::SetMiracastSinkConfig(const std::string& config)

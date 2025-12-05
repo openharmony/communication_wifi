@@ -307,6 +307,7 @@ static void JsObjToP2pConfig(const napi_env& env, const napi_value& object, Wifi
     std::string address = "";
     int bssidType = RANDOM_DEVICE_ADDRESS;
     int netId = -1;
+    int freq = -1;
     std::string passphrase = "";
     std::string groupName = "";
     int band = static_cast<int>(GroupOwnerBand::GO_BAND_AUTO);
@@ -318,12 +319,14 @@ static void JsObjToP2pConfig(const napi_env& env, const napi_value& object, Wifi
     JsObjectToString(env, object, "passphrase", MAX_PASSPHRASE_LENGTH + 1, passphrase);
     JsObjectToString(env, object, "groupName", DEVICE_NAME_LENGTH + 1, groupName);
     JsObjectToInt(env, object, "goBand", band);
+    JsObjectToInt(env, object, "goFreq", freq);
     config.SetDeviceAddress(address);
     config.SetDeviceAddressType(bssidType);
     config.SetNetId(netId);
     config.SetPassphrase(passphrase);
     config.SetGroupName(groupName);
     config.SetGoBand(static_cast<GroupOwnerBand>(band));
+    config.SetFreq(freq);
 }
 
 NO_SANITIZE("cfi") napi_value P2pConnect(napi_env env, napi_callback_info info)

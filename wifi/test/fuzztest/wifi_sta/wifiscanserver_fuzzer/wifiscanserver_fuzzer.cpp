@@ -184,8 +184,6 @@ void StoreRequestScanConfigFuzzTest(FuzzedDataProvider& FDP)
     pScanService->SetNetworkInterfaceUpDown(true);
     pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_CHECK_PORTAL);
     pScanService->HandlePnoScanInfo(infoList);
-    pScanService->ReportStoreScanInfos(infoList);
-    pScanService->ReportScanInfos(infoList);
     pScanService->ReportScanFinishEvent(appId);
     pScanService->StoreUserScanInfo(config, infoList);
     pScanService->Scan(ScanType::SCAN_TYPE_NATIVE_EXTERN);
@@ -248,6 +246,7 @@ void StoreRequestScanConfigFuzzTest02(FuzzedDataProvider& FDP)
 
 void StoreRequestScanConfigFuzzTest03(FuzzedDataProvider& FDP)
 {
+    std::vector<InterScanInfo> infoList;
     int appId = FDP.ConsumeIntegral<int>();
     ScanIntervalMode scanIntervalMode;
     scanIntervalMode.intervalMode = static_cast<IntervalMode>(FDP.ConsumeIntegral<int>() % U32_AT_SIZE_ZERO);
@@ -273,6 +272,8 @@ void StoreRequestScanConfigFuzzTest03(FuzzedDataProvider& FDP)
     pScanService->ReportScanStartEvent();
     pScanService->ReportScanStopEvent();
     pScanService->ExternScanByInterval(appId, singleAppForbid);
+    pScanService->ReportStoreScanInfos(infoList);
+    pScanService->ReportScanInfos(infoList);
 }
 
 void AllowExternScanByForbidFuzzTest(FuzzedDataProvider& FDP)

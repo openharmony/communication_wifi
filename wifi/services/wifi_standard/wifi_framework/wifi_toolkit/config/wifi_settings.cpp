@@ -42,6 +42,7 @@
 
 namespace OHOS {
 namespace Wifi {
+constexpr int MAX_DECRYPT_DEVICE_CONFIG_NUM = 400;
 std::string g_defaultApSsid;
 #ifdef DTFUZZ_TEST
 static WifiSettings* gWifiSettings = nullptr;
@@ -866,6 +867,9 @@ int WifiSettings::ReloadDeviceConfig()
         WifiDeviceConfig &item = tmp[i];
         SetKeyMgmtBitset(item);
         item.networkId = mNetworkId++;
+        if (item.networkId < MAX_DECRYPT_DEVICE_CONFIG_NUM) {
+            SyncAfterDecryped(item);
+        }
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
     LOGI("ReloadDeviceConfig load deviceConfig size: %{public}d", static_cast<int>(mWifiDeviceConfig.size()));

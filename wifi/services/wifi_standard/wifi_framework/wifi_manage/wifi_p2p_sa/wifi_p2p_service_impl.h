@@ -477,6 +477,8 @@ private:
     bool IsP2pServiceRunning(bool forceEnable = true);
     bool IsCallingAllowed();
     static void SaBasicDump(std::string& result);
+    void CheckAndStopDualWifi(void);
+    ErrCode ConvertMac(WifiP2pConfig &updateConfig, const WifiP2pConfig &config);
 
 private:
     static sptr<WifiP2pServiceImpl> instance;

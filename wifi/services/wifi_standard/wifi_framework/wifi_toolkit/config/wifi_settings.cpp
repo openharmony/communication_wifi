@@ -543,7 +543,7 @@ int WifiSettings::SetDeviceEphemeral(int networkId, bool isEphemeral)
     return 0;
 }
 
-int WifiSettings::SetDeviceAfterConnect(int networkId)
+int WifiSettings::SetDeviceAfterConnect(int networkId, int rssi)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto iter = mWifiDeviceConfig.find(networkId);
@@ -555,6 +555,10 @@ int WifiSettings::SetDeviceAfterConnect(int networkId)
     iter->second.numRebootsSinceLastUse = 0;
     iter->second.numAssociation++;
     iter->second.networkSelectionStatus.networkDisableCount = 0;
+    // update rssi only when connectChoice matches
+    if (rssi != INVALID_SIGNAL_LEVEL && iter->second.networkSelectionStatus.connectChoice == networkId) {
+        iter->second.networkSelectionStatus.rssi = rssi;
+    }
     return 0;
 }
 

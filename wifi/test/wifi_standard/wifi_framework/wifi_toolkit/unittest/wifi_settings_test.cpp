@@ -105,7 +105,7 @@ HWTEST_F(WifiSettingsTest, SetDeviceEphemeralTest, TestSize.Level1)
 HWTEST_F(WifiSettingsTest, SetDeviceAfterConnectTest, TestSize.Level1)
 {
     WIFI_LOGE("SetDeviceAfterConnectTest enter!");
-    int result = WifiSettings::GetInstance().SetDeviceAfterConnect(NETWORK_ID);
+    int result = WifiSettings::GetInstance().SetDeviceAfterConnect(NETWORK_ID, -70);
     WIFI_LOGE("SetDeviceAfterConnectTest result(%{public}d)", result);
     EXPECT_EQ(result, WIFI_OPT_RETURN);
 }
@@ -116,6 +116,93 @@ HWTEST_F(WifiSettingsTest, SetDeviceAfterDisconnectTest, TestSize.Level1)
     int result = WifiSettings::GetInstance().SetDeviceAfterDisconnect(NETWORK_ID);
     WIFI_LOGE("SetDeviceAfterDisconnectTest result(%{public}d)", result);
     EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
+HWTEST_F(WifiSettingsTest, SetDeviceAfterConnectSuccessTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetDeviceAfterConnectSuccessTest enter!");
+    WifiDeviceConfig config;
+    config.networkId = NETWORK_ID;
+    config.ssid = "test_ssid";
+    config.preSharedKey = "test_psk";
+    config.keyMgmt = "WPA-PSK";
+    config.lastConnectTime = 0;
+    config.numRebootsSinceLastUse = 5;
+    config.numAssociation = 10;
+    config.networkSelectionStatus.networkDisableCount = 3;
+    config.networkSelectionStatus.rssi = -50;
+    config.networkSelectionStatus.connectChoice = NETWORK_ID; // Set connectChoice to match networkId
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+
+    int result = WifiSettings::GetInstance().SetDeviceAfterConnect(NETWORK_ID, -70);
+    WIFI_LOGE("SetDeviceAfterConnectSuccessTest result(%{public}d)", result);
+    EXPECT_EQ(result, 0);
+
+    WifiDeviceConfig updatedConfig;
+    WifiSettings::GetInstance().GetDeviceConfig(NETWORK_ID, updatedConfig);
+    EXPECT_NE(updatedConfig.lastConnectTime, 0);
+    EXPECT_EQ(updatedConfig.numRebootsSinceLastUse, 0);
+    EXPECT_EQ(updatedConfig.numAssociation, 11);
+    EXPECT_EQ(updatedConfig.networkSelectionStatus.networkDisableCount, 0);
+    EXPECT_EQ(updatedConfig.networkSelectionStatus.rssi, -70);
+}
+
+HWTEST_F(WifiSettingsTest, SetDeviceAfterConnectInvalidRssiTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetDeviceAfterConnectInvalidRssiTest enter!");
+    WifiDeviceConfig config;
+    config.networkId = NETWORK_ID + 1; // Use different networkId
+    config.ssid = "test_ssid2";
+    config.preSharedKey = "test_psk2";
+    config.keyMgmt = "WPA-PSK";
+    config.lastConnectTime = 0;
+    config.numRebootsSinceLastUse = 5;
+    config.numAssociation = 10;
+    config.networkSelectionStatus.networkDisableCount = 3;
+    config.networkSelectionStatus.rssi = -50;
+    config.networkSelectionStatus.connectChoice = NETWORK_ID + 1; // Set connectChoice to match
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+
+    int result = WifiSettings::GetInstance().SetDeviceAfterConnect(NETWORK_ID + 1, -1); // INVALID_SIGNAL_LEVEL
+    WIFI_LOGE("SetDeviceAfterConnectInvalidRssiTest result(%{public}d)", result);
+    EXPECT_EQ(result, 0);
+
+    WifiDeviceConfig updatedConfig;
+    WifiSettings::GetInstance().GetDeviceConfig(NETWORK_ID + 1, updatedConfig);
+    EXPECT_NE(updatedConfig.lastConnectTime, 0);
+    EXPECT_EQ(updatedConfig.numRebootsSinceLastUse, 0);
+    EXPECT_EQ(updatedConfig.numAssociation, 11);
+    EXPECT_EQ(updatedConfig.networkSelectionStatus.networkDisableCount, 0);
+    EXPECT_EQ(updatedConfig.networkSelectionStatus.rssi, -50); // Should not change
+}
+
+HWTEST_F(WifiSettingsTest, SetDeviceAfterConnectNoConnectChoiceTest, TestSize.Level1)
+{
+    WIFI_LOGE("SetDeviceAfterConnectNoConnectChoiceTest enter!");
+    WifiDeviceConfig config;
+    config.networkId = NETWORK_ID + 2; // Use different networkId
+    config.ssid = "test_ssid3";
+    config.preSharedKey = "test_psk3";
+    config.keyMgmt = "WPA-PSK";
+    config.lastConnectTime = 0;
+    config.numRebootsSinceLastUse = 5;
+    config.numAssociation = 10;
+    config.networkSelectionStatus.networkDisableCount = 3;
+    config.networkSelectionStatus.rssi = -50;
+    config.networkSelectionStatus.connectChoice = NETWORK_ID; // Set connectChoice to different from networkId
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+
+    int result = WifiSettings::GetInstance().SetDeviceAfterConnect(NETWORK_ID + 2, -70);
+    WIFI_LOGE("SetDeviceAfterConnectNoConnectChoiceTest result(%{public}d)", result);
+    EXPECT_EQ(result, 0);
+
+    WifiDeviceConfig updatedConfig;
+    WifiSettings::GetInstance().GetDeviceConfig(NETWORK_ID + 2, updatedConfig);
+    EXPECT_NE(updatedConfig.lastConnectTime, 0);
+    EXPECT_EQ(updatedConfig.numRebootsSinceLastUse, 0);
+    EXPECT_EQ(updatedConfig.numAssociation, 11);
+    EXPECT_EQ(updatedConfig.networkSelectionStatus.networkDisableCount, 0);
+    EXPECT_EQ(updatedConfig.networkSelectionStatus.rssi, -50); // Should not change because connectChoice != networkId
 }
 
 HWTEST_F(WifiSettingsTest, GetCandidateConfigTest, TestSize.Level1)

@@ -2690,7 +2690,8 @@ void StaStateMachine::LinkedState::GoInState()
 #endif
 #endif
     pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
-    WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId);
+    WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId,
+    pStaStateMachine->linkedInfo.rssi);
     WifiSettings::GetInstance().ClearAllNetworkConnectChoice();
     BlockConnectService::GetInstance().EnableNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId);
 #ifndef OHOS_ARCH_LITE

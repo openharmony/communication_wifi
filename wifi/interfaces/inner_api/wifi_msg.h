@@ -77,9 +77,10 @@ inline const std::string EAP_METHOD_PWD = "PWD";
 inline const std::string EAP_METHOD_SIM = "SIM";
 inline const std::string EAP_METHOD_AKA = "AKA";
 inline const std::string EAP_METHOD_AKA_PRIME = "AKA'";
-
+inline const int RSSI_MINUS_MARGIN = 5;
 inline const int INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
 inline const uint32_t ENABLE_AIDFS = 7;
+inline constexpr int DEFAULT_CONNECT_RSSI = -72;
 enum class DisconnState {
     DEFAULTSTAT,
     DISCONNECTED,
@@ -711,6 +712,11 @@ struct NetworkSelectionStatus {
      * found to this WifiDeviceConfig and meet the minimum requirement.
      */
     bool seenInLastQualifiedNetworkSelection;
+
+    /**
+     * Rssi of the network when it is selected by user last time.  Used to compare with current Rssi to decide
+     */
+    int rssi;
     NetworkSelectionStatus()
     {
         status = WifiDeviceConfigStatus::ENABLED;
@@ -720,6 +726,7 @@ struct NetworkSelectionStatus {
         connectChoice = INVALID_NETWORK_ID;
         connectChoiceTimestamp = INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP;
         seenInLastQualifiedNetworkSelection = false;
+        rssi = DEFAULT_CONNECT_RSSI;
     }
 };
 

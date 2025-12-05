@@ -301,6 +301,7 @@ bool NetworkSelectionManager::IsOutdoorFilter(NetworkSelection::NetworkCandidate
         rssiCntMap_.clear();
         return false;
     }
+
     if ((WifiChannelHelper::GetInstance().IsValid5GHz(networkCandidate->interScanInfo.frequency) &&
             networkCandidate->interScanInfo.rssi >= RSSI_LEVEL_4_5G) ||
         (WifiChannelHelper::GetInstance().IsValid24GHz(networkCandidate->interScanInfo.frequency) &&
@@ -309,13 +310,15 @@ bool NetworkSelectionManager::IsOutdoorFilter(NetworkSelection::NetworkCandidate
         rssiCntMap_.clear();
         return false;
     }
-    if ((WifiChannelHelper::GetInstance().IsValid5GHz(networkCandidate->interScanInfo.frequency) &&
-            networkCandidate->interScanInfo.rssi < RSSI_LEVEL_3_5G) ||
-        (WifiChannelHelper::GetInstance().IsValid24GHz(networkCandidate->interScanInfo.frequency) &&
-            networkCandidate->interScanInfo.rssi < RSSI_LEVEL_3_2G)) {
+
+    int rssi = networkCandidate->interScanInfo.rssi;
+    if (rssi >= networkCandidate->wifiDeviceConfig.networkSelectionStatus.rssi - RSSI_MINUS_MARGIN) {
+        WIFI_LOGI("IsOutdoorFilter current rssi %{public}d is close to last selected rssi %{public}d do not filter",
+            rssi, networkCandidate->wifiDeviceConfig.networkSelectionStatus.rssi);
         rssiCntMap_.clear();
-        return true;
+        return false;
     }
+
     if (rssiCntMap_[networkCandidate->interScanInfo.bssid] < OUTDOOR_NETWORK_SELECT_THRES) {
         rssiCntMap_[networkCandidate->interScanInfo.bssid]++;
         int instId = 0;

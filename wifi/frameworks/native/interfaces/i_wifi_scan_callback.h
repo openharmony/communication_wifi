@@ -38,6 +38,7 @@ public:
 #ifndef OHOS_ARCH_LITE
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"ohos.wifi.IWifiScanCallback");
+    std::string name = "default";
 #endif
 };
 }  // namespace Wifi

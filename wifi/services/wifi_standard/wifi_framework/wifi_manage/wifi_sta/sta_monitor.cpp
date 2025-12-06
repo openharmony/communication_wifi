@@ -111,6 +111,7 @@ void StaMonitor::OnConnectChangedCallBack(int status, int code, const std::strin
     }
     switch (status) {
         case HAL_WPA_CB_CONNECTED: {
+            pStaStateMachine->StopTimer(static_cast<int>(WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT));
             InternalMessagePtr msg = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT);
             if (msg == nullptr) {
                 WIFI_LOGE("CreateMessage failed");

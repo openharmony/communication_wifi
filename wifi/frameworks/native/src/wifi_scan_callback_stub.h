@@ -50,7 +50,8 @@ public:
 private:
 #ifdef OHOS_ARCH_LITE
     int RemoteOnWifiScanStateChanged(uint32_t code, IpcIo *data);
-    std::shared_ptr<IWifiScanCallback> userCallback_;
+    std::map<std::string, std::shared_ptr<IWifiScanCallback>>> userCallbackMap_;
+    std::shared_mutex userCallbackMutex_;
 #else
     int RemoteOnWifiScanStateChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
     sptr<IWifiScanCallback> userCallback_;

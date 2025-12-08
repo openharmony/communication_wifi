@@ -89,9 +89,13 @@ void WifiScanCallbackStub::SetRemoteDied(bool val)
 void WifiScanCallbackStub::OnWifiScanStateChanged(int state)
 {
     WIFI_LOGD("OnWifiScanStateChanged,state:%{public}d", state);
-    std::shared_lock<std::shared_mutex> lock(userCallbackMutex_);
-    if (!userCallbackMap_.empty()) {
-        for (auto& pair : userCallbackMap_) {
+    std::map<std::string, sptr<IWifiScanCallback>> tmpUserCallbackMap_;
+    {
+        std::shared_lock<std::shared_mutex> lock(userCallbackMutex_);
+        tmpUserCallbackMap_ = userCallbackMap_;
+    }
+    for (auto& pair : tmpUserCallbackMap_) {
+        if (pair.second) {
             pair.second->OnWifiScanStateChanged(state);
         }
     }

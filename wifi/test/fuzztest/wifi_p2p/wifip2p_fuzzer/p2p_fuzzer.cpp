@@ -53,13 +53,14 @@ void UpdateWpaGroupFuzzerTest(const uint8_t *data, size_t size)
 
 void RemoveClientFromGroupFuzzerTest(const uint8_t *data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     WifiP2pGroupInfo pGroupInfo;
     pGroupInfo.SetNetworkId(static_cast<int>(data[0]));
-    std::string mDeviceAddress = std::string(reinterpret_cast<const char *>(data), size);
+    std::string mDeviceAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
 
     WifiP2pGroupManager pGroupManager;
     pGroupManager.AddGroup(pGroupInfo);
-    int netId = static_cast<int>(data[0]);
+    int netId = FDP.ConsumeIntegral<int>();
     pGroupManager.RemoveClientFromGroup(netId, mDeviceAddress);
 }
 
@@ -106,23 +107,25 @@ void GetGroupNetworkIdFuzzerTest1(FuzzedDataProvider& FDP)
 
 void GetGroupOwnerAddrFuzzerTest(const uint8_t *data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     WifiP2pGroupInfo pGroupInfo;
     pGroupInfo.SetNetworkId(static_cast<int>(data[0]));
 
     WifiP2pGroupManager pGroupManager;
     pGroupManager.AddGroup(pGroupInfo);
-    int netId = static_cast<int>(data[0]);
+    int netId = FDP.ConsumeIntegral<int>();
     pGroupManager.GetGroupOwnerAddr(netId);
 }
 
 void IsIncludeFuzzerTest(const uint8_t *data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     WifiP2pGroupInfo pGroupInfo;
     pGroupInfo.SetNetworkId(static_cast<int>(data[0]));
 
     WifiP2pGroupManager pGroupManager;
     pGroupManager.AddGroup(pGroupInfo);
-    int netId = static_cast<int>(data[0]);
+    int netId = FDP.ConsumeIntegral<int>();
     pGroupManager.IsInclude(netId);
 }
 

@@ -982,7 +982,7 @@ bool WifiIntelligenceStateMachine::HandleScanResult(std::vector<WifiScanInfo> sc
     if (hasApInBlacklist) {
         WIFI_LOGI("Has tartget in black list, update record.");
         ApInfoHelper::GetInstance().ResetBlacklist(scanInfoList, 1);
-        WritePositionAutoOpenWlanHiSysEvent("BLACKLIST_CONTROL_CNT");
+        WritePositionAutoOpenWlanHiSysEvent("FORBIDDEN_CONTROL_CNT");
         return true;
     } else {
         if (hasTargetAp) {

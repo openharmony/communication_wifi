@@ -111,6 +111,9 @@ void StaMonitor::OnConnectChangedCallBack(int status, int code, const std::strin
     }
     switch (status) {
         case HAL_WPA_CB_CONNECTED: {
+            // When both wifi2wifi and chip roaming occur simultaneously, if wifi2wifi fails and then
+            // chip roaming succeeds, the WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT event, which is
+            // scheduled to be executed with a 2-second delay, needs to be removed.
             pStaStateMachine->StopTimer(static_cast<int>(WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT));
             InternalMessagePtr msg = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT);
             if (msg == nullptr) {

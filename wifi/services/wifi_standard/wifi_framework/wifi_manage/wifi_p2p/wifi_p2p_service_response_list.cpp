@@ -153,8 +153,20 @@ bool WifiP2pServiceResponseList::ParseTlvs2RespList(const std::vector<unsigned c
     std::size_t headLength = SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE + TRANSACTION_ID_SIZE + SERVICE_STATUS_SIZE;
     std::size_t pos = 0;
     while (leftLength > 0) {
+        if (pos + 1 >= tlvList.size()) {
+            WIFI_LOGW("tlvList length field out of bounds");
+            return false;
+        }
         unsigned short length = tlvList[pos] + (tlvList[pos + 1] << CHAR_BIT);
+        if (length < PROTOCOL_SIZE + TRANSACTION_ID_SIZE + SERVICE_STATUS_SIZE) {
+            WIFI_LOGW("Invalid TLV length: too small");
+            return false;
+        }
         unsigned short dataLength = length - PROTOCOL_SIZE - TRANSACTION_ID_SIZE - SERVICE_STATUS_SIZE;
+        if (pos + headLength > tlvList.size()) {
+            WIFI_LOGW("Invalid header out of bounds");
+            return false;
+        }
         int type = tlvList[pos + SERVICE_TLV_LENGTH_SIZE];
         unsigned char transId = tlvList[pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE];
         int status = tlvList[pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE + TRANSACTION_ID_SIZE];

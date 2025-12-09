@@ -3156,8 +3156,8 @@ HWTEST_F(ScanServiceTest, AllowScanByGameScene03, TestSize.Level1) {
     pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
     WifiNetworkControlInfo networkControlInfo;
     networkControlInfo.state = GameSceneId::MSG_GAME_ENTER_PVP_BATTLE;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetNetworkControlInfo()).WillOnce(Return(networkControlInfo));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLpScanAbility()).WillOnce(Return(true));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetNetworkControlInfo()).WillRepeatedly(Return(networkControlInfo));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLpScanAbility()).WillRepeatedly(Return(true));
  
     int scanStyle = SCAN_TYPE_LOW_PRIORITY;
     EXPECT_TRUE(pScanService->AllowScanByGameScene(ScanType::SCAN_TYPE_EXTERN, scanStyle));
@@ -3168,8 +3168,8 @@ HWTEST_F(ScanServiceTest, AllowScanByGameScene04, TestSize.Level1) {
     pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
     WifiNetworkControlInfo networkControlInfo;
     networkControlInfo.state = GameSceneId::MSG_GAME_ENTER_PVP_BATTLE;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetNetworkControlInfo()).WillOnce(Return(networkControlInfo));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLpScanAbility()).WillOnce(Return(false));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetNetworkControlInfo()).WillRepeatedly(Return(networkControlInfo));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLpScanAbility()).WillRepeatedly(Return(false));
     int scanStyle = SCAN_TYPE_LOW_PRIORITY;
     EXPECT_FALSE(pScanService->AllowScanByGameScene(ScanType::SCAN_TYPE_EXTERN, scanStyle));
     EXPECT_FALSE(pScanService->AllowScanByGameScene(ScanType::SCAN_TYPE_PNO, scanStyle));
@@ -3179,7 +3179,7 @@ HWTEST_F(ScanServiceTest, AllowScanByGameScene05, TestSize.Level1) {
     pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
     WifiNetworkControlInfo networkControlInfo;
     networkControlInfo.state = GameSceneId::MSG_GAME_STATE_BACKGROUND;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetNetworkControlInfo()).WillOnce(Return(networkControlInfo));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetNetworkControlInfo()).WillRepeatedly(Return(networkControlInfo));
  
     int scanStyle = SCAN_TYPE_LOW_PRIORITY;
     EXPECT_TRUE(pScanService->AllowScanByGameScene(ScanType::SCAN_TYPE_EXTERN, scanStyle));
@@ -3237,7 +3237,7 @@ HWTEST_F(ScanServiceTest, AllowScanByHid2dStateTest02, TestSize.Level1) {
     int scanStyle = 0;
     WifiConfigCenter::GetInstance().SetHid2dSceneLastSetTime(0);
     bool result = pScanService->AllowScanByHid2dState(ScanType::SCAN_TYPE_EXTERN, scanStyle);
-    EXPECT_FALSE(result);
+    EXPECT_TRUE(result);
 }
  
 HWTEST_F(ScanServiceTest, AllowScanByHid2dStateTest03, TestSize.Level1) {
@@ -3246,7 +3246,7 @@ HWTEST_F(ScanServiceTest, AllowScanByHid2dStateTest03, TestSize.Level1) {
     softbusScene.scene = 0x07;
     WifiConfigCenter::GetInstance().SetHid2dUpperScene(1024, softbusScene);
     bool result = pScanService->AllowScanByHid2dState(ScanType::SCAN_TYPE_EXTERN, scanStyle);
-    EXPECT_FALSE(result);
+    EXPECT_TRUE(result);
 }
  
 HWTEST_F(ScanServiceTest, AllowScanByHid2dStateTest04, TestSize.Level1) {

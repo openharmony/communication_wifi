@@ -24,7 +24,8 @@
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanCallbackStub");
 namespace OHOS {
 namespace Wifi {
-WifiScanCallbackStub::WifiScanCallbackStub() : userCallback_(nullptr), mRemoteDied(false)
+static const int CALLBACK_LIMIT = 1000;
+WifiScanCallbackStub::WifiScanCallbackStub() : userCallbackMap_ {}, mRemoteDied(false)
 {}
 
 WifiScanCallbackStub::~WifiScanCallbackStub()
@@ -61,11 +62,17 @@ int WifiScanCallbackStub::OnRemoteRequest(
 
 void WifiScanCallbackStub::RegisterCallBack(const sptr<IWifiScanCallback> &userCallback)
 {
-    if (userCallback_ != nullptr) {
-        WIFI_LOGE("Callback has registered!");
+    WIFI_LOGD("RegisterCallBack:userCallback %{public}s!", userCallback->name.c_str());
+    if (userCallback == nullptr) {
         return;
     }
-    userCallback_ = userCallback;
+    std::unique_lock<std::shared_mutex> lock(userCallbackMutex_);
+    if (userCallbackMap_.size() >= CALLBACK_LIMIT &&
+        userCallbackMap_.find(userCallback->name) == userCallbackMap_.end()) {
+        WIFI_LOGE("RegisterCallBack:userCallback %{public}s reaches number limit!", userCallback->name.c_str());
+        return;
+    }
+    userCallbackMap_[userCallback->name] = userCallback;
 }
 
 bool WifiScanCallbackStub::IsRemoteDied() const
@@ -82,9 +89,15 @@ void WifiScanCallbackStub::SetRemoteDied(bool val)
 void WifiScanCallbackStub::OnWifiScanStateChanged(int state)
 {
     WIFI_LOGD("OnWifiScanStateChanged,state:%{public}d", state);
-
-    if (userCallback_) {
-        userCallback_->OnWifiScanStateChanged(state);
+    std::map<std::string, sptr<IWifiScanCallback>> tmpUserCallbackMap_;
+    {
+        std::shared_lock<std::shared_mutex> lock(userCallbackMutex_);
+        tmpUserCallbackMap_ = userCallbackMap_;
+    }
+    for (auto& pair : tmpUserCallbackMap_) {
+        if (pair.second) {
+            pair.second->OnWifiScanStateChanged(state);
+        }
     }
     WriteWifiEventReceivedHiSysEvent(HISYS_STA_SCAN_STATE_CHANGE, state);
 }

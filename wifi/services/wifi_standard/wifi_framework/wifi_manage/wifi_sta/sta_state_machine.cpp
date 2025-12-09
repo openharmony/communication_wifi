@@ -1225,6 +1225,12 @@ bool StaStateMachine::SeparatedState::ExecuteStateMsg(InternalMessagePtr msg)
             pStaStateMachine->DealScreenStateChangedEvent(msg);
             break;
         }
+#ifndef OHOS_ARCH_LITE
+        case WIFI_SVR_CMD_STA_FOREGROUND_APP_CHANGED_EVENT:
+            ret = EXECUTED;
+            pStaStateMachine->HandleForegroundAppChangedAction(msg);
+            break;
+#endif
         default:
             break;
     }

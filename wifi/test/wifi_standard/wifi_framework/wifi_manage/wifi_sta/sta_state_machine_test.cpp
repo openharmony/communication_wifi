@@ -2335,6 +2335,17 @@ HWTEST_F(StaStateMachineTest, SeparatedStateExeMsgSuccess2, TestSize.Level1)
     SeparatedStateExeMsgSuccess2();
 }
 
+HWTEST_F(StaStateMachineTest, SeparatedStateExeMsgSuccessFgAppChanged, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(WIFI_SVR_CMD_STA_FOREGROUND_APP_CHANGED_EVENT);
+    AppExecFwk::AppStateData appStateData;
+    appStateData.bundleName = "com.ohos.whatever";
+    appStateData.isFocused = true;
+    msg->SetMessageObj(appStateData);
+    EXPECT_TRUE(pStaStateMachine->pSeparatedState->ExecuteStateMsg(msg));
+}
+
 HWTEST_F(StaStateMachineTest, SeparatedStateExeMsgFail, TestSize.Level1)
 {
     SeparatedStateExeMsgFail();

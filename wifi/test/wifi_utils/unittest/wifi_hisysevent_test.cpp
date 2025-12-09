@@ -121,5 +121,12 @@ HWTEST_F(WifiHisyseventTest, WriteWifiConfigStatusHiSysEventTest, TestSize.Level
     WriteWifiConfigStatusHiSysEvent("test_package", WifiConfigReportType::ADD);
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
+
+HWTEST_F(WifiHisyseventTest, WritePositionAutoOpenWlanHiSysEventTest, TestSize.Level1)
+{
+    const std::string updateType = "OPEN_CNT";
+    WritePositionAutoOpenWlanHiSysEvent(updateType);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
 }  // namespace Wifi
 }  // namespace OHOS

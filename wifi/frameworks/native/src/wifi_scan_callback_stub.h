@@ -53,7 +53,8 @@ private:
     std::shared_ptr<IWifiScanCallback> userCallback_;
 #else
     int RemoteOnWifiScanStateChanged(uint32_t code, MessageParcel &data, MessageParcel &reply);
-    sptr<IWifiScanCallback> userCallback_;
+    std::map<std::string, sptr<IWifiScanCallback>> userCallbackMap_;
+    std::shared_mutex userCallbackMutex_;
 #endif
 
     bool mRemoteDied;

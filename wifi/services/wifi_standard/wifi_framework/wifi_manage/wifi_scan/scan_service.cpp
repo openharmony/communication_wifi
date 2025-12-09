@@ -1680,6 +1680,9 @@ ErrCode ScanService::AllowSystemTimerScan(ScanType scanType, int &scanStyle)
         WriteScanLimitHiSysEvent("SYSTEM_SCAN", static_cast<int>(ScanLimitType::LP_SCANSTYLE));
         return WIFI_OPT_FAILED;
     }
+    if (GetDeviceType() == ProductDeviceType::GLASSES) {
+        return WIFI_OPT_FAILED;
+    }
     if (WifiConfigCenter::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
         WIFI_LOGW("system timer scan not allow when wifi disable");
         WriteScanLimitHiSysEvent("SYSTEM_SCAN", static_cast<int>(ScanLimitType::WIFI_DISABLE));
@@ -1853,6 +1856,10 @@ ErrCode ScanService::AllowPnoScan(ScanType scanType, int &scanStyle)
 
 ErrCode ScanService::AllowWifiProScan(ScanType scanType, int &scanStyle)
 {
+    if (GetDeviceType() == ProductDeviceType::GLASSES) {
+        return WIFI_OPT_FAILED;
+    }
+
     if (!AllowScanByHid2dState(scanType, scanStyle)) {
         WIFI_LOGW("internal scan not allow by hid2d state");
         return WIFI_OPT_FAILED;
@@ -1862,35 +1869,42 @@ ErrCode ScanService::AllowWifiProScan(ScanType scanType, int &scanStyle)
         WIFI_LOGW("internal scan not allow by ActionListen condition");
         return WIFI_OPT_FAILED;
     }
- 
+
     int state = WifiConfigCenter::GetInstance().GetScreenState();
     if (state == MODE_STATE_CLOSE) {
         WIFI_LOGW("internal scan not allow by Screen Off");
         WriteScanLimitHiSysEvent("WIFIPRO_SCAN", static_cast<int>(ScanLimitType::SCREEN_OFF));
         return WIFI_OPT_FAILED;
     }
- 
+
     if (staStatus != static_cast<int>(OperateResState::CONNECT_AP_CONNECTED)) {
         WIFI_LOGW("NOT allow scan for staStatus: %{public}d", staStatus);
         WriteScanLimitHiSysEvent("WIFIPRO_SCAN", static_cast<int>(ScanLimitType::STA_STATE));
         return WIFI_OPT_FAILED;
     }
- 
+
     return WIFI_OPT_SUCCESS;
 }
  
 ErrCode ScanService::Allow5GApScan(ScanType scanType, int &scanStyle)
 {
+    if (GetDeviceType() == ProductDeviceType::GLASSES) {
+        return WIFI_OPT_FAILED;
+    }
+
     if (AllowWifiProScan(scanType, scanStyle) == WIFI_OPT_FAILED) {
         return WIFI_OPT_FAILED;
     }
- 
+
     // game optimization going
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode ScanService::AllowSystemSingleScan(ScanType scanType, int &scanStyle)
 {
+    if (GetDeviceType() == ProductDeviceType::GLASSES) {
+        return WIFI_OPT_FAILED;
+    }
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     if (screenState != MODE_STATE_OPEN) {
         return WIFI_OPT_FAILED;

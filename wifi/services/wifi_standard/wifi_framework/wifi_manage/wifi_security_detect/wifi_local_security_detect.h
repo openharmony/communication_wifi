@@ -46,6 +46,16 @@ struct DomainRecord {
     std::string domain;
     IpType ipType;
 };
+
+struct ChrApInfo {
+    std::string ssid = "";
+    std::string bssid = "";
+    int frequency = 0;
+    int band = -1;
+    int rssi = -1;
+    int cloudRiskType = -1;
+};
+
 using RecordDeque = std::deque<DomainRecord>;
 
 class WifiLocalSecurityDetect {
@@ -85,6 +95,10 @@ private:
     sptr<LocalSecurityDetectDnsResultCallback> dnsResultCallback_{nullptr};
     time_t lastAddRecordTime_ = -1;
     RecordDeque domainHistoryCache_;
+    ChrApInfo apInfo_;
+    void SetApInfo(const WifiLinkedInfo &linkedInfo);
+    void ResetApInfo();
+    void ReportWifiDnsHijackHiSysEvent(const std::string& domain);
     void HandleWifiConnected(const WifiLinkedInfo &linkedInfo);
     void HandleWifiDisconnected(const WifiLinkedInfo &linkedInfo);
     void HandleDnsResultReport(const std::list<NetDnsResultReport>& dnsResultReport);

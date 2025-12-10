@@ -98,6 +98,16 @@ HWTEST_F(WifiCommonUtilTest, SsidAnonymizeTest, TestSize.Level1)
     EXPECT_NE(SsidAnonymize(strIp), "");
 }
 
+HWTEST_F(WifiCommonUtilTest, DomainAnonymizeTest, TestSize.Level1)
+{
+    std::string domain1 = "www.abcdefg.com";
+    EXPECT_EQ(DomainAnonymize(domain1), "www.abc********");
+    std::string domain2 = "www.123456.com";
+    EXPECT_EQ(DomainAnonymize(domain2), "www.123*******");
+    std::string domain3 = "";
+    EXPECT_EQ(DomainAnonymize(domain3), "");
+}
+
 HWTEST_F(WifiCommonUtilTest, Byte2HexStringTest, TestSize.Level1)
 {
     WIFI_LOGI("Byte2HexStringTest enter");

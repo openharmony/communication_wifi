@@ -95,7 +95,15 @@ private:
      */
     std::string GetFilteredReasonForChr(
         std::vector<NetworkSelection::NetworkCandidate> &networkCandidates);
-    
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+    /**
+     * report wifi forgery protection hisysevent
+     *
+     * @param networkCandidates candidate networks
+     */
+    void ReportWifiForgeryProtectionHiSysEvent(
+        NetworkSelection::NetworkCandidate &networkCandidate);
+#endif
     /**
      * get selected network info for chr
      *

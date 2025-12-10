@@ -350,10 +350,16 @@ int WifiConfigCenter::SaveLinkedInfo(const WifiLinkedInfo &info, int instId)
     auto iter = mWifiLinkedInfo.find(instId);
     if (iter != mWifiLinkedInfo.end()) {
         WifiChannelWidth channelWidth = iter->second.channelWidth;
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+        WifiRiskType riskType = iter->second.riskType;
+#endif
         std::string bssid = iter->second.bssid;
         iter->second = info;
         if (bssid == info.bssid) {
             iter->second.channelWidth = channelWidth;
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+            iter->second.riskType = riskType;
+#endif
         }
     } else {
         mWifiLinkedInfo.emplace(instId, info);

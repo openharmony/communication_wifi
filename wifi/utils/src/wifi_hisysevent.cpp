@@ -1056,5 +1056,24 @@ void WriteWifiConfigStatusHiSysEvent(const std::string &packageName, WifiConfigR
     cJSON_free(jsonStr);
     cJSON_Delete(root);
 }
+ 
+void WritePositionAutoOpenWlanHiSysEvent(const std::string updateType)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(root, "UPDATE_TYPE", updateType.c_str());
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "POSITION_AUTO_OPEN_WLAN", "EVENT_VALUE", std::string(jsonStr));
+    free(jsonStr);
+    cJSON_Delete(root);
+}
 }  // namespace Wifi
 }  // namespace OHOS

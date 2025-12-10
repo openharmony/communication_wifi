@@ -19,6 +19,7 @@
 #include "wifi_service_manager.h"
 #include "wifi_manager.h"
 #include "wifi_config_center.h"
+#include "wifi_hisysevent.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -40,6 +41,7 @@ const int SCAN_INTERVAL_NORMAL_5 = 5 * 60 * 1000;
 const int SCAN_INTERVAL_SHORT = 20 * 1000;
 const int AUTO_OPEN_WIFI_DELAY_TIME = 3 * 1000;
 const int UPDATE_TARGET_SSID_TIME = 10 * 1000;
+const int AUTO_OPEN_WIFI_TIMEOUT = 10 * 1000; // 参照WIFI_OPEN_TIMEOUT
 }
 DEFINE_WIFILOG_LABEL("WifiIntelligenceStateMachine");
 
@@ -501,6 +503,8 @@ void WifiIntelligenceStateMachine::DisabledState::HandleWifiOpen(InternalMessage
         WIFI_LOGI("HandleWifiOpen, open wifi.");
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
+        WritePositionAutoOpenWlanHiSysEvent("OPEN_CNT");
+        pWifiIntelligenceStateMachine_->StartTimer(EVENT_WIFI_HANLE_OPEN_WAIT_SUC, AUTO_OPEN_WIFI_TIMEOUT);
         return;
     } else if (staState == WifiDetailState::STATE_SEMI_ACTIVATING &&
         !WifiConfigCenter::GetInstance().IsScreenLandscape() && screenState == MODE_STATE_OPEN &&
@@ -508,6 +512,10 @@ void WifiIntelligenceStateMachine::DisabledState::HandleWifiOpen(InternalMessage
         WIFI_LOGI("HandleWifiOpen, open wifi wait.");
         pWifiIntelligenceStateMachine_->StartTimer(EVENT_WIFI_HANLE_OPEN, AUTO_OPEN_WIFI_DELAY_TIME);
         return;
+    } else if (WifiConfigCenter::GetInstance().IsScreenLandscape()) {
+        WritePositionAutoOpenWlanHiSysEvent("SCREEN_FULL_CONTROL_CNT");
+    } else if (screenState != MODE_STATE_OPEN) {
+        WritePositionAutoOpenWlanHiSysEvent("SCREEN_OFF_CONTROL_CNT");
     }
     WIFI_LOGI("HandleWifiOpen, can't open wifi.");
     return;
@@ -864,6 +872,11 @@ bool WifiIntelligenceStateMachine::InternetReadyState::ExecuteStateMsg(InternalM
             }
             break;
         }
+        case EVENT_WIFI_HANLE_OPEN_WAIT_SUC: {
+            WritePositionAutoOpenWlanHiSysEvent("OPEN_SUCCESS_CNT");
+            ret = EXECUTED;
+            break;
+        }
         default:
             WIFI_LOGD("InternetReadyState-msgCode=%{public}d not handle.", msg->GetMessageName());
             break;
@@ -960,6 +973,7 @@ bool WifiIntelligenceStateMachine::HandleScanResult(std::vector<WifiScanInfo> sc
             WIFI_LOGI("HandleScanResult, hasTargetAp=true, ssid=%{public}s, bssid=%{public}s",
                 SsidAnonymize(scanInfo.ssid).c_str(), MacAnonymize(scanInfo.bssid).c_str());
         } else {
+            WritePositionAutoOpenWlanHiSysEvent("LOW_RSSI_CONTROL_CNT");
             WIFI_LOGI("HandleScanResult, AP RSSI is weak, ssid=%{public}s, bssid=%{public}s",
                 SsidAnonymize(scanInfo.ssid).c_str(), MacAnonymize(scanInfo.bssid).c_str());
         }
@@ -968,6 +982,7 @@ bool WifiIntelligenceStateMachine::HandleScanResult(std::vector<WifiScanInfo> sc
     if (hasApInBlacklist) {
         WIFI_LOGI("Has tartget in black list, update record.");
         ApInfoHelper::GetInstance().ResetBlacklist(scanInfoList, 1);
+        WritePositionAutoOpenWlanHiSysEvent("FORBIDDEN_CONTROL_CNT");
         return true;
     } else {
         if (hasTargetAp) {

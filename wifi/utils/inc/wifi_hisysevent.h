@@ -260,6 +260,8 @@ void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo);
 void WriteMdmHiSysEvent(const MdmRestrictedInfo &mdmRestrictedInfo);
 
 void WriteWifiConfigStatusHiSysEvent(const std::string &packageName, WifiConfigReportType reportType);
+
+void WritePositionAutoOpenWlanHiSysEvent(const std::string updateType);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

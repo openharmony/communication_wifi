@@ -399,7 +399,7 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if(WifiManager::GetInstance().GetCacRadarDetectionStatus() == CAC_DETECT_IS_IN_PROGRESS) {
+    if (WifiManager::GetInstance().GetCacRadarDetectionStatus() == CAC_DETECT_IS_IN_PROGRESS) {
         WIFI_LOGI("%{public}s, CAC is in progress, cannot proceed", __func__);
         return WIFI_OPT_FAILED;
     }
@@ -532,7 +532,7 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         WIFI_LOGE("P2pConnect:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if(WifiManager::GetInstance().GetCacRadarDetectionStatus() == CAC_DETECT_IS_IN_PROGRESS) {
+    if (WifiManager::GetInstance().GetCacRadarDetectionStatus() == CAC_DETECT_IS_IN_PROGRESS) {
         WIFI_LOGI("%{public}s, CAC is in progress, cannot proceed", __func__);
         return WIFI_OPT_FAILED;
     }
@@ -1165,7 +1165,7 @@ ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
         WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if(WifiManager::GetInstance().GetCacRadarDetectionStatus() == CAC_DETECT_IS_IN_PROGRESS) {
+    if (WifiManager::GetInstance().GetCacRadarDetectionStatus() == CAC_DETECT_IS_IN_PROGRESS) {
         WIFI_LOGI("%{public}s, CAC is in progress, cannot proceed", __func__);
         return WIFI_OPT_FAILED;
     }
@@ -1217,7 +1217,7 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
         WIFI_LOGE("password is invalid, %{public}d", passLen);
         return WIFI_OPT_P2P_INVALID_PASSWORD;
     }
-    if(WifiManager::GetInstance().GetCacRadarDetectionStatus() == CAC_DETECT_IS_IN_PROGRESS) {
+    if (WifiManager::GetInstance().GetCacRadarDetectionStatus() == CAC_DETECT_IS_IN_PROGRESS) {
         WIFI_LOGI("%{public}s, CAC is in progress, cannot proceed", __func__);
         return WIFI_OPT_FAILED;
     }

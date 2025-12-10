@@ -143,6 +143,15 @@ const WifiP2pDevice &WifiP2pServiceResponseList::GetDevice() const
     return p2pDevice;
 }
 
+inline bool SafeAccess(std::span<const unsigned char> data, size_t offset)
+{
+    if (offset >= data.size()) {
+        WIFI_LOGW("Access out of bounds at size=%{public}zu, line = %{public}d", __LINE__);
+        return false;
+    }
+    return true;
+}
+
 bool WifiP2pServiceResponseList::ParseTlvs2RespList(const std::vector<unsigned char> &tlvList)
 {
     if (tlvList.empty()) {
@@ -153,8 +162,7 @@ bool WifiP2pServiceResponseList::ParseTlvs2RespList(const std::vector<unsigned c
     std::size_t headLength = SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE + TRANSACTION_ID_SIZE + SERVICE_STATUS_SIZE;
     std::size_t pos = 0;
     while (leftLength > 0) {
-        if (pos + 1 >= tlvList.size()) {
-            WIFI_LOGW("tlvList length field out of bounds");
+        if (!SafeAccess(tlvList, pos + 1)) {
             return false;
         }
         unsigned short length = tlvList[pos] + (tlvList[pos + 1] << CHAR_BIT);
@@ -163,19 +171,23 @@ bool WifiP2pServiceResponseList::ParseTlvs2RespList(const std::vector<unsigned c
             return false;
         }
         unsigned short dataLength = length - PROTOCOL_SIZE - TRANSACTION_ID_SIZE - SERVICE_STATUS_SIZE;
-        if (pos + headLength > tlvList.size()) {
-            WIFI_LOGW("Invalid header out of bounds");
+        if (!SafeAccess(tlvList, pos + SERVICE_TLV_LENGTH_SIZE)) {
             return false;
         }
         int type = tlvList[pos + SERVICE_TLV_LENGTH_SIZE];
-        unsigned char transId = tlvList[pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE];
-        int status = tlvList[pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE + TRANSACTION_ID_SIZE];
+        if (!SafeAccess(tlvList, pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE)) {
+            return false;
+        }
 
+        unsigned char transId = tlvList[pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE];
+        if (!SafeAccess(tlvList, pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE + TRANSACTION_ID_SIZE)) {
+            return false;
+        }
+        int status = tlvList[pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE + TRANSACTION_ID_SIZE];
         if (dataLength > leftLength - headLength || dataLength < 0) {
             WIFI_LOGW("A tlv packet error!");
             return false;
         }
-
         pos += headLength;
         if (dataLength <= MAX_BUF_SIZE) {
             std::vector<unsigned char> data;

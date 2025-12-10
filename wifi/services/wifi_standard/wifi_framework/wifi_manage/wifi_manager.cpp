@@ -221,6 +221,18 @@ void WifiManager::StopGetCacResultAndLocalCac(int reason)
     pEnhanceService->StopGetCacResultAndLocalCac(reason);
 }
 
+IsCACDetectInProgress WifiManager::GetCacRadarDetectionStatus()
+{
+    WIFI_LOGI("GetCacRadarDetectionStatus");
+ 
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (!pEnhanceService) {
+        WIFI_LOGE("IEnhanceService pEnhanceService is null, GetCacRadarDetectionStatus failed");
+        return CAC_DETECT_IS_UNKNOWN;
+    }
+    return pEnhanceService->GetCacRadarDetectionStatus();
+}
+
 void WifiManager::CheckSapcoExist()
 {
     char preValue[PROP_SUPPORT_SAPCOEXIST_LEN] = {0};

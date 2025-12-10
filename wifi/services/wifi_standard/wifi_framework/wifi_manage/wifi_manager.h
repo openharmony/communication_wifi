@@ -151,6 +151,7 @@ public:
 #endif
     void OnNativeProcessStatusChange(int status);
     void StopGetCacResultAndLocalCac(int reason);
+    IsCACDetectInProgress GetCacRadarDetectionStatus();
 
 private:
     WifiManager();

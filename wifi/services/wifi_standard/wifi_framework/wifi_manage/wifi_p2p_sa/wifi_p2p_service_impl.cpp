@@ -399,6 +399,10 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
         WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if(WifiManager::GetInstance().GetCacRadarDetectionStatus() == CAC_DETECT_IS_IN_PROGRESS) {
+        WIFI_LOGI("%{public}s, CAC is in progress, cannot proceed", __func__);
+        return WIFI_OPT_FAILED;
+    }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_P2P_REQUEST);
 
     uint32_t passLen = config.GetPassphrase().length();
@@ -527,6 +531,10 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("P2pConnect:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if(WifiManager::GetInstance().GetCacRadarDetectionStatus() == CAC_DETECT_IS_IN_PROGRESS) {
+        WIFI_LOGI("%{public}s, CAC is in progress, cannot proceed", __func__);
+        return WIFI_OPT_FAILED;
     }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_P2P_REQUEST);
 
@@ -1157,6 +1165,10 @@ ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
         WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    if(WifiManager::GetInstance().GetCacRadarDetectionStatus() == CAC_DETECT_IS_IN_PROGRESS) {
+        WIFI_LOGI("%{public}s, CAC is in progress, cannot proceed", __func__);
+        return WIFI_OPT_FAILED;
+    }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_HID2D_REQUEST);
 
     if (!IsP2pServiceRunning()) {
@@ -1204,6 +1216,10 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
     if (passLen < WIFI_P2P_PASSPHRASE_MIN_LEN || passLen > WIFI_P2P_PASSPHRASE_MAX_LEN) {
         WIFI_LOGE("password is invalid, %{public}d", passLen);
         return WIFI_OPT_P2P_INVALID_PASSWORD;
+    }
+    if(WifiManager::GetInstance().GetCacRadarDetectionStatus() == CAC_DETECT_IS_IN_PROGRESS) {
+        WIFI_LOGI("%{public}s, CAC is in progress, cannot proceed", __func__);
+        return WIFI_OPT_FAILED;
     }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_HID2D_REQUEST);
 

@@ -37,6 +37,11 @@ const std::map<int, std::string> g_connectTypeTransMap {
     { NETWORK_SELECTED_BY_MDM, "MDM" },
 };
 constexpr int MAX_DNS_NUM = 10;
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+constexpr int MIN_RISKINFO_REPORT_INTERVAL = 2 * 60 * 60; // 上报间隔不短于2小时
+static int lastWriteWifiRiskInfoHiSysEventTime = -1;
+std::mutex riskInfoTimerMutex_;
+#endif
 
 template<typename... Types>
 static void WriteEvent(const std::string& eventType, Types... args)
@@ -1075,5 +1080,47 @@ void WritePositionAutoOpenWlanHiSysEvent(const std::string updateType)
     free(jsonStr);
     cJSON_Delete(root);
 }
+
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+void WriteWifiRiskInfoHiSysEvent(const WifiRiskInfo &wifiRiskInfo)
+{
+    time_t now = time(nullptr);
+    if (now < 0) {
+        WIFI_LOGE("time return invalid!");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(riskInfoTimerMutex_);
+    auto interval = now - lastWriteWifiRiskInfoHiSysEventTime;
+    if (interval < MIN_RISKINFO_REPORT_INTERVAL) {
+        return;
+    }
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    
+    cJSON_AddNumberToObject(root, "RISKTYPE", wifiRiskInfo.riskType);
+    cJSON_AddNumberToObject(root, "LAST_DISCONNECT_TIME", wifiRiskInfo.lastDisconnectTime);
+    cJSON_AddNumberToObject(root, "CONNECT_INTERVAL", wifiRiskInfo.connectInterval);
+    cJSON_AddStringToObject(root, "HOST_NAME", DomainAnonymize(wifiRiskInfo.hostName).c_str());
+    cJSON_AddStringToObject(root, "SSID", SsidAnonymize(wifiRiskInfo.ssid).c_str());
+    cJSON_AddStringToObject(root, "BSSID", MacAnonymize(wifiRiskInfo.bssid).c_str());
+    cJSON_AddNumberToObject(root, "FREQUENCY", wifiRiskInfo.frequency);
+    cJSON_AddNumberToObject(root, "BAND", wifiRiskInfo.band);
+    cJSON_AddNumberToObject(root, "RSSI", wifiRiskInfo.rssi);
+    cJSON_AddNumberToObject(root, "CLOUD_RISKTYPE", wifiRiskInfo.cloudRiskType);
+    
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_RISK_INFO", "EVENT_VALUE", std::string(jsonStr));
+    cJSON_free(jsonStr);
+    cJSON_Delete(root);
+    lastWriteWifiRiskInfoHiSysEventTime = time(nullptr);
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

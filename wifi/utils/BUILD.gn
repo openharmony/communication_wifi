@@ -108,6 +108,10 @@ if (defined(ohos_lite)) {
       external_deps += [ "eventhandler:libeventhandler" ]
     }
 
+    if (wifi_feature_with_local_security_detect) {
+      defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
+    }
+
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc
     ldflags = memory_optimization_ldflags

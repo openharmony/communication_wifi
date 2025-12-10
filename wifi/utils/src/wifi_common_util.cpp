@@ -187,6 +187,20 @@ std::string PassWordAnonymize(const std::string str)
     return s;
 }
 
+std::string DomainAnonymize(const std::string str)
+{
+    if (str.empty()) {
+        return str;
+    }
+    size_t length = str.size();
+    size_t start = length / 2;
+    std::string masked = str;
+    for (size_t i = start; i < length; ++i) {
+        masked[i] = '*';
+    }
+    return masked;
+}
+
 static unsigned char ConvertStrChar(char ch)
 {
     constexpr int numDiffForHexAlphabet = 10;

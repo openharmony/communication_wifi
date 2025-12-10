@@ -128,5 +128,13 @@ HWTEST_F(WifiHisyseventTest, WritePositionAutoOpenWlanHiSysEventTest, TestSize.L
     WritePositionAutoOpenWlanHiSysEvent(updateType);
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+HWTEST_F(WifiHisyseventTest, WriteWifiRiskInfoHiSysEventTest, TestSize.Level1)
+{
+    WifiRiskInfo wifiRiskInfo;
+    WriteWifiRiskInfoHiSysEvent(wifiRiskInfo);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

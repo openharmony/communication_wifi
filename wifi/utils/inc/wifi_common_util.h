@@ -178,6 +178,15 @@ std::string SsidAnonymize(const std::string str);
 std::string PassWordAnonymize(const std::string str);
 
 /**
+ * @Description Domain anonymization
+ *
+ * Mask last half of the input Domain.
+ * @param str - Input Domain
+ * @return std::string - Processed Domain
+ */
+std::string DomainAnonymize(const std::string str);
+
+/**
  * @Description Converting string MAC to a C-style MAC address
  *
  * @param strMac - Input MAC address

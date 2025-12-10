@@ -18,6 +18,7 @@
 
 #include <string>
 #include "wifi_msg.h"
+#include <mutex>
 #define AP_ERR_CODE 3
 #define AP_STA_PSK_MISMATCH_CNT 1
 
@@ -83,6 +84,19 @@ enum class WifiScanFailReason {
     HDI_PNO_SCAN_FAIL,
     HDI_GET_SCAN_INFOS_FAIL,
     SERVICE_REGISTERCALLBACK_FAIL
+};
+
+enum class WifiRiskInfoReason {
+    DEFAULT = -1,
+    WIFI_COPY_NETWORK = 1,
+    WIFI_FORGERY_PROTECTION = 2,
+    WIFI_DNS_SPOOFING = 3
+};
+
+enum class WifiCloudRiskType {
+    UNKNOWN = -1,
+    SAFE = 0,
+    UNSAFE = 1
 };
 
 struct Pref5gStatisticsInfo {
@@ -151,6 +165,20 @@ struct MdmRestrictedInfo {
     std::string restrictedType = "";
     int uid = 0;
     std::string bundleName = "";
+};
+
+struct WifiRiskInfo {
+    int riskType = -1;
+    int lastDisconnectTime = -1;
+    int connectInterval = -1;
+    std::string hostName = "";
+    //Ap_Info
+    std::string ssid = "";
+    std::string bssid = "";
+    int frequency = 0;
+    int band = -1;
+    int rssi = -1;
+    int cloudRiskType = -1;
 };
 
 void WriteWifiStateTypeHiSysEvent(const std::string& serviceType, WifiOperType operType);
@@ -262,6 +290,9 @@ void WriteMdmHiSysEvent(const MdmRestrictedInfo &mdmRestrictedInfo);
 void WriteWifiConfigStatusHiSysEvent(const std::string &packageName, WifiConfigReportType reportType);
 
 void WritePositionAutoOpenWlanHiSysEvent(const std::string updateType);
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+void WriteWifiRiskInfoHiSysEvent(const WifiRiskInfo &wifiRiskInfo);
+#endif
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

@@ -1212,6 +1212,12 @@ struct Ipv6ControlData {
     int txPacketThreshold = 3;
     int failCountThreshold = 3;
 };
+
+typedef enum {
+    CAC_DETECT_IS_UNKNOWN = 0,
+    CAC_DETECT_IS_NOT_IN_PROGRESS = 1,
+    CAC_DETECT_IS_IN_PROGRESS = 2,
+} IsCACDetectInProgress;
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

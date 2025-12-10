@@ -146,7 +146,7 @@ const WifiP2pDevice &WifiP2pServiceResponseList::GetDevice() const
 inline bool SafeAccess(std::span<const unsigned char> data, size_t offset)
 {
     if (offset >= data.size()) {
-        WIFI_LOGW("Access out of bounds at size=%{public}zu, line = %{public}d", __LINE__);
+        WIFI_LOGW("Access out of bounds at line = %{public}d", __LINE__);
         return false;
     }
     return true;

@@ -318,6 +318,7 @@
         "OHOS::Wifi::WifiManager::InstallPacketFilterProgram(int, int)";
         "OHOS::Wifi::WifiManager::OnNativeProcessStatusChange(int)";
         "OHOS::Wifi::WifiManager::StopGetCacResultAndLocalCac(int)";
+        "OHOS::Wifi::WifiManager::GetCacRadarDetectionStatus()";
         "OHOS::Wifi::WifiServiceManager::GetInstance()";
         "OHOS::Wifi::WifiServiceManager::GetP2pServiceInst()";
         "OHOS::Wifi::WifiServiceManager::GetEnhanceServiceInst()";

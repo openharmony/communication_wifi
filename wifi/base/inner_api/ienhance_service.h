@@ -147,6 +147,13 @@ public:
     virtual void StopGetCacResultAndLocalCac(int reason) = 0;
 
     /**
+    * @Description Get the current 160M clone CAC detection status
+    *
+    * @return void
+    */
+    virtual IsCACDetectInProgress GetCacRadarDetectionStatus() = 0;
+
+    /**
      * @Description Is external scan allowed.
      *
      * @param scanDeviceInfo - scan device info

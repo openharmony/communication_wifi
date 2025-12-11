@@ -436,6 +436,12 @@ private:
      * @param scanInfos - Scanning Result list
      */
     void GetWifiRiskType(std::vector<InterScanInfo> &scanInfos);
+
+    /**
+     * @Description get report clone attack chr event
+     * @param interInfo -single wifi scan result
+     */
+    void ReportWifiCloneAttackHiSysEvent(const InterScanInfo &interInfo);
 #endif
     
     /**

@@ -110,7 +110,6 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
 
     /* Traverse networkCandidates and reserve qualified networkCandidate */
     TryNominate(networkCandidates, networkSelector);
-
     std::string filteredReason = GetFilteredReasonForChr(networkCandidates);
 
     /* Get best networkCandidate from the reserved networkCandidates */
@@ -253,6 +252,9 @@ std::string NetworkSelectionManager::GetFilteredReasonForChr(
         if (filtedReason.size() == 0) {
             continue;
         }
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+        ReportWifiForgeryProtectionHiSysEvent(networkCandidates.at(i));
+#endif
         filteredReasons += "[";
         for (const auto& pair : filtedReason) {
             std::string filterName = pair.first;
@@ -268,6 +270,39 @@ std::string NetworkSelectionManager::GetFilteredReasonForChr(
     filteredReasons += "]";
     return filteredReasons;
 }
+
+#ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
+void NetworkSelectionManager::ReportWifiForgeryProtectionHiSysEvent(
+    NetworkSelection::NetworkCandidate &networkCandidate)
+{
+    std::map<std::string, std::set<NetworkSelection::FiltedReason,
+        NetworkSelection::FiltedReasonComparator, std::allocator<NetworkSelection::FiltedReason>>> filtedReason
+            = networkCandidate.filtedReason;
+    bool isFilteredByLongUnusedOpenNetworkFilter = false;
+    for (const auto& pair : filtedReason) {
+        if (pair.second.count(NetworkSelection::FiltedReason::LONG_TIME_UNUSED_OPEN_NETWORK) != 0) {
+            isFilteredByLongUnusedOpenNetworkFilter = true;
+            break;
+        }
+    }
+    if (!isFilteredByLongUnusedOpenNetworkFilter) {
+        return;
+    }
+    WifiRiskInfo wifiRiskInfo;
+    wifiRiskInfo.riskType = static_cast<int>(WifiRiskInfoReason::WIFI_FORGERY_PROTECTION);
+    wifiRiskInfo.lastDisconnectTime = networkCandidate.wifiDeviceConfig.lastDisconnectTime;
+    wifiRiskInfo.connectInterval =
+        time(nullptr) - networkCandidate.wifiDeviceConfig.lastDisconnectTime;
+    wifiRiskInfo.ssid = networkCandidate.wifiDeviceConfig.ssid;
+    wifiRiskInfo.bssid = networkCandidate.wifiDeviceConfig.bssid;
+    wifiRiskInfo.frequency = networkCandidate.wifiDeviceConfig.frequency;
+    wifiRiskInfo.band = networkCandidate.interScanInfo.band;
+    wifiRiskInfo.rssi = networkCandidate.wifiDeviceConfig.rssi;
+    wifiRiskInfo.cloudRiskType = networkCandidate.wifiDeviceConfig.isSecureWifi ?
+        static_cast<int>(WifiCloudRiskType::SAFE) : static_cast<int>(WifiCloudRiskType::UNSAFE);
+    WriteWifiRiskInfoHiSysEvent(wifiRiskInfo);
+}
+#endif
 
 std::string NetworkSelectionManager::GetSelectedInfoForChr(NetworkSelection::NetworkCandidate *networkCandidate)
 {

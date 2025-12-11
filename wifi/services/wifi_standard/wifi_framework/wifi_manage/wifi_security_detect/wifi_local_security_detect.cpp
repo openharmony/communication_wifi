@@ -77,14 +77,53 @@ void WifiLocalSecurityDetect::DealStaConnChanged(OperateResState state, const Wi
     }
 }
 
+void WifiLocalSecurityDetect::SetApInfo(const WifiLinkedInfo &linkedInfo)
+{
+    apInfo_.ssid = linkedInfo.ssid;
+    apInfo_.bssid = linkedInfo.bssid;
+    apInfo_.frequency = linkedInfo.frequency;
+    apInfo_.band = linkedInfo.band;
+    apInfo_.rssi = linkedInfo.rssi;
+}
+
+void WifiLocalSecurityDetect::ResetApInfo()
+{
+    apInfo_.ssid = "";
+    apInfo_.bssid = "";
+    apInfo_.frequency = 0;
+    apInfo_.band = -1;
+    apInfo_.rssi = -1;
+    apInfo_.cloudRiskType = static_cast<int>(WifiCloudRiskType::UNKNOWN);
+}
+
+void WifiLocalSecurityDetect::ReportWifiDnsHijackHiSysEvent(const std::string& domain)
+{
+    WifiRiskInfo wifiRiskInfo;
+    wifiRiskInfo.riskType = static_cast<int>(WifiRiskInfoReason::WIFI_DNS_SPOOFING);
+    wifiRiskInfo.hostName = domain;
+    {
+        std::lock_guard<std::mutex> lock(localDetectMutex_);
+        wifiRiskInfo.ssid = apInfo_.ssid;
+        wifiRiskInfo.bssid = apInfo_.bssid;
+        wifiRiskInfo.frequency = apInfo_.frequency;
+        wifiRiskInfo.band = apInfo_.band;
+        wifiRiskInfo.rssi = apInfo_.rssi;
+        wifiRiskInfo.cloudRiskType = apInfo_.cloudRiskType;
+    }
+    WriteWifiRiskInfoHiSysEvent(wifiRiskInfo);
+}
+
 void WifiLocalSecurityDetect::HandleWifiConnected(const WifiLinkedInfo & linkedInfo)
 {
     currentUseNetworkId_ = linkedInfo.networkId;
+    SetApInfo(linkedInfo);
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config) != 0) {
         WIFI_LOGE("%{public}s, not find networkId: %{public}d", __FUNCTION__, linkedInfo.networkId);
         return;
     }
+    apInfo_.cloudRiskType = config.isSecureWifi ?
+        static_cast<int>(WifiCloudRiskType::SAFE) : static_cast<int>(WifiCloudRiskType::UNSAFE);
     config.riskType = linkedInfo.riskType;
     WifiSettings::GetInstance().AddDeviceConfig(config);
     WifiSettings::GetInstance().SyncDeviceConfig();
@@ -94,6 +133,7 @@ void WifiLocalSecurityDetect::HandleWifiConnected(const WifiLinkedInfo & linkedI
 void WifiLocalSecurityDetect::HandleWifiDisconnected(const WifiLinkedInfo & linkedInfo)
 {
     currentUseNetworkId_ = -1;
+    ResetApInfo();
     return;
 }
 
@@ -105,7 +145,6 @@ StaServiceCallback WifiLocalSecurityDetect::GetStaCallback() const
 int32_t WifiLocalSecurityDetect::LocalSecurityDetectDnsResultCallback::OnDnsResultReport(uint32_t size,
     const std::list<NetDnsResultReport> netDnsResultReport)
 {
-    WIFI_LOGI("Enter into OnDnsResultReport successfully...");
     if (!WifiLocalSecurityDetect::GetInstance().canAccessInternetThroughWifi_) {
         WIFI_LOGI("DnsResultCallback failed because the visit is not through wifi...");
         return 1;
@@ -125,6 +164,7 @@ void WifiLocalSecurityDetect::HandleDnsResultReport(const std::list<NetDnsResult
         if (CheckPublicToPrivateTransition(domain, currentIpType)) {
             WIFI_LOGI("Potential dns hijack detected: Current Domain Ip type changed from public to private! \
                 This may indicate a security issue.");
+            ReportWifiDnsHijackHiSysEvent(domain);
         }
         AddRecordToDnsCache(domain, currentIpType);
     }
@@ -161,8 +201,6 @@ void WifiLocalSecurityDetect::AddRecordToDnsCache(const std::string& domain, IpT
     if (now - lastAddRecordTime_ > DOMAIN_STORE_CD) {
         UpdateDnsCache(domainHistoryCache_, domain, ipType);
         lastAddRecordTime_ = time(nullptr);
-    } else {
-        WIFI_LOGI("dnsLRUCache: addrecord in cd...");
     }
 }
 

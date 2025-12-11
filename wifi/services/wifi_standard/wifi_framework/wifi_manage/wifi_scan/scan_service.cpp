@@ -810,6 +810,7 @@ void ScanService::GetWifiRiskType(std::vector<InterScanInfo> &scanInfos)
     }
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     std::unordered_map<std::string, int> ssidBssidCount;
+    std::unordered_set<std::string> reportedCloneWifi;
     for (const auto& wifi : scanInfos) {
         if (wifi.ssid.empty()) {
             continue;
@@ -821,6 +822,10 @@ void ScanService::GetWifiRiskType(std::vector<InterScanInfo> &scanInfos)
         std::string key = wifi.ssid + "--" + wifi.bssid;
         if (ssidBssidCount[key] > 1) {
             wifi.riskType = WifiRiskType::CLONE_ATTACK;
+            if (reportedCloneWifi.count(key) == 0) {
+                ReportWifiCloneAttackHiSysEvent(wifi);
+                reportedCloneWifi.insert(key);
+            }
             continue;
         }
         if (wifi.securityType == WifiSecurity::OPEN) {
@@ -830,6 +835,18 @@ void ScanService::GetWifiRiskType(std::vector<InterScanInfo> &scanInfos)
             wifi.riskType = WifiRiskType::NORMAL;
         }
     }
+}
+
+void ScanService::ReportWifiCloneAttackHiSysEvent(const InterScanInfo &interInfo)
+{
+    WifiRiskInfo wifiRiskInfo;
+    wifiRiskInfo.riskType = static_cast<int>(WifiRiskInfoReason::WIFI_COPY_NETWORK);
+    wifiRiskInfo.ssid = interInfo.ssid;
+    wifiRiskInfo.bssid = interInfo.bssid;
+    wifiRiskInfo.frequency = interInfo.frequency;
+    wifiRiskInfo.band = interInfo.band;
+    wifiRiskInfo.rssi = interInfo.rssi;
+    WriteWifiRiskInfoHiSysEvent(wifiRiskInfo);
 }
 #endif
 

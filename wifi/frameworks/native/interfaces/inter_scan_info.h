@@ -101,10 +101,8 @@ struct InterScanInfo {
           maxRates(0),
           isHiLinkNetwork(0),
           isHiLinkProNetwork(false),
-          supportedWifiCategory(WifiCategory::DEFAULT)
-          {
-          riskType = WifiRiskType::INVALID;
-          }
+          supportedWifiCategory(WifiCategory::DEFAULT),
+          riskType(WifiRiskType::INVALID) {}
 
     ~InterScanInfo() {}
 

@@ -114,7 +114,7 @@ function portalHiSysEvent() {
 }
  
 export function updateOnBackground() {
-  if (httpErrorCode_ != 0 || errorCode_ != 0 || sslErrorCode_ != 0 && !isUpload_) {
+  if ((httpErrorCode_ != 0 || errorCode_ != 0 || sslErrorCode_ != 0) && !isUpload_) {
     portalHiSysEvent();
     isUpload_ = true;
   }

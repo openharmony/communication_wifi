@@ -254,7 +254,7 @@ bool WifiCommonEventHelper::PublishInternetAccessChangedEvent(const int &code, c
 bool WifiCommonEventHelper::PublishNetCheckResultChange(const int &code, const std::string &data)
 {
     WIFI_LOGI("PublishNetCheckResultChange code:%{public}d", code);
-    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_NET_CHECK_RESULT_CHNAGE, code, data);
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_NET_CHECK_RESULT_CHANGE, code, data);
 }
 }  // namespace Wifi
 }  // namespace OHOS

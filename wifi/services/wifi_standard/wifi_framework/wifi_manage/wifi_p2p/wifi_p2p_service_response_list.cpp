@@ -147,14 +147,12 @@ static bool CheckTlvBounds(const std::vector<unsigned char>& tlvList, size_t pos
 {
 
     if (pos >= tlvList.size()) {
-        WIFI_LOGW("Line %{public}d: TLV access out of bounds: pos=%{public}zu, pos+1=%{public}zu, size=%{public}zu",
-                    __LINE__, pos, pos + 1, tlvList.size());
+        WIFI_LOGW("Line %{public}d: TLV access out of bounds", __LINE__);
         return false;
     }
 
     if (pos + 1 >= tlvList.size()) {
-        WIFI_LOGW("Line %{public}d: TLV access out of bounds: pos=%{public}zu, pos+1=%{public}zu, size=%{public}zu",
-                    __LINE__, pos, pos + 1, tlvList.size());
+        WIFI_LOGW("Line %{public}d: TLV access out of bounds", __LINE__);
         return false;
     }
 
@@ -165,8 +163,7 @@ static bool CheckTlvBounds(const std::vector<unsigned char>& tlvList, size_t pos
     if (tlvTypeOffset >= tlvList.size() ||
         transIdOffset >= tlvList.size() ||
         statusOffset >= tlvList.size()) {
-        WIFI_LOGW("Line %{public}d: TLV access out of bounds: type=%{public}zu, transId=%{public}zu, status=%{public}zu, size=%{public}zu",
-                    __LINE__, tlvTypeOffset, transIdOffset, statusOffset, tlvList.size());
+        WIFI_LOGW("Line %{public}d: TLV access out of bounds", __LINE__);
         return false;
     }
 

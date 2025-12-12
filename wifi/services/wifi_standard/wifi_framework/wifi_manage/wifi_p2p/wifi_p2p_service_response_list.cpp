@@ -182,13 +182,14 @@ bool WifiP2pServiceResponseList::ParseTlvs2RespList(const std::vector<unsigned c
         unsigned short length = tlvList[pos] + (tlvList[pos + 1] << CHAR_BIT);
         unsigned short dataLength = length - PROTOCOL_SIZE - TRANSACTION_ID_SIZE - SERVICE_STATUS_SIZE;
         int type = tlvList[pos + SERVICE_TLV_LENGTH_SIZE];
-
         unsigned char transId = tlvList[pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE];
         int status = tlvList[pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE + TRANSACTION_ID_SIZE];
+
         if (dataLength > leftLength - headLength || dataLength < 0) {
             WIFI_LOGW("A tlv packet error!");
             return false;
         }
+        
         pos += headLength;
         if (dataLength <= MAX_BUF_SIZE) {
             std::vector<unsigned char> data;

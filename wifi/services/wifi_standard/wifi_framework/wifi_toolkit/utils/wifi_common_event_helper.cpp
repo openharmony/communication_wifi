@@ -250,5 +250,11 @@ bool WifiCommonEventHelper::PublishInternetAccessChangedEvent(const int &code, c
     permissions.push_back(COMMON_EVENT_MANAGE_WIFI_CONNECTION_PERMISSION);
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_INTERNET_ACCESS_CHANGE, code, data, permissions);
 }
+
+bool WifiCommonEventHelper::PublishNetCheckResultChange(const int &code, const std::string &data)
+{
+    WIFI_LOGI("PublishNetCheckResultChange code:%{public}d", code);
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_NET_CHECK_RESULT_CHNAGE, code, data);
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -180,10 +180,6 @@ bool WifiP2pServiceResponseList::ParseTlvs2RespList(const std::vector<unsigned c
     std::size_t pos = 0;
     while (leftLength > 0 && CheckTlvBounds(tlvList, pos)) {
         unsigned short length = tlvList[pos] + (tlvList[pos + 1] << CHAR_BIT);
-        if (length < PROTOCOL_SIZE + TRANSACTION_ID_SIZE + SERVICE_STATUS_SIZE) {
-            WIFI_LOGW("Invalid TLV length: too small");
-            return false;
-        }
         unsigned short dataLength = length - PROTOCOL_SIZE - TRANSACTION_ID_SIZE - SERVICE_STATUS_SIZE;
         int type = tlvList[pos + SERVICE_TLV_LENGTH_SIZE];
 

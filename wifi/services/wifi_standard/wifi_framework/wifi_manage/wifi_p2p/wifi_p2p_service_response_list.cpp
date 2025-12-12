@@ -143,12 +143,33 @@ const WifiP2pDevice &WifiP2pServiceResponseList::GetDevice() const
     return p2pDevice;
 }
 
-inline bool SafeAccess(const std::vector<unsigned char>& data, size_t offset)
+static bool CheckTlvBounds(const std::vector<unsigned char>& tlvList, size_t pos)
 {
-    if (offset >= data.size()) {
-        WIFI_LOGW("Access out of bounds at line = %{public}d", __LINE__);
+
+    if (pos >= tlvList.size()) {
+        WIFI_LOGW("Line %{public}d: TLV access out of bounds: pos=%{public}zu, pos+1=%{public}zu, size=%{public}zu",
+                    __LINE__, pos, pos + 1, tlvList.size());
         return false;
     }
+
+    if (pos + 1 >= tlvList.size()) {
+        WIFI_LOGW("Line %{public}d: TLV access out of bounds: pos=%{public}zu, pos+1=%{public}zu, size=%{public}zu",
+                    __LINE__, pos, pos + 1, tlvList.size());
+        return false;
+    }
+
+    size_t tlvTypeOffset = pos + SERVICE_TLV_LENGTH_SIZE;
+    size_t transIdOffset = tlvTypeOffset + PROTOCOL_SIZE;
+    size_t statusOffset = transIdOffset + TRANSACTION_ID_SIZE;
+
+    if (tlvTypeOffset >= tlvList.size() ||
+        transIdOffset >= tlvList.size() ||
+        statusOffset >= tlvList.size()) {
+        WIFI_LOGW("Line %{public}d: TLV access out of bounds: type=%{public}zu, transId=%{public}zu, status=%{public}zu, size=%{public}zu",
+                    __LINE__, tlvTypeOffset, transIdOffset, statusOffset, tlvList.size());
+        return false;
+    }
+
     return true;
 }
 
@@ -161,27 +182,16 @@ bool WifiP2pServiceResponseList::ParseTlvs2RespList(const std::vector<unsigned c
     std::size_t leftLength = tlvList.size();
     std::size_t headLength = SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE + TRANSACTION_ID_SIZE + SERVICE_STATUS_SIZE;
     std::size_t pos = 0;
-    while (leftLength > 0) {
-        if (!SafeAccess(tlvList, pos + 1)) { return false; }
-        if (!SafeAccess(tlvList, pos)) { return false; }
+    while (leftLength > 0 && CheckTlvBounds(tlvList, pos)) {
         unsigned short length = tlvList[pos] + (tlvList[pos + 1] << CHAR_BIT);
         if (length < PROTOCOL_SIZE + TRANSACTION_ID_SIZE + SERVICE_STATUS_SIZE) {
             WIFI_LOGW("Invalid TLV length: too small");
             return false;
         }
         unsigned short dataLength = length - PROTOCOL_SIZE - TRANSACTION_ID_SIZE - SERVICE_STATUS_SIZE;
-        if (!SafeAccess(tlvList, pos + SERVICE_TLV_LENGTH_SIZE)) {
-            return false;
-        }
         int type = tlvList[pos + SERVICE_TLV_LENGTH_SIZE];
-        if (!SafeAccess(tlvList, pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE)) {
-            return false;
-        }
 
         unsigned char transId = tlvList[pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE];
-        if (!SafeAccess(tlvList, pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE + TRANSACTION_ID_SIZE)) {
-            return false;
-        }
         int status = tlvList[pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE + TRANSACTION_ID_SIZE];
         if (dataLength > leftLength - headLength || dataLength < 0) {
             WIFI_LOGW("A tlv packet error!");

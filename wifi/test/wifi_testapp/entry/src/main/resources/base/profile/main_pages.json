@@ -19,6 +19,7 @@
     "pages/subAppTest/p2pDiscoveryTest",
     "pages/subAppTest/tcpSocketTest",
     "pages/subAppTest/udpSocketTest",
+    "pages/subAppTest/multipathSocketTest",
     "pages/subAppTest/httpSocketTest",
     "pages/subAppTest/httpsSocketTest",
     "pages/subAppTest/rcpHttpTest",

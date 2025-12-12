@@ -183,7 +183,7 @@ public:
         EXPECT_EQ(WIFI_OPT_SUCCESS, pStaStateMachine->ConvertDeviceCfg(config, apBssid, ifname));
     }
 
-    void ConvertDeviceCfgFail3()
+    void ConvertDeviceCfgFail3() const
     {
         WifiDeviceConfig config;
         std::string apBssid = "";
@@ -934,7 +934,7 @@ public:
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_PORTAL, "");
     }
 
-    void HandleNetCheckResultTxRxGoodButNoInternetTest()
+    void HandleNetCheckResultTxRxGoodButNoInternetTest() const
     {
         IpQosMonitor::GetInstance().lastTxRxGood_ = true;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(MODE_STATE_OPEN));
@@ -949,7 +949,7 @@ public:
         IpQosMonitor::GetInstance().lastTxRxGood_ = false;
     }
     
-    void HandleNetCheckResultTxRxGoodButNoInternetFalseTest()
+    void HandleNetCheckResultTxRxGoodButNoInternetFalseTest() const
     {
         IpQosMonitor::GetInstance().lastTxRxGood_ = false;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(MODE_STATE_OPEN));
@@ -1973,7 +1973,7 @@ public:
         pStaStateMachine-> CloseNoInternetDialog();
     }
 
-    void DhcpResultNotifySuccessOrderTest()
+    void DhcpResultNotifySuccessOrderTest() const
     {
         DhcpResult result;
         std::string ifname = "wlan0";

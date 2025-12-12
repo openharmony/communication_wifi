@@ -68,6 +68,8 @@ void MockStaStateMachine::StopTimer(int timerName)
 }
 
 void MessageExecutedLater(int msgName, int64_t delayTimeMs, MsgLogLevel logLevel)
-{}
+{
+    WIFI_LOGD("MessageExecutedLater, msgName is %{private}d.", msgName);
+}
 }  // namespace Wifi
 }  // namespace OHOS

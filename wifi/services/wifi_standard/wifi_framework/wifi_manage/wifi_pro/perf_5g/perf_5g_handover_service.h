@@ -42,7 +42,7 @@ public:
     void HandleSignalInfoChange(InternalMessagePtr msg);
     void QoeUpdate(InternalMessagePtr msg);
     void OnDisconnectedExternal();
-    bool HasHiddenNetworkSsid();
+    bool HasHiddenNetworkSsid() const;
     void LoadRelationApInfo();
  
 public:

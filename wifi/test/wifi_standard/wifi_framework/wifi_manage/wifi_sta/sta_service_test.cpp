@@ -463,7 +463,7 @@ void StaServiceTest::StaServiceEnableDeviceConfigFail2()
     EXPECT_FALSE(pStaService->EnableDeviceConfig(networkId, attemptEnable) == WIFI_OPT_FAILED);
 }
 
-void StaServiceTest::StaServiceDisableDeviceConfigSuccess00()
+void StaServiceTest::StaServiceDisableDeviceConfigSuccess00() const
 {
     int networkId = NETWORK_ID;
     int64_t blockDuration = -1;
@@ -473,7 +473,7 @@ void StaServiceTest::StaServiceDisableDeviceConfigSuccess00()
     EXPECT_FALSE(pStaService->DisableDeviceConfig(networkId, blockDuration) == WIFI_OPT_SUCCESS);
 }
 
-void StaServiceTest::StaServiceDisableDeviceConfigFail00()
+void StaServiceTest::StaServiceDisableDeviceConfigFail00() const
 {
     int networkId = NETWORK_ID;
     int64_t blockDuration = -1;

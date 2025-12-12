@@ -281,7 +281,7 @@ void WifiRandomMacHelperTest(const uint8_t* data, size_t size)
     m_WifiRandomMacHelper->GenerateRandomMacAddressByLong(random, randomMacAddr);
 }
 
-void WifiRandomMacHelperTest01(const uint8_t* data, size_t size)
+void WifiRandomMacHelperTest01(const uint8_t* data)
 {
     int index = 0;
     unsigned long long addr1 = static_cast<unsigned long long>(data[index++]);
@@ -410,7 +410,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::InitParam();
     OHOS::Wifi::AppXmlParserTest(data, size);
     OHOS::Wifi::WifiRandomMacHelperTest(data, size);
-    OHOS::Wifi::WifiRandomMacHelperTest01(data, size);
+    OHOS::Wifi::WifiRandomMacHelperTest01(data);
     OHOS::Wifi::AppXmlParserTest2(data, size);
     OHOS::Wifi::NetworkXmlParserTest();
     OHOS::Wifi::AppParserTest();

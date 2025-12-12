@@ -324,7 +324,7 @@ public:
         bool IsPublicESS();
         bool IsProhibitUseCacheIp();
         void DealGetDhcpIpv4Timeout(InternalMessagePtr msg);
-        void DealDhcpResultNotify(int result, int ipType);
+        void DealDhcpResultNotify(int result, int ipType) const;
         void HandleStaticIpv6(bool isStaticIpv6);
         StaStateMachine *pStaStateMachine;
     };
@@ -627,8 +627,7 @@ private:
      *
      * @param deviceConfig - Ap device config information
      */
-    void UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& ifaceName,
-        std::string& apBssid);
+    void UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& apBssid);
 
     /**
      * @Description  Disconnect network

@@ -338,17 +338,17 @@ bool IpQosMonitor::GetTxRxStatus()
     return lastTxRxGood_;
 }
 
-int64_t IpQosMonitor::GetCurrentIpv6TcpTxCounter()
+int64_t IpQosMonitor::GetCurrentIpv6TcpTxCounter() const
 {
     return mLastIpv6TcpTxCounter;
 }
  
-int64_t IpQosMonitor::GetCurrentIpv6TcpRxCounter()
+int64_t IpQosMonitor::GetCurrentIpv6TcpRxCounter() const
 {
     return mLastIpv6TcpRxCounter;
 }
 
-int32_t IpQosMonitor::GetIpv6FailedCounter()
+int32_t IpQosMonitor::GetIpv6FailedCounter() const
 {
     return mIpv6FailedCounter;
 }

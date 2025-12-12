@@ -39,9 +39,9 @@ public:
     int64_t GetCurrentTcpRxCounter();
     void ResetTxRxProperty();
     bool GetTxRxStatus();
-    int64_t GetCurrentIpv6TcpTxCounter();
-    int64_t GetCurrentIpv6TcpRxCounter();
-    int32_t GetIpv6FailedCounter();
+    int64_t GetCurrentIpv6TcpTxCounter() const;
+    int64_t GetCurrentIpv6TcpRxCounter() const;
+    int32_t GetIpv6FailedCounter() const;
 private:
     bool AllowSelfCureNetwork(int32_t currentRssi);
     int32_t mInstId = 0;

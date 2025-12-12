@@ -940,7 +940,7 @@ private:
      * @param scanStyle - Type of scan to trigger the WiFi chip
      * @return true: allow, false: not allowed.
      */
-    bool AllowScanByGameScene(ScanType scanType, int &scanStyle);
+    bool AllowScanByGameScene(ScanType scanType, int &scanStyle) const;
     /**
      * @Description Get interval time between currentMs and startTime.
      *

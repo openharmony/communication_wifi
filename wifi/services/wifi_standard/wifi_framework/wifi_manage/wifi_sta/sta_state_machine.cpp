@@ -1885,7 +1885,7 @@ bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessagePtr msg)
     return ret;
 }
 
-void StaStateMachine::GetIpState::DealDhcpResultNotify(int result, int ipType)
+void StaStateMachine::GetIpState::DealDhcpResultNotify(int result, int ipType) const
 {
     switch (result) {
         case DhcpReturnCode::DHCP_RESULT: {
@@ -4741,8 +4741,7 @@ void StaStateMachine::DealReassociateCmd(InternalMessagePtr msg)
     }
 }
 
-void StaStateMachine::UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& ifaceName,
-    std::string& apBssid)
+void StaStateMachine::UserSelectConnectToNetwork(WifiDeviceConfig& deviceConfig, std::string& apBssid)
 {
     if (!deviceConfig.userSelectBssid.empty()) {
         WIFI_LOGI("SetBssid userSelectBssid=%{public}s", MacAnonymize(deviceConfig.userSelectBssid).c_str());
@@ -4795,7 +4794,7 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     if (apBssid.empty()) {
         // user select connect
-        UserSelectConnectToNetwork(deviceConfig, ifaceName, apBssid);
+        UserSelectConnectToNetwork(deviceConfig, apBssid);
     } else {
         WIFI_LOGI("SetBssid bssid=%{public}s", MacAnonymize(apBssid).c_str());
     }

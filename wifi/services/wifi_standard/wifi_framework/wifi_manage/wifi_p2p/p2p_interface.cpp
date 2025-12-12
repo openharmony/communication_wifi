@@ -283,14 +283,14 @@ ErrCode P2pInterface::SetEnhanceService(IEnhanceService* enhanceService)
     return p2pService.SetEnhanceService(enhanceService);
 }
 
-void P2pInterface::NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPincode)
+void P2pInterface::NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPinCode)
 {
-    return p2pService.NotifyWscDialogConfirmResult(isAccept, inputPincode);
+    p2pService.NotifyWscDialogConfirmResult(isAccept, inputPinCode);
 }
 
 void P2pInterface::NotifyWscDisplayConfirmResult()
 {
-    return p2pService.NotifyWscDisplayConfirmResult();
+    p2pService.NotifyWscDisplayConfirmResult();
 }
 
 ErrCode P2pInterface::SetMiracastSinkConfig(const std::string& config)

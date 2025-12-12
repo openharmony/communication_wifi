@@ -146,12 +146,12 @@ const WifiP2pDevice &WifiP2pServiceResponseList::GetDevice() const
 static bool CheckTlvBounds(const std::vector<unsigned char>& tlvList, size_t pos)
 {
     if (pos >= tlvList.size()) {
-        WIFI_LOGW("Line %{public}d: TLV access out of bounds", __LINE__);
+        WIFI_LOGW("TLV access out of bounds");
         return false;
     }
 
     if (pos + 1 >= tlvList.size()) {
-        WIFI_LOGW("Line %{public}d: TLV access out of bounds", __LINE__);
+        WIFI_LOGW("TLV access out of bounds");
         return false;
     }
 
@@ -162,7 +162,7 @@ static bool CheckTlvBounds(const std::vector<unsigned char>& tlvList, size_t pos
     if (tlvTypeOffset >= tlvList.size() ||
         transIdOffset >= tlvList.size() ||
         statusOffset >= tlvList.size()) {
-        WIFI_LOGW("Line %{public}d: TLV access out of bounds", __LINE__);
+        WIFI_LOGW("TLV access out of bounds");
         return false;
     }
 

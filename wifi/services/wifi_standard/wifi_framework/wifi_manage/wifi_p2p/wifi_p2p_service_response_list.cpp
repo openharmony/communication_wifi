@@ -189,7 +189,7 @@ bool WifiP2pServiceResponseList::ParseTlvs2RespList(const std::vector<unsigned c
             WIFI_LOGW("A tlv packet error!");
             return false;
         }
-        
+
         pos += headLength;
         if (dataLength <= MAX_BUF_SIZE) {
             std::vector<unsigned char> data;

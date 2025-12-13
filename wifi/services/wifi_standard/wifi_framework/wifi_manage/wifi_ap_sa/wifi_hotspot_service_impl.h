@@ -315,6 +315,9 @@ private:
     static void StationsInfoDump(std::string& result);
     ErrCode VerifyConfigValidity(const HotspotConfig &config);
     ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback, const std::vector<std::string> &event);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    void ProcessMacAddressRandomization(std::vector<StationInfo> &infos);
+#endif
     int m_id;
     bool mSingleCallback;
     std::mutex deathRecipientMutex;

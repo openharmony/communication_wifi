@@ -2551,6 +2551,7 @@ void StaStateMachine::PublishPortalNitificationAndLogin()
     if (m_instId != INSTID_WLAN0) {
         WIFI_LOGI("%{public}s not allow publish, m_instId:%{public}d", __func__, m_instId);
         return;
+    }
     if (!WifiConfigCenter::GetInstance().IsAllowPopUp()) {
         return;
     }

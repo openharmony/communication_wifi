@@ -1022,7 +1022,6 @@ public:
         pStaStateMachine->HandleNetCheckResultIsPortal(SystemNetWorkState::NETWORK_IS_WORKING, false);
     }
 
-
     void TestPublishPortalNitificationAndLogin1()
     {
         pStaStateMachine->m_instId = INSTID_WLAN1;  // 设置非 INSTID_WLAN0 的值

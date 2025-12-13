@@ -16,8 +16,6 @@
 sequenceable OHOS.IRemoteObject;
 sequenceable OHOS.Wifi.ScanControlInfoParcel; 
 sequenceable OHOS.Wifi.WifiScanParamsParcel;
-sequenceable OHOS.Wifi.WifiScanInfoParcel;
-sequenceable OHOS.Wifi.WifiInfoElemParcel;
 sequenceable OHOS.Wifi.ScanAshmemParcel;
  
 interface OHOS.Wifi.IWifiScanCallback;

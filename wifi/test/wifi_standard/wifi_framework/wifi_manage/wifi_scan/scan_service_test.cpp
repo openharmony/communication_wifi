@@ -979,6 +979,7 @@ public:
         mode.isSingle = false;
         pScanService->scanControlInfo.scanIntervalList.push_back(mode);
         pScanService->AllowPnoScan(ScanType::SCAN_TYPE_PNO, scanStyle);
+        EXPECT_TRUE(pScanService->AllowScanByActionListen());
     }
 
     void GetStaSceneSuccess1()

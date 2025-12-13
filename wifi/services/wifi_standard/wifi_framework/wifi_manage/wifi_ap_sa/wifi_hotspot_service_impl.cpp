@@ -724,6 +724,32 @@ int32_t WifiHotspotServiceImpl::GetValidChannels(BandTypeParcel parcelBand, std:
     return WIFI_OPT_SUCCESS;
 }
 
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+void WifiHotspotServiceImpl::ProcessMacAddressRandomization(std::vector<StationInfo> &infos)
+{
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
+        WIFI_LOGI("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED", __func__);
+        for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
+            WifiMacAddrInfo macAddrInfo;
+            macAddrInfo.bssid = iter->bssid;
+            macAddrInfo.bssidType = iter->bssidType;
+            std::string randomMacAddr =
+                WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
+            if (randomMacAddr.empty()) {
+                WIFI_LOGI("%{public}s: GenerateRandomMacAddress", __func__);
+                WifiRandomMacHelper::GenerateRandomMacAddress(randomMacAddr);
+            }
+            if (!randomMacAddr.empty() && (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
+                iter->bssid = randomMacAddr;
+                iter->bssidType = RANDOM_DEVICE_ADDRESS;
+                WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
+                    __func__, iter->bssid.c_str(), iter->bssidType);
+            }
+        }
+    }
+}
+#endif
+
 int32_t WifiHotspotServiceImpl::GetBlockLists(std::vector<StationInfoParcel> &parcelInfos)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
@@ -746,27 +772,7 @@ int32_t WifiHotspotServiceImpl::GetBlockLists(std::vector<StationInfoParcel> &pa
         infos.emplace_back(FromParcel(parcelInfo));
     }
 #ifdef SUPPORT_RANDOM_MAC_ADDR
-    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
-        WIFI_LOGI("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED", __func__);
-        for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
-            WifiMacAddrInfo macAddrInfo;
-            macAddrInfo.bssid = iter->bssid;
-            macAddrInfo.bssidType = iter->bssidType;
-            std::string randomMacAddr =
-                WifiConfigCenter::GetInstance().GetMacAddrPairs(WifiMacAddrInfoType::HOTSPOT_MACADDR_INFO, macAddrInfo);
-            if (randomMacAddr.empty()) {
-                WIFI_LOGI("%{public}s: GenerateRandomMacAddress", __func__);
-                WifiRandomMacHelper::GenerateRandomMacAddress(randomMacAddr);
-            }
-            if (!randomMacAddr.empty() &&
-                (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
-                iter->bssid = randomMacAddr;
-                iter->bssidType = RANDOM_DEVICE_ADDRESS;
-                WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
-                    __func__, iter->bssid.c_str(), iter->bssidType);
-            }
-        }
-    }
+    ProcessMacAddressRandomization(infos);
 #endif
     if (WifiSettings::GetInstance().GetBlockList(infos, m_id) < 0) {
         WIFI_LOGE("Get block list failed!");

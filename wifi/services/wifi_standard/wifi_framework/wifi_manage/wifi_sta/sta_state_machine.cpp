@@ -2733,9 +2733,7 @@ void StaStateMachine::LinkedState::GoInState()
 #endif
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("Start requesting GRS network detection");
-    if (GrsNetworkProbe()) {
-        WIFI_LOGI("GrsNetworkProbe is success");
-    } else {
+    if (!GrsNetworkProbe()) {
         WIFI_LOGD("Detection cannot be obtained or the detection has failed.");
     }
 #endif

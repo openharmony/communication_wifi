@@ -1042,6 +1042,7 @@ public:
         pStaStateMachine->autoPullBrowserFlag = false;
         pStaStateMachine->portalReCheck_ = false;
         pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), IsAllowPopUp()).WillRepeatedly(Return(false)); 
         // Act
         pStaStateMachine->PublishPortalNitificationAndLogin();
 

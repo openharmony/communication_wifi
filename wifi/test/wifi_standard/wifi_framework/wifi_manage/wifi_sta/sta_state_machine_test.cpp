@@ -1022,6 +1022,78 @@ public:
         pStaStateMachine->HandleNetCheckResultIsPortal(SystemNetWorkState::NETWORK_IS_WORKING, false);
     }
 
+
+    void TestPublishPortalNitificationAndLogin1()
+    {
+        pStaStateMachine->m_instId = INSTID_WLAN1;  // 设置非 INSTID_WLAN0 的值
+        pStaStateMachine->autoPullBrowserFlag = false;
+        pStaStateMachine->portalReCheck_ = false;
+
+        // Act
+        pStaStateMachine->PublishPortalNitificationAndLogin();
+
+        // Assert
+        EXPECT_FALSE(pStaStateMachine->portalReCheck_);
+        EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
+    }
+
+    void TestPublishPortalNitificationAndLogin2()
+    {
+        pStaStateMachine->m_instId = INSTID_WLAN0;
+        pStaStateMachine->autoPullBrowserFlag = false;
+        pStaStateMachine->portalReCheck_ = false;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), IsAllowPopUp()).WillOnce(Return(false));
+
+        // Act
+        pStaStateMachine->PublishPortalNitificationAndLogin();
+
+        // Assert
+        EXPECT_FALSE(pStaStateMachine->portalReCheck_);
+        EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
+    }
+
+    void TestPublishPortalNitificationAndLogin3()
+    {
+        pStaStateMachine->m_instId = INSTID_WLAN0;
+        pStaStateMachine->autoPullBrowserFlag = false;
+        pStaStateMachine->portalReCheck_ = false;
+        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
+        // Act
+        pStaStateMachine->PublishPortalNitificationAndLogin();
+
+        // Assert
+        EXPECT_TRUE(pStaStateMachine->portalReCheck_);
+        EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
+    }
+
+    void TestPublishPortalNitificationAndLogin4()
+    {
+        pStaStateMachine->m_instId = INSTID_WLAN0;
+        pStaStateMachine->autoPullBrowserFlag = false;
+        pStaStateMachine->portalReCheck_ = false;
+        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
+        // Act
+        pStaStateMachine->PublishPortalNitificationAndLogin();
+
+        // Assert
+        EXPECT_FALSE(pStaStateMachine->portalReCheck_);
+        EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
+    }
+
+    void TestPublishPortalNitificationAndLogin5()
+    {
+        pStaStateMachine->m_instId = INSTID_WLAN0;
+        pStaStateMachine->autoPullBrowserFlag = false;
+        pStaStateMachine->portalReCheck_ = true;
+        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
+        // Act
+        pStaStateMachine->PublishPortalNitificationAndLogin();
+
+        // Assert
+        EXPECT_FALSE(pStaStateMachine->portalReCheck_);
+        EXPECT_TRUE(pStaStateMachine->autoPullBrowserFlag);
+    }
+
     void TestTryModifyPortalAttribute1()
     {
         pStaStateMachine->linkedInfo.networkId = INVALID_NETWORK_ID;
@@ -2533,6 +2605,15 @@ HWTEST_F(StaStateMachineTest, HandleNetCheckResultFail, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, TestHandleNetCheckResultIsPortal, TestSize.Level1)
 {
     TestHandleNetCheckResultIsPortal1();
+}
+
+HWTEST_F(StaStateMachineTest, TestTestPublishPortalNitificationAndLogin, TestSize.Level1)
+{
+    TestPublishPortalNitificationAndLogin1();
+    TestPublishPortalNitificationAndLogin2();
+    TestPublishPortalNitificationAndLogin3();
+    TestPublishPortalNitificationAndLogin4();
+    TestPublishPortalNitificationAndLogin5();
 }
 
 HWTEST_F(StaStateMachineTest, TestTryModifyPortalAttribute, TestSize.Level1)

@@ -2457,7 +2457,6 @@ void StaStateMachine::HandleNetCheckResultIsWorking(SystemNetWorkState netState,
     SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
     InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
     lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
-    StopTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION));
     InsertOrUpdateNetworkStatusHistory(NetworkStatus::HAS_INTERNET, updatePortalAuthTime);
     if (getCurrentWifiDeviceConfig().isPortal) {
         StartDetectTimer(DETECT_TYPE_PERIODIC);
@@ -2535,7 +2534,6 @@ void StaStateMachine::HandleNetCheckResultIsNotWorking(SystemNetWorkState netSta
     SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
     InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
     lastCheckNetState_ = OperateResState::CONNECT_NETWORK_DISABLED;
-    StopTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION));
     InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
 // if wifipro is open, wifipro will notify selfcure no internet, if not, sta should notify
 #ifndef FEATURE_WIFI_PRO_SUPPORT
@@ -2549,25 +2547,31 @@ void StaStateMachine::HandleNetCheckResultIsNotWorking(SystemNetWorkState netSta
 
 void StaStateMachine::PublishPortalNitificationAndLogin()
 {
-    if (m_instId != INSTID_WLAN0) { return; }
 #ifndef OHOS_ARCH_LITE
-    bool shouldShowNotification =
-        (lastCheckNetState_ != OperateResState::CONNECT_CHECK_PORTAL) && WifiConfigCenter::GetInstance().IsAllowPopUp();
-
-    if (shouldShowNotification) {
-        if (selfCureService_ == nullptr || !selfCureService_->IsSelfCureOnGoing()) {
-            if (lastCheckNetState_ == OperateResState::CONNECT_NETWORK_ENABLED) {
-                WIFI_LOGI("%{public}s, ShowPortalNitification delay", __func__);
-                StartTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION), PORTAL_NOTIFICATION_TIMEOUT);
-                StartDetectTimer(DETECT_TYPE_DEFAULT);
-            } else {
-                WIFI_LOGI("%{public}s, ShowPortalNitification", __func__);
-                ShowPortalNitification();
-            }
-        }
+    if (m_instId != INSTID_WLAN0) {
+        WIFI_LOGI("%{public}s not allow publish, m_instId:%{public}d", __func__, m_instId);
+        return;
+    if (!WifiConfigCenter::GetInstance().IsAllowPopUp()) {
+        return;
     }
+    if (selfCureService_ != nullptr && selfCureService_->IsSelfCureOnGoing()) {
+        WIFI_LOGI("%{public}s not allow publish, SelfCureOnGoing", __func__);
+        return;
+    }
+    if (lastCheckNetState_ == OperateResState::CONNECT_NETWORK_ENABLED) {
+        WIFI_LOGI("%{public}s not allow publish, lastCheckNetState:%{public}d, recheck", __func__, lastCheckNetState_);
+        StartDetectTimer(DETECT_TYPE_DEFAULT);
+        portalReCheck_ = true;
+        return;
+    }
+    if (lastCheckNetState_ == OperateResState::CONNECT_CHECK_PORTAL && !portalReCheck_) {
+        return;
+    }
+    WIFI_LOGI("%{public}s, ShowPortalNitification recheck %{public}d", __func__, portalReCheck_);
+    ShowPortalNitification();
+    portalReCheck_ = false;
 #endif
-    if (autoPullBrowserFlag == false) {
+    if (!autoPullBrowserFlag) {
         HandlePortalNetworkPorcess();
         autoPullBrowserFlag = true;
     }
@@ -2772,11 +2776,6 @@ bool StaStateMachine::LinkedState::ExecuteStateMsg(InternalMessagePtr msg)
         case CMD_START_NETCHECK : {
             ret = EXECUTED;
             DealNetworkCheck(msg);
-            break;
-        }
-        case CMD_SHOW_PORTAL_NOTIFICATION : {
-            ret = EXECUTED;
-            pStaStateMachine->ShowPortalNitification();
             break;
         }
         case WIFI_SVR_CMD_STA_FOLD_STATUS_NOTIFY_EVENT: {

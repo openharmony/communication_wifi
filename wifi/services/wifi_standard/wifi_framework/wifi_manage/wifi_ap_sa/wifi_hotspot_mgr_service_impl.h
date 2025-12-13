@@ -19,7 +19,6 @@
 #include <file_ex.h>
 #include "iremote_object.h"
 #include "system_ability.h"
-#include "wifi_errcode.h"
 #include "wifi_hotspot_mgr_stub.h"
 #include "wifi_hotspot_stub.h"
 
@@ -38,7 +37,7 @@ public:
     static sptr<WifiHotspotMgrServiceImpl> GetInstance();
     void OnStart() override;
     void OnStop() override;
-    sptr<IRemoteObject> GetWifiRemote(int id) override;
+    ErrCode GetWifiRemote(int id, sptr<IRemoteObject>& remote) override;
 
     /**
      * @Description dump hotspot information

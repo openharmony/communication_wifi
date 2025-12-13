@@ -17,9 +17,9 @@
 #define OHOS_WIFI_HOTSPOT_SERVICE_IMPL_H
 
 #include "wifi_ap_msg.h"
-#include "wifi_config_center.h"
-#include "wifi_errcode.h"
 #include "wifi_hotspot_stub.h"
+#include "wifi_config_center.h"
+#include "wifi_hotspot_death_recipient.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -36,7 +36,7 @@ public:
      * @param bActive - hotspot state
      * @return ErrCode - operation result
      */
-    ErrCode IsHotspotActive(bool &bActive) override;
+    int32_t IsHotspotActive(bool &bActive) override;
 
     /**
      * @Description Check whether the hotspot supports dual band.
@@ -44,7 +44,7 @@ public:
      * @param isSpuported - Supported / NOT supported
      * @return ErrCode - operation result
      */
-    ErrCode IsHotspotDualBandSupported(bool &isSpuported) override;
+    int32_t IsHotspotDualBandSupported(bool &isSpuported) override;
 
     /**
      * @Description Check whether Wi-Fi hotspot is can be operated under some situation.
@@ -55,7 +55,7 @@ public:
      * @param isSpuported - Supported / NOT supported
      * @return ErrCode - operation result
      */
-    ErrCode IsOpenSoftApAllowed(bool &isSpuported) override;
+    int32_t IsOpenSoftApAllowed(bool &isSpuported) override;
 
     /**
      * @Description Get the Hotspot Config object
@@ -63,7 +63,7 @@ public:
      * @param state - Result of obtaining the hotspot status
      * @return ErrCode - operation result
      */
-    ErrCode GetHotspotState(int &state) override;
+    int32_t GetHotspotState(int &state) override;
 
     /**
      * @Description Get the Hotspot State object
@@ -71,15 +71,15 @@ public:
      * @param config - Current hotspot configuration
      * @return ErrCode - operation result
      */
-    ErrCode GetHotspotConfig(HotspotConfig &config) override;
+    int32_t GetHotspotConfig(HotspotConfigParcel &parcelconfig) override;
 
     /**
      * @Description Set the configuration of Hotspot
      *
-     * @param config - HotspotConfig object,
+     * @param config - HotspotConfigParcel object,
      * @return ErrCode - operation result
      */
-    ErrCode SetHotspotConfig(const HotspotConfig &config) override;
+    int32_t SetHotspotConfig(const HotspotConfigParcel &config) override;
 
     /**
      * @Description Get the LocalOnly Hotspot State object
@@ -87,7 +87,7 @@ public:
      * @param config - Current LocalOnly hotspot configuration
      * @return ErrCode - operation result
      */
-    ErrCode GetLocalOnlyHotspotConfig(HotspotConfig &config) override;
+    int32_t GetLocalOnlyHotspotConfig(HotspotConfigParcel &config) override;
 
     /**
      * @Description Set the idel timeout of Hotspot
@@ -95,7 +95,7 @@ public:
      * @param time -input time,
      * @return ErrCode - operation result
      */
-    ErrCode SetHotspotIdleTimeout(int time) override;
+    int32_t SetHotspotIdleTimeout(int time) override;
 
     /**
      * @Description Get the Station List object
@@ -103,29 +103,29 @@ public:
      * @param result - Get result vector of connect Station Info
      * @return ErrCode - operation result
      */
-    ErrCode GetStationList(std::vector<StationInfo> &result) override;
+    int32_t GetStationList(std::vector<StationInfoParcel> &result) override;
 
     /**
      * @Description Disconnects a specified sta connection when ap is opened
      *
-     * @param info - StationInfo object
+     * @param info - StationInfoParcel object
      * @return ErrCode - operation result
      */
-    ErrCode DisassociateSta(const StationInfo &info) override;
+    int32_t DisassociateSta(const StationInfoParcel &info) override;
 
     /**
      * @Description Enable Hotspot
      *
      * @return ErrCode - operation result
      */
-    ErrCode EnableHotspot(const ServiceType type = ServiceType::DEFAULT) override;
+    int32_t EnableHotspot(ServiceTypeParcel type = ServiceTypeParcel::DEFAULT) override;
 
     /**
      * @Description Disable Hotspot
      *
      * @return ErrCode - operation result
      */
-    ErrCode DisableHotspot(const ServiceType type = ServiceType::DEFAULT) override;
+    int32_t DisableHotspot(ServiceTypeParcel type = ServiceTypeParcel::DEFAULT) override;
 
     /**
      * @Description Enable local only Hotspot
@@ -133,7 +133,7 @@ public:
      * @param type - service type
      * @return ErrCode - operation result
      */
-    ErrCode EnableLocalOnlyHotspot(const ServiceType type = ServiceType::DEFAULT) override;
+    int32_t EnableLocalOnlyHotspot(const ServiceTypeParcel type = ServiceTypeParcel::DEFAULT) override;
  
     /**
      * @Description Disable local only Hotspot
@@ -141,7 +141,7 @@ public:
      * @param type - service type
      * @return ErrCode - operation result
      */
-    ErrCode DisableLocalOnlyHotspot(const ServiceType type = ServiceType::DEFAULT) override;
+    int32_t DisableLocalOnlyHotspot(const ServiceTypeParcel type = ServiceTypeParcel::DEFAULT) override;
  
     /**
      * @Description Get local only Hotspot mode
@@ -149,39 +149,39 @@ public:
      * @param mode - hotspot mode
      * @return ErrCode - operation result
      */
-    ErrCode GetHotspotMode(HotspotMode &mode) override;
+    int32_t GetHotspotMode(HotspotModeParcel &mode) override;
 
     /**
      * @Description Get the Block Lists object
      *
-     * @param infos - Get Blocklist result vector of StationInfo
+     * @param infos - Get Blocklist result vector of StationInfoParcel
      * @return ErrCode - operation result
      */
-    ErrCode GetBlockLists(std::vector<StationInfo> &infos) override;
+    int32_t GetBlockLists(std::vector<StationInfoParcel> &infos) override;
 
     /**
-     * @Description Add a StationInfo object to Blocklist when ap is opened
+     * @Description Add a StationInfoParcel object to Blocklist when ap is opened
      *
-     * @param info - StationInfo object
+     * @param info - StationInfoParcel object
      * @return ErrCode - operation result
      */
-    ErrCode AddBlockList(const StationInfo &info) override;
+    int32_t AddBlockList(const StationInfoParcel &info) override;
 
     /**
-     * @Description Del a StationInfo object from Blocklist
+     * @Description Del a StationInfoParcel object from Blocklist
      *
-     * @param info - StationInfo object
+     * @param info - StationInfoParcel object
      * @return ErrCode - operation result
      */
-    ErrCode DelBlockList(const StationInfo &info) override;
+    int32_t DelBlockList(const StationInfoParcel &info) override;
 
     /**
      * @Description Get the Valid Bands object
      *
-     * @param bands - Get result vector of BandType when ap is opened
+     * @param bands - Get result vector of BandTypeParcel when ap is opened
      * @return ErrCode - operation result
      */
-    ErrCode GetValidBands(std::vector<BandType> &bands) override;
+    int32_t GetValidBands(std::vector<BandTypeParcel> &bands) override;
 
     /**
      * @Description Get the Valid Channels object when ap is opened
@@ -190,48 +190,47 @@ public:
      * @param validchannels - Obtains the channels corresponding to the specified band
      * @return ErrCode - operation result
      */
-    ErrCode GetValidChannels(BandType band, std::vector<int32_t> &validchannels) override;
+    int32_t GetValidChannels(BandTypeParcel band, std::vector<int32_t> &validchannels) override;
 
     /**
      * @Description Register callback client
      *
      * @param callback - callback struct
-     * @return ErrCode - operation result
+     * @return int32_t - operation result
      */
-    ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback,
-        const std::vector<std::string> &event) override;
+    int32_t RegisterCallBack(const sptr<IRemoteObject> &cbParcel, const std::vector<std::string> &event) override;
 
     /**
      * @Description Get supported feature
      *
      * @param features - return supported feature
-     * @return ErrCode - operation result
+     * @return int32_t - operation result
      */
-    ErrCode GetSupportedFeatures(long &features) override;
+    int32_t GetSupportedFeatures(int64_t &features) override;
 
     /**
      * @Description Get supported power model list
      *
      * @param setPowerModelList - supported power model list
-     * @return ErrCode - operation result
+     * @return int32_t - operation result
      */
-    ErrCode GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList) override;
+    int32_t GetSupportedPowerModel(std::set<PowerModelParcel>& setPowerModelList) override;
 
     /**
      * @Description Get power model
      *
      * @param model - current power model
-     * @return ErrCode - operation result
+     * @return int32_t - operation result
      */
-    ErrCode GetPowerModel(PowerModel& model) override;
+    int32_t GetPowerModel(PowerModelParcel &model) override;
 
     /**
      * @Description Get supported power model list
      *
      * @param model - the model to be set
-     * @return ErrCode - operation result
+     * @return int32_t - operation result
      */
-    ErrCode SetPowerModel(const PowerModel& model) override;
+    int32_t SetPowerModel(PowerModelParcel model) override;
 
     /**
      * @Description Dump sa basic information
@@ -245,12 +244,12 @@ public:
      *
      * @return bool - true: service is died, false: service is not died.
      */
-    bool IsRemoteDied(void) override;
+    bool IsRemoteDied(void);
 
     /**
      * @Description Check valid ssid config
      *
-     * @param cfg - HotspotConfig
+     * @param cfg - HotspotConfigParcel
      * @return ErrCode - WIFI_OPT_SUCCESS or others
      */
     ErrCode CfgCheckSsid(const HotspotConfig &cfg);
@@ -258,7 +257,7 @@ public:
     /**
      * @Description Check valid psk config
      *
-     * @param cfg - HotspotConfig
+     * @param cfg - HotspotConfigParcel
      * @return ErrCode - WIFI_OPT_SUCCESS or others
      */
     ErrCode CfgCheckPsk(const HotspotConfig &cfg);
@@ -267,7 +266,7 @@ public:
      * @Description Check valid band config
      *
      * @param cfg - HotspotConfig
-     * @param bandsFromCenter - vector of BandType
+     * @param bandsFromCenter - vector of BandTypeParcel
      * @return ErrCode - WIFI_OPT_SUCCESS or others
      */
     ErrCode CfgCheckBand(const HotspotConfig &cfg, std::vector<BandType> &bandsFromCenter);
@@ -285,7 +284,7 @@ public:
      *
      * @param cfg - HotspotConfig
      * @param cfgFromCenter - Get HotspotConfig from config center
-     * @param bandsFromCenter - vector of BandType
+     * @param bandsFromCenter - vector of BandTypeParcel
      * @return ErrCode - WIFI_OPT_SUCCESS or others
      */
     ErrCode IsValidHotspotConfig(const HotspotConfig &cfg, const HotspotConfig &cfgFromCenter,
@@ -295,9 +294,9 @@ public:
      * @Description Get ap iface name
      *
      * @param ifaceName - the ifaceName to be set
-     * @return ErrCode - operation result
+     * @return int32_t - operation result
      */
-    ErrCode GetApIfaceName(std::string& ifaceName) override;
+    int32_t GetApIfaceName(std::string &ifaceName) override;
     /**
      * @Description convert randomMac to realMac
      *
@@ -305,14 +304,21 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode TransRandomToRealMac(StationInfo &updateInfo, const StationInfo &info);
+    static int32_t HandleHotspotIdlRet(ErrCode originRet);
 private:
     ErrCode CheckCanEnableHotspot(const ServiceType type);
+    ErrCode VerifyGetStationListPermission();
     int CheckOperHotspotSwitchPermission(const ServiceType type);
     bool IsApServiceRunning();
     bool IsRptRunning();
     static void ConfigInfoDump(std::string& result);
     static void StationsInfoDump(std::string& result);
     ErrCode VerifyConfigValidity(const HotspotConfig &config);
+    ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback, const std::vector<std::string> &event);
+    int m_id;
+    bool mSingleCallback;
+    std::mutex deathRecipientMutex;
+    sptr<IRemoteObject::DeathRecipient> deathRecipient_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

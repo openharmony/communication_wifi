@@ -368,10 +368,11 @@ bool WifiHotspotImpl::IsFeatureSupported(long feature)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
-    long tmpFeatures = 0;
-    if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
+    int64_t featuresInt64 = 0;
+    if (client_->GetSupportedFeatures(featuresInt64) != WIFI_OPT_SUCCESS) {
         return false;
     }
+    long tmpFeatures = static_cast<long>(featuresInt64);
     return ((tmpFeatures & feature) == feature);
 }
 

@@ -1820,10 +1820,6 @@ ErrCode ScanService::AllowPnoScan(ScanType scanType, int &scanStyle)
         WIFI_LOGW("pnoScan scan not allow by hid2d state");
         return WIFI_OPT_FAILED;
     }
-    if (!AllowScanByActionListen()) {
-        WIFI_LOGW("pnoScan scan not allow by ActionListen condition");
-        return WIFI_OPT_FAILED;
-    }
     int staScene = GetStaScene();
     if (staScene == SCAN_SCENE_MAX) {
         WIFI_LOGE("NOT allow PNO scan for staScene: %{public}d", staScene);

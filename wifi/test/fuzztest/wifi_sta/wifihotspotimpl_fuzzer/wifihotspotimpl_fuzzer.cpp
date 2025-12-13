@@ -106,23 +106,23 @@ void SetHotspotIdleTimeoutFuzzTest(const uint8_t* data, size_t size)
 
 void DisassociateStaFuzzTest(const uint8_t* data, size_t size)
 {
-    StationInfo info;
-    info.bssid = std::string(reinterpret_cast<const char*>(data), size);
-    info.bssidType = static_cast<int>(data[0]) % IDLE_TIME_OUT_MAX;
-    pWifiHotspotServiceImpl->DisassociateSta(info);
+    StationInfoParcel parcelInfo;
+    parcelInfo.bssid = std::string(reinterpret_cast<const char*>(data), size);
+    parcelInfo.bssidType = static_cast<int>(data[0]) % IDLE_TIME_OUT_MAX;
+    pWifiHotspotServiceImpl->DisassociateSta(parcelInfo);
     Init();
-    pWifiHotspotServiceImpl->AddBlockList(info);
-    pWifiHotspotServiceImpl->DelBlockList(info);
-    std::set<PowerModel> setPowerModelList;
+    pWifiHotspotServiceImpl->AddBlockList(parcelInfo);
+    pWifiHotspotServiceImpl->DelBlockList(parcelInfo);
+    std::set<PowerModelParcel> setPowerModelList;
     pWifiHotspotServiceImpl->GetSupportedPowerModel(setPowerModelList);
-    PowerModel model;
+    PowerModelParcel model;
     pWifiHotspotServiceImpl->GetPowerModel(model);
     pWifiHotspotServiceImpl->SetPowerModel(model);
 }
 
 void RegisterCallBackFuzzTest()
 {
-    const sptr<IWifiHotspotCallback> callback;
+    const sptr<IRemoteObject> callback;
     const std::vector<std::string> event;
     pWifiHotspotServiceImpl->RegisterCallBack(callback, event);
 }

@@ -1,0 +1,48 @@
+/*
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+sequenceable OHOS.IRemoteObject;
+sequenceable OHOS.Wifi.HotspotConfigParcel;
+interface OHOS.Wifi.IWifiHotspotCallback;
+import HotspotTypes;
+
+interface OHOS.Wifi.IWifiHotspot {
+    void IsHotspotActive([out] boolean bActive);
+    void IsHotspotDualBandSupported([out] boolean isSupported);
+    void IsOpenSoftApAllowed([out] boolean isSupported);
+    void GetHotspotConfig([out] HotspotConfigParcel config);
+    void GetHotspotState([out] int state);
+    void SetHotspotConfig([in] HotspotConfigParcel config);
+    void SetHotspotIdleTimeout([in] int time);
+    void GetStationList([out] StationInfoParcel[] res);
+    void DisassociateSta([in] StationInfoParcel info);
+    void EnableHotspot([in] ServiceTypeParcel type);
+    void DisableHotspot([in] ServiceTypeParcel type);
+    void GetBlockLists([out] StationInfoParcel[] infos);
+    void AddBlockList([in] StationInfoParcel info);
+    void DelBlockList([in] StationInfoParcel info);
+    void GetValidBands([out] BandTypeParcel[] bands);
+    void GetValidChannels([in] BandTypeParcel band, [out] int[] validchannels);
+    void RegisterCallBack([in] IRemoteObject cb, [in] String[] event);
+    void GetSupportedFeatures([out] long features);
+    void GetSupportedPowerModel([out] Set<PowerModelParcel> setPowerModelList);
+    void GetPowerModel([out] PowerModelParcel model);
+    void SetPowerModel([in] PowerModelParcel model);
+    void GetApIfaceName([out] String ifaceName);
+    void EnableLocalOnlyHotspot([in] ServiceTypeParcel type);
+    void DisableLocalOnlyHotspot([in] ServiceTypeParcel type);
+    void GetHotspotMode([out] HotspotModeParcel mode);
+    void GetLocalOnlyHotspotConfig([out] HotspotConfigParcel config);
+}

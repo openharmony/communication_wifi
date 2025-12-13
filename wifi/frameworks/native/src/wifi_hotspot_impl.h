@@ -19,17 +19,30 @@
 #include <cstdint>
 #include <set>
 #include <vector>
-#include "i_wifi_hotspot.h"
+#include "iwifi_hotspot.h"
 #include "i_wifi_hotspot_callback.h"
 #include "refbase.h"
 #include "wifi_ap_msg.h"
 #include "wifi_common_msg.h"
 #include "wifi_errcode.h"
 #include "wifi_hotspot.h"
+#include "wifi_hotspot_callback_stub.h"
 
 namespace OHOS {
 namespace Wifi {
 class WifiHotspotImpl : public WifiHotspot {
+private:
+    class WifiHotspotDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit WifiHotspotDeathRecipient(WifiHotspotImpl &hotspotImpl) : hotspotImpl_(hotspotImpl)
+        {}
+        ~WifiHotspotDeathRecipient() override = default;
+        void OnRemoteDied(const wptr<IRemoteObject> &remoteObject) override;
+
+    private:
+        WifiHotspotImpl &hotspotImpl_;
+    };
+
 public:
     WifiHotspotImpl();
     virtual ~WifiHotspotImpl();
@@ -268,11 +281,20 @@ public:
      */
     ErrCode GetLocalOnlyHotspotConfig(HotspotConfig &config) override;
 private:
+    bool SetupClientWithDeathRecipient(sptr<IRemoteObject> service);
+    void HandleRemoteDied(const wptr<IRemoteObject>& remoteObject);
+    bool RegisterDeathRecipient(const sptr<IRemoteObject>& remote);
+    void RemoveDeathRecipient();
+    ErrCode ErrCodeToWifiErrCode(OHOS::ErrCode errorCode);
     bool GetWifiHotspotProxy();
     std::atomic<int> systemAbilityId_;
     std::mutex mutex_;
     int instId;
     sptr<IWifiHotspot> client_;
+    sptr<WifiHotspotDeathRecipient> deathRecipient_;
+    sptr<IRemoteObject> remoteService_;
+    bool mRemoteDied;
+    static sptr<WifiHotspotCallbackStub> g_wifiHotspotCallbackStub;
 };
 }  // namespace Wifi
 }  // namespace OHOS

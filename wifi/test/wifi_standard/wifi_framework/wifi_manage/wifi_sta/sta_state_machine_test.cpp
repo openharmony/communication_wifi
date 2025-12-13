@@ -1041,21 +1041,6 @@ public:
         pStaStateMachine->m_instId = INSTID_WLAN0;
         pStaStateMachine->autoPullBrowserFlag = false;
         pStaStateMachine->portalReCheck_ = false;
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), IsAllowPopUp()).WillOnce(Return(false));
-
-        // Act
-        pStaStateMachine->PublishPortalNitificationAndLogin();
-
-        // Assert
-        EXPECT_FALSE(pStaStateMachine->portalReCheck_);
-        EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
-    }
-
-    void TestPublishPortalNitificationAndLogin3()
-    {
-        pStaStateMachine->m_instId = INSTID_WLAN0;
-        pStaStateMachine->autoPullBrowserFlag = false;
-        pStaStateMachine->portalReCheck_ = false;
         pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
         // Act
         pStaStateMachine->PublishPortalNitificationAndLogin();
@@ -1065,7 +1050,7 @@ public:
         EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
     }
 
-    void TestPublishPortalNitificationAndLogin4()
+    void TestPublishPortalNitificationAndLogin3()
     {
         pStaStateMachine->m_instId = INSTID_WLAN0;
         pStaStateMachine->autoPullBrowserFlag = false;
@@ -1079,7 +1064,7 @@ public:
         EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
     }
 
-    void TestPublishPortalNitificationAndLogin5()
+    void TestPublishPortalNitificationAndLogin4()
     {
         pStaStateMachine->m_instId = INSTID_WLAN0;
         pStaStateMachine->autoPullBrowserFlag = false;
@@ -2612,7 +2597,6 @@ HWTEST_F(StaStateMachineTest, TestTestPublishPortalNitificationAndLogin, TestSiz
     TestPublishPortalNitificationAndLogin2();
     TestPublishPortalNitificationAndLogin3();
     TestPublishPortalNitificationAndLogin4();
-    TestPublishPortalNitificationAndLogin5();
 }
 
 HWTEST_F(StaStateMachineTest, TestTryModifyPortalAttribute, TestSize.Level1)

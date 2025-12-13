@@ -934,6 +934,33 @@ public:
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_PORTAL, "");
     }
 
+    void HandleNetCheckResultSuccess6()
+    {
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
+        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_WORKING, "");
+    }
+
+    void HandleNetCheckResultSuccess7()
+    {
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
+        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_PORTAL, "");
+    }
+
+    void HandleNetCheckResultSuccess8()
+    {
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
+        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
+        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
+    }
+
     void HandleNetCheckResultTxRxGoodButNoInternetTest()
     {
         IpQosMonitor::GetInstance().lastTxRxGood_ = true;
@@ -2470,6 +2497,21 @@ HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess4, TestSize.Level1)
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess5, TestSize.Level1)
 {
     HandleNetCheckResultSuccess5();
+}
+
+HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess6, TestSize.Level1)
+{
+    HandleNetCheckResultSuccess6();
+}
+
+HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess7, TestSize.Level1)
+{
+    HandleNetCheckResultSuccess7();
+}
+
+HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess8, TestSize.Level1)
+{
+    HandleNetCheckResultSuccess8();
 }
 
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultTxRxGoodButNoInternetTest, TestSize.Level1)

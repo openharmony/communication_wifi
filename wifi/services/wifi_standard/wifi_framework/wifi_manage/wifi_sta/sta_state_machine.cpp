@@ -3336,6 +3336,9 @@ void StaStateMachine::DhcpResultNotify::SaveDhcpResult(DhcpResult *dest, DhcpRes
     dest->uOptLeasetime = source->uOptLeasetime;
     dest->uAddTime = source->uAddTime;
     dest->uGetTime = source->uGetTime;
+    dest->ipv6LifeTime.validLifeTime = source->ipv6LifeTime.validLifeTime;
+    dest->ipv6LifeTime.prefLifeTime = source->ipv6LifeTime.prefLifeTime;
+    dest->ipv6LifeTime.routerLifeTime = source->ipv6LifeTime.routerLifeTime;
     if (strcpy_s(dest->strOptClientId, DHCP_MAX_FILE_BYTES, source->strOptClientId) != EOK) {
         WIFI_LOGE("SaveDhcpResult strOptClientId strcpy_s failed!");
         return;
@@ -3684,6 +3687,9 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
     ipv6Info.secondDns = result->strOptDns2;
     ipv6Info.uniqueLocalAddress1 = result->strOptLocalAddr1;
     ipv6Info.uniqueLocalAddress2 = result->strOptLocalAddr2;
+    ipv6Info.validLifeTime = result->ipv6LifeTime.validLifeTime;
+    ipv6Info.preferredLifeTime = result->ipv6LifeTime.prefLifeTime;
+    ipv6Info.routerLifeTime = result->ipv6LifeTime.routerLifeTime;
     ipv6Info.dnsAddr.clear();
     ipv6Info.IpAddrMap.clear();
     TryToSaveIpV6ResultExt(ipInfo, ipv6Info, result);

@@ -81,6 +81,7 @@ inline const int RSSI_MINUS_MARGIN = 5;
 inline const int INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
 inline const uint32_t ENABLE_AIDFS = 7;
 inline constexpr int DEFAULT_CONNECT_RSSI = -72;
+inline constexpr uint32_t MAX_LIFETIME_S = 0xFFFFFFFF;
 enum class DisconnState {
     DEFAULTSTAT,
     DISCONNECTED,
@@ -1002,6 +1003,9 @@ struct IpV6Info {
     std::string uniqueLocalAddress2;
     std::vector<std::string> dnsAddr;
     std::map<std::string, int> IpAddrMap;
+    uint32_t validLifeTime;
+    uint32_t preferredLifeTime;
+    uint32_t routerLifeTime;
     IpV6Info()
     {
         linkIpV6Address = "";
@@ -1015,6 +1019,9 @@ struct IpV6Info {
         uniqueLocalAddress2 = "";
         dnsAddr.clear();
         IpAddrMap.clear();
+        validLifeTime = MAX_LIFETIME_S;
+        preferredLifeTime = MAX_LIFETIME_S;
+        routerLifeTime = MAX_LIFETIME_S;
     }
 };
 

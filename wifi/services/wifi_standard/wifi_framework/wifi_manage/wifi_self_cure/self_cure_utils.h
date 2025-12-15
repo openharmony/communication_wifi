@@ -53,9 +53,9 @@ public:
     bool IsIpConflictDetect();
     std::string GetSelfCureHistory();
     void ReportNoInternetChrEvent();
-    bool IsIpv6SelfCureSupported() const;
+    bool IsIpv6SelfCureSupported();
     bool DisableIpv6(int instId = 0);
-    bool HasIpv6Disabled(int instId = 0) const;
+    bool HasIpv6Disabled(int instId = 0);
     void SetIpv6Disabled(bool disabled, int instId = 0);
     void ReportIpv6ChrEvent();
 private:

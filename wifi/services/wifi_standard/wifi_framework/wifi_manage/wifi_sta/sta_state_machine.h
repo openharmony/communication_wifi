@@ -1042,7 +1042,9 @@ private:
     void UpdateRiskTypeAttribute();
 #endif
     void LogSignalInfo(WifiSignalPollInfo &signalInfo);
+    void HandleNetCheckResultIsWorking(SystemNetWorkState netState, bool updatePortalAuthTime);
     void HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime);
+    void HandleNetCheckResultIsNotWorking(SystemNetWorkState netState);
     void EnableScreenOffSignalPoll(int delayTime);
     void PublishPortalNitificationAndLogin();
     OHOS::ErrCode StartPortalLogin(int netId, std::string url, int deviceType);

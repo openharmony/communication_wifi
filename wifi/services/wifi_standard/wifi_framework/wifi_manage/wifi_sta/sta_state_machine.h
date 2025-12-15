@@ -324,7 +324,7 @@ public:
         bool IsPublicESS();
         bool IsProhibitUseCacheIp();
         void DealGetDhcpIpv4Timeout(InternalMessagePtr msg);
-        void DealDhcpResultNotify(int result, int ipType);
+        void DealDhcpResultNotify(int result, int ipType) const;
         void HandleStaticIpv6(bool isStaticIpv6);
         StaStateMachine *pStaStateMachine;
     };

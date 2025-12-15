@@ -2430,48 +2430,11 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #endif
     bool updatePortalAuthTime = false;
     if (netState == SystemNetWorkState::NETWORK_IS_WORKING) {
-        mIsWifiInternetCHRFlag = false;
-        UpdatePortalState(netState, updatePortalAuthTime);
-        /* Save connection information to WifiSettings. */
-        EnhanceWriteIsInternetHiSysEvent(NETWORK);
-        WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
-        SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
-        InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
-        lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
-        StopTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION));
-        InsertOrUpdateNetworkStatusHistory(NetworkStatus::HAS_INTERNET, updatePortalAuthTime);
-        if (getCurrentWifiDeviceConfig().isPortal) {
-            StartDetectTimer(DETECT_TYPE_PERIODIC);
-        }
-        mPortalUrl = "";
-#ifndef OHOS_ARCH_LITE
-        UpdateAcceptUnvalidatedState();
-        WifiNotificationUtil::GetInstance().CancelWifiNotification(
-            WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
-        if (hasNoInternetDialog_) {
-            CloseNoInternetDialog();
-        }
-#endif
+        HandleNetCheckResultIsWorking(netState, updatePortalAuthTime);
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
         HandleNetCheckResultIsPortal(netState, updatePortalAuthTime);
     } else {
-        EnhanceWriteIsInternetHiSysEvent(NO_NETWORK);
-#ifndef OHOS_ARCH_LITE
-        SyncDeviceEverConnectedState(false);
-#endif
-        SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
-        InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
-        lastCheckNetState_ = OperateResState::CONNECT_NETWORK_DISABLED;
-        StopTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION));
-        InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
-// if wifipro is open, wifipro will notify selfcure no internet, if not, sta should notify
-#ifndef FEATURE_WIFI_PRO_SUPPORT
-#ifdef FEATURE_SELF_CURE_SUPPORT
-        if (selfCureService_ != nullptr) {
-            selfCureService_->NotifyInternetFailureDetected(false);
-        }
-#endif
-#endif
+        HandleNetCheckResultIsNotWorking(netState);
     }
 #ifndef OHOS_ARCH_LITE
     SyncDeviceEverConnectedState(true);
@@ -2481,8 +2444,40 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     HandleInternetAccessChanged(netState);
 }
 
+void StaStateMachine::HandleNetCheckResultIsWorking(SystemNetWorkState netState, bool updatePortalAuthTime)
+{
+    if (lastCheckNetState_ != OperateResState::CONNECT_NETWORK_ENABLED) {
+        WifiCommonEventHelper::PublishNetCheckResultChange(netState, "WorkingNetwork");
+    }
+    mIsWifiInternetCHRFlag = false;
+    UpdatePortalState(netState, updatePortalAuthTime);
+    /* Save connection information to WifiSettings. */
+    EnhanceWriteIsInternetHiSysEvent(NETWORK);
+    WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(false);
+    SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
+    InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
+    lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
+    StopTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION));
+    InsertOrUpdateNetworkStatusHistory(NetworkStatus::HAS_INTERNET, updatePortalAuthTime);
+    if (getCurrentWifiDeviceConfig().isPortal) {
+        StartDetectTimer(DETECT_TYPE_PERIODIC);
+    }
+    mPortalUrl = "";
+#ifndef OHOS_ARCH_LITE
+    UpdateAcceptUnvalidatedState();
+    WifiNotificationUtil::GetInstance().CancelWifiNotification(
+        WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
+    if (hasNoInternetDialog_) {
+        CloseNoInternetDialog();
+    }
+#endif
+}
+
 void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, bool updatePortalAuthTime)
 {
+    if (lastCheckNetState_ != OperateResState::CONNECT_CHECK_PORTAL) {
+        WifiCommonEventHelper::PublishNetCheckResultChange(netState, "PortalNetwork");
+    }
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     UpdatePortalState(netState, updatePortalAuthTime);
@@ -2526,6 +2521,30 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
     }
+}
+
+void StaStateMachine::HandleNetCheckResultIsNotWorking(SystemNetWorkState netState)
+{
+    if (lastCheckNetState_ != OperateResState::CONNECT_NETWORK_DISABLED) {
+        WifiCommonEventHelper::PublishNetCheckResultChange(netState, "NotWorkingNetwork");
+    }
+    EnhanceWriteIsInternetHiSysEvent(NO_NETWORK);
+#ifndef OHOS_ARCH_LITE
+    SyncDeviceEverConnectedState(false);
+#endif
+    SaveLinkstate(ConnState::CONNECTED, DetailedState::NOTWORKING);
+    InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_DISABLED, linkedInfo);
+    lastCheckNetState_ = OperateResState::CONNECT_NETWORK_DISABLED;
+    StopTimer(static_cast<int>(CMD_SHOW_PORTAL_NOTIFICATION));
+    InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
+// if wifipro is open, wifipro will notify selfcure no internet, if not, sta should notify
+#ifndef FEATURE_WIFI_PRO_SUPPORT
+#ifdef FEATURE_SELF_CURE_SUPPORT
+    if (selfCureService_ != nullptr) {
+        selfCureService_->NotifyInternetFailureDetected(false);
+    }
+#endif
+#endif
 }
 
 void StaStateMachine::PublishPortalNitificationAndLogin()
@@ -2714,9 +2733,7 @@ void StaStateMachine::LinkedState::GoInState()
 #endif
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("Start requesting GRS network detection");
-    if (GrsNetworkProbe()) {
-        WIFI_LOGI("GrsNetworkProbe is success");
-    } else {
+    if (!GrsNetworkProbe()) {
         WIFI_LOGD("Detection cannot be obtained or the detection has failed.");
     }
 #endif
@@ -3319,6 +3336,9 @@ void StaStateMachine::DhcpResultNotify::SaveDhcpResult(DhcpResult *dest, DhcpRes
     dest->uOptLeasetime = source->uOptLeasetime;
     dest->uAddTime = source->uAddTime;
     dest->uGetTime = source->uGetTime;
+    dest->ipv6LifeTime.validLifeTime = source->ipv6LifeTime.validLifeTime;
+    dest->ipv6LifeTime.prefLifeTime = source->ipv6LifeTime.prefLifeTime;
+    dest->ipv6LifeTime.routerLifeTime = source->ipv6LifeTime.routerLifeTime;
     if (strcpy_s(dest->strOptClientId, DHCP_MAX_FILE_BYTES, source->strOptClientId) != EOK) {
         WIFI_LOGE("SaveDhcpResult strOptClientId strcpy_s failed!");
         return;
@@ -3667,6 +3687,9 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
     ipv6Info.secondDns = result->strOptDns2;
     ipv6Info.uniqueLocalAddress1 = result->strOptLocalAddr1;
     ipv6Info.uniqueLocalAddress2 = result->strOptLocalAddr2;
+    ipv6Info.validLifeTime = result->ipv6LifeTime.validLifeTime;
+    ipv6Info.preferredLifeTime = result->ipv6LifeTime.prefLifeTime;
+    ipv6Info.routerLifeTime = result->ipv6LifeTime.routerLifeTime;
     ipv6Info.dnsAddr.clear();
     ipv6Info.IpAddrMap.clear();
     TryToSaveIpV6ResultExt(ipInfo, ipv6Info, result);

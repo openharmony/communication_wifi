@@ -14,17 +14,18 @@
  */
 
 #include <csignal>
+#include "wifi_hotspot_mgr_service_impl.h"
+#include "wifi_hotspot_service_impl.h"
 #include "wifi_logger.h"
 #include "wifi_config_center.h"
 #include "wifi_dumper.h"
 #include "wifi_manager.h"
-#include "wifi_hotspot_mgr_service_impl.h"
-#include "wifi_hotspot_service_impl.h"
 
 DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotMgrServiceImpl");
 
 namespace OHOS {
 namespace Wifi {
+const int HOTSPOT_IDL_ERROR_OFFSET = 3500000;
 std::mutex WifiHotspotMgrServiceImpl::g_instanceLock;
 std::mutex WifiHotspotMgrServiceImpl::g_hotspotMutex;
 sptr<WifiHotspotMgrServiceImpl> WifiHotspotMgrServiceImpl::g_instance;
@@ -105,14 +106,15 @@ bool WifiHotspotMgrServiceImpl::Init()
     return true;
 }
 
-sptr<IRemoteObject> WifiHotspotMgrServiceImpl::GetWifiRemote(int id)
+int32_t WifiHotspotMgrServiceImpl::GetWifiRemote(int id, sptr<IRemoteObject>& remote)
 {
     std::lock_guard<std::mutex> lock(g_hotspotMutex);
     auto iter = mWifiService.find(id);
     if (iter != mWifiService.end()) {
-        return mWifiService[id];
+        remote = iter->second;
+        return WIFI_OPT_SUCCESS;
     }
-    return nullptr;
+    return  WIFI_OPT_FAILED + HOTSPOT_IDL_ERROR_OFFSET;
 }
 
 int32_t WifiHotspotMgrServiceImpl::Dump(int32_t fd, const std::vector<std::u16string>& args)

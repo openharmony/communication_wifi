@@ -21,6 +21,7 @@
 #include "wifi_auth_center.h"
 #include "wifi_channel_helper.h"
 #include "wifi_manager.h"
+#include "wifi_hotspot_callback_proxy.h"
 #include "wifi_service_manager.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_logger.h"
@@ -35,6 +36,8 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
 
 namespace OHOS {
 namespace Wifi {
+const int HOTSPOT_IDL_ERROR_OFFSET = 3500000;
+
 WifiHotspotServiceImpl::WifiHotspotServiceImpl()
 {}
 
@@ -44,32 +47,32 @@ WifiHotspotServiceImpl::WifiHotspotServiceImpl(int id) : WifiHotspotStub(id)
 WifiHotspotServiceImpl::~WifiHotspotServiceImpl()
 {}
 
-ErrCode WifiHotspotServiceImpl::IsHotspotActive(bool &bActive)
+int32_t WifiHotspotServiceImpl::IsHotspotActive(bool &bActive)
 {
     WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsHotspotActive:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     bActive = IsApServiceRunning() || IsRptRunning();
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
+int32_t WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
 {
     WIFI_LOGI("IsHotspotDualBandSupported");
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("IsHotspotDualBandSupported:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsHotspotDualBandSupported:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 
     if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsHotspotDualBandSupported:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 
     std::vector<BandType> bands;
@@ -94,25 +97,25 @@ ErrCode WifiHotspotServiceImpl::IsHotspotDualBandSupported(bool &isSupported)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::IsOpenSoftApAllowed(bool &isSupported)
+int32_t WifiHotspotServiceImpl::IsOpenSoftApAllowed(bool &isSupported)
 {
     WIFI_LOGI("IsOpenSoftApAllowed enter");
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("IsOpenSoftApAllowed:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsOpenSoftApAllowed:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 
     if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("IsOpenSoftApAllowed:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
         WIFI_LOGE("IsOpenSoftApAllowed, GetWifiTogglerManager get failed");
-        return WIFI_OPT_FAILED;
+        return HandleHotspotIdlRet(WIFI_OPT_FAILED);
     }
     auto &wifiControllerMachine = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     if (wifiControllerMachine != nullptr && wifiControllerMachine->IsOpenSoftApAllowed(0)) {
@@ -123,46 +126,48 @@ ErrCode WifiHotspotServiceImpl::IsOpenSoftApAllowed(bool &isSupported)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::GetHotspotState(int &state)
+int32_t WifiHotspotServiceImpl::GetHotspotState(int &state)
 {
     WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetHotspotState:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 
     if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetHotspotState:VerifySetWifiConfigPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 
     state = WifiConfigCenter::GetInstance().GetHotspotState(m_id);
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::GetHotspotConfig(HotspotConfig &result)
+int32_t WifiHotspotServiceImpl::GetHotspotConfig(HotspotConfigParcel &parcelconfig)
 {
     WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetHotspotConfig:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetHotspotConfig:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 
     if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetHotspotConfig:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
-
-    WifiSettings::GetInstance().GetHotspotConfig(result, m_id);
+    HotspotConfig config;
+    WifiSettings::GetInstance().GetHotspotConfig(config, m_id);
+    parcelconfig.FromHotspotConfig(config);
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
+int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parcelconfig)
 {
+    HotspotConfig config = parcelconfig.ToHotspotConfig();
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("Inst%{public}d %{public}s, pid:%{public}d, uid:%{public}d, band:%{public}d, "
         "channel:%{public}d", m_id, __func__, GetCallingPid(), GetCallingUid(),
@@ -170,25 +175,25 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
 #endif
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("SetHotspotConfig:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetHotspotConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetHotspotConfig:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     ErrCode validRetval = VerifyConfigValidity(config);
     if (validRetval != ErrCode::WIFI_OPT_SUCCESS) {
         WIFI_LOGE("SetHotspotConfig:VerifyConfigValidity failed!");
-        return validRetval;
+        return HandleHotspotIdlRet(validRetval);
     }
     HotspotConfig lastConfig;
     if (WifiSettings::GetInstance().GetHotspotConfig(lastConfig, m_id) != 0) {
         WIFI_LOGE("Instance %{public}d %{public}s GetHotspotConfig error", m_id, __func__);
-        return WIFI_OPT_FAILED;
+        return HandleHotspotIdlRet(WIFI_OPT_FAILED);
     }
     HotspotConfig innerConfig = config;
     if (lastConfig.GetRandomMac() != "") {
@@ -211,23 +216,24 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfig &config)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::GetLocalOnlyHotspotConfig(HotspotConfig &result)
+int32_t WifiHotspotServiceImpl::GetLocalOnlyHotspotConfig(HotspotConfigParcel &parcelresult)
 {
     WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetHotspotConfig:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetHotspotConfig:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetHotspotConfig:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
- 
+    HotspotConfig result;
     WifiConfigCenter::GetInstance().GetLocalOnlyHotspotConfig(result);
+    parcelresult.FromHotspotConfig(result);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -254,19 +260,19 @@ ErrCode WifiHotspotServiceImpl::VerifyConfigValidity(const HotspotConfig &config
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::SetHotspotIdleTimeout(int time)
+int32_t WifiHotspotServiceImpl::SetHotspotIdleTimeout(int time)
 {
     WIFI_LOGI("SetHotspotIdleTimeout");
     if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetHotspotIdleTimeout:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     /* Set the hotspot idle timeout unit to 1 minute */
     constexpr int hotspotIdleTimeoutUnit = 60000;
     int maxValue = std::numeric_limits<int>::max() / hotspotIdleTimeoutUnit;
     if (maxValue <= time || time < 0) {
         WIFI_LOGE("SetHotspotIdleTimeout invalid time:%{public}d maxValue is %{public}d", time, maxValue);
-        return WIFI_OPT_INVALID_PARAM;
+        return HandleHotspotIdlRet(WIFI_OPT_INVALID_PARAM);
     }
     int delayTime = time * hotspotIdleTimeoutUnit;
     if (!IsApServiceRunning()) {
@@ -274,16 +280,16 @@ ErrCode WifiHotspotServiceImpl::SetHotspotIdleTimeout(int time)
     } else {
         IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
         if (pService == nullptr) {
-            return WIFI_OPT_AP_NOT_OPENED;
+            return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
         }
-        return pService->SetHotspotIdleTimeout(delayTime);
+        ErrCode ret = pService->SetHotspotIdleTimeout(delayTime);
+        return HandleHotspotIdlRet(ret);
     }
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
+ErrCode WifiHotspotServiceImpl::VerifyGetStationListPermission()
 {
-    WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
     int apiVersion = WifiPermissionUtils::GetApiVersion();
     if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
         WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
@@ -309,12 +315,23 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
         WIFI_LOGE("GetStationList:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    return WIFI_OPT_SUCCESS;
+}
+
+int32_t WifiHotspotServiceImpl::GetStationList(std::vector<StationInfoParcel> &parcelResult)
+{
+    WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
+    ErrCode permCode = VerifyGetStationListPermission();
+    if (permCode != WIFI_OPT_SUCCESS) {
+        return HandleHotspotIdlRet(permCode);
+    }
     ErrCode errCode;
+    std::vector<StationInfo> result;
     if (IsApServiceRunning()) {
         IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
         if (pService == nullptr) {
             WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
-            return WIFI_OPT_AP_NOT_OPENED;
+            return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
         }
         errCode = pService->GetStationList(result);
     } else if (IsRptRunning()) {
@@ -322,7 +339,7 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
         errCode = (rptManager != nullptr) ? rptManager->GetStationList(result) : WIFI_OPT_FAILED;
     } else {
         WIFI_LOGE("Instance %{public}d hotspot service is not running!", m_id);
-        return WIFI_OPT_AP_NOT_OPENED;
+        return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
     }
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
@@ -343,7 +360,11 @@ ErrCode WifiHotspotServiceImpl::GetStationList(std::vector<StationInfo> &result)
         }
     }
 #endif
-    return errCode;
+    parcelResult.clear();
+    for (const auto &r : result) {
+        parcelResult.emplace_back(ToParcel(r));
+    }
+    return HandleHotspotIdlRet(errCode);
 }
 
 ErrCode WifiHotspotServiceImpl::TransRandomToRealMac(StationInfo &updateInfo, const StationInfo &info)
@@ -379,23 +400,24 @@ ErrCode WifiHotspotServiceImpl::TransRandomToRealMac(StationInfo &updateInfo, co
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)
+int32_t WifiHotspotServiceImpl::DisassociateSta(const StationInfoParcel &parcelInfo)
 {
+    StationInfo info = FromParcel(parcelInfo);
     WIFI_LOGI("Instance %{public}d %{public}s device name [%{private}s]", m_id, __func__,
         info.deviceName.c_str());
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DisassociateSta:VerifySetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("DisassociateSta:IsSystemAppByToken NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (CheckMacIsValid(info.bssid)) {
-        return WIFI_OPT_INVALID_PARAM;
+        return HandleHotspotIdlRet(WIFI_OPT_INVALID_PARAM);
     }
     if (!IsApServiceRunning()) {
-        return WIFI_OPT_AP_NOT_OPENED;
+        return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
     }
     StationInfo updateInfo = info;
 #ifdef SUPPORT_RANDOM_MAC_ADDR
@@ -404,9 +426,10 @@ ErrCode WifiHotspotServiceImpl::DisassociateSta(const StationInfo &info)
     IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
     if (pService == nullptr) {
         WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
-        return WIFI_OPT_AP_NOT_OPENED;
+        return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
     }
-    return pService->DisconnetStation(updateInfo);
+    ErrCode ret = pService->DisconnetStation(updateInfo);
+    return HandleHotspotIdlRet(ret);
 }
 
 int WifiHotspotServiceImpl::CheckOperHotspotSwitchPermission(const ServiceType type)
@@ -449,61 +472,67 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::EnableHotspot(const ServiceType type)
+int32_t WifiHotspotServiceImpl::EnableHotspot(const ServiceTypeParcel parcelType)
 {
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("Inst%{public}d %{public}s, pid:%{public}d, uid:%{public}d", m_id, __func__,
         GetCallingPid(), GetCallingUid());
 #endif
+    ServiceType type = FromParcel<ServiceType>(parcelType);
     ErrCode errCode = CheckCanEnableHotspot(type);
     if (errCode != WIFI_OPT_SUCCESS) {
-        return errCode;
+        return HandleHotspotIdlRet(errCode);
     }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_AP_REQUEST);
 
-    return WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, m_id);
+    ErrCode ret = WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, m_id);
+    return HandleHotspotIdlRet(ret);
 }
 
-ErrCode WifiHotspotServiceImpl::DisableHotspot(const ServiceType type)
+int32_t WifiHotspotServiceImpl::DisableHotspot(const ServiceTypeParcel parcelType)
 {
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("Inst%{public}d %{public}s, pid:%{public}d, uid:%{public}d", m_id, __func__,
         GetCallingPid(), GetCallingUid());
 #endif
+    ServiceType type = FromParcel<ServiceType>(parcelType);
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("DisableHotspot:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (CheckOperHotspotSwitchPermission(type) == PERMISSION_DENIED) {
         WIFI_LOGE("EnableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
-
-    return WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, m_id);
+    ErrCode ret = WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, m_id);
+    return HandleHotspotIdlRet(ret);
 }
 
-ErrCode WifiHotspotServiceImpl::EnableLocalOnlyHotspot(const ServiceType type)
+int32_t WifiHotspotServiceImpl::EnableLocalOnlyHotspot(const ServiceTypeParcel parcelType)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
+    ServiceType type = FromParcel<ServiceType>(parcelType);
     ErrCode errCode = CheckCanEnableHotspot(type);
     if (errCode != WIFI_OPT_SUCCESS) {
-        return errCode;
+        return HandleHotspotIdlRet(errCode);
     }
     if (IsRptRunning() || IsApServiceRunning()) {
         WIFI_LOGI("%{public}s, softap/rpt is running, can not use localOnlyHotspot", __func__);
-        return WIFI_OPT_FAILED;
+        return HandleHotspotIdlRet(WIFI_OPT_FAILED);
     }
     auto &wifiControllerMachine = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     if (wifiControllerMachine != nullptr) {
         wifiControllerMachine->IsLocalOnlyHotspot(true);
     }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_AP_REQUEST);
-    return WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, m_id);
+    ErrCode ret = WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(1, m_id);
+    return HandleHotspotIdlRet(ret);
 }
  
-ErrCode WifiHotspotServiceImpl::DisableLocalOnlyHotspot(const ServiceType type)
+int32_t WifiHotspotServiceImpl::DisableLocalOnlyHotspot(const ServiceTypeParcel parcelType)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
+    ServiceType type = FromParcel<ServiceType>(parcelType);
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("DisableHotspot:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -512,10 +541,11 @@ ErrCode WifiHotspotServiceImpl::DisableLocalOnlyHotspot(const ServiceType type)
         WIFI_LOGE("EnableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    return WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, m_id);
+    ErrCode ret = WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, m_id);
+    return HandleHotspotIdlRet(ret);
 }
  
-ErrCode WifiHotspotServiceImpl::GetHotspotMode(HotspotMode &mode)
+int32_t WifiHotspotServiceImpl::GetHotspotMode(HotspotModeParcel &parcelMode)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
     if (!WifiAuthCenter::IsSystemAccess()) {
@@ -527,12 +557,16 @@ ErrCode WifiHotspotServiceImpl::GetHotspotMode(HotspotMode &mode)
         return WIFI_OPT_PERMISSION_DENIED;
     }
     IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
+    HotspotMode mode;
     if (pService == nullptr) {
         WIFI_LOGE("%{public}s, get hotspot service is null!", __func__);
         mode = HotspotMode::NONE;
-        return WIFI_OPT_AP_NOT_OPENED;
+        parcelMode = ToParcel<HotspotModeParcel>(mode);
+        return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
     }
-    return pService->GetHotspotMode(mode);
+    ErrCode ret = pService->GetHotspotMode(mode);
+    parcelMode = ToParcel<HotspotModeParcel>(mode);
+    return HandleHotspotIdlRet(ret);
 }
 
 static ErrCode AddApBlockList(int m_id, StationInfo& updateInfo)
@@ -563,30 +597,31 @@ static ErrCode AddRptBlockList(int m_id, StationInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
+int32_t WifiHotspotServiceImpl::AddBlockList(const StationInfoParcel &parcelInfo)
 {
+    StationInfo info = FromParcel(parcelInfo);
     WIFI_LOGI("current ap service is %{public}d %{public}s"
         " device name [%{private}s]", m_id, __func__, info.deviceName.c_str());
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("AddBlockList:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("AddBlockList:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("AddBlockList:VerifySetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     if (CheckMacIsValid(info.bssid)) {
-        return WIFI_OPT_INVALID_PARAM;
+        return HandleHotspotIdlRet(WIFI_OPT_INVALID_PARAM);
     }
     bool isApServiceRunning = IsApServiceRunning();
     bool isRptRunning = IsRptRunning();
     if (!isApServiceRunning && !isRptRunning) {
         WIFI_LOGE("ApService is not running!");
-        return WIFI_OPT_AP_NOT_OPENED;
+        return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
     }
     StationInfo updateInfo = info;
 #ifdef SUPPORT_RANDOM_MAC_ADDR
@@ -594,7 +629,7 @@ ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
 #endif
     if (WifiSettings::GetInstance().ManageBlockList(info, MODE_ADD, m_id) < 0) {
         WIFI_LOGE("Add block list failed!");
-        return WIFI_OPT_FAILED;
+        return HandleHotspotIdlRet(WIFI_OPT_FAILED);
     }
 
     if (isApServiceRunning) {
@@ -605,26 +640,27 @@ ErrCode WifiHotspotServiceImpl::AddBlockList(const StationInfo &info)
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::DelBlockList(const StationInfo &info)
+int32_t WifiHotspotServiceImpl::DelBlockList(const StationInfoParcel &parcelInfo)
 {
+    StationInfo info = FromParcel(parcelInfo);
     WIFI_LOGI("current ap service is %{public}d %{public}s device name [%{private}s]",
         m_id, __func__, info.deviceName.c_str());
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("DelBlockList:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DelBlockList:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("DelBlockList:VerifySetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 
     if (CheckMacIsValid(info.bssid)) {
-        return WIFI_OPT_INVALID_PARAM;
+        return HandleHotspotIdlRet(WIFI_OPT_INVALID_PARAM);
     }
     StationInfo updateInfo = info;
 #ifdef SUPPORT_RANDOM_MAC_ADDR
@@ -634,72 +670,63 @@ ErrCode WifiHotspotServiceImpl::DelBlockList(const StationInfo &info)
         IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
         if (pService == nullptr) {
             WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
-            return WIFI_OPT_AP_NOT_OPENED;
+            return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
         }
         if (pService->DelBlockList(updateInfo) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("request del hotspot blocklist failed!");
-            return WIFI_OPT_FAILED;
+            return HandleHotspotIdlRet(WIFI_OPT_FAILED);
         }
     } else if (IsRptRunning()) {
         auto rptManager = WifiManager::GetInstance().GetRptInterface(m_id);
         if (rptManager == nullptr) {
-            return WIFI_OPT_FAILED;
+            return HandleHotspotIdlRet(WIFI_OPT_FAILED);
         }
         rptManager->DelBlock(info.bssid);
     }
 
     if (WifiSettings::GetInstance().ManageBlockList(info, MODE_DEL, m_id) < 0) {
         WIFI_LOGE("Delete block list failed!");
-        return WIFI_OPT_FAILED;
+        return HandleHotspotIdlRet(WIFI_OPT_FAILED);
     }
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::GetValidBands(std::vector<BandType> &bands)
+int32_t WifiHotspotServiceImpl::GetValidBands(std::vector<BandTypeParcel> &parcelBands)
 {
      WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetValidBands:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
-
+    std::vector<BandType> bands;
     ApConfigUse::GetInstance().GetApVaildBands(bands);
+    parcelBands.clear();
+    for (const auto &band : bands) {
+        parcelBands.emplace_back(ToParcel<BandTypeParcel>(band));
+    }
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::GetValidChannels(BandType band, std::vector<int32_t> &validchannels)
+int32_t WifiHotspotServiceImpl::GetValidChannels(BandTypeParcel parcelBand, std::vector<int32_t> &validchannels)
 {
+    BandType band = FromParcel<BandType>(parcelBand);
     WIFI_LOGI("current ap service is %{public}d %{public}s band %{public}d",
         m_id, __func__, static_cast<int>(band));
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetValidChannels:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 
     if (band == BandType::BAND_NONE) {
-        return WIFI_OPT_INVALID_PARAM;
+        return HandleHotspotIdlRet(WIFI_OPT_INVALID_PARAM);
     }
     ApConfigUse::GetInstance().GetApVaildChannel(band, validchannels);
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::GetBlockLists(std::vector<StationInfo> &infos)
-{
-    WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
-    if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("GetBlockLists:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
-    }
-    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetBlockLists:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
-
-    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetBlockLists:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
 #ifdef SUPPORT_RANDOM_MAC_ADDR
+void WifiHotspotServiceImpl::ProcessMacAddressRandomization(std::vector<StationInfo> &infos)
+{
     if (WifiPermissionUtils::VerifyGetWifiPeersMacPermission() == PERMISSION_DENIED) {
         WIFI_LOGI("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED", __func__);
         for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
@@ -712,8 +739,7 @@ ErrCode WifiHotspotServiceImpl::GetBlockLists(std::vector<StationInfo> &infos)
                 WIFI_LOGI("%{public}s: GenerateRandomMacAddress", __func__);
                 WifiRandomMacHelper::GenerateRandomMacAddress(randomMacAddr);
             }
-            if (!randomMacAddr.empty() &&
-                (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
+            if (!randomMacAddr.empty() && (macAddrInfo.bssidType == REAL_DEVICE_ADDRESS)) {
                 iter->bssid = randomMacAddr;
                 iter->bssidType = RANDOM_DEVICE_ADDRESS;
                 WIFI_LOGI("%{public}s: the record is updated, bssid:%{private}s, bssidType:%{public}d",
@@ -721,10 +747,40 @@ ErrCode WifiHotspotServiceImpl::GetBlockLists(std::vector<StationInfo> &infos)
             }
         }
     }
+}
+#endif
+
+int32_t WifiHotspotServiceImpl::GetBlockLists(std::vector<StationInfoParcel> &parcelInfos)
+{
+    WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetBlockLists:NOT System APP, PERMISSION_DENIED!");
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
+    }
+    if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetBlockLists:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
+    }
+
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetBlockLists:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
+    }
+    std::vector<StationInfo> infos;
+    infos.reserve(parcelInfos.size());
+    for (const auto &parcelInfo : parcelInfos) {
+        infos.emplace_back(FromParcel(parcelInfo));
+    }
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    ProcessMacAddressRandomization(infos);
 #endif
     if (WifiSettings::GetInstance().GetBlockList(infos, m_id) < 0) {
         WIFI_LOGE("Get block list failed!");
-        return WIFI_OPT_FAILED;
+        return HandleHotspotIdlRet(WIFI_OPT_FAILED);
+    }
+    parcelInfos.clear();
+    for (const auto &info : infos) {
+        parcelInfos.emplace_back(ToParcel(info));
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -747,6 +803,47 @@ bool WifiHotspotServiceImpl::IsRptRunning()
     return rptManager != nullptr && rptManager->IsRptRunning();
 }
 
+int32_t WifiHotspotServiceImpl::RegisterCallBack(const sptr<IRemoteObject> &cbParcel,
+    const std::vector<std::string> &event)
+{
+    WIFI_LOGD("WifiHotspotServiceImpl::RegisterCallBack");
+    ErrCode ret = WIFI_OPT_FAILED;
+    sptr<IRemoteObject> remote = cbParcel;
+    if (remote == nullptr) {
+        WIFI_LOGE("RegisterCallBack: remote object is null!");
+        return HandleHotspotIdlRet(WIFI_OPT_FAILED);
+    }
+    sptr<IWifiHotspotCallback> callback = iface_cast<IWifiHotspotCallback>(remote);
+    if (callback == nullptr) {
+        callback = sptr<WifiHotspotCallbackProxy>::MakeSptr(remote);
+        WIFI_LOGI("RegisterCallBack: create new WifiHotspotCallbackProxy!");
+    }
+    if (mSingleCallback) {
+        ret = RegisterCallBack(callback, event);
+    } else {
+        std::unique_lock<std::mutex> lock(deathRecipientMutex);
+        if (deathRecipient_ == nullptr) {
+            deathRecipient_ = sptr<WifiHotspotDeathRecipient>::MakeSptr();
+        }
+        // Add death recipient to remote object if this is the first time to register callback.
+        if (remote->IsProxyObject() &&
+            !WifiInternalEventDispatcher::GetInstance().HasHotspotRemote(remote, m_id)) {
+            remote->AddDeathRecipient(deathRecipient_);
+        }
+
+        if (callback != nullptr) {
+            for (const auto &eventName : event) {
+                ret = WifiInternalEventDispatcher::GetInstance().AddHotspotCallback(remote, callback, eventName, m_id);
+            }
+        } else {
+            WIFI_LOGE("Converted callback is null");
+        }
+    }
+
+    WIFI_LOGI("RegisterCallBack retcode: %{public}d", ret);
+    return HandleHotspotIdlRet(ret);
+}
+
 ErrCode WifiHotspotServiceImpl::RegisterCallBack(const sptr<IWifiHotspotCallback> &callback,
     const std::vector<std::string> &event)
 {
@@ -759,80 +856,90 @@ ErrCode WifiHotspotServiceImpl::RegisterCallBack(const sptr<IWifiHotspotCallback
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::GetSupportedFeatures(long &features)
+int32_t WifiHotspotServiceImpl::GetSupportedFeatures(int64_t &features)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetSupportedFeatures:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetSupportedFeatures:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
-    int ret = WifiManager::GetInstance().GetSupportedFeatures(features);
+    long features_long = 0;
+    int ret = WifiManager::GetInstance().GetSupportedFeatures(features_long);
+    features = static_cast<int64_t>(features_long);
     if (ret < 0) {
         WIFI_LOGE("Failed to get supported features!");
-        return WIFI_OPT_FAILED;
+        return HandleHotspotIdlRet(WIFI_OPT_FAILED);
     }
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::GetSupportedPowerModel(std::set<PowerModel>& setPowerModelList)
+int32_t WifiHotspotServiceImpl::GetSupportedPowerModel(std::set<PowerModelParcel>& parcelPowerModelSet)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetSupportedPowerModel:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 
     if (!IsApServiceRunning()) {
-        return WIFI_OPT_AP_NOT_OPENED;
+        return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
     }
     IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
     if (pService == nullptr) {
         WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
-        return WIFI_OPT_AP_NOT_OPENED;
+        return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
     }
+    std::set<PowerModel> setPowerModelList;
     pService->GetSupportedPowerModel(setPowerModelList);
+    parcelPowerModelSet.clear();
+    for (const auto &model : setPowerModelList) {
+        parcelPowerModelSet.insert(ToParcel<PowerModelParcel>(model));
+    }
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::GetPowerModel(PowerModel& model)
+int32_t WifiHotspotServiceImpl::GetPowerModel(PowerModelParcel& parcelModel)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetPowerModel:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 
     if (!IsApServiceRunning()) {
-        return WIFI_OPT_AP_NOT_OPENED;
+        return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
     }
     IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
     if (pService == nullptr) {
         WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
-        return WIFI_OPT_AP_NOT_OPENED;
+        return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
     }
+    PowerModel model;
     pService->GetPowerModel(model);
+    parcelModel = ToParcel<PowerModelParcel>(model);
     return WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::SetPowerModel(const PowerModel& model)
+int32_t WifiHotspotServiceImpl::SetPowerModel(PowerModelParcel parcelModel)
 {
     WIFI_LOGI("SetPowerModel, m_id is %{public}d %{public}s", m_id, __func__);
+    PowerModel model = FromParcel<PowerModel>(parcelModel);
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetPowerModel:VerifySetWifiInfoPermission() PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 
     if (!IsApServiceRunning()) {
-        return WIFI_OPT_AP_NOT_OPENED;
+        return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
     }
     IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);
     if (pService == nullptr) {
         WIFI_LOGE("Instance %{public}d get hotspot service is null!", m_id);
-        return WIFI_OPT_AP_NOT_OPENED;
+        return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
     }
     pService->SetPowerModel(model);
     return WIFI_OPT_SUCCESS;
@@ -1055,15 +1162,15 @@ ErrCode WifiHotspotServiceImpl::IsValidHotspotConfig(const HotspotConfig &cfg, c
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
-ErrCode WifiHotspotServiceImpl::GetApIfaceName(std::string& ifaceName)
+int32_t WifiHotspotServiceImpl::GetApIfaceName(std::string& ifaceName)
 {
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetBlockLists:NOT System APP, PERMISSION_DENIED!");
-        return WIFI_OPT_NON_SYSTEMAPP;
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetBlockLists:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     if (IsApServiceRunning()) {
         ifaceName = WifiConfigCenter::GetInstance().GetApIfaceName();
@@ -1072,6 +1179,15 @@ ErrCode WifiHotspotServiceImpl::GetApIfaceName(std::string& ifaceName)
         ifaceName = (rptManager != nullptr) ? rptManager->GetRptIfaceName() : "";
     }
     return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+int32_t WifiHotspotServiceImpl::HandleHotspotIdlRet(ErrCode originRet)
+{
+    if (originRet == WIFI_OPT_SUCCESS) {
+        return WIFI_OPT_SUCCESS;
+    } else {
+        return originRet + HOTSPOT_IDL_ERROR_OFFSET;
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

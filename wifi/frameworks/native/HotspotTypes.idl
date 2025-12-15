@@ -1,0 +1,49 @@
+/*
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package OHOS.Wifi;
+
+enum BandTypeParcel {
+    BAND_NONE = 0,
+    BAND_2GHZ = 1,
+    BAND_5GHZ = 2,
+    BAND_6GHZ = 3,
+    BAND_60GHZ = 4,
+    BAND_ANY = 5,
+};
+
+enum PowerModelParcel {
+    SLEEPING = 0,
+    GENERAL = 1,
+    THROUGH_WALL = 2,
+};
+
+enum ServiceTypeParcel {
+    DEFAULT = 0,
+    WIFI_EXT = 1,
+};
+
+enum HotspotModeParcel {
+    NONE = 0,
+    SOFTAP,
+    RPT,
+    LOCAL_ONLY_SOFTAP,
+};
+
+struct StationInfoParcel {
+    String deviceName;
+    String bssid;
+    int bssidType;
+    String ipAddr;
+};

@@ -19,9 +19,10 @@
 #include <cstddef>
 #include <cstdint>
 #include <unistd.h>
+#include "wifi_hotspot_stub.h"
+#include "wifi_hotspot_service_impl.h"
 #include "wifi_p2p_stub.h"
 #include "wifi_device_stub.h"
-#include "wifi_hotspot_stub.h"
 #include "wifi_scan_stub.h"
 #include "message_parcel.h"
 #include "securec.h"
@@ -29,7 +30,6 @@
 #include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_p2p_service_impl.h"
 #include "wifi_device_service_impl.h"
-#include "wifi_hotspot_service_impl.h"
 #include "wifi_scan_service_impl.h"
 #include "wifi_log.h"
 #include "wifi_config_center.h"

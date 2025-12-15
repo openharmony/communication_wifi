@@ -171,23 +171,42 @@ InternalMessagePtr StateMachine::CreateMessage(int msgName, int param1, int para
 }
 void StateMachine::MessageExecutedLater(int msgName, int64_t delayTimeMs, MsgLogLevel logLevel)
 {
-    (void)msgName;
+    (void)logLevel;
+    WIFI_LOGD("MessageExecutedLater, msgName is %{private}d, delayTimeMs is %{public}d.", msgName, delayTimeMs);
 }
 
 void StateMachine::MessageExecutedLater(int msgName, int param1, int64_t delayTimeMs)
-{}
+{
+    WIFI_LOGD("MessageExecutedLater, msgName is %{public}d, param1 is %{public}d, delayTimeMs is %{public}d.",
+        msgName, param1, delayTimeMs);
+}
 void StateMachine::MessageExecutedLater(int msgName, int param1, int param2, int64_t delayTimeMs)
-{}
+{
+    WIFI_LOGD("MessageExecutedLater, msgName is %{public}d, param1 is %{public}d, param2 is %{public}d, delayTimeMs is %{public}d.",
+        msgName, param1, param2, delayTimeMs);
+}
 void StateMachine::MessageExecutedLater(InternalMessagePtr msg, int64_t delayTimeMs)
-{}
+{
+    (void)msg;
+    WIFI_LOGD("MessageExecutedLater, delayTimeMs is %{public}d.", delayTimeMs);
+}
 void StateMachine::MessageExecutedLater(int msgName, const std::any &messageObj,
                                         int64_t delayTimeMs)
-{}
+{
+    (void)messageObj;
+    WIFI_LOGD("MessageExecutedLater, msgName is %{public}d, delayTimeMs is %{public}d.", msgName, delayTimeMs);
+}
 void StateMachine::MessageExecutedLater(int msgName, int param1,
                                         int param2, const std::any &messageObj, int64_t delayTimeMs)
-{}
+{
+    (void)messageObj;
+    WIFI_LOGD("MessageExecutedLater, msgName is %{public}d, param1 is %{public}d, param2 is %{public}d, delayTimeMs is %{public}d.",
+        msgName, param1, param2, delayTimeMs);
+}
 void StateMachine::SendMessageAtFrontOfQueue(int msgName, int param1)
-{}
+{
+    WIFI_LOGD("MessageExecutedLater, msgName is %{public}d, param1 is %{public}d.", msgName, param1);
+}
 std::string StateMachine::GetCurStateName()
 { return "";}
 void StateMachine::StatePlus(State *state, State *upper)

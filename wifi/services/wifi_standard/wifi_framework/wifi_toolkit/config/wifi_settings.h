@@ -391,7 +391,7 @@ private:
     int SyncWifiConfig();
     std::vector<WifiDeviceConfig> RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const;
     std::string FuzzyBssid(const std::string bssid);
-    std::string GetSubstringByBytes(const std::string &value, int size) const;
+    std::string GetSubstringByBytes(const std::string &value, int size);
 #ifndef OHOS_ARCH_LITE
     void MergeWifiConfig();
     void MergeSoftapConfig();

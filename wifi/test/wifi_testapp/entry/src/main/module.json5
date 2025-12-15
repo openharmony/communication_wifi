@@ -92,6 +92,9 @@
         "name": "ohos.permission.GET_WIFI_INFO"
       },
       {
+        "name": "ohos.permission.LINKTURBO"
+      },
+      {
         "name": "ohos.permission.DISTRIBUTED_DATASYNC",
         "reason": "$string:app_name",
         "usedScene": {

@@ -143,6 +143,32 @@ const WifiP2pDevice &WifiP2pServiceResponseList::GetDevice() const
     return p2pDevice;
 }
 
+static bool CheckTlvBounds(const std::vector<unsigned char>& tlvList, size_t pos)
+{
+    if (pos >= tlvList.size()) {
+        WIFI_LOGW("TLV access out of bounds");
+        return false;
+    }
+
+    if (pos + 1 >= tlvList.size()) {
+        WIFI_LOGW("TLV access out of bounds");
+        return false;
+    }
+
+    size_t tlvTypeOffset = pos + SERVICE_TLV_LENGTH_SIZE;
+    size_t transIdOffset = tlvTypeOffset + PROTOCOL_SIZE;
+    size_t statusOffset = transIdOffset + TRANSACTION_ID_SIZE;
+
+    if (tlvTypeOffset >= tlvList.size() ||
+        transIdOffset >= tlvList.size() ||
+        statusOffset >= tlvList.size()) {
+        WIFI_LOGW("TLV access out of bounds");
+        return false;
+    }
+
+    return true;
+}
+
 bool WifiP2pServiceResponseList::ParseTlvs2RespList(const std::vector<unsigned char> &tlvList)
 {
     if (tlvList.empty()) {
@@ -152,7 +178,7 @@ bool WifiP2pServiceResponseList::ParseTlvs2RespList(const std::vector<unsigned c
     std::size_t leftLength = tlvList.size();
     std::size_t headLength = SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE + TRANSACTION_ID_SIZE + SERVICE_STATUS_SIZE;
     std::size_t pos = 0;
-    while (leftLength > 0) {
+    while (leftLength > 0 && CheckTlvBounds(tlvList, pos)) {
         unsigned short length = tlvList[pos] + (tlvList[pos + 1] << CHAR_BIT);
         unsigned short dataLength = length - PROTOCOL_SIZE - TRANSACTION_ID_SIZE - SERVICE_STATUS_SIZE;
         int type = tlvList[pos + SERVICE_TLV_LENGTH_SIZE];

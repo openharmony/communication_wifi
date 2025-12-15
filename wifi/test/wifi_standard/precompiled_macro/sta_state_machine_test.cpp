@@ -572,6 +572,29 @@ HWTEST_F(StaStateMachineTest, TryToSaveIpV6ResultAddrListTest, TestSize.Level1)
     EXPECT_EQ(ipv6Info.IpAddrMap["2001:db8::2"], 2);
 }
 
+HWTEST_F(StaStateMachineTest, TryToSaveIpV6ResultLifetimeTest, TestSize.Level1)
+{
+    IpInfo ipInfo;
+    IpV6Info ipv6Info;
+    DhcpResult result;
+    // Set lifetime fields
+    result.ipv6LifeTime.validLifeTime = 3600;
+    result.ipv6LifeTime.prefLifeTime = 1800;
+    result.ipv6LifeTime.routerLifeTime = 7200;
+    // Set other required fields to avoid null checks
+    strcpy_s(result.strOptClientId, DHCP_MAX_FILE_BYTES, "2001:db8::1");
+    strcpy_s(result.strOptRouter1, DHCP_MAX_FILE_BYTES, "2001:db8::1");
+    strcpy_s(result.strOptSubnet, DHCP_MAX_FILE_BYTES, "64");
+    strcpy_s(result.strOptDns1, DHCP_MAX_FILE_BYTES, "2001:db8::53");
+    result.iptype = 0;
+    // Call the function
+    pStaStateMachine->pDhcpResultNotify->TryToSaveIpV6Result(ipInfo, ipv6Info, &result);
+    // Verify lifetime fields are set correctly
+    EXPECT_EQ(ipv6Info.validLifeTime, 3600u);
+    EXPECT_EQ(ipv6Info.preferredLifeTime, 1800u);
+    EXPECT_EQ(ipv6Info.routerLifeTime, 7200u);
+}
+
 HWTEST_F(StaStateMachineTest, TryToSaveIpV6ResultExtTest, TestSize.Level1)
 {
     IpInfo ipInfo;

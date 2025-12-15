@@ -1027,30 +1027,30 @@ public:
         pStaStateMachine->m_instId = INSTID_WLAN1;  // 设置非 INSTID_WLAN0 的值
         pStaStateMachine->autoPullBrowserFlag = false;
         pStaStateMachine->portalReCheck_ = false;
-
+ 
         // Act
         pStaStateMachine->PublishPortalNitificationAndLogin();
-
+ 
         // Assert
         EXPECT_FALSE(pStaStateMachine->portalReCheck_);
         EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
     }
-
+ 
     void TestPublishPortalNitificationAndLogin2()
     {
         pStaStateMachine->m_instId = INSTID_WLAN0;
         pStaStateMachine->autoPullBrowserFlag = false;
         pStaStateMachine->portalReCheck_ = false;
         pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), IsAllowPopUp()).WillRepeatedly(Return(false)); 
         // Act
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), IsAllowPopUp()).WillRepeatedly(Return(true));
         pStaStateMachine->PublishPortalNitificationAndLogin();
-
+ 
         // Assert
         EXPECT_TRUE(pStaStateMachine->portalReCheck_);
         EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
     }
-
+ 
     void TestPublishPortalNitificationAndLogin3()
     {
         pStaStateMachine->m_instId = INSTID_WLAN0;
@@ -1059,12 +1059,12 @@ public:
         pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
         // Act
         pStaStateMachine->PublishPortalNitificationAndLogin();
-
+ 
         // Assert
         EXPECT_FALSE(pStaStateMachine->portalReCheck_);
         EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
     }
-
+ 
     void TestPublishPortalNitificationAndLogin4()
     {
         pStaStateMachine->m_instId = INSTID_WLAN0;
@@ -1073,7 +1073,7 @@ public:
         pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
         // Act
         pStaStateMachine->PublishPortalNitificationAndLogin();
-
+ 
         // Assert
         EXPECT_FALSE(pStaStateMachine->portalReCheck_);
         EXPECT_TRUE(pStaStateMachine->autoPullBrowserFlag);

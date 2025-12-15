@@ -68,7 +68,6 @@ constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 constexpr int CMD_LINK_SWITCH_DETECT_TIMEOUT = 0x07;
 constexpr int CMD_NO_INTERNET_TIMEOUT = 0x08;
 constexpr int CMD_IPV6_DELAY_TIMEOUT = 0x09;
-constexpr int CMD_SHOW_PORTAL_NOTIFICATION = 0x10;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
@@ -118,8 +117,6 @@ constexpr int RSSI_OFFSET_DEFAULT = 5;
 constexpr int RSSI_OFFSET_MAX = 10;
 
 constexpr unsigned int BIT_MLO_CONNECT = 0x80;
-
-constexpr int PORTAL_NOTIFICATION_TIMEOUT = 3 * 1000;
 
 #define DNS_IP_ADDR_LEN 15
 #define WIFI_FIRST_DNS_NAME "const.wifi.wifi_first_dns"
@@ -1059,6 +1056,7 @@ private:
     WifiDeviceConfig m_hilinkDeviceConfig;
 #ifndef OHOS_ARCH_LITE
     bool hasNoInternetDialog_ = false;
+    bool portalReCheck_ = false;
     sptr<NetManagerStandard::NetSupplierInfo> NetSupplierInfo;
     sptr<NetStateObserver> m_NetWorkState;
     IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */

@@ -164,8 +164,8 @@ public:
     void IsAutoConnectFailByP2PEnhanceFilterSucc1();
     void IsAutoConnectFailByP2PEnhanceFilterSucc2();
     void IsAutoConnectFailByP2PEnhanceFilterFail1();
-    void OnScanInfosReadyHandlerWithSupplicantTransientState();
-    void OnScanInfosReadyHandlerWithAsyncTaskDeduplication();
+    void OnScanInfosReadyHandlerWithSupplicantTransientState() const;
+    void OnScanInfosReadyHandlerWithAsyncTaskDeduplication() const;
 };
 
 void StaAutoConnectServiceTest::InitAutoConnectService()

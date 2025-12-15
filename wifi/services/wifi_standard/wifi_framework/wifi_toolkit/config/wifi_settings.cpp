@@ -1941,7 +1941,7 @@ std::string WifiSettings::GetPackageName(std::string tag)
     return "";
 }
 
-std::string WifiSettings::GetSubstringByBytes(const std::string& value, int size) const
+std::string WifiSettings::GetSubstringByBytes(const std::string& value, int size)
 {
     std::string result;
     size_t charLen;

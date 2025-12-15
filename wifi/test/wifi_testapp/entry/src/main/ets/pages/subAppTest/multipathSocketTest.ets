@@ -14,9 +14,10 @@
  */
 
 import socket from '@ohos.net.socket';
+import TextDecoder from '@ohos.util';
 import { netHandover } from '@kit.NetworkBoostKit';
 import connection from '@ohos.net.connection';
-import ConfigData from '../../Utils/ConfigData';
+import ConfigData from '../../utils/ConfigData';
 import { TestImageDisplay } from '../../Component/testImageDisplay';
 import { PageTitle } from '../../Component/pageTitle';
 import { TestData } from '../../entryability/model/testData'
@@ -34,6 +35,7 @@ export interface NetAddress {
 }
 
 type PathType = 'wifi' | 'cellular';
+type ModeType = 'Client' | 'Server';
 
 const TAG = 'wifiTestApp [multipathSocketTest]';
 
@@ -44,6 +46,15 @@ const TAG = 'wifiTestApp [multipathSocketTest]';
 @Component
 struct MultipathSocketTest {
   private testItem: TestData = (router.getParams() as myParams).testItem
+  // 模式选择
+  @State wifiModeIndex: number = 0;
+  @State wifiModeValue: string = 'Client';
+  @State cellularModeIndex: number = 0;
+  @State cellularModeValue: string = 'Client';
+  @State modeList: Array<SelectOption> = [
+    { value: 'Client' },
+    { value: 'Server' }
+  ];
   // WiFi链路配置
   @State wifiRemoteAddress: string = '192.168.1.100';
   @State wifiRemotePort: string = '8081';
@@ -52,6 +63,7 @@ struct MultipathSocketTest {
   @State cellularRemoteAddress: string = '8.8.8.8';
   @State cellularRemotePort: string = '8082';
   @State cellularLocalPort: string = '12001';
+  @State cellularResponse: string = ''; // 用于显示 DNS 响应
   // 通用状态
   @State message: string = 'Hello Multipath';
   @State responseData: string = '';
@@ -70,7 +82,7 @@ struct MultipathSocketTest {
   @State wifiReceiveCount: number = 0;
   @State cellularReceiveCount: number = 0;
   private wifiSocket: socket.UDPSocket | null = null;
-  private cellularSocket: socket.UDPSocket | null = null;
+  private cellularSocket: socket.TCPSocket | null = null; // ✅ 改为 TCP
   private wifiNetHandle: connection.NetHandle | null = null;
   private cellularNetHandle: connection.NetHandle | null = null;
   private netConnection: connection.NetConnection | null = null;
@@ -84,6 +96,12 @@ struct MultipathSocketTest {
     this.checkCurrentNetwork();
   }
 
+  bytesToHex(bytes: Uint8Array): string {
+    return Array.from(bytes)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join(' ');
+  }
+
   // 将family字符串转换为数字（1 for IPv4, 2 for IPv6）
   convertFamilyToNumber(family: string | number | undefined): number {
     if (typeof family === 'number') {
@@ -93,6 +111,24 @@ struct MultipathSocketTest {
       return 2;
     }
     return 1; // 默认为IPv4
+  }
+
+  requestMultiPath() {
+    try {
+      netHandover.requestMultiPath((data: netHandover.MultiPathRequestResult) => {
+        console.info(` zly20000requestMultiPath result:` + JSON.stringify(data));
+      });
+    } catch (err) {
+      console.error('zly20001errCode: ' + (err as BusinessError).code + ', errMessage: ' + (err as BusinessError).message);
+    }
+  }
+
+  releaseMultiPath() {
+    try {
+      netHandover.releaseMultiPath();
+    } catch (err) {
+      console.error('zly20002errCode: ' + (err as BusinessError).code + ', errMessage: ' + (err as BusinessError).message);
+    }
   }
 
   // 注册网络监听
@@ -172,25 +208,6 @@ struct MultipathSocketTest {
     }
   }
 
-  requestMultiPath() {
-    try {
-      netHandover.requestMultiPath((data: netHandover.MultiPathRequestResult) => {
-        console.info(TAG, `requestMultiPath result:` + JSON.stringify(data));
-      });
-    } catch (err) {
-      console.error(TAG, 'requestMultiPath errCode: ' + (err as BusinessError).code + ', errMessage: ' + (err as BusinessError).message);
-    }
-  }
-
-  releaseMultiPath() {
-    try {
-      netHandover.releaseMultiPath();
-    } catch (err) {
-      console.error(TAG, 'releaseMultiPath errCode: ' + (err as BusinessError).code + ', errMessage: ' + (err as BusinessError).message);
-    }
-  }
-
-
   // 双路网络检测
   async checkCurrentNetwork() {
     this.wifiNetworkStatus = '检测中...';
@@ -223,7 +240,7 @@ struct MultipathSocketTest {
         if (!handle || handle.netId === 0) {
           continue;
         }
-        
+
         try {
           const netCapabilities = await connection.getNetCapabilities(handle);
           if (netCapabilities.bearerTypes.includes(connection.NetBearType.BEARER_WIFI) && !this.wifiNetHandle) {
@@ -266,7 +283,7 @@ struct MultipathSocketTest {
   handleWifiNetworkChange() {
     this.appendLog('[WiFi] 检测到WiFi网络变化，刷新链路中...');
     const wasWifiBound = this.wifiBound;
-    
+
     this.checkCurrentNetwork().then(() => {
       // WiFi链路：如果之前已绑定且新netHandle有效，尝试重建
       if (wasWifiBound && this.wifiNetHandle && this.wifiNetHandle.netId !== 0) {
@@ -285,7 +302,7 @@ struct MultipathSocketTest {
   handleCellularNetworkChange() {
     this.appendLog('[蜂窝] 检测到蜂窝网络变化，刷新链路中...');
     const wasCellularBound = this.cellularBound;
-    
+
     this.checkCurrentNetwork().then(() => {
       // 蜂窝链路：如果之前已绑定且新netHandle有效，尝试重建
       if (wasCellularBound && this.cellularNetHandle && this.cellularNetHandle.netId !== 0) {
@@ -312,7 +329,7 @@ struct MultipathSocketTest {
   }
 
   async bindCellularSocket() {
-    await this.bindSocket('cellular');
+    await this.bindSocketCellular();
   }
 
   async bindSocket(path: PathType) {
@@ -345,9 +362,6 @@ struct MultipathSocketTest {
     if (path === 'wifi') {
       this.wifiSocket = socketInstance;
       this.wifiStatus = '绑定中...';
-    } else {
-      this.cellularSocket = socketInstance;
-      this.cellularStatus = '绑定中...';
     }
 
     try {
@@ -366,7 +380,7 @@ struct MultipathSocketTest {
 
       // 5. 最后绑定到指定netHandle
       const bindSuccess = await this.applyNetHandleToSocket(socketInstance, targetHandle, label);
-      
+
       if (bindSuccess) {
         if (path === 'wifi') {
           this.wifiBound = true;
@@ -382,14 +396,14 @@ struct MultipathSocketTest {
     } catch (error) {
       console.error(TAG, `绑定${label} Socket失败: ${JSON.stringify(error)}`);
       this.appendLog(`[${label}] ✗ 绑定失败: ${JSON.stringify(error)}`);
-      
+
       // 绑定失败，清理socket
       try {
         await socketInstance.close();
       } catch (e) {
         // ignore
       }
-      
+
       if (path === 'wifi') {
         this.wifiSocket = null;
         this.wifiBound = false;
@@ -399,6 +413,44 @@ struct MultipathSocketTest {
         this.cellularBound = false;
         this.cellularStatus = '绑定失败';
       }
+    }
+  }
+
+  async bindSocketCellular() {
+    const label = '蜂窝';
+
+    // 关闭旧 socket（如果存在）
+    if (this.cellularSocket) {
+      try {
+        await this.cellularSocket.close();
+      } catch (e) {
+        console.error(TAG, `关闭旧${label} Socket失败: ${JSON.stringify(e)}`);
+      }
+    }
+
+    // 创建新的 TCP Socket
+    const socketInstance = socket.constructTCPSocketInstance();
+    this.cellularSocket = socketInstance;
+    this.cellularStatus = '初始化中...';
+
+    try {
+      // 设置 TCP 选项（参考你提供的大纲）
+      socketInstance.setExtraOptions({
+        receiveBufferSize: 8192,
+        sendBufferSize: 8192,
+        reuseAddress: true,
+        socketTimeout: 60000
+      });
+
+      this.cellularBound = true;
+      this.cellularStatus = '已准备（TCP Socket就绪）';
+      this.appendLog('[蜂窝] ✓ TCP Socket 初始化完成，等待连接百度');
+    } catch (error) {
+      console.error(TAG, `初始化蜂窝 TCP Socket失败: ${JSON.stringify(error)}`);
+      this.appendLog('[蜂窝] ✗ 初始化失败: ' + JSON.stringify(error));
+      this.cellularSocket = null;
+      this.cellularBound = false;
+      this.cellularStatus = '初始化失败';
     }
   }
 
@@ -428,16 +480,37 @@ struct MultipathSocketTest {
       const receivedData = data.message ? data.message.toString() : '';
       const remoteInfo = data.remoteInfo;
       const isWifi = label === 'WiFi';
-      
+      const currentMode = isWifi ? this.wifiModeValue : this.cellularModeValue;
+
       // 更新接收计数
       if (isWifi) {
         this.wifiReceiveCount++;
       } else {
         this.cellularReceiveCount++;
       }
-      
+
       const receiveCount = isWifi ? this.wifiReceiveCount : this.cellularReceiveCount;
-      this.appendLog(`[${label}] 收到 #${receiveCount}: ${receivedData} (来自: ${remoteInfo.address}:${remoteInfo.port})`);
+      this.appendLog(`[${label}][${currentMode}] 收到 #${receiveCount}: ${receivedData} (来自: ${remoteInfo.address}:${remoteInfo.port})`);
+
+      // Server模式：自动回复
+      if (currentMode === 'Server') {
+        const replyMsg = `[${label}][Server] Echo: ${receivedData}`;
+        const replyAddress: NetAddress = {
+          address: remoteInfo.address,
+          port: remoteInfo.port,
+          family: this.convertFamilyToNumber(remoteInfo.family)
+        };
+
+        socketInstance.send({
+          data: replyMsg,
+          address: replyAddress
+        }).then(() => {
+          this.appendLog(`[${label}][Server] 回复到 ${remoteInfo.address}:${remoteInfo.port}`);
+        }).catch((err:BusinessError) => {
+          console.error(TAG, `${label} Server回复失败: ${JSON.stringify(err)}`);
+          this.appendLog(`[${label}][Server] ✗ 回复失败: ${JSON.stringify(err)}`);
+        });
+      }
     });
 
     socketInstance.on('error', (err) => {
@@ -465,7 +538,7 @@ struct MultipathSocketTest {
   }
 
   async sendOnCellular() {
-    await this.sendMessage('cellular');
+    await this.sendMessageCellular();
   }
 
   async sendBoth() {
@@ -489,33 +562,196 @@ struct MultipathSocketTest {
       // 生成序列号
       const seq = path === 'wifi' ? ++this.wifiPacketSeq : ++this.cellularPacketSeq;
       const timestamp = new Date().toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3 });
-      
-      const sendAddress: NetAddress = {
-        address: targetAddress,
-        port: targetPort,
-        family: 1
-      };
-      
-      const dataToSend = `[${label}] [SEQ:${seq}] [TIME:${timestamp}] ${this.message}`;
-      
-      await socketInstance.send({
-        data: dataToSend,
-        address: sendAddress
-      });
-      
-      // 更新发送计数
+
+      // 根据路径区分发送方式
       if (path === 'wifi') {
-        this.wifiSendCount++;
+        // ✅ WiFi 是 UDP，需要 address
+        const udpSocket = socketInstance as socket.UDPSocket; // ✅ 类型断言为 UDPSocket
+        const sendAddress: NetAddress = {
+          address: targetAddress,
+          port: targetPort,
+          family: 1
+        };
+
+        const dataToSend = `[${label}] [SEQ:${seq}] [TIME:${timestamp}] ${this.message}`;
+
+        await udpSocket.send({
+          data: dataToSend,
+          address: sendAddress
+        });
+
+        this.appendLog(`[${label}] 发送 #${seq} 到 ${targetAddress}:${targetPort}`);
+        console.log(TAG, `${label} 发送数据包 #${seq}: ${dataToSend}`);
+
+        this.wifiSendCount++; // 只有 WiFi 才递增
       } else {
-        this.cellularSendCount++;
+        // ✅ 蜂窝是 TCP，不需要 address
+        const tcpSocket = socketInstance as socket.TCPSocket; // ✅ 类型断言为 TCPSocket
+        const dataToSend = `[${label}] [SEQ:${seq}] [TIME:${timestamp}] ${this.message}`;
+
+        await tcpSocket.send({
+          data: dataToSend
+        });
+
+        this.appendLog(`[${label}] 发送数据包 #${seq} (TCP)`);
+        console.log(TAG, `${label} 发送 TCP 数据: ${dataToSend}`);
+
+        this.cellularSendCount++; // 只有蜂窝才递增
       }
-      
-      this.appendLog(`[${label}] 发送 #${seq} 到 ${targetAddress}:${targetPort}`);
-      console.log(TAG, `${label} 发送数据包 #${seq}: ${dataToSend}`);
+
     } catch (error) {
       console.error(TAG, `${label} 发送失败: ${JSON.stringify(error)}`);
       this.appendLog(`[${label}] ✗ 发送失败: ${JSON.stringify(error)}`);
     }
+  }
+
+  async sendMessageCellular() {
+    if (!this.cellularSocket || !this.cellularBound) {
+      this.appendLog('[蜂窝] ✗ TCP Socket未初始化，请先点击“绑定蜂窝”');
+      this.cellularStatus = '未初始化';
+      return;
+    }
+
+    this.cellularStatus = '连接中...';
+    this.cellularResponse = '';
+    this.appendLog('[蜂窝] 正在连接百度服务器...');
+
+    const host = 'www.baidu.com';
+    const port = 80;
+
+    let response = '';
+    let hasReceivedData = false;
+    let isClosed = false;
+
+    try {
+      const tcpSocket = this.cellularSocket as socket.TCPSocket;
+
+      // ✅ 连接
+      await tcpSocket.connect({
+        address: {
+          address: host,
+          port: port
+        },
+        timeout: 10000
+      });
+      this.appendLog('[蜂窝] ✅ 连接成功！');
+
+      // ✅ 发送 HTTP GET 请求
+      const httpRequest = `GET / HTTP/1.1\r\nHost: ${host}\r\nConnection: close\r\n\r\n`;
+      await tcpSocket.send({
+        data: httpRequest
+      });
+      this.appendLog('[蜂窝] ✅ HTTP 请求已发送');
+
+      // ✅ 使用事件监听接收数据（✅ 替代 while(true) + recv）
+      tcpSocket.on('message', (info: socket.SocketMessageInfo) => {
+        if (isClosed) return;
+
+        const message = info.message;
+        if (!message || message.byteLength === 0) return;
+
+        // ✅ 正确使用 info.message
+        const uint8Array = new Uint8Array(message);
+        let dataStr = '';
+        for (let i = 0; i < uint8Array.length; i++) {
+          dataStr += String.fromCharCode(uint8Array[i]);
+        }
+
+        response += dataStr;
+        hasReceivedData = true;
+
+        this.appendLog(`[蜂窝] 接收到 ${message.byteLength} 字节数据`);
+
+        if (info.remoteInfo) {
+          console.log(`[蜂窝] 来自 ${info.remoteInfo.address}:${info.remoteInfo.port}`);
+        }
+      });
+
+      // ✅ 监听连接关闭
+      tcpSocket.on('close', () => {
+        isClosed = true;
+        this.appendLog('[蜂窝] ✅ 连接已关闭');
+      });
+
+      // ✅ 监听错误
+      tcpSocket.on('error', (err: Error) => {
+        if (!isClosed) {
+          this.appendLog(`[蜂窝] ❌ 收到错误: ${err.message}`);
+        }
+      });
+
+      // ✅ 等待连接关闭（通过事件触发）
+      await new Promise<void>((resolve) => {
+        const checkClosed = () => {
+          if (isClosed) {
+            resolve();
+          } else {
+            setTimeout(checkClosed, 50); // 每50ms检查一次
+          }
+        };
+        checkClosed();
+      });
+
+      // ✅ 检查是否收到数据
+      if (!hasReceivedData) {
+        throw new Error('未收到任何响应数据');
+      }
+
+      this.appendLog(`[蜂窝] ✅ 收到完整响应（总长度: ${response.length} 字节）`);
+      this.cellularSendCount++;
+
+      // 提取 HTML 内容
+      const bodyStart = response.indexOf('\r\n\r\n');
+      if (bodyStart !== -1) {
+        const htmlContent = response.substring(bodyStart + 4);
+        this.cellularResponse = htmlContent.length > 500 ? htmlContent.substring(0, 500) + '...' : htmlContent;
+      } else {
+        this.cellularResponse = response.length > 500 ? response.substring(0, 500) + '...' : response;
+      }
+
+      this.cellularStatus = '访问成功';
+      this.appendLog('[蜂窝] ✅ 响应内容已显示');
+
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : JSON.stringify(error);
+      this.cellularResponse = `❌ 连接失败: ${errorMsg}`;
+      this.appendLog(`[蜂窝] ❌ ${this.cellularResponse}`);
+      this.cellularStatus = '访问失败';
+    } finally {
+      try {
+        const tcpSocket = this.cellularSocket as socket.TCPSocket;
+        if (tcpSocket) {
+          await tcpSocket.close();
+        }
+        this.appendLog('[蜂窝] 连接已关闭');
+      } catch (e) {
+        console.error(TAG, '关闭蜂窝 TCP Socket失败:', JSON.stringify(e));
+      }
+      this.cellularSocket = null;
+      this.cellularBound = false;
+      this.cellularStatus = '已断开';
+    }
+  }
+
+
+
+  setupCellularSocketEvents(socketInstance: socket.UDPSocket, label: string) {
+    socketInstance.on('message', (data) => {
+      // 蜂窝模式下，只关心收到的 DNS 响应
+      const receivedData = data.message ? data.message.toString() : '';
+      const remoteInfo = data.remoteInfo;
+      this.appendLog(`[${label}] 收到响应来自 ${remoteInfo.address}:${remoteInfo.port}（长度: ${data.message.byteLength} 字节）`);
+    });
+
+    socketInstance.on('error', (err) => {
+      console.error(TAG, `${label} Socket错误: ${JSON.stringify(err)}`);
+      this.appendLog(`[${label}] ✗ Socket错误: ${JSON.stringify(err)}`);
+    });
+
+    socketInstance.on('close', () => {
+      this.appendLog(`[${label}] UDP Socket已关闭`);
+      this.cellularBound = false;
+    });
   }
 
   async closeWifiSocket() {
@@ -523,7 +759,7 @@ struct MultipathSocketTest {
   }
 
   async closeCellularSocket() {
-    await this.closeSocket('cellular');
+    await this.closeSocketCellular();
   }
 
   async closeSocket(path: PathType, log: boolean = true) {
@@ -554,6 +790,23 @@ struct MultipathSocketTest {
     }
   }
 
+  async closeSocketCellular() {
+    const label = '蜂窝';
+    if (!this.cellularSocket) return;
+
+    try {
+      await this.cellularSocket.close();
+      this.appendLog(`[${label}] 主动关闭Socket`);
+    } catch (error) {
+      console.error(TAG, `${label} 关闭Socket失败: ${JSON.stringify(error)}`);
+      this.appendLog(`[${label}] 关闭Socket失败: ${JSON.stringify(error)}`);
+    }
+
+    this.cellularBound = false;
+    this.cellularStatus = '已关闭';
+    this.cellularSocket = null;
+  }
+
   clearResponse() {
     this.responseData = '';
   }
@@ -572,359 +825,409 @@ struct MultipathSocketTest {
         TestImageDisplay({ testItem: this.testItem })
         PageTitle({ testItem: this.testItem })
       }
+      Scroll() {
+        Column() {
+          // 网络信息
+          Text('网络与链路状态')
+            .fontSize(18)
+            .fontWeight(FontWeight.Bold)
+            .width('100%')
+            .margin({ top: 10, bottom: 10 })
 
-      Column() {
-        // 网络信息
-        Text('网络与链路状态')
-          .fontSize(18)
-          .fontWeight(FontWeight.Bold)
+          Row() {
+            Text('WiFi状态: ')
+              .fontSize(16)
+              .width('30%')
+            Text(this.wifiNetworkStatus)
+              .fontSize(16)
+              .fontColor(this.wifiNetworkStatus.indexOf('正常') >= 0 || this.wifiNetworkStatus.indexOf('可用') >= 0 ?
+                Color.Green : Color.Orange)
+              .width('70%')
+          }
           .width('100%')
-          .margin({ top: 10, bottom: 10 })
+          .margin({ bottom: 8 })
 
-        Row() {
-          Text('WiFi状态: ')
-            .fontSize(16)
-            .width('30%')
-          Text(this.wifiNetworkStatus)
-            .fontSize(16)
-            .fontColor(this.wifiNetworkStatus.indexOf('正常') >= 0 || this.wifiNetworkStatus.indexOf('可用') >= 0 ? Color.Green : Color.Orange)
-            .width('70%')
-        }
-        .width('100%')
-        .margin({ bottom: 8 })
-
-        Row() {
-          Text('蜂窝状态: ')
-            .fontSize(16)
-            .width('30%')
-          Text(this.cellularNetworkStatus)
-            .fontSize(16)
-            .fontColor(this.cellularNetworkStatus.indexOf('正常') >= 0 || this.cellularNetworkStatus.indexOf('可用') >= 0 ? Color.Green : Color.Orange)
-            .width('70%')
-        }
-        .width('100%')
-        .margin({ bottom: 10 })
-
-        Row() {
-          Text('WiFi句柄: ')
-            .fontSize(16)
-            .width('30%')
-          Text(this.wifiHandleInfo)
-            .fontSize(16)
-            .fontColor(this.wifiNetHandle ? Color.Green : Color.Red)
-            .width('70%')
-        }
-        .width('100%')
-        .margin({ bottom: 8 })
-
-        Row() {
-          Text('蜂窝句柄: ')
-            .fontSize(16)
-            .width('30%')
-          Text(this.cellularHandleInfo)
-            .fontSize(16)
-            .fontColor(this.cellularNetHandle ? Color.Green : Color.Red)
-            .width('70%')
-        }
-        .width('100%')
-        .margin({ bottom: 10 })
-
-        Button('刷新网络')
+          Row() {
+            Text('蜂窝状态: ')
+              .fontSize(16)
+              .width('30%')
+            Text(this.cellularNetworkStatus)
+              .fontSize(16)
+              .fontColor(this.cellularNetworkStatus.indexOf('正常') >= 0 ||
+                this.cellularNetworkStatus.indexOf('可用') >= 0 ? Color.Green : Color.Orange)
+              .width('70%')
+          }
           .width('100%')
-          .backgroundColor(Color.Blue)
-          .onClick(() => {
-            this.checkCurrentNetwork();
-          })
+          .margin({ bottom: 10 })
+
+          Row() {
+            Text('WiFi句柄: ')
+              .fontSize(16)
+              .width('30%')
+            Text(this.wifiHandleInfo)
+              .fontSize(16)
+              .fontColor(this.wifiNetHandle ? Color.Green : Color.Red)
+              .width('70%')
+          }
+          .width('100%')
+          .margin({ bottom: 8 })
+
+          Row() {
+            Text('蜂窝句柄: ')
+              .fontSize(16)
+              .width('30%')
+            Text(this.cellularHandleInfo)
+              .fontSize(16)
+              .fontColor(this.cellularNetHandle ? Color.Green : Color.Red)
+              .width('70%')
+          }
+          .width('100%')
+          .margin({ bottom: 10 })
+
+          Button('刷新网络')
+            .width('100%')
+            .backgroundColor(Color.Blue)
+            .onClick(() => {
+              this.checkCurrentNetwork();
+            })
+            .margin({ bottom: 12 })
+
+          // WiFi 链路
+          Text('WiFi链路(使用WiFi netHandle)')
+            .fontSize(18)
+            .fontWeight(FontWeight.Bold)
+            .width('100%')
+            .margin({ top: 10, bottom: 8 })
+
+          // WiFi 模式选择
+          Row() {
+            Text('运行模式: ')
+              .fontSize(16)
+              .width('30%')
+            Select(this.modeList)
+              .selected(this.wifiModeIndex)
+              .value(this.wifiModeValue)
+              .font({ size: 14, weight: 400 })
+              .fontColor('#182431')
+              .selectedOptionFont({ size: 16, weight: 400 })
+              .optionFont({ size: 16, weight: 400 })
+              .borderRadius(5)
+              .width('70%')
+              .enabled(!this.wifiBound)
+              .onSelect((index: number, text?: string) => {
+                console.log(TAG, `WiFi模式选择: ${index}`);
+                this.wifiModeIndex = index;
+                if (text) {
+                  this.wifiModeValue = text;
+                  // 切换模式时调整默认配置
+                  if (text === 'Server') {
+                    this.wifiLocalPort = '8081';
+                  } else {
+                    this.wifiLocalPort = '12000';
+                    this.wifiRemoteAddress = '192.168.1.100';
+                    this.wifiRemotePort = '8081';
+                  }
+                }
+              })
+          }
+          .width('100%')
+          .margin({ bottom: 8 })
+
+          Row() {
+            Text('本地端口: ')
+              .fontSize(16)
+              .width('30%')
+            TextInput({ text: this.wifiLocalPort })
+              .width('70%')
+              .borderRadius(5)
+              .type(InputType.Number)
+              .onChange((value: string) => {
+                this.wifiLocalPort = value;
+              })
+          }
+          .width('100%')
+          .margin({ bottom: 8 })
+
+          // Client模式才需要配置目标地址和端口
+          if (this.wifiModeValue === 'Client') {
+            Row() {
+              Text('目标地址: ')
+                .fontSize(16)
+                .width('30%')
+              TextInput({ placeholder: 'WiFi局域网IP', text: this.wifiRemoteAddress })
+                .width('70%')
+                .borderRadius(5)
+                .onChange((value: string) => {
+                  this.wifiRemoteAddress = value;
+                })
+            }
+            .width('100%')
+            .margin({ bottom: 8 })
+
+            Row() {
+              Text('目标端口: ')
+                .fontSize(16)
+                .width('30%')
+              TextInput({ text: this.wifiRemotePort })
+                .width('70%')
+                .borderRadius(5)
+                .type(InputType.Number)
+                .onChange((value: string) => {
+                  this.wifiRemotePort = value;
+                })
+            }
+            .width('100%')
+            .margin({ bottom: 8 })
+          }
+
+          Row() {
+            Text('链路状态: ')
+              .fontSize(16)
+              .width('30%')
+            Text(`[${this.wifiModeValue}] ${this.wifiStatus}`)
+              .fontSize(16)
+              .fontColor(this.wifiBound ? Color.Green : Color.Red)
+              .width('70%')
+          }
+          .width('100%')
+          .margin({ bottom: 8 })
+
+          Row() {
+            Text('发送/接收: ')
+              .fontSize(14)
+              .width('30%')
+            Text(`${this.wifiSendCount} / ${this.wifiReceiveCount}`)
+              .fontSize(14)
+              .fontColor(Color.Blue)
+              .width('70%')
+          }
+          .width('100%')
+          .margin({ bottom: 8 })
+
+          if (this.wifiReconnectCount > 0) {
+            Row() {
+              Text('重连次数: ')
+                .fontSize(14)
+                .width('30%')
+              Text(`${this.wifiReconnectCount}`)
+                .fontSize(14)
+                .fontColor(Color.Orange)
+                .width('70%')
+            }
+            .width('100%')
+            .margin({ bottom: 8 })
+          }
+
+          // 根据模式显示不同的按钮组合
+          if (this.wifiModeValue === 'Client') {
+            Row() {
+              Button('绑定WiFi')
+                .width('32%')
+                .backgroundColor(this.wifiBound ? Color.Gray : Color.Blue)
+                .enabled(!this.wifiBound)
+                .onClick(() => {
+                  this.bindWifiSocket();
+                })
+
+              Button('发送WiFi')
+                .width('32%')
+                .backgroundColor(this.wifiBound ? Color.Green : Color.Gray)
+                .enabled(this.wifiBound)
+                .onClick(() => {
+                  this.sendOnWifi();
+                })
+
+              Button('关闭WiFi')
+                .width('32%')
+                .backgroundColor(this.wifiBound ? Color.Red : Color.Gray)
+                .enabled(this.wifiBound)
+                .onClick(() => {
+                  this.closeWifiSocket();
+                })
+            }
+            .width('100%')
+            .justifyContent(FlexAlign.SpaceBetween)
+            .margin({ bottom: 16 })
+          } else {
+            // Server模式：启动/关闭
+            Row() {
+              Button('启动Server')
+                .width('48%')
+                .backgroundColor(this.wifiBound ? Color.Gray : Color.Blue)
+                .enabled(!this.wifiBound)
+                .onClick(() => {
+                  this.bindWifiSocket();
+                })
+
+              Button('关闭Server')
+                .width('48%')
+                .backgroundColor(this.wifiBound ? Color.Red : Color.Gray)
+                .enabled(this.wifiBound)
+                .onClick(() => {
+                  this.closeWifiSocket();
+                })
+            }
+            .width('100%')
+            .justifyContent(FlexAlign.SpaceBetween)
+            .margin({ bottom: 16 })
+          }
+
+          // 蜂窝链路
+          Text('蜂窝链路（直接访问公网 DNS）')
+            .fontSize(18)
+            .fontWeight(FontWeight.Bold)
+            .width('100%')
+            .margin({ top: 5, bottom: 8 })
+
+          // 蜂窝本地端口（可配置）
+          Row() {
+            Text('本地端口: ')
+              .fontSize(16)
+              .width('30%')
+            TextInput({ text: this.cellularLocalPort })
+              .width('70%')
+              .borderRadius(5)
+              .type(InputType.Number)
+              .onChange((value: string) => {
+                this.cellularLocalPort = value;
+              })
+          }
+          .width('100%')
+          .margin({ bottom: 8 })
+
+          // 链路状态（无 Client/Server 选项）
+          Row() {
+            Text('链路状态: ')
+              .fontSize(16)
+              .width('30%')
+            Text(this.cellularStatus)
+              .fontSize(16)
+              .fontColor(this.cellularBound ? Color.Green : Color.Red)
+              .width('70%')
+          }
+          .width('100%')
+          .margin({ bottom: 8 })
+
+          Row() {
+            Text('发送次数: ')
+              .fontSize(14)
+              .width('30%')
+            Text(`${this.cellularSendCount}`)
+              .fontSize(14)
+              .fontColor(Color.Blue)
+              .width('70%')
+          }
+          .width('100%')
+          .margin({ bottom: 8 })
+
+          // 三个按钮：绑定 / 发送 / 关闭
+          Row() {
+            Button('绑定蜂窝')
+              .width('32%')
+              .backgroundColor(this.cellularBound ? Color.Gray : Color.Blue)
+              .enabled(!this.cellularBound)
+              .onClick(() => {
+                this.bindSocketCellular();
+              })
+
+            Button('发送到百度')
+              .width('32%')
+              .backgroundColor(this.cellularBound ? Color.Green : Color.Gray)
+              .enabled(this.cellularBound)
+              .onClick(() => {
+                this.sendMessageCellular();
+              })
+
+            Button('关闭蜂窝')
+              .width('32%')
+              .backgroundColor(this.cellularBound ? Color.Red : Color.Gray)
+              .enabled(this.cellularBound)
+              .onClick(() => {
+                this.closeCellularSocket();
+              })
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceBetween)
+          .margin({ bottom: 16 })
+
+          // 显示 DNS 响应（Hex）
+          if (this.cellularResponse) {
+            Text('DNS响应（Hex）')
+              .fontSize(16)
+              .fontWeight(FontWeight.Bold)
+              .width('100%')
+              .margin({ bottom: 5 })
+
+            TextArea({ text: this.cellularResponse })
+              .width('100%')
+              .height('15%')
+              .borderRadius(5)
+              .backgroundColor(Color.White)
+              .margin({ bottom: 15 })
+          }
+
+          // 公共操作
+          Row() {
+            // 只有双Client模式才显示双路发送按钮
+            if (this.wifiModeValue === 'Client' && this.cellularModeValue === 'Client') {
+              Button('双路发送')
+                .width('48%')
+                .backgroundColor((this.wifiBound || this.cellularBound) ? Color.Green : Color.Gray)
+                .enabled(this.wifiBound || this.cellularBound)
+                .onClick(() => {
+                  this.sendBoth();
+                })
+            }
+
+            Button('清空日志')
+              .width(this.wifiModeValue === 'Client' && this.cellularModeValue === 'Client' ? '48%' : '100%')
+              .backgroundColor(Color.Orange)
+              .onClick(() => {
+                this.clearResponse();
+              })
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceBetween)
           .margin({ bottom: 12 })
 
-        // WiFi 链路
-        Text('WiFi链路配置')
-          .fontSize(18)
-          .fontWeight(FontWeight.Bold)
-          .width('100%')
-          .margin({ top: 10, bottom: 8 })
+          // 消息输入区域（Client模式才需要）
+          if (this.wifiModeValue === 'Client' || this.cellularModeValue === 'Client') {
+            Text('发送消息')
+              .fontSize(16)
+              .fontWeight(FontWeight.Bold)
+              .width('100%')
+              .margin({ bottom: 5 })
 
-        Row() {
-          Text('本地端口: ')
-            .fontSize(16)
-            .width('30%')
-          TextInput({ text: this.wifiLocalPort })
-            .width('70%')
-            .borderRadius(5)
-            .type(InputType.Number)
-            .onChange((value: string) => {
-              this.wifiLocalPort = value;
-            })
-        }
-        .width('100%')
-        .margin({ bottom: 8 })
-
-        Row() {
-          Text('目标地址: ')
-            .fontSize(16)
-            .width('30%')
-          TextInput({ placeholder:'WiFi局域网IP', text: this.wifiRemoteAddress})
-            .width('70%')
-            .borderRadius(5)
-            .onChange((value: string) => {
-              this.wifiRemoteAddress = value;
-            })
-        }
-        .width('100%')
-        .margin({ bottom: 8 })
-
-        Row() {
-          Text('目标端口: ')
-            .fontSize(16)
-            .width('30%')
-          TextInput({ text: this.wifiRemotePort })
-            .width('70%')
-            .borderRadius(5)
-            .type(InputType.Number)
-            .onChange((value: string) => {
-              this.wifiRemotePort = value;
-            })
-        }
-        .width('100%')
-        .margin({ bottom: 8 })
-
-        Row() {
-          Text('链路状态: ')
-            .fontSize(16)
-            .width('30%')
-          Text(this.wifiStatus)
-            .fontSize(16)
-            .fontColor(this.wifiBound ? Color.Green : Color.Red)
-            .width('70%')
-        }
-        .width('100%')
-        .margin({ bottom: 8 })
-
-        Row() {
-          Text('发送/接收: ')
-            .fontSize(14)
-            .width('30%')
-          Text(`${this.wifiSendCount} / ${this.wifiReceiveCount}`)
-            .fontSize(14)
-            .fontColor(Color.Blue)
-            .width('70%')
-        }
-        .width('100%')
-        .margin({ bottom: 8 })
-
-        if (this.wifiReconnectCount > 0) {
-          Row() {
-            Text('重连次数: ')
-              .fontSize(14)
-              .width('30%')
-            Text(`${this.wifiReconnectCount}`)
-              .fontSize(14)
-              .fontColor(Color.Orange)
-              .width('70%')
+            TextInput({ text: this.message })
+              .width('100%')
+              .borderRadius(5)
+              .onChange((value: string) => {
+                this.message = value;
+              })
+              .margin({ bottom: 15 })
           }
-          .width('100%')
-          .margin({ bottom: 8 })
-        }
 
-        Row() {
-          Button('绑定WiFi')
-            .width('32%')
-            .backgroundColor(this.wifiBound ? Color.Gray : Color.Blue)
-            .enabled(!this.wifiBound)
-            .onClick(() => {
-              this.bindWifiSocket();
-            })
-
-          Button('发送WiFi')
-            .width('32%')
-            .backgroundColor(this.wifiBound ? Color.Green : Color.Gray)
-            .enabled(this.wifiBound)
-            .onClick(() => {
-              this.sendOnWifi();
-            })
-
-          Button('关闭WiFi')
-            .width('32%')
-            .backgroundColor(this.wifiBound ? Color.Red : Color.Gray)
-            .enabled(this.wifiBound)
-            .onClick(() => {
-              this.closeWifiSocket();
-            })
-        }
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
-        .margin({ bottom: 16 })
-
-        // 蜂窝链路
-        Text('蜂窝链路配置')
-          .fontSize(18)
-          .fontWeight(FontWeight.Bold)
-          .width('100%')
-          .margin({ top: 5, bottom: 8 })
-
-        Row() {
-          Text('本地端口: ')
+          // 响应区域
+          Text('响应数据')
             .fontSize(16)
-            .width('30%')
-          TextInput({ text: this.cellularLocalPort })
-            .width('70%')
+            .fontWeight(FontWeight.Bold)
+            .width('100%')
+            .margin({ bottom: 5 })
+
+          TextArea({ text: this.responseData })
+            .width('100%')
+            .height('40%')
             .borderRadius(5)
-            .type(InputType.Number)
-            .onChange((value: string) => {
-              this.cellularLocalPort = value;
-            })
+            .backgroundColor(Color.White)
         }
         .width('100%')
-        .margin({ bottom: 8 })
-
-        Row() {
-          Text('目标地址: ')
-            .fontSize(16)
-            .width('30%')
-          TextInput({placeholder:'蜂窝公网IP', text: this.cellularRemoteAddress })
-            .width('70%')
-            .borderRadius(5)
-            .onChange((value: string) => {
-              this.cellularRemoteAddress = value;
-            })
-        }
-        .width('100%')
-        .margin({ bottom: 8 })
-
-        Row() {
-          Text('目标端口: ')
-            .fontSize(16)
-            .width('30%')
-          TextInput({ text: this.cellularRemotePort })
-            .width('70%')
-            .borderRadius(5)
-            .type(InputType.Number)
-            .onChange((value: string) => {
-              this.cellularRemotePort = value;
-            })
-        }
-        .width('100%')
-        .margin({ bottom: 8 })
-
-        Row() {
-          Text('链路状态: ')
-            .fontSize(16)
-            .width('30%')
-          Text(this.cellularStatus)
-            .fontSize(16)
-            .fontColor(this.cellularBound ? Color.Green : Color.Red)
-            .width('70%')
-        }
-        .width('100%')
-        .margin({ bottom: 8 })
-
-        Row() {
-          Text('发送/接收: ')
-            .fontSize(14)
-            .width('30%')
-          Text(`${this.cellularSendCount} / ${this.cellularReceiveCount}`)
-            .fontSize(14)
-            .fontColor(Color.Blue)
-            .width('70%')
-        }
-        .width('100%')
-        .margin({ bottom: 8 })
-
-        if (this.cellularReconnectCount > 0) {
-          Row() {
-            Text('重连次数: ')
-              .fontSize(14)
-              .width('30%')
-            Text(`${this.cellularReconnectCount}`)
-              .fontSize(14)
-              .fontColor(Color.Orange)
-              .width('70%')
-          }
-          .width('100%')
-          .margin({ bottom: 8 })
-        }
-
-        Row() {
-          Button('绑定蜂窝')
-            .width('32%')
-            .backgroundColor(this.cellularBound ? Color.Gray : Color.Blue)
-            .enabled(!this.cellularBound)
-            .onClick(() => {
-              this.bindCellularSocket();
-            })
-
-          Button('发送蜂窝')
-            .width('32%')
-            .backgroundColor(this.cellularBound ? Color.Green : Color.Gray)
-            .enabled(this.cellularBound)
-            .onClick(() => {
-              this.sendOnCellular();
-            })
-
-          Button('关闭蜂窝')
-            .width('32%')
-            .backgroundColor(this.cellularBound ? Color.Red : Color.Gray)
-            .enabled(this.cellularBound)
-            .onClick(() => {
-              this.closeCellularSocket();
-            })
-        }
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
-        .margin({ bottom: 16 })
-
-        // 公共操作
-        Row() {
-          Button('双路发送')
-            .width('48%')
-            .backgroundColor((this.wifiBound || this.cellularBound) ? Color.Green : Color.Gray)
-            .enabled(this.wifiBound || this.cellularBound)
-            .onClick(() => {
-              this.sendBoth();
-            })
-
-          Button('清空日志')
-            .width('48%')
-            .backgroundColor(Color.Orange)
-            .onClick(() => {
-              this.clearResponse();
-            })
-        }
-        .width('100%')
-        .justifyContent(FlexAlign.SpaceBetween)
-        .margin({ bottom: 12 })
-
-        // 消息输入区域
-        Text('发送消息')
-          .fontSize(16)
-          .fontWeight(FontWeight.Bold)
-          .width('100%')
-          .margin({ bottom: 5 })
-
-        TextInput({ text: this.message })
-          .width('100%')
-          .borderRadius(5)
-          .onChange((value: string) => {
-            this.message = value;
-          })
-          .margin({ bottom: 15 })
-
-        // 响应区域
-        Text('响应数据')
-          .fontSize(16)
-          .fontWeight(FontWeight.Bold)
-          .width('100%')
-          .margin({ bottom: 5 })
-
-        TextArea({ text: this.responseData })
-          .width('100%')
-          .height('40%')
-          .borderRadius(5)
-          .backgroundColor(Color.White)
+        .padding(10)
       }
       .width('95%')
       .height('85%')
-      .padding(10)
+      .scrollable(ScrollDirection.Vertical)
+      .scrollBar(BarState.Auto)
+      .edgeEffect(EdgeEffect.Spring)
     }
     .size({ width: ConfigData.WH_100_100, height: ConfigData.WH_100_100 })
     .backgroundColor('#F5F5F5')
@@ -932,7 +1235,7 @@ struct MultipathSocketTest {
 
   aboutToDisappear() {
     console.log(TAG, '页面即将销毁，清理资源...');
-    
+
     // 1. 取消网络监听
     if (this.netConnection) {
       try {
@@ -989,8 +1292,11 @@ struct MultipathSocketTest {
     // 4. 清理netHandle引用
     this.wifiNetHandle = null;
     this.cellularNetHandle = null;
-    
+
     console.log(TAG, '资源清理完成');
+
+    //5.关闭多网请求
+    this.releaseMultiPath();
   }
 }
 

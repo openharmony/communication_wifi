@@ -147,9 +147,7 @@ ohos_source_set("wifi_scan_stub") {
     sources = [      
       "src/scan_ashmem_parcel.cpp",
       "src/scan_control_info_parcel.cpp",
-      "src/wifi_scan_info_parcel.cpp",
       "src/wifi_scan_params_parcel.cpp",
-      "src/wifi_info_elem_parcel.cpp",
       ]
     output_values = get_target_outputs(":wifi_scan_interface")
     sources += filter_include(output_values, [ "*wifi_scan_stub.cpp" ])
@@ -268,9 +266,7 @@ ohos_source_set("wifi_scan_stub") {
       "src/wifi_scan_impl.cpp",
       "src/scan_ashmem_parcel.cpp",
       "src/scan_control_info_parcel.cpp",
-      "src/wifi_scan_info_parcel.cpp",
       "src/wifi_scan_params_parcel.cpp",
-      "src/wifi_info_elem_parcel.cpp",
     ]
     output_values = get_target_outputs(":wifi_scan_interface")
     sources += filter_include(output_values, [ "*wifi_scan_proxy.cpp" ])

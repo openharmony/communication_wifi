@@ -93,8 +93,8 @@ public:
     void StaServiceEnableDeviceConfigSuccess();
     void StaServiceEnableDeviceConfigFail1();
     void StaServiceEnableDeviceConfigFail2();
-    void StaServiceDisableDeviceConfigSuccess00();
-    void StaServiceDisableDeviceConfigFail00();
+    void StaServiceDisableDeviceConfigSuccess00() const;
+    void StaServiceDisableDeviceConfigFail00() const;
     void StaServiceDisconnectSuccess();
     void StaServiceStartWpsSuccess();
     void StaServiceCancelWpsSuccess();

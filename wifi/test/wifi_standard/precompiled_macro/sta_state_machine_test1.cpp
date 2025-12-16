@@ -212,7 +212,7 @@ void DealApRoamingStateTimeoutTest1()
     pStaStateMachine->pApRoamingState->DealApRoamingStateTimeout(msg);
 }
 
-void DealWpaLinkFailEventInApLinkedTest1()
+void DealWpaLinkFailEventInApLinkedTest1() const
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();
     pStaStateMachine->pApLinkedState->DealWpaLinkFailEventInApLinked(msg);
@@ -252,21 +252,21 @@ void DealDhcpResultTest()
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 
-void TryToJumpToConnectedStateTest()
+void TryToJumpToConnectedStateTest() const
 {
     int ipType = 1;
     pStaStateMachine->pDhcpResultNotify->TryToJumpToConnectedState(ipType);
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 
-void TryToJumpToConnectedStateTest1()
+void TryToJumpToConnectedStateTest1() const
 {
     int ipType = 2;
     pStaStateMachine->pDhcpResultNotify->TryToJumpToConnectedState(ipType);
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 
-void DealDhcpIpv4ResultFailedTest()
+void DealDhcpIpv4ResultFailedTest() const
 {
     pStaStateMachine->pDhcpResultNotify->DealDhcpIpv4ResultFailed();
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);

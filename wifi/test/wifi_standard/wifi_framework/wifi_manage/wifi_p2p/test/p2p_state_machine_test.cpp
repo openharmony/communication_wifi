@@ -435,7 +435,7 @@ public:
     {
         return pP2pStateMachine->HasP2pConnected();
     }
-    void WarpCancelWpsPbc()
+    void WarpCancelWpsPbc() const
     {
         pP2pStateMachine->CancelWpsPbc();
     }

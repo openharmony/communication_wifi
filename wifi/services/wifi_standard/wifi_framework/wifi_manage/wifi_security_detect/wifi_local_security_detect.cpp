@@ -61,6 +61,7 @@ WifiLocalSecurityDetect &WifiLocalSecurityDetect::GetInstance()
 
 void WifiLocalSecurityDetect::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &linkedInfo, int instId)
 {
+    WIFI_LOGD("WifiLocalSecurityDetect::DealStaConnChanged, instId = %{public}d", instId);
     std::unique_lock<std::mutex> lock(localDetectMutex_);
     // record canAccessInternetThroughWifi_ status
     if (state == OperateResState::CONNECT_NETWORK_ENABLED) {
@@ -145,6 +146,7 @@ StaServiceCallback WifiLocalSecurityDetect::GetStaCallback() const
 int32_t WifiLocalSecurityDetect::LocalSecurityDetectDnsResultCallback::OnDnsResultReport(uint32_t size,
     const std::list<NetDnsResultReport> netDnsResultReport)
 {
+    WIFI_LOGD("Enter into OnDnsResultReport successfully, size = %{public}d", size);
     if (!WifiLocalSecurityDetect::GetInstance().canAccessInternetThroughWifi_) {
         WIFI_LOGI("DnsResultCallback failed because the visit is not through wifi...");
         return 1;

@@ -228,6 +228,8 @@ void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
 
 void Hid2dSetGroupType(const uint8_t* data, size_t size)
 {
+    (void)data;
+    (void)size;
     GroupLiveType type = GROUPKEEPALIVE;
     (void)Hid2dSetGroupType(type);
 }

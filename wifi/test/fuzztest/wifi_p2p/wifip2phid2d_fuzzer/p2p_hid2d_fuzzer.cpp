@@ -47,20 +47,20 @@ void IncreaseSharedLinkFuzzerTest1(FuzzedDataProvider& FDP)
     pShareManager.IncreaseSharedLink();
 }
 
-void IncreaseSharedLinkFuzzerTest2(const uint8_t *data, size_t size)
+void IncreaseSharedLinkFuzzerTest2(const uint8_t *data)
 {
     SharedLinkManager pShareManager;
     int callingUid = static_cast<int>(data[0]);
     pShareManager.IncreaseSharedLink(callingUid);
 }
 
-void DecreaseSharedLinkFuzzerTest(const uint8_t *data, size_t size)
+void DecreaseSharedLinkFuzzerTest(const uint8_t *data)
 {
     SharedLinkManager pShareManager;
     int callingUid = static_cast<int>(data[0]);
     pShareManager.DecreaseSharedLink(callingUid);
 }
-void ClearUidCountFuzzerTest(const uint8_t *data, size_t size)
+void ClearUidCountFuzzerTest(const uint8_t *data)
 {
     SharedLinkManager pShareManager;
     int uid = static_cast<int>(data[0]);
@@ -92,9 +92,9 @@ void IpPoolFuzzerTest()
 
 void WifiHid2dServiceUtilsFuzzerTest(const uint8_t *data, size_t size)
 {
-    IncreaseSharedLinkFuzzerTest2(data, size);
-    DecreaseSharedLinkFuzzerTest(data, size);
-    ClearUidCountFuzzerTest(data, size);
+    IncreaseSharedLinkFuzzerTest2(data);
+    DecreaseSharedLinkFuzzerTest(data);
+    ClearUidCountFuzzerTest(data);
 }
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)

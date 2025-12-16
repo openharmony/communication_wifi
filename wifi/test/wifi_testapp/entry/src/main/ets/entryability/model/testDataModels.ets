@@ -410,6 +410,13 @@ const TestComposition: WifiTestComposition[] = [
     'category' : Category.App
   },
   {
+    'name' : 'Multipath Socket验证' ,
+    'detail' : '蜂窝+WiFi双路Socket验证' ,
+    'url' : 'pages/subAppTest/multipathSocketTest' ,
+    'image' : $r('app.media.wifi') ,
+    'category' : Category.App
+  },
+  {
     'name' : 'HTTP验证' ,
     'detail' : 'HTTP请求测试' ,
     'url' : 'pages/subAppTest/httpSocketTest' ,

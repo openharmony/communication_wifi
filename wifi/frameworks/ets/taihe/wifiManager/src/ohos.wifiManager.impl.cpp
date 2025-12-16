@@ -905,7 +905,7 @@ void StartWifiDetection()
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
         return;
     }
-    ErrCode ret = wifiDevicePtr->StartWifiDetection();
+    ErrCode ret = g_wifiDevicePtr->StartWifiDetection();
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
     }

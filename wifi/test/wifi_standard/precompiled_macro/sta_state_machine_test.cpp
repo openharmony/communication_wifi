@@ -198,7 +198,7 @@ public:
         pStaStateMachine->pApRoamingState->DealApRoamingStateTimeout(msg);
     }
 
-    void DealWpaLinkFailEventInApLinkedTest()
+    void DealWpaLinkFailEventInApLinkedTest() const
     {
         InternalMessagePtr msg = nullptr;
         pStaStateMachine->pApLinkedState->DealWpaLinkFailEventInApLinked(msg);

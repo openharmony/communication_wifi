@@ -164,8 +164,8 @@ public:
     void IsAutoConnectFailByP2PEnhanceFilterSucc1();
     void IsAutoConnectFailByP2PEnhanceFilterSucc2();
     void IsAutoConnectFailByP2PEnhanceFilterFail1();
-    void OnScanInfosReadyHandlerWithSupplicantTransientState();
-    void OnScanInfosReadyHandlerWithAsyncTaskDeduplication();
+    void OnScanInfosReadyHandlerWithSupplicantTransientState() const;
+    void OnScanInfosReadyHandlerWithAsyncTaskDeduplication() const;
 };
 
 void StaAutoConnectServiceTest::InitAutoConnectService()
@@ -347,7 +347,7 @@ void StaAutoConnectServiceTest::OnScanResultsReadyHandlerFail6()
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
-void StaAutoConnectServiceTest::OnScanInfosReadyHandlerWithSupplicantTransientState()
+void StaAutoConnectServiceTest::OnScanInfosReadyHandlerWithSupplicantTransientState() const
 {
     std::vector<InterScanInfo> scanInfos;
     scanInfos.emplace_back();
@@ -361,7 +361,7 @@ void StaAutoConnectServiceTest::OnScanInfosReadyHandlerWithSupplicantTransientSt
     pStaAutoConnectService->OnScanInfosReadyHandler(scanInfos);
 }
 
-void StaAutoConnectServiceTest::OnScanInfosReadyHandlerWithAsyncTaskDeduplication()
+void StaAutoConnectServiceTest::OnScanInfosReadyHandlerWithAsyncTaskDeduplication() const
 {
     // Test async task deduplication logic
     std::vector<InterScanInfo> scanInfos;

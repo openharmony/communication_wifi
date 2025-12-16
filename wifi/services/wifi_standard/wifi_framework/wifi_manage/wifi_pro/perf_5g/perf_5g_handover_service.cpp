@@ -691,7 +691,7 @@ void Perf5gHandoverService::RssiUpdate(int32_t rssi)
         SCAN_TYPE_LOW_PRIORITY : SCAN_DEFAULT_TYPE;
     ActiveScan(rssi, scanStyle);
 }
-bool Perf5gHandoverService::HasHiddenNetworkSsid()
+bool Perf5gHandoverService::HasHiddenNetworkSsid() const
 {
     int apNum = apMaxNum_;
     for (auto &ap : relationAps_) {

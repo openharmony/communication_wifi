@@ -579,7 +579,7 @@ void SelfCureUtils::ReportIpv6ChrEvent()
         NetworkFailReason::IPV6_STATE_FAILED_DISABLE, resetState, selfcureHistory);
 }
 
-bool SelfCureUtils::IsIpv6SelfCureSupported()
+bool SelfCureUtils::IsIpv6SelfCureSupported() const
 {
 #ifdef FEATURE_IPV6_SELF_CURE
     if (WifiConfigCenter::GetInstance().GetDeviceType() != ProductDeviceType::PHONE) {
@@ -591,7 +591,7 @@ bool SelfCureUtils::IsIpv6SelfCureSupported()
 #endif
 }
 
-bool SelfCureUtils::HasIpv6Disabled(int instId)
+bool SelfCureUtils::HasIpv6Disabled(int instId) const
 {
     return ipv6Disabled_[instId];
 }

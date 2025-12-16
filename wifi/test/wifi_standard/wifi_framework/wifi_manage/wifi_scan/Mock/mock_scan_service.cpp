@@ -40,6 +40,7 @@ void MockScanService::RegisterScanCallbacks(const IScanSerivceCallbacks &iScanSe
 ErrCode MockScanService::Scan(ScanType scanType, int scanStyle)
 {
     (void)scanType;
+    (void)scanStyle;
     WIFI_LOGI("Enter MockScanService::Scan");
     return WIFI_OPT_SUCCESS;
 }

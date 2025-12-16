@@ -2880,7 +2880,7 @@ bool ScanService::AllowScanByActionListen()
     return true;
 }
 
-bool ScanService::AllowScanByGameScene(ScanType scanType, int &scanStyle)
+bool ScanService::AllowScanByGameScene(ScanType scanType, int &scanStyle) const
 {
     if (staStatus == static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
         return true;

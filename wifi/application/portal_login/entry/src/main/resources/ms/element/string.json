@@ -4,70 +4,70 @@
             "name":"compatibility_mode_of_the_PC_version",
             "value":"Tapak desktop",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"actions_menu_user_agent",
             "value":"Pelayar UA",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"confirm_dialog_cancel",
             "value":"Batalkan",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"contextmenu_open_in_browser",
             "value":"Buka dalam Pelayar",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"compatibility_mode_of_the_mobile_version",
             "value":"Tapak mudah alih",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"ssl_normal_error_msg",
             "value":"Sijil SSL tapak ini telah tamat tempoh atau tidak dipercayai. Mungkin wujudnya risiko keselamatan jika anda meneruskan.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"continue_visit",
             "value":"Teruskan ke tapak ini?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"site_setting_single_website_title",
             "value":"Tetapan %s",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"ssl_error_dialog_continue_btn",
             "value":"Teruskan",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"user_agent_harmony",
             "value":"HarmonyOS",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

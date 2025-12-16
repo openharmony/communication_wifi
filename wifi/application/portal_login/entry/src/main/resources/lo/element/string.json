@@ -4,70 +4,70 @@
             "name":"compatibility_mode_of_the_PC_version",
             "value":"ເວັບ​ໄຊ​ທ໌ເທິງເດັສທັອບ",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"actions_menu_user_agent",
             "value":"UA ບຣາວເຊີ",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"confirm_dialog_cancel",
             "value":"​ຍົກ​ເລີກ",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"contextmenu_open_in_browser",
             "value":"ເປີດຢູ່ໃນບຣາວເຊີ",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"compatibility_mode_of_the_mobile_version",
             "value":"ເວັບ​ໄຊ​ທ໌​ມື​ຖື",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"ssl_normal_error_msg",
             "value":"ໃບ​ຢັ້ງ​ຢືນ SSL ຂອງ​ເວັບ​ໄຊ​ນີ້​ໝົດ​ອາ​ຍຸ ຫຼື ຂາດ​ຄວາມ​ເຊື່ອ​ຖື​ແລ້ວ. ອາດ​ຈະ​ມີ​ຄວາມ​ສ່ຽງ​ຕໍ່​ຄວາມ​ປອດ​ໄພ ຖ້າ​ທ່ານ​ສືບ​ຕໍ່.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"continue_visit",
             "value":"ສືບ​ຕໍ່​ເວັບ​ໄຊ​ທ໌​ນີ້​ບໍ?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"site_setting_single_website_title",
             "value":"ການຕັ້ງຄ່າ %s",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"ssl_error_dialog_continue_btn",
             "value":"​ສືບ​ຕໍ່​",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"user_agent_harmony",
             "value":"HarmonyOS",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

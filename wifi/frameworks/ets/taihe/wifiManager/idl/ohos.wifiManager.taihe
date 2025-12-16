@@ -441,6 +441,9 @@ function StartScan(): void;
 function GetDisconnectedReason(): DisconnectedReason;
 function GetScanAlwaysAllowed(): bool;
 
+function IsRandomMacDisabled(): bool;
+function StartWifiDetection(): void;
+
 @gen_promise("connectToCandidateConfigWithUserAction")
 function ConnectToCandidateConfigWithUserActionSync(networkId: i32): void;
 

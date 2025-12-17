@@ -63,7 +63,7 @@
 #include "wifi_country_code_manager.h"
 #include "wifi_telephony_utils.h"
 #include "network_interface.h"
-
+#include "self_cure_utils.h"
 namespace OHOS {
 namespace Wifi {
 namespace {
@@ -1799,6 +1799,12 @@ void StaStateMachine::GetIpState::GoInState()
         }
     }
     pStaStateMachine->HandlePreDhcpSetup();
+
+    bool isIpv6Disabled = SelfCureUtils::GetInstance().HasIpv6Disabled() &&
+        (pStaStateMachine->m_instId == INSTID_WLAN1);
+    if (isIpv6Disabled) {
+        WIFI_LOGI("IPv6 wlan0 is disabled by selfcure and m_instId=%{public}d", pStaStateMachine->m_instId);
+    }
     /* start dhcp */
     do {
         int dhcpRet;
@@ -1812,7 +1818,7 @@ void StaStateMachine::GetIpState::GoInState()
             config.prohibitUseCacheIp = IsProhibitUseCacheIp();
         }
         config.isStaticIpv4 = isStaticIpv4;
-        config.bIpv6 = !isStaticIpv6;
+        config.bIpv6 = !isStaticIpv6 && !isIpv6Disabled;
         config.bSpecificNetwork = pStaStateMachine->IsSpecificNetwork();
         if (strncpy_s(config.ifname, sizeof(config.ifname), ifname.c_str(), ifname.length()) != EOK) {
             break;

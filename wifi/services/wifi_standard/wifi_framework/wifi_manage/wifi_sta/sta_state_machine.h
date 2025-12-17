@@ -1048,6 +1048,7 @@ private:
     void RecordPortalInfo();
     void DealSignalPacketChangedByTime(WifiSignalPollInfo &signalInfo);
     bool HasMultiBssidAp(const WifiDeviceConfig &config);
+    void NotifyWifiDisconnectReason(const int reason, const int subReason);
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;

@@ -1699,7 +1699,7 @@ void StaStateMachine::ApLinkedState::DealWpaLinkFailEventInApLinked(InternalMess
     WIFI_LOGI("DealWpaLinkFailEventInApLinked bssid=%{public}s,targetRoamBssid=%{public}s,"
         "isCurrentRoaming_=%{public}d", MacAnonymize(bssid).c_str(),
         MacAnonymize(pStaStateMachine->targetRoamBssid).c_str(), pStaStateMachine->isCurrentRoaming_);
-    if (pStaStateMachine->isCurrentRoaming_ && bssid = pStaStateMachine->targetRoamBssid) {
+    if (pStaStateMachine->isCurrentRoaming_ && bssid == pStaStateMachine->targetRoamBssid) {
         switch (msg->GetMessageName()) {
             case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT: {
                 pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,

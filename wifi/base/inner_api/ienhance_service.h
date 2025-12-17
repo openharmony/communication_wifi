@@ -26,6 +26,32 @@ enum SettingsDialogClickType {
     SETTINGS_5G_AUTO_IDENTIFY_CONN = 0
 };
 
+typedef enum {
+    DISCONNECT_BY_NO_REASON,
+    DISCONNECT_BY_WIFI_DISABLED,
+    DISCONNECT_BY_NETWORK_REMOVED,
+    DISCONNECT_BY_WIFI2WIFI_SWITCH,
+    DISCONNECT_BY_POOR_LINK,
+    DISCONNECT_BY_SELF_CURE,
+    DISCONNECT_BY_DHCP_FAIL,
+    DISCONNECT_BY_ROAMING_FAIL
+} WifiDisconnectReason;
+
+typedef enum {
+    TYPE_CONFIG_STATIC_IP_ADDRESS_FAIL = 1,
+    TYPE_DHCP_CONNECTION_FAIL,
+    TYPE_GET_IP_TIMEOUT,
+    TYPE_DEAL_IPV4_RESULT_FAIL,
+    TYPE_IP_EXPIRED
+} DhcpFailType;
+
+typedef enum {
+    TYPE_ROAMING_TIMEOUT = 1,
+    TYPE_ROAMING_PASSWD_WRONG,
+    TYPE_ROAMING_FULL_CONNECT,
+    TYPE_ROAMING_ASSOC_REJECT
+} RoamingResultType;
+
 using P2pEnhanceCallback = std::function<void(const std::string &, int32_t, int32_t)>;
 using SensorEnhanceCallback = std::function<void(int)>;
 using MovementEnhanceCallback = std::function<void(int32_t movementType, int32_t movementValue)>;
@@ -408,6 +434,7 @@ public:
      * @return success: 0, failed: -1
      */
     virtual void OnFoldStateChanged(const int foldStatus) = 0;
+
     /**
      * @Description check lp scan ability
      *
@@ -421,6 +448,15 @@ public:
      * @return bool - network probing result
      */
     virtual bool GrsProbe() = 0;
+
+    /**
+     * @Description notify wifi disconnect reason
+     *
+     * @param reason - main reason
+     * @param subReason - sub reason
+     * @return void
+     */
+    virtual void NotifyWifiDisconnectReason(const int reason, const int subReason) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

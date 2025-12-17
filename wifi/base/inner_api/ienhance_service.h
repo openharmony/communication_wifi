@@ -451,7 +451,11 @@ public:
 
     /**
      * @Description notify wifi disconnect reason
+<<<<<<< HEAD
      *
+=======
+     * 
+>>>>>>> 7420fdc4a14024819dbb59e7f15dd496358b18d9
      * @param reason - main reason
      * @param subReason - sub reason
      * @return void

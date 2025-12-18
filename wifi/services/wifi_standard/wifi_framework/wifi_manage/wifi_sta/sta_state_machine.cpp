@@ -2522,7 +2522,6 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
 #endif
     EnhanceWriteIsInternetHiSysEvent(NO_NETWORK);
-    lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
     WIFI_LOGD("%{public}s, isHiLinkNetwork : %{public}d isHomeAp : %{public}d isHomeRouter : %{public}d keyMgmt : "
@@ -2551,6 +2550,7 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
     }
+    lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
 }
 
 void StaStateMachine::HandleNetCheckResultIsNotWorking(SystemNetWorkState netState)

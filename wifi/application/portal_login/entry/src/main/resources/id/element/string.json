@@ -4,70 +4,70 @@
             "name":"compatibility_mode_of_the_PC_version",
             "value":"Situs desktop",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"actions_menu_user_agent",
             "value":"UA Browser",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"confirm_dialog_cancel",
             "value":"Batal",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"contextmenu_open_in_browser",
             "value":"Buka di Browser",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"compatibility_mode_of_the_mobile_version",
             "value":"Situs perangkat seluler",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"ssl_normal_error_msg",
             "value":"Sertifikat SSL situs ini telah kedaluwarsa atau tidak tepercaya. Kemungkinan ada risiko keamanan jika Anda melanjutkan.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"continue_visit",
             "value":"Lanjutkan ke situs ini?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"site_setting_single_website_title",
             "value":"Pengaturan %s",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"ssl_error_dialog_continue_btn",
             "value":"Lanjut",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"user_agent_harmony",
             "value":"HarmonyOS",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

@@ -34,6 +34,7 @@
 #include "wifi_global_func.h"
 #include "wifi_pro_chr.h"
 #include "wifi_channel_helper.h"
+#include "ienhance_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -946,6 +947,12 @@ void WifiProStateMachine::WifiDisconnectedState::GoInState()
     if (!pWifiProStateMachine_->isWifi2WifiSwitching_) {
         auto &networkBlackListManager = NetworkBlockListManager::GetInstance();
         networkBlackListManager.CleanAbnormalWifiBlocklist();
+    } else {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_WIFI2WIFI_SWITCH,
+                WifiDisconnectReason::DISCONNECT_BY_NO_REASON);
+        }
     }
 }
 

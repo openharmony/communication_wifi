@@ -90,7 +90,7 @@ void IpPoolFuzzerTest()
     pIpPool.ReleaseIp(gcMac);
 }
 
-void WifiHid2dServiceUtilsFuzzerTest(const uint8_t *data, size_t size)
+void WifiHid2dServiceUtilsFuzzerTest(const uint8_t *data)
 {
     IncreaseSharedLinkFuzzerTest2(data);
     DecreaseSharedLinkFuzzerTest(data);
@@ -103,7 +103,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
-    OHOS::Wifi::WifiHid2dServiceUtilsFuzzerTest(data, size);
+    OHOS::Wifi::WifiHid2dServiceUtilsFuzzerTest(data);
     OHOS::Wifi::IncreaseSharedLinkFuzzerTest1(FDP);
     OHOS::Wifi::CheckNeedRemoveGroupFuzzerTest(FDP);
     OHOS::Wifi::GetGroupUidFuzzerTest(FDP);

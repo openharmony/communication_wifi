@@ -884,6 +884,33 @@ bool GetScanAlwaysAllowed()
     return isScanAlwaysAllowed;
 }
 
+bool IsRandomMacDisabled()
+{
+    bool isRandomMacDisabled = false;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return isRandomMacDisabled;
+    }
+    ErrCode ret = g_wifiDevicePtr->IsRandomMacDisabled(isRandomMacDisabled);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Is Random Mac Disabeld: %{public}d", ret);
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return isRandomMacDisabled;
+}
+ 
+void StartWifiDetection()
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->StartWifiDetection();
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+}
+
 void ConnectToCandidateConfigWithUserActionSync(int32_t networkId)
 {
     std::vector<std::string> event = {EVENT_STA_CANDIDATE_CONNECT_CHANGE};
@@ -1727,6 +1754,8 @@ TH_EXPORT_CPP_API_Get5GChannelList(Get5GChannelList);
 TH_EXPORT_CPP_API_StartScan(StartScan);
 TH_EXPORT_CPP_API_GetDisconnectedReason(GetDisconnectedReason);
 TH_EXPORT_CPP_API_GetScanAlwaysAllowed(GetScanAlwaysAllowed);
+TH_EXPORT_CPP_API_IsRandomMacDisabled(IsRandomMacDisabled);
+TH_EXPORT_CPP_API_StartWifiDetection(StartWifiDetection);
 TH_EXPORT_CPP_API_ConnectToCandidateConfigWithUserActionSync(ConnectToCandidateConfigWithUserActionSync);
 TH_EXPORT_CPP_API_GetLinkedInfoSync(GetLinkedInfoSync);
 TH_EXPORT_CPP_API_AddDeviceConfigSync(AddDeviceConfigSync);

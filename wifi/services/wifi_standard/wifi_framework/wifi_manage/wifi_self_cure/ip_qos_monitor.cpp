@@ -88,7 +88,12 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
 {
     WIFI_LOGD("enter %{public}s", __FUNCTION__);
     std::unique_lock<std::mutex> locker(txRxStatusMtx_);
-    bool internetGood = ParseNetworkInternetGood(elems);
+    bool ignored = false;
+    bool internetGood = ParseNetworkInternetGood(elems, ignored);
+    if (ignored) {
+        WIFI_LOGD("QoS sample ignored (no traffic), no state change.");
+        return;
+    }
     if (internetGood) {
         if (!lastTxRxGood_) {
             WIFI_LOGI("%{public}s: set tx_rx_good true", __FUNCTION__);
@@ -203,7 +208,7 @@ bool IpQosMonitor::AllowSelfCureNetwork(int32_t currentRssi)
     return false;
 }
 
-bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
+bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems, bool &ignored)
 {
     WIFI_LOGD("enter %{public}s", __FUNCTION__);
     int32_t packetsLength = static_cast<int32_t>(elems.size());
@@ -241,6 +246,11 @@ bool IpQosMonitor::ParseNetworkInternetGood(const std::vector<int64_t> &elems)
         mLastTcpTxCounter = tcpTxPkts;
         mLastTcpRxCounter = tcpRxPkts;
         if (deltaTcpRxPkts == 0) {
+            if (deltaTcpTxPkts == 0) {
+                WIFI_LOGD("No traffic sample (deltaTx=0, deltaRx=0), marking as ignored.");
+                ignored = true;
+                return lastTxRxGood_;
+            }
             if (deltaTcpTxPkts < MIN_DELTA_TCP_TX) {
                 WIFI_LOGD("%{public}s deltaTcpRxPkts 0, deltaTcpTxPkts less 3, return last tx rx status %{public}d",
                     __FUNCTION__, lastTxRxGood_);

@@ -216,11 +216,6 @@ void StateMachine::SendMessageAtFrontOfQueue(int msgName, int param1)
     WIFI_LOGD("StateMachine::SendMessageAtFrontOf, msgName is %{private}d, param1 is %{public}d",
         msgName, param1);
 }
-void StateMachine::SendMessageAtFrontOfQueue(int msgName, int param1)
-{
-    WIFI_LOGD("StateMachine::SendMessageAtFrontOf, msgName is %{private}d, param1 is %{public}d.",
-        msgName, param1);
-}
 std::string StateMachine::GetCurStateName()
 {
     return "";

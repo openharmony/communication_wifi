@@ -78,7 +78,7 @@ IApServiceCallbacks WifiCountryCodeManager::GetApCallback() const
 
 void WifiCountryCodeManager::GetWifiCountryCode(std::string &wifiCountryCode) const
 {
-    std::lock_guard<std::mutex> lock(mutex);
+    std::unique_lock<std::mutex> lock(m_countryMutex);
     wifiCountryCode = m_wifiCountryCode;
 }
 
@@ -146,11 +146,12 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externa
             WIFI_LOGE("calculate wifi country code failed");
             return WIFI_OPT_FAILED;
         }
-        StrToUpper(wifiCountryCode);
-        WIFI_LOGI("calculate wifi country code result:%{public}s", wifiCountryCode.c_str());
-        UpdateWifiCountryCodeCache(wifiCountryCode);
-        m_wifiCountryCode = wifiCountryCode;
     }
+    StrToUpper(wifiCountryCode);
+    WIFI_LOGI("calculate wifi country code result:%{public}s", wifiCountryCode.c_str());
+    UpdateWifiCountryCodeCache(wifiCountryCode);
+    std::unique_lock<std::mutex> lock(m_countryMutex);
+    m_wifiCountryCode = wifiCountryCode;
     NotifyWifiCountryCodeChangeListeners(wifiCountryCode);
     return WIFI_OPT_SUCCESS;
 }

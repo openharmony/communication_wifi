@@ -69,8 +69,8 @@ ErrCode WifiTogglerManager::ScanOnlyToggled(int isOpen)
 
 void SetScanControlInfoFuzzTest()
 {
-    ScanControlInfo info;
-    pWifiScanServiceImpl.SetScanControlInfo(info);
+    ScanControlInfoParcel parcelInfo;
+    pWifiScanServiceImpl.SetScanControlInfo(parcelInfo);
 }
 
 void ScanFuzzTest(const uint8_t* data, size_t size)
@@ -149,6 +149,44 @@ void WifiScanMgrServiceImplFuzzTest(const uint8_t* data, size_t size)
     
     pWifiScanMgrServiceImpl.Dump(fd, args);
 }
+
+void WifiScanImplFuzzTest(FuzzedDataProvider& FDP)
+{
+    WifiScanParamsParcel paramsParcel;
+    bool compatible = FDP.ConsumeBool();
+    bool bOpen = FDP.ConsumeBool();
+    std::string bundleName = FDP.ConsumeBytesAsString(NUM_BYTES);
+    int32_t scanResultCode = FDP.ConsumeIntegral<int32_t>();
+    std::vector<WifiInfoElem> infoElems;
+    size_t maxIeLen = FDP.ConsumeIntegral<size_t>();
+    size_t ieSize = FDP.ConsumeIntegral<size_t>();
+    Parcel outParcel;
+    pWifiScanServiceImpl.Scan(compatible, bundleName, scanResultCode);
+    pWifiScanServiceImpl.PermissionVerification();
+    pWifiScanServiceImpl.AdvanceScan(paramsParcel, bundleName);
+    pWifiScanServiceImpl.IsWifiClosedScan(bOpen);
+    pWifiScanServiceImpl.WriteInfoElementsToParcel(infoElems, ieSize, maxIeLen, outParcel);
+}
+ 
+void WifiScanServiceImpl01FuzzTest(FuzzedDataProvider& FDP)
+{
+    int32_t contentSize = FDP.ConsumeIntegral<int32_t>();
+    std::vector<WifiScanInfo> result;
+    std::vector<uint32_t> allSizeUint;
+    ScanAshmemParcel outAshmemParcel;
+    bool compatible = FDP.ConsumeBool();
+    bool bScanOnlyAvailable = FDP.ConsumeBool();
+    std::vector<int32_t> allSize;
+    const sptr<IRemoteObject> cbParcel;
+    int32_t pid = FDP.ConsumeIntegral<int32_t>();
+    int32_t tokenId = FDP.ConsumeIntegral<int32_t>();
+    std::vector<std::string> event;
+    pWifiScanServiceImpl.SendScanInfo(contentSize, result, outAshmemParcel, allSizeUint);
+    pWifiScanServiceImpl.GetScanInfoList(compatible, outAshmemParcel, allSize);
+    pWifiScanServiceImpl.GetScanOnlyAvailable(bScanOnlyAvailable);
+    pWifiScanServiceImpl.RegisterCallBack(cbParcel, pid, tokenId, event);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -168,7 +206,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::RegisterCallBackFuzzTest(data, size);
     OHOS::Wifi::WifiScanServiceImplFuzzTest(data, size);
     OHOS::Wifi::WifiScanMgrServiceImplFuzzTest(data, size);
-
+    OHOS::Wifi::WifiScanImplFuzzTest(FDP);
+    OHOS::Wifi::WifiScanServiceImpl01FuzzTest(FDP);
     return 0;
 }
 }

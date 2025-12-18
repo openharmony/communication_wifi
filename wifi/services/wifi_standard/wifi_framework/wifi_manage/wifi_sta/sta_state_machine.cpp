@@ -937,6 +937,8 @@ void StaStateMachine::LinkState::StopWifiProcessInLinkState(InternalMessagePtr m
 {
     WIFI_LOGI("Enter StaStateMachine::StopWifiProcessInLinkState m_instId = %{public}d\n", pStaStateMachine->m_instId);
     EnhanceWriteWifiLinkTypeHiSysEvent(pStaStateMachine->linkedInfo.ssid, -1, "DISCONNECT");
+    pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_WIFI_DISABLED,
+        WifiDisconnectReason::DISCONNECT_BY_NO_REASON);
     WifiStaHalInterface::GetInstance().Disconnect(
         WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId));
     pStaStateMachine->DelayMessage(msg);
@@ -962,6 +964,8 @@ void StaStateMachine::LinkState::DealNetworkRemoved(InternalMessagePtr msg)
     if (pStaStateMachine->linkedInfo.networkId == networkId || pStaStateMachine->targetNetworkId_ == networkId) {
         std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
         WIFI_LOGI("Enter StartDisConnectToNetwork ifaceName:%{public}s!", ifaceName.c_str());
+        pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_NETWORK_REMOVED,
+            WifiDisconnectReason::DISCONNECT_BY_NO_REASON);
         WifiStaHalInterface::GetInstance().Disconnect(ifaceName);
     }
     return;
@@ -1695,6 +1699,27 @@ void StaStateMachine::ApLinkedState::DealWpaLinkFailEventInApLinked(InternalMess
     WIFI_LOGI("DealWpaLinkFailEventInApLinked bssid=%{public}s,targetRoamBssid=%{public}s,"
         "isCurrentRoaming_=%{public}d", MacAnonymize(bssid).c_str(),
         MacAnonymize(pStaStateMachine->targetRoamBssid).c_str(), pStaStateMachine->isCurrentRoaming_);
+    if (pStaStateMachine->isCurrentRoaming_ && bssid == pStaStateMachine->targetRoamBssid) {
+        switch (msg->GetMessageName()) {
+            case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT: {
+                pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
+                    RoamingResultType::TYPE_ROAMING_PASSWD_WRONG);
+                break;
+            }
+            case WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT: {
+                pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
+                    RoamingResultType::TYPE_ROAMING_FULL_CONNECT);
+                break;
+            }
+            case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT: {
+                pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
+                    RoamingResultType::TYPE_ROAMING_ASSOC_REJECT);
+                break;
+            }
+            default:
+                break;
+        }
+    }
     if (!pStaStateMachine->isCurrentRoaming_ ||  bssid == pStaStateMachine->targetRoamBssid) {
         pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
     }
@@ -1794,6 +1819,8 @@ void StaStateMachine::GetIpState::GoInState()
         if (!pStaStateMachine->ConfigStaticIpAddress(config.wifiIpConfig.staticIpAddress)) {
             pStaStateMachine->InvokeOnStaConnChanged(
                 OperateResState::CONNECT_NETWORK_DISABLED, pStaStateMachine->linkedInfo);
+            pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_DHCP_FAIL,
+                DhcpFailType::TYPE_CONFIG_STATIC_IP_ADDRESS_FAIL);
             pStaStateMachine->StartDisConnectToNetwork();
             WIFI_LOGE("ConfigstaticIpAddress failed!\n");
         }
@@ -1839,6 +1866,8 @@ void StaStateMachine::GetIpState::GoInState()
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
         pStaStateMachine->linkedInfo);
     if (!pStaStateMachine->isRoam) {
+        pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_DHCP_FAIL,
+            DhcpFailType::TYPE_DHCP_CONNECTION_FAIL);
         pStaStateMachine->StartDisConnectToNetwork();
     }
     return;
@@ -1937,6 +1966,8 @@ void StaStateMachine::GetIpState::DealGetDhcpIpv4Timeout(InternalMessagePtr msg)
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
         pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_DHCP_FAILURE);
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
+    pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_DHCP_FAIL,
+        DhcpFailType::TYPE_GET_IP_TIMEOUT);
     pStaStateMachine->StartDisConnectToNetwork();
     EnhanceWriteDhcpFailHiSysEvent("DHCP_TIMEOUT");
 }
@@ -2858,6 +2889,8 @@ void StaStateMachine::LinkedState::DhcpResultNotify(InternalMessagePtr msg)
     } else if (result == DhcpReturnCode::DHCP_RESULT) {
         pStaStateMachine->pDhcpResultNotify->DealDhcpResult(ipType);
     } else if (result == DhcpReturnCode::DHCP_IP_EXPIRED) {
+        pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_DHCP_FAIL,
+            DhcpFailType::TYPE_IP_EXPIRED);
         pStaStateMachine->StartDisConnectToNetwork();
     } else if (result == DhcpReturnCode::DHCP_OFFER_REPORT) {
         pStaStateMachine->pDhcpResultNotify->DealDhcpOfferResult();
@@ -3132,6 +3165,8 @@ void StaStateMachine::ApRoamingState::DealApRoamingStateTimeout(InternalMessageP
         return;
     }
     WIFI_LOGI("DealApRoamingStateTimeout StopTimer aproaming timer");
+    pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
+        RoamingResultType::TYPE_ROAMING_TIMEOUT);
     pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
     pStaStateMachine->StartDisConnectToNetwork();
     pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
@@ -3819,6 +3854,8 @@ void StaStateMachine::DhcpResultNotify::DealDhcpIpv4ResultFailed()
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
         pStaStateMachine->linkedInfo);
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
+    pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_DHCP_FAIL,
+        DhcpFailType::TYPE_DEAL_IPV4_RESULT_FAIL);
     pStaStateMachine->StartDisConnectToNetwork();
 }
 
@@ -5812,6 +5849,13 @@ bool StaStateMachine::HasMultiBssidAp(const WifiDeviceConfig &config)
         }
     }
     return false;
+}
+
+void StaStateMachine::NotifyWifiDisconnectReason(const int reason, const int subReason)
+{
+    if (enhanceService_ != nullptr) {
+        enhanceService_->NotifyWifiDisconnectReason(reason, subReason);
+    }
 }
 } // namespace Wifi
 } // namespace OHOS

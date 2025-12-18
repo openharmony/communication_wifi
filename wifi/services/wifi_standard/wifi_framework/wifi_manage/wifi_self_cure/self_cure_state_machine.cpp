@@ -2802,9 +2802,7 @@ bool SelfCureStateMachine::CheckSelfCureConnectState()
 {
     WifiLinkedInfo info;
     WifiConfigCenter::GetInstance().GetLinkedInfo(info);
-    // only effective in scenarios where the connection is interrupted
-    if (info.detailedState == DetailedState::DISCONNECTED &&
-        info.disconnTriggerMode == DisconnState::DISCONNECTED) {
+    if (info.detailedState == DetailedState::DISCONNECTED) {
         HandleSelfCureException(SCE_WIFI_STATUS_FAIL);
         if (connectNetworkRetryCnt_ >= CONNECT_NETWORK_RETRY) {
             return false; // while reconnect fail, should not ignore sta connect event callback

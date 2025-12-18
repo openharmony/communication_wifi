@@ -345,6 +345,7 @@ ErrCode WifiTogglerManager::SatelliteToggled(int state)
 
 void WifiTogglerManager::SetSatelliteStartState(bool state)
 {
+    std::unique_lock<std::mutex> lock(mutex);
     mIsSatelliteStart = state;
 }
 

@@ -78,6 +78,7 @@ IApServiceCallbacks WifiCountryCodeManager::GetApCallback() const
 
 void WifiCountryCodeManager::GetWifiCountryCode(std::string &wifiCountryCode) const
 {
+    std::lock_guard<std::mutex> lock(mutex);
     wifiCountryCode = m_wifiCountryCode;
 }
 
@@ -135,18 +136,21 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externa
         return WIFI_OPT_FAILED;
     }
     std::string wifiCountryCode;
-    if (!externalCode.empty() && !IsValidCountryCode(externalCode)) {
-        WIFI_LOGI("external set wifi country code, code=%{public}s", externalCode.c_str());
-        wifiCountryCode = externalCode;
-    } else if (m_wifiCountryCodePolicy == nullptr ||
-        m_wifiCountryCodePolicy->CalculateWifiCountryCode(wifiCountryCode) == WIFI_OPT_FAILED) {
-        WIFI_LOGE("calculate wifi country code failed");
-        return WIFI_OPT_FAILED;
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        if (!externalCode.empty() && !IsValidCountryCode(externalCode)) {
+            WIFI_LOGI("external set wifi country code, code=%{public}s", externalCode.c_str());
+            wifiCountryCode = externalCode;
+        } else if (m_wifiCountryCodePolicy == nullptr ||
+            m_wifiCountryCodePolicy->CalculateWifiCountryCode(wifiCountryCode) == WIFI_OPT_FAILED) {
+            WIFI_LOGE("calculate wifi country code failed");
+            return WIFI_OPT_FAILED;
+        }
+        StrToUpper(wifiCountryCode);
+        WIFI_LOGI("calculate wifi country code result:%{public}s", wifiCountryCode.c_str());
+        UpdateWifiCountryCodeCache(wifiCountryCode);
+        m_wifiCountryCode = wifiCountryCode;
     }
-    StrToUpper(wifiCountryCode);
-    WIFI_LOGI("calculate wifi country code result:%{public}s", wifiCountryCode.c_str());
-    UpdateWifiCountryCodeCache(wifiCountryCode);
-    m_wifiCountryCode = wifiCountryCode;
     NotifyWifiCountryCodeChangeListeners(wifiCountryCode);
     return WIFI_OPT_SUCCESS;
 }

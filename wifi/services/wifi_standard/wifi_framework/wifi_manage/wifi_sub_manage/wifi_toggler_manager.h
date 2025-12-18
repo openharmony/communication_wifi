@@ -79,6 +79,7 @@ private:
     bool IsInterfaceUp(std::string &iface);
 
 private:
+    std::mutex mutex;
     ConcreteModeCallback mConcreteModeCb;
     SoftApModeCallback mSoftApModeCb;
     MultiStaModeCallback mMultiStaModeCb;

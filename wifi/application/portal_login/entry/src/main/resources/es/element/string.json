@@ -2,7 +2,7 @@
     "string":[
         {
             "name":"compatibility_mode_of_the_PC_version",
-            "value":"Sitio de escritorio",
+            "value":"Versión de escritorio",
             "attr":{
                 "priority":"translate"
             }

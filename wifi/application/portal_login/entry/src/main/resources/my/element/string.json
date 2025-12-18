@@ -4,70 +4,70 @@
             "name":"compatibility_mode_of_the_PC_version",
             "value":"ဒတ်ခ်စတော့(ပ်) ဆိုက်",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"actions_menu_user_agent",
             "value":"Browser UA",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"confirm_dialog_cancel",
-            "value":"ပယ်ဖျက်မည်",
+            "value":"မလုပ်ပါ",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"contextmenu_open_in_browser",
             "value":"Browser တွင် ဖွင့်ရန်",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"compatibility_mode_of_the_mobile_version",
             "value":"မိုဘိုင်း ဆိုက်",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"ssl_normal_error_msg",
             "value":"ဤဆိုက်၏ SSL ဆာတီဖီကိတ်သည် သက်တမ်းကုန်နေပါသည် သို့မဟုတ် မယုံကြည်ရပါ။ ဆက်လက်လုပ်ဆောင်ပါက လုံခြုံရေး ပြဿနာ ရှိနိုင်ပါသည်။",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"continue_visit",
             "value":"ဤဆိုက်ကို ဆက်ဖွင့်မည်လား။",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"site_setting_single_website_title",
             "value":"%s ဆက်တင်",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"ssl_error_dialog_continue_btn",
             "value":"ဆက်လုပ်မည်",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"user_agent_harmony",
             "value":"HarmonyOS",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

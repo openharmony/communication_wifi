@@ -57,6 +57,8 @@ enum FiltedReason {
     NOT_HML_FREQ_AT_5G,
     NOT_SECURE_WIFI,
     LONG_TIME_UNUSED_OPEN_NETWORK,
+    NOT_HIGHER_CATEGORY,
+    CONFIG_NULL,
 };
 
 struct FiltedReasonComparator {

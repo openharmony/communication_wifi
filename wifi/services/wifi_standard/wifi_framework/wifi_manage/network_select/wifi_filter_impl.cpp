@@ -852,4 +852,53 @@ bool SecureNetworkFilter::Filter(NetworkCandidate &networkCandidate)
  
     return true;
 }
+
+HigherCategoryFilter::HigherCategoryFilter() : SimpleWifiFilter("HigherCategoryFilter") {}
+
+HigherCategoryFilter::~HigherCategoryFilter() {}
+
+bool HigherCategoryFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    WifiLinkedInfo currentConnection;
+    if (WifiConfigCenter::GetInstance().GetLinkedInfo(currentConnection) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGD("HigherCategoryFilter: GetLinkedInfo failed.");
+        return true;
+    }
+    // If networkId invalid or bssid empty, also treat as no current connection.
+    if (currentConnection.networkId == INVALID_NETWORK_ID || currentConnection.bssid.empty()) {
+        return true;
+    }
+    auto &scanConfig = WifiConfigCenter::GetInstance().GetWifiScanConfig();
+    if (!scanConfig) {
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::CONFIG_NULL);
+        WIFI_LOGD("HigherCategoryFilter: GetWifiScanConfig returned nullptr.");
+        return false; // Cannot determine category, filter it for safety
+    }
+    WifiCategory currentCategory = scanConfig->GetWifiCategoryRecord(currentConnection.bssid);
+    WifiCategory candidateCategory = scanConfig->GetWifiCategoryRecord(networkCandidate.interScanInfo.bssid);
+    if (static_cast<int>(candidateCategory) > static_cast<int>(WifiCategory::DEFAULT) &&
+        static_cast<int>(candidateCategory) >= static_cast<int>(currentCategory)) {
+        WIFI_LOGD("HigherCategoryFilter: candidate %{public}s (cat %d) >= current %{public}s (cat %d) and > WIFI5",
+                  MacAnonymize(networkCandidate.interScanInfo.bssid).c_str(), static_cast<int>(candidateCategory),
+                  MacAnonymize(currentConnection.bssid).c_str(), static_cast<int>(currentCategory));
+        return true;
+    }
+    networkCandidate.filtedReason[filterName].insert(FiltedReason::NOT_HIGHER_CATEGORY);
+    return false;
+}
+
+Perf5gBlackListFilter::Perf5gBlackListFilter() : SimpleWifiFilter("Perf5gBlackListFilter") {}
+
+Perf5gBlackListFilter::~Perf5gBlackListFilter() {}
+
+bool Perf5gBlackListFilter::Filter(NetworkCandidate &networkCandidate)
+{
+    if (NetworkBlockListManager::GetInstance().IsInPerf5gBlocklist(networkCandidate.interScanInfo.bssid)) {
+        WIFI_LOGD("Perf5gBlackListFilter: bssid %{public}s is in perf5g blocklist",
+                  MacAnonymize(networkCandidate.interScanInfo.bssid).c_str());
+        networkCandidate.filtedReason[filterName].insert(FiltedReason::BLOCKLIST_AP);
+        return false;
+    }
+    return true;
+}
 }

@@ -19,6 +19,7 @@
 #include "network_selection_utils.h"
 #include "mock_wifi_config_center.h"
 #include "wifi_sensor_scene.h"
+#include "network_black_list_manager.h"
 
 using ::testing::_;
 using ::testing::Return;
@@ -747,5 +748,89 @@ HWTEST_F(WifiFilterImplTest, WeakAlgorithmWifiFilterReturnFalse, TestSize.Level1
     EXPECT_FALSE(weakAlgorithmWifiFilter->DoFilter(networkCandidate2));
 }
 
+HWTEST_F(WifiFilterImplTest, HigherCategoryFilterTest_CandidateIsHigher_ShouldPass, TestSize.Level1)
+{
+    auto filter = std::make_shared<NetworkSelection::HigherCategoryFilter>();
+    WifiLinkedInfo currentLinkInfo;
+    currentLinkInfo.bssid = "11:22:33:44:55:66";
+    currentLinkInfo.networkId = 1;
+    InterScanInfo candidateScanInfo;
+    candidateScanInfo.bssid = "AA:BB:CC:DD:EE:FF";
+    NetworkSelection::NetworkCandidate candidate(candidateScanInfo);
+
+    // Arrange: Mock the behavior of WifiConfigCenter
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(Invoke([&](WifiLinkedInfo& info, int32_t) {
+            info = currentLinkInfo;
+            return 0;
+        }));
+    EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetWifiCategoryRecord(currentLinkInfo.bssid))
+        .WillRepeatedly(Return(WifiCategory::WIFI6));
+    EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetWifiCategoryRecord(candidateScanInfo.bssid))
+        .WillRepeatedly(Return(WifiCategory::WIFI7));
+
+    // Act & Assert
+    EXPECT_TRUE(filter->DoFilter(candidate));
+}
+
+HWTEST_F(WifiFilterImplTest, HigherCategoryFilterTest_CandidateIsLower_ShouldFilter, TestSize.Level1)
+{
+    auto filter = std::make_shared<NetworkSelection::HigherCategoryFilter>();
+    WifiLinkedInfo currentLinkInfo;
+    currentLinkInfo.bssid = "11:22:33:44:55:66";
+    currentLinkInfo.networkId = 1;
+    InterScanInfo candidateScanInfo;
+    candidateScanInfo.bssid = "AA:BB:CC:DD:EE:FF";
+    NetworkSelection::NetworkCandidate candidate(candidateScanInfo);
+
+    // Arrange: Mock the behavior of WifiConfigCenter
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(Invoke([&](WifiLinkedInfo& info, int32_t) {
+            info = currentLinkInfo;
+            return 0;
+        }));
+    EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetWifiCategoryRecord(currentLinkInfo.bssid))
+        .WillRepeatedly(Return(WifiCategory::WIFI7));
+    EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetWifiCategoryRecord(candidateScanInfo.bssid))
+        .WillRepeatedly(Return(WifiCategory::WIFI6));
+
+    // Act & Assert
+    EXPECT_FALSE(filter->DoFilter(candidate));
+}
+
+HWTEST_F(WifiFilterImplTest, Perf5gBlackListFilterTest_BssidInList_ShouldFilter, TestSize.Level1)
+{
+    auto filter = std::make_shared<NetworkSelection::Perf5gBlackListFilter>();
+    InterScanInfo scanInfo;
+    const std::string bssid = "11:22:33:44:55:66";
+    scanInfo.bssid = bssid;
+    NetworkSelection::NetworkCandidate candidate(scanInfo);
+
+    // Arrange: Add BSSID to the blocklist and verify it's in the list.
+    NetworkBlockListManager::GetInstance().AddPerf5gBlocklist(bssid);
+    ASSERT_TRUE(NetworkBlockListManager::GetInstance().IsInPerf5gBlocklist(bssid));
+
+    // Act & Assert: The filter should block the candidate.
+    EXPECT_FALSE(filter->DoFilter(candidate));
+
+    // Cleanup
+    NetworkBlockListManager::GetInstance().RemovePerf5gBlocklist(bssid);
+}
+
+HWTEST_F(WifiFilterImplTest, Perf5gBlackListFilterTest_BssidNotInList_ShouldPass, TestSize.Level1)
+{
+    auto filter = std::make_shared<NetworkSelection::Perf5gBlackListFilter>();
+    InterScanInfo scanInfo;
+    const std::string bssid = "11:22:33:44:55:77";
+    scanInfo.bssid = bssid;
+    NetworkSelection::NetworkCandidate candidate(scanInfo);
+
+    // Arrange: Ensure the BSSID is not in the blocklist.
+    NetworkBlockListManager::GetInstance().RemovePerf5gBlocklist(bssid);
+    ASSERT_FALSE(NetworkBlockListManager::GetInstance().IsInPerf5gBlocklist(bssid));
+
+    // Act & Assert: The filter should pass the candidate.
+    EXPECT_TRUE(filter->DoFilter(candidate));
+}
 }
 }

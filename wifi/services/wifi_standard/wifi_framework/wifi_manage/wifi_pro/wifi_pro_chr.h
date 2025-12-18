@@ -48,6 +48,8 @@ enum WifiProEventResult {
     POORLINK_FAILED,
     NONET_FAILED,
     QOESLOW_FAILED,
+    HIGHER_CATEGORY_SUCC,
+    HIGHER_CATEGORY_FAILED,
 };
 
 enum ReasonNotSwitch {
@@ -60,6 +62,7 @@ enum ReasonNotSwitch {
     WIFIPRO_ISCALLING,
     WIFIPRO_NOT_ALLOW_AUTOSWITCH,
     WIFIPRO_DISABLED,
+    WIFIPRO_USER_SELECT,
 };
 
 class WifiProChr {

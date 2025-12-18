@@ -163,6 +163,7 @@ private:
     void ProcessExtMsg(WifiCloseServiceCode code);
 private:
     std::mutex initStatusMutex;
+    mutable std::mutex mutex;
     InitStatus mInitStatus;
     long mSupportedFeatures;
     bool g_supportsapcoexistflag;

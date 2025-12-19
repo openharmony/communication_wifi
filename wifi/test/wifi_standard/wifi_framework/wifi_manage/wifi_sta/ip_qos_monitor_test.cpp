@@ -123,7 +123,8 @@ HWTEST_F(IpQosMonitorTest, TestAllowSelfCureNetwork, TestSize.Level1)
 HWTEST_F(IpQosMonitorTest, TestParseNetworkInternetGood, TestSize.Level1)
 {
     std::vector<int64_t> elems = {1, 2, 3, 1, 2, 3, 1, 2, 0, 1};
-    EXPECT_TRUE(IpQosMonitor::GetInstance().ParseNetworkInternetGood(elems));
+    bool ignored = false;
+    EXPECT_TRUE(IpQosMonitor::GetInstance().ParseNetworkInternetGood(elems, ignored));
 }
 
 HWTEST_F(IpQosMonitorTest, TestQueryIpv6Packets, TestSize.Level1)

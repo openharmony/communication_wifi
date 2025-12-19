@@ -80,7 +80,7 @@ std::string WifiCodeConvertUtil::GbkToUtf8(const std::string &strGbk)
     if (strGbk.length() == 0 || IsUtf8(strGbk)) {
         return strGbk;
     }
-    std::string result = Convert(strGbk, "gb2312", "utf8");
+    std::string result = Convert(strGbk, "gb18030", "utf8");
     if (result.length() == 0) {
         return strGbk;
     }
@@ -96,7 +96,7 @@ std::string WifiCodeConvertUtil::Utf8ToGbk(const std::string &strUtf8)
     if (strUtf8.length() == 0 || !IsUtf8(strUtf8)) {
         return strUtf8;
     }
-    std::string result = Convert(strUtf8, "utf8", "gb2312");
+    std::string result = Convert(strUtf8, "utf8", "gb18030");
     if (result.length() == 0) {
         return strUtf8;
     }

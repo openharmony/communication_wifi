@@ -150,7 +150,7 @@ private:
     std::shared_ptr<WifiCountryCodePolicy> m_wifiCountryCodePolicy;
     std::mutex m_countryCodeMutex;
     mutable std::mutex mutex;
-    std::mutex m_countryMutex;
+    mutable std::mutex m_countryMutex;
     bool m_isFirstConnected = false;
     std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> wifiCountryCodePolicyConf_;
 

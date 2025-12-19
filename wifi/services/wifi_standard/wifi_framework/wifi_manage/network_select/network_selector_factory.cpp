@@ -34,6 +34,8 @@ NetworkSelectorFactory::NetworkSelectorFactory()
         &NetworkSelectorFactory::CreateUserConnectNetworkSelector;
     handleFuncMap[static_cast<uint32_t>(NetworkSelectType::WIFI2WIFI_PORTAL)] =
         &NetworkSelectorFactory::CreateWifi2WifiNoNetNetworkSelector;
+    handleFuncMap[static_cast<uint32_t>(NetworkSelectType::HIGHER_CATEGORY)] =
+        &NetworkSelectorFactory::CreateHigherCategoryNetworkSelector;
 }
 
 std::optional<std::unique_ptr<NetworkSelection::INetworkSelector>> NetworkSelectorFactory::GetNetworkSelector(
@@ -65,6 +67,11 @@ std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::Crea
 std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::CreateWifi2WifiQoeSlowNetworkSelector()
 {
     return std::make_unique<NetworkSelection::Wifi2WifiQoeSlowIntegrator>();
+}
+
+std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::CreateHigherCategoryNetworkSelector()
+{
+    return std::make_unique<NetworkSelection::HigherCategoryNetworkSelector>();
 }
 
 std::unique_ptr<NetworkSelection::INetworkSelector> NetworkSelectorFactory::CreateUserConnectNetworkSelector()

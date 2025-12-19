@@ -101,6 +101,8 @@ void WifiProChr::RecordSelectNetChrCnt(bool isSuccess)
     if (isSuccess) {
         if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_NO_INTERNET) {
             selectNetResultCnt_[WifiProEventResult::NONET_SUCC]++;
+        } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_HIGHER_CATEGORY) {
+            selectNetResultCnt_[WifiProEventResult::HIGHER_CATEGORY_SUCC]++;
         } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_APP_QOE_SLOW) {
             selectNetResultCnt_[WifiProEventResult::QOE_SUCCC]++;
         } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_POOR_RSSI) {
@@ -109,6 +111,8 @@ void WifiProChr::RecordSelectNetChrCnt(bool isSuccess)
     } else {
         if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_NO_INTERNET) {
             selectNetResultCnt_[WifiProEventResult::NONET_FAILED]++;
+        } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_HIGHER_CATEGORY) {
+            selectNetResultCnt_[WifiProEventResult::HIGHER_CATEGORY_FAILED]++;
         } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_APP_QOE_SLOW) {
             selectNetResultCnt_[WifiProEventResult::QOESLOW_FAILED]++;
         } else if (switchReason_ == WifiSwitchReason::WIFI_SWITCH_REASON_POOR_RSSI) {
@@ -126,6 +130,9 @@ void WifiProChr::RecordSwitchChrCnt(bool isSuccess)
             case WifiSwitchReason::WIFI_SWITCH_REASON_NO_INTERNET:
                 wifiProResultCnt_[WifiProEventResult::NONET_SUCC]++;
                 break;
+            case WifiSwitchReason::WIFI_SWITCH_REASON_HIGHER_CATEGORY:
+                wifiProResultCnt_[WifiProEventResult::HIGHER_CATEGORY_SUCC]++;
+                break;
             case WifiSwitchReason::WIFI_SWITCH_REASON_APP_QOE_SLOW:
                 wifiProResultCnt_[WifiProEventResult::QOE_SUCCC]++;
                 break;
@@ -139,6 +146,9 @@ void WifiProChr::RecordSwitchChrCnt(bool isSuccess)
         switch (switchReason_) {
             case WifiSwitchReason::WIFI_SWITCH_REASON_NO_INTERNET:
                 wifiProResultCnt_[WifiProEventResult::NONET_FAILED]++;
+                break;
+            case WifiSwitchReason::WIFI_SWITCH_REASON_HIGHER_CATEGORY:
+                wifiProResultCnt_[WifiProEventResult::HIGHER_CATEGORY_FAILED]++;
                 break;
             case WifiSwitchReason::WIFI_SWITCH_REASON_APP_QOE_SLOW:
                 wifiProResultCnt_[WifiProEventResult::QOESLOW_FAILED]++;
@@ -394,6 +404,8 @@ cJSON *WifiProChr::FillWifiProStatisticsJson()
     cJSON_AddNumberToObject(root, "NONET_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::NONET_SUCC]);
     cJSON_AddNumberToObject(root, "QOE_SLOW_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::QOE_SUCCC]);
     cJSON_AddNumberToObject(
+        root, "HIGHER_CATEGORY_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::HIGHER_CATEGORY_SUCC]);
+    cJSON_AddNumberToObject(
         root, "POOR_LINK_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::POORLINK_FAILED]);
     cJSON_AddNumberToObject(root, "NONET_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::NONET_FAILED]);
     cJSON_AddNumberToObject(
@@ -401,6 +413,8 @@ cJSON *WifiProChr::FillWifiProStatisticsJson()
     cJSON_AddNumberToObject(root, "POOR_LINK_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::POORLINK_SUCC]);
     cJSON_AddNumberToObject(root, "NONET_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::NONET_SUCC]);
     cJSON_AddNumberToObject(root, "QOE_SLOW_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::QOE_SUCCC]);
+    cJSON_AddNumberToObject(
+        root, "HIGHER_CATEGORY_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::HIGHER_CATEGORY_SUCC]);
     cJSON_AddNumberToObject(
         root, "POOR_LINK_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::POORLINK_FAILED]);
         

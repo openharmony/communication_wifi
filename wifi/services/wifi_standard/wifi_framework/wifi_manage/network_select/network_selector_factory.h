@@ -28,7 +28,8 @@ enum class NetworkSelectType {
     WIFI2WIFI_NONET,
     WIFI2WIFI_QOE_BAD,
     USER_CONNECT,
-    WIFI2WIFI_PORTAL
+    WIFI2WIFI_PORTAL,
+    HIGHER_CATEGORY,
 };
 
 class NetworkSelectorFactory {
@@ -68,6 +69,12 @@ public:
      * @return the network selector
      */
     std::unique_ptr<NetworkSelection::INetworkSelector> CreateWifi2WifiQoeSlowNetworkSelector();
+
+   /**
+     * the function to create Higher Category networkSelector
+     * @return the network selector
+     */
+    std::unique_ptr<NetworkSelection::INetworkSelector> CreateHigherCategoryNetworkSelector();
 
     /**
      * the function to create user connect networkSelector

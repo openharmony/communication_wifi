@@ -81,7 +81,9 @@ enum WifiSwitchReason {
     // current ap triggers wifi switch because of appqoe slow
     WIFI_SWITCH_REASON_APP_QOE_SLOW = 6,
     // current ap triggers wifi switch because of portal
-    WIFI_SWITCH_REASON_PORTAL = 7
+    WIFI_SWITCH_REASON_PORTAL = 7,
+    // current ap triggers wifi switch because of higher category network available
+    WIFI_SWITCH_REASON_HIGHER_CATEGORY = 8
 };
 
 // current state in wifiPro

@@ -423,6 +423,20 @@ bool PreferredApSelector::Filter(NetworkCandidate &networkCandidate)
     return false;
 }
 
+HigherCategoryNetworkSelector::HigherCategoryNetworkSelector()
+    : SimpleNetworkSelector("HigherCategoryNetworkSelector")
+{
+    auto andFilters = make_shared<AndWifiFilter>();
+    andFilters->AddFilter(make_shared<ValidNetworkIdFilter>());
+    andFilters->AddFilter(make_shared<NotCurrentNetworkFilter>());
+    andFilters->AddFilter(make_shared<NotNetworkBlackListFilter>());
+    andFilters->AddFilter(make_shared<SignalLevelFilter>());
+    andFilters->AddFilter(make_shared<HigherCategoryFilter>());
+    andFilters->AddFilter(make_shared<Perf5gBlackListFilter>());
+    andFilters->AddFilter(make_shared<ValidConfigNetworkFilter>());
+    SetWifiFilter(andFilters);
+}
+
 SameSsidMultiBssidIntegrator::SameSsidMultiBssidIntegrator() : SimpleNetworkSelector(
     "SameSsidMultiBssidIntegrator")
 {

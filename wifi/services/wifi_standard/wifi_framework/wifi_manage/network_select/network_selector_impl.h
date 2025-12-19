@@ -55,6 +55,12 @@ protected:
     void GetCandidatesFromSubNetworkSelector() override;
 };
 
+class HigherCategoryNetworkSelector : public SimpleNetworkSelector {
+public:
+    explicit HigherCategoryNetworkSelector();
+    ~HigherCategoryNetworkSelector() override = default;
+};
+
 class SavedNetworkTracker final: public CompositeNetworkSelector {
 public:
     SavedNetworkTracker();

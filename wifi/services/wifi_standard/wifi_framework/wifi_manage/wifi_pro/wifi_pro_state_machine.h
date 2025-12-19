@@ -140,6 +140,8 @@ public:
         int netDisableDetectCount_ { 0 };
         bool qoeSwitch_  { false } ;
         bool qoeScaning_  { false } ;
+        bool Try5gHandover(const std::vector<InterScanInfo> &scanInfos);
+        bool TryHigherCategoryNetworkSelection(const std::vector<InterScanInfo> &scanInfos);
         bool isLpScanTriggered_ {false};
         bool isConnected24G_ = false;
         bool isConnected5G_ = false;
@@ -147,7 +149,7 @@ public:
         void HandleRssiChangedInHasNet(const InternalMessagePtr msg);
         void HandleReuqestScanInHasNet(const InternalMessagePtr msg);
         void HandleScanResultInHasNet(const InternalMessagePtr msg);
-        void HandleScanResultInHasNetInner(const std::vector<InterScanInfo> &scanInfos);
+        bool HandleScanResultInHasNetInner(const std::vector<InterScanInfo> &scanInfos);
         void TryStartScan(bool hasSwitchRecord, int32_t signalLevel);
         void StartScanWithDynamicStrategy(int32_t &rssiLevelScanedCounter, bool hasSwitchRecord, int32_t scanInterval);
         bool IsSatisfiedLpScanCondition();
@@ -251,6 +253,7 @@ private:
     std::string currentBssid_;
     std::string currentSsid_;
     std::int32_t currentBand_ {static_cast<int>(BandType::BAND_NONE)};
+    WifiCategory currentWifiCategory_ {WifiCategory::DEFAULT};
     std::shared_ptr<WifiLinkedInfo> pCurrWifiInfo_ { nullptr };
     std::shared_ptr<WifiDeviceConfig> pCurrWifiDeviceConfig_ { nullptr };
     bool isWifi2WifiSwitching_ { false };
@@ -277,6 +280,12 @@ private:
     bool TrySelfCure(bool forceNoHttpCheck);
     bool SelectNetwork(NetworkSelectionResult &networkSelectionResult, const std::vector<InterScanInfo> &scanInfos);
     bool IsSatisfiedWifi2WifiCondition();
+    bool IsAutoReconnectPreferred(
+        const std::vector<InterScanInfo> &higherCategoryCandidates,
+        const std::vector<InterScanInfo> &scanInfos,
+        NetworkSelectionResult &outSelectionResult);
+    bool GetFilteredCandidates(const std::vector<InterScanInfo>& scanInfos,
+        NetworkSelectType selectType, std::vector<InterScanInfo>& outCandidates);
     bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
     ErrCode FullScan();
     void ProcessSwitchResult(const InternalMessagePtr msg);
@@ -285,6 +294,7 @@ private:
     bool IsFirstConnectAndNonet();
     bool IsKeepCurrWifiConnectedExtral();
     void Handle5GWifiTo2GWifi();
+    void HandleHigherCategoryToLowerCategory();
 };
 } // namespace Wifi
 } // namespace OHOS

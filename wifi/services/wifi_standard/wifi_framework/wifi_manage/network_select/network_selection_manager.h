@@ -60,8 +60,6 @@ public:
                        NetworkSelectType type,
                        const std::vector<InterScanInfo> &scanInfos,
                        std::string &failReason);
-private:
-    std::unique_ptr<NetworkSelectorFactory> pNetworkSelectorFactory = nullptr;
 
     /**
      * get the saved deviceConfig associated with scanInfo
@@ -80,6 +78,8 @@ private:
      */
     static void TryNominate(std::vector<NetworkSelection::NetworkCandidate> &networkCandidates,
                             const std::unique_ptr<NetworkSelection::INetworkSelector> &networkSelector);
+private:
+    std::unique_ptr<NetworkSelectorFactory> pNetworkSelectorFactory = nullptr;
     
     /**
      * get saved configs for chr

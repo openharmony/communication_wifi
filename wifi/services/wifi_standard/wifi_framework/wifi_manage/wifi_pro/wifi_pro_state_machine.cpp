@@ -63,6 +63,7 @@ std::map<WifiSwitchReason, std::string> g_switchReason = {
     {WIFI_SWITCH_REASON_POOR_RSSI_INTERNET_SLOW, "POOR_RSSI_INTERNET_SLOW"},
     {WIFI_SWITCH_REASON_BACKGROUND_CHECK_AVAILABLE_WIFI, "BACKGROUND_CHECK_AVAILABLE_WIFI"},
     {WIFI_SWITCH_REASON_APP_QOE_SLOW, "APP_QOE_SLOW"},
+    {WIFI_SWITCH_REASON_HIGHER_CATEGORY, "HIGHER_CATEGORY"}
 };
 }
 
@@ -254,6 +255,7 @@ void WifiProStateMachine::RefreshConnectedNetWork()
     currentSsid_ = linkedInfo.ssid;
     currentRssi_ = linkedInfo.rssi;
     currentBand_ = linkedInfo.band;
+    currentWifiCategory_ = linkedInfo.supportedWifiCategory;
     std::vector<WifiDeviceConfig> configs;
     WifiSettings::GetInstance().GetDeviceConfig(configs);
     if (configs.empty()) {
@@ -359,6 +361,7 @@ void WifiProStateMachine::HandleWifi2WifiSucsess()
         networkBlackListManager.CleanTempWifiBlockList();
     }
     Handle5GWifiTo2GWifi();
+    HandleHigherCategoryToLowerCategory();
 }
 
 void WifiProStateMachine::Handle5GWifiTo2GWifi()
@@ -372,6 +375,24 @@ void WifiProStateMachine::Handle5GWifiTo2GWifi()
             MessageExecutedLater(EVENT_REMOVE_5GBLOCK_LIST, badBssid_, BLOCKLIST_5GVALID_TIME);
         } else {
             MessageExecutedLater(EVENT_REMOVE_5GBLOCK_LIST, badBssid_, BLOCKLIST_VALID_TIME);
+        }
+    }
+}
+
+void WifiProStateMachine::HandleHigherCategoryToLowerCategory()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.supportedWifiCategory < currentWifiCategory_) {
+        NetworkBlockListManager::GetInstance().AddPerf5gBlocklist(badBssid_);
+        if (NetworkBlockListManager::GetInstance().IsOverTwiceInPerf5gBlocklist(badBssid_)) {
+            MessageExecutedLater(EVENT_REMOVE_5GBLOCK_LIST, badBssid_, BLOCKLIST_5GVALID_TIME);
+            WIFI_LOGI("HandleHigherCategoryToLowerCategory: Added previous bssid %{public}s to Perf5gBlocklist(10).",
+                MacAnonymize(badBssid_).c_str());
+        } else {
+            MessageExecutedLater(EVENT_REMOVE_5GBLOCK_LIST, badBssid_, BLOCKLIST_VALID_TIME);
+            WIFI_LOGI("HandleHigherCategoryToLowerCategory: Added previous bssid %{public}s to Perf5gBlocklist(2).",
+                MacAnonymize(badBssid_).c_str());
         }
     }
 }
@@ -1334,14 +1355,6 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
         return;
     }
 
-    pWifiProStateMachine_->perf5gHandoverService_.ScanResultUpdated(scanInfos);
-    pWifiProStateMachine_->targetBssid_ = pWifiProStateMachine_->perf5gHandoverService_.Switch5g();
-    if (pWifiProStateMachine_->targetBssid_ != "") {
-        WIFI_LOGI("HandleScanResultInHasNet, perf 5g tried to switch.");
-        pWifiProStateMachine_->badBssid_ = pWifiProStateMachine_->currentBssid_;
-        pWifiProStateMachine_->isWifi2WifiSwitching_ = true;
-        return;
-    }
     // Make sure the wifipro lag switch is done only once
     if (pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW && !qoeSwitch_) {
         WIFI_LOGI("HandleScanResultInHasNet, qoe has tried to switch.");
@@ -1353,23 +1366,33 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
         isLpScanTriggered_ = false;
         ScanByPerf5gTable(scanInfos);
     } else {
-        HandleScanResultInHasNetInner(scanInfos);
+        if (HandleScanResultInHasNetInner(scanInfos)) {
+            return;
+        }
+    }
+    if (Try5gHandover(scanInfos)) {
+            WIFI_LOGI("HandleScanResultInHasNet: 5G handover successful.");
+            return;
+    }
+    if (TryHigherCategoryNetworkSelection(scanInfos)) {
+        WIFI_LOGI("HandleScanResultInHasNet: Higher category selection successful.");
+        return;
     }
 }
 
-void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const std::vector<InterScanInfo> &scanInfos)
+bool WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGI("wifi to wifi step 1: select network.");
     if (!pWifiProStateMachine_->SelectNetwork(pWifiProStateMachine_->networkSelectionResult_, scanInfos)) {
         WIFI_LOGI("wifi to wifi step X: Wifi2Wifi select network fail.");
         pWifiProStateMachine_->Wifi2WifiFinish();
-        return;
+        return false;
     }
 
     WIFI_LOGI("wifi to wifi step 2: receive good ap.");
     if (!pWifiProStateMachine_->IsSatisfiedWifi2WifiCondition()) {
         pWifiProStateMachine_->Wifi2WifiFinish();
-        return;
+        return false;
     }
 
     // when wifiSwitchReason is APP_QOE_SLOW, skip IsReachWifiScanThreshold
@@ -1377,7 +1400,7 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const s
     if (pWifiProStateMachine_->wifiSwitchReason_ != WIFI_SWITCH_REASON_APP_QOE_SLOW &&
         signalLevel > SIG_LEVEL_2) {
         pWifiProStateMachine_->Wifi2WifiFinish();
-        return;
+        return false;
     }
     
 #ifndef OHOS_ARCH_LITE
@@ -1385,7 +1408,7 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const s
         pWifiProStateMachine_->InLandscapeSwitchLimitList()) {
         WIFI_LOGI("KeepCurrWifiConnected ScreenLandscape and InLandscapeSwitchLimitList.");
         pWifiProStateMachine_->Wifi2WifiFinish();
-        return;
+        return false;
     }
 #endif
  
@@ -1393,7 +1416,69 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const s
     if (!pWifiProStateMachine_->TryWifi2Wifi(pWifiProStateMachine_->networkSelectionResult_)) {
         WIFI_LOGI("wifi to wifi step X: TryWifi2Wifi Failed.");
         pWifiProStateMachine_->Wifi2WifiFinish();
+        return false;
     }
+    return true;
+}
+
+bool WifiProStateMachine::WifiHasNetState::Try5gHandover(const std::vector<InterScanInfo> &scanInfos)
+{
+    std::vector<InterScanInfo> mutableScanInfos = scanInfos;
+    pWifiProStateMachine_->perf5gHandoverService_.ScanResultUpdated(mutableScanInfos);
+    pWifiProStateMachine_->targetBssid_ = pWifiProStateMachine_->perf5gHandoverService_.Switch5g();
+    if (pWifiProStateMachine_->targetBssid_ != "") {
+        WIFI_LOGI("Try5gHandover, perf 5g tried to switch.");
+        pWifiProStateMachine_->badBssid_ = pWifiProStateMachine_->currentBssid_;
+        pWifiProStateMachine_->isWifi2WifiSwitching_ = true;
+        return true;
+    }
+    WIFI_LOGI("Try5gHandover: 5G handover not available.");
+    return false;
+}
+
+bool WifiProStateMachine::WifiHasNetState::TryHigherCategoryNetworkSelection(
+    const std::vector<InterScanInfo> &scanInfos)
+{
+    if (WifiProUtils::IsUserSelectNetwork()) {
+        WIFI_LOGI("TryHigherCategoryNetworkSelection, user select network, do not switch.");
+        WifiProChr::GetInstance().RecordReasonNotSwitchChrCnt(WIFIPRO_USER_SELECT);
+        return false;
+    }
+    WIFI_LOGI("TryHigherCategoryNetworkSelection: Starting higher category network selection.");
+    // 设置WiFi7+强场切换原因，使用统一的网络选择接口
+    WifiSwitchReason previousReason = pWifiProStateMachine_->wifiSwitchReason_;
+    pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_HIGHER_CATEGORY);
+
+      // 1. 使用新的辅助函数获取所有 Higher Category 候选网络
+    std::vector<InterScanInfo> higherCategoryCandidates;
+    if (!pWifiProStateMachine_->GetFilteredCandidates(
+        scanInfos, NetworkSelectType::HIGHER_CATEGORY,
+        higherCategoryCandidates)) {
+        WIFI_LOGI("TryHigherCategoryNetworkSelection: No suitable higher category network found.");
+        pWifiProStateMachine_->Wifi2WifiFinish();
+        pWifiProStateMachine_->SetSwitchReason(previousReason);
+        return false;
+    }
+
+    // 2. 使用 IsAutoReconnectPreferred (内部用 AUTO_CONNECT) 比较候选网络和当前网络
+    NetworkSelectionResult outSelectionResult;
+    if (!pWifiProStateMachine_->IsAutoReconnectPreferred(higherCategoryCandidates, scanInfos, outSelectionResult)) {
+        WIFI_LOGI("TryHigherCategoryNetworkSelection: AUTO_CONNECT selection failed, skip switching.");
+        pWifiProStateMachine_->Wifi2WifiFinish();
+        pWifiProStateMachine_->SetSwitchReason(previousReason);
+        return false;
+    }
+
+    // IsAutoReconnectPreferred 返回 true 意味着选出了一个更优的网络, 且不是当前网络
+    WIFI_LOGI("TryHigherCategoryNetworkSelection: AUTO_CONNECT selected %{public}s as winner, attempting switch.",
+              MacAnonymize(outSelectionResult.interScanInfo.bssid).c_str());
+    if (!pWifiProStateMachine_->TryWifi2Wifi(outSelectionResult)) {
+        WIFI_LOGI("TryHigherCategoryNetworkSelection: TryWifi2Wifi failed to start connection.");
+        pWifiProStateMachine_->Wifi2WifiFinish();
+        pWifiProStateMachine_->SetSwitchReason(previousReason);
+        return false;
+    }
+    return true;
 }
 
 void WifiProStateMachine::WifiHasNetState::RequestHttpDetect(bool forceHttpDetect)
@@ -1461,6 +1546,108 @@ void WifiProStateMachine::WifiHasNetState::HandleWifiQoeSlow()
             rssiLevel2Or3ScanedCounter_ = 0;
         }
     }
+}
+
+bool WifiProStateMachine::GetFilteredCandidates(const std::vector<InterScanInfo>& scanInfos,
+    NetworkSelectType selectType, std::vector<InterScanInfo>& outCandidates)
+{
+    BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
+    std::unique_ptr<NetworkSelectionManager> pNetworkSelectionManager = std::make_unique<NetworkSelectionManager>();
+    if (!pNetworkSelectionManager) {
+        WIFI_LOGE("GetFilteredCandidates: Failed to create NetworkSelectionManager.");
+        return false;
+    }
+
+    std::vector<NetworkSelection::NetworkCandidate> networkCandidates;
+    pNetworkSelectionManager->GetAllDeviceConfigs(networkCandidates, scanInfos);
+
+    auto factory = std::make_unique<NetworkSelectorFactory>();
+    auto selectorOpt = factory->GetNetworkSelector(selectType);
+    if (!selectorOpt.has_value()) {
+        WIFI_LOGE("GetFilteredCandidates: Failed to obtain selector for type %{public}d.",
+            static_cast<int>(selectType));
+        WifiProChr::GetInstance().RecordSelectNetChrCnt(false);
+        return false;
+    }
+    auto &selector = selectorOpt.value();
+
+    pNetworkSelectionManager->TryNominate(networkCandidates, selector);
+
+    std::vector<NetworkSelection::NetworkCandidate *> bestCandidates;
+    selector->GetBestCandidates(bestCandidates);
+
+    if (bestCandidates.empty()) {
+        WIFI_LOGI("GetFilteredCandidates: Selector filtered out all candidates.");
+        WifiProChr::GetInstance().RecordSelectNetChrCnt(false);
+        return false;
+    }
+
+    for (auto *nc : bestCandidates) {
+        if (nc != nullptr) {
+            outCandidates.push_back(nc->interScanInfo);
+        }
+    }
+
+    WIFI_LOGI("GetFilteredCandidates: Found %{public}zu candidates for select type %{public}d.",
+        outCandidates.size(), static_cast<int>(selectType));
+    WifiProChr::GetInstance().RecordSelectNetChrCnt(true);
+    return true;
+}
+
+bool WifiProStateMachine::IsAutoReconnectPreferred(
+    const std::vector<InterScanInfo> &higherCategoryCandidates,
+    const std::vector<InterScanInfo> &scanInfos,
+    NetworkSelectionResult &outSelectionResult)
+{
+    if (!pCurrWifiInfo_) {
+        WIFI_LOGE("IsAutoReconnectPreferred: Current WiFi info is null.");
+        return false;
+    }
+
+    // Find the InterScanInfo for the current network from the scan results
+    const InterScanInfo* currentCandidate = nullptr;
+    for (const auto& scanInfo : scanInfos) {
+        if (scanInfo.bssid == pCurrWifiInfo_->bssid) {
+            currentCandidate = &scanInfo;
+            break;
+        }
+    }
+
+    if (currentCandidate == nullptr) {
+        WIFI_LOGW("IsAutoReconnectPreferred: Could not find current network in scan results.");
+        return false;
+    }
+
+    // Build candidate vector: current first, then all higher-category candidates
+    std::vector<InterScanInfo> candidatesToCompare;
+    candidatesToCompare.push_back(*currentCandidate);
+    for (const auto &cand : higherCategoryCandidates) {
+        candidatesToCompare.push_back(cand);
+    }
+
+    // Use NetworkSelectionManager with AUTO_CONNECT to determine the best one among current+all candidates
+    std::unique_ptr<NetworkSelectionManager> pNetworkSelectionManager = std::make_unique<NetworkSelectionManager>();
+    NetworkSelectionResult selectionResult;
+    std::string failReason;
+
+    if (!pNetworkSelectionManager->SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT,
+        candidatesToCompare, failReason)) {
+        WIFI_LOGI("IsAutoReconnectPreferred: AUTO_CONNECT selection failed: %{public}s", failReason.c_str());
+        return false;
+    }
+
+    WIFI_LOGI("IsAutoReconnectPreferred: Selection winner is %{public}s.",
+        MacAnonymize(selectionResult.interScanInfo.bssid).c_str());
+
+    // Fill outSelectionResult for caller
+    outSelectionResult = selectionResult;
+
+    // If winner is not the current network, then a higher-category candidate won
+    if (selectionResult.interScanInfo.bssid != pCurrWifiInfo_->bssid) {
+        WIFI_LOGI("IsAutoReconnectPreferred: A higher-category candidate was selected by AUTO_CONNECT. Allow switch.");
+        return true;
+    }
+    return false;
 }
 /* --------------------------- state machine no net state ------------------------------ */
 WifiProStateMachine::WifiNoNetState::WifiNoNetState(WifiProStateMachine *pWifiProStateMachine)

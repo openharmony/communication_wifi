@@ -145,7 +145,7 @@ void WifiNetAgent::UpdateNetLinkInfo(IpInfo &wifiIpInfo, IpV6Info &wifiIpV6Info,
     CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
     uint32_t& supplierIdNow = (instId == 0) ? supplierId : supplierIdForWlan1;
     int32_t result = NetConnClient::GetInstance().UpdateNetLinkInfo(supplierIdNow, netLinkInfo);
-    WIFI_LOGI("UpdateNetLinkInfo result:%{public}d", result);
+    WIFI_HILOG_COMM_INFO("UpdateNetLinkInfo result:%{public}d", result);
 }
 
 bool WifiNetAgent::AddRoute(const std::string interface, const std::string ipAddress, int prefixLength)

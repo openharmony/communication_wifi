@@ -279,7 +279,7 @@ void AppStateObserver::OnAppStopped(const AppExecFwk::AppStateData &appStateData
 
 void AppStateObserver::OnForegroundApplicationChanged(const AppExecFwk::AppStateData &appStateData)
 {
-    WIFI_LOGI("%{public}s bundleName: %{public}s, uid: %{public}d, state: %{public}d, isFocused: %{public}d",
+    WIFI_HILOG_COMM_INFO("%{public}s bundleName: %{public}s, uid: %{public}d, state: %{public}d, isFocused: %{public}d",
         __func__, appStateData.bundleName.c_str(), appStateData.uid, appStateData.state, appStateData.isFocused);
     WifiAppStateAware::GetInstance().OnForegroundAppChanged(appStateData);
 }

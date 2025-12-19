@@ -116,7 +116,7 @@ void IpQosMonitor::HandleTcpPktsResp(const std::vector<int64_t> &elems)
             return;
         }
         if (mHttpDetectedAllowed && signalLevel >= SIGNAL_LEVEL_2) {
-            WIFI_LOGI("%{public}s: start http detect", __FUNCTION__);
+            WIFI_HILOG_COMM_INFO("%{public}s: start http detect", __FUNCTION__);
             if (mNetWorkDetect == nullptr) {
                 mNetWorkDetect = sptr<NetStateObserver>(new NetStateObserver());
             }

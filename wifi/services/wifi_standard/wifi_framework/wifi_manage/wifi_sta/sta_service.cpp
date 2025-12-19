@@ -578,7 +578,7 @@ ErrCode StaService::ConnectToDevice(const WifiDeviceConfig &config) const
         LOGD("ConnectToDevice, AddDeviceConfig failed!");
         return WIFI_OPT_FAILED;
     }
-    LOGI("ConnectToDevice, netWorkId: %{public}d", netWorkId);
+    WIFI_HILOG_COMM_INFO("ConnectToDevice, netWorkId: %{public}d", netWorkId);
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_NETWORK, netWorkId, NETWORK_SELECTED_BY_USER);
     return WIFI_OPT_SUCCESS;
 }
@@ -753,7 +753,7 @@ ErrCode StaService::AllowAutoConnect(int32_t networkId, bool isAllowed) const
 
 ErrCode StaService::Disconnect() const
 {
-    WIFI_LOGI("Enter Disconnect.\n");
+    WIFI_HILOG_COMM_INFO("Enter Disconnect.\n");
     if (m_instId == INSTID_WLAN0) {
         CHECK_NULL_AND_RETURN(pStaAutoConnectService, WIFI_OPT_FAILED);
         WifiLinkedInfo linkedInfo;

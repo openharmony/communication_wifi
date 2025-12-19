@@ -69,10 +69,10 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
     bool isEnterprise = DualBandUtils::IsEnterprise(wifiDeviceConfig);
     connectedAp_->canNotPerf = isEnterprise || wifiLinkedInfo.isDataRestricted || isItCustNetwork ||
         wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE || connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR;
-    WIFI_LOGI("OnConnected, canNotPerf:isEnterprise(%{public}d),isItCustNetwork(%{public}d),isPortal(%{public}d),"
-        "isDataRestricted(%{public}d),openNet(%{public}d), isEMLSR(%{public}d)", isEnterprise, isItCustNetwork,
-        wifiDeviceConfig.isPortal, wifiLinkedInfo.isDataRestricted, wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE,
-        connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR);
+    WIFI_HILOG_COMM_INFO("OnConnected, canNotPerf:isEnterprise(%{public}d),isItCustNetwork(%{public}d),"
+        "isPortal(%{public}d),isDataRestricted(%{public}d),openNet(%{public}d), isEMLSR(%{public}d)", isEnterprise,
+        isItCustNetwork, wifiDeviceConfig.isPortal, wifiLinkedInfo.isDataRestricted,
+        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE, connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR);
     if (connectedAp_->canNotPerf) {
         WIFI_LOGI("OnConnected, ap is not allow perf 5g");
         return;
@@ -147,7 +147,7 @@ void Perf5gHandoverService::OnDisconnected()
         pDualBandRepostitory_->SaveRelationApInfo(relationAps_);
     }
     StopMonitor();
-    WIFI_LOGI("OnDisconnected, ssid(%{public}s),bssid(%{public}s),frequency(%{public}d)",
+    WIFI_HILOG_COMM_INFO("OnDisconnected, ssid(%{public}s),bssid(%{public}s),frequency(%{public}d)",
         SsidAnonymize(connectedAp_->apInfo.ssid).data(), MacAnonymize(connectedAp_->apInfo.bssid).data(),
         connectedAp_->apInfo.frequency);
     if (connectedAp_ != nullptr) {
@@ -207,7 +207,8 @@ std::string Perf5gHandoverService::Switch5g()
         return "";
     }
     int32_t ret;
-    WIFI_LOGI("Switch5g StartConnectToBssid. bssid(%{public}s)", MacAnonymize(selectRelationAp_->apInfo.bssid).data());
+    WIFI_HILOG_COMM_INFO("Switch5g StartConnectToBssid. bssid(%{public}s)",
+        MacAnonymize(selectRelationAp_->apInfo.bssid).data());
     ret = pStaService->StartConnectToBssid(
         selectRelationAp_->apInfo.networkId, selectRelationAp_->apInfo.bssid, NETWORK_SELECTED_BY_WIFIPRO);
     if (ret == WIFI_OPT_SUCCESS) {

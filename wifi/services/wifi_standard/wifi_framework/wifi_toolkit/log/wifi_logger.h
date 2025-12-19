@@ -73,6 +73,19 @@ struct LogLable {
 #define WIFI_LOGD(...) HILOG_IMPL(LOG_CORE, LOG_DEBUG, WIFI_LOG_LABEL.dominId, WIFI_LOG_LABEL.tag, ##__VA_ARGS__)
 
 #endif
+
+#ifndef WIFI_HILOG_COMM_INFO
+#define WIFI_HILOG_COMM_INFO(...) HILOG_COMM_INFO(__VA_ARGS__)
+#endif
+
+#ifndef WIFI_HILOG_COMM_WARN
+#define WIFI_HILOG_COMM_WARN(...) HILOG_COMM_WARN(__VA_ARGS__)
+#endif
+
+#ifndef WIFI_HILOG_COMM_ERROR
+#define WIFI_HILOG_COMM_ERROR(...) HILOG_COMM_ERROR(__VA_ARGS__)
+#endif
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

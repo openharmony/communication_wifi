@@ -805,5 +805,104 @@ HWTEST_F(WifiProStateMachineTest, wifiproblocklistTest01, TestSize.Level1)
     NetworkBlockListManager::GetInstance().CleanPerf5gBlocklist();
     EXPECT_EQ(NetworkBlockListManager::GetInstance().IsInPerf5gBlocklist(bssid3), false);
 }
+
+HWTEST_F(WifiProStateMachineTest, HandleWifi2WifiSuccessTest01, TestSize.Level1)
+{
+    pWifiProStateMachine_->isWifi2WifiSwitching_ = true;
+    pWifiProStateMachine_->targetBssid_ = "AA:BB:CC:DD:EE:FF"; // New BSSID (WiFi 7)
+    pWifiProStateMachine_->currentBssid_ = "11:22:33:44:55:66"; // Old BSSID (WiFi 6)
+    pWifiProStateMachine_->badBssid_ = pWifiProStateMachine_->currentBssid_;
+    pWifiProStateMachine_->wifiSwitchReason_ = WIFI_SWITCH_REASON_HIGHER_CATEGORY;
+    pWifiProStateMachine_->currentWifiCategory_ = WifiCategory::WIFI6; // Old standard
+
+    NetworkBlockListManager::GetInstance().RemovePerf5gBlocklist(pWifiProStateMachine_->currentBssid_);
+
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.bssid = pWifiProStateMachine_->targetBssid_; // Switched successfully to the new BSSID.
+    linkedInfo.supportedWifiCategory = WifiCategory::WIFI7; // New standard
+    msg->SetMessageObj(linkedInfo);
+
+    pWifiProStateMachine_->ProcessSwitchResult(msg);
+
+    EXPECT_FALSE(pWifiProStateMachine_->isWifi2WifiSwitching_);
+    EXPECT_FALSE(NetworkBlockListManager::GetInstance().IsInPerf5gBlocklist(pWifiProStateMachine_->badBssid_));
+}
+
+HWTEST_F(WifiProStateMachineTest, GetFilteredCandidatesTest01, TestSize.Level1)
+{
+    std::vector<InterScanInfo> scanInfos;
+    std::vector<InterScanInfo> outCandidates;
+
+    bool ret = pWifiProStateMachine_->GetFilteredCandidates(scanInfos, NetworkSelectType::AUTO_CONNECT, outCandidates);
+
+    EXPECT_FALSE(ret);
+    EXPECT_TRUE(outCandidates.empty());
+}
+
+HWTEST_F(WifiProStateMachineTest, Try5gHandoverTest01, TestSize.Level1)
+{
+    auto linkedInfo = std::make_shared<WifiLinkedInfo>();
+    linkedInfo->bssid = "11:22:33:44:55:66";
+    linkedInfo->ssid = "current_ap";
+    linkedInfo->rssi = -60;
+    linkedInfo->band = 1; // 2.4G
+    pWifiProStateMachine_->pCurrWifiInfo_ = linkedInfo;
+
+    std::vector<InterScanInfo> scanInfos;
+    InterScanInfo currentScan;
+    currentScan.bssid = linkedInfo->bssid;
+    currentScan.ssid = linkedInfo->ssid;
+    currentScan.rssi = linkedInfo->rssi;
+    currentScan.band = 1; // 2.4G
+    scanInfos.push_back(currentScan);
+
+    bool ret = pWifiProStateMachine_->pWifiHasNetState_->Try5gHandover(scanInfos);
+
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(WifiProStateMachineTest, TryHigherCategoryNetworkSelectionTest01, TestSize.Level1)
+{
+    auto linkedInfo = std::make_shared<WifiLinkedInfo>();
+    linkedInfo->bssid = "11:22:33:44:55:66";
+    linkedInfo->ssid = "current_ap";
+    linkedInfo->rssi = -55;
+    pWifiProStateMachine_->pCurrWifiInfo_ = linkedInfo;
+
+    std::vector<InterScanInfo> scanInfos;
+    InterScanInfo currentScan;
+    currentScan.bssid = linkedInfo->bssid;
+    currentScan.ssid = linkedInfo->ssid;
+    currentScan.rssi = linkedInfo->rssi;
+    scanInfos.push_back(currentScan);
+
+    InterScanInfo candidateScan;
+    candidateScan.bssid = "AA:BB:CC:DD:EE:FF";
+    candidateScan.ssid = "candidate_ap";
+    candidateScan.rssi = -55; // Same RSSI, not a better candidate
+    scanInfos.push_back(candidateScan);
+
+    bool ret = pWifiProStateMachine_->pWifiHasNetState_->TryHigherCategoryNetworkSelection(scanInfos);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(WifiProStateMachineTest, HandleHigherCategoryToLowerCategoryTest01, TestSize.Level1)
+{
+    pWifiProStateMachine_->currentWifiCategory_ = WifiCategory::WIFI7; // Old standard (Wifi 7)
+    pWifiProStateMachine_->badBssid_ = "11:22:33:44:55:66"; // Old BSSID
+
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.supportedWifiCategory = WifiCategory::WIFI6; // New standard (Wifi 6)
+    linkedInfo.bssid = "AA:BB:CC:DD:EE:FF"; // New BSSID
+
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+
+    NetworkBlockListManager::GetInstance().RemovePerf5gBlocklist(pWifiProStateMachine_->badBssid_);
+    pWifiProStateMachine_->HandleHigherCategoryToLowerCategory();
+
+    EXPECT_TRUE(NetworkBlockListManager::GetInstance().IsInPerf5gBlocklist(pWifiProStateMachine_->badBssid_));
+}
 } // namespace Wifi
 } // namespace OHOS

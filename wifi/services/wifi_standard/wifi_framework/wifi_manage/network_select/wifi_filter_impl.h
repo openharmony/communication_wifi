@@ -237,5 +237,21 @@ public:
 protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
+
+class HigherCategoryFilter final : public SimpleWifiFilter {
+public:
+    HigherCategoryFilter();
+    ~HigherCategoryFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+
+class Perf5gBlackListFilter final : public SimpleWifiFilter {
+public:
+    Perf5gBlackListFilter();
+    ~Perf5gBlackListFilter() override;
+protected:
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
 }
 #endif //OHOS_WIFI_WIFI_FILTER_H

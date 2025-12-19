@@ -204,7 +204,7 @@ void SelfCureStateMachine::DefaultState::HandleDhcpOfferPacketRcv(const IpInfo &
     }
     uint32_t retSize = 0;
     pEnhanceService->DealDhcpOfferResult(OperationCmd::DHCP_OFFER_ADD, info, retSize);
-    WIFI_LOGI("dhcpOfferPackets size: %{public}u", retSize);
+    WIFI_HILOG_COMM_INFO("dhcpOfferPackets size: %{public}u", retSize);
 }
 
 void SelfCureStateMachine::DefaultState::HandleP2pEnhanceStateChange(int state)
@@ -562,7 +562,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
             TransitionToSelfCureState(WIFI_CURE_INTERNET_FAILED_TYPE_DNS);
         } else {
             pSelfCureStateMachine_->SwitchState(pSelfCureStateMachine_->pNoInternetState_);
-            WIFI_LOGI("Handle network disable, there is not a expectant condition!.");
+            WIFI_HILOG_COMM_INFO("Handle network disable, there is not a expectant condition!.");
         }
         return;
     }
@@ -583,7 +583,7 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetectedIn
         pSelfCureStateMachine_->selfCureReason_ = deltaFailedDns >= DNS_FAILED_CNT ?
             WIFI_CURE_INTERNET_FAILED_TYPE_DNS : WIFI_CURE_INTERNET_FAILED_TYPE_TCP;
     }
-    WIFI_LOGI("HandleInternetFailedDetected, http unreachable, transition to SelfCureState,"
+    WIFI_HILOG_COMM_INFO("HandleInternetFailedDetected, http unreachable, transition to SelfCureState,"
         "selfCureReason_: %{public}d", pSelfCureStateMachine_->selfCureReason_);
     TransitionToSelfCureState(pSelfCureStateMachine_->selfCureReason_);
 }
@@ -1232,7 +1232,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForStaticIp(int reques
         return;
     }
     std::string gatewayKey = IpTools::ConvertIpv4Address(dhcpResult.gateway);
-    WIFI_LOGI("begin to self cure for internet access: TRY_NEXT_DHCP_OFFER");
+    WIFI_HILOG_COMM_INFO("begin to self cure for internet access: TRY_NEXT_DHCP_OFFER");
     pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP, true);
     EnhanceWriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::GATEWAY_ABNORMAL));
     RequestUseStaticIpConfig(dhcpResult);
@@ -1273,7 +1273,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReassoc(int request
         isDelayedReassocSelfCure_ = true;
         return;
     }
-    WIFI_LOGI("begin to self cure for internet access: Reassoc");
+    WIFI_HILOG_COMM_INFO("begin to self cure for internet access: Reassoc");
     EnhanceWriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::TCP_RX_ABNORMAL));
     pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_MIDDLE_REASSOC, true);
     testedSelfCureLevel_.push_back(requestCureLevel);
@@ -1300,7 +1300,7 @@ bool SelfCureStateMachine::InternetSelfCureState::IsNeedMultiGatewaySelfcure()
 
 void SelfCureStateMachine::InternetSelfCureState::SelfcureForMultiGateway(InternalMessagePtr msg)
 {
-    WIFI_LOGI("begin to self cure for internet access: multi gateway");
+    WIFI_HILOG_COMM_INFO("begin to self cure for internet access: multi gateway");
     if (!pSelfCureStateMachine_->IsSuppOnCompletedState()) {
         WIFI_LOGW("it is not connect, no need selfcure");
         return;
@@ -1343,7 +1343,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForRandMacReassoc(int 
         WIFI_LOGW("delay randmac self cure");
         return;
     }
-    WIFI_LOGI("begin to self cure for internet access: RandMacReassoc");
+    WIFI_HILOG_COMM_INFO("begin to self cure for internet access: RandMacReassoc");
     pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_RAND_MAC_REASSOC, true);
     isDelayedRandMacReassocSelfCure_ = false;
     pSelfCureStateMachine_->useWithRandMacAddress_ = FAC_MAC_REASSOC;
@@ -1377,7 +1377,7 @@ void SelfCureStateMachine::InternetSelfCureState::SelfCureForReset(int requestCu
         isDelayedResetSelfCure_ = true;
         return;
     }
-    WIFI_LOGI("begin to self cure for internet access: Reset");
+    WIFI_HILOG_COMM_INFO("begin to self cure for internet access: Reset");
 
     pSelfCureStateMachine_->SetSelfCureWifiTimeOut(SelfCureState::SCE_WIFI_OFF_STATE);
     WifiConfigCenter::GetInstance().SetWifiSelfcureResetEntered(true);
@@ -1797,7 +1797,7 @@ void SelfCureStateMachine::Wifi6SelfCureState::HandleWifi6WithoutHtcArpFail(Inte
 
 void SelfCureStateMachine::Wifi6SelfCureState::Wifi6ReassocSelfcure()
 {
-    WIFI_LOGI("begin to self cure for wifi6 reassoc");
+    WIFI_HILOG_COMM_INFO("begin to self cure for wifi6 reassoc");
     pSelfCureStateMachine_->isHasTestWifi6Reassoc_ = true;
     pSelfCureStateMachine_->MessageExecutedLater(WIFI_CURE_CMD_INTERNET_FAILED_SELF_CURE,
         WIFI_CURE_INTERNET_FAILED_TYPE_TCP, SELF_CURE_DELAYED_MS);
@@ -2247,7 +2247,7 @@ void SelfCureStateMachine::PeriodicArpDetection()
     }
     if (!CanArpReachable()) {
         arpDetectionFailedCnt_++;
-        WIFI_LOGI("Periodic Arp Detection failed, times : %{public}d", arpDetectionFailedCnt_);
+        WIFI_HILOG_COMM_INFO("Periodic Arp Detection failed, times : %{public}d", arpDetectionFailedCnt_);
         if (arpDetectionFailedCnt_ == ARP_DETECTED_FAILED_COUNT) {
             SendMessage(WIFI_CURE_CMD_ARP_FAILED_DETECTED);
         } else if (arpDetectionFailedCnt_ > 0 && arpDetectionFailedCnt_ < ARP_DETECTED_FAILED_COUNT) {
@@ -2863,7 +2863,7 @@ void SelfCureStateMachine::HandleSelfCureNormal()
         }
         case SelfCureState::SCE_WIFI_DISCONNECT_STATE:  // fall through
         case SelfCureState::SCE_WIFI_ON_STATE: {
-            WIFI_LOGI("HandleSelfCureNormal wifi on OK or disconnect ok! -> wifi connect");
+            WIFI_HILOG_COMM_INFO("HandleSelfCureNormal wifi on OK or disconnect ok! -> wifi connect");
             if (selfCureL2State_ == SelfCureState::SCE_WIFI_ON_STATE) {
                 UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_HIGH_RESET_WIFI_ON, true);
             }

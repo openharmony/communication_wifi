@@ -146,7 +146,6 @@ void WifiScanMgrServiceImplFuzzTest(const uint8_t* data, size_t size)
 {
     int32_t fd = static_cast<int32_t>(data[0]);
     std::vector<std::u16string> args;
-    
     pWifiScanMgrServiceImpl.Dump(fd, args);
 }
 
@@ -167,24 +166,89 @@ void WifiScanImplFuzzTest(FuzzedDataProvider& FDP)
     pWifiScanServiceImpl.IsWifiClosedScan(bOpen);
     pWifiScanServiceImpl.WriteInfoElementsToParcel(infoElems, ieSize, maxIeLen, outParcel);
 }
- 
-void WifiScanServiceImpl01FuzzTest(FuzzedDataProvider& FDP)
+
+void WifiScanSendScanInfoFuzzTest(FuzzedDataProvider& FDP)
 {
     int32_t contentSize = FDP.ConsumeIntegral<int32_t>();
+    size_t infoCount = FDP.ConsumeIntegral<size_t>();
+    if (infoCount == 0) {
+        return;
+    }
+
     std::vector<WifiScanInfo> result;
+
+    for (size_t i = 0; i < infoCount; ++i) {
+        WifiScanInfo info;
+
+        size_t bssidLen = FDP.ConsumeIntegral<size_t>();
+        std::string bssid = FDP.ConsumeBytesAsString(bssidLen);
+        info.bssid = bssid;
+
+        size_t ssidLen = FDP.ConsumeIntegral<size_t>();
+        std::string ssid = FDP.ConsumeBytesAsString(ssidLen);
+        info.ssid = ssid;
+
+        info.bssidType = FDP.ConsumeIntegral<int32_t>();
+        info.frequency = FDP.ConsumeIntegral<int32_t>();
+        info.band = FDP.ConsumeIntegral<uint8_t>();
+        info.channelWidth = static_cast<WifiChannelWidth>(FDP.ConsumeIntegral<uint8_t>());
+        info.centerFrequency0 = FDP.ConsumeIntegral<int32_t>();
+        info.centerFrequency1 = FDP.ConsumeIntegral<int32_t>();
+        info.rssi = FDP.ConsumeIntegral<int32_t>();
+        info.securityType = static_cast<WifiSecurity>(FDP.ConsumeIntegral<uint8_t>());
+        info.features = FDP.ConsumeIntegral<uint32_t>();
+        info.timestamp = FDP.ConsumeIntegral<int64_t>();
+        info.wifiStandard = FDP.ConsumeIntegral<uint8_t>();
+        info.maxSupportedRxLinkSpeed = FDP.ConsumeIntegral<uint32_t>();
+        info.maxSupportedTxLinkSpeed = FDP.ConsumeIntegral<uint32_t>();
+        info.disappearCount = FDP.ConsumeIntegral<uint32_t>();
+        info.isHiLinkNetwork = FDP.ConsumeBool();
+        info.isHiLinkProNetwork = FDP.ConsumeBool();
+        info.supportedWifiCategory = static_cast<WifiCategory>(FDP.ConsumeIntegral<uint8_t>());
+        info.riskType = static_cast<WifiRiskType>(FDP.ConsumeIntegral<uint8_t>());
+
+        result.push_back(info);
+    }
+
     std::vector<uint32_t> allSizeUint;
     ScanAshmemParcel outAshmemParcel;
+
+    pWifiScanServiceImpl.SendScanInfo(contentSize, result, outAshmemParcel, allSizeUint);
+}
+
+void WifiScanGetScanInfoListFuzzTest(FuzzedDataProvider& FDP)
+{
+    ScanAshmemParcel outAshmemParcel;
     bool compatible = FDP.ConsumeBool();
-    bool bScanOnlyAvailable = FDP.ConsumeBool();
     std::vector<int32_t> allSize;
-    const sptr<IRemoteObject> cbParcel;
+    pWifiScanServiceImpl.GetScanInfoList(compatible, outAshmemParcel, allSize);
+}
+
+void WifiScanGetScanOnlyAvailableFuzzTest(FuzzedDataProvider& FDP)
+{
+    bool bScanOnlyAvailable = FDP.ConsumeBool();
+    pWifiScanServiceImpl.GetScanOnlyAvailable(bScanOnlyAvailable);
+}
+
+void WifiScanRegisterCallBackFuzzTest(FuzzedDataProvider& FDP)
+{
+    uintptr_t ptrValue = FDP.ConsumeIntegral<uintptr_t>();
+    if (ptrValue == 0) {
+        ptrValue = 0x1000;
+    }
+
+    auto cbParcel = sptr<IRemoteObject>(reinterpret_cast<IRemoteObject*>(ptrValue));
+
+    if (cbParcel == nullptr) {
+        return;
+    }
+
+    const sptr<IRemoteObject>& cbParcelRef = cbParcel;
+
     int32_t pid = FDP.ConsumeIntegral<int32_t>();
     int32_t tokenId = FDP.ConsumeIntegral<int32_t>();
     std::vector<std::string> event;
-    pWifiScanServiceImpl.SendScanInfo(contentSize, result, outAshmemParcel, allSizeUint);
-    pWifiScanServiceImpl.GetScanInfoList(compatible, outAshmemParcel, allSize);
-    pWifiScanServiceImpl.GetScanOnlyAvailable(bScanOnlyAvailable);
-    pWifiScanServiceImpl.RegisterCallBack(cbParcel, pid, tokenId, event);
+    pWifiScanServiceImpl.RegisterCallBack(cbParcelRef, pid, tokenId, event);
 }
 
 /* Fuzzer entry point */
@@ -207,7 +271,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::WifiScanServiceImplFuzzTest(data, size);
     OHOS::Wifi::WifiScanMgrServiceImplFuzzTest(data, size);
     OHOS::Wifi::WifiScanImplFuzzTest(FDP);
-    OHOS::Wifi::WifiScanServiceImpl01FuzzTest(FDP);
+    OHOS::Wifi::WifiScanGetScanInfoListFuzzTest(FDP);
+    OHOS::Wifi::WifiScanGetScanOnlyAvailableFuzzTest(FDP);
     return 0;
 }
 }

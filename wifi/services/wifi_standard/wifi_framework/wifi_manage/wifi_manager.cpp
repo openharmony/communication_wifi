@@ -269,6 +269,7 @@ int WifiManager::GetSupportedFeatures(long &features) const
 
 void WifiManager::AddSupportedFeatures(WifiFeatures feature)
 {
+    std::unique_lock<std::mutex> lock(mutex);
     mSupportedFeatures = static_cast<long>(static_cast<unsigned long>(mSupportedFeatures) |
         static_cast<unsigned long>(feature));
 }

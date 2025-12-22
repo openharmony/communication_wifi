@@ -1804,10 +1804,6 @@ bool WifiProStateMachine::WifiNoNetState::HandleHttpResultInNoNet(InternalMessag
 
 void WifiProStateMachine::WifiNoNetState::HandleReuqestSelfCure()
 {
-    if (pWifiProStateMachine_->IsFirstConnectAndNonet()) {
-        WIFI_LOGI("user select and nonet, not selfcure.");
-        return;
-    }
     if (isSelfCure_.load()) {
         WIFI_LOGI("SelfCure has already been done.");
         return;

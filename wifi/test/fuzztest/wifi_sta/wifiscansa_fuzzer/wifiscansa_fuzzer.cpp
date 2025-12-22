@@ -169,50 +169,41 @@ void WifiScanImplFuzzTest(FuzzedDataProvider& FDP)
 
 void WifiScanSendScanInfoFuzzTest(FuzzedDataProvider& FDP)
 {
-    int32_t contentSize = FDP.ConsumeIntegral<int32_t>();
-    size_t infoCount = FDP.ConsumeIntegral<size_t>();
-    if (infoCount == 0) {
-        return;
-    }
-
+    const size_t kMaxInfoCount = 64;
+    size_t infoCount = FDP.ConsumeIntegralInRange<size_t>(1, kMaxInfoCount);
+    int32_t contentSize = FDP.ConsumeIntegralInRange<int32_t>(0, static_cast<int32_t>(infoCount));
     std::vector<WifiScanInfo> result;
-
+    result.reserve(infoCount);
+    const size_t kMaxBssidLen = 32;
+    const size_t kMaxSsidLen  = 64; 
     for (size_t i = 0; i < infoCount; ++i) {
         WifiScanInfo info;
-
-        size_t bssidLen = FDP.ConsumeIntegral<size_t>();
-        std::string bssid = FDP.ConsumeBytesAsString(bssidLen);
-        info.bssid = bssid;
-
-        size_t ssidLen = FDP.ConsumeIntegral<size_t>();
-        std::string ssid = FDP.ConsumeBytesAsString(ssidLen);
-        info.ssid = ssid;
-
-        info.bssidType = FDP.ConsumeIntegral<int32_t>();
-        info.frequency = FDP.ConsumeIntegral<int32_t>();
-        info.band = FDP.ConsumeIntegral<uint8_t>();
-        info.channelWidth = static_cast<WifiChannelWidth>(FDP.ConsumeIntegral<uint8_t>());
+        size_t bssidLen = FDP.ConsumeIntegralInRange<size_t>(0, kMaxBssidLen);
+        info.bssid = FDP.ConsumeBytesAsString(bssidLen);
+        size_t ssidLen = FDP.ConsumeIntegralInRange<size_t>(0, kMaxSsidLen);
+        info.ssid = FDP.ConsumeBytesAsString(ssidLen);
+        info.bssidType = FDP.ConsumeIntegralInRange<int32_t>(0, 4);
+        info.frequency = FDP.ConsumeIntegralInRange<int32_t>(2400, 6000);
+        info.band = FDP.ConsumeIntegralInRange<uint8_t>(0, 5);
+        info.channelWidth = static_cast<WifiChannelWidth>(FDP.ConsumeIntegralInRange<uint8_t>(0, 5));
         info.centerFrequency0 = FDP.ConsumeIntegral<int32_t>();
         info.centerFrequency1 = FDP.ConsumeIntegral<int32_t>();
-        info.rssi = FDP.ConsumeIntegral<int32_t>();
-        info.securityType = static_cast<WifiSecurity>(FDP.ConsumeIntegral<uint8_t>());
+        info.rssi = FDP.ConsumeIntegralInRange<int32_t>(-120, 0);
+        info.securityType = static_cast<WifiSecurity>(FDP.ConsumeIntegralInRange<uint8_t>(0, 10));
         info.features = FDP.ConsumeIntegral<uint32_t>();
         info.timestamp = FDP.ConsumeIntegral<int64_t>();
-        info.wifiStandard = FDP.ConsumeIntegral<uint8_t>();
+        info.wifiStandard = FDP.ConsumeIntegralInRange<uint8_t>(0, 10);
         info.maxSupportedRxLinkSpeed = FDP.ConsumeIntegral<uint32_t>();
         info.maxSupportedTxLinkSpeed = FDP.ConsumeIntegral<uint32_t>();
-        info.disappearCount = FDP.ConsumeIntegral<uint32_t>();
+        info.disappearCount = FDP.ConsumeIntegralInRange<uint32_t>(0, 100);
         info.isHiLinkNetwork = FDP.ConsumeBool();
         info.isHiLinkProNetwork = FDP.ConsumeBool();
-        info.supportedWifiCategory = static_cast<WifiCategory>(FDP.ConsumeIntegral<uint8_t>());
-        info.riskType = static_cast<WifiRiskType>(FDP.ConsumeIntegral<uint8_t>());
-
-        result.push_back(info);
+        info.supportedWifiCategory = static_cast<WifiCategory>(FDP.ConsumeIntegralInRange<uint8_t>(0, 10));
+        info.riskType = static_cast<WifiRiskType>(FDP.ConsumeIntegralInRange<uint8_t>(0, 10));
+        result.push_back(std::move(info));
     }
-
     std::vector<uint32_t> allSizeUint;
     ScanAshmemParcel outAshmemParcel;
-
     pWifiScanServiceImpl.SendScanInfo(contentSize, result, outAshmemParcel, allSizeUint);
 }
 
@@ -271,6 +262,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::WifiScanServiceImplFuzzTest(data, size);
     OHOS::Wifi::WifiScanMgrServiceImplFuzzTest(data, size);
     OHOS::Wifi::WifiScanImplFuzzTest(FDP);
+    OHOS::Wifi::WifiScanSendScanInfoFuzzTest(FDP);
     OHOS::Wifi::WifiScanGetScanInfoListFuzzTest(FDP);
     OHOS::Wifi::WifiScanGetScanOnlyAvailableFuzzTest(FDP);
     return 0;

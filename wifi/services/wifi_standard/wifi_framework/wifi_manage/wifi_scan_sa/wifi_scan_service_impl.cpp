@@ -329,6 +329,10 @@ void WifiScanServiceImpl::WriteInfoElementsToParcel(
     size_t maxIeLen,
     Parcel &outParcel)
 {
+    if (infoElems.empty()) {
+        return;
+    }
+
     for (size_t j = 0; j < ieSize; j++) {
         const auto &elem = infoElems[j];
         outParcel.WriteUint32(elem.id);

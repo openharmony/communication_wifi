@@ -36,8 +36,8 @@ constexpr int TWO = 2;
 constexpr int U32_AT_SIZE_ZERO = 4;
 static const int32_t NUM_BYTES = 1;
 const size_t K_MAX_INFO_COUNT = 64;
-const size_t K_MAX_SSID_LEN = 32;
-const size_t K_MAX_SSID_LEN  = 64;
+const size_t K_MAX_SSID_LEN = 64;
+const size_t K_MAX_BSSID_LEN = 32;
 const size_t MAX_FREQUENCY = 6000;
 const size_t MIN_FREQUENCY = 2400;
 const size_t TEN = 10;
@@ -184,7 +184,7 @@ void WifiScanSendScanInfoFuzzTest(FuzzedDataProvider& FDP)
     result.reserve(infoCount);
     for (size_t i = 0; i < infoCount; ++i) {
         WifiScanInfo info;
-        size_t bssidLen = FDP.ConsumeIntegralInRange<size_t>(0, K_BSSID_LEN);
+        size_t bssidLen = FDP.ConsumeIntegralInRange<size_t>(0, K_MAX_BSSID_LEN);
         info.bssid = FDP.ConsumeBytesAsString(bssidLen);
         size_t ssidLen = FDP.ConsumeIntegralInRange<size_t>(0, K_MAX_SSID_LEN);
         info.ssid = FDP.ConsumeBytesAsString(ssidLen);

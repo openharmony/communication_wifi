@@ -35,15 +35,15 @@ namespace Wifi {
 constexpr int TWO = 2;
 constexpr int U32_AT_SIZE_ZERO = 4;
 static const int32_t NUM_BYTES = 1;
-const size_t K_MAX_INFO_COUNT = 64;
-const size_t K_MAX_SSID_LEN = 64;
-const size_t K_MAX_BSSID_LEN = 32;
-const size_t MAX_FREQUENCY = 6000;
-const size_t MIN_FREQUENCY = 2400;
-const size_t TEN = 10;
-const size_t FIVE = 5
-const size_t MIN_RSSI = -120;
-const size_t DISAPPEAR_COUNT = 100;
+constexpr int K_MAX_INFO_COUNT = 64;
+constexpr int K_MAX_SSID_LEN = 64;
+constexpr int K_MAX_BSSID_LEN = 32;
+constexpr int MAX_FREQUENCY = 6000;
+constexpr int MIN_FREQUENCY = 2400;
+constexpr int TEN = 10;
+constexpr int FIVE = 5
+constexpr int MIN_RSSI = -120;
+constexpr int DISAPPEAR_COUNT = 100;
 
 OHOS::Wifi::WifiScanServiceImpl pWifiScanServiceImpl;
 WifiScanMgrServiceImpl pWifiScanMgrServiceImpl;

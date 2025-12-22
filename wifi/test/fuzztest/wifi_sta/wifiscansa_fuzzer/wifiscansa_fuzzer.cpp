@@ -41,7 +41,7 @@ constexpr int K_MAX_BSSID_LEN = 32;
 constexpr int MAX_FREQUENCY = 6000;
 constexpr int MIN_FREQUENCY = 2400;
 constexpr int TEN = 10;
-constexpr int FIVE = 5
+constexpr int FIVE = 5;
 constexpr int MIN_RSSI = -120;
 constexpr int DISAPPEAR_COUNT = 100;
 

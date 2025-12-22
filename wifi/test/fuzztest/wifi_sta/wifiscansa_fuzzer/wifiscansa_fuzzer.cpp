@@ -35,15 +35,15 @@ namespace Wifi {
 constexpr int TWO = 2;
 constexpr int U32_AT_SIZE_ZERO = 4;
 static const int32_t NUM_BYTES = 1;
-const size_t kMaxInfoCount = 64;
-const size_t kMaxBssidLen = 32;
-const size_t kMaxSsidLen  = 64;
-const size_t MaxFrequency = 6000;
-const size_t MinFrequency = 2400;
+const size_t K_MAX_INFO_COUNT = 64;
+const size_t K_MAX_SSID_LEN = 32;
+const size_t K_MAX_SSID_LEN  = 64;
+const size_t MAX_FREQUENCY = 6000;
+const size_t MIN_FREQUENCY = 2400;
 const size_t TEN = 10;
 const size_t FIVE = 5
-const size_t MinRssi = -120;
-const size_t DisappearCount = 100;
+const size_t MIN_RSSI = -120;
+const size_t DISAPPEAR_COUNT = 100;
 
 OHOS::Wifi::WifiScanServiceImpl pWifiScanServiceImpl;
 WifiScanMgrServiceImpl pWifiScanMgrServiceImpl;
@@ -178,30 +178,30 @@ void WifiScanImplFuzzTest(FuzzedDataProvider& FDP)
 
 void WifiScanSendScanInfoFuzzTest(FuzzedDataProvider& FDP)
 {
-    size_t infoCount = FDP.ConsumeIntegralInRange<size_t>(1, kMaxInfoCount);
+    size_t infoCount = FDP.ConsumeIntegralInRange<size_t>(1, K_MAX_INFO_COUNT);
     int32_t contentSize = FDP.ConsumeIntegralInRange<int32_t>(0, static_cast<int32_t>(infoCount));
     std::vector<WifiScanInfo> result;
     result.reserve(infoCount);
     for (size_t i = 0; i < infoCount; ++i) {
         WifiScanInfo info;
-        size_t bssidLen = FDP.ConsumeIntegralInRange<size_t>(0, kMaxBssidLen);
+        size_t bssidLen = FDP.ConsumeIntegralInRange<size_t>(0, K_BSSID_LEN);
         info.bssid = FDP.ConsumeBytesAsString(bssidLen);
-        size_t ssidLen = FDP.ConsumeIntegralInRange<size_t>(0, kMaxSsidLen);
+        size_t ssidLen = FDP.ConsumeIntegralInRange<size_t>(0, K_MAX_SSID_LEN);
         info.ssid = FDP.ConsumeBytesAsString(ssidLen);
         info.bssidType = FDP.ConsumeIntegralInRange<int32_t>(0, U32_AT_SIZE_ZERO);
-        info.frequency = FDP.ConsumeIntegralInRange<int32_t>(MinFrequency, MaxFrequency);
+        info.frequency = FDP.ConsumeIntegralInRange<int32_t>(MIN_FREQUENCY,  MAX_FREQUENCY);
         info.band = FDP.ConsumeIntegralInRange<uint8_t>(0, FIVE);
         info.channelWidth = static_cast<WifiChannelWidth>(FDP.ConsumeIntegralInRange<uint8_t>(0, FIVE));
         info.centerFrequency0 = FDP.ConsumeIntegral<int32_t>();
         info.centerFrequency1 = FDP.ConsumeIntegral<int32_t>();
-        info.rssi = FDP.ConsumeIntegralInRange<int32_t>(MinRssi, 0);
+        info.rssi = FDP.ConsumeIntegralInRange<int32_t>(MIN_RSSI, 0);
         info.securityType = static_cast<WifiSecurity>(FDP.ConsumeIntegralInRange<uint8_t>(0, TEN));
         info.features = FDP.ConsumeIntegral<uint32_t>();
         info.timestamp = FDP.ConsumeIntegral<int64_t>();
         info.wifiStandard = FDP.ConsumeIntegralInRange<uint8_t>(0, TEN);
         info.maxSupportedRxLinkSpeed = FDP.ConsumeIntegral<uint32_t>();
         info.maxSupportedTxLinkSpeed = FDP.ConsumeIntegral<uint32_t>();
-        info.disappearCount = FDP.ConsumeIntegralInRange<uint32_t>(0, DisappearCount);
+        info.disappearCount = FDP.ConsumeIntegralInRange<uint32_t>(0, DISAPPEAR_COUNT);
         info.isHiLinkNetwork = FDP.ConsumeBool();
         info.isHiLinkProNetwork = FDP.ConsumeBool();
         info.supportedWifiCategory = static_cast<WifiCategory>(FDP.ConsumeIntegralInRange<uint8_t>(0, TEN));

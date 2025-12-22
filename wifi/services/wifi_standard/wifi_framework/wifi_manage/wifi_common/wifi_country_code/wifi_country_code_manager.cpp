@@ -150,8 +150,10 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externa
     StrToUpper(wifiCountryCode);
     WIFI_LOGI("calculate wifi country code result:%{public}s", wifiCountryCode.c_str());
     UpdateWifiCountryCodeCache(wifiCountryCode);
-    std::unique_lock<std::mutex> lock(m_countryMutex);
-    m_wifiCountryCode = wifiCountryCode;
+    {
+        std::unique_lock<std::mutex> lock(m_countryMutex);
+        m_wifiCountryCode = wifiCountryCode;
+    }
     NotifyWifiCountryCodeChangeListeners(wifiCountryCode);
     return WIFI_OPT_SUCCESS;
 }

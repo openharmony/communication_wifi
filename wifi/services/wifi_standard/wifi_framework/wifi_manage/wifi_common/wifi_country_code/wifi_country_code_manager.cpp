@@ -49,6 +49,7 @@ ErrCode WifiCountryCodeManager::Init()
 {
     WIFI_LOGI("init");
     wifiCountryCodePolicyConf_ = GetWifiCountryCodePolicy();
+    std::unique_lock<std::mutex> lock(mutex);
     m_wifiCountryCodePolicy = std::make_shared<WifiCountryCodePolicy>(wifiCountryCodePolicyConf_);
 #ifdef FEATURE_STA_SUPPORT
     m_staCallback.callbackModuleName = CLASS_NAME;
@@ -95,7 +96,10 @@ void WifiCountryCodeManager::TriggerUpdateWifiCountryCode(int triggerReason)
         UpdateWifiCountryCode();
     } else if (triggerReason == TRIGGER_UPDATE_REASON_SCAN_CHANGE &&
         wifiCountryCodePolicyConf_[FEATURE_RCV_SCAN_RESLUT] && m_wifiCountryCodePolicy != nullptr) {
-        m_wifiCountryCodePolicy->HandleScanResultAction();
+        {
+            std::unique_lock<std::mutex> lock(mutex);
+            m_wifiCountryCodePolicy->HandleScanResultAction();
+        }
         UpdateWifiCountryCode();
     }
 }

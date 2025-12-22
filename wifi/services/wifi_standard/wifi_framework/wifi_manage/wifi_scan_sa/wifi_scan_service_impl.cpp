@@ -874,5 +874,6 @@ int32_t WifiScanServiceImpl::HandleScanIdlRet(int32_t originRet)
 #endif
 }
 
+
 }  // namespace Wifi
 }  // namespace OHOS

@@ -1054,7 +1054,7 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
 
 void StaStateMachine::LinkState::DealConnectTimeOutCmd(InternalMessagePtr msg)
 {
-    WIFI_LOGW("enter DealConnectTimeOutCmd.\n");
+    WIFI_HILOG_COMM_WARN("enter DealConnectTimeOutCmd.\n");
     if (msg == nullptr) {
         WIFI_LOGE("msg is nul\n");
     }
@@ -1767,7 +1767,7 @@ StaStateMachine::GetIpState::~GetIpState()
 
 void StaStateMachine::GetIpState::GoInState()
 {
-    WIFI_LOGI("GetIpState GoInState function. m_instId=%{public}d", pStaStateMachine->m_instId);
+    WIFI_HILOG_COMM_INFO("GetIpState GoInState function. m_instId=%{public}d", pStaStateMachine->m_instId);
 #ifdef WIFI_DHCP_DISABLED
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::WORKING);
@@ -1822,7 +1822,7 @@ void StaStateMachine::GetIpState::GoInState()
             pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_DHCP_FAIL,
                 DhcpFailType::TYPE_CONFIG_STATIC_IP_ADDRESS_FAIL);
             pStaStateMachine->StartDisConnectToNetwork();
-            WIFI_LOGE("ConfigstaticIpAddress failed!\n");
+            WIFI_HILOG_COMM_ERROR("ConfigstaticIpAddress failed!\n");
         }
     }
     pStaStateMachine->HandlePreDhcpSetup();
@@ -1867,7 +1867,7 @@ void StaStateMachine::GetIpState::GoInState()
         }
     } while (0);
     EnhanceWriteDhcpFailHiSysEvent("START_DHCP_CLIENT_FAIL");
-    WIFI_LOGE("Dhcp connection failed, isRoam:%{public}d", pStaStateMachine->isRoam);
+    WIFI_HILOG_COMM_ERROR("Dhcp connection failed, isRoam:%{public}d", pStaStateMachine->isRoam);
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
         pStaStateMachine->linkedInfo);
@@ -1899,7 +1899,7 @@ bool StaStateMachine::GetIpState::ExecuteStateMsg(InternalMessagePtr msg)
             ret = EXECUTED;
             int result = msg->GetParam1();
             int ipType = msg->GetParam2();
-            WIFI_LOGI("GetIpState, get ip result:%{public}d, ipType = %{public}d, m_instId = %{public}d\n",
+            WIFI_HILOG_COMM_INFO("GetIpState, get ip result:%{public}d, ipType = %{public}d, m_instId = %{public}d\n",
                 result, ipType, pStaStateMachine->m_instId);
             DealDhcpResultNotify(result, ipType);
             break;
@@ -1966,7 +1966,7 @@ void StaStateMachine::GetIpState::DealGetDhcpIpv4Timeout(InternalMessagePtr msg)
         WIFI_LOGE("DealGetDhcpIpv4Timeout InternalMessage msg is null.");
         return;
     }
-    WIFI_LOGI("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT DealGetDhcpIpv4Timeout");
+    WIFI_HILOG_COMM_INFO("StopTimer CMD_START_GET_DHCP_IP_TIMEOUT DealGetDhcpIpv4Timeout");
     BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
                                                                  DisabledReason::DISABLED_DHCP_FAILURE);
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
@@ -2889,7 +2889,7 @@ void StaStateMachine::LinkedState::DhcpResultNotify(InternalMessagePtr msg)
 
     int result = msg->GetParam1();
     int ipType = msg->GetParam2();
-    WIFI_LOGI("LinkedState, result:%{public}d, ipType = %{public}d\n", result, ipType);
+    WIFI_HILOG_COMM_INFO("LinkedState, result:%{public}d, ipType = %{public}d\n", result, ipType);
     if (result == DhcpReturnCode::DHCP_RENEW_FAIL) {
         pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
     } else if (result == DhcpReturnCode::DHCP_RESULT) {
@@ -2996,7 +2996,7 @@ void StaStateMachine::LinkedState::NetDetectionNotify(InternalMessagePtr msg)
     if (!msg->GetMessageObj(url)) {
         WIFI_LOGW("Failed to obtain portal url.");
     }
-    WIFI_LOGI("netdetection, netstate:%{public}d url:%{private}s\n", netstate, url.c_str());
+    WIFI_HILOG_COMM_INFO("netdetection, netstate:%{public}d url:%{private}s\n", netstate, url.c_str());
     pStaStateMachine->HandleNetCheckResult(netstate, url);
 }
 
@@ -3170,7 +3170,7 @@ void StaStateMachine::ApRoamingState::DealApRoamingStateTimeout(InternalMessageP
         WIFI_LOGE("DealApRoamingStateTimeout InternalMessage msg is null.");
         return;
     }
-    WIFI_LOGI("DealApRoamingStateTimeout StopTimer aproaming timer");
+    WIFI_HILOG_COMM_INFO("DealApRoamingStateTimeout StopTimer aproaming timer");
     pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
         RoamingResultType::TYPE_ROAMING_TIMEOUT);
     pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
@@ -3503,7 +3503,8 @@ void StaStateMachine::DhcpResultNotify::OnSuccessDhcpResult(int status, const ch
         WIFI_LOGE("StaStateMachine DhcpResultNotify OnSuccess ifname or result is nullptr.");
         return;
     }
-    WIFI_LOGI("Enter Sta DhcpResultNotify OnSuccess. ifname=[%{public}s] status=[%{public}d]", ifname, status);
+    WIFI_HILOG_COMM_INFO("Enter Sta DhcpResultNotify OnSuccess. ifname=[%{public}s] status=[%{public}d]",
+        ifname, status);
     WIFI_LOGI("iptype=%{public}d, isOptSuc=%{public}d, clientip =%{private}s, \
         serverip=%{private}s, subnet=%{private}s", result->iptype, result->isOptSuc,
         result->strOptClientId,  result->strOptServerId, result->strOptSubnet);
@@ -3662,8 +3663,8 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
                 pStaStateMachine->m_instId);
             EnhanceWriteDhcpInfoHiSysEvent(ipInfo, ipv6Info);
 #ifndef OHOS_ARCH_LITE
-            WIFI_LOGI("TryToSaveIpV4Result Update NetLink info, strYourCli=%{private}s, strSubnet=%{private}s, \
-                strRouter1=%{private}s, strDns1=%{private}s, strDns2=%{private}s",
+            WIFI_HILOG_COMM_INFO("TryToSaveIpV4Result Update NetLink info, strYourCli=%{private}s, \
+                strSubnet=%{private}s, strRouter1=%{private}s, strDns1=%{private}s, strDns2=%{private}s",
                 IpAnonymize(result->strOptClientId).c_str(), IpAnonymize(result->strOptSubnet).c_str(),
                 IpAnonymize(result->strOptRouter1).c_str(), IpAnonymize(result->strOptDns1).c_str(),
                 IpAnonymize(result->strOptDns2).c_str());
@@ -3856,7 +3857,7 @@ void StaStateMachine::DhcpResultNotify::DealDhcpIpv4ResultFailed()
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
         pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_DHCP_FAILURE);
 
-    WIFI_LOGI("DhcpResultNotify OnFailed type: %{public}d", pStaStateMachine->currentTpType);
+    WIFI_HILOG_COMM_INFO("DhcpResultNotify OnFailed type: %{public}d", pStaStateMachine->currentTpType);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_OBTAINING_IP_FAILED,
         pStaStateMachine->linkedInfo);
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::OBTAINING_IPADDR_FAIL);
@@ -5151,7 +5152,7 @@ bool StaStateMachine::SetMacToHal(const std::string &currentMac, const std::stri
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
 void StaStateMachine::DealMdmRestrictedConnect(WifiDeviceConfig &config)
 {
-    WIFI_LOGI("WIFI Disconnect by MdmRestricted");
+    WIFI_HILOG_COMM_INFO("WIFI Disconnect by MdmRestricted");
     SaveDiscReason(DisconnectedReason::DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL);
     BlockConnectService::GetInstance().UpdateNetworkSelectStatus(config.networkId,
         DisabledReason::DISABLED_MDM_RESTRICTED);

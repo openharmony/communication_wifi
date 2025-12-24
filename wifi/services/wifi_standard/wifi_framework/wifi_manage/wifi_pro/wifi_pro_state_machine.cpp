@@ -491,7 +491,7 @@ bool WifiProStateMachine::SelectNetwork(NetworkSelectionResult &networkSelection
     std::unique_ptr<NetworkSelectionManager> pNetworkSelectionManager = std::make_unique<NetworkSelectionManager>();
     std::string failReason;
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, mNetworkSelectType, scanInfos, failReason)) {
-        WIFI_LOGI("Wifi2Wifi select network result, ssid: %{public}s, bssid: %{public}s.",
+        WIFI_HILOG_COMM_INFO("Wifi2Wifi select network result, ssid: %{public}s, bssid: %{public}s.",
             SsidAnonymize(networkSelectionResult.interScanInfo.ssid).c_str(),
             MacAnonymize(networkSelectionResult.interScanInfo.bssid).c_str());
         WifiProChr::GetInstance().RecordSelectNetChrCnt(true);
@@ -555,7 +555,7 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
     isWifi2WifiSwitching_ = true;
     WifiProChr::GetInstance().RecordWifiProConnectTime();
     WifiProChr::GetInstance().RecordGatewayInfoBeforeSwitch();
-    WIFI_LOGE("TryWifi2Wifi: Switch reason : %{public}s", (g_switchReason[wifiSwitchReason_]).c_str());
+    WIFI_HILOG_COMM_ERROR("TryWifi2Wifi: Switch reason : %{public}s", (g_switchReason[wifiSwitchReason_]).c_str());
     if (pStaService->StartConnectToBssid(networkId, targetBssid_, NETWORK_SELECTED_BY_WIFIPRO) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("TryWifi2Wifi: ConnectToNetwork failed.");
         return false;

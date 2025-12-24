@@ -56,4 +56,19 @@ if (!(ptr)) { \
     return; \
 }
 #endif
+
+#ifndef WIFI_HILOG_COMM_INFO
+#define WIFI_HILOG_COMM_INFO(...) \
+    HILOG_COMM_INFO(__VA_ARGS__)
+#endif
+
+#ifndef WIFI_HILOG_COMM_WARN
+#define WIFI_HILOG_COMM_WARN(...) \
+    HILOG_COMM_WARN(__VA_ARGS__)
+#endif
+
+#ifndef WIFI_HILOG_COMM_ERROR
+#define WIFI_HILOG_COMM_ERROR(...) \
+    HILOG_COMM_ERROR(__VA_ARGS__)
+#endif
 #endif

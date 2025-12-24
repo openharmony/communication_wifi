@@ -103,8 +103,8 @@ void StaMonitor::SetStateMachine(StaStateMachine *paraStaStateMachine)
 
 void StaMonitor::OnConnectChangedCallBack(int status, int code, const std::string &bssid, int locallyGenerated)
 {
-    WIFI_LOGI("OnConnectChangedCallBack status:%{public}d, code=%{public}d, bssid=%{public}s, instId=%{public}d",
-        status, code, MacAnonymize(bssid).c_str(), m_instId);
+    WIFI_HILOG_COMM_INFO("OnConnectChangedCallBack status:%{public}d, code=%{public}d, bssid=%{public}s, \
+        instId=%{public}d", status, code, MacAnonymize(bssid).c_str(), m_instId);
     if (pStaStateMachine == nullptr) {
         WIFI_LOGE("The statemachine pointer is null.");
         return;

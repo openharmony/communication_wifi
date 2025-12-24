@@ -154,11 +154,11 @@ ErrCode StaInterface::ReAssociate()
 
 ErrCode StaInterface::Disconnect()
 {
-    LOGI("Enter Disconnect.\n");
+    WIFI_HILOG_COMM_INFO("Enter Disconnect.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->Disconnect() != WIFI_OPT_SUCCESS) {
-        LOGE("Disconnect failed.\n");
+        WIFI_HILOG_COMM_ERROR("Disconnect failed.\n");
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;

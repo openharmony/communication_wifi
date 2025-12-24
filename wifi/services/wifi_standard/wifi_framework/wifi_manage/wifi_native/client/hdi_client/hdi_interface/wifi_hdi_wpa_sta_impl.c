@@ -639,12 +639,12 @@ WifiErrorNo HdiWpaStaAddNetwork(int *networkId, const char *ifaceName)
 
     int32_t result = wpaObj->AddNetwork(wpaObj, ifaceName, networkId);
     if (result != HDF_SUCCESS) {
-        LOGE("HdiWpaStaAddNetwork: AddNetwork failed result:%{public}d", result);
+        WIFI_HILOG_COMM_ERROR("HdiWpaStaAddNetwork: AddNetwork failed result:%{public}d", result);
         pthread_mutex_unlock(GetWpaObjMutex());
         return WIFI_HAL_OPT_FAILED;
     }
     pthread_mutex_unlock(GetWpaObjMutex());
-    LOGI("HdiWpaStaAddNetwork success, networkId:%{public}d", *networkId);
+    WIFI_HILOG_COMM_INFO("HdiWpaStaAddNetwork success, networkId:%{public}d", *networkId);
     return WIFI_HAL_OPT_OK;
 }
 

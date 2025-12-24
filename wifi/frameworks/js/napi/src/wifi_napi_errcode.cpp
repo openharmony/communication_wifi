@@ -186,7 +186,7 @@ void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info)
 
 void HandleSyncErrCode(const napi_env &env, int32_t errCode, int32_t sysCap)
 {
-    WIFI_LOGI("HandleSyncErrCode, errCode = %{public}d", (int)errCode);
+    WIFI_LOGI("HandleSyncErrCode, errCode = %{public}d", static_cast<int>(errCode));
     if (errCode == ErrCode::WIFI_OPT_SUCCESS) {
         return;
     }

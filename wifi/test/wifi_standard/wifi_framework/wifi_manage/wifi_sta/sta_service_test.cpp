@@ -487,6 +487,7 @@ void StaServiceTest::StaServiceDisconnectSuccess()
 {
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(1));
     EXPECT_TRUE(pStaService->Disconnect() == WIFI_OPT_SUCCESS);
+    EXPECT_FALSE(g_errLog.find("Enter Disconnect.\n") != std::string::npos);
 }
 
 void StaServiceTest::StaServiceReconnectByMdmTest1()

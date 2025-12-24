@@ -25,7 +25,7 @@ namespace Wifi {
 
 const uint32_t VDR_VOWIFI_SYNC_REPORT = 302;
 
-StaInterface::StaInterface(int instId) : pStaService(nullptr), m_instId(instId)
+StaInterface::StaInterface(int instId) : pStaService(nullptr), m_instId(instId), isEnabled_(false)
 {
     WIFI_LOGI("StaInterface constuctor instId %{public}d", instId);
 }
@@ -55,6 +55,10 @@ ErrCode StaInterface::EnableStaService()
 {
     WIFI_LOGI("Enter EnableStaService m_instId:%{public}d\n", m_instId);
     std::lock_guard<std::mutex> lock(mutex);
+    if (isEnabled_) {
+        WIFI_LOGE("EnableStaService already enabled");
+        return WIFI_OPT_SUCCESS;
+    }
     if (!InitStaServiceLocked()) {
         return WIFI_OPT_FAILED;
     }
@@ -65,6 +69,7 @@ ErrCode StaInterface::EnableStaService()
         pStaService->DisableStaService();
         return WIFI_OPT_FAILED;
     }
+    isEnabled_ = true;
     return WIFI_OPT_SUCCESS;
 }
 
@@ -72,11 +77,16 @@ ErrCode StaInterface::DisableStaService()
 {
     WIFI_LOGI("Enter DisableStaService m_instId:%{public}d\n", m_instId);
     std::lock_guard<std::mutex> lock(mutex);
+    if (!isEnabled_) {
+        WIFI_LOGE("EnableStaService already disabled");
+        return WIFI_OPT_SUCCESS;
+    }
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     if (pStaService->DisableStaService() != WIFI_OPT_SUCCESS) {
         LOGE("DisableStaService failed.\n");
         return WIFI_OPT_FAILED;
     }
+    isEnabled_ = false;
     return WIFI_OPT_SUCCESS;
 }
 

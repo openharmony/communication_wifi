@@ -2018,6 +2018,68 @@ std::string OutTClassString<WifiBackupConfig>(WifiBackupConfig &item)
        << OutPutWifiProxyConfig(item.wifiProxyconfig) << OutPutWifiBackupConfigPrivacy(item);
     return ss.str();
 }
+
+static void ClearHotspotBackupConfig(HotspotBackupConfig &item)
+{
+    item.hotspotConfig = true;
+    item.band = BandType::BAND_2GHZ;
+    item.deviceName.clear();
+    item.deviceBssid.clear();
+    item.deviceIpAddr.clear();
+    return;
+}
+ 
+template<>
+int SetTClassKeyValue<HotspotBackupConfig>(HotspotBackupConfig &item, const std::string &key, const std::string &value)
+{
+    int errorKeyValue = 0;
+    std::string tmpValue = value;
+    if (key == "hotspotConfig") {
+        item.hotspotConfig = CheckDataLegal(tmpValue);
+    } else if (key == "preSharedKey") {
+        item.preSharedKey = value;
+    } else if (key == "band") {
+        item.band = static_cast<BandType>(CheckDataLegal(tmpValue));
+    } else if (key == "deviceName") {
+        item.deviceName = value;
+    } else if (key == "deviceBssid") {
+        item.deviceBssid = value;
+    }  else if (key == "deviceIpAddr") {
+        item.deviceIpAddr = value;
+    } else {
+        LOGE("Invalid config key value");
+        errorKeyValue++;
+    }
+    return errorKeyValue;
+}
+ 
+template<>
+void ClearTClass<HotspotBackupConfig>(HotspotBackupConfig &item)
+{
+    ClearHotspotBackupConfig(item);
+    return;
+}
+ 
+template <>
+std::string GetTClassName<HotspotBackupConfig>()
+{
+    return "HotspotBackupConfig";
+}
+ 
+template <>
+std::string OutTClassString<HotspotBackupConfig>(HotspotBackupConfig &item)
+{
+    std::ostringstream ss;
+    ss << "    " <<"<HotspotBackupConfig>" << std::endl;
+    ss << "    " <<"hotspotConfig=" << item.hotspotConfig << std::endl;
+    ss << "    " <<"preSharedKey=" << item.preSharedKey << std::endl;
+    ss << "    " <<"band=" << (int)item.band << std::endl;
+    ss << "    " <<"deviceName=" << item.deviceName << std::endl;
+    ss << "    " <<"deviceBssid=" << item.deviceBssid << std::endl;
+    ss << "    " <<"deviceIpAddr=" << item.deviceIpAddr << std::endl;
+    ss << "    " <<"</HotspotBackupConfig>" << std::endl;
+    return ss.str();
+}
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

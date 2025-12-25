@@ -16,6 +16,7 @@
 #ifndef OHOS_WIFI_BACKUP_CONFIG_H
 #define OHOS_WIFI_BACKUP_CONFIG_H
 #include "wifi_msg.h"
+#include "wifi_ap_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -60,10 +61,27 @@ struct WifiBackupConfig {
     }
 };
 
+struct HotspotBackupConfig {
+    bool hotspotConfig;
+    std::string preSharedKey;
+    BandType band;
+    std::string deviceName;
+    std::string deviceBssid;
+    std::string deviceIpAddr;
+    HotspotBackupConfig() {}
+};
+
 void ConvertBackupCfgToDeviceCfg(const WifiBackupConfig &backupCfg, WifiDeviceConfig &config);
 
 void ConvertDeviceCfgToBackupCfg(const WifiDeviceConfig &config, WifiBackupConfig &backupCfg);
 
+void ConvertHotspotBackupCfgToDeviceCfg(const HotspotBackupConfig &backupCfg, HotspotConfig &config);
+ 
+void ConvertHotspotCfgToBackupCfg(const HotspotConfig &config, HotspotBackupConfig &backupCfg);
+ 
+void ConvertBlockListBackupCfgToDeviceCfg(const HotspotBackupConfig &backupCfg, StationInfo &config);
+ 
+void ConvertBlockListCfgToBackupCfg(const StationInfo &config, HotspotBackupConfig &backupCfg);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif  // OHOS_WIFI_BACKUP_CONFIG_H

@@ -70,5 +70,33 @@ void ConvertDeviceCfgToBackupCfg(const WifiDeviceConfig &config, WifiBackupConfi
     backupCfg.isAllowAutoConnect = config.isAllowAutoConnect;
     backupCfg.lastDisconnectTime = config.lastDisconnectTime;
 }
+
+void ConvertHotspotBackupCfgToDeviceCfg(const HotspotBackupConfig &backupCfg, HotspotConfig &config)
+{
+    config.SetPreSharedKey(backupCfg.preSharedKey);
+    config.SetBand(backupCfg.band);
+}
+ 
+void ConvertHotspotCfgToBackupCfg(const HotspotConfig &config, HotspotBackupConfig &backupCfg)
+{
+    backupCfg.hotspotConfig = true;
+    backupCfg.preSharedKey = config.GetPreSharedKey();
+    backupCfg.band = config.GetBand();
+}
+ 
+void ConvertBlockListBackupCfgToDeviceCfg(const HotspotBackupConfig &backupCfg, StationInfo &config)
+{
+    config.deviceName = backupCfg.deviceName;
+    config.bssid = backupCfg.deviceBssid;
+    config.ipAddr = backupCfg.deviceIpAddr;
+}
+ 
+void ConvertBlockListCfgToBackupCfg(const StationInfo &config, HotspotBackupConfig &backupCfg)
+{
+    backupCfg.hotspotConfig = false;
+    backupCfg.deviceName = config.deviceName;
+    backupCfg.deviceBssid = config.bssid;
+    backupCfg.deviceIpAddr = config.ipAddr;
+}
 }  // namespace Wifi
 }  // namespace OHOS

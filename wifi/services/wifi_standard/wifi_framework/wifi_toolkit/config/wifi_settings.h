@@ -73,6 +73,7 @@ constexpr uint32_t COMPARE_MAC_LENGTH = 17 - 4;
 inline constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";
 inline constexpr char BACKUP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/backup_config.conf";
 inline constexpr char HOTSPOT_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/hotspot_config.conf";
+inline constexpr char HOTSPOT_BACKUP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/hotspot_backup.conf";
 inline constexpr char BLOCK_LIST_FILE_PATH[] = CONFIG_ROOR_DIR"/block_list.conf";
 inline constexpr char WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/wifi_config.conf";
 inline constexpr char WIFI_P2P_GROUP_INFO_FILE_PATH[] = CONFIG_ROOR_DIR"/p2p_groups.conf";
@@ -235,9 +236,17 @@ public:
 
     int OnBackup(UniqueFd &fd, const std::string &backupInfo);
 
+    int OnHotspotRestore(UniqueFd &fd, const std::string &restoreInfo);
+ 
+    int OnHotspotBackup(UniqueFd &fd, const std::string &backupInfo);
+ 
+    void HotspotCfgBackup(std::vector<HotspotBackupConfig>& hotspotBackupConfigs);
+
     std::string SetBackupReplyCode(int replyCode);
 
     void RemoveBackupFile();
+
+    void RemoveHotspotBackupFile();
 
     int SetWifiToggleCaller(int callerPid, int instId = 0);
 #endif
@@ -396,10 +405,14 @@ private:
     void MergeWifiConfig();
     void MergeSoftapConfig();
     void ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newConfigs);
+    void ConfigsHotspotAndSave(std::vector<HotspotConfig> &newConfigs);
+    void ConfigsBlockListAndSave(std::vector<StationInfo> &newConfigs);
     void ParseBackupJson(const std::string &backupInfo, std::string &key, std::string &iv, std::string &version);
     int GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConfigs, UniqueFd &fd);
     int GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceConfigs, UniqueFd &fd, const std::string &key,
         const std::string &iv);
+    int GetHotspotConfigbyBackupFile(std::vector<HotspotConfig> &hotspotConfigs, std::vector<StationInfo> &stationInfos,
+        UniqueFd &fd, const std::string &key, const std::string &iv);
 #endif
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     bool IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) const;

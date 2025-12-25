@@ -305,6 +305,8 @@ public:
      */
     ErrCode TransRandomToRealMac(StationInfo &updateInfo, const StationInfo &info);
     static int32_t HandleHotspotIdlRet(ErrCode originRet);
+    static ErrCode OnBackup(MessageParcel& data, MessageParcel& reply);
+    static ErrCode OnRestore(MessageParcel& data, MessageParcel& reply);
 private:
     ErrCode CheckCanEnableHotspot(const ServiceType type);
     ErrCode VerifyGetStationListPermission();

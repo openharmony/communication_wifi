@@ -1048,7 +1048,6 @@ void WifiSettings::RemoveHotspotBackupFile()
 {
     remove(HOTSPOT_BACKUP_CONFIG_FILE_PATH);
 }
-#endif
 
 int WifiSettings::OnHotspotRestore(UniqueFd &fd, const std::string &restoreInfo)
 {
@@ -1137,6 +1136,7 @@ void WifiSettings::HotspotCfgBackup(std::vector<HotspotBackupConfig>& hotspotBac
     hotspotBackupConfigs.push_back(backupConfig);
     std::vector<HotspotConfig>().swap(hotspotConfigs);
 }
+#endif
 
 bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
 {

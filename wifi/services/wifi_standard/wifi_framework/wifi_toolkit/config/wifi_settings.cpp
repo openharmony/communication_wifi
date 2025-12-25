@@ -1124,7 +1124,7 @@ void WifiSettings::HotspotCfgBackup(std::vector<HotspotBackupConfig>& hotspotBac
         hotspotBackupConfigs.push_back(backupConfig);
     }
     std::vector<StationInfo>().swap(blockInfos);
- 
+    SyncHotspotConfig();
     std::vector<HotspotConfig> hotspotConfigs;
     {
         std::unique_lock<std::mutex> lock(mApMutex);
@@ -2434,6 +2434,7 @@ void WifiSettings::ConfigsHotspotAndSave(std::vector<HotspotConfig> &newConfigs)
         LOGE("NewConfigs is empty!");
         return;
     }
+    SyncHotspotConfig();
     std::vector<HotspotConfig> localConfigs;
     {
         std::unique_lock<std::mutex> lock(mApMutex);

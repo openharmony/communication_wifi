@@ -36,6 +36,7 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
 
 namespace OHOS {
 namespace Wifi {
+constexpr int EXTENSION_ERROR_CODE = 13500099;
 const int HOTSPOT_IDL_ERROR_OFFSET = 3500000;
 
 WifiHotspotServiceImpl::WifiHotspotServiceImpl()
@@ -1188,6 +1189,51 @@ int32_t WifiHotspotServiceImpl::HandleHotspotIdlRet(ErrCode originRet)
     } else {
         return originRet + HOTSPOT_IDL_ERROR_OFFSET;
     }
+}
+
+ErrCode WifiHotspotServiceImpl::OnBackup(MessageParcel& data, MessageParcel& reply)
+{
+    UniqueFd fd(-1);
+    std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
+    std::string backupInfo = data.ReadString();
+    WIFI_LOGE("OnBackup %{public}s", backupInfo.c_str());
+    int ret = WifiSettings::GetInstance().OnHotspotBackup(fd, backupInfo);
+    std::fill(backupInfo.begin(), backupInfo.end(), 0);
+    if (ret < 0) {
+        WIFI_LOGE("OnBackup fail: backup data fail!");
+        replyCode = WifiSettings::GetInstance().SetBackupReplyCode(EXTENSION_ERROR_CODE);
+    }
+    if (reply.WriteFileDescriptor(fd) == false || reply.WriteString(replyCode) == false) {
+        close(fd.Release());
+        WifiSettings::GetInstance().RemoveHotspotBackupFile();
+        WIFI_LOGE("OnBackup fail: reply write fail!");
+        return WIFI_OPT_FAILED;
+    }
+    close(fd.Release());
+    WifiSettings::GetInstance().RemoveHotspotBackupFile();
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode WifiHotspotServiceImpl::OnRestore(MessageParcel& data, MessageParcel& reply)
+{
+    UniqueFd fd(data.ReadFileDescriptor());
+    std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
+    std::string restoreInfo = data.ReadString();
+    int ret = WifiSettings::GetInstance().OnHotspotRestore(fd, restoreInfo);
+    std::fill(restoreInfo.begin(), restoreInfo.end(), 0);
+    if (ret < 0) {
+        WIFI_LOGE("OnRestore fail: restore data fail!");
+        replyCode = WifiSettings::GetInstance().SetBackupReplyCode(EXTENSION_ERROR_CODE);
+    }
+    if (reply.WriteString(replyCode) == false) {
+        close(fd.Release());
+        WifiSettings::GetInstance().RemoveHotspotBackupFile();
+        WIFI_LOGE("OnRestore fail: reply write fail!");
+        return WIFI_OPT_FAILED;
+    }
+    close(fd.Release());
+    WifiSettings::GetInstance().RemoveHotspotBackupFile();
+    return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

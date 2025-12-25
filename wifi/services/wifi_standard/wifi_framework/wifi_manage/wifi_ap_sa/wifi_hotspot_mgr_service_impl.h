@@ -37,6 +37,7 @@ public:
     static sptr<WifiHotspotMgrServiceImpl> GetInstance();
     void OnStart() override;
     void OnStop() override;
+    int32_t OnExtension(const std::string& extension, MessageParcel& data, MessageParcel& reply) override;
     ErrCode GetWifiRemote(int id, sptr<IRemoteObject>& remote) override;
 
     /**

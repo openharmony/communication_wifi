@@ -325,6 +325,7 @@ int WifiInternalEventDispatcher::SetSingleScanCallback(const sptr<IWifiScanCallb
 
 sptr<IWifiScanCallback> WifiInternalEventDispatcher::GetSingleScanCallback(int instId) const
 {
+    std::unique_lock<std::mutex> lock(mScanCallbackMutex);
     auto iter = mScanSingleCallback.find(instId);
     if (iter != mScanSingleCallback.end()) {
         return iter->second;
@@ -415,6 +416,7 @@ int WifiInternalEventDispatcher::SetSingleHotspotCallback(const sptr<IWifiHotspo
 
 sptr<IWifiHotspotCallback> WifiInternalEventDispatcher::GetSingleHotspotCallback(int id) const
 {
+    std::unique_lock<std::mutex> lock(mHotspotCallbackMutex);
     auto iter = mHotspotSingleCallback.find(id);
     if (iter != mHotspotSingleCallback.end()) {
         return iter->second;

@@ -121,12 +121,12 @@ void NetworkBlockListManager::CleanTempWifiBlockList()
 
 bool NetworkBlockListManager::IsInTempWifiBlockList(const std::string &bssid)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (tempWifiBlockMap_.empty()) {
         WIFI_LOGI("IsInTempWifiBlockList, bssid is invalid");
         return false;
     }
 
-    std::lock_guard<std::mutex> lock(mutex_);
     return tempWifiBlockMap_.find(bssid) != tempWifiBlockMap_.end();
 }
 

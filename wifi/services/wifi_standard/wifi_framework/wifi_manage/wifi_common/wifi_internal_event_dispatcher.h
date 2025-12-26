@@ -149,11 +149,11 @@ private:
     std::map<int, StaCallbackMapType> mStaCallbacks;
     std::map<int, StaCallbackInfo> mStaCallBackInfo;
     std::map<int, sptr<IWifiDeviceCallBack>> mStaSingleCallback;
-    std::mutex mScanCallbackMutex;
+    mutable std::mutex mScanCallbackMutex;
     std::map<int, ScanCallbackMapType> mScanCallbacks;
     std::map<int, ScanCallbackInfo> mScanCallBackInfo;
     std::map<int, sptr<IWifiScanCallback>> mScanSingleCallback;
-    std::mutex mHotspotCallbackMutex;
+    mutable std::mutex mHotspotCallbackMutex;
     std::map<int, HotspotCallbackMapType> mHotspotCallbacks;
     std::map<int, HotspotCallbackInfo> mHotspotCallbackInfo;
     std::map<int, sptr<IWifiHotspotCallback>> mHotspotSingleCallback;

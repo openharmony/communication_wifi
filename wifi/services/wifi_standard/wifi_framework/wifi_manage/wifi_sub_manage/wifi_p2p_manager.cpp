@@ -212,8 +212,8 @@ void WifiP2pManager::StopUnloadP2PSaTimer(void)
 
 void WifiP2pManager::StartUnloadP2PSaTimer(void)
 {
-    WIFI_LOGI("StartUnloadP2PSaTimer! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
     std::unique_lock<std::mutex> lock(unloadP2PSaTimerMutex);
+    WIFI_LOGI("StartUnloadP2PSaTimer! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
     if (unloadP2PSaTimerId == 0) {
         std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
         wifiSysTimer->SetCallbackInfo(UnloadP2PSaTimerCallback);
@@ -239,8 +239,8 @@ static void RemoveGroupTimerCallback(void)
 
 void WifiP2pManager::StopRemoveGroupTimer(void)
 {
-    WIFI_LOGD("StopRemoveGroupTimer! removeGroupTimerId:%{public}u", removeGroupTimerId);
     std::unique_lock<std::mutex> lock(removeGroupTimerMutex);
+    WIFI_LOGD("StopRemoveGroupTimer! removeGroupTimerId:%{public}u", removeGroupTimerId);
     if (removeGroupTimerId == 0) {
         return;
     }
@@ -255,8 +255,8 @@ void WifiP2pManager::StartRemoveGroupTimer(void)
     if (GetDeviceType() != ProductDeviceType::PHONE) {
         return;
     }
-    WIFI_LOGD("StartRemoveGroupTimer! removeGroupTimerId:%{public}u", removeGroupTimerId);
     std::unique_lock<std::mutex> lock(removeGroupTimerMutex);
+    WIFI_LOGD("StartRemoveGroupTimer! removeGroupTimerId:%{public}u", removeGroupTimerId);
     if (removeGroupTimerId == 0) {
         std::shared_ptr<WifiSysTimer> removeTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
         removeTimer->SetCallbackInfo(RemoveGroupTimerCallback);
@@ -349,20 +349,23 @@ void WifiP2pManager::DealP2pStateChanged(P2pState state)
     cbMsg.msgCode = WIFI_CBK_MSG_P2P_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(state);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    if (state == P2pState::P2P_STATE_IDLE) {
-        // close p2p service sync here to avoid p2p service not closed when p2p service opened Again
-        CloseP2pService();
-        p2pEnableCond.notify_all();
-    }
-    if (state == P2pState::P2P_STATE_STARTED) {
-        WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING);
-        p2pEnableCond.notify_all();
-        WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
-        WIFI_LOGI("DealP2pStateChanged, current sta state:%{public}d", staState);
-        if (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::CLOSED) {
-            AutoStopP2pService();
+    {
+        std::unique_lock<std::mutex> lockerCond(p2pEnableCondMutex);
+        if (state == P2pState::P2P_STATE_IDLE) {
+            // close p2p service sync here to avoid p2p service not closed when p2p service opened Again
+            CloseP2pService();
+            p2pEnableCond.notify_all();
         }
-        retryOpenCount_ = 0;
+        if (state == P2pState::P2P_STATE_STARTED) {
+            WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING);
+            p2pEnableCond.notify_all();
+            WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
+            WIFI_LOGI("DealP2pStateChanged, current sta state:%{public}d", staState);
+            if (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::CLOSED) {
+                AutoStopP2pService();
+            }
+            retryOpenCount_ = 0;
+        }
     }
     if (state == P2pState::P2P_STATE_CLOSED) {
         bool ret = WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);

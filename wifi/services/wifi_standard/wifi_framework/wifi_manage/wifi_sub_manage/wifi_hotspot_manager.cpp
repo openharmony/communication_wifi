@@ -70,8 +70,8 @@ void WifiHotspotManager::StopUnloadApSaTimer(void)
 
 void WifiHotspotManager::StartUnloadApSaTimer(void)
 {
-    WIFI_LOGI("StartUnloadApSaTimer! unloadHotspotSaTimerId:%{public}u", unloadHotspotSaTimerId);
     std::unique_lock<std::mutex> lock(unloadHotspotSaTimerMutex);
+    WIFI_LOGI("StartUnloadApSaTimer! unloadHotspotSaTimerId:%{public}u", unloadHotspotSaTimerId);
     if (unloadHotspotSaTimerId == 0) {
         std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
         wifiSysTimer->SetCallbackInfo(UnloadHotspotSaTimerCallback);

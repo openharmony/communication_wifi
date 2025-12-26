@@ -168,11 +168,9 @@ ScanStateMachine::InitState::~InitState()
 void ScanStateMachine::InitState::GoInState()
 {
     WIFI_LOGI("Enter InitState::GoInState.\n");
-    {
         std::unique_lock<std::shared_mutex> guard(lock);
         pScanStateMachine->runningScans.clear();
         pScanStateMachine->waitingScans.clear();
-    }
 
     if (pScanStateMachine->quitFlag) {
         WIFI_LOGI("Notify finish ScanStateMachine.\n");
@@ -626,7 +624,7 @@ void ScanStateMachine::PnoScanSoftware::GoInState()
 {
     WIFI_LOGI("Enter PnoScanSoftware::GoInState.\n");
     WIFI_LOGI("Start scan first!");
-
+    std::unique_lock<std::shared_mutex> guard(lock);
     if (!pScanStateMachine->StartNewSoftwareScan()) {
         WIFI_LOGE("failed to start new softwareScan");
     }
@@ -683,7 +681,7 @@ bool ScanStateMachine::PnoSwScanFree::ExecuteStateMsg(InternalMessagePtr msg)
         WIFI_LOGE("msg is null.\n");
         return true;
     }
-
+    std::unique_lock<std::shared_mutex> guard(lock);
     switch (msg->GetMessageName()) {
         case CMD_START_PNO_SCAN:
             pScanStateMachine->PnoScanSoftwareProcess(msg);

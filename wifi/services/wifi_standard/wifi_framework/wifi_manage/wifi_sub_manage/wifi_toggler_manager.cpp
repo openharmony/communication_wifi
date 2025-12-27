@@ -398,7 +398,7 @@ bool WifiTogglerManager::IsSatelliteStateStart()
     return mIsSatelliteStart;
 }
 
-void WifiTogglerManager::RetryOpenP2p(void)
+void WifiTogglerManager::RetryOpenP2p(void) const
 {
     if (pWifiControllerMachine) {
         pWifiControllerMachine->SendMessage(CMD_P2P_RETRY_OPEN);

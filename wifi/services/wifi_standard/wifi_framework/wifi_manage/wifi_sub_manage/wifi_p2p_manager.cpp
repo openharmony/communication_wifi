@@ -349,23 +349,20 @@ void WifiP2pManager::DealP2pStateChanged(P2pState state)
     cbMsg.msgCode = WIFI_CBK_MSG_P2P_STATE_CHANGE;
     cbMsg.msgData = static_cast<int>(state);
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-    {
-        std::unique_lock<std::mutex> lockerCond(p2pEnableCondMutex);
-        if (state == P2pState::P2P_STATE_IDLE) {
-            // close p2p service sync here to avoid p2p service not closed when p2p service opened Again
-            CloseP2pService();
-            p2pEnableCond.notify_all();
+    if (state == P2pState::P2P_STATE_IDLE) {
+        // close p2p service sync here to avoid p2p service not closed when p2p service opened Again
+        CloseP2pService();
+        p2pEnableCond.notify_all();
+    }
+    if (state == P2pState::P2P_STATE_STARTED) {
+        WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING);
+        p2pEnableCond.notify_all();
+        WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
+        WIFI_LOGI("DealP2pStateChanged, current sta state:%{public}d", staState);
+        if (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::CLOSED) {
+            AutoStopP2pService();
         }
-        if (state == P2pState::P2P_STATE_STARTED) {
-            WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::RUNNING);
-            p2pEnableCond.notify_all();
-            WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState();
-            WIFI_LOGI("DealP2pStateChanged, current sta state:%{public}d", staState);
-            if (staState == WifiOprMidState::CLOSING || staState == WifiOprMidState::CLOSED) {
-                AutoStopP2pService();
-            }
-            retryOpenCount_ = 0;
-        }
+        retryOpenCount_ = 0;
     }
     if (state == P2pState::P2P_STATE_CLOSED) {
         bool ret = WifiConfigCenter::GetInstance().SetP2pMidState(WifiOprMidState::OPENING, WifiOprMidState::CLOSED);

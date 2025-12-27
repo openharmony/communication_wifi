@@ -116,6 +116,9 @@ bool LongUnusedOpenWifiFilter::Filter(NetworkCandidate &networkCandidate)
         networkCandidate.filtedReason[filterName].insert(FiltedReason::TIME_INVALID);
         return false;
     }
+    if (lastDisconnectTime == -1) {
+        return false;
+    }
     auto elapsed = now - lastDisconnectTime;
     if (elapsed > LONG_TIME_UNUSED_THRESHOLD) {
         // 大于回连阈值(15天)的open网络，不允许自动回连

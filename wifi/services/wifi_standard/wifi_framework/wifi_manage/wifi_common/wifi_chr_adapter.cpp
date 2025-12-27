@@ -635,6 +635,14 @@ void EnhanceWriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6In
     cJSON_AddStringToObject(root, "IPV6_SECONDDNS", Ipv6Anonymize(ipv6Info.secondDns).c_str());
     cJSON_AddStringToObject(root, "IPV6_UNIQUELOCALADDR1", Ipv6Anonymize(ipv6Info.uniqueLocalAddress1).c_str());
     cJSON_AddStringToObject(root, "IPV6_UNIQUELOCALADDR2", Ipv6Anonymize(ipv6Info.uniqueLocalAddress2).c_str());
+    cJSON_AddNumberToObject(root, "IPV6_PREFERRED_LIFE_TIME", ipv6Info.preferredLifeTime);
+    cJSON_AddNumberToObject(root, "IPV6_VALID_LIFE_TIME", ipv6Info.validLifeTime);
+    cJSON_AddNumberToObject(root, "IPV6_ROUTE_LIFE_TIME", ipv6Info.routerLifeTime);
+    std::string ipv6Address;
+    for (const auto& pair : ipv6Info.IpAddrMap) {
+        ipv6Address += Ipv6Anonymize(pair.first) + ":" + std::to_string(pair.second) + ";";
+    }
+    cJSON_AddStringToObject(root, "IPV6_IPADDRMAP", ipv6Address.c_str());
     char *jsonStr = cJSON_PrintUnformatted(root);
     if (jsonStr == nullptr) {
         cJSON_Delete(root);

@@ -933,48 +933,6 @@ public:
         pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_PORTAL, "");
     }
-
-    void HandleNetCheckResultSuccess6()
-    {
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
-        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
-        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
-        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_WORKING, "");
-    }
-
-    void HandleNetCheckResultSuccess7()
-    {
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
-        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
-        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
-        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_PORTAL, "");
-    }
-
-    void HandleNetCheckResultSuccess8()
-    {
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
-        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
-        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
-        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
-    }
-
-    void HandleNetCheckResultTxRxGoodButNoInternetTest()
-    {
-        IpQosMonitor::GetInstance().lastTxRxGood_ = true;
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(MODE_STATE_OPEN));
-        
-        pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(1));
-        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(
-            OperateResState::CONNECT_NETWORK_ENABLED, _, _)).Times(AtLeast(1));
-        pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
-        
-        IpQosMonitor::GetInstance().lastTxRxGood_ = false;
-    }
     
     void HandleNetCheckResultTxRxGoodButNoInternetFalseTest() const
     {
@@ -1020,63 +978,6 @@ public:
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
             WillRepeatedly(DoAll(SetArgReferee<1>(wifiDeviceConfig2), Return(0)));
         pStaStateMachine->HandleNetCheckResultIsPortal(SystemNetWorkState::NETWORK_IS_WORKING, false);
-    }
-
-    void TestPublishPortalNitificationAndLogin1()
-    {
-        pStaStateMachine->m_instId = INSTID_WLAN1;  // 设置非 INSTID_WLAN0 的值
-        pStaStateMachine->autoPullBrowserFlag = false;
-        pStaStateMachine->portalReCheck_ = false;
- 
-        // Act
-        pStaStateMachine->PublishPortalNitificationAndLogin();
- 
-        // Assert
-        EXPECT_FALSE(pStaStateMachine->portalReCheck_);
-        EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
-    }
- 
-    void TestPublishPortalNitificationAndLogin2()
-    {
-        pStaStateMachine->m_instId = INSTID_WLAN0;
-        pStaStateMachine->autoPullBrowserFlag = false;
-        pStaStateMachine->portalReCheck_ = false;
-        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
-        // Act
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), IsAllowPopUp()).WillRepeatedly(Return(true));
-        pStaStateMachine->PublishPortalNitificationAndLogin();
- 
-        // Assert
-        EXPECT_TRUE(pStaStateMachine->portalReCheck_);
-        EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
-    }
- 
-    void TestPublishPortalNitificationAndLogin3()
-    {
-        pStaStateMachine->m_instId = INSTID_WLAN0;
-        pStaStateMachine->autoPullBrowserFlag = false;
-        pStaStateMachine->portalReCheck_ = false;
-        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
-        // Act
-        pStaStateMachine->PublishPortalNitificationAndLogin();
- 
-        // Assert
-        EXPECT_FALSE(pStaStateMachine->portalReCheck_);
-        EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
-    }
- 
-    void TestPublishPortalNitificationAndLogin4()
-    {
-        pStaStateMachine->m_instId = INSTID_WLAN0;
-        pStaStateMachine->autoPullBrowserFlag = false;
-        pStaStateMachine->portalReCheck_ = true;
-        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
-        // Act
-        pStaStateMachine->PublishPortalNitificationAndLogin();
- 
-        // Assert
-        EXPECT_FALSE(pStaStateMachine->portalReCheck_);
-        EXPECT_TRUE(pStaStateMachine->autoPullBrowserFlag);
     }
 
     void TestTryModifyPortalAttribute1()
@@ -2558,22 +2459,44 @@ HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess5, TestSize.Level1)
 
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess6, TestSize.Level1)
 {
-    HandleNetCheckResultSuccess6();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
+    pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+    pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
+    pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_WORKING, "");
 }
 
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess7, TestSize.Level1)
 {
-    HandleNetCheckResultSuccess7();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
+    pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+    pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
+    pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_PORTAL, "");
 }
 
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultSuccess8, TestSize.Level1)
 {
-    HandleNetCheckResultSuccess8();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
+    pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+    pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
+    pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
 }
 
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultTxRxGoodButNoInternetTest, TestSize.Level1)
 {
-    HandleNetCheckResultTxRxGoodButNoInternetTest();
+    IpQosMonitor::GetInstance().lastTxRxGood_ = true;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScreenState()).WillRepeatedly(Return(MODE_STATE_OPEN));
+        
+    pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(1));
+    EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(
+        OperateResState::CONNECT_NETWORK_ENABLED, _, _)).Times(AtLeast(1));
+    pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
+        
+    IpQosMonitor::GetInstance().lastTxRxGood_ = false;
 }
  
 HWTEST_F(StaStateMachineTest, HandleNetCheckResultTxRxGoodButNoInternetFalseTest, TestSize.Level1)
@@ -2594,10 +2517,53 @@ HWTEST_F(StaStateMachineTest, TestHandleNetCheckResultIsPortal, TestSize.Level1)
 
 HWTEST_F(StaStateMachineTest, TestTestPublishPortalNitificationAndLogin, TestSize.Level1)
 {
-    TestPublishPortalNitificationAndLogin1();
-    TestPublishPortalNitificationAndLogin2();
-    TestPublishPortalNitificationAndLogin3();
-    TestPublishPortalNitificationAndLogin4();
+    // TestPublishPortalNitificationAndLogin1
+    pStaStateMachine->m_instId = INSTID_WLAN1;  // 设置非 INSTID_WLAN0 的值
+    pStaStateMachine->autoPullBrowserFlag = false;
+    pStaStateMachine->portalReCheck_ = false;
+ 
+    // Act
+    pStaStateMachine->PublishPortalNitificationAndLogin();
+ 
+    // Assert
+    EXPECT_FALSE(pStaStateMachine->portalReCheck_);
+    EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
+ 
+    // TestPublishPortalNitificationAndLogin2
+    pStaStateMachine->m_instId = INSTID_WLAN0;
+    pStaStateMachine->autoPullBrowserFlag = false;
+    pStaStateMachine->portalReCheck_ = false;
+    pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_ENABLED;
+    // Act
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), IsAllowPopUp()).WillRepeatedly(Return(true));
+    pStaStateMachine->PublishPortalNitificationAndLogin();
+ 
+    // Assert
+    EXPECT_TRUE(pStaStateMachine->portalReCheck_);
+    EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
+ 
+ 
+    // TestPublishPortalNitificationAndLogin3
+    pStaStateMachine->m_instId = INSTID_WLAN0;
+    pStaStateMachine->autoPullBrowserFlag = false;
+    pStaStateMachine->portalReCheck_ = false;
+    pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
+    // Act
+    pStaStateMachine->PublishPortalNitificationAndLogin();
+    // Assert
+    EXPECT_FALSE(pStaStateMachine->portalReCheck_);
+    EXPECT_FALSE(pStaStateMachine->autoPullBrowserFlag);
+ 
+    // TestPublishPortalNitificationAndLogin4()
+    pStaStateMachine->m_instId = INSTID_WLAN0;
+    pStaStateMachine->autoPullBrowserFlag = false;
+    pStaStateMachine->portalReCheck_ = true;
+    pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
+    // Act
+    pStaStateMachine->PublishPortalNitificationAndLogin();
+    // Assert
+    EXPECT_FALSE(pStaStateMachine->portalReCheck_);
+    EXPECT_TRUE(pStaStateMachine->autoPullBrowserFlag);
 }
 
 HWTEST_F(StaStateMachineTest, TestTryModifyPortalAttribute, TestSize.Level1)

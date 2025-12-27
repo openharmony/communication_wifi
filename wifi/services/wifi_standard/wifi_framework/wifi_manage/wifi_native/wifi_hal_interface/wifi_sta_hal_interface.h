@@ -436,12 +436,6 @@ public:
     WifiErrorNo GetConnectionMloSignalInfo(const std::string &ifName, std::vector<WifiMloSignalInfo> &mloSignalInfo);
 
 private:
-#ifdef READ_MAC_FROM_OEM
-    std::string GetWifiOeminfoMac();
-    std::string wifiOemMac_ = "";
-#endif
-
-private:
     WifiEventCallback mStaCallback[2];
     std::function<void(int)> mDeathCallback;
 };

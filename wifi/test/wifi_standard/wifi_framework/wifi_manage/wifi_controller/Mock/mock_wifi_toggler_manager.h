@@ -43,7 +43,7 @@ public:
 #ifndef OHOS_ARCH_LITE
     ErrCode SatelliteToggled(int state);
     void SetSatelliteStartState(bool state);
-    bool IsSatelliteStateStart();
+    bool IsSatelliteStateStart() const;
 #endif
     void StartWifiToggledTimer();
     void StopWifiToggledTimer();
@@ -51,7 +51,7 @@ public:
     void StartSemiWifiToggledTimer();
     void StopSemiWifiToggledTimer();
     void OnSemiWifiToggledTimeOut();
-    void RetryOpenP2p(void);
+    void RetryOpenP2p(void) const;
 private:
     void InitConcreteCallback(void);
     void InitSoftapCallback(void);

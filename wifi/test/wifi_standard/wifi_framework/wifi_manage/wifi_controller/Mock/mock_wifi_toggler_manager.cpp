@@ -212,12 +212,12 @@ bool WifiTogglerManager::IsInterfaceUp(std::string &iface)
     return false;
 }
 
-bool WifiTogglerManager::IsSatelliteStateStart()
+bool WifiTogglerManager::IsSatelliteStateStart() const
 {
     return false;
 }
 
-void WifiTogglerManager::RetryOpenP2p(void)
+void WifiTogglerManager::RetryOpenP2p(void) const
 {
     return;
 }

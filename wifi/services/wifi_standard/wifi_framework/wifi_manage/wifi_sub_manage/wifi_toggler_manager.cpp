@@ -35,7 +35,7 @@ namespace OHOS {
 namespace Wifi {
 
 #ifndef OHOS_ARCH_LITE
-bool mIsSatelliteStart = false;
+std::atomic<bool> mIsSatelliteStart{false};
 constexpr int32_t WIFI_MODE_RSMC_START = 3009;
 constexpr int32_t WIFI_MODE_RSMC_STOP = 3010;
 constexpr int32_t WIFI_MODE_RSMC_CHECK = 3011;
@@ -345,7 +345,6 @@ ErrCode WifiTogglerManager::SatelliteToggled(int state)
 
 void WifiTogglerManager::SetSatelliteStartState(bool state)
 {
-    std::unique_lock<std::mutex> lock(mutex);
     mIsSatelliteStart = state;
 }
 

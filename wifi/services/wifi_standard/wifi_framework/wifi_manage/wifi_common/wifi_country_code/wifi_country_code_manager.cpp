@@ -91,15 +91,18 @@ ErrCode WifiCountryCodeManager::SetWifiCountryCodeFromExternal(const std::string
 
 void WifiCountryCodeManager::TriggerUpdateWifiCountryCode(int triggerReason)
 {
+    std::shared_ptr<WifiCountryCodePolicy> tempWifiCountryCodePolicy;
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        m_wifiCountryCodePolicy = tempWifiCountryCodePolicy;
+    }
     if (triggerReason == TRIGGER_UPDATE_REASON_TEL_NET_CHANGE && wifiCountryCodePolicyConf_[FEATURE_MCC]) {
         WIFI_LOGI("TEL_NET_CHANGE trigger update country code change");
         UpdateWifiCountryCode();
     } else if (triggerReason == TRIGGER_UPDATE_REASON_SCAN_CHANGE &&
-        wifiCountryCodePolicyConf_[FEATURE_RCV_SCAN_RESLUT] && m_wifiCountryCodePolicy != nullptr) {
-        {
-            std::unique_lock<std::mutex> lock(mutex);
-            m_wifiCountryCodePolicy->HandleScanResultAction();
-        }
+        wifiCountryCodePolicyConf_[FEATURE_RCV_SCAN_RESLUT] && tempWifiCountryCodePolicy != nullptr) {
+            
+        tempWifiCountryCodePolicy->HandleScanResultAction();
         UpdateWifiCountryCode();
     }
 }
@@ -140,16 +143,18 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externa
         return WIFI_OPT_FAILED;
     }
     std::string wifiCountryCode;
+    std::shared_ptr<WifiCountryCodePolicy> tempWifiCountryCodePolicy;
     {
         std::unique_lock<std::mutex> lock(mutex);
-        if (!externalCode.empty() && !IsValidCountryCode(externalCode)) {
-            WIFI_LOGI("external set wifi country code, code=%{public}s", externalCode.c_str());
-            wifiCountryCode = externalCode;
-        } else if (m_wifiCountryCodePolicy == nullptr ||
-            m_wifiCountryCodePolicy->CalculateWifiCountryCode(wifiCountryCode) == WIFI_OPT_FAILED) {
-            WIFI_LOGE("calculate wifi country code failed");
-            return WIFI_OPT_FAILED;
-        }
+        m_wifiCountryCodePolicy = tempWifiCountryCodePolicy;
+    }
+    if (!externalCode.empty() && !IsValidCountryCode(externalCode)) {
+        WIFI_LOGI("external set wifi country code, code=%{public}s", externalCode.c_str());
+        wifiCountryCode = externalCode;
+    } else if (tempWifiCountryCodePolicy == nullptr ||
+        tempWifiCountryCodePolicy->CalculateWifiCountryCode(wifiCountryCode) == WIFI_OPT_FAILED) {
+        WIFI_LOGE("calculate wifi country code failed");
+        return WIFI_OPT_FAILED;
     }
     StrToUpper(wifiCountryCode);
     WIFI_LOGI("calculate wifi country code result:%{public}s", wifiCountryCode.c_str());

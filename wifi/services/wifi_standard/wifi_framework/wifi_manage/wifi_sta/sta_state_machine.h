@@ -194,10 +194,10 @@ public:
         void SaveFoldStatus(InternalMessagePtr msg);
         void DealScreenStateChangedEvent(InternalMessagePtr msg);
 #ifdef READ_MAC_FROM_OEM
-        GetRealMacAddressFromOemInfo();
+        ErrCode GetRealMacAddressFromOemInfo();
         std::string wifiOemMac_ = "";
 #endif
-        GetRealMacAddressFromHal();
+        ErrCode GetRealMacAddressFromHal();
         StaStateMachine *pStaStateMachine;
     };
     /**

@@ -3184,6 +3184,18 @@ HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultMaskNoMatchTest, TestSize.Level
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
+#ifdef READ_MAC_FROM_OEM
+HWTEST_F(StaStateMachineTest, GetRealMacAddressFromOemInfoTest, TestSize.Level1)
+{
+    EXPECT_TRUE(pStaStateMachine->pClosedState->GetRealMacAddressFromOemInfo());
+}
+#endif
+ 
+HWTEST_F(StaStateMachineTest, GetRealMacAddressFromHalTest, TestSize.Level1)
+{
+    EXPECT_TRUE(pStaStateMachine->pClosedState->GetRealMacAddressFromHal());
+}
+
 #ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
 HWTEST_F(StaStateMachineTest, DealWifiPowerSaveWhenBatteryStatusNotifyTest01, TestSize.Level1)
 {

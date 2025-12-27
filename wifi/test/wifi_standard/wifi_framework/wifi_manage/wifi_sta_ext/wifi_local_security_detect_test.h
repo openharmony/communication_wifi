@@ -32,7 +32,7 @@ public:
     {
         wifiLocalSecurityDetect_ = std::make_unique<WifiLocalSecurityDetect>();
     }
-    void TearDown() const override {}
+    void TearDown() override {}
     std::unique_ptr<WifiLocalSecurityDetect> wifiLocalSecurityDetect_;
 };
 

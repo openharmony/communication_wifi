@@ -626,6 +626,7 @@ void ScanStateMachine::PnoScanSoftware::GoInState()
 {
     WIFI_LOGI("Enter PnoScanSoftware::GoInState.\n");
     WIFI_LOGI("Start scan first!");
+
     if (!pScanStateMachine->StartNewSoftwareScan()) {
         WIFI_LOGE("failed to start new softwareScan");
     }
@@ -682,6 +683,7 @@ bool ScanStateMachine::PnoSwScanFree::ExecuteStateMsg(InternalMessagePtr msg)
         WIFI_LOGE("msg is null.\n");
         return true;
     }
+    
     switch (msg->GetMessageName()) {
         case CMD_START_PNO_SCAN:
             pScanStateMachine->PnoScanSoftwareProcess(msg);

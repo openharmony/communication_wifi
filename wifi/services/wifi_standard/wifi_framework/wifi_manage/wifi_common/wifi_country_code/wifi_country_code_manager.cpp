@@ -94,7 +94,7 @@ void WifiCountryCodeManager::TriggerUpdateWifiCountryCode(int triggerReason)
     std::shared_ptr<WifiCountryCodePolicy> tempWifiCountryCodePolicy;
     {
         std::unique_lock<std::mutex> lock(mutex);
-        m_wifiCountryCodePolicy = tempWifiCountryCodePolicy;
+        tempWifiCountryCodePolicy = m_wifiCountryCodePolicy;
     }
     if (triggerReason == TRIGGER_UPDATE_REASON_TEL_NET_CHANGE && wifiCountryCodePolicyConf_[FEATURE_MCC]) {
         WIFI_LOGI("TEL_NET_CHANGE trigger update country code change");
@@ -145,7 +145,7 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externa
     std::shared_ptr<WifiCountryCodePolicy> tempWifiCountryCodePolicy;
     {
         std::unique_lock<std::mutex> lock(mutex);
-        m_wifiCountryCodePolicy = tempWifiCountryCodePolicy;
+        tempWifiCountryCodePolicy = m_wifiCountryCodePolicy;
     }
     if (!externalCode.empty() && !IsValidCountryCode(externalCode)) {
         WIFI_LOGI("external set wifi country code, code=%{public}s", externalCode.c_str());

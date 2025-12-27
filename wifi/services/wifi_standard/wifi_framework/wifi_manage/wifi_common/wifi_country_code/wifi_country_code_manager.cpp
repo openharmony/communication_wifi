@@ -101,7 +101,6 @@ void WifiCountryCodeManager::TriggerUpdateWifiCountryCode(int triggerReason)
         UpdateWifiCountryCode();
     } else if (triggerReason == TRIGGER_UPDATE_REASON_SCAN_CHANGE &&
         wifiCountryCodePolicyConf_[FEATURE_RCV_SCAN_RESLUT] && tempWifiCountryCodePolicy != nullptr) {
-            
         tempWifiCountryCodePolicy->HandleScanResultAction();
         UpdateWifiCountryCode();
     }

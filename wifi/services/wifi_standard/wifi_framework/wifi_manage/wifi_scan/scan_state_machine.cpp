@@ -683,7 +683,7 @@ bool ScanStateMachine::PnoSwScanFree::ExecuteStateMsg(InternalMessagePtr msg)
         WIFI_LOGE("msg is null.\n");
         return true;
     }
-    
+
     switch (msg->GetMessageName()) {
         case CMD_START_PNO_SCAN:
             pScanStateMachine->PnoScanSoftwareProcess(msg);

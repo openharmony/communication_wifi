@@ -1100,7 +1100,7 @@ void WriteWifiRiskInfoHiSysEvent(const WifiRiskInfo &wifiRiskInfo)
         return;
     }
     
-    cJSON_AddNumberToObject(root, "RISKTYPE", wifiRiskInfo.riskType);
+    cJSON_AddNumberToObject(root, "RISK_TYPE", wifiRiskInfo.riskType);
     cJSON_AddNumberToObject(root, "LAST_DISCONNECT_TIME", wifiRiskInfo.lastDisconnectTime);
     cJSON_AddNumberToObject(root, "CONNECT_INTERVAL", wifiRiskInfo.connectInterval);
     cJSON_AddStringToObject(root, "HOST_NAME", DomainAnonymize(wifiRiskInfo.hostName).c_str());
@@ -1109,7 +1109,7 @@ void WriteWifiRiskInfoHiSysEvent(const WifiRiskInfo &wifiRiskInfo)
     cJSON_AddNumberToObject(root, "FREQUENCY", wifiRiskInfo.frequency);
     cJSON_AddNumberToObject(root, "BAND", wifiRiskInfo.band);
     cJSON_AddNumberToObject(root, "RSSI", wifiRiskInfo.rssi);
-    cJSON_AddNumberToObject(root, "CLOUD_RISKTYPE", wifiRiskInfo.cloudRiskType);
+    cJSON_AddNumberToObject(root, "CLOUD_RISK_TYPE", wifiRiskInfo.cloudRiskType);
     
     char *jsonStr = cJSON_PrintUnformatted(root);
     if (jsonStr == nullptr) {

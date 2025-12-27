@@ -288,6 +288,9 @@ void NetworkSelectionManager::ReportWifiForgeryProtectionHiSysEvent(
     if (!isFilteredByLongUnusedOpenNetworkFilter) {
         return;
     }
+    if (networkCandidate.wifiDeviceConfig.lastDisconnectTime == -1) {
+        return;
+    }
     WifiRiskInfo wifiRiskInfo;
     wifiRiskInfo.riskType = static_cast<int>(WifiRiskInfoReason::WIFI_FORGERY_PROTECTION);
     wifiRiskInfo.lastDisconnectTime = networkCandidate.wifiDeviceConfig.lastDisconnectTime;

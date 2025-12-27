@@ -694,7 +694,8 @@ bool StaStateMachine::InitState::RestrictedByMdm(WifiDeviceConfig &config)
 }
 #endif
 
-void StaStateMachine::InitState::DealHiddenSsidConnectMiss(int networkId) {
+void StaStateMachine::InitState::DealHiddenSsidConnectMiss(int networkId)
+{
     WifiLinkedInfo linkInfo = pStaStateMachine->linkedInfo;
     linkInfo.networkId = networkId;
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_MISS_MATCH, linkInfo);
@@ -1147,7 +1148,8 @@ void StaStateMachine::StopDhcp(bool isStopV4, bool isStopV6)
 bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::string &bssid)
 {
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
-    std::string currentMac, realMac;
+    std::string currentMac;
+    std::string realMac;
     WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC ||
         WifiSettings::GetInstance().IsRandomMacDisabled() || ShouldUseFactoryMac(deviceConfig)) {
@@ -1155,9 +1157,6 @@ bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::st
     } else {
         WifiStoreRandomMac randomMacInfo;
         InitRandomMacInfo(deviceConfig, bssid, randomMacInfo);
-        if (randomMacInfo.peerBssid.empty()) {
-            LOGI("scanInfo has no target wifi and bssid is empty!");
-        }
         if (!MacAddress::IsValidMac(deviceConfig.macAddress) || deviceConfig.macAddress == realMac) {
             WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
             if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
@@ -2814,7 +2813,7 @@ void StaStateMachine::LinkedState::GoInState()
 #endif
     pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
     WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId,
-    pStaStateMachine->linkedInfo.rssi);
+        pStaStateMachine->linkedInfo.rssi);
     WifiSettings::GetInstance().ClearAllNetworkConnectChoice();
     BlockConnectService::GetInstance().EnableNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId);
 #ifndef OHOS_ARCH_LITE
@@ -5124,6 +5123,9 @@ void StaStateMachine::InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, co
             }
         }
     }
+    if (randomMacInfo.peerBssid.empty()) {
+        LOGI("scanInfo has no target wifi and bssid is empty!");
+    }
 }
 
 static constexpr int STA_CONNECT_RANDOMMAC_MAX_FAILED_COUNT = 2;
@@ -5238,7 +5240,7 @@ bool StaStateMachine::WhetherRestrictedByMdm(const std::string &ssid, const std:
 }
 
 void StaStateMachine::ReportMdmRestrictedEvent(const std::string &ssid, const std::string &bssid,
-                                                const std::string &restrictedType)
+    const std::string &restrictedType)
 {
     int uid = GetCallingUid();
     std::string bundleName = "";

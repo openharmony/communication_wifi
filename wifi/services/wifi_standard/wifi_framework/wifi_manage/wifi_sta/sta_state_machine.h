@@ -196,7 +196,7 @@ public:
 #ifdef READ_MAC_FROM_OEM
         GetRealMacAddressFromOemInfo();
         std::string wifiOemMac_ = "";
-#else
+#endif
         GetRealMacAddressFromHal();
         StaStateMachine *pStaStateMachine;
     };

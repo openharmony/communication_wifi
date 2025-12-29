@@ -389,6 +389,73 @@ bool StaStateMachine::ClosedState::ExecuteStateMsg(InternalMessagePtr msg)
     return ret;
 }
 
+#ifdef READ_MAC_FROM_OEM
+ErrCode StaStateMachine::ClosedState::GetRealMacAddressFromOemInfo()
+{
+    WIFI_LOGI("GetStaDeviceMacAddress oeminfo enter, %{public}d", pStaStateMachine->m_instId);
+    auto GetWifiOeminfoMac = []() {
+        WIFI_LOGI("read mac from oem");
+        std::string oemMac = "";
+        int nvPhynumMacWifiNumber = 193;
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->ReadNvInfo(nvPhynumMacWifiNumber, oemMac);
+        }
+        return oemMac;
+    };
+ 
+    std::string realMacAddressWlan0;
+    WifiSettings::GetInstance().GetRealMacAddress(realMacAddressWlan0, INSTID_WLAN0);
+    if (pStaStateMachine->m_instId == INSTID_WLAN1) {
+        std::string realMacAddressWlan1;
+        WifiSettings::GetInstance().GetRealMacAddress(realMacAddressWlan1, INSTID_WLAN1);
+        if (realMacAddressWlan1.empty() || realMacAddressWlan1 != realMacAddressWlan0) {
+            WifiSettings::GetInstance().SetRealMacAddress(realMacAddressWlan0, INSTID_WLAN1);
+        }
+        WifiConfigCenter::GetInstance().SetMacAddress(realMacAddressWlan1, INSTID_WLAN1);
+        return WIFI_OPT_SUCCESS;
+    }
+ 
+    bool isFromHal = false;
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
+    std::string mac = wifiOemMac_ == ""? GetWifiOeminfoMac() : wifiOemMac_;
+    if (mac.empty()) {
+        WIFI_LOGE("GetStaDeviceMacAddress from oeminfo failed, try to Get from hal!");
+        if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac, ifaceName)) != WIFI_HAL_OPT_OK) {
+            WIFI_LOGE("GetStaDeviceMacAddress from hal failed!");
+        }
+        isFromHal = true;
+    }
+    wifiOemMac_ = mac;
+    WifiConfigCenter::GetInstance().SetMacAddress(mac, pStaStateMachine->m_instId);
+    if ((!isFromHal && (realMacAddressWlan0.empty() || realMacAddressWlan0 != mac)) ||
+        (isFromHal && realMacAddressWlan0.empty())) {
+        WifiSettings::GetInstance().SetRealMacAddress(mac, pStaStateMachine->m_instId);
+    }
+    return WIFI_OPT_SUCCESS;
+}
+#endif
+ 
+ErrCode StaStateMachine::ClosedState::GetRealMacAddressFromHal()
+{
+    WIFI_LOGI("GetRealMacAddressFromHal enter!");
+    std::string mac;
+    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
+    if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac, ifaceName))
+        == WIFI_HAL_OPT_OK) {
+        WifiConfigCenter::GetInstance().SetMacAddress(mac, pStaStateMachine->m_instId);
+        std::string realMacAddress;
+        WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, pStaStateMachine->m_instId);
+        if (realMacAddress.empty()) {
+            WifiSettings::GetInstance().SetRealMacAddress(mac, pStaStateMachine->m_instId);
+        }
+        return WIFI_OPT_SUCCESS;
+    } else {
+        WIFI_LOGI("GetStaDeviceMacAddress failed!");
+        return WIFI_OPT_FAILED;
+    }
+}
+
 void StaStateMachine::ClosedState::StartWifiProcess()
 {
     if (WifiStaHalInterface::GetInstance().WpaAutoConnect(false) != WIFI_HAL_OPT_OK) {
@@ -403,23 +470,11 @@ void StaStateMachine::ClosedState::StartWifiProcess()
         }
     }
     /* Sets the MAC address of WifiSettings. */
-    std::string mac;
-    std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
-    if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac, ifaceName, WIFI_OEMINFO_MAC))
-        == WIFI_HAL_OPT_OK) {
-        WifiConfigCenter::GetInstance().SetMacAddress(mac, pStaStateMachine->m_instId);
-        std::string realMacAddress;
-        WifiSettings::GetInstance().GetRealMacAddress(realMacAddress, pStaStateMachine->m_instId);
 #ifdef READ_MAC_FROM_OEM
-        if (realMacAddress.empty() || realMacAddress != mac) {
+    GetRealMacAddressFromOemInfo();
 #else
-        if (realMacAddress.empty()) {
+    GetRealMacAddressFromHal();
 #endif
-            WifiSettings::GetInstance().SetRealMacAddress(mac, pStaStateMachine->m_instId);
-        }
-    } else {
-        WIFI_LOGI("GetStaDeviceMacAddress failed!");
-    }
 
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("Register netsupplier %{public}d", pStaStateMachine->m_instId);
@@ -639,7 +694,8 @@ bool StaStateMachine::InitState::RestrictedByMdm(WifiDeviceConfig &config)
 }
 #endif
 
-void StaStateMachine::InitState::DealHiddenSsidConnectMiss(int networkId) {
+void StaStateMachine::InitState::DealHiddenSsidConnectMiss(int networkId)
+{
     WifiLinkedInfo linkInfo = pStaStateMachine->linkedInfo;
     linkInfo.networkId = networkId;
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_MISS_MATCH, linkInfo);
@@ -1092,7 +1148,8 @@ void StaStateMachine::StopDhcp(bool isStopV4, bool isStopV6)
 bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::string &bssid)
 {
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
-    std::string currentMac, realMac;
+    std::string currentMac;
+    std::string realMac;
     WifiSettings::GetInstance().GetRealMacAddress(realMac, m_instId);
     if (deviceConfig.wifiPrivacySetting == WifiPrivacyConfig::DEVICEMAC ||
         WifiSettings::GetInstance().IsRandomMacDisabled() || ShouldUseFactoryMac(deviceConfig)) {
@@ -1100,9 +1157,6 @@ bool StaStateMachine::SetRandomMac(WifiDeviceConfig &deviceConfig, const std::st
     } else {
         WifiStoreRandomMac randomMacInfo;
         InitRandomMacInfo(deviceConfig, bssid, randomMacInfo);
-        if (randomMacInfo.peerBssid.empty()) {
-            LOGI("scanInfo has no target wifi and bssid is empty!");
-        }
         if (!MacAddress::IsValidMac(deviceConfig.macAddress) || deviceConfig.macAddress == realMac) {
             WifiSettings::GetInstance().GetRandomMac(randomMacInfo);
             if (MacAddress::IsValidMac(randomMacInfo.randomMac) && randomMacInfo.randomMac != realMac) {
@@ -2759,7 +2813,7 @@ void StaStateMachine::LinkedState::GoInState()
 #endif
     pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
     WifiSettings::GetInstance().SetDeviceAfterConnect(pStaStateMachine->linkedInfo.networkId,
-    pStaStateMachine->linkedInfo.rssi);
+        pStaStateMachine->linkedInfo.rssi);
     WifiSettings::GetInstance().ClearAllNetworkConnectChoice();
     BlockConnectService::GetInstance().EnableNetworkSelectStatus(pStaStateMachine->linkedInfo.networkId);
 #ifndef OHOS_ARCH_LITE
@@ -5069,6 +5123,9 @@ void StaStateMachine::InitRandomMacInfo(const WifiDeviceConfig &deviceConfig, co
             }
         }
     }
+    if (randomMacInfo.peerBssid.empty()) {
+        LOGI("scanInfo has no target wifi and bssid is empty!");
+    }
 }
 
 static constexpr int STA_CONNECT_RANDOMMAC_MAX_FAILED_COUNT = 2;
@@ -5183,7 +5240,7 @@ bool StaStateMachine::WhetherRestrictedByMdm(const std::string &ssid, const std:
 }
 
 void StaStateMachine::ReportMdmRestrictedEvent(const std::string &ssid, const std::string &bssid,
-                                                const std::string &restrictedType)
+    const std::string &restrictedType)
 {
     int uid = GetCallingUid();
     std::string bundleName = "";

@@ -429,6 +429,18 @@ public:
     virtual int32_t GetPackageNum(std::string packageName) = 0;
 
     /**
+    * @brief Reads the information of the specified NV item.
+    *
+    * This pure virtual function is used to read data from a specific NV area.
+    * The caller must provide the physical number of the NV, its name, and the expected read length.
+    * The function will write the read data into nvInfo.
+    *
+    * @param nvPhynum The physical number of the NV, used to locate the NV area.
+    * @param nvInfo Output parameter. The function will write the read NV information into this string.
+    */
+    virtual ErrCode ReadNvInfo(int nvPhynum, std::string &nvInfo) = 0;
+
+    /**
      * @Description fold status
      *
      * @return success: 0, failed: -1

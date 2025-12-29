@@ -49,6 +49,7 @@ ErrCode WifiCountryCodeManager::Init()
 {
     WIFI_LOGI("init");
     wifiCountryCodePolicyConf_ = GetWifiCountryCodePolicy();
+    std::unique_lock<std::mutex> lock(mutex);
     m_wifiCountryCodePolicy = std::make_shared<WifiCountryCodePolicy>(wifiCountryCodePolicyConf_);
 #ifdef FEATURE_STA_SUPPORT
     m_staCallback.callbackModuleName = CLASS_NAME;
@@ -78,6 +79,7 @@ IApServiceCallbacks WifiCountryCodeManager::GetApCallback() const
 
 void WifiCountryCodeManager::GetWifiCountryCode(std::string &wifiCountryCode) const
 {
+    std::unique_lock<std::mutex> lock(m_countryMutex);
     wifiCountryCode = m_wifiCountryCode;
 }
 
@@ -89,12 +91,17 @@ ErrCode WifiCountryCodeManager::SetWifiCountryCodeFromExternal(const std::string
 
 void WifiCountryCodeManager::TriggerUpdateWifiCountryCode(int triggerReason)
 {
+    std::shared_ptr<WifiCountryCodePolicy> tempWifiCountryCodePolicy;
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        tempWifiCountryCodePolicy = m_wifiCountryCodePolicy;
+    }
     if (triggerReason == TRIGGER_UPDATE_REASON_TEL_NET_CHANGE && wifiCountryCodePolicyConf_[FEATURE_MCC]) {
         WIFI_LOGI("TEL_NET_CHANGE trigger update country code change");
         UpdateWifiCountryCode();
     } else if (triggerReason == TRIGGER_UPDATE_REASON_SCAN_CHANGE &&
-        wifiCountryCodePolicyConf_[FEATURE_RCV_SCAN_RESLUT] && m_wifiCountryCodePolicy != nullptr) {
-        m_wifiCountryCodePolicy->HandleScanResultAction();
+        wifiCountryCodePolicyConf_[FEATURE_RCV_SCAN_RESLUT] && tempWifiCountryCodePolicy != nullptr) {
+        tempWifiCountryCodePolicy->HandleScanResultAction();
         UpdateWifiCountryCode();
     }
 }
@@ -135,18 +142,26 @@ ErrCode WifiCountryCodeManager::UpdateWifiCountryCode(const std::string &externa
         return WIFI_OPT_FAILED;
     }
     std::string wifiCountryCode;
+    std::shared_ptr<WifiCountryCodePolicy> tempWifiCountryCodePolicy;
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        tempWifiCountryCodePolicy = m_wifiCountryCodePolicy;
+    }
     if (!externalCode.empty() && !IsValidCountryCode(externalCode)) {
         WIFI_LOGI("external set wifi country code, code=%{public}s", externalCode.c_str());
         wifiCountryCode = externalCode;
-    } else if (m_wifiCountryCodePolicy == nullptr ||
-        m_wifiCountryCodePolicy->CalculateWifiCountryCode(wifiCountryCode) == WIFI_OPT_FAILED) {
+    } else if (tempWifiCountryCodePolicy == nullptr ||
+        tempWifiCountryCodePolicy->CalculateWifiCountryCode(wifiCountryCode) == WIFI_OPT_FAILED) {
         WIFI_LOGE("calculate wifi country code failed");
         return WIFI_OPT_FAILED;
     }
     StrToUpper(wifiCountryCode);
     WIFI_LOGI("calculate wifi country code result:%{public}s", wifiCountryCode.c_str());
     UpdateWifiCountryCodeCache(wifiCountryCode);
-    m_wifiCountryCode = wifiCountryCode;
+    {
+        std::unique_lock<std::mutex> lock(m_countryMutex);
+        m_wifiCountryCode = wifiCountryCode;
+    }
     NotifyWifiCountryCodeChangeListeners(wifiCountryCode);
     return WIFI_OPT_SUCCESS;
 }

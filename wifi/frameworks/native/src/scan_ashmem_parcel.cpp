@@ -53,13 +53,6 @@ ScanAshmemParcel *ScanAshmemParcel::Unmarshalling(Parcel &parcel)
         return nullptr;
     }
 
-    if (!ashmem->MapReadAndWriteAshmem()) {
-        WIFI_LOGE("ScanAshmemParcel Unmarshalling: MapAshmem failed");
-        ashmem->UnmapAshmem();
-        ashmem->CloseAshmem();
-        return nullptr;
-    }
-
     ashmemParcelPtr->ashmem_ = ashmem;
     WIFI_LOGI("ScanAshmemParcel Unmarshalling: success");
 

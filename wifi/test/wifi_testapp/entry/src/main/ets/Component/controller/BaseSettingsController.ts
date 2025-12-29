@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import ISettingsController from './ISettingsController'
+import ISettingsController from './ISettingsController';
 
 /**
  * BaseSettingsController Of Wifi test
@@ -55,21 +55,21 @@ export default abstract class BaseSettingsController implements ISettingsControl
    */
   initData(): ISettingsController {
     return this;
-  };
+  }
 
   /**
    * Subscribe listeners.
    */
   subscribe(): ISettingsController {
     return this;
-  };
+  }
 
   /**
    * Unsubscribe listeners.
    */
   unsubscribe(): ISettingsController {
     return this;
-  };
+  }
 
   /**
    * Define bound properties.

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { TestData , TestApi } from '../entryability/model/testData'
-import { initHotspotManagerApIData } from '../entryability/model/testDataModels'
+import { TestData, TestApi } from '../entryability/model/testData';
+import { initHotspotManagerApiData } from '../entryability/model/testDataModels';
 import ConfigData from '../utils/ConfigData';
 
 const TAG = "wifiTestApp [filterTableManager]"
@@ -25,7 +25,7 @@ const TAG = "wifiTestApp [filterTableManager]"
 @Component
 export struct FilterTableManager {
   private testItem!: TestData
-  @State apiItems: TestApi[] = initHotspotManagerApIData()
+  @State apiItems: TestApi[] = initHotspotManagerApiData()
   @State changeIndex: number = - 1
   // input ble scan parameters:
   /*ScanFilter*/
@@ -38,16 +38,16 @@ export struct FilterTableManager {
   @State h_channel1: number = 36;
 
   getCurrentState(index: number) {
-    return this.apiItems[ index ].result
+    return this.apiItems[index].result
   }
 
   aboutToAppear() {
-    AppStorage.setOrCreate("h_ssid1" , this.h_ssid1)
-    AppStorage.setOrCreate("h_securityType1" , this.h_securityType1)
-    AppStorage.setOrCreate("h_band1" , this.h_band1)
-    AppStorage.setOrCreate("h_preSharedKey1" , this.h_preSharedKey1)
-    AppStorage.setOrCreate("h_maxConn1" , this.h_maxConn1)
-    AppStorage.setOrCreate("h_channel1" , this.h_channel1)
+    AppStorage.setOrCreate("h_ssid1", this.h_ssid1)
+    AppStorage.setOrCreate("h_securityType1", this.h_securityType1)
+    AppStorage.setOrCreate("h_band1", this.h_band1)
+    AppStorage.setOrCreate("h_preSharedKey1", this.h_preSharedKey1)
+    AppStorage.setOrCreate("h_maxConn1", this.h_maxConn1)
+    AppStorage.setOrCreate("h_channel1", this.h_channel1)
   }
 
   build() {
@@ -57,11 +57,11 @@ export struct FilterTableManager {
           Column() {
             Row() {
               Text("ssid").fontSize("17vp").width(60);
-              TextInput({ text : this.h_ssid1 , placeholder : "testApp123" })
+              TextInput({ text: this.h_ssid1, placeholder: "testApp123" })
                 .fontSize("15vp")
                 .onChange((strInput: string) => {
                   this.h_ssid1 = strInput;
-                  AppStorage.setOrCreate("h_ssid1" , this.h_ssid1);
+                  AppStorage.setOrCreate("h_ssid1", this.h_ssid1);
                 })
                 .width(ConfigData.WH_80_100)
                 .borderRadius(1)
@@ -73,11 +73,11 @@ export struct FilterTableManager {
 
             Row() {
               Text("securityType").fontSize(17).width(110);
-              TextInput({ text : this.h_securityType1.toString() , placeholder : "3" })
+              TextInput({ text: this.h_securityType1.toString(), placeholder: "3" })
                 .fontSize("15vp")
                 .onChange((strInput: string) => {
                   this.h_securityType1 = Number(strInput);
-                  AppStorage.setOrCreate('h_securityType1' , this.h_securityType1);
+                  AppStorage.setOrCreate('h_securityType1', this.h_securityType1);
                 })
                 .width(ConfigData.WH_80_100)
                 .borderRadius(1)
@@ -91,19 +91,19 @@ export struct FilterTableManager {
               Text("maxConn").fontSize(17).width(80)
               Column() {
                 Select([
-                  { value : '1' },
-                  { value : '2' },
-                  { value : '3' }
-                ])
+                  { value: '1' },
+                  { value: '2' },
+                  { value: '3' }
+])
                   .selected(2)
                   .value('3')
-                  .font({ size : 17 })
-                  .selectedOptionFont({ size : 17 })
-                  .optionFont({ size : 15 })
+                  .font({ size: 17 })
+                  .selectedOptionFont({ size: 17 })
+                  .optionFont({ size: 15 })
                   .width(ConfigData.WH_80_100)
                   .onSelect((index: number) => {
-                    console.log(TAG , "Select:" + index)
-                    AppStorage.setOrCreate('h_maxConn1' , index);
+                    console.log(TAG, "Select:" + index)
+                    AppStorage.setOrCreate('h_maxConn1', index);
                   })
               }
               .width(ConfigData.WH_80_100)
@@ -115,11 +115,11 @@ export struct FilterTableManager {
 
             Row() {
               Text("band").fontSize(17).width(60);
-              TextInput({ text : this.h_band1.toString() , placeholder : "2" })
+              TextInput({ text: this.h_band1.toString(), placeholder: "2" })
                 .fontSize("15vp")
                 .onChange((strInput: string) => {
                   this.h_band1 = Number(strInput);
-                  AppStorage.setOrCreate('h_band1' , this.h_band1);
+                  AppStorage.setOrCreate('h_band1', this.h_band1);
                 })
                 .width(ConfigData.WH_80_100)
                 .borderRadius(1)
@@ -131,11 +131,11 @@ export struct FilterTableManager {
 
             Row() {
               Text("preSharedKey").fontSize(17).width(120)
-              TextInput({ text : this.h_preSharedKey1 , placeholder : "12345678" })
+              TextInput({ text: this.h_preSharedKey1, placeholder: "12345678" })
                 .fontSize("17vp")
                 .onChange((strInput: string) => {
                   this.h_preSharedKey1 = strInput;
-                  AppStorage.setOrCreate('h_preSharedKey1' , this.h_preSharedKey1);
+                  AppStorage.setOrCreate('h_preSharedKey1', this.h_preSharedKey1);
                 })
                 .width(ConfigData.WH_80_100)
             }
@@ -146,11 +146,11 @@ export struct FilterTableManager {
 
             Row() {
               Text("channel").fontSize(17).width(120)
-              TextInput({ text : this.h_channel1.toString() , placeholder : "36" })
+              TextInput({ text: this.h_channel1.toString(), placeholder: "36" })
                 .fontSize("17vp")
                 .onChange((strInput: string) => {
                   this.h_channel1 = Number(strInput);
-                  AppStorage.setOrCreate('h_channel1' , this.h_channel1);
+                  AppStorage.setOrCreate('h_channel1', this.h_channel1);
                 })
                 .width(ConfigData.WH_80_100)
             }
@@ -170,6 +170,6 @@ export struct FilterTableManager {
       .backgroundColor($r("app.color.lead"))
     }
     .scrollBarWidth(20)
-    .padding({ bottom : 10 })
+    .padding({ bottom: 10 })
   }
 }

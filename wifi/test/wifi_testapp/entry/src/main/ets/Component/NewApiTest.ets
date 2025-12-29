@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-import { TestData } from "../entryability/model/testData"
-import { TestList } from "./testList"
+import { TestData } from "../entryability/model/testData";
+import { AllInOneView } from "../pages/newApi/AllInOneView";
+import { TestList } from "./testList";
 
 @Component
 export struct NewApiTest {
@@ -24,13 +25,14 @@ export struct NewApiTest {
   build() {
     Column() {
       TestList({
-        testItems : this.testItems
+        testItems: this.testItems
       })
     }
   }
 
   @Builder routeMap(name: string) {
     if (name === 'allInOne') {
+      AllInOneView()
     }
 
   }

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { TestData , TestAuto } from '../entryability/model/testData'
+import { TestData, TestAuto } from '../entryability/model/testData';
 import ConfigData from '../utils/ConfigData';
 
 const TAG = "wifiTestApp [autoContentTable]"
@@ -29,10 +29,10 @@ export struct AutoContentTable {
   @State localName: string = 'DaYuBlue'
   @Prop changeIndex: number;
 
-  @Builder IngredientItem(autoItem: TestAuto , index: number) {
+  @Builder IngredientItem(autoItem: TestAuto, index: number) {
     Stack() {
       Flex() {
-        Flex({ alignItems : ItemAlign.Center }) {
+        Flex({ alignItems: ItemAlign.Center }) {
           Image($r('app.media.wifi'))
             .objectFit(ImageFit.Contain)
             .autoResize(false)
@@ -41,13 +41,13 @@ export struct AutoContentTable {
         }
         .height(30)
         .width(ConfigData.WH_10_100)
-        .padding({ left : 10 })
+        .padding({ left: 10 })
 
-        Flex({ direction : FlexDirection.Column , alignItems : ItemAlign.Start }) {
+        Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start }) {
           Row() {
             Text(autoItem.method)
               .fontSize("17vp")
-              .margin({ top : "3vp" , bottom : "3vp" , left : "10vp" })
+              .margin({ top: "3vp", bottom: "3vp", left: "10vp" })
               .textAlign(TextAlign.Start)
               .height(40)
               .width(200)
@@ -58,29 +58,29 @@ export struct AutoContentTable {
         .height(30)
         .layoutWeight(6)
 
-        Flex({ alignItems : ItemAlign.Center }) {
+        Flex({ alignItems: ItemAlign.Center }) {
           Text(this.changeIndex >= 0 ? this.getCurrentState(index) : autoItem.result)
-            .margin({ left : "10vp" })
+            .margin({ left: "10vp" })
             .fontSize("17vp")
             .flexGrow(1)
         }
         .layoutWeight(3)
-        .padding({ left : 10 })
+        .padding({ left: 10 })
       }
     }
     .height(40)
     .borderRadius(10)
-    .margin({ top : 3 , bottom : 3 })
+    .margin({ top: 3, bottom: 3 })
     .backgroundColor($r("app.color.white"))
   }
 
   getCurrentState(index: number) {
-    if ( index <= this.changeIndex ) {
-      this.autoItemsX[ index ].result = 'pass';
+    if (index <= this.changeIndex) {
+      this.autoItemsX[index].result = 'pass';
     } else {
-      console.log(TAG , "index > this.changeIndex")
+      console.log(TAG, "index > this.changeIndex")
     }
-    return this.autoItemsX[ index ].result
+    return this.autoItemsX[index].result
   }
 
   aboutToAppear(): void {
@@ -93,18 +93,18 @@ export struct AutoContentTable {
     Column() {
       Scroll() {
         Flex({
-          direction : FlexDirection.Column ,
-          justifyContent : FlexAlign.SpaceBetween ,
-          alignItems : ItemAlign.Start
+          direction: FlexDirection.Column,
+          justifyContent: FlexAlign.SpaceBetween,
+          alignItems: ItemAlign.Start
         }) {
-          ForEach(this.autoItems , (item: TestAuto , index: number) => {
-            this.IngredientItem(item , index)
+          ForEach(this.autoItems, (item: TestAuto, index: number) => {
+            this.IngredientItem(item, index)
           })
         }
       }
       .scrollBarWidth(20)
     }
     .height(ConfigData.WH_80_100)
-    .padding({ top : 5 , right : 10 , left : 10 })
+    .padding({ top: 5, right: 10, left: 10 })
   }
 }

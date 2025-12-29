@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { TestData , TestApi } from '../entryability/model/testData'
-import { initHotspotApIData } from '../entryability/model/testDataModels'
+import { TestData, TestApi } from '../entryability/model/testData';
+import { initHotspotApIData } from '../entryability/model/testDataModels';
 import ConfigData from '../utils/ConfigData';
 
 const TAG = "wifiTestApp [filterTable]"
@@ -38,16 +38,16 @@ export struct FilterTable {
   @State h_channel: number = 36;
 
   getCurrentState(index: number) {
-    return this.apiItems[ index ].result
+    return this.apiItems[index].result
   }
 
   aboutToAppear() {
-    AppStorage.setOrCreate("h_ssid" , this.h_ssid)
-    AppStorage.setOrCreate("h_securityType" , this.h_securityType)
-    AppStorage.setOrCreate("h_band" , this.h_band)
-    AppStorage.setOrCreate("h_preSharedKey" , this.h_preSharedKey)
-    AppStorage.setOrCreate("h_maxConn" , this.h_maxConn)
-    AppStorage.setOrCreate("h_channel" , this.h_channel)
+    AppStorage.setOrCreate("h_ssid", this.h_ssid)
+    AppStorage.setOrCreate("h_securityType", this.h_securityType)
+    AppStorage.setOrCreate("h_band", this.h_band)
+    AppStorage.setOrCreate("h_preSharedKey", this.h_preSharedKey)
+    AppStorage.setOrCreate("h_maxConn", this.h_maxConn)
+    AppStorage.setOrCreate("h_channel", this.h_channel)
   }
 
   build() {
@@ -57,11 +57,11 @@ export struct FilterTable {
           Column() {
             Row() {
               Text("ssid").fontSize("17vp").width(60);
-              TextInput({ text : this.h_ssid , placeholder : "testApp1" })
+              TextInput({ text: this.h_ssid, placeholder: "testApp1" })
                 .fontSize("15vp")
                 .onChange((strInput: string) => {
                   this.h_ssid = strInput;
-                  AppStorage.setOrCreate("h_ssid" , this.h_ssid);
+                  AppStorage.setOrCreate("h_ssid", this.h_ssid);
                 })
                 .width(ConfigData.WH_80_100)
                 .borderRadius(1)
@@ -73,11 +73,11 @@ export struct FilterTable {
 
             Row() {
               Text("securityType").fontSize(17).width(110);
-              TextInput({ text : this.h_securityType.toString() , placeholder : "3" })
+              TextInput({ text: this.h_securityType.toString(), placeholder: "3" })
                 .fontSize("15vp")
                 .onChange((strInput: string) => {
                   this.h_securityType = Number(strInput);
-                  AppStorage.setOrCreate('h_securityType' , this.h_securityType);
+                  AppStorage.setOrCreate('h_securityType', this.h_securityType);
                 })
                 .width(ConfigData.WH_80_100)
                 .borderRadius(1)
@@ -91,19 +91,19 @@ export struct FilterTable {
               Text("maxConn").fontSize(17).width(80)
               Column() {
                 Select([
-                  { value : '1' },
-                  { value : '2' },
-                  { value : '3' }
-                ])
+                  { value: '1' },
+                  { value: '2' },
+                  { value: '3' }
+])
                   .selected(2)
                   .value('3')
-                  .font({ size : 17 })
-                  .selectedOptionFont({ size : 17 })
-                  .optionFont({ size : 15 })
+                  .font({ size: 17 })
+                  .selectedOptionFont({ size: 17 })
+                  .optionFont({ size: 15 })
                   .width(ConfigData.WH_80_100)
                   .onSelect((index: number) => {
-                    console.log(TAG , "Select:" + index)
-                    AppStorage.setOrCreate('h_maxConn' , index);
+                    console.log(TAG, "Select:" + index)
+                    AppStorage.setOrCreate('h_maxConn', index);
                   })
               }
               .width(ConfigData.WH_80_100)
@@ -115,11 +115,11 @@ export struct FilterTable {
 
             Row() {
               Text("band").fontSize(17).width(60);
-              TextInput({ text : this.h_band.toString() , placeholder : "2" })
+              TextInput({ text: this.h_band.toString(), placeholder: "2" })
                 .fontSize("15vp")
                 .onChange((strInput: string) => {
                   this.h_band = Number(strInput);
-                  AppStorage.setOrCreate('h_band' , this.h_band);
+                  AppStorage.setOrCreate('h_band', this.h_band);
                 })
                 .width(ConfigData.WH_80_100)
                 .borderRadius(1)
@@ -132,11 +132,11 @@ export struct FilterTable {
 
             Row() {
               Text("preSharedKey").fontSize(17).width(120)
-              TextInput({ text : this.h_preSharedKey , placeholder : "12345678" })
+              TextInput({ text: this.h_preSharedKey, placeholder: "12345678" })
                 .fontSize("17vp")
                 .onChange((strInput: string) => {
                   this.h_preSharedKey = strInput;
-                  AppStorage.setOrCreate('h_preSharedKey' , this.h_preSharedKey);
+                  AppStorage.setOrCreate('h_preSharedKey', this.h_preSharedKey);
                 })
                 .width(ConfigData.WH_80_100)
             }
@@ -147,11 +147,11 @@ export struct FilterTable {
 
             Row() {
               Text("channel").fontSize(17).width(120)
-              TextInput({ text : this.h_channel.toString() , placeholder : "36" })
+              TextInput({ text: this.h_channel.toString(), placeholder: "36" })
                 .fontSize("17vp")
                 .onChange((strInput: string) => {
                   this.h_channel = Number(strInput);
-                  AppStorage.setOrCreate('h_channel' , this.h_channel);
+                  AppStorage.setOrCreate('h_channel', this.h_channel);
                 })
                 .width(ConfigData.WH_80_100)
             }
@@ -171,6 +171,6 @@ export struct FilterTable {
       .backgroundColor($r("app.color.lead"))
     }
     .scrollBarWidth(20)
-    .padding({ bottom : 10 })
+    .padding({ bottom: 10 })
   }
 }

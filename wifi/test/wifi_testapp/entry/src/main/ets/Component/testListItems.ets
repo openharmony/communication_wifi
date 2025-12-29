@@ -14,10 +14,10 @@
  */
 
 import ConfigData from '../utils/ConfigData';
-import { TestData } from '../entryability/model/testData'
+import { TestData } from '../entryability/model/testData';
 
 /**
- * Test-ListItem component of wifi test
+ * Test - ListItem component of wifi test
  */
 
 @Component
@@ -29,8 +29,8 @@ export struct TestListItem {
   }
 
   build() {
-    Navigator({ target : this.testItem.url }) {
-      Flex({ justifyContent : FlexAlign.Start , alignItems : ItemAlign.Center }) {
+    Navigator({ target: this.testItem.url }) {
+      Flex({ justifyContent: FlexAlign.Start, alignItems: ItemAlign.Center }) {
         Row() {
           Image(this.testItem.image)
             .objectFit(ImageFit.Contain)
@@ -44,18 +44,18 @@ export struct TestListItem {
         Text(this.testItem.name)
           .fontSize(20)
           .flexGrow(1)
-          .margin({ left : 12 })
+          .margin({ left: 12 })
           .width(ConfigData.WH_45_100)
         Text(this.testItem.detail)
           .fontSize(17)
-          .margin({ left : 10 , right : 5 })
+          .margin({ left: 10, right: 5 })
           .width(ConfigData.WH_45_100)
       }
       .height(85)
     }
-    .params({ testItem : this.testItem })
-    .margin({ right : 10 , left : 10 , top : 10 })
-    .padding({ left : 15 , right : 15 })
+    .params({ testItem: this.testItem })
+    .margin({ right: 10, left: 10, top: 10 })
+    .padding({ left: 15, right: 15 })
     .borderRadius(10)
     .backgroundColor($r("app.color.white"))
   }

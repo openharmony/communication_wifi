@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { TestData } from '../entryability/model/testData'
-import { TestGridItem } from './testGridItem'
+import { TestData } from '../entryability/model/testData';
+import { TestGridItem } from './testGridItem';
 /**
  * TestGrid component page of wifi test
  */
@@ -26,7 +26,7 @@ export struct TestGrid {
   private heightValue: number
 
   aboutToAppear() {
-    let rows = Math.round(this.testItems.length / 2);
+    let rows = Math.round(this.testItems.length/2);
     this.gridRowTemplate = '1fr '.repeat(rows);
     this.heightValue = rows * 192 - 8;
   }
@@ -34,11 +34,11 @@ export struct TestGrid {
   build() {
     Scroll() {
       Grid() {
-        ForEach(this.testItems , (item: TestData) => {
+        ForEach(this.testItems, (item: TestData) => {
           GridItem() {
-            TestGridItem({ testItem : item })
+            TestGridItem({ testItem: item })
           }
-        } , (item: TestData) => item.id.toString())
+        }, (item: TestData) => item.id.toString())
       }
       .rowsTemplate(this.gridRowTemplate)
       .columnsTemplate('1fr 1fr')
@@ -47,6 +47,6 @@ export struct TestGrid {
       .height(this.heightValue)
     }
     .scrollBar(BarState.Off)
-    .padding({ left : 16 , right : 16 })
+    .padding({ left: 16, right: 16 })
   }
 }

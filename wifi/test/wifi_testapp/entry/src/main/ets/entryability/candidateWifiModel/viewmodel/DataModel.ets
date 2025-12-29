@@ -42,13 +42,13 @@ export class DataModel {
    * @param selectArr: An array indicating whether historical data is selected.
    */
   deleteData(selectArr: Array<boolean>) {
-    if ( !selectArr ) {
-      Logger.error(TAG , 'Failed to delete data because selectArr is ' + selectArr);
+    if (!selectArr) {
+      Logger.error(TAG, 'Failed to delete data because selectArr is ' + selectArr);
     }
     let dataLen = this.targetData.length - CommonConstants.ONE_TASK;
-    for ( let i = dataLen ; i >= 0 ; i -- ) {
-      if ( selectArr[ i ] ) {
-        this.targetData.splice(i , CommonConstants.ONE_TASK);
+    for (let i = dataLen ; i >= 0 ; i --) {
+      if (selectArr[i]) {
+        this.targetData.splice(i, CommonConstants.ONE_TASK);
       }
     }
   }
@@ -59,8 +59,8 @@ export class DataModel {
    * @param Data of the RecordItemBean type to be added.
    */
   addData(data: TaskItemBean) {
-    if ( !data ) {
-      Logger.error(TAG , 'addData error because data is: ' + data);
+    if (!data) {
+      Logger.error(TAG, 'addData error because data is: ' + data);
       return;
     }
     this.targetData.push(data);
@@ -70,10 +70,10 @@ export class DataModel {
    * Get the latest progress.
    */
   getLatestProgressValue(): number {
-    if ( this.targetData.length === 0 ) {
+    if (this.targetData.length === 0) {
       return 0;
     }
-    return this.targetData[ this.targetData.length - CommonConstants.ONE_TASK ].progressValue;
+    return this.targetData[this.targetData.length - CommonConstants.ONE_TASK].progressValue;
   }
 
   /**
@@ -83,12 +83,12 @@ export class DataModel {
    * @param updateValue of update item.
    * @param updateDate of update item.
    */
-  updateProgress(index: number , updateValue: number , updateDate: string): boolean {
-    if ( !this.targetData[ index ] ) {
+  updateProgress(index: number, updateValue: number, updateDate: string): boolean {
+    if (!this.targetData[index]) {
       return false;
     }
-    this.targetData[ index ].progressValue = updateValue;
-    this.targetData[ index ].updateDate = updateDate;
+    this.targetData[index].progressValue = updateValue;
+    this.targetData[index].updateDate = updateDate;
     return true;
   }
 }

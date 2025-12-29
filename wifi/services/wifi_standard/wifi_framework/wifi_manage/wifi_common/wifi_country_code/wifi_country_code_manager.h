@@ -149,6 +149,8 @@ private:
     std::string m_wifiCountryCode = DEFAULT_WIFI_COUNTRY_CODE;
     std::shared_ptr<WifiCountryCodePolicy> m_wifiCountryCodePolicy;
     std::mutex m_countryCodeMutex;
+    mutable std::mutex mutex;
+    mutable std::mutex m_countryMutex;
     bool m_isFirstConnected = false;
     std::bitset<WIFI_COUNTRY_CODE_POLICE_DEF_LEN> wifiCountryCodePolicyConf_;
 

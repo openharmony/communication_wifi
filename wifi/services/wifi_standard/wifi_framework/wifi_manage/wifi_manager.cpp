@@ -253,6 +253,7 @@ void WifiManager::CheckSapcoExist()
 
 int WifiManager::GetSupportedFeatures(long &features) const
 {
+    std::lock_guard<std::mutex> lock(mutex);
     long supportedFeatures = mSupportedFeatures;
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_INFRA);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_INFRA_5G);
@@ -268,6 +269,7 @@ int WifiManager::GetSupportedFeatures(long &features) const
 
 void WifiManager::AddSupportedFeatures(WifiFeatures feature)
 {
+    std::unique_lock<std::mutex> lock(mutex);
     mSupportedFeatures = static_cast<long>(static_cast<unsigned long>(mSupportedFeatures) |
         static_cast<unsigned long>(feature));
 }

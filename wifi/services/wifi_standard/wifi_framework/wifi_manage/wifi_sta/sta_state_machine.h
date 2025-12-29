@@ -193,6 +193,11 @@ public:
         void StopWifiProcess();
         void SaveFoldStatus(InternalMessagePtr msg);
         void DealScreenStateChangedEvent(InternalMessagePtr msg);
+#ifdef READ_MAC_FROM_OEM
+        ErrCode GetRealMacAddressFromOemInfo();
+        std::string wifiOemMac_ = "";
+#endif
+        ErrCode GetRealMacAddressFromHal();
         StaStateMachine *pStaStateMachine;
     };
     /**

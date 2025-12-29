@@ -36,7 +36,7 @@ export default class DateTimeUtil {
 
   /**
    * 日期不足两位补充0
-   * @param value-数据值
+   * @param value - 数据值
    */
   fill(value: number) {
     return (value > 9 ? '' : '0') + value

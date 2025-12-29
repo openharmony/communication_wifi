@@ -609,13 +609,16 @@ bool StaAutoConnectService::IsCandidateWithUserSelectChoiceHidden(NetworkSelecti
     long currentTime = static_cast<int64_t>(times.tv_sec) * MSEC + times.tv_nsec / (MSEC * MSEC);
     long choiceSetToGet = currentTime - candidateConfig.networkSelectionStatus.connectChoiceTimestamp;
     WIFI_LOGD("%{public}s.candidateConfig hiddenSSID:%{public}d, networkSelectionStatus.status:%{public}d, "
-        "networkSelectionStatus.connectChoice:%{public}d, networkId:%{public}d, choiceSetToGet:%{public}ld",
+        "networkSelectionStatus.connectChoice:%{public}d, networkId:%{public}d, choiceSetToGet:%{public}ld"
+        "networkSelectionStatus.networkDisableCount:%{public}d",
         __FUNCTION__, candidateConfig.hiddenSSID, candidateConfig.networkSelectionStatus.status,
-        candidateConfig.networkSelectionStatus.connectChoice, candidateConfig.networkId, choiceSetToGet);
+        candidateConfig.networkSelectionStatus.connectChoice, candidateConfig.networkId, choiceSetToGet,
+        candidateConfig.networkSelectionStatus.networkDisableCount);
+    bool isByRetry = candidateConfig.networkSelectionStatus.networkDisableCount > 0;
     return candidateConfig.hiddenSSID &&
         candidateConfig.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED &&
         candidateConfig.networkId == candidateConfig.networkSelectionStatus.connectChoice &&
-        choiceSetToGet > CONNECT_CHOICE_INVALID && choiceSetToGet < CONNECT_CHOICE_TIMEOUT_MS;
+        choiceSetToGet > CONNECT_CHOICE_INVALID && choiceSetToGet < CONNECT_CHOICE_TIMEOUT_MS && !isByRetry;
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -13,10 +13,10 @@
  * limitations under the License.
  */
  
-import { wifiManager } from "@kit.ConnectivityKit"
-import { promptAction } from "@kit.ArkUI"
-import { DeviceItemView, P2PDevice } from "./AllInOneView"
-import { NormalNav } from "./Components/NormalNav"
+import { wifiManager } from "@kit.ConnectivityKit";
+import { promptAction } from "@kit.ArkUI";
+import { DeviceItemView, P2PDevice } from "./AllInOneView";
+import { NormalNav } from "./components/NormalNav";
 
 const TAG = "CreateGroupView"
 
@@ -31,7 +31,6 @@ PersistentStorage.persistProp<GroupInfo>('groupInfo', undefined)
 
 @Component
 export struct CreateGroupView {
-
   @State showCreateGroupSheet: boolean = false
   @State showConnectTestSheet: boolean = false
   @State groupName: string = ''
@@ -149,17 +148,17 @@ export struct CreateGroupView {
               .fontWeight(FontWeight.Bolder)
             Text() {
               Span($r('app.string.group_name'))
-              Span(' : ')
+              Span(': ')
               Span(this.groupInfo.groupName)
             }
             Text() {
               Span($r('app.string.device_name'))
-              Span(' : ')
+              Span(': ')
               Span(this.groupInfo.goName)
             }
             Text() {
               Span($r('app.string.pwd_title'))
-              Span(' : ')
+              Span(': ')
               Span(this.groupInfo.password)
             }
 
@@ -204,7 +203,7 @@ export struct CreateGroupView {
   }
 
   startConnect() {
-    if (this.selectDevice === null ) return
+    if (this.selectDevice === null) return
     let config:wifiManager.WifiP2PConfig = {
       deviceAddress: this.selectDevice.address,
       netId: -1,

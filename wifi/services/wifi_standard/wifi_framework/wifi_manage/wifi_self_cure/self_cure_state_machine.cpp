@@ -2178,7 +2178,7 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
     if (config.numAssociation <= 1 && isInternetUnknown_ &&
         system::GetParameter("persist.wifi.is_connect_from_user", "") == "1") {
         WIFI_LOGE("%{public}s: first connect and no net return!", __FUNCTION__);
-        return;
+        return false;
     }
 #ifdef SUPPORT_LOCAL_RANDOM_MAC
     if (!CanArpReachable() || IsUseFactoryMac()) {

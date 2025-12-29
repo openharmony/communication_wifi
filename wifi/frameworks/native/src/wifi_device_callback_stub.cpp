@@ -90,13 +90,12 @@ void WifiDeviceCallBackStub::RegisterUserCallBack(const sptr<IWifiDeviceCallBack
         WIFI_LOGE("RegisterUserCallBack:callBack is nullptr!");
         return;
     }
-
+    std::lock_guard<std::mutex> lock(callbackMutex_);
     if (callbackMap_.size() >= CALLBACK_LIMIT &&
         callbackMap_.find(callBack->name) == callbackMap_.end()) {
         WIFI_LOGE("RegisterUserCallBack:callBack %{public}s reaches number limit!", callBack->name.c_str());
         return;
     }
-    std::lock_guard<std::mutex> lock(callbackMutex_);
     callbackMap_[callBack->name] = callBack;
 }
 

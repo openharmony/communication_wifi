@@ -192,6 +192,7 @@ ErrCode ScanInterface::OnCustomControlStateChanged(int customScene, int customSc
 
 ErrCode ScanInterface::OnGetCustomSceneState(std::map<int, time_t>& sceneMap)
 {
+    std::lock_guard<std::mutex> lock(mutex);
     WIFI_LOGI("Enter ScanInterface::OnGetCustomSceneState\n");
     CHECK_NULL_AND_RETURN(pScanService, WIFI_OPT_FAILED);
     pScanService->HandleGetCustomSceneState(sceneMap);

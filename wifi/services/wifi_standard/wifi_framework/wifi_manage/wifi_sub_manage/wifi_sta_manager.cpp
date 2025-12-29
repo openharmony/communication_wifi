@@ -409,8 +409,8 @@ void WifiStaManager::DealInternetAccessChanged(int internetAccessStatus, int ins
 #ifndef OHOS_ARCH_LITE
 void WifiStaManager::StopSatelliteTimer(void)
 {
-    WIFI_LOGI("StopSatelliteTimer! satelliteTimerId:%{public}u", satelliteTimerId);
     std::unique_lock<std::mutex> lock(satelliteTimerMutex);
+    WIFI_LOGI("StopSatelliteTimer! satelliteTimerId:%{public}u", satelliteTimerId);
     if (satelliteTimerId == 0) {
         return;
     }

@@ -1360,6 +1360,7 @@ void WifiConfigCenter::UpdateLinkedInfo(int instId)
 {
     std::vector<WifiScanInfo> wifiScanInfoList;
     wifiScanConfig->GetScanInfoListInner(wifiScanInfoList);
+    std::unique_lock<std::mutex> lock(mStaMutex);
     for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
         if (iter->bssid == mWifiLinkedInfo[instId].bssid) {
             if (mWifiLinkedInfo[instId].channelWidth == WifiChannelWidth::WIDTH_INVALID) {

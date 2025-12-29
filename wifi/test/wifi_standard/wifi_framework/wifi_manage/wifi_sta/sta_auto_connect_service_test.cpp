@@ -1564,5 +1564,20 @@ HWTEST_F(StaAutoConnectServiceTest, IsCandidateWithUserSelectChoiceHiddenFail, T
     candidate.wifiDeviceConfig.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED;
     EXPECT_FALSE(pStaAutoConnectService->IsCandidateWithUserSelectChoiceHidden(candidate));
 }
+
+HWTEST_F(StaAutoConnectServiceTest, IsCandidateWithUserSelectChoiceHiddenFail1, TestSize.Level0)
+{
+    NetworkSelectionResult candidate;
+    candidate.wifiDeviceConfig.networkId = 1;
+    candidate.wifiDeviceConfig.hiddenSSID = true;
+    candidate.wifiDeviceConfig.networkSelectionStatus.connectChoice = 1;
+    candidate.wifiDeviceConfig.networkSelectionStatus.networkDisableCount = 1;
+    struct timespec times = {0, 0};
+    clock_gettime(CLOCK_BOOTTIME, &times);
+    long currentTime = static_cast<int64_t>(times.tv_sec) * MSEC + times.tv_nsec / (MSEC * MSEC);
+    candidate.wifiDeviceConfig.networkSelectionStatus.connectChoiceTimestamp = currentTime - MSEC;
+    candidate.wifiDeviceConfig.networkSelectionStatus.status == WifiDeviceConfigStatus::ENABLED;
+    EXPECT_FALSE(pStaAutoConnectService->IsCandidateWithUserSelectChoiceHidden(candidate));
+}
 } // Wifi
 } // OHOS

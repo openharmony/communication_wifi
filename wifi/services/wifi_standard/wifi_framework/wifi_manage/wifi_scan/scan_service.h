@@ -142,7 +142,7 @@ public:
     /**
      * @Description Start a complete Wi-Fi scan.
      *
-     * @param externFlag - Externally initiated scanning[in]
+     * @param scanType it is from ScanType[in]
      * @param scanStyle - Type of scan to trigger the WiFi chip[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
@@ -151,6 +151,7 @@ public:
      * @Description Start Wi-Fi scanning based on specified parameters.
      *
      * @param params - Scan specified parameters[in]
+     * @param scanType it is from ScanType[in]
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode ScanWithParam(const WifiScanParams &params, ScanType scanType);
@@ -392,7 +393,7 @@ private:
     int m_instId;
     int lastNetworkQuality;
     int chipsetCategory;
-    int chipsetFeatrureCapability;
+    int chipsetFeatrureCapability {0};
     bool isChipsetInfoObtained;
     std::atomic<int> currSingleScanCount {0};
     int lastP2pEnhanceState {0};
@@ -578,7 +579,8 @@ private:
     /**
      * @Description Determines whether external scanning is allowed based on the scanning policy.
      *
-     * @param scanStyle - Type of scan to trigger the WiFi chip
+     * @param scanType it is from ScanType[in]
+     * @param scanStyle - Type of scan to trigger the WiFi chip[in]
      * @return success: true, failed: false
      */
     ErrCode AllowExternScan(ScanType scanType, int &scanStyle);
@@ -591,35 +593,40 @@ private:
     /**
      * @Description Determine whether to allow scheduled system scanning.
      *
-     * @param scanStyle - Type of scan to trigger the WiFi chip
+     * @param scanType it is from ScanType[in]
+     * @param scanStyle - Type of scan to trigger the WiFi chip[in]
      * @return success: true, failed: false
      */
     ErrCode AllowSystemTimerScan(ScanType scanType, int &scanStyle);
     /**
      * @Description Extra determine whether to allow scheduled system scanning.
      *
-     * @param scanStyle - Type of scan to trigger the WiFi chip
+     * @param scanType it is from ScanType[in]
+     * @param scanStyle - Type of scan to trigger the WiFi chip[in]
      * @return success: true, failed: false
      */
     ErrCode AllowSystemTimerScanExtra(ScanType scanType, int &scanStyle);
     /**
      * @Description Determines whether to allow PNO scanning based on the scanning policy.
      *
-     * @param scanStyle - Type of scan to trigger the WiFi chip
+     * @param scanType it is from ScanType[in]
+     * @param scanStyle - Type of scan to trigger the WiFi chip[in]
      * @return success: true, failed: false
      */
     ErrCode AllowPnoScan(ScanType scanType, int &scanStyle);
     /**
      * @Description Determines whether to allow WifiPro scanning based on the scanning policy.
      *
-     * @param scanStyle - Type of scan to trigger the WiFi chip
+     * @param scanType it is from ScanType[in]
+     * @param scanStyle - Type of scan to trigger the WiFi chip[in]
      * @return success: true, failed: false
      */
     ErrCode AllowWifiProScan(ScanType scanType, int &scanStyle);
     /**
      * @Description Determines whether to allow 5G Ap scanning based on the scanning policy.
      *
-     * @param scanStyle - Type of scan to trigger the WiFi chip
+     * @param scanType it is from ScanType[in]
+     * @param scanStyle - Type of scan to trigger the WiFi chip[in]
      * @return success: true, failed: false
      */
     ErrCode Allow5GApScan(ScanType scanType, int &scanStyle);
@@ -627,7 +634,8 @@ private:
      * @Description Determines whether to allow single frequency scan based on
      *              screenState && staState && Hid2dScanControl.
      *
-     * @param scanStyle - Type of scan to trigger the WiFi chip
+     * @param scanType it is from ScanType[in]
+     * @param scanStyle - Type of scan to trigger the WiFi chip[in]
      * @return success: true, failed: false
      */
     ErrCode AllowSystemSingleScan(ScanType scanType, int &scanStyle);
@@ -922,9 +930,17 @@ private:
      */
     bool AllowScanByMovingFreeze(ScanMode appRunMode);
     /**
+     * @Description Determines whether lp scan is allowed.
+     *
+     * @param scanType it is from ScanType[in]
+     * @return true: allow, false: not allowed.
+     */
+    bool AllowLpScan(ScanType scanType) const;
+    /**
      * @Description Determines whether scanning is allowed in hid2d state.
      *
-     * @param scanStyle - Type of scan to trigger the WiFi chip
+     * @param scanType it is from ScanType[in]
+     * @param scanStyle - Type of scan to trigger the WiFi chip[in]
      * @return true: allow, false: not allowed.
      */
     bool AllowScanByHid2dState(ScanType scanType, int &scanStyle);
@@ -937,7 +953,8 @@ private:
     /**
      * @Description Determines whether scanning is allowed in Game Scene.
      *
-     * @param scanStyle - Type of scan to trigger the WiFi chip
+     * @param scanType it is from ScanType[in]
+     * @param scanStyle - Type of scan to trigger the WiFi chip[in]
      * @return true: allow, false: not allowed.
      */
     bool AllowScanByGameScene(ScanType scanType, int &scanStyle);

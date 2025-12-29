@@ -1,10 +1,27 @@
 {
   "src": [
-    "pages/index",
+    "pages/Index",
     "pages/homePage",
+    "pages/subManualApiTest/wifiInterfaceTest",
+    "pages/subManualApiTest/hotspotInterfaceTest",
+    "pages/subManualApiTest/p2pInterfaceTest",
+    "pages/subManualApiTest/wifiManagerInterfaceTest",
+    "pages/subManualApiTest/hotspotManagerInterfaceTest",
     "pages/subManualApiTest/p2pManagerInterfaceTest",
     "pages/subManualApiTest/linkEnhanceInterfaceTest",
 
+    "pages/subAutoTest/wifiAutoTest",
+    "pages/subAutoTest/wifiManagerAutoTest",
+    "pages/subAutoTest/hotspotAutoTest",
+    "pages/subAutoTest/hotspotManagerAutoTest",
+    "pages/subAutoTest/p2pAutoTest",
+    "pages/subAutoTest/p2pManagerAutoTest",
+    "pages/subScenarioTest/wifiConnectScenarioTest",
+    "pages/subScenarioTest/wifiManagerConnectScenarioTest",
+    "pages/subScenarioTest/hotspotCreateScenarioTest",
+    "pages/subScenarioTest/hotspotManagerCreateScenarioTest",
+    "pages/subScenarioTest/p2pConnectScenarioTest",
+    "pages/subScenarioTest/p2pManagerConnectScenarioTest",
     "pages/subBenchmarkTest/wifiBenchmarkTest",
     "pages/subBenchmarkTest/wifiManagerBenchmarkTest",
     "pages/subBenchmarkTest/hotspotBenchmarkTest",
@@ -12,10 +29,17 @@
     "pages/subBenchmarkTest/p2pBenchmarkTest",
     "pages/subBenchmarkTest/p2pManagerBenchmarkTest",
 
+    "pages/subStressTest/wifiStressTest",
+    "pages/subStressTest/wifiManagerStressTest",
+    "pages/subStressTest/hotspotStressTest",
+    "pages/subStressTest/hotspotManagerStressTest",
+    "pages/subStressTest/p2pStressTest",
+    "pages/subStressTest/p2pManagerStressTest",
     "pages/subManualApiTest/subWifiTest/login",
     "pages/subManualApiTest/subWifiTest/about",
+    "pages/subManualApiTest/subWifiTest/wifiFound",
     "pages/subManualApiTest/subP2pTest/p2pFound",
-    "pages/subAppTest/wifiCandidateTest",
+    "pages/subAppTest/wifiScanTest",
     "pages/subAppTest/p2pDiscoveryTest",
     "pages/subAppTest/tcpSocketTest",
     "pages/subAppTest/udpSocketTest",
@@ -27,6 +51,9 @@
     "pages/subStabilityTest/wifiSwitchStabilityTest",
     "pages/subStabilityTest/wifiScanStabilityTest",
     "pages/subStabilityTest/wifiConnectStabilityTest",
-    "pages/subStabilityTest/hotspotStabilityTest"
+    "pages/subStabilityTest/hotspotStabilityTest",
+    "pages/subStabilityTest/webLatencyTest",
+    "pages/newApi/AllInOneView",
+    "pages/newApi/QuickVerifyTest"
   ]
 }

@@ -1,0 +1,10 @@
+{
+  "devices": {
+    "general": ["default"]
+  },
+  "production": {
+    "removedSysCaps": [
+      "SystemCapability.Window.SessionManager"
+    ]
+  }
+}

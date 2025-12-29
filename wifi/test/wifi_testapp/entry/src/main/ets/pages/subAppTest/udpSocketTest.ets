@@ -15,9 +15,9 @@
 
 import socket from '@ohos.net.socket';
 import connection from '@ohos.net.connection';
-import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { PageTitle } from '../../Component/pageTitle';
-import { TestData } from '../../entryability/model/testData'
+import { TestImageDisplay } from '../../component/testImageDisplay';
+import { PageTitle } from '../../component/pageTitle';
+import { TestData } from '../../entryability/model/testData';
 import ConfigData from '../../utils/ConfigData';
 import router from '@ohos.router';
 
@@ -302,9 +302,9 @@ struct UdpSocketTest {
 
   build() {
     Column() {
-      Stack({ alignContent : Alignment.TopStart }) {
-        TestImageDisplay({ testItem : this.testItem })
-        PageTitle({ testItem : this.testItem })
+      Stack({ alignContent: Alignment.TopStart }) {
+        TestImageDisplay({ testItem: this.testItem })
+        PageTitle({ testItem: this.testItem })
       }
 
       Column() {
@@ -366,7 +366,7 @@ struct UdpSocketTest {
             .width('30%')
           Text(this.socketStatus)
             .fontSize(16)
-            .fontColor(this.isSocketBound ? Color.Green : Color.Red)
+            .fontColor(this.isSocketBound ? Color.Green: Color.Red)
             .width('70%')
         }
         .width('100%')

@@ -36,6 +36,7 @@
 #include "self_cure_utils.h"
 #include "wifi_global_func.h"
 #include "wifi_chr_adapter.h"
+#include "parameters.h"
 
 namespace OHOS {
 namespace Wifi {

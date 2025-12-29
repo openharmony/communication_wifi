@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-import { PageTitle } from '../../Component/pageTitle';
-import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { ContentTable } from '../../Component/contentTable';
+import { PageTitle } from '../../component/pageTitle';
+import { TestImageDisplay } from '../../component/testImageDisplay';
+import { ContentTable } from '../../component/contentTable';
 import router from '@ohos.router';
 import ConfigData from '../../utils/ConfigData';
-import { initLinkEnhanceApiData } from '../../entryability/model/testDataModels'
-import { TestData } from '../../entryability/model/testData'
+import { initLinkEnhanceApiData } from '../../entryability/model/testDataModels';
+import { TestData } from '../../entryability/model/testData';
 import linkEnhance from '@ohos.distributedsched.linkEnhance';
 
 interface myParams extends Object {

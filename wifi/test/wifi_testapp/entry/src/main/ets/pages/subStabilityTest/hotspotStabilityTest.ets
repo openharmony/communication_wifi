@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-import { PageTitle } from '../../Component/pageTitle';
-import { TestImageDisplay } from '../../Component/testImageDisplay';
+import { PageTitle } from '../../component/pageTitle';
+import { TestImageDisplay } from '../../component/testImageDisplay';
 import router from '@ohos.router';
-import ConfigData from '../../Utils/ConfigData';
-import { TestData } from '../../entryability/model/testData'
+import ConfigData from '../../utils/ConfigData';
+import { TestData } from '../../entryability/model/testData';
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
-import promptAction from '@ohos.promptAction'
+import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
-import wantAgent , { WantAgent } from '@ohos.app.ability.wantAgent';
+import wantAgent, { WantAgent } from '@ohos.app.ability.wantAgent';
 import ohosWantAgentInfo from '@ohos.wantAgent';
 import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
 import { BusinessError } from '@ohos.base';
@@ -70,7 +70,7 @@ struct HotspotStabilityTest {
       // 申请WiFi相关权限
       let atManager = abilityAccessCtrl.createAtManager();
       try {
-        atManager.requestPermissionsFromUser(getContext(this) , [
+        atManager.requestPermissionsFromUser(getContext(this), [
           'ohos.permission.INTERNET',
           'ohos.permission.SET_WIFI_INFO',
           'ohos.permission.GET_WIFI_INFO',
@@ -82,14 +82,14 @@ struct HotspotStabilityTest {
           "ohos.permission.GET_WIFI_LOCAL_MAC",
           "ohos.permission.MANAGE_WIFI_HOTSPOT",
           "ohos.permission.GET_WIFI_INFO_INTERNAL"
-        ])
+])
           .then((data) => {
             console.info(`[EntryAbility], data: ${ JSON.stringify(data) }`);
           })
           .catch((err: BusinessError) => {
             console.info(`[EntryAbility], err: ${ JSON.stringify(err) }`);
           })
-      } catch( err ) {
+      } catch( err) {
         console.info(`[EntryAbility], catch err->${ JSON.stringify(err) }`);
       }
     }).catch((err: BusinessError) => {
@@ -102,19 +102,19 @@ struct HotspotStabilityTest {
     let context: Context = getContext(this);
     // 通知参数，指定点击长时任务通知后跳转的应用
     let wantAgentInfo: wantAgent.WantAgentInfo = {
-      wants : [
+      wants: [
         {
-          bundleName : (context as common.UIAbilityContext).abilityInfo.bundleName ,
-          abilityName : (context as common.UIAbilityContext).abilityInfo.name
+          bundleName: (context as common.UIAbilityContext).abilityInfo.bundleName ,
+          abilityName: (context as common.UIAbilityContext).abilityInfo.name
         }
-      ] ,
-      operationType : ohosWantAgentInfo.OperationType.START_ABILITY ,
-      requestCode : 0 ,
-      wantAgentFlags : [ wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG ]
+] ,
+      operationType: ohosWantAgentInfo.OperationType.START_ABILITY ,
+      requestCode: 0,
+      wantAgentFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG]
     };
     wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
       backgroundTaskManager.startBackgroundRunning(context ,
-        backgroundTaskManager.BackgroundMode.DATA_TRANSFER , wantAgentObj).then(() => {
+        backgroundTaskManager.BackgroundMode.DATA_TRANSFER, wantAgentObj).then(() => {
         console.info(`Succeeded in operationing startBackgroundRunning.`);
       }).catch((err: BusinessError) => {
         console.error(`Failed to operation startBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
@@ -133,19 +133,19 @@ struct HotspotStabilityTest {
 
   build() {
     Column() {
-      Stack({ alignContent : Alignment.TopStart }) {
-        TestImageDisplay({ testItem : this.testItem })
-        PageTitle({ testItem : this.testItem })
+      Stack({ alignContent: Alignment.TopStart }) {
+        TestImageDisplay({ testItem: this.testItem })
+        PageTitle({ testItem: this.testItem })
       }
 
       Stack().height("1vp").backgroundColor($r("app.color.black"));
 
       Column() {
         Row() {
-          Text("测试次数：").fontSize($r('app.float.font_18')).width(ConfigData.WH_25_100).padding({ left : "10vp" })
-          TextInput({ placeholder : "请输入循环次数，默认为：30" })
+          Text("测试次数：").fontSize($r('app.float.font_18')).width(ConfigData.WH_25_100).padding({ left: "10vp" })
+          TextInput({ placeholder: "请输入循环次数，默认为：30" })
             .placeholderColor(Color.Grey)
-            .placeholderFont({ size : $r('app.float.font_16') })
+            .placeholderFont({ size: $r('app.float.font_16') })
             .caretColor(Color.Blue)
             .width(ConfigData.WH_70_100)
             .fontSize($r('app.float.font_16'))
@@ -160,32 +160,32 @@ struct HotspotStabilityTest {
             .fontSize("22vp")
             .width(ConfigData.WH_95_100)
             .align(Alignment.TopStart)
-            .padding({ top : "10vp" })
+            .padding({ top: "10vp" })
           Scroll() {
             Column() {
               Text("测试次数：" + this.testNumbers)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
               Text("打开热点的成功次数：" + this.openSuccessNumber)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
               Text("打开热点的失败次数：" + this.openFailNumber)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
               Text("关闭热点的成功次数：" + this.closeSuccessNumber)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
               Text("关闭热点的失败次数：" + this.closeFailNumber)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
             }
@@ -202,12 +202,12 @@ struct HotspotStabilityTest {
             .height(ConfigData.WH_15_100)
             .width(ConfigData.WH_95_100)
             .align(Alignment.TopStart)
-            .padding({ top : "18vp" })
+            .padding({ top: "18vp" })
           List() {
             ListItem() {
               Text(this.hotspotMessageLog)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "20vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "20vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
             }
@@ -225,9 +225,9 @@ struct HotspotStabilityTest {
         Row() {
           Button("开始热点测试")
             .operateButtonStyle($r('app.color.main_blue'))
-            .padding({ right : "10vp" })
+            .padding({ right: "10vp" })
             .onClick(async(event: ClickEvent) => {
-              console.log(TAG , "start HotspotSwitch test-------------")
+              console.log(TAG, "start HotspotSwitch test-------------")
               this.startContinuousTask();
               await this.forLoop()
             })
@@ -236,10 +236,10 @@ struct HotspotStabilityTest {
 
           Button("关闭热点测试")
             .operateButtonStyle($r('app.color.main_blue'))
-            .padding({ right : "10vp" })
+            .padding({ right: "10vp" })
             .onClick(async(event: ClickEvent) => {
               this.hotspotLoopState = false
-              console.log(TAG , "准备测试停止 -------------")
+              console.log(TAG, "准备测试停止 -------------")
               this.hotspotMessageLog = ""
               this.openHotspotNumber = 0
               this.stopContinuousTask();
@@ -250,41 +250,36 @@ struct HotspotStabilityTest {
   }
 
   onHotspotStateChange() {
-    console.log(TAG , "on.hotspotStateChange start--------")
-    wifiManager.on("hotspotStateChange" , (number) => {
-      console.log(TAG , " on.hotspotStateChange --------")
+    console.log(TAG, "on.hotspotStateChange start--------")
+    wifiManager.on("hotspotStateChange", (number) => {
+      console.log(TAG, " on.hotspotStateChange --------")
       let hotspotStateMessage = ""
-      switch ( number ) {
-        case 0:
-          hotspotStateMessage = "inactive";
+      switch (number) {
+        case 0: hotspotStateMessage = "inactive";
           break;
-        case 1:
-          hotspotStateMessage = "active";
+        case 1: hotspotStateMessage = "active";
           break;
-        case 2:
-          hotspotStateMessage = "activating";
+        case 2: hotspotStateMessage = "activating";
           break;
-        case 3:
-          hotspotStateMessage = "de-activating";
+        case 3: hotspotStateMessage = "de-activating";
           break;
-        default:
-          hotspotStateMessage = '未知状态';
+        default: hotspotStateMessage = '未知状态';
           break;
       }
-      console.log(TAG , "热点开关状态为:" + hotspotStateMessage)
-      if ( number == 1 ) {
+      console.log(TAG, "热点开关状态为:" + hotspotStateMessage)
+      if (number == 1) {
         // 打时间戳
         this.open_EndTime = new Date().getTime()
-        console.log(TAG , "热点使能结束时间: " + this.open_EndTime + "ms")
-      } else if ( number == 0 ) {
+        console.log(TAG, "热点使能结束时间: " + this.open_EndTime + "ms")
+      } else if (number == 0) {
         this.close_EndTime = new Date().getTime()
-        console.log(TAG , "热点去使能结束时间: " + this.close_EndTime + "ms")
+        console.log(TAG, "热点去使能结束时间: " + this.close_EndTime + "ms")
       }
-      console.log(TAG , " on.hotspotStateChange callback success --------")
-      promptAction.showToast({ message : "热点状态: " + hotspotStateMessage })
+      console.log(TAG, " on.hotspotStateChange callback success --------")
+      promptAction.showToast({ message: "热点状态: " + hotspotStateMessage })
       this.hotspotMessage = hotspotStateMessage
-      AppStorage.setOrCreate("hotspotMessage" , this.hotspotMessage)
-      console.log(TAG , " on.hotspotStateChange callback end--------")
+      AppStorage.setOrCreate("hotspotMessage", this.hotspotMessage)
+      console.log(TAG, " on.hotspotStateChange callback end--------")
       return this.hotspotMessage
     })
     return this.hotspotMessage
@@ -306,70 +301,70 @@ struct HotspotStabilityTest {
     this.hotspotMessageLog = ""
     this.onHotspotStateChange() // 监听函数
     let funcMessage = false // 函数信息
-    for ( this.openHotspotNumber ; this.openHotspotNumber < this.testNumbers ; this.openHotspotNumber ++ ) {
-      if ( !this.hotspotLoopState ) {
-        console.log(TAG , "测试结束------------")
+    for (this.openHotspotNumber ; this.openHotspotNumber < this.testNumbers ; this.openHotspotNumber ++) {
+      if (!this.hotspotLoopState) {
+        console.log(TAG, "测试结束------------")
         break;
       } else {
         let wifiState = wifiManager.isWifiActive()
-        if ( wifiState ) {
+        if (wifiState) {
           wifiManager.disableWifi()
-          console.log(TAG , "wifi当前已使能，已经去使能，正常开始测试------")
+          console.log(TAG, "wifi当前已使能，已经去使能，正常开始测试------")
         } else {
-          console.log(TAG , "wifi当前未使能，正常开始测试------")
+          console.log(TAG, "wifi当前未使能，正常开始测试------")
         }
         await sleep(3)
 
         // funcMessage = wifiManager.enableHotspot()
         // 打时间戳
         this.open_StartTime = new Date().getTime()
-        console.log(TAG , "第" + (this.openHotspotNumber + 1) + "次热点使能-----")
-        console.log(TAG , "第" + (this.openHotspotNumber + 1) + "次热点使能开始时间: " + this.open_StartTime + "ms")
+        console.log(TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能-----")
+        console.log(TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能开始时间: " + this.open_StartTime + "ms")
         this.hotspotMessageLog += "第" + (this.openHotspotNumber + 1) + "次热点使能结果：" + funcMessage + "\n"
-        console.log(TAG , "第" + (this.openHotspotNumber + 1) + "次热点使能结果：" + funcMessage)
+        console.log(TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能结果：" + funcMessage)
         await sleep(10)
         this.hotspotMessage = AppStorage.get("hotspotMessage") ! //非空断言操作符
-        // promptAction.showToast( { message : funcMessage } )
-        if ( this.hotspotMessage == "active" ) {
+        // promptAction.showToast( { message: funcMessage })
+        if (this.hotspotMessage == "active") {
           this.open_SpendTime = this.open_EndTime - this.open_StartTime
           this.hotspotMessageLog += "第" + (this.openHotspotNumber + 1) + "次热点使能耗时: " + this.open_SpendTime + "ms" + "\n"
-          console.log(TAG , "第" + (this.openHotspotNumber + 1) + "次热点使能耗时: " + this.open_SpendTime + "ms")
+          console.log(TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能耗时: " + this.open_SpendTime + "ms")
           this.openSuccessNumber = this.openSuccessNumber + 1
           this.hotspotMessageLog += "热点使能成功的次数：" + this.openSuccessNumber + "\n"
-          console.log(TAG , "热点使能成功的次数：" + this.openSuccessNumber)
+          console.log(TAG, "热点使能成功的次数：" + this.openSuccessNumber)
           // funcMessage = wifiManager.disableHotspot()
           this.closeHotspotNumber = this.closeHotspotNumber + 1
           this.close_StartTime = new Date().getTime()
-          console.log(TAG , "第" + this.closeHotspotNumber + "次热点去使能-----")
-          console.log(TAG , "第" + this.closeHotspotNumber + "次热点去使能开始时间: " + this.close_StartTime + "ms")
+          console.log(TAG, "第" + this.closeHotspotNumber + "次热点去使能-----")
+          console.log(TAG, "第" + this.closeHotspotNumber + "次热点去使能开始时间: " + this.close_StartTime + "ms")
           this.hotspotMessageLog += "第" + this.closeHotspotNumber + "次热点去使能结果：" + funcMessage + "\n"
-          console.log(TAG , "第" + this.closeHotspotNumber + "次热点去使能结果：" + funcMessage)
-          console.log(TAG , "closeHotspotNumber: " + this.closeHotspotNumber)
+          console.log(TAG, "第" + this.closeHotspotNumber + "次热点去使能结果：" + funcMessage)
+          console.log(TAG, "closeHotspotNumber: " + this.closeHotspotNumber)
           await sleep(10)
           this.hotspotMessage = AppStorage.get("hotspotMessage") ! //非空断言操作符
-          if ( this.hotspotMessage == "inactive" ) {
+          if (this.hotspotMessage == "inactive") {
             this.close_SpendTime = this.close_EndTime - this.close_StartTime
             this.hotspotMessageLog += "第" + this.closeHotspotNumber + "次热点去使能耗时: " + this.close_SpendTime + "ms" + "\n"
-            console.log(TAG , "第" + this.closeHotspotNumber + "次热点去使能耗时: " + this.close_SpendTime + "ms")
+            console.log(TAG, "第" + this.closeHotspotNumber + "次热点去使能耗时: " + this.close_SpendTime + "ms")
             this.closeSuccessNumber = this.closeSuccessNumber + 1
             this.hotspotMessageLog += "热点去使能成功的次数：" + this.closeSuccessNumber + "\n"
-            console.log(TAG , "热点去使能成功的次数：" + this.closeSuccessNumber)
+            console.log(TAG, "热点去使能成功的次数：" + this.closeSuccessNumber)
             await sleep(7)
           } else {
             this.closeFailNumber = this.closeFailNumber + 1
-            console.log(TAG , "热点去使能失败的次数：" + this.closeFailNumber)
-            console.log(TAG , "第" + this.closeHotspotNumber + "次热点去使能失败")
+            console.log(TAG, "热点去使能失败的次数：" + this.closeFailNumber)
+            console.log(TAG, "第" + this.closeHotspotNumber + "次热点去使能失败")
           }
-        } else if ( this.hotspotMessage == "inactive" ) {
+        } else if (this.hotspotMessage == "inactive") {
           this.openFailNumber = this.openFailNumber + 1
-          console.log(TAG , "热点使能失败的次数：" + this.openFailNumber)
-          console.log(TAG , "第" + (this.openHotspotNumber + 1) + "次热点使能失败")
+          console.log(TAG, "热点使能失败的次数：" + this.openFailNumber)
+          console.log(TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能失败")
         } else {
           console.log("第" + (this.openHotspotNumber + 1) + "次开热点后状态不清楚");
         }
       }
     }
-    console.log(TAG , "测试结束 -------------")
+    console.log(TAG, "测试结束 -------------")
     this.stopContinuousTask();
   }
 }
@@ -387,9 +382,9 @@ struct HotspotStabilityTest {
 }
 
 async function sleep(time: number): Promise<void> {
-  return new Promise<void>((resolve , reject) => {
+  return new Promise<void>((resolve, reject) => {
     setTimeout(() => {
       resolve();
-    } , time * 1000);
+    }, time * 1000);
   });
 }

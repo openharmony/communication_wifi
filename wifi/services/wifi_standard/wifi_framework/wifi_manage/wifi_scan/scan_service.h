@@ -385,7 +385,7 @@ private:
     mutable std::mutex scanControlInfoMutex;
     bool scanTrustMode;                              /* scan trustlist mode */
     std::unordered_set<int> scanTrustSceneIds;       /* scan scene ids */
-    bool lastFreezeState;                            /* last freeze state. */
+    std::atomic<bool> lastFreezeState{false};                            /* last freeze state. */
     bool isAbsFreezeScaned;                          /* scanned in freeze state. */
     int scanResultBackup;                            /* scan result backup. */
     IEnhanceService *mEnhanceService;                /* EnhanceService handle */

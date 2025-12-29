@@ -212,8 +212,8 @@ void WifiP2pManager::StopUnloadP2PSaTimer(void)
 
 void WifiP2pManager::StartUnloadP2PSaTimer(void)
 {
-    WIFI_LOGI("StartUnloadP2PSaTimer! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
     std::unique_lock<std::mutex> lock(unloadP2PSaTimerMutex);
+    WIFI_LOGI("StartUnloadP2PSaTimer! unloadP2PSaTimerId:%{public}u", unloadP2PSaTimerId);
     if (unloadP2PSaTimerId == 0) {
         std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
         wifiSysTimer->SetCallbackInfo(UnloadP2PSaTimerCallback);
@@ -239,8 +239,8 @@ static void RemoveGroupTimerCallback(void)
 
 void WifiP2pManager::StopRemoveGroupTimer(void)
 {
-    WIFI_LOGD("StopRemoveGroupTimer! removeGroupTimerId:%{public}u", removeGroupTimerId);
     std::unique_lock<std::mutex> lock(removeGroupTimerMutex);
+    WIFI_LOGD("StopRemoveGroupTimer! removeGroupTimerId:%{public}u", removeGroupTimerId);
     if (removeGroupTimerId == 0) {
         return;
     }
@@ -255,8 +255,8 @@ void WifiP2pManager::StartRemoveGroupTimer(void)
     if (GetDeviceType() != ProductDeviceType::PHONE) {
         return;
     }
-    WIFI_LOGD("StartRemoveGroupTimer! removeGroupTimerId:%{public}u", removeGroupTimerId);
     std::unique_lock<std::mutex> lock(removeGroupTimerMutex);
+    WIFI_LOGD("StartRemoveGroupTimer! removeGroupTimerId:%{public}u", removeGroupTimerId);
     if (removeGroupTimerId == 0) {
         std::shared_ptr<WifiSysTimer> removeTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
         removeTimer->SetCallbackInfo(RemoveGroupTimerCallback);

@@ -71,8 +71,8 @@ void WifiScanManager::StopUnloadScanSaTimer(void)
 
 void WifiScanManager::StartUnloadScanSaTimer(void)
 {
-    WIFI_LOGI("StartUnloadScanSaTimer! unloadScanSaTimerId:%{public}u", unloadScanSaTimerId);
     std::unique_lock<std::mutex> lock(unloadScanSaTimerMutex);
+    WIFI_LOGI("StartUnloadScanSaTimer! unloadScanSaTimerId:%{public}u", unloadScanSaTimerId);
     if (unloadScanSaTimerId == 0) {
         std::shared_ptr<WifiSysTimer> wifiSysTimer = std::make_shared<WifiSysTimer>(false, 0, true, false);
         wifiSysTimer->SetCallbackInfo(UnloadScanSaTimerCallback);

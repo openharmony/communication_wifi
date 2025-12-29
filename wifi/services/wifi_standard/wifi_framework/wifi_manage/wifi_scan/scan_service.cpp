@@ -614,10 +614,12 @@ int ScanService::StoreRequestScanConfig(const ScanConfig &scanConfig, const Inte
         if (scanConfigStoreIndex >= MAX_SCAN_CONFIG_STORE_INDEX) {
             scanConfigStoreIndex = 0;
         }
-
-        ScanConfigMap::iterator iter = scanConfigMap.find(scanConfigStoreIndex);
-        if (iter == scanConfigMap.end()) {
-            break;
+        {
+            std::unique_lock<std::mutex> lock(scanConfigMapMutex);
+            ScanConfigMap::iterator iter = scanConfigMap.find(scanConfigStoreIndex);
+            if (iter == scanConfigMap.end()) {
+                break;
+            }
         }
     }
 
@@ -1292,10 +1294,7 @@ void ScanService::HandleMovingFreezeChanged()
         WIFI_LOGW("Moving change do nothing.");
         return;
     }
-    {
-        std::unique_lock<std::mutex> lock(scanControlInfoMutex);
         lastFreezeState = freezeState;
-    }
     SystemScanProcess(false);
 }
 

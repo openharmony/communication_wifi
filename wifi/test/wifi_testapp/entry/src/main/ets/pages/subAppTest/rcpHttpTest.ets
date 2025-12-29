@@ -15,11 +15,11 @@
 
 import { rcp } from '@kit.RemoteCommunicationKit';
 import connection from '@ohos.net.connection';
-import { TestData } from '../../entryability/model/testData'
+import { TestData } from '../../entryability/model/testData';
 import ConfigData from '../../utils/ConfigData';
 import { BusinessError } from '@ohos.base';
-import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { PageTitle } from '../../Component/pageTitle';
+import { TestImageDisplay } from '../../component/testImageDisplay';
+import { PageTitle } from '../../component/pageTitle';
 import router from '@ohos.router';
 
 interface myParams extends Object {
@@ -44,7 +44,7 @@ struct RcpHttpTest {
     { value: 'DELETE'},
     { value: 'HEAD'},
     { value: 'FETCH'}
-  ];
+];
   @State urlValue: string = 'http://www.baidu.com';
   @State reqValue: string = '';
   @State resData: string = '';
@@ -179,9 +179,9 @@ struct RcpHttpTest {
 
   build() {
     Column() {
-      Stack({ alignContent : Alignment.TopStart }) {
-        TestImageDisplay({ testItem : this.testItem })
-        PageTitle({ testItem : this.testItem })
+      Stack({ alignContent: Alignment.TopStart }) {
+        TestImageDisplay({ testItem: this.testItem })
+        PageTitle({ testItem: this.testItem })
       }
 
       Column() {

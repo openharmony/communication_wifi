@@ -429,13 +429,14 @@ public:
     virtual int32_t GetPackageNum(std::string packageName) = 0;
 
     /**
-    * @brief 读取指定 NV 项的信息。
+    * @brief Reads the information of the specified NV item.
     *
-    * 该纯虚函数用于从特定 NV 区域读取数据。调用方需提供 NV 的物理编号、
-    * 名称以及期望读取的长度，函数将把读取到的数据写入 nvInfo。
+    * This pure virtual function is used to read data from a specific NV area.
+    * The caller must provide the physical number of the NV, its name, and the expected read length.
+    * The function will write the read data into nvInfo.
     *
-    * @param nvPhynum NV 的物理编号，用于定位 NV 区域。
-    * @param nvInfo   输出参数，函数将把读取到的 NV 信息写入此字符串。
+    * @param nvPhynum The physical number of the NV, used to locate the NV area.
+    * @param nvInfo Output parameter. The function will write the read NV information into this string.
     */
     virtual ErrCode ReadNvInfo(int nvPhynum, std::string &nvInfo) = 0;
 

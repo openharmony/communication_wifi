@@ -14,18 +14,18 @@
  */
 
 import promptAction from '@ohos.promptAction';
-import router from '@ohos.router'
-import { PageTitle } from '../../Component/pageTitle'
-import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { TestData } from '../../entryability/model/testData'
-import ConfigData from "../../utils/ConfigData"
+import router from '@ohos.router';
+import { PageTitle } from '../../component/pageTitle';
+import { TestImageDisplay } from '../../component/testImageDisplay';
+import { TestData } from '../../entryability/model/testData';
+import ConfigData from "../../utils/ConfigData";
 import wifi from '@ohos.wifi';
-import { resolveIP } from '../../utils/Util'
+import { resolveIP } from '../../utils/Util';
 import socket from '@ohos.net.socket';
-import http from '@ohos.net.http'
-import request from '@ohos.request'
+import http from '@ohos.net.http';
+import request from '@ohos.request';
 import common from '@ohos.app.ability.common';
-import abilityAccessCtrl , { Context , PermissionRequestResult } from '@ohos.abilityAccessCtrl';
+import abilityAccessCtrl, { Context, PermissionRequestResult } from '@ohos.abilityAccessCtrl';
 import { BusinessError } from '@ohos.base';
 
 /**
@@ -56,14 +56,14 @@ interface myParams extends Object {
 }
 
 let localAddr: LocalAddr = {
-  address : resolveIP(wifi.getIpInfo().ipAddress) ,
-  family : 1 ,
-  port : 9090
+  address: resolveIP(wifi.getIpInfo().ipAddress),
+  family: 1,
+  port: 9090
 }
 let oppositeAddr: OppositeAddr = {
-  address : '' ,
-  family : 1 ,
-  port : 0
+  address: '' ,
+  family: 1,
+  port: 0
 }
 let loginCount = 0
 
@@ -90,19 +90,19 @@ struct P2PBenchmarkTest {
   @State deviceName: string = "MyTestDevice"
 
   aboutToAppear() {
-    AppStorage.setOrCreate("deviceAddress" , this.deviceAddress)
-    AppStorage.setOrCreate("netId" , this.netId)
-    AppStorage.setOrCreate("passphrase" , this.passphrase)
-    AppStorage.setOrCreate("groupName" , this.groupName)
-    AppStorage.setOrCreate("goBand" , this.goBand)
-    AppStorage.setOrCreate("deviceName" , this.deviceName)
+    AppStorage.setOrCreate("deviceAddress", this.deviceAddress)
+    AppStorage.setOrCreate("netId", this.netId)
+    AppStorage.setOrCreate("passphrase", this.passphrase)
+    AppStorage.setOrCreate("groupName", this.groupName)
+    AppStorage.setOrCreate("goBand", this.goBand)
+    AppStorage.setOrCreate("deviceName", this.deviceName)
   }
 
   build() {
     Column() {
-      Stack({ alignContent : Alignment.TopStart }) {
-        TestImageDisplay({ testItem : this.testItem })
-        PageTitle({ testItem : this.testItem })
+      Stack({ alignContent: Alignment.TopStart }) {
+        TestImageDisplay({ testItem: this.testItem })
+        PageTitle({ testItem: this.testItem })
       }
 
       Stack().height("1vp").backgroundColor("#000000");
@@ -112,7 +112,7 @@ struct P2PBenchmarkTest {
           Column() {
             Text("性能测试: 测试p2p连接时的数据收发性能")
               .fontSize("18vp")
-              .margin({ top : "5vp" , bottom : "5vp" , left : "5vp" })
+              .margin({ top: "5vp", bottom: "5vp", left: "5vp" })
               .textAlign(TextAlign.Start)
               .width(ConfigData.WH_100_100)
           }
@@ -127,35 +127,35 @@ struct P2PBenchmarkTest {
         Column() {
           Text("性能测试时间：" + this.p2pBenchmarkTime + "ms")
             .fontSize("20vp")
-            .margin({ top : "5vp" , left : "10vp" , bottom : "5vp" })
+            .margin({ top: "5vp", left: "10vp", bottom: "5vp" })
             .textAlign(TextAlign.Start)
             .width(ConfigData.WH_90_100)
             .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
 
-          Flex({ alignItems : ItemAlign.Center , justifyContent : FlexAlign.SpaceBetween }) {
-            Button({ type : ButtonType.Normal , stateEffect : true }) {
-              Text('传输数据').fontSize("24vp").fontColor(0xffffff).margin({ left : 5 , right : 5 })
+          Flex({ alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
+            Button({ type: ButtonType.Normal, stateEffect: true }) {
+              Text('传输数据').fontSize("24vp").fontColor(0xffffff).margin({ left: 5, right: 5 })
             }
             .borderRadius(8)
             .backgroundColor($r("app.color.blue"))
             .width(120)
             .height(60)
-            .margin({ top : "5vp" , left : "50vp" , bottom : "5vp" })
+            .margin({ top: "5vp", left: "50vp", bottom: "5vp" })
             .align(Alignment.Start)
             .onClick(async(event: ClickEvent) => {
               this.showList = false
             })
 
-            Button({ type : ButtonType.Normal , stateEffect : true }) {
+            Button({ type: ButtonType.Normal, stateEffect: true }) {
               Row() {
-                Text('上传下载').fontSize("24vp").fontColor(0xffffff).margin({ left : 5 , right : 5 })
+                Text('上传下载').fontSize("24vp").fontColor(0xffffff).margin({ left: 5, right: 5 })
               }.alignItems(VerticalAlign.Center)
             }
             .borderRadius(8)
             .backgroundColor($r("app.color.blue"))
             .width(120)
             .height(60)
-            .margin({ top : "5vp" , right : "50vp" , bottom : "5vp" })
+            .margin({ top: "5vp", right: "50vp", bottom: "5vp" })
             .align(Alignment.Start)
             .onClick(async(event: ClickEvent) => {
               this.showList = true;
@@ -172,7 +172,7 @@ struct P2PBenchmarkTest {
         Stack().height("1vp").backgroundColor("#000000")
 
         Column() {
-          if ( !this.showList ) {
+          if (!this.showList) {
             socketTest()
           } else {
             upDownLoad()
@@ -204,23 +204,23 @@ struct socketTest {
   bindOption() {
     let bindOption = udp.bind(localAddr)
     bindOption.then(() => {
-      console.log(TAG , 'bind success')
+      console.log(TAG, 'bind success')
       this.bindMsg = "绑定成功"
     }).catch((err: BusinessError) => {
-      console.log(TAG , 'bind fail' + err)
+      console.log(TAG, 'bind fail' + err)
       this.bindMsg = "绑定失败"
     })
-    udp.on('message' , data => {
-      console.log(TAG , `data:${ JSON.stringify(data) }`)
+    udp.on('message', data => {
+      console.log(TAG, `data:${ JSON.stringify(data) }`)
       let buffer = data.message
       let dataView = new DataView(buffer)
-      console.log(TAG , `length = ${ dataView.byteLength }`)
+      console.log(TAG, `length = ${ dataView.byteLength }`)
       let endSend = new Date().getTime()
       this.sendOption()
       let str = ""
-      for ( let i = 0 ;i < dataView.byteLength ; ++i ) {
+      for (let i = 0 ;i < dataView.byteLength ; ++i) {
         let c = String.fromCharCode(dataView.getUint8(i))
-        if ( c != "\n" ) {
+        if (c != "\n") {
           str += c
         }
       }
@@ -228,49 +228,49 @@ struct socketTest {
       this.confirmDialog = true
       let startSend: number = AppStorage.get("startSend") ! //非空断言操作符
       let p2pBenchmarkTime = endSend - startSend
-      AppStorage.setOrCreate("p2pBenchmarkTime" , p2pBenchmarkTime)
+      AppStorage.setOrCreate("p2pBenchmarkTime", p2pBenchmarkTime)
     })
   }
 
   sendOption() {
     let number = 0
-    let letter = String.fromCharCode(97 + number) //a-z
+    let letter = String.fromCharCode(97 + number) //a - z
     let startSend = new Date().getTime()
-    AppStorage.setOrCreate("startSend" , startSend)
+    AppStorage.setOrCreate("startSend", startSend)
     //发送数据
     udp.send({
-      data : letter , //a-z
-      address : oppositeAddr
+      data: letter, //a - z
+      address: oppositeAddr
     }).then(data => {
-      console.log(TAG , `send sucess : ${ data }`)
+      console.log(TAG, `send sucess: ${ data }`)
     }).catch((error: BusinessError) => {
-      console.log(TAG , `TAG,send : ${ JSON.stringify(error) }`)
+      console.log(TAG, `TAG,send: ${ JSON.stringify(error) }`)
     })
   }
 
   build() {
-    Stack({ alignContent : Alignment.Center }) {
+    Stack({ alignContent: Alignment.Center }) {
       Column() {
 
-        if ( this.ipDialog ) {
+        if (this.ipDialog) {
           Column() {
             Text('本地IP：' + localAddr.address)
               .fontSize(25)
-              .margin({ top : 10 })
-            TextInput({ placeholder : '请输入对端ip' })
+              .margin({ top: 10 })
+            TextInput({ placeholder: '请输入对端ip' })
               .width(200)
               .fontSize(25)
-              .margin({ top : 10 })
+              .margin({ top: 10 })
               .onChange((value: string) => {
                 oppositeAddr.address = value
                 oppositeAddr.port = 9090
               })
 
-            if ( this.warnDialog ) {
+            if (this.warnDialog) {
               Text(this.warnText)
                 .width(200)
                 .fontSize(10)
-                .fontColor(Color.Red).margin({ top : 5 })
+                .fontColor(Color.Red).margin({ top: 5 })
             }
             Row() {
               Button($r('app.string.confirm'))
@@ -278,17 +278,17 @@ struct socketTest {
                 .height(40)
                 .width(130)
                 .fontSize(25)
-                .margin({ bottom : 10 })
+                .margin({ bottom: 10 })
                 .onClick(() => {
-                  if ( oppositeAddr.address === '' ) {
+                  if (oppositeAddr.address === '') {
                     this.warnDialog = true
                     this.warnText = '请先输入对端IP'
                   } else {
                     this.bindOption()
                     this.txtDialog = true
-                    console.log(TAG , `peer ip=${ oppositeAddr.address }`)
-                    console.log(TAG , `peer port=${ oppositeAddr.port }`)
-                    console.log(TAG , `peer port=${ localAddr.port }`)
+                    console.log(TAG, `peer ip=${ oppositeAddr.address }`)
+                    console.log(TAG, `peer port=${ oppositeAddr.port }`)
+                    console.log(TAG, `peer port=${ localAddr.port }`)
                   }
                 })
                 .backgroundColor(0xffffff)
@@ -298,13 +298,13 @@ struct socketTest {
                 .height(40)
                 .width(130)
                 .fontSize(25)
-                .margin({ bottom : 10 })
+                .margin({ bottom: 10 })
                 .onClick(() => {
                   {
                     this.sendOption()
-                    console.log(TAG , `send peer ip=${ oppositeAddr.address }`)
-                    console.log(TAG , `send peer port=${ oppositeAddr.port }`)
-                    console.log(TAG , `send peer port=${ localAddr.port }`)
+                    console.log(TAG, `send peer ip=${ oppositeAddr.address }`)
+                    console.log(TAG, `send peer port=${ oppositeAddr.port }`)
+                    console.log(TAG, `send peer port=${ localAddr.port }`)
                   }
                 })
                 .backgroundColor(0xffffff)
@@ -313,31 +313,31 @@ struct socketTest {
             Text(this.bindMsg)
               .width(200)
               .fontSize(25)
-              .fontColor(Color.Red).margin({ top : 3 })
+              .fontColor(Color.Red).margin({ top: 3 })
           }
           .width(ConfigData.WH_80_100)
           .height(200)
-          .margin({ top : ConfigData.WH_3_100 })
+          .margin({ top: ConfigData.WH_3_100 })
           .backgroundColor(Color.White)
-          .border({ radius : 10 , width : 3 })
+          .border({ radius: 10, width: 3 })
         }
 
-        if ( this.txtDialog ) {
+        if (this.txtDialog) {
           Column() {
             Text('接收本地IP：' + localAddr.address)
               .fontSize(25)
-              .margin({ top : 10 })
+              .margin({ top: 10 })
 
             Text(this.receiveMsg)
               .width(200)
               .fontSize(25)
-              .fontColor(Color.Red).margin({ top : 5 })
+              .fontColor(Color.Red).margin({ top: 5 })
           }
           .width(ConfigData.WH_80_100)
           .height(200)
-          .margin({ top : ConfigData.WH_3_100 })
+          .margin({ top: ConfigData.WH_3_100 })
           .backgroundColor(Color.White)
-          .border({ radius : 10 , width : 3 })
+          .border({ radius: 10, width: 3 })
         }
       }.width(ConfigData.WH_100_100).height(ConfigData.WH_100_100)
     }
@@ -352,46 +352,46 @@ struct upDownLoad {
   @State files: Array<string> = []
   @State uploads: Array<string> = []
   private downloadConfig: DownloadConfig = {
-    url : 'http://192.168.62.127:8000' ,
-    filePath : ""
+    url: 'http://192.168.62.127:8000',
+    filePath: ""
   }
 
   aboutToAppear() {
-    console.log(TAG , `enter Index aboutToAppear`)
+    console.log(TAG, `enter Index aboutToAppear`)
     let context: Context = getContext(this) as common.UIAbilityContext;
     let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
     // requestPermissionsFromUser会判断权限的授权状态来决定是否唤起弹窗
-    atManager.requestPermissionsFromUser(context , [ 'ohos.permission.INTERNET' ])
+    atManager.requestPermissionsFromUser(context, ['ohos.permission.INTERNET'])
       .then((data: PermissionRequestResult) => {
-        console.log(TAG , `grantPermission,requestPermissionsFromUser,result.requestCode=${ data }`)
+        console.log(TAG, `grantPermission,requestPermissionsFromUser,result.requestCode=${ data }`)
       })
     this.files.push("http://192.168.62.127:8000")
     let httpRequest = http.createHttp()
     httpRequest.request(
-      'http://192.168.0.123/?tpl=list&folders-filter=&recursive' ,
+      'http://192.168.0.123/ ? tpl=list&folders - filter=&recursive',
       {
-        method : http.RequestMethod.GET ,
-        header : {
-          'Content-Type' : 'text/plain'
+        method: http.RequestMethod.GET,
+        header: {
+          'Content - Type': 'text/plain'
         }
-      } , (err , data) => {
-      console.log(TAG , `error = ${ JSON.stringify(err) }`)
-      if ( !err ) {
-        console.log(TAG , `data = ${ JSON.stringify(data) }`)
+      }, (err, data) => {
+      console.log(TAG, `error = ${ JSON.stringify(err) }`)
+      if (!err) {
+        console.log(TAG, `data = ${ JSON.stringify(data) }`)
         let result: string = data.result.toString()
-        console.log(TAG , `Result = ${ result }`)
+        console.log(TAG, `Result = ${ result }`)
 
         let tempFiles = result.split('\r\n')
-        for ( let i = 0 ; i < tempFiles.length ; i ++ ) {
-          let splitFiles = tempFiles[ i ].split('//')[ 1 ].split('/')
-          console.log(TAG , `splitFiles = ${ JSON.stringify(splitFiles) }`)
-          if ( splitFiles.indexOf('upload') === - 1 ) {
-            this.files.push(tempFiles[ i ])
+        for (let i = 0 ; i < tempFiles.length ; i ++) {
+          let splitFiles = tempFiles[i].split('//')[1].split('/')
+          console.log(TAG, `splitFiles = ${ JSON.stringify(splitFiles) }`)
+          if (splitFiles.indexOf('upload') === - 1) {
+            this.files.push(tempFiles[i])
           }
         }
-        console.log(TAG , `files = ${ JSON.stringify(this.files) }`)
+        console.log(TAG, `files = ${ JSON.stringify(this.files) }`)
       } else {
-        console.log(TAG , `error: ${ JSON.stringify(err) }`)
+        console.log(TAG, `error: ${ JSON.stringify(err) }`)
         httpRequest.destroy()
       }
     })
@@ -404,76 +404,76 @@ struct upDownLoad {
           Text($r('app.string.choice_download_file'))
             .fontSize(25)
             .alignSelf(ItemAlign.Start)
-            .margin({ top : 20 , left : 10 })
-          ForEach(this.files , (item: string , index) => {
+            .margin({ top: 20, left: 10 })
+          ForEach(this.files, (item: string, index) => {
             Divider()
-              .margin({ top : 20 })
+              .margin({ top: 20 })
             Row() {
               Text(item)
                 .fontSize(25)
-                .constraintSize({ maxWidth : ConfigData.WH_75_100 })
+                .constraintSize({ maxWidth: ConfigData.WH_75_100 })
                 .fontWeight(FontWeight.Bold)
-                .margin({ top : 20 , left : 10 })
+                .margin({ top: 20, left: 10 })
               Blank()
 
               Button($r('app.string.click_download'))
-                .margin({ top : 20 , right : 10 })
+                .margin({ top: 20, right: 10 })
                 .onClick(async() => {
                   let fileindex = 1;
                   setInterval(() => {
                     this.downloadConfig.url = item
-                    console.log(TAG , `downloadConfig.url = ${ JSON.stringify(this.downloadConfig.url) }`)
+                    console.log(TAG, `downloadConfig.url = ${ JSON.stringify(this.downloadConfig.url) }`)
                     this.downloadConfig.filePath = `/data/storage/el2/base/haps/entry/cache/ ${
-                    item.split('//')[ 1 ].split('/')[ 1 ] + fileindex }`
-                    //                    /data/storage/el2/base/haps/entry/cache/
-                    fileindex += 1
-                    console.log(TAG , `downloadConfig.filePath = ${ JSON.stringify(this.downloadConfig.filePath) }`)
-                    request.downloadFile(getContext() , this.downloadConfig , (err , downloadTask) => {
-                      console.log(TAG , `download enter`)
-                      if ( err ) {
-                        console.log(TAG , `download err = ${ JSON.stringify(err) }`)
+                    item.split('//')[1].split('/')[1] + fileindex }`
+                    //   /data/storage/el2/base/haps/entry/cache/ 
+		    fileindex += 1
+                    console.log(TAG, `downloadConfig.filePath = ${ JSON.stringify(this.downloadConfig.filePath) }`)
+                    request.downloadFile(getContext(), this.downloadConfig, (err, downloadTask) => {
+                      console.log(TAG, `download enter`)
+                      if (err) {
+                        console.log(TAG, `download err = ${ JSON.stringify(err) }`)
                         return
                       }
-                      console.log(TAG , `download data = ${ JSON.stringify(downloadTask) }`)
-                      console.log(TAG , `download end`)
+                      console.log(TAG, `download data = ${ JSON.stringify(downloadTask) }`)
+                      console.log(TAG, `download end`)
                     })
-                  } , 1000)
+                  }, 1000)
                 })
             }
             .width(ConfigData.WH_100_100)
-          } , (item: string) => item)
+          }, (item: string) => item)
           Button($r('app.string.upload_page'))
             .fontSize(30)
             .width(180)
             .height(50)
-            .margin({ top : 30 })
+            .margin({ top: 30 })
             .key('uploadBtn')
             .onClick(() => {
               router.pushUrl({
-                url : 'pages/Upload' ,
-                params : { uploads : this.uploads }
+                url: 'pages/Upload',
+                params: { uploads: this.uploads }
               })
             })
         }
         .width(ConfigData.WH_100_100)
       }
-      .constraintSize({ maxHeight : ConfigData.WH_87_100 })
+      .constraintSize({ maxHeight: ConfigData.WH_87_100 })
 
-      if ( this.receivedSize !== 0 && this.totalSize !== 0 && this.files.length > 0 ) {
+      if (this.receivedSize !== 0 && this.totalSize !== 0 && this.files.length > 0) {
         Row() {
           Text($r('app.string.download_progress'))
             .fontSize(25)
             .fontWeight(FontWeight.Bold)
-            .margin({ left : 10 })
-          Progress({ value : this.receivedSize , total : this.totalSize , type : ProgressType.Capsule })
+            .margin({ left: 10 })
+          Progress({ value: this.receivedSize, total: this.totalSize, type: ProgressType.Capsule })
             .color(Color.Grey)
             .width(ConfigData.WH_40_100)
             .height(10)
-            .margin({ left : 10 })
+            .margin({ left: 10 })
           Text(`${ JSON.stringify(Math.floor(this.receivedSize / this.totalSize * 100)) }%`)
-            .margin({ left : 10 })
+            .margin({ left: 10 })
         }
-        .margin({ top : 10 })
+        .margin({ top: 10 })
         .alignSelf(ItemAlign.Center)
       }
     }
@@ -481,9 +481,9 @@ struct upDownLoad {
 }
 
 async function sleep(time: number): Promise<void> {
-  return new Promise<void>((resolve , reject) => {
+  return new Promise<void>((resolve, reject) => {
     setTimeout(() => {
       resolve();
-    } , time * 1000);
+    }, time * 1000);
   });
 }

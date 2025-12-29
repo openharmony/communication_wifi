@@ -244,12 +244,12 @@ export class CommonConstants {
   static readonly CLICK_SLIDER_MODE: number = 3;
 
   /**
-   * x-axis transition animation.
+   * x - axis transition animation.
    */
   static readonly TRANSITION_ANIMATION_X: number = 1;
 
   /**
-   * y-axis transition animation.
+   * y - axis transition animation.
    */
   static readonly TRANSITION_ANIMATION_Y: number = 0;
 }

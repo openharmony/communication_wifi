@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import wifi from '@ohos.wifi'
+import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
 import ConfigData from '../utils/ConfigData';
 /**
@@ -25,19 +25,19 @@ export struct P2pPswDialog {
   private p2pScanInfo!: wifiManager.WifiP2pDevice
   private psw: string = ''
   private controller: CustomDialogController
-  private action!: (p2pScanInfo: wifiManager.WifiP2pDevice , psw: string) => void
+  private action!: (p2pScanInfo: wifiManager.WifiP2pDevice, psw: string) => void
 
   build() {
     Column() {
       Text(this.p2pScanInfo.deviceName)
         .fontSize(20)
         .width(ConfigData.WH_95_100)
-      TextInput({ placeholder : 'input password' })
+      TextInput({ placeholder: 'input password' })
         .key('input')
         .type(InputType.Password)
         .placeholderColor(Color.Gray)
         .fontSize(19)
-        .margin({ top : 15 })
+        .margin({ top: 15 })
         .width(ConfigData.WH_95_100)
         .onChange((value: string) => {
           this.psw = value
@@ -53,7 +53,7 @@ export struct P2pPswDialog {
         .margin(5)
         .onClick(() => {
           this.controller.close()
-          this.action(this.p2pScanInfo , this.psw)
+          this.action(this.p2pScanInfo, this.psw)
         })
 
         Text()
@@ -72,7 +72,7 @@ export struct P2pPswDialog {
         })
       }
       .width(ConfigData.WH_100_100)
-      .margin({ top : ConfigData.WH_3_100 })
+      .margin({ top: ConfigData.WH_3_100 })
     }
     .padding(15)
   }

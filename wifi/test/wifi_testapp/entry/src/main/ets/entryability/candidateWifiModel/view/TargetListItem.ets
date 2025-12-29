@@ -41,36 +41,36 @@ export default struct TargetListItem {
    * Listening click index.
    */
   onClickIndexChanged() {
-    if ( this.clickIndex !== this.index ) {
+    if (this.clickIndex !== this.index) {
       this.isExpanded = false;
     }
   }
 
   build() {
-    Stack({ alignContent : Alignment.Start }) {
+    Stack({ alignContent: Alignment.Start }) {
       Column() {
         this.TargetItem()
-        if ( this.isExpanded ) {
+        if (this.isExpanded) {
           Blank()
           ProgressEditPanel({
-            slidingProgress : this.latestProgress ,
-            onCancel : () => this.isExpanded = false ,
-            onClickOK : this.changeProgress.bind(this) ,
-            sliderMode : $sliderMode
+            slidingProgress: this.latestProgress ,
+            onCancel: () => this.isExpanded = false ,
+            onClickOK: this.changeProgress.bind(this) ,
+            sliderMode: $sliderMode
           })
             .transition({
-              scale : {
-                x : CommonConstants.TRANSITION_ANIMATION_X ,
-                y : CommonConstants.TRANSITION_ANIMATION_Y
+              scale: {
+                x: CommonConstants.TRANSITION_ANIMATION_X ,
+                y: CommonConstants.TRANSITION_ANIMATION_Y
               }
             })
         }
       }
       .padding({
-        left : $r('app.float.distance_16') ,
-        top : $r('app.float.distance_14') ,
-        bottom : $r('app.float.distance_12') ,
-        right : this.isEditMode ? $r('app.float.distance_54') : $r('app.float.distance_16')
+        left: $r('app.float.distance_16') ,
+        top: $r('app.float.distance_14') ,
+        bottom: $r('app.float.distance_12') ,
+        right: this.isEditMode ? $r('app.float.distance_54') : $r('app.float.distance_16')
       })
       .height(this.isExpanded ? $r('app.float.expanded_item_height') : $r('app.float.list_item_height'))
       .width(CommonConstants.FULL_WIDTH)
@@ -79,30 +79,30 @@ export default struct TargetListItem {
         CommonConstants.OPACITY : CommonConstants.NO_OPACITY
       )
       .borderRadius(CommonConstants.LIST_RADIUS)
-      .animation({ duration : CommonConstants.DURATION })
-      .backgroundColor(this.selectArr[ this.index ] ? $r('app.color.edit_blue') : Color.White)
+      .animation({ duration: CommonConstants.DURATION })
+      .backgroundColor(this.selectArr[this.index] ? $r('app.color.edit_blue') : Color.White)
       .onClick(() => {
-        if ( this.sliderMode === CommonConstants.CLICK_SLIDER_MODE ) {
+        if (this.sliderMode === CommonConstants.CLICK_SLIDER_MODE) {
           this.sliderMode = CommonConstants.DEFAULT_SLIDER_MODE;
           return;
         }
-        if ( !this.isEditMode ) {
-          animateTo({ duration : CommonConstants.DURATION } , () => {
+        if (!this.isEditMode) {
+          animateTo({ duration: CommonConstants.DURATION }, () => {
             this.isExpanded = !this.isExpanded;
           })
           this.clickIndex = this.index;
         }
       })
 
-      if ( this.isEditMode ) {
+      if (this.isEditMode) {
         Row() {
           Checkbox()
-            .select(this.selectArr[ this.index ])
+            .select(this.selectArr[this.index])
             .selectedColor($r('app.color.main_blue'))
             .width(CommonConstants.CHECKBOX_WIDTH)
-            .margin({ right : $r('app.float.distance_16') })
+            .margin({ right: $r('app.float.distance_16') })
             .onChange((isCheck: boolean) => {
-              this.selectArr[ this.index ] = isCheck;
+              this.selectArr[this.index] = isCheck;
             })
         }
         .width(CommonConstants.FULL_WIDTH)
@@ -120,8 +120,8 @@ export default struct TargetListItem {
   changeProgress(progress: number) {
     this.latestProgress = progress;
     this.updateDate = getCurrentTime();
-    let result = DataModel.updateProgress(this.index , this.latestProgress , this.updateDate);
-    if ( result ) {
+    let result = DataModel.updateProgress(this.index, this.latestProgress, this.updateDate);
+    if (result) {
       this.overAllProgressChanged = !this.overAllProgressChanged;
     }
     this.isExpanded = false
@@ -148,7 +148,7 @@ export default struct TargetListItem {
           Text(this.updateDate)
             .opacityTextStyle()
         }
-        .margin({ top : $r('app.float.distance_2') })
+        .margin({ top: $r('app.float.distance_2') })
       }
       .alignItems(HorizontalAlign.End)
     }

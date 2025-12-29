@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-import { TestData } from '../entryability/model/testData'
+import { TestData } from '../entryability/model/testData';
 import router from '@ohos.router';
-import screenshot from '@ohos.screenshot'
-import image from '@ohos.multimedia.image'
-import MediaUtils from '../entryability/model/MediaUtils'
+import screenshot from '@ohos.screenshot';
+import image from '@ohos.multimedia.image';
+import MediaUtils from '../entryability/model/MediaUtils';
 import ConfigData from '../utils/ConfigData';
 
 const TAG = "wifiTestApp [p2pTitleBar]"
@@ -38,9 +38,35 @@ export struct P2pTitleBar {
   @State offsetY: number = 0
   @State myscale: number = 1
   @State angle: number = 0
+  getScreen = (isFullScreen: boolean) => {
+    let screenshotOptions: screenshot.ScreenshotOptions = {
+      screenRect: { left: 0, top: 0, width: 400, height: 400 } ,
+      imageSize: { width: 400, height: 400 } ,
+      rotation: 0,
+      displayId: 0
+    }
+    if (isFullScreen) {
+      screenshotOptions = {
+        rotation: 0
+      }
+    } else {
+      console.log(TAG, "error -----------")
+    }
+    try {
+      screenshot.save(screenshotOptions, (err, data: image.PixelMap) => {
+        if (err) {
+          console.log(TAG, `Failed to save the screenshot. Error:${ JSON.stringify(err) }`)
+        }
+        console.log(TAG, 'save callback')
+        MediaUtils.savePicture(data, getContext(this))
+      })
+    } catch( err) {
+      console.log(TAG, `save failed, code is ${ err.code }, message is ${ err.message }`)
+    }
+  }
 
   @Builder
-  CustomBtn(text: Resource , isFullScreen: boolean) {
+  CustomBtn(text: Resource, isFullScreen: boolean) {
     Button() {
       Image($r('app.media.screenShot'))
         .height(40)
@@ -51,15 +77,16 @@ export struct P2pTitleBar {
     .backgroundColor($r("app.color.blue"))
     .height(ConfigData.WH_100_100)
     .width(ConfigData.WH_30_100)
-    .margin({ left : 3 , right : 3 , top : 2 })
+    .margin({ left: 3, right: 3, top: 2 })
     .onClick(() => {
-      console.log(TAG , '[Screenshot] onClick,screenshot')
+      console.log(TAG, '[Screenshot] onClick,screenshot')
+      this.getScreen(isFullScreen)
     })
   }
 
   build() {
     Column() {
-      Flex({ alignItems : ItemAlign.Start }) {
+      Flex({ alignItems: ItemAlign.Start }) {
         Button() {
           Image($r('app.media.Back'))
             .width(ConfigData.WH_60_100)
@@ -69,7 +96,7 @@ export struct P2pTitleBar {
         .width(ConfigData.WH_20_100)
         .height(ConfigData.WH_100_100)
         .backgroundColor($r("app.color.blue"))
-        .padding({ left : 1 , top : 15 })
+        .padding({ left: 1, top: 15 })
         .onClick(() => {
           router.back()
         })
@@ -77,12 +104,12 @@ export struct P2pTitleBar {
         Text($r('app.string.entry_p2p_MainAbility'))
           .fontColor(Color.White)
           .fontSize(24)
-          .margin({ left : 3 })
-          .padding({ top : 18 })
+          .margin({ left: 3 })
+          .padding({ top: 18 })
 
         Scroll() {
           Column() {
-            this.CustomBtn($r('app.string.btn_fullscreen') , true)
+            this.CustomBtn($r('app.string.btn_fullscreen'), true)
           }
           .width(ConfigData.WH_100_100)
           .height(ConfigData.WH_100_100)
@@ -91,14 +118,14 @@ export struct P2pTitleBar {
           .borderColor(Color.Green)
           .gesture(
             GestureGroup(GestureMode.Parallel ,
-              TapGesture({ count : 2 , fingers : 1 })
+              TapGesture({ count: 2, fingers: 1 })
                 .onAction(() => {
                   this.myborderWidth += 1
                 }) ,
-              LongPressGesture({ fingers : 1 , repeat : true , duration : 1000 })
+              LongPressGesture({ fingers: 1, repeat: true, duration: 1000 })
                 .onAction((event: GestureEvent) => {
                   this.colOpacity -= 0.1
-                  if ( event.repeat ) {
+                  if (event.repeat) {
                     this.count ++
                   }
                 })
@@ -106,41 +133,42 @@ export struct P2pTitleBar {
                   this.colOpacity = 1;
                   this.count = 0;
                 }) ,
-              PanGesture({ fingers : 1 , direction : PanDirection.All , distance : 5.0 })
+              PanGesture({ fingers: 1, direction: PanDirection.All, distance: 5.0 })
                 .onActionStart(() => {
-                  console.log(TAG , 'Pan start')
+                  console.log(TAG, 'Pan start')
                 })
                 .onActionUpdate((event: GestureEvent) => {
                   this.offsetY = event.offsetY;
                   this.offsetX = event.offsetX;
                 })
                 .onActionEnd(() => {
-                  console.log(TAG , 'Pan end')
+                  console.log(TAG, 'Pan end')
                 }) ,
-              PinchGesture({ fingers : 2 , distance : 4 })
+              PinchGesture({ fingers: 2, distance: 4 })
                 .onActionStart(() => {
-                  console.log(TAG , 'PinchGesture start')
+                  console.log(TAG, 'PinchGesture start')
                 })
                 .onActionUpdate((event: GestureEvent) => {
                   this.myscale = event.scale
                   this.myborderRadius = 10
                 })
                 .onActionEnd(() => {
-                  console.log(TAG , 'PinchGesture end')
+                  console.log(TAG, 'PinchGesture end')
+                  this.getScreen(true);
                 }) ,
-              RotationGesture({ fingers : 2 , angle : 2 })
+              RotationGesture({ fingers: 2, angle: 2 })
                 .onActionStart(() => {
-                  console.log(TAG , 'RotationGesture start')
+                  console.log(TAG, 'RotationGesture start')
                 })
                 .onActionUpdate((event: GestureEvent) => {
                   this.angle = event.angle
                 })
                 .onActionEnd(() => {
-                  console.log(TAG , 'RotationGesture end')
+                  console.log(TAG, 'RotationGesture end')
                 })
             )
               .onCancel(() => {
-                console.log(TAG , 'Parallel gesture canceled')
+                console.log(TAG, 'Parallel gesture canceled')
               })
           )
         }
@@ -148,7 +176,7 @@ export struct P2pTitleBar {
       }
       .height(61)
       .backgroundColor('#FFedf2f5')
-      .padding({ left : 10 })
+      .padding({ left: 10 })
       .borderColor($r("app.color.black"))
       .backgroundColor($r("app.color.blue"))
     }

@@ -14,7 +14,7 @@
  */
 
 export class MessageDataManager {
-  TAG = 'WIFI_Manager_Test'
+  TAG = 'WIFI_Manager_Test';
   //wifi
   testEnableWifi = "enableWifi test";
   testIsActive = "Wifi已经使能"
@@ -27,7 +27,7 @@ export class MessageDataManager {
   testDisableResult = "去使能结果："
   testWifiDisableMaybe = "Wifi已关闭或关闭失败,请确认"
 
-  testEnableSemiWifi ="enableSemiWifi test";
+  testEnableSemiWifi = "enableSemiWifi test";
 
   testIsWifiActive = "testIsWifiActive"
   testIsActiveResult = "wifi使能结果为："

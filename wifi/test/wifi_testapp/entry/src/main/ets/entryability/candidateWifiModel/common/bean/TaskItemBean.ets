@@ -39,7 +39,7 @@ export default class TaskItemBean {
    * @param progressValue progress value.
    * @param updateDate update time.
    */
-  constructor(taskName: string , progressValue: number , updateDate: string) {
+  constructor(taskName: string, progressValue: number, updateDate: string) {
     this.taskName = taskName;
     this.progressValue = progressValue;
     this.updateDate = updateDate;

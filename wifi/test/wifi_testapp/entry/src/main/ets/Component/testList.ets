@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-import { TestData } from '../entryability/model/testData'
+import { TestData } from '../entryability/model/testData';
 import { TestListItem } from './testListItems';
 import ConfigData from '../utils/ConfigData';
 /**
- * Test-List component page of wifi test
+ * Test - List component page of wifi test
  */
 
 @Component
@@ -31,13 +31,13 @@ export struct TestList {
   build() {
     Column() {
       List() {
-        ForEach(this.testItems , (item: TestData) => {
+        ForEach(this.testItems, (item: TestData) => {
           ListItem() {
             TestListItem({
-              testItem : item
+              testItem: item
             })
           }
-        } , (item: TestData) => item.id?.toString())
+        }, (item: TestData) => item.id?.toString())
       }
       .height(ConfigData.WH_100_100)
       .backgroundColor($r("app.color.lead"))

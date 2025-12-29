@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { TestData } from '../entryability/model/testData'
+import { TestData } from '../entryability/model/testData';
 import { TestList } from './testList';
 
 /**
@@ -31,7 +31,7 @@ export struct ManualApiTest {
   build() {
     Column() {
       TestList({
-        testItems : this.testItems
+        testItems: this.testItems
       })
     }
   }

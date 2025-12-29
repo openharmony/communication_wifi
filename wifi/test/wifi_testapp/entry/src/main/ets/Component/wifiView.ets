@@ -29,28 +29,28 @@ export struct WifiView {
   @State isLock: boolean = true
 
   aboutToAppear() {
-    console.log(TAG , `aboutToAppear ${ JSON.stringify(this.wifiScanInfo) }`)
-    if ( this.wifiScanInfo ) {
-      if ( this.wifiScanInfo.securityType ) {
-        if ( this.wifiScanInfo.securityType === 1 ) {
+    console.log(TAG, `aboutToAppear ${ JSON.stringify(this.wifiScanInfo) }`)
+    if (this.wifiScanInfo) {
+      if (this.wifiScanInfo.securityType) {
+        if (this.wifiScanInfo.securityType === 1) {
           this.securityString = $r('app.string.open')
           this.isLock = false
         } else {
-          console.log(TAG , "this.wifi.securityType /= 0 && this.wifi.securityType /= 1")
+          console.log(TAG, "this.wifi.securityType != 0 && this.wifi.securityType != 1")
         }
       } else {
-        console.log(TAG , "this.wifi.securityType is false")
+        console.log(TAG, "this.wifi.securityType is false")
       }
     } else {
-      console.log(TAG , "this.wifi is false")
+      console.log(TAG, "this.wifi is false")
     }
   }
 
   build() {
     Row() {
       Column() {
-        if ( this.wifiScanInfo ) {
-          if ( this.wifiScanInfo.ssid ) {
+        if (this.wifiScanInfo) {
+          if (this.wifiScanInfo.ssid) {
             Text(this.wifiScanInfo.ssid)
               .fontSize(20)
               .width(ConfigData.WH_100_100)
@@ -63,18 +63,18 @@ export struct WifiView {
       }
       .layoutWeight(1)
 
-      Stack({ alignContent : Alignment.BottomEnd }) {
+      Stack({ alignContent: Alignment.BottomEnd }) {
         Image($r('app.media.wifi'))
           .height(30).width(30)
           .objectFit(ImageFit.Contain)
-        if ( this.isLock ) {
+        if (this.isLock) {
           Image($r('app.media.lock'))
             .objectFit(ImageFit.Contain)
             .width(15).height(15)
         }
       }
       .width(40).height(40)
-      .margin({ right : 10 })
+      .margin({ right: 10 })
     }
     .backgroundColor(Color.White)
     .width(ConfigData.WH_100_100)

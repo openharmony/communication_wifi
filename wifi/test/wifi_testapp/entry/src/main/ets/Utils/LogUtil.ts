@@ -42,7 +42,7 @@ let LogLevel = {
   FATAL: 7,
 };
 
-const LOG_LEVEL = LogLevel.INFO
+const LOG_LEVEL = LogLevel.INFO;
 
 /**
  *  log package tool class
@@ -85,5 +85,4 @@ export class LogUtil extends BaseModel {
 
 let mLogUtil = new LogUtil();
 
-export default mLogUtil as LogUtil
-;
+export default mLogUtil as LogUtil;

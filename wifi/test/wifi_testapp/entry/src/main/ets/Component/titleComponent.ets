@@ -34,7 +34,7 @@ export struct TitleComponent {
 
   build() {
     Column() {
-      Flex({ justifyContent : FlexAlign.SpaceBetween , alignItems : ItemAlign.Center }) {
+      Flex({ justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center }) {
         Text(this.stateChangeFlag ? this.state : (this.pinRequiredFlag ? this.pin : (this.bondStateChangeFlag ? this.bondState : this.title)))
           .textAlign(TextAlign.Center)
           .width(ConfigData.WH_100_100)
@@ -47,18 +47,18 @@ export struct TitleComponent {
       .width(ConfigData.WH_100_100)
       .backgroundColor(this.bgColor)
       .linearGradient(this.isTouched ? {
-        angle : 90 ,
-        direction : GradientDirection.Right ,
-        colors : [ [ $r("app.color.DCEAF9"), 0.0 ], [ $r("app.color.FAFAFA"), 1.0 ] ]
-      } : {
-        angle : 90 ,
-        direction : GradientDirection.Right ,
-        colors : [ [ $r("sys.color.ohos_id_color_foreground_contrary"), 1 ], [ $r("sys.color.ohos_id_color_foreground_contrary"), 1 ] ]
+        angle: 90,
+        direction: GradientDirection.Right ,
+        colors: [[$r("app.color.DCEAF9"), 0.0], [$r("app.color.FAFAFA"), 1.0]]
+      }: {
+        angle: 90,
+        direction: GradientDirection.Right ,
+        colors: [[$r("sys.color.ohos_id_color_foreground_contrary"), 1], [$r("sys.color.ohos_id_color_foreground_contrary"), 1]]
       })
       .onTouch((event: TouchEvent) => {
-        if ( event.type === TouchType.Down ) {
+        if (event.type === TouchType.Down) {
           this.isTouched = true;
-        } else if ( event.type === TouchType.Up ) {
+        } else if (event.type === TouchType.Up) {
           this.isTouched = false;
         }
       })

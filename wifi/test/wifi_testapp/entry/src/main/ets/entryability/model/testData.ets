@@ -40,7 +40,7 @@ export class TestData {
   image?: Resource
   category?: Category;
 
-  constructor(name: string , detail: string , url: string , image: Resource , category: Category) {
+  constructor(name: string, detail: string, url: string, image: Resource, category: Category) {
     this.id = `${ NextId ++ }`;
     this.name = name;
     this.url = url;
@@ -71,7 +71,7 @@ export class TestApi {
   result?: string;
   category?: CaseCategory;
 
-  constructor(name: string , detail: string , method: string , api: Function , result: string , category: CaseCategory) {
+  constructor(name: string, detail: string, method: string, api: Function, result: string, category: CaseCategory) {
     this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
@@ -100,7 +100,7 @@ export class TestAuto {
   result: string;
   category: AutoCategory;
 
-  constructor(name: string , detail: string , method: string , api: Function , result: string , category: AutoCategory) {
+  constructor(name: string, detail: string, method: string, api: Function, result: string, category: AutoCategory) {
     this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
@@ -129,7 +129,7 @@ export class TestScenario {
   result: string;
   category: ScenarioCategory;
 
-  constructor(name: string , detail: string , method: string , api: Function , result: string , category: ScenarioCategory) {
+  constructor(name: string, detail: string, method: string, api: Function, result: string, category: ScenarioCategory) {
     this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
@@ -158,7 +158,7 @@ export class TestBenchmark {
   result: string;
   category: BenchmarkCategory;
 
-  constructor(name: string , detail: string , method: string , api: Function , result: string , category: BenchmarkCategory) {
+  constructor(name: string, detail: string, method: string, api: Function, result: string, category: BenchmarkCategory) {
     this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
@@ -187,7 +187,7 @@ export class TestStress {
   result: string;
   category: StressCategory;
 
-  constructor(name: string , detail: string , method: string , api: Function , result: string , category: StressCategory) {
+  constructor(name: string, detail: string, method: string, api: Function, result: string, category: StressCategory) {
     this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;

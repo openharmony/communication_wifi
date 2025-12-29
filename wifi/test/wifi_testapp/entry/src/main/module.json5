@@ -51,6 +51,20 @@
         ]
       }
     ],
+    "extensionAbilities": [
+      {
+        "name": "EntryBackupAbility",
+        "srcEntry": "./ets/entrybackupability/EntryBackupAbility.ets",
+        "type": "backup",
+        "exported": false,
+        "metadata": [
+          {
+            "name": "ohos.extension.backup",
+            "resource": "$profile:backup_config"
+          }
+        ]
+      }
+    ],
     "requestPermissions": [
       {
         "name": "ohos.permission.WRITE_MEDIA",
@@ -80,19 +94,64 @@
         }
       },
       {
-        "name": "ohos.permission.SET_WIFI_INFO"
+        "name": "ohos.permission.SET_WIFI_INFO",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
       },
       {
-        "name": "ohos.permission.MANAGE_WIFI_CONNECTION"
+        "name": "ohos.permission.MANAGE_WIFI_CONNECTION",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
       },
       {
-        "name": "ohos.permission.MANAGE_ENTERPRISE_WIFI_CONNECTION"
+        "name": "ohos.permission.MANAGE_ENTERPRISE_WIFI_CONNECTION",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
       },
       {
-        "name": "ohos.permission.GET_WIFI_INFO"
+        "name": "ohos.permission.GET_WIFI_INFO",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
       },
       {
-        "name": "ohos.permission.LINKTURBO"
+        "name": "ohos.permission.GET_WIFI_PEERS_MAC",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.MANAGE_WIFI_HOTSPOT",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
       },
       {
         "name": "ohos.permission.DISTRIBUTED_DATASYNC",
@@ -101,6 +160,16 @@
           "abilities": [
             "FormAbility"
           ]
+        }
+      },
+      {
+        "name": "ohos.permission.GET_NETWORK_INFO",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
         }
       },
       {
@@ -113,7 +182,14 @@
         }
       },
       {
-        "name": "ohos.permission.INTERNET"
+        "name": "ohos.permission.INTERNET",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
       },
       {
         "name": "ohos.permission.LOCATION_IN_BACKGROUND",
@@ -134,28 +210,14 @@
         }
       },
       {
-        "name": "ohos.permission.KEEP_BACKGROUND_RUNNING"
-      },
-      {
-        "name": "ohos.permission.GET_NETWORK_INFO"
-      },
-      {
-        "name": "ohos.permission.ACCESS_PROTOCOL_DFX_STATE"
-      },
-      {
-        "name": "ohos.permission.GET_WIFI_INFO_INTERNAL"
-      },
-      {
-        "name": "ohos.permission.MANAGE_WIFI_HOTSPOT"
-      },
-      {
-        "name": "ohos.permission.GET_WIFI_LOCAL_MAC"
-      },
-      {
-        "name": "ohos.permission.GET_WIFI_CONFIG"
-      },
-      {
-        "name": "ohos.permission.GET_WIFI_PEERS_MAC"
+        "name": "ohos.permission.KEEP_BACKGROUND_RUNNING",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility"
+          ],
+          "when": "inuse"
+        }
       }
     ]
   }

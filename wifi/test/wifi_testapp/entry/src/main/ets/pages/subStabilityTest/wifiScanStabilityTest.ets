@@ -13,16 +13,16 @@
  * limitations under the License.
  */
 
-import { PageTitle } from '../../Component/pageTitle';
-import { TestImageDisplay } from '../../Component/testImageDisplay';
+import { PageTitle } from '../../component/pageTitle';
+import { TestImageDisplay } from '../../component/testImageDisplay';
 import router from '@ohos.router';
-import ConfigData from '../../Utils/ConfigData';
+import ConfigData from '../../utils/ConfigData';
 import { TestData } from '../../entryability/model/testData';
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
-import promptAction from '@ohos.promptAction'
+import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
-import wantAgent , { WantAgent } from '@ohos.app.ability.wantAgent';
+import wantAgent, { WantAgent } from '@ohos.app.ability.wantAgent';
 import ohosWantAgentInfo from '@ohos.wantAgent';
 import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
 import { BusinessError } from '@ohos.base';
@@ -67,7 +67,7 @@ struct WiFiScanStabilityTest {
       // 申请WiFi相关权限
       let atManager = abilityAccessCtrl.createAtManager();
       try {
-        atManager.requestPermissionsFromUser(getContext(this) , [
+        atManager.requestPermissionsFromUser(getContext(this), [
           'ohos.permission.INTERNET',
           'ohos.permission.SET_WIFI_INFO',
           'ohos.permission.GET_WIFI_INFO',
@@ -79,14 +79,14 @@ struct WiFiScanStabilityTest {
           "ohos.permission.GET_WIFI_LOCAL_MAC",
           "ohos.permission.MANAGE_WIFI_HOTSPOT",
           "ohos.permission.GET_WIFI_INFO_INTERNAL"
-        ])
+])
           .then((data) => {
             console.info(`[EntryAbility], data: ${ JSON.stringify(data) }`);
           })
           .catch((err: BusinessError) => {
             console.info(`[EntryAbility], err: ${ JSON.stringify(err) }`);
           })
-      } catch( err ) {
+      } catch( err) {
         console.info(`[EntryAbility], catch err->${ JSON.stringify(err) }`);
       }
     }).catch((err: BusinessError) => {
@@ -99,19 +99,19 @@ struct WiFiScanStabilityTest {
     let context: Context = getContext(this);
     // 通知参数，指定点击长时任务通知后跳转的应用
     let wantAgentInfo: wantAgent.WantAgentInfo = {
-      wants : [
+      wants: [
         {
-          bundleName : (context as common.UIAbilityContext).abilityInfo.bundleName ,
-          abilityName : (context as common.UIAbilityContext).abilityInfo.name
+          bundleName: (context as common.UIAbilityContext).abilityInfo.bundleName,
+          abilityName: (context as common.UIAbilityContext).abilityInfo.name
         }
-      ] ,
-      operationType : ohosWantAgentInfo.OperationType.START_ABILITY ,
-      requestCode : 0 ,
-      wantAgentFlags : [ wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG ]
+] ,
+      operationType: ohosWantAgentInfo.OperationType.START_ABILITY,
+      requestCode: 0,
+      wantAgentFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG]
     };
     wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
       backgroundTaskManager.startBackgroundRunning(context ,
-        backgroundTaskManager.BackgroundMode.DATA_TRANSFER , wantAgentObj).then(() => {
+        backgroundTaskManager.BackgroundMode.DATA_TRANSFER, wantAgentObj).then(() => {
         console.info(`Succeeded in operationing startBackgroundRunning.`);
       }).catch((err: BusinessError) => {
         console.error(`Failed to operation startBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
@@ -130,19 +130,19 @@ struct WiFiScanStabilityTest {
 
   build() {
     Column() {
-      Stack({ alignContent : Alignment.TopStart }) {
-        TestImageDisplay({ testItem : this.testItem })
-        PageTitle({ testItem : this.testItem })
+      Stack({ alignContent: Alignment.TopStart }) {
+        TestImageDisplay({ testItem: this.testItem })
+        PageTitle({ testItem: this.testItem })
       }
 
       Stack().height("1vp").backgroundColor($r("app.color.black"));
 
       Column() {
         Row() {
-          Text("测试次数：").fontSize($r('app.float.font_18')).width(ConfigData.WH_25_100).padding({ left : "10vp" })
-          TextInput({ placeholder : "请输入循环次数，默认30" })
+          Text("测试次数：").fontSize($r('app.float.font_18')).width(ConfigData.WH_25_100).padding({ left: "10vp" })
+          TextInput({ placeholder: "请输入循环次数，默认30" })
             .placeholderColor(Color.Grey)
-            .placeholderFont({ size : $r('app.float.font_16') })
+            .placeholderFont({ size: $r('app.float.font_16') })
             .caretColor(Color.Blue)
             .width(ConfigData.WH_70_100)
             .fontSize($r('app.float.font_16'))
@@ -157,27 +157,27 @@ struct WiFiScanStabilityTest {
             .fontSize("22vp")
             .width(ConfigData.WH_95_100)
             .align(Alignment.TopStart)
-            .padding({ top : "10vp" })
+            .padding({ top: "10vp" })
           Scroll() {
             Column() {
               Text("测试次数：" + this.testNumbers)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
               Text("scan的成功次数：" + this.openScanSuccessNumber)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
               Text("scan的失败次数：" + this.openScanFailNumber)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
               Text("scan的扫描个数：" + this.scanInfo)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
             }
@@ -194,12 +194,12 @@ struct WiFiScanStabilityTest {
             .height(ConfigData.WH_15_100)
             .width(ConfigData.WH_95_100)
             .align(Alignment.TopStart)
-            .padding({ top : "10vp" })
+            .padding({ top: "10vp" })
           List() {
             ListItem() {
               Text(this.scanStateMessageLog)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
             }
@@ -217,9 +217,9 @@ struct WiFiScanStabilityTest {
         Row() {
           Button("开始扫描测试")
             .operateButtonStyle($r('app.color.main_blue'))
-            .padding({ right : "10vp" })
+            .padding({ right: "10vp" })
             .onClick(async(event: ClickEvent) => {
-              console.log(TAG , "start scan test-------------")
+              console.log(TAG, "start scan test-------------")
               this.startContinuousTask();
               await this.forLoop()
             })
@@ -228,10 +228,10 @@ struct WiFiScanStabilityTest {
 
           Button("关闭扫描测试")
             .operateButtonStyle($r('app.color.main_blue'))
-            .padding({ right : "10vp" })
+            .padding({ right: "10vp" })
             .onClick(async(event: ClickEvent) => {
               this.scanLoopState = false
-              console.log(TAG , "准备测试停止 -------------")
+              console.log(TAG, "准备测试停止 -------------")
               this.scanStateMessageLog = ""
               this.openScanNumber = 0;
               this.stopContinuousTask();
@@ -242,36 +242,33 @@ struct WiFiScanStabilityTest {
   }
 
   onWifiScanState() {
-    console.log(TAG , "on.wifiScanStateChange start--------")
-    wifiManager.on("wifiScanStateChange" , (number) => {
-      console.log(TAG , " on.wifiScanStateChange success--------")
+    console.log(TAG, "on.wifiScanStateChange start--------")
+    wifiManager.on("wifiScanStateChange", (number) => {
+      console.log(TAG, " on.wifiScanStateChange success--------")
       let wifiScanStateMessage = ""
-      switch ( number ) {
-        case 0:
-          wifiScanStateMessage = "scan fail";
+      switch (number) {
+        case 0: wifiScanStateMessage = "scan fail";
           break;
-        case 1:
-          wifiScanStateMessage = "scan success";
+        case 1: wifiScanStateMessage = "scan success";
           break;
-        default:
-          wifiScanStateMessage = '未知状态';
+        default: wifiScanStateMessage = '未知状态';
           break;
       }
-      console.log(TAG , "WiFi扫描状态为:" + wifiScanStateMessage)
-      if ( number == 1 ) {
+      console.log(TAG, "WiFi扫描状态为:" + wifiScanStateMessage)
+      if (number == 1) {
         // 打时间戳
         this.scan_EndTime = new Date().getTime()
-        console.log(TAG , "WIFI扫描成功时间: " + this.scan_EndTime + "ms")
+        console.log(TAG, "WIFI扫描成功时间: " + this.scan_EndTime + "ms")
         this.scanInfo = wifiManager.getScanResultsSync().length
-        console.log(TAG , "WIFI扫描结果个数: " + this.scanInfo + "; WIFI扫描结果个数: " + JSON.stringify(wifiManager.getScanResultsSync()))
+        console.log(TAG, "WIFI扫描结果个数: " + this.scanInfo + "; WIFI扫描结果个数: " + JSON.stringify(wifiManager.getScanResultsSync()))
       } else {
-        console.log(TAG , "WIFI扫描还未成功------")
+        console.log(TAG, "WIFI扫描还未成功------")
       }
-      console.log(TAG , " on.wifiScanStateChange  callback success --------")
-      promptAction.showToast({ message : "wifiScan状态: " + wifiScanStateMessage })
+      console.log(TAG, " on.wifiScanStateChange  callback success --------")
+      promptAction.showToast({ message: "wifiScan状态: " + wifiScanStateMessage })
       this.scanStateMessage = wifiScanStateMessage
-      AppStorage.setOrCreate("scanStateMessage" , this.scanStateMessage)
-      console.log(TAG , " on.wifiStateChange callback end--------")
+      AppStorage.setOrCreate("scanStateMessage", this.scanStateMessage)
+      console.log(TAG, " on.wifiStateChange callback end--------")
       return this.scanStateMessage
     })
   }
@@ -286,55 +283,57 @@ struct WiFiScanStabilityTest {
     this.openScanSuccessNumber = 0
     this.openScanFailNumber = 0
     this.scanStateMessageLog = ""
+    wifiManager.setScanAlwaysAllowed(false)
     let funcMessage = false
-    console.log(TAG , "getScanAlwaysAllowed:" + funcMessage)
-    for ( this.openScanNumber ; this.openScanNumber < this.testNumbers ; this.openScanNumber ++ ) {
-      if ( !this.scanLoopState ) {
-        console.log(TAG , "测试结束------------")
+    funcMessage = wifiManager.getScanAlwaysAllowed()
+    console.log(TAG, "getScanAlwaysAllowed:" + funcMessage)
+    for (this.openScanNumber ; this.openScanNumber < this.testNumbers ; this.openScanNumber ++) {
+      if (!this.scanLoopState) {
+        console.log(TAG, "测试结束------------")
         break;
       } else {
         let wifiState = wifiManager.isWifiActive()
-        if ( !wifiState ) {
+        if (!wifiState) {
           wifiManager.enableWifi()
-          console.log(TAG , "wifi当前未使能，已经使能，正常开始测试------")
+          console.log(TAG, "wifi当前未使能，已经使能，正常开始测试------")
         } else {
-          console.log(TAG , "wifi当前使能，正常开始测试------")
+          console.log(TAG, "wifi当前使能，正常开始测试------")
         }
         this.onWifiScanState()
         await sleep(5)
-        wifiManager.scan()
+        wifiManager.startScan()
         this.scan_StartTime = new Date().getTime()
-        console.log(TAG , "第" + (this.openScanNumber + 1) + "次WIFI扫描-----")
-        console.log(TAG , "第" + (this.openScanNumber + 1) + "次WIFI扫描开始时间: " + this.scan_StartTime + "ms")
-        console.log(TAG , "第" + (this.openScanNumber + 1) + "次WIFI扫描接口的调用成功")
+        console.log(TAG, "第" + (this.openScanNumber + 1) + "次WIFI扫描-----")
+        console.log(TAG, "第" + (this.openScanNumber + 1) + "次WIFI扫描开始时间: " + this.scan_StartTime + "ms")
+        console.log(TAG, "第" + (this.openScanNumber + 1) + "次WIFI扫描接口的调用成功")
         await sleep(10)
         this.scanStateMessage = AppStorage.get("scanStateMessage")! //非空断言操作符
-        if ( this.scanStateMessage == "scan success" ) {
+        if (this.scanStateMessage == "scan success") {
           this.scanStateMessageLog += "第" + (this.openScanNumber + 1) + "次WIFI扫描成功" + "\n"
           this.scan_SpendTime = this.scan_EndTime - this.scan_StartTime
           this.scanStateMessageLog += "第" + (this.openScanNumber + 1) + "次WIFI扫描耗时: " + this.scan_SpendTime + "ms" + "\n"
           this.scanStateMessageLog += "第" + (this.openScanNumber + 1) + "次WIFI扫描结果个数: " + this.scanInfo + "\n"
-          console.log(TAG , "第" + (this.openScanNumber + 1) + "次WIFI扫描耗时: " + this.scan_SpendTime + "ms")
+          console.log(TAG, "第" + (this.openScanNumber + 1) + "次WIFI扫描耗时: " + this.scan_SpendTime + "ms")
           this.openScanSuccessNumber = this.openScanSuccessNumber + 1
           this.scanStateMessageLog += "扫描成功的次数：" + this.openScanSuccessNumber + "\n"
-          console.log(TAG , "扫描成功的次数：" + this.openScanSuccessNumber)
+          console.log(TAG, "扫描成功的次数：" + this.openScanSuccessNumber)
           await sleep(10)
           this.scanStateMessage = AppStorage.get("scanStateMessage")! //非空断言操作符
-        } else if ( this.scanStateMessage == "scan fail" ) {
+        } else if (this.scanStateMessage == "scan fail") {
           this.openScanFailNumber = this.openScanFailNumber + 1
           this.scanStateMessageLog += "第" + (this.openScanNumber + 1) + "次WIFI扫描失败" + "\n"
-          console.log(TAG , "扫描失败的次数：" + this.openScanFailNumber)
-          console.log(TAG , "第" + (this.openScanNumber + 1) + "次WIFI扫描失败")
+          console.log(TAG, "扫描失败的次数：" + this.openScanFailNumber)
+          console.log(TAG, "第" + (this.openScanNumber + 1) + "次WIFI扫描失败")
         } else {
           this.scanStateMessageLog += "第" + (this.openScanNumber + 1) + "次WIFI扫描情况未知" + "\n"
-          console.log(TAG , "第" + (this.openScanNumber + 1) + "次扫描后状态不清楚");
+          console.log(TAG, "第" + (this.openScanNumber + 1) + "次扫描后状态不清楚");
         }
         wifiManager.off("wifiScanStateChange")
-        console.log(TAG , "off.wifiScanStateChange success--------");
+        console.log(TAG, "off.wifiScanStateChange success--------");
         await sleep(5)
       }
     }
-    console.log(TAG , "测试结束 -------------")
+    console.log(TAG, "测试结束 -------------")
     this.stopContinuousTask();
   }
 }
@@ -353,9 +352,9 @@ function operateButtonStyle(color: Resource) {
 }
 
 async function sleep(time: number): Promise<void> {
-  return new Promise<void>((resolve , reject) => {
+  return new Promise<void>((resolve, reject) => {
     setTimeout(() => {
       resolve();
-    } , time * 1000);
+    }, time * 1000);
   });
 }

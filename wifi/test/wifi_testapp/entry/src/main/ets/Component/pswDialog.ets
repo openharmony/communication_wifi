@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import wifiManager from '@ohos.wifiManager'
+import wifiManager from '@ohos.wifiManager';
 import ConfigData from '../utils/ConfigData';
 /**
  * PswDialog page of WiFi test
@@ -26,18 +26,18 @@ export struct PswDialog {
   private scanInfo!: wifiManager.WifiScanInfo
   private psw: string = ''
   private controller: CustomDialogController
-  private action!: (scanInfo: wifiManager.WifiScanInfo , psw: string) => void
+  private action!: (scanInfo: wifiManager.WifiScanInfo, psw: string) => void
 
   build() {
     Column() {
       Text(this.scanInfo.ssid)
         .fontSize(20)
         .width(ConfigData.WH_95_100)
-      TextInput({ placeholder : 'Please enter your Password' })
+      TextInput({ placeholder: 'Please enter your Password' })
         .type(InputType.Password)
         .placeholderColor(Color.Gray)
         .fontSize(19)
-        .margin({ top : 15 })
+        .margin({ top: 15 })
         .width(ConfigData.WH_95_100)
         .onChange((value: string) => {
           this.psw = value
@@ -68,15 +68,14 @@ export struct PswDialog {
         .backgroundColor(Color.White)
         .margin(5)
         .onClick(() => {
-          this.action(this.scanInfo , this.psw)
+          this.action(this.scanInfo, this.psw)
           console.log(TAG,"this.scanInfo: " + JSON.stringify(this.scanInfo),"  this.psw:" + this.psw)
           this.controller.close()
         })
       }
       .width(ConfigData.WH_100_100)
-      .margin({ top : ConfigData.WH_3_100 })
+      .margin({ top: ConfigData.WH_3_100 })
     }
     .padding(15)
   }
 }
-

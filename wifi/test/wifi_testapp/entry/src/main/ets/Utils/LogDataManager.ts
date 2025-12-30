@@ -14,7 +14,7 @@
  */
 
 export class LogDataManager {
-  TAG = 'WIFI_Manager_Test'
+  TAG = 'WIFI_Manager_Test';
   //wifi
   testEnableWifiManager_StartLog = "testEnableWifiManager Start----------"
   testEnableWifiManager_EndLog = "testEnableWifi End----------"
@@ -22,7 +22,7 @@ export class LogDataManager {
   testDisableWifiManager_EndLog = "testDisableWifi End----------"
   testIsWifiActiveManager_StartLog = "testIsWifiActive Start----------"
   testIsWifiActiveManager_EndLog = "testDisableWifi End----------"
-  testScanManager_StartLog = -"testScan Start----------"
+  testScanManager_StartLog = "testScan Start----------"
   testScanManager_EndLog = "testScan End----------"
   testForcibleScanManager_StartLog = "testForcibleScan Start----------"
   testForcibleScanManager_EndLog = "testForcibleScan End----------"
@@ -138,7 +138,7 @@ export class LogDataManager {
   testOnHotspotStaJoinManager_EndLog = "testOnHotspotStaJoin End--------------"
   testOnHotspotStaLeaveManager_StartLog = "testOnHotspotStaLeave start--------------"
   testOnHotspotStaLeaveManager_EndLog = "testOnHotspotStaLeave End--------------"
-  
+
   //p2p
   testGetP2pLinkedInfoPromiseManager_StartLog = "testGetP2pLinkedInfoPromise Start----------"
   testGetP2pLinkedInfoPromiseManager_EndLog = "testGetP2pLinkedInfoPromise End----------"

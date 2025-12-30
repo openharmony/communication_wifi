@@ -13,15 +13,14 @@
  * limitations under the License.
  */
 
-import wifi from '@ohos.wifi'
 import wifiManager from '@ohos.wifiManager';
-import { AvailableP2p } from '../../Component/availableP2p'
-import { TestData } from '../../entryability/model/testData'
+import { AvailableP2p } from '../../component/availableP2p';
+import { TestData } from '../../entryability/model/testData';
 import router from '@ohos.router';
-import { PageTitle } from '../../Component/pageTitle'
-import { TestImageDisplay } from '../../Component/testImageDisplay'
-import { P2pModel } from '../../entryability/model/p2pModel'
-import ConfigData from '../../Utils/ConfigData';
+import { PageTitle } from '../../component/pageTitle';
+import { TestImageDisplay } from '../../component/testImageDisplay';
+import { P2pModel } from '../../entryability/model/p2pModel';
+import ConfigData from '../../utils/ConfigData';
 
 interface myParams extends Object {
   testItem: TestData
@@ -36,23 +35,23 @@ const TAG = 'wifiTestApp [p2pScan]'
 @Component
 struct P2pFound {
   private p2pModel: P2pModel = new P2pModel()
-  private testItem: TestData = (router.getParams() as myParams).testItem
+  private testItem: TestData = (router.getParams() as myParams).testItem;
   private isScanning: boolean = false;
   @State p2pList: Array<wifiManager.WifiP2pDevice> = []
   @State p2pIsLinked: boolean = false
   @State p2pIsSwitchOn: boolean = false
   @State p2pLinkedInfo: wifiManager.WifiP2pLinkedInfo = {
-    connectState : wifiManager.P2pConnectState.DISCONNECTED ,
-    isGroupOwner : false ,
-    groupOwnerAddr : '' ,
+    connectState: wifiManager.P2pConnectState.DISCONNECTED ,
+    isGroupOwner: false ,
+    groupOwnerAddr: '' ,
   }
 
   async scan() {
-    if ( !this.isScanning ) {
+    if (!this.isScanning) {
       return; // 如果不需要扫描，则直接返回
     } else {
       this.p2pModel.getP2pPeerDevices((result: wifiManager.WifiP2pDevice[]) => {
-        if ( this.p2pIsSwitchOn ) {
+        if (this.p2pIsSwitchOn) {
           result.forEach(item => {
             if (item.deviceName) {
               this.p2pList.push({
@@ -65,11 +64,11 @@ struct P2pFound {
               });
             }
           });
-          console.log(TAG , 'scan p2pList:' + JSON.stringify(this.p2pList))
-          if ( this.isScanning ) { // 再次检查是否还需要继续扫描
+          console.log(TAG, 'scan p2pList:' + JSON.stringify(this.p2pList))
+          if (this.isScanning) { // 再次检查是否还需要继续扫描
             setTimeout(() => {
               this.scan()
-            } , 2000)
+            }, 2000)
           }
         }
       })
@@ -77,18 +76,18 @@ struct P2pFound {
   }
 
   getP2pLinkedInfo() {
-    wifiManager.getP2pLinkedInfo((err , p2pLinkedInfo) => {
-      if ( err ) {
-        console.log(TAG , `getLinkedInfo err: ${ JSON.stringify(err) }`)
+    wifiManager.getP2pLinkedInfo((err, p2pLinkedInfo) => {
+      if (err) {
+        console.log(TAG, `getLinkedInfo err: ${ JSON.stringify(err) }`)
         return
       }
-      console.log(TAG , `p2pLinkedInfo: ${ JSON.stringify(p2pLinkedInfo) }`)
-      if ( p2pLinkedInfo === null || p2pLinkedInfo.connectState === 0 ) {
+      console.log(TAG, `p2pLinkedInfo: ${ JSON.stringify(p2pLinkedInfo) }`)
+      if (p2pLinkedInfo === null || p2pLinkedInfo.connectState === 0) {
         this.p2pIsLinked = false
         this.p2pLinkedInfo = {
-          connectState : 0 ,
-          isGroupOwner : false ,
-          groupOwnerAddr : ''
+          connectState: 0,
+          isGroupOwner: false ,
+          groupOwnerAddr: ''
         }
         return
       }
@@ -98,15 +97,15 @@ struct P2pFound {
   }
 
   addP2pListener() {
-    wifiManager.on('p2pConnectionChange' , wifiP2pLinkedInfo => {
+    wifiManager.on('p2pConnectionChange', wifiP2pLinkedInfo => {
       let state = wifiP2pLinkedInfo.connectState
-      console.log(TAG , `p2pConnectionChange: ${ state }`)
+      console.log(TAG, `p2pConnectionChange: ${ state }`)
       this.getP2pLinkedInfo()
     })
-    wifiManager.on('p2pStateChange' , state => {
-      console.log(TAG , `p2pStateLisener state: ${ state }`)
+    wifiManager.on('p2pStateChange', state => {
+      console.log(TAG, `p2pStateLisener state: ${ state }`)
       this.p2pList = []
-      if ( state === 3 ) { //1: idle, 2: starting, 3:started, 4: closing, 5: closed
+      if (state === 3) { //1: idle, 2: starting, 3:started, 4: closing, 5: closed
         wifiManager.startDiscoverDevices()
         this.scan()
       }
@@ -114,9 +113,9 @@ struct P2pFound {
   }
 
   aboutToAppear() {
-    console.log(TAG,"test" + wifiManager.isWifiActive() )
-    if ( wifiManager.isWifiActive() ) {
-      console.log(TAG , 'wifi is active')
+    console.log(TAG,"test" + wifiManager.isWifiActive())
+    if (wifiManager.isWifiActive()) {
+      console.log(TAG, 'wifi is active')
       this.p2pIsSwitchOn = true
       this.isScanning = true; // 在页面出现时开始扫描
       wifiManager.startDiscoverDevices()
@@ -130,9 +129,9 @@ struct P2pFound {
 
   build() {
     Column() {
-      Stack({ alignContent : Alignment.TopStart }) {
-        TestImageDisplay({ testItem : this.testItem })
-        PageTitle({ testItem : this.testItem })
+      Stack({ alignContent: Alignment.TopStart }) {
+        TestImageDisplay({ testItem: this.testItem })
+        PageTitle({ testItem: this.testItem })
       }
 
       Row() {
@@ -142,11 +141,11 @@ struct P2pFound {
           .layoutWeight(1)
           .align(Alignment.TopStart)
         Column() {
-          Toggle({ type : ToggleType.Switch, isOn : this.p2pIsSwitchOn })
+          Toggle({ type: ToggleType.Switch, isOn: this.p2pIsSwitchOn })
             .onChange(async(isOn: boolean) => {
               console.log(TAG, `wifi swtich is: ${ isOn }`)
               this.p2pList = []
-              if ( isOn ) {
+              if (isOn) {
                 try {
                   this.p2pIsSwitchOn = true
                   this.isScanning = true;
@@ -156,8 +155,8 @@ struct P2pFound {
                   setTimeout(() => {
                     this.scan();
                   }, 2000);
-                } catch( error ) {
-                  console.error(TAG, `Failed to enable Wi-Fi: ${ error }`);
+                } catch( error) {
+                  console.error(TAG, `Failed to enable Wi - Fi: ${ error }`);
                 }
               } else {
                 this.p2pIsSwitchOn = false
@@ -166,8 +165,8 @@ struct P2pFound {
                 try {
                   await wifiManager.disconnect();
                   await wifiManager.disableWifi();
-                } catch( error ) {
-                  console.error(TAG, `Failed to disable Wi-Fi: ${ error }`);
+                } catch( error) {
+                  console.error(TAG, `Failed to disable Wi - Fi: ${ error }`);
                 }
                 this.p2pList = [];
               }
@@ -176,9 +175,9 @@ struct P2pFound {
       }
       .width(ConfigData.WH_95_100)
 
-      AvailableP2p({ p2pList : $p2pList , p2pLinkedInfo : $p2pLinkedInfo })
+      AvailableP2p({ p2pList: $p2pList, p2pLinkedInfo: $p2pLinkedInfo })
     }
-    .size({ width : ConfigData.WH_100_100 , height : ConfigData.WH_100_100 })
+    .size({ width: ConfigData.WH_100_100, height: ConfigData.WH_100_100 })
     .backgroundColor('#F5F5F5')
   }
 

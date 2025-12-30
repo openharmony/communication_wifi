@@ -13,8 +13,8 @@
  * limitations under the License.
  */
  
-import { NormalNav } from "./Components/NormalNav"
-import { wifiManager } from "@kit.ConnectivityKit"
+import { NormalNav } from "./components/NormalNav";
+import { wifiManager } from "@kit.ConnectivityKit";
 
 @Component
 export struct ChangeNameView {

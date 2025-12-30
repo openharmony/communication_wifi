@@ -17,7 +17,7 @@
  * info view Of WiFi test
  */
 
-import ConfigData from '../Utils/ConfigData'
+import ConfigData from '../utils/ConfigData';
 
 interface IpInfo {
   key: Resource,
@@ -30,7 +30,7 @@ export struct InfoView {
 
   build() {
     Column() {
-      ForEach(this.infoList , (item: IpInfo , index) => {
+      ForEach(this.infoList, (item: IpInfo, index) => {
         Column() {
           Text(item.key)
             .fontColor(Color.Black)
@@ -40,15 +40,15 @@ export struct InfoView {
             .fontColor(Color.Black)
             .fontSize(20)
             .width(ConfigData.WH_100_100)
-            .margin({ top : 5 , bottom : 5 })
-          if ( index < this.infoList.length - 1 ) {
+            .margin({ top: 5, bottom: 5 })
+          if (index < this.infoList.length - 1) {
             Divider().color(Color.Grey)
           }
         }
         .padding(5)
-      } , (item: IpInfo) => JSON.stringify(item))
+      }, (item: IpInfo) => JSON.stringify(item))
     }
     .margin(10)
-    .border({ width : 1 , color : Color.Gray , radius : 15 })
+    .border({ width: 1, color: Color.Gray, radius: 15 })
   }
 }

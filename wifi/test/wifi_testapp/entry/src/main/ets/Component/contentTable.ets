@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { TestData , TestApi } from '../entryability/model/testData'
-import promptAction from '@ohos.promptAction'
+import { TestData, TestApi } from '../entryability/model/testData';
+import promptAction from '@ohos.promptAction';
 import ConfigData from '../utils/ConfigData';
 
 const TAG = "wifiTestApp [contentTable]"
@@ -27,7 +27,7 @@ const TAG = "wifiTestApp [contentTable]"
 @Component
 export struct ContentTable {
   private testItem!: TestData
-  private currentApiItem!: TestApi
+  private currentApiItem!: TestApi;
   @State apiItems: TestApi[] = [];
   @State changeIndex: number = - 1
   @State localName: string = 'MyTestDevice'
@@ -35,64 +35,64 @@ export struct ContentTable {
   @StorageLink('pairedMac') pairedMac: string = "";
 
   onCancel() {
-    console.log(TAG , '取消1')
+    console.log(TAG, '取消1')
   }
 
   onAccept(text: string) {
-    console.log(TAG , 'input text:' , text)
+    console.log(TAG, 'input text:', text)
   }
 
-  @Builder IngredientItem(apiItem: TestApi , index: number) {
+  @Builder IngredientItem(apiItem: TestApi, index: number) {
     Stack() {
       Flex() {
-        Flex({ alignItems : ItemAlign.Center }) {
+        Flex({ alignItems: ItemAlign.Center }) {
           Image($r('app.media.WLAN'))
             .objectFit(ImageFit.Contain)
             .autoResize(false)
             .height(50)
             .width(40)
-            .padding({ top : "15vp" })
+            .padding({ top: "15vp" })
         }
         .layoutWeight(1)
-        .padding({ left : 10 })
+        .padding({ left: 10 })
 
-        Flex({ direction : FlexDirection.Column , alignItems : ItemAlign.Start }) {
+        Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start }) {
           Text(apiItem.name)
             .fontSize(17.4)
             .fontWeight(FontWeight.Bold)
             .layoutWeight(1)
-            .padding({ left : "10vp" , top : "10vp" })
+            .padding({ left: "10vp", top: "10vp" })
           Text(apiItem.method)
             .fontSize(17.4)
             .fontWeight(FontWeight.Bold)
             .layoutWeight(1)
-            .padding({ left : "10vp" , top : "5vp" })
+            .padding({ left: "10vp", top: "5vp" })
         }
         .layoutWeight(6)
         .width(ConfigData.WH_80_100)
 
-        Flex({ alignItems : ItemAlign.Center }) {
+        Flex({ alignItems: ItemAlign.Center }) {
           Text(this.changeIndex >= 0 ? this.getCurrentState(index) : apiItem.result)
             .fontSize(17.4)
             .flexGrow(1)
-            .padding({ top : "15vp" })
+            .padding({ top: "15vp" })
         }
         .layoutWeight(3)
-        .padding({ left : 25 })
+        .padding({ left: 25 })
       }
     }
     .height(80)
     .borderRadius(10)
-    .margin({ top : 5 , bottom : 5 })
+    .margin({ top: 5, bottom: 5 })
     .backgroundColor($r("app.color.white"))
     .onClick(() => {
-      switch ( apiItem.method ) {
+      switch (apiItem.method) {
         case "pairDevice": {
           let message: string = apiItem.api!(this.pairedMac);
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          promptAction.showToast({ message : message });
+          promptAction.showToast({ message: message });
         }
           break;
         case "unpairDevice": {
@@ -100,7 +100,7 @@ export struct ContentTable {
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          promptAction.showToast({ message : message });
+          promptAction.showToast({ message: message });
         }
           break;
         case "getDeviceName": {
@@ -108,7 +108,7 @@ export struct ContentTable {
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          promptAction.showToast({ message : message });
+          promptAction.showToast({ message: message });
         }
           break;
         case "getDeviceType": {
@@ -116,7 +116,7 @@ export struct ContentTable {
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          promptAction.showToast({ message : message });
+          promptAction.showToast({ message: message });
         }
           break;
         default: {
@@ -124,7 +124,7 @@ export struct ContentTable {
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          promptAction.showToast({ message : message });
+          promptAction.showToast({ message: message });
         }
           break;
       }
@@ -132,25 +132,25 @@ export struct ContentTable {
   }
 
   getCurrentState(index: number) {
-    return this.apiItems[ index ].result
+    return this.apiItems[index].result
   }
 
   build() {
     Column() {
       Scroll() {
         Flex({
-          direction : FlexDirection.Column ,
-          justifyContent : FlexAlign.SpaceBetween ,
-          alignItems : ItemAlign.Start
+          direction: FlexDirection.Column,
+          justifyContent: FlexAlign.SpaceBetween,
+          alignItems: ItemAlign.Start
         }) {
-          ForEach(this.apiItems , (item: TestApi , index: number) => {
-            this.IngredientItem(item , index)
+          ForEach(this.apiItems, (item: TestApi, index: number) => {
+            this.IngredientItem(item, index)
           })
         }
       }
       .scrollBarWidth(20)
     }
     .height(ConfigData.WH_60_100)
-    .padding({ top : 5 , right : 10 , left : 10 })
+    .padding({ top: 5, right: 10, left: 10 })
   }
 }

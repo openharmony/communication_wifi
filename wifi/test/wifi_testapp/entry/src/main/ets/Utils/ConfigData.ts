@@ -14,7 +14,7 @@
  */
 
 export class ConfigData {
-  TAG = 'WIFI_Test'
+  TAG = 'WIFI_Test';
   WH_100_100 = '100%';
   WH_3_100 = '3%';
   WH_5_100 = '5%';

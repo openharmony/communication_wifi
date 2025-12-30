@@ -16,9 +16,9 @@
 import socket from '@ohos.net.socket';
 import connection from '@ohos.net.connection';
 import ConfigData from '../../utils/ConfigData';
-import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { PageTitle } from '../../Component/pageTitle';
-import { TestData } from '../../entryability/model/testData'
+import { TestImageDisplay } from '../../component/testImageDisplay';
+import { PageTitle } from '../../component/pageTitle';
+import { TestData } from '../../entryability/model/testData';
 import router from '@ohos.router';
 
 interface myParams extends Object {
@@ -403,7 +403,7 @@ struct TcpSocketTest {
   }
 
   // 发送服务端响应
-  async sendServerResponse(receivedMessage: string, remoteInfo:socket.SocketRemoteInfo ) {
+  async sendServerResponse(receivedMessage: string, remoteInfo:socket.SocketRemoteInfo) {
     try {
       if (!this.serverSocket) {
         return;
@@ -457,9 +457,9 @@ struct TcpSocketTest {
 
   build() {
     Column() {
-      Stack({ alignContent : Alignment.TopStart }) {
-        TestImageDisplay({ testItem : this.testItem })
-        PageTitle({ testItem : this.testItem })
+      Stack({ alignContent: Alignment.TopStart }) {
+        TestImageDisplay({ testItem: this.testItem })
+        PageTitle({ testItem: this.testItem })
       }
 
       Scroll() {
@@ -718,9 +718,6 @@ struct TcpSocketTest {
           // 说明提示（服务端模式）
           if (this.mode === 'server') {
             Row() {
-              Text('💡 ')
-                .fontSize(14)
-                .fontColor(Color.Blue)
               Text('服务端模式: 监听本地端口，等待客户端连接。可以向所有已连接的客户端广播消息。')
                 .fontSize(12)
                 .fontColor(Color.Blue)

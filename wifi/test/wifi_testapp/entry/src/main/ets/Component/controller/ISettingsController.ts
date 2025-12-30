@@ -26,7 +26,7 @@ export default interface ISettingsController {
   /**
    *  Bind component's properties.
    */
-  bindProperties(componentProperties: string[], controllerProperties?: string[]): ISettingsController
+  bindProperties(componentProperties: string[], controllerProperties?: string[]): ISettingsController;
 
   /**
    * Initialize data.

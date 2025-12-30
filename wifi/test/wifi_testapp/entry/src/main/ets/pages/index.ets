@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import ConfigData from '../Utils/ConfigData';
+import ConfigData from '../utils/ConfigData';
 
 /*
  ** index of page, not useful in wifi test

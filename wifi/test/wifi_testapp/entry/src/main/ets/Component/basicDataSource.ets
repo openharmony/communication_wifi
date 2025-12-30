@@ -13,98 +13,98 @@
  * limitations under the License.
  */
 
-import wifi from '@ohos.wifi'
+import wifi from '@ohos.wifi';
 
-const TAG = "wifiTestApp [basicDataSource]"
+const TAG = "wifiTestApp [basicDataSource]";
 
 /**
  * BasicDataSource page of WiFi test
  */
 
 class BasicDataSource implements IDataSource {
-  private listeners: DataChangeListener[] = []
+  private listeners: DataChangeListener[] = [];
 
   public totalCount(): number {
-    return 0
+    return 0;
   }
 
   public getData(index: number): any {
-    return undefined
+    return undefined;
   }
 
   registerDataChangeListener(listener: DataChangeListener): void {
-    if ( this.listeners.indexOf(listener) < 0 ) {
-      console.log(TAG , 'add listener')
-      this.listeners.push(listener)
+    if (this.listeners.indexOf(listener) < 0) {
+      console.log(TAG, 'add listener');
+      this.listeners.push(listener);
     } else {
-      console.log(TAG , 'indexOf(listener) >= 0')
+      console.log(TAG, 'indexOf(listener) >= 0');
     }
   }
 
   unregisterDataChangeListener(listener: DataChangeListener): void {
     const pos = this.listeners.indexOf(listener);
-    if ( pos >= 0 ) {
-      console.log(TAG , 'remove listener')
-      this.listeners.splice(pos , 1)
+    if (pos >= 0) {
+      console.log(TAG, 'remove listener');
+      this.listeners.splice(pos, 1);
     } else {
-      console.log(TAG , 'pos < 0')
+      console.log(TAG, 'pos < 0');
     }
   }
 
   notifyDataReload(): void {
     this.listeners.forEach(listener => {
-      listener.onDataReloaded()
-    })
+      listener.onDataReloaded();
+    });
   }
 
   notifyDataAdd(index: number): void {
     this.listeners.forEach(listener => {
-      listener.onDataAdd(index)
-    })
+      listener.onDataAdd(index);
+    });
   }
 
   notifyDataChange(index: number): void {
     this.listeners.forEach(listener => {
-      listener.onDataChange(index)
-    })
+      listener.onDataChange(index);
+    });
   }
 
   notifyDataDelete(index: number): void {
     this.listeners.forEach(listener => {
-      listener.onDataDelete(index)
-    })
+      listener.onDataDelete(index);
+    });
   }
 
-  notifyDataMove(from: number , to: number): void {
+  notifyDataMove(from: number, to: number): void {
     this.listeners.forEach(listener => {
-      listener.onDataMove(from , to)
-    })
+      listener.onDataMove(from, to);
+    });
   }
 }
 
 export default class WifiDataSource extends BasicDataSource {
-  private dataArray: wifi.WifiScanInfo[] = []
+  private dataArray: wifi.WifiScanInfo[] = [];
 
   constructor(data: wifi.WifiScanInfo[]) {
-    super()
-    this.dataArray = data
+    super();
+    this.dataArray = data;
   }
 
   public totalCount(): number {
-    return this.dataArray.length
+    return this.dataArray.length;
   }
 
   public getData(index: number): any {
-    return this.dataArray[ index ]
+    return this.dataArray[index];
   }
 
-  public addData(index: number , data: wifi.WifiScanInfo): void {
-    this.dataArray.splice(index , 0 , data)
-    this.notifyDataAdd(index)
+  public addData(index: number, data: wifi.WifiScanInfo): void {
+    this.dataArray.splice(index, 0, data);
+    this.notifyDataAdd(index);
   }
 
   public pushData(data: wifi.WifiScanInfo): void {
-    this.dataArray.push(data)
-    this.notifyDataAdd(this.dataArray.length - 1)
+    this.dataArray.push(data);
+    this.notifyDataAdd(this.dataArray.length - 1);
   }
 }

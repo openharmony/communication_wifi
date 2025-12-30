@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-import screenshot from '@ohos.screenshot'
-import image from '@ohos.multimedia.image'
-import MediaUtils from '../entryability/model/MediaUtils'
+import screenshot from '@ohos.screenshot';
+import image from '@ohos.multimedia.image';
+import MediaUtils from '../entryability/model/MediaUtils';
 import ConfigData from '../utils/ConfigData';
 
 const TAG = "wifiTestApp [mainPageTitle]"
@@ -34,9 +34,35 @@ export struct MainPageTitle {
   @State offsetY: number = 0
   @State myscale: number = 1
   @State angle: number = 0
+  getScreen = (isFullScreen: boolean) => {
+    let screenshotOptions: screenshot.ScreenshotOptions = {
+      screenRect: { left: 0, top: 0, width: 400, height: 400 } ,
+      imageSize: { width: 400, height: 400 } ,
+      rotation: 0,
+      displayId: 0
+    }
+    if (isFullScreen) {
+      screenshotOptions = {
+        rotation: 0
+      }
+    } else {
+      console.log(TAG, "error-----")
+    }
+    try {
+      screenshot.save(screenshotOptions, (err, data: image.PixelMap) => {
+        if (err) {
+          console.log(TAG, `Failed to save the screenshot. Error:${ JSON.stringify(err) }`)
+        }
+        console.log(TAG, 'save callback')
+        MediaUtils.savePicture(data, getContext(this))
+      })
+    } catch( err) {
+      console.log(TAG, `save failed, code is ${ err.code }, message is ${ err.message }`)
+    }
+  }
 
   @Builder
-  CustomBtn(text: Resource , isFullScreen: boolean) {
+  CustomBtn(text: Resource, isFullScreen: boolean) {
     Button() {
       Image($r('app.media.screenShot'))
         .height(50)
@@ -47,21 +73,22 @@ export struct MainPageTitle {
     .backgroundColor($r("app.color.blue"))
     .height(ConfigData.WH_100_100)
     .width(ConfigData.WH_100_100)
-    .margin({ left : 6 , right : 6 , top : 3 })
+    .margin({ left: 6, right: 6, top: 3 })
     .onClick(() => {
-      console.log(TAG , 'onClick,screenshot')
+      console.log(TAG, 'onClick,screenshot')
+      this.getScreen(isFullScreen)
     })
   }
 
   build() {
-    Flex({ alignItems : ItemAlign.Start }) {
+    Flex({ alignItems: ItemAlign.Start }) {
       Text('WIFI调试助手')
         .fontSize(26)
-        .margin({ left : 15 })
-        .padding({ top : 28 })
+        .margin({ left: 15 })
+        .padding({ top: 28 })
       Scroll() {
         Column() {
-          this.CustomBtn($r('app.string.btn_fullscreen') , true)
+          this.CustomBtn($r('app.string.btn_fullscreen'), true)
         }
         .width(ConfigData.WH_100_100)
         .height(ConfigData.WH_100_100)
@@ -70,14 +97,14 @@ export struct MainPageTitle {
         .borderColor(Color.Green)
         .gesture(
           GestureGroup(GestureMode.Parallel ,
-            TapGesture({ count : 2 , fingers : 1 })
+            TapGesture({ count: 2, fingers: 1 })
               .onAction(() => {
                 this.myborderWidth += 1
               }) ,
-            LongPressGesture({ fingers : 1 , repeat : true , duration : 1000 })
+            LongPressGesture({ fingers: 1, repeat: true, duration: 1000 })
               .onAction((event: GestureEvent) => {
                 this.colOpacity -= 0.1
-                if ( event.repeat ) {
+                if (event.repeat) {
                   this.count ++
                 }
               })
@@ -85,41 +112,42 @@ export struct MainPageTitle {
                 this.colOpacity = 1;
                 this.count = 0;
               }) ,
-            PanGesture({ fingers : 1 , direction : PanDirection.All , distance : 5.0 })
+            PanGesture({ fingers: 1, direction: PanDirection.All, distance: 5.0 })
               .onActionStart(() => {
-                console.log(TAG , 'Pan start')
+                console.log(TAG, 'Pan start')
               })
               .onActionUpdate((event: GestureEvent) => {
                 this.offsetY = event.offsetY;
                 this.offsetX = event.offsetX;
               })
               .onActionEnd(() => {
-                console.log(TAG , 'Pan end')
+                console.log(TAG, 'Pan end')
               }) ,
-            PinchGesture({ fingers : 2 , distance : 4 })
+            PinchGesture({ fingers: 2, distance: 4 })
               .onActionStart(() => {
-                console.log(TAG , 'PinchGesture start')
+                console.log(TAG, 'PinchGesture start')
               })
               .onActionUpdate((event: GestureEvent) => {
                 this.myscale = event.scale
                 this.myborderRadius = 10
               })
               .onActionEnd(() => {
-                console.log(TAG , 'PinchGesture end')
+                console.log(TAG, 'PinchGesture end')
+                this.getScreen(true);
               }) ,
-            RotationGesture({ fingers : 2 , angle : 2 })
+            RotationGesture({ fingers: 2, angle: 2 })
               .onActionStart(() => {
-                console.log(TAG , 'RotationGesture start')
+                console.log(TAG, 'RotationGesture start')
               })
               .onActionUpdate((event: GestureEvent) => {
                 this.angle = event.angle
               })
               .onActionEnd(() => {
-                console.log(TAG , 'RotationGesture end')
+                console.log(TAG, 'RotationGesture end')
               })
           )
             .onCancel(() => {
-              console.log(TAG , 'Parallel gesture canceled')
+              console.log(TAG, 'Parallel gesture canceled')
             })
         )
       }
@@ -127,6 +155,6 @@ export struct MainPageTitle {
     }
     .height(80)
     .backgroundColor($r("app.color.blue"))
-    .padding({ left : 20 })
+    .padding({ left: 20 })
   }
 }

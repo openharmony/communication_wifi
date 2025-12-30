@@ -36,6 +36,7 @@
 #include "self_cure_utils.h"
 #include "wifi_global_func.h"
 #include "wifi_chr_adapter.h"
+#include "parameters.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -2175,14 +2176,14 @@ bool SelfCureStateMachine::IsNeedWifiReassocUseDeviceMac()
         WIFI_LOGE("%{public}s: GetCurrentWifiDeviceConfig failed!", __FUNCTION__);
         return false;
     }
-#ifdef SUPPORT_LOCAL_RANDOM_MAC
-    WIFI_LOGD("random MAC address is supported!");
-    if (!CanArpReachable()) {
-        WIFI_LOGI("arp is not reachable!");
+    if (config.numAssociation <= 1 && isInternetUnknown_ &&
+        system::GetParameter("persist.wifi.is_connect_from_user", "") == "1") {
+        WIFI_LOGE("%{public}s: first connect and no net return!", __FUNCTION__);
         return false;
     }
-    if (IsUseFactoryMac()) {
-        WIFI_LOGI("use factory mac now!");
+#ifdef SUPPORT_LOCAL_RANDOM_MAC
+    if (!CanArpReachable() || IsUseFactoryMac()) {
+        WIFI_LOGI("arp is not reachable or use factory mac now!");
         return false;
     }
     std::vector<WifiScanInfo> scanResults;

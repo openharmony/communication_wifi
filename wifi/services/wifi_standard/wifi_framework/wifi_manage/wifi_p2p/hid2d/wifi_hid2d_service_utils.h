@@ -35,7 +35,7 @@ private:
 
     static std::list<std::string> ipList;
     static std::map<std::string, std::string> mapGcMacToAllocIp;
-    static constexpr int HID2D_IPPOOL_START = 3;
+    static constexpr int HID2D_IPPOOL_START = 20;
     static constexpr int HID2D_IPPOOL_END = 75;
 };
 

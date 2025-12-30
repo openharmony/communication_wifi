@@ -1674,6 +1674,13 @@ const TestComposition: WifiTestComposition[] = [
     'image': $r('app.media.wifi') ,
     'category': Category.App
   },
+    {
+    'name': 'RCP验证' ,
+    'detail': 'RCP请求测试' ,
+    'url': 'pages/subAppTest/rcpHttpTest' ,
+    'image': $r('app.media.wifi') ,
+    'category': Category.App
+  },
 
   {
     'name': 'WIFI' ,

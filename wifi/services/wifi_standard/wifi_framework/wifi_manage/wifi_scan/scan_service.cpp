@@ -3071,10 +3071,9 @@ void ScanService::InitChipsetInfo()
     }
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService != nullptr) {
-        WIFI_LOGI("initservice, setchipsetInfos.");
         pEnhanceService->SetChipSetInfos(chipsetCategory, chipsetFeatrureCapability);
+        WifiConfigCenter::GetInstance().SetLpScanAbility(pEnhanceService->IsSupportLpScanAbility());
     }
-    WifiConfigCenter::GetInstance().SetLpScanAbility(pEnhanceService->IsSupportLpScanAbility());
 }
 
 void ScanService::ResetScanInterval()

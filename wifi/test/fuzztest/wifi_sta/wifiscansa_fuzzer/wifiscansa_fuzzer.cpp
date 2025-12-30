@@ -108,9 +108,9 @@ void GetScanInfoListFuzzTest(const uint8_t* data, size_t size)
     pWifiScanServiceImpl.GetScanInfoList(result, status);
 }
 
-void SetScanOnlyAvailableFuzzTest(const uint8_t* data, size_t size)
+void SetScanOnlyAvailableFuzzTest(FuzzedDataProvider& FDP)
 {
-    bool status = (static_cast<int>(data[0]) % TWO) ? true : false;
+    bool status = FDP.ConsumeBool();
     pWifiScanServiceImpl.SetScanOnlyAvailable(status);
 }
 
@@ -240,7 +240,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::AdvanceScanFuzzTest();
     OHOS::Wifi::IsWifiScanAllowedFuzzTest(data, size);
     OHOS::Wifi::GetScanInfoListFuzzTest(data, size);
-    OHOS::Wifi::SetScanOnlyAvailableFuzzTest(data, size);
     OHOS::Wifi::StartWifiPnoScanFuzzTest(data, size);
     OHOS::Wifi::GetSupportedFeaturesFuzzTest(data, size);
     OHOS::Wifi::RegisterCallBackFuzzTest(data, size);
@@ -250,6 +249,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::WifiScanSendScanInfoFuzzTest(FDP);
     OHOS::Wifi::WifiScanGetScanInfoListFuzzTest(FDP);
     OHOS::Wifi::WifiScanGetScanOnlyAvailableFuzzTest(FDP);
+    OHOS::Wifi::SetScanOnlyAvailableFuzzTest(FDP);
     return 0;
 }
 }

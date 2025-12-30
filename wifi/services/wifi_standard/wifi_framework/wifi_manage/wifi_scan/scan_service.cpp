@@ -2796,7 +2796,7 @@ bool ScanService::AllowScanByMovingFreeze(ScanMode appRunMode)
     return true;
 }
 
-bool ScanService::AllowLpScan(ScanType scanType) const
+bool ScanService::AllowLpScan(ScanType scanType)
 {
     if (WifiConfigCenter::GetInstance().GetLpScanAbility() && (scanType != ScanType::SCAN_TYPE_PNO &&
         scanType != ScanType::SCAN_TYPE_SYSTEMTIMER)) {

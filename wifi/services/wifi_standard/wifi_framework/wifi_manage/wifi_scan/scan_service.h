@@ -935,7 +935,7 @@ private:
      * @param scanType it is from ScanType[in]
      * @return true: allow, false: not allowed.
      */
-    bool AllowLpScan(ScanType scanType) const;
+    bool AllowLpScan(ScanType scanType);
     /**
      * @Description Determines whether scanning is allowed in hid2d state.
      *

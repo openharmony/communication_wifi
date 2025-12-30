@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { WifiModel } from '../../../entryability/model/wifiModel'
-import { InfoView } from '../../../Component/infoView'
+import { WifiModel } from '../../../entryability/model/wifiModel';
+import { InfoView } from '../../../component/infoView';
 import ConfigData from '../../../utils/ConfigData';
 import router from '@ohos.router';
 /**
@@ -27,7 +27,7 @@ struct About {
 
   build() {
     Column() {
-      Flex({ alignItems : ItemAlign.Start }) {
+      Flex({ alignItems: ItemAlign.Start }) {
         Button() {
           Image($r('app.media.Back'))
             .width(ConfigData.WH_60_100)
@@ -37,7 +37,7 @@ struct About {
         .width(ConfigData.WH_20_100)
         .height(ConfigData.WH_100_100)
         .backgroundColor($r("app.color.blue"))
-        .padding({ left : 1 , top : 15 })
+        .padding({ left: 1, top: 15 })
         .onClick(() => {
           router.back()
         })
@@ -45,25 +45,25 @@ struct About {
         Text($r('app.string.about'))
           .fontColor(Color.White)
           .fontSize(24)
-          .margin({ left : 3 })
-          .padding({ top : 18 })
+          .margin({ left: 3 })
+          .padding({ top: 18 })
       }
       .height(61)
       .backgroundColor('#FFedf2f5')
-      .padding({ left : 10 })
+      .padding({ left: 10 })
       .borderColor($r("app.color.black"))
       .backgroundColor($r("app.color.blue"))
 
       Scroll() {
         Column() {
-          InfoView({ infoList : this.wifiModel.getIpInfo() })
-          InfoView({ infoList : this.wifiModel.getCountryCode() })
-          InfoView({ infoList : this.wifiModel.getFeatureSupport() })
+          InfoView({ infoList: this.wifiModel.getIpInfo() })
+          InfoView({ infoList: this.wifiModel.getCountryCode() })
+          InfoView({ infoList: this.wifiModel.getFeatureSupport() })
         }
       }
       .layoutWeight(1)
     }
-    .size({ width : ConfigData.WH_100_100 , height : ConfigData.WH_100_100 })
+    .size({ width: ConfigData.WH_100_100, height: ConfigData.WH_100_100 })
     .backgroundColor('#F5F5F5')
   }
 }

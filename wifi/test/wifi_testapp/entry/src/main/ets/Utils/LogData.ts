@@ -14,7 +14,7 @@
  */
 
 export class LogData {
-  TAG = 'WIFI_Test'
+  TAG = 'WIFI_Test';
   //wifi
   testEnableWifi_StartLog = "testEnableWifi Start----------"
   testEnableWifi_EndLog = "testEnableWifi End----------"

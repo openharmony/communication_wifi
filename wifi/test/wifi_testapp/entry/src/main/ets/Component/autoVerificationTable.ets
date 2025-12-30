@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { TestData , TestApi } from '../entryability/model/testData'
-import promptAction from '@ohos.promptAction'
+import { TestData, TestApi } from '../entryability/model/testData';
+import promptAction from '@ohos.promptAction';
 import ConfigData from '../utils/ConfigData';
 /**
  * AutoVerificationTable of wifi test
@@ -29,10 +29,10 @@ export struct AutoVerificationTable {
   @State currentIndex: number = 1
   @StorageLink('pairedMac') pairedMac: string = "";
 
-  @Builder IngredientItem(apiItem: TestApi , index: number) {
+  @Builder IngredientItem(apiItem: TestApi, index: number) {
     Stack() {
       Flex() {
-        Flex({ alignItems : ItemAlign.Center }) {
+        Flex({ alignItems: ItemAlign.Center }) {
           Image($r('app.media.wifi'))
             .objectFit(ImageFit.Contain)
             .autoResize(false)
@@ -40,43 +40,43 @@ export struct AutoVerificationTable {
             .width(30)
         }
         .layoutWeight(1)
-        .padding({ left : 10 })
+        .padding({ left: 10 })
 
-        Flex({ direction : FlexDirection.Column , alignItems : ItemAlign.Start }) {
+        Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start }) {
           Text(apiItem.name)
             .fontSize(17.4)
             .fontWeight(FontWeight.Bold)
             .layoutWeight(1)
-            .padding({ left : 10 , top : 15 })
+            .padding({ left: 10, top: 15 })
           Text(apiItem.detail)
             .fontSize(17.4)
             .fontWeight(FontWeight.Bold)
             .layoutWeight(1)
-            .padding({ left : 10 , top : 5 })
+            .padding({ left: 10, top: 5 })
         }
         .layoutWeight(6)
 
-        Flex({ alignItems : ItemAlign.Center }) {
+        Flex({ alignItems: ItemAlign.Center }) {
           Text(this.changeIndex >= 0 ? this.getCurrentState(index) : apiItem.result)
             .fontSize(17.4)
             .flexGrow(1)
         }
         .layoutWeight(3)
-        .padding({ left : 10 })
+        .padding({ left: 10 })
       }
     }
     .height(80)
     .borderRadius(10)
-    .margin({ top : 5 , bottom : 5 })
+    .margin({ top: 5, bottom: 5 })
     .backgroundColor($r("app.color.white"))
     .onClick(() => {
-      switch ( apiItem.method ) {
+      switch (apiItem.method) {
         default: {
           let message = apiItem.api();
           apiItem.result = message;
           this.currentIndex += 1;
           this.changeIndex = this.currentIndex;
-          promptAction.showToast({ message : message });
+          promptAction.showToast({ message: message });
         }
           break;
       }
@@ -84,25 +84,25 @@ export struct AutoVerificationTable {
   }
 
   getCurrentState(index: number) {
-    return this.apiItems[ index ].result
+    return this.apiItems[index].result
   }
 
   build() {
     Column() {
       Scroll() {
         Flex({
-          direction : FlexDirection.Column ,
-          justifyContent : FlexAlign.SpaceBetween ,
-          alignItems : ItemAlign.Start
+          direction: FlexDirection.Column ,
+          justifyContent: FlexAlign.SpaceBetween ,
+          alignItems: ItemAlign.Start
         }) {
-          ForEach(this.apiItems , (item: TestApi , index: number) => {
-            this.IngredientItem(item , index)
+          ForEach(this.apiItems, (item: TestApi, index: number) => {
+            this.IngredientItem(item, index)
           })
         }
       }
       .scrollBarWidth(20)
     }
     .height(ConfigData.WH_88_100)
-    .padding({ top : 5 , right : 10 , left : 10 })
+    .padding({ top: 5, right: 10, left: 10 })
   }
 }

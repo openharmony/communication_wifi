@@ -15,9 +15,9 @@
 
 import http from '@ohos.net.http';
 import connection from '@ohos.net.connection';
-import { TestImageDisplay } from '../../Component/testImageDisplay';
-import { PageTitle } from '../../Component/pageTitle';
-import { TestData } from '../../entryability/model/testData'
+import { TestImageDisplay } from '../../component/testImageDisplay';
+import { PageTitle } from '../../component/pageTitle';
+import { TestData } from '../../entryability/model/testData';
 import router from '@ohos.router';
 import ConfigData from '../../utils/ConfigData';
 import { BusinessError } from '@ohos.base';
@@ -45,14 +45,14 @@ struct HttpsSocketTest {
     { value: 'TRACE'},
     { value: 'CONNECT'},
     { value: 'OPTIONS'}
-  ];
+];
   @State urlValue: string = 'https://www.baidu.com';
   @State reqSelectIndex: number = 0;
   @State reqSelectValue: string = 'none';
   @State reqTypeList: Array<SelectOption> = [
     { value: 'none'},
     { value: 'raw'}
-  ];
+];
   @State reqValue: string = '';
   @State resData: string = '';
   @State codeValue: string = '';
@@ -78,9 +78,9 @@ struct HttpsSocketTest {
         console.log(TAG, `网络切换: netId=${netHandle.netId}`);
         this.networkStatus = '网络已切换';
         this.networkSwitchCount++;
-        this.resData += `\n\n⚠️ [系统] 检测到网络切换 (第${this.networkSwitchCount}次)`;
-        this.resData += '\n⚠️ [警告] HTTP模块无Close接口，旧连接可能未关闭';
-        this.resData += '\n💡 [建议] 推荐使用 RCP HTTP验证 页面进行测试';
+        this.resData += `\n\n[系统] 检测到网络切换 (第${this.networkSwitchCount}次)`;
+        this.resData += '\n[警告] HTTP模块无Close接口，旧连接可能未关闭';
+        this.resData += '\n[建议] 推荐使用 RCP HTTP验证 页面进行测试';
       });
 
       this.netConnection.on('netCapabilitiesChange', (netCapabilityInfo: connection.NetCapabilityInfo) => {
@@ -155,9 +155,9 @@ struct HttpsSocketTest {
 
   build() {
     Column() {
-      Stack({ alignContent : Alignment.TopStart }) {
-        TestImageDisplay({ testItem : this.testItem })
-        PageTitle({ testItem : this.testItem })
+      Stack({ alignContent: Alignment.TopStart }) {
+        TestImageDisplay({ testItem: this.testItem })
+        PageTitle({ testItem: this.testItem })
       }
 
       Scroll() {
@@ -184,7 +184,7 @@ struct HttpsSocketTest {
               .fontColor(Color.Gray)
             Text(`${this.networkStatus} (${this.networkType})`)
               .fontSize(14)
-              .fontColor(this.networkStatus === '网络正常' ? Color.Green : Color.Orange)
+              .fontColor(this.networkStatus === '网络正常' ? Color.Green: Color.Orange)
           }
           .width('100%')
           .margin({ bottom: 5 })
@@ -257,7 +257,7 @@ struct HttpsSocketTest {
               .width('20%')
             Text(this.sslVerify ? '开启' : '关闭')
               .fontSize(14)
-              .fontColor(this.sslVerify ? Color.Green : Color.Red)
+              .fontColor(this.sslVerify ? Color.Green: Color.Red)
               .width('40%')
           }
           .width('100%')
@@ -301,7 +301,7 @@ struct HttpsSocketTest {
           Row() {
             Button('发送HTTPS请求')
               .width('45%')
-              .backgroundColor(this.isLoading ? Color.Gray : Color.Blue)
+              .backgroundColor(this.isLoading ? Color.Gray: Color.Blue)
               .enabled(!this.isLoading)
               .onClick(() => {
                 this.sendHttpsRequest();
@@ -326,7 +326,7 @@ struct HttpsSocketTest {
                 .fontWeight(FontWeight.Bold)
               Text(this.codeValue)
                 .fontSize(16)
-                .fontColor(this.codeValue.startsWith('2') ? Color.Green : Color.Red)
+                .fontColor(this.codeValue.startsWith('2') ? Color.Green: Color.Red)
             }
             .width('100%')
             .margin({ bottom: 10 })
@@ -381,22 +381,14 @@ struct HttpsSocketTest {
 
     let str2method = (value: string): http.RequestMethod => {
       switch (value) {
-        case 'GET':
-          return http.RequestMethod.GET;
-        case 'HEAD':
-          return http.RequestMethod.HEAD;
-        case 'POST':
-          return http.RequestMethod.POST;
-        case 'PUT':
-          return http.RequestMethod.PUT;
-        case 'DELETE':
-          return http.RequestMethod.DELETE;
-        case 'TRACE':
-          return http.RequestMethod.TRACE;
-        case 'OPTIONS':
-          return http.RequestMethod.OPTIONS;
-        case 'CONNECT':
-          return http.RequestMethod.CONNECT;
+        case 'GET': return http.RequestMethod.GET;
+        case 'HEAD': return http.RequestMethod.HEAD;
+        case 'POST': return http.RequestMethod.POST;
+        case 'PUT': return http.RequestMethod.PUT;
+        case 'DELETE': return http.RequestMethod.DELETE;
+        case 'TRACE': return http.RequestMethod.TRACE;
+        case 'OPTIONS': return http.RequestMethod.OPTIONS;
+        case 'CONNECT': return http.RequestMethod.CONNECT;
       }
       return http.RequestMethod.GET;
     }
@@ -417,7 +409,7 @@ struct HttpsSocketTest {
       priority: 1,
       usingProtocol: http.HttpProtocol.HTTP2,
       // SSL证书验证配置
-      caPath: this.sslVerify ? undefined : "/system/etc/security/cacerts/"
+      caPath: this.sslVerify ? undefined: "/system/etc/security/cacerts/"
     }
 
     httpRequest.request(this.urlValue, options, (err: BusinessError, data: http.HttpResponse) => {

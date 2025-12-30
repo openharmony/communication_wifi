@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-import { TestData } from '../entryability/model/testData'
+import { TestData } from '../entryability/model/testData';
 import ConfigData from '../utils/ConfigData';
 
 /**
- * Test-ImageDisplay page of wifi test
+ * Test - ImageDisplay page of wifi test
  */
 
 @Component
@@ -25,13 +25,13 @@ export struct TestImageDisplay {
   private testItem!: TestData
 
   build() {
-    Stack({ alignContent : Alignment.BottomStart }) {
-      Flex({ alignItems : ItemAlign.Start }) {
+    Stack({ alignContent: Alignment.BottomStart }) {
+      Flex({ alignItems: ItemAlign.Start }) {
         Stack() {
           Image(this.testItem.image)
             .height(100)
             .width(100)
-            .margin({ left : "20vp" , top : "20vp" })
+            .margin({ left: "20vp", top: "20vp" })
         }
         .width(ConfigData.WH_20_100)
 
@@ -39,16 +39,16 @@ export struct TestImageDisplay {
           Text(this.testItem.name)
             .fontSize(26)
             .fontWeight(500)
-            .margin({ left : "26vp" , top : "20vp" })
+            .margin({ left: "26vp", top: "20vp" })
             .width(ConfigData.WH_90_100)
           Text(this.testItem.detail)
             .fontSize(18)
             .fontWeight(500)
-            .margin({ top : "8vp" })
+            .margin({ top: "8vp" })
             .width(ConfigData.WH_80_100)
         }
         .width(ConfigData.WH_70_100)
-        .padding({ left : "20vp" , top : "15vp" })
+        .padding({ left: "20vp", top: "15vp" })
       }
     }
     .backgroundColor('#FFedf2f5')

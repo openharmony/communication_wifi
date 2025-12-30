@@ -14,7 +14,7 @@
  */
 
 export class MessageData {
-  TAG = 'WIFI_Test'
+  TAG = 'WIFI_Test';
   //wifi
   testEnableWifi = "enableWifi test";
   testIsActive = "Wifi已经使能"

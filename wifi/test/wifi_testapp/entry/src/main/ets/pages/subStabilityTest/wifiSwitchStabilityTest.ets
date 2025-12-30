@@ -13,17 +13,17 @@
  * limitations under the License.
  */
 
-import { PageTitle } from '../../Component/pageTitle';
-import { TestImageDisplay } from '../../Component/testImageDisplay';
+import { PageTitle } from '../../component/pageTitle';
+import { TestImageDisplay } from '../../component/testImageDisplay';
 import router from '@ohos.router';
-import ConfigData from '../../Utils/ConfigData';
+import ConfigData from '../../utils/ConfigData';
 import { TestData } from '../../entryability/model/testData';
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
-import promptAction from '@ohos.promptAction'
+import promptAction from '@ohos.promptAction';
 import fs from '@ohos.file.fs';
 import common from '@ohos.app.ability.common';
-import wantAgent , { WantAgent } from '@ohos.app.ability.wantAgent';
+import wantAgent, { WantAgent } from '@ohos.app.ability.wantAgent';
 import ohosWantAgentInfo from '@ohos.wantAgent';
 import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
 import { BusinessError } from '@ohos.base';
@@ -74,23 +74,24 @@ struct WiFiSwitchStabilityTest {
   @State failTimes: number = 0
   @State stateMessage: string = ""
   @State stateMessageLog: string = ""
-  @State switchLoopState: Boolean = true
+  @State switchLoopState: Boolean = true;
   @State fileData: string = "";
   @State filePath: string = ""
   private file!: fs.File
   @StorageLink("pathDir") pathDir: string = ""
+  private isWifiStateListenerRegistered: boolean = false // 标记是否已注册WiFi状态监听器
 
   async openLogFile() {
     let time: number = new Date().getTime()
     let currentTime: string = timestampToDate(time)
-    console.log(TAG , "当前时间: " + currentTime)
+    console.log(TAG, "当前时间: " + currentTime)
     this.filePath = this.pathDir + ("/" + currentTime + ".txt");
-    console.log(TAG , "沙箱路径为: " + this.filePath)
-    this.file = fs.openSync(this.filePath , fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
-    AppStorage.setOrCreate("fsFile" , this.file)
-    AppStorage.setOrCreate("openWifiNumber" , this.openWifiNumber)
-    console.log(TAG , "数据文件的沙箱路径为: " + this.filePath)
-    console.log(TAG , "file fd: " + this.file.fd);
+    console.log(TAG, "沙箱路径为: " + this.filePath)
+    this.file = fs.openSync(this.filePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE);
+    AppStorage.setOrCreate("fsFile", this.file)
+    AppStorage.setOrCreate("openWifiNumber", this.openWifiNumber)
+    console.log(TAG, "数据文件的沙箱路径为: " + this.filePath)
+    console.log(TAG, "file fd: " + this.file.fd);
   }
 
   aboutToAppear() {
@@ -100,7 +101,7 @@ struct WiFiSwitchStabilityTest {
       // 申请WiFi相关权限
       let atManager = abilityAccessCtrl.createAtManager();
       try {
-        atManager.requestPermissionsFromUser(getContext(this) , [
+        atManager.requestPermissionsFromUser(getContext(this), [
           'ohos.permission.INTERNET',
           'ohos.permission.SET_WIFI_INFO',
           'ohos.permission.GET_WIFI_INFO',
@@ -112,14 +113,14 @@ struct WiFiSwitchStabilityTest {
           "ohos.permission.GET_WIFI_LOCAL_MAC",
           "ohos.permission.MANAGE_WIFI_HOTSPOT",
           "ohos.permission.GET_WIFI_INFO_INTERNAL"
-        ])
+])
           .then((data) => {
             console.info(`[EntryAbility], data: ${ JSON.stringify(data) }`);
           })
           .catch((err: BusinessError) => {
             console.info(`[EntryAbility], err: ${ JSON.stringify(err) }`);
           })
-      } catch( err ) {
+      } catch( err) {
         console.info(`[EntryAbility], catch err->${ JSON.stringify(err) }`);
       }
     }).catch((err: BusinessError) => {
@@ -132,19 +133,19 @@ struct WiFiSwitchStabilityTest {
     let context: Context = getContext(this);
     // 通知参数，指定点击长时任务通知后跳转的应用
     let wantAgentInfo: wantAgent.WantAgentInfo = {
-      wants : [
+      wants: [
         {
-          bundleName : (context as common.UIAbilityContext).abilityInfo.bundleName ,
-          abilityName : (context as common.UIAbilityContext).abilityInfo.name
+          bundleName: (context as common.UIAbilityContext).abilityInfo.bundleName ,
+          abilityName: (context as common.UIAbilityContext).abilityInfo.name
         }
-      ] ,
-      operationType : ohosWantAgentInfo.OperationType.START_ABILITY ,
-      requestCode : 0 ,
-      wantAgentFlags : [ wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG ]
+] ,
+      operationType: ohosWantAgentInfo.OperationType.START_ABILITY ,
+      requestCode: 0,
+      wantAgentFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG]
     };
     wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
       backgroundTaskManager.startBackgroundRunning(context ,
-        backgroundTaskManager.BackgroundMode.DATA_TRANSFER , wantAgentObj).then(() => {
+        backgroundTaskManager.BackgroundMode.DATA_TRANSFER, wantAgentObj).then(() => {
         console.info(`Succeeded in operationing startBackgroundRunning.`);
       }).catch((err: BusinessError) => {
         console.error(`Failed to operation startBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
@@ -163,19 +164,19 @@ struct WiFiSwitchStabilityTest {
 
   build() {
     Column() {
-      Stack({ alignContent : Alignment.TopStart }) {
-        TestImageDisplay({ testItem : this.testItem })
-        PageTitle({ testItem : this.testItem })
+      Stack({ alignContent: Alignment.TopStart }) {
+        TestImageDisplay({ testItem: this.testItem })
+        PageTitle({ testItem: this.testItem })
       }
 
       Stack().height("1vp").backgroundColor($r("app.color.black"));
 
       Column() {
         Row() {
-          Text("测试次数：").fontSize($r('app.float.font_18')).width(ConfigData.WH_25_100).padding({ left : "10vp" })
-          TextInput({ placeholder : "请输入循环次数，默认为：30" })
+          Text("测试次数：").fontSize($r('app.float.font_18')).width(ConfigData.WH_25_100).padding({ left: "10vp" })
+          TextInput({ placeholder: "请输入循环次数，默认为：30" })
             .placeholderColor(Color.Grey)
-            .placeholderFont({ size : $r('app.float.font_16') })
+            .placeholderFont({ size: $r('app.float.font_16') })
             .caretColor(Color.Blue)
             .width(ConfigData.WH_70_100)
             .fontSize($r('app.float.font_16'))
@@ -190,32 +191,32 @@ struct WiFiSwitchStabilityTest {
             .fontSize("22vp")
             .width(ConfigData.WH_95_100)
             .align(Alignment.TopStart)
-            .padding({ top : "10vp" })
+            .padding({ top: "10vp" })
           Scroll() {
             Column() {
               Text("测试次数：" + this.testNumbers)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
               Text("打开WiFi的成功次数：" + this.openSuccessNumber)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
               Text("打开WiFi的失败次数：" + this.openFailNumber)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
               Text("关闭WiFi的成功次数：" + this.closeSuccessNumber)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
               Text("关闭WiFi的失败次数：" + this.closeFailNumber)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "10vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "10vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
             }
@@ -232,12 +233,12 @@ struct WiFiSwitchStabilityTest {
             .height(ConfigData.WH_15_100)
             .width(ConfigData.WH_95_100)
             .align(Alignment.TopStart)
-            .padding({ top : "18vp" })
+            .padding({ top: "18vp" })
           List() {
             ListItem() {
               Text(this.stateMessageLog)
                 .fontSize("18vp")
-                .margin({ top : "5vp" , left : "20vp" , right : "5vp" })
+                .margin({ top: "5vp", left: "20vp", right: "5vp" })
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
             }
@@ -255,9 +256,9 @@ struct WiFiSwitchStabilityTest {
         Row() {
           Button("开始WiFi测试")
             .operateButtonStyle($r('app.color.main_blue'))
-            .padding({ right : "10vp" })
+            .padding({ right: "10vp" })
             .onClick(async(event: ClickEvent) => {
-              console.log(TAG , "start WiFiSwitch test-------------")
+              console.log(TAG, "start WiFiSwitch test-------------")
               this.startContinuousTask();
               await this.openLogFile()
               await this.forLoop()
@@ -267,13 +268,24 @@ struct WiFiSwitchStabilityTest {
 
           Button("关闭WiFi测试")
             .operateButtonStyle($r('app.color.main_blue'))
-            .padding({ right : "10vp" })
+            .padding({ right: "10vp" })
             .onClick(async(event: ClickEvent) => {
               this.switchLoopState = false
-              console.log(TAG , "准备测试停止 -------------")
+              console.log(TAG, "准备测试停止 -------------")
+              // 注销WiFi状态监听器
+              if (this.isWifiStateListenerRegistered) {
+                try {
+                  wifiManager.off("wifiStateChange")
+                  this.isWifiStateListenerRegistered = false
+                  console.log(TAG, "off.wifiStateChange on stop test")
+                } catch( error) {
+                  console.error(TAG, `Failed to unregister wifiStateChange on stop. Error: ${ JSON.stringify(error) }`)
+                  this.isWifiStateListenerRegistered = false
+                }
+              }
               this.stateMessageLog = ""
               this.openWifiNumber = 0
-              AppStorage.setOrCreate("openWifiNumber" , this.openWifiNumber)
+              AppStorage.setOrCreate("openWifiNumber", this.openWifiNumber)
               fs.closeSync(this.file);
               this.stopContinuousTask();
             })
@@ -283,47 +295,57 @@ struct WiFiSwitchStabilityTest {
   }
 
   onWifiState() {
-    console.log(TAG , "on.wifiStateChange start--------")
-    wifiManager.on("wifiStateChange" , (number) => {
-      console.log(TAG , " on.wifiStateChange --------")
+    console.log(TAG, "on.wifiStateChange start--------")
+    wifiManager.on("wifiStateChange", (number) => {
+      console.log(TAG, " on.wifiStateChange --------")
       let wifiStateMessage = ""
-      switch ( number ) {
-        case 0:
-          wifiStateMessage = "inactive";
+      switch (number) {
+        case 0: wifiStateMessage = "inactive";
           break;
-        case 1:
-          wifiStateMessage = "active";
+        case 1: wifiStateMessage = "active";
           break;
-        case 2:
-          wifiStateMessage = "activating";
+        case 2: wifiStateMessage = "activating";
           break;
-        case 3:
-          wifiStateMessage = "de-activating";
+        case 3: wifiStateMessage = "de-activating";
           break;
-        default:
-          wifiStateMessage = '未知状态';
+        default: wifiStateMessage = '未知状态';
           break;
       }
-      console.log(TAG , "WiFi开关状态为:" + wifiStateMessage)
-      if ( number == 1 ) {
+      console.log(TAG, "WiFi开关状态为:" + wifiStateMessage)
+      if (number == 1) {
         // 打时间戳
         this.open_EndTime = new Date().getTime()
-        console.log(TAG , "WIFI使能结束时间: " + this.open_EndTime + "ms")
-      } else if ( number == 0 ) {
+        console.log(TAG, "WIFI使能结束时间: " + this.open_EndTime + "ms")
+      } else if (number == 0) {
         this.close_EndTime = new Date().getTime()
-        console.log(TAG , "WIFI去使能结束时间: " + this.close_EndTime + "ms")
+        console.log(TAG, "WIFI去使能结束时间: " + this.close_EndTime + "ms")
       }
-      console.log(TAG , " on.wifiStateChange callback success --------")
-      promptAction.showToast({ message : "wifi状态: " + wifiStateMessage })
+      console.log(TAG, " on.wifiStateChange callback success --------")
+      promptAction.showToast({ message: "wifi状态: " + wifiStateMessage })
       this.stateMessage = wifiStateMessage
-      AppStorage.setOrCreate("stateMessage" , this.stateMessage)
-      console.log(TAG , " on.wifiStateChange callback end--------")
+      AppStorage.setOrCreate("stateMessage", this.stateMessage)
+      console.log(TAG, " on.wifiStateChange callback end--------")
       return this.stateMessage
     })
+    this.isWifiStateListenerRegistered = true // 标记已注册监听器
+    console.log(TAG, "on.wifiStateChange registered successfully--------")
   }
 
   aboutToDisappear() {
-    wifiManager.off("wifiStateChange")
+    // 只有在已注册监听器的情况下才注销
+    if (this.isWifiStateListenerRegistered) {
+      try {
+        wifiManager.off("wifiStateChange")
+        this.isWifiStateListenerRegistered = false
+        console.log(TAG, "off.wifiStateChange unregistered successfully")
+      } catch( error) {
+        console.error(TAG, `Failed to unregister wifiStateChange. Error: ${ JSON.stringify(error) }`)
+        // 即使注销失败也将标志设为false，避免重复尝试
+        this.isWifiStateListenerRegistered = false
+      }
+    } else {
+      console.log(TAG, "wifiStateChange listener was not registered, no need to unregister")
+    }
   }
 
   async forLoop() {
@@ -338,69 +360,69 @@ struct WiFiSwitchStabilityTest {
     this.stateMessageLog = ""
     this.onWifiState() // 监听函数
     let funcMessage = false // 函数信息
-    for ( this.openWifiNumber ; this.openWifiNumber < this.testNumbers ; this.openWifiNumber ++ ) {
-      if ( !this.switchLoopState ) {
+    for (this.openWifiNumber ; this.openWifiNumber < this.testNumbers ; this.openWifiNumber ++) {
+      if (!this.switchLoopState) {
         this.openWifiNumber = 0;
-        console.log(TAG , "测试结束------------")
+        console.log(TAG, "测试结束------------")
         break;
       } else {
         let wifiState = wifiManager.isWifiActive()
-        if ( wifiState ) {
+        if (wifiState) {
           wifiManager.disableWifi()
-          console.log(TAG , "wifi当前已使能，已经去使能，正常开始测试------")
+          console.log(TAG, "wifi当前已使能，已经去使能，正常开始测试------")
         } else {
-          console.log(TAG , "wifi当前未使能，正常开始测试------")
+          console.log(TAG, "wifi当前未使能，正常开始测试------")
         }
         await sleep(3)
         // funcMessage = wifiManager.enableWifi()
         // 打时间戳
         this.open_StartTime = new Date().getTime()
-        console.log(TAG , "第" + (this.openWifiNumber + 1) + "次WIFI使能-----")
-        console.log(TAG , "第" + (this.openWifiNumber + 1) + "次WIFI使能开始时间: " + this.open_StartTime + "ms")
+        console.log(TAG, "第" + (this.openWifiNumber + 1) + "次WIFI使能-----")
+        console.log(TAG, "第" + (this.openWifiNumber + 1) + "次WIFI使能开始时间: " + this.open_StartTime + "ms")
         this.stateMessageLog += "第" + (this.openWifiNumber + 1) + "次WIFI使能接口的调用结果：" + funcMessage + "\n"
-        console.log(TAG , "第" + (this.openWifiNumber + 1) + "次WIFI使能接口的调用结果：" + funcMessage)
+        console.log(TAG, "第" + (this.openWifiNumber + 1) + "次WIFI使能接口的调用结果：" + funcMessage)
         await sleep(15)
         this.stateMessage = AppStorage.get("stateMessage")! //非空断言操作符
-        if ( this.stateMessage == "active" ) {
+        if (this.stateMessage == "active") {
           this.open_SpendTime = this.open_EndTime - this.open_StartTime
           this.stateMessageLog += "第" + (this.openWifiNumber + 1) + "次WIFI使能耗时: " + this.open_SpendTime + "ms" + "\n"
-          console.log(TAG , "第" + (this.openWifiNumber + 1) + "次WIFI使能耗时: " + this.open_SpendTime + "ms")
+          console.log(TAG, "第" + (this.openWifiNumber + 1) + "次WIFI使能耗时: " + this.open_SpendTime + "ms")
           this.openSuccessNumber = this.openSuccessNumber + 1
           this.stateMessageLog += "使能成功的次数：" + this.openSuccessNumber + "\n"
-          console.log(TAG , "使能成功的次数：" + this.openSuccessNumber)
+          console.log(TAG, "使能成功的次数：" + this.openSuccessNumber)
           // funcMessage = wifiManager.disableWifi()
           this.closeWifiNumber = this.closeWifiNumber + 1
           this.close_StartTime = new Date().getTime()
-          console.log(TAG , "第" + this.closeWifiNumber + "次WIFI去使能-----")
-          console.log(TAG , "第" + this.closeWifiNumber + "次WIFI去使能开始时间: " + this.close_StartTime + "ms")
+          console.log(TAG, "第" + this.closeWifiNumber + "次WIFI去使能-----")
+          console.log(TAG, "第" + this.closeWifiNumber + "次WIFI去使能开始时间: " + this.close_StartTime + "ms")
           this.stateMessageLog += "第" + this.closeWifiNumber + "次WIFI去使能接口的调用结果：" + funcMessage + "\n"
-          console.log(TAG , "第" + this.closeWifiNumber + "次WIFI去使能接口的调用结果：" + funcMessage)
-          console.log(TAG , "closeWifiNumber: " + this.closeWifiNumber)
+          console.log(TAG, "第" + this.closeWifiNumber + "次WIFI去使能接口的调用结果：" + funcMessage)
+          console.log(TAG, "closeWifiNumber: " + this.closeWifiNumber)
           await sleep(15)
           this.stateMessage = AppStorage.get("stateMessage")! //非空断言操作符
-          if ( this.stateMessage == "inactive" ) {
+          if (this.stateMessage == "inactive") {
             this.close_SpendTime = this.close_EndTime - this.close_StartTime
             this.stateMessageLog += "第" + this.closeWifiNumber + "次WIFI去使能耗时: " + this.close_SpendTime + "ms" + "\n"
-            console.log(TAG , "第" + this.closeWifiNumber + "次WIFI去使能耗时: " + this.close_SpendTime + "ms")
+            console.log(TAG, "第" + this.closeWifiNumber + "次WIFI去使能耗时: " + this.close_SpendTime + "ms")
             this.closeSuccessNumber = this.closeSuccessNumber + 1
             this.stateMessageLog += "去使能成功的次数：" + this.closeSuccessNumber + "\n"
-            console.log(TAG , "去使能成功的次数：" + this.closeSuccessNumber)
+            console.log(TAG, "去使能成功的次数：" + this.closeSuccessNumber)
             await sleep(7)
           } else {
             this.closeFailNumber = this.closeFailNumber + 1
-            console.log(TAG , "去使能失败的次数：" + this.closeFailNumber)
-            console.log(TAG , "第" + this.closeWifiNumber + "次WIFI去使能失败")
+            console.log(TAG, "去使能失败的次数：" + this.closeFailNumber)
+            console.log(TAG, "第" + this.closeWifiNumber + "次WIFI去使能失败")
           }
-        } else if ( this.stateMessage == "inactive" ) {
+        } else if (this.stateMessage == "inactive") {
           this.openFailNumber = this.openFailNumber + 1
-          console.log(TAG , "使能失败的次数：" + this.openFailNumber)
-          console.log(TAG , "第" + (this.openWifiNumber + 1) + "次WIFI使能失败")
+          console.log(TAG, "使能失败的次数：" + this.openFailNumber)
+          console.log(TAG, "第" + (this.openWifiNumber + 1) + "次WIFI使能失败")
         } else {
           console.log("第" + (this.openWifiNumber + 1) + "次开wifi后状态不清楚");
         }
       }
     }
-    console.log(TAG , "测试结束 -------------")
+    console.log(TAG, "测试结束 -------------")
     this.stopContinuousTask();
   }
 }
@@ -422,9 +444,9 @@ export function timestampToDate(timestamp: number): string {
 }
 
 async function sleep(time: number): Promise<void> {
-  return new Promise<void>((resolve , reject) => {
+  return new Promise<void>((resolve, reject) => {
     setTimeout(() => {
       resolve();
-    } , time * 1000);
+    }, time * 1000);
   });
 }

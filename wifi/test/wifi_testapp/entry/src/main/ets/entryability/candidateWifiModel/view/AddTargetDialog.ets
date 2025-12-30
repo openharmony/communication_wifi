@@ -20,11 +20,11 @@ import { CommonConstants } from '../common/constant/CommonConstant';
 @CustomDialog
 export default struct AddTargetDialog {
   @State wifiCandidateConfig: wifiManager.WifiDeviceConfig = {
-    ssid : "TP-LINK_6365" ,
-    bssid : "6C:B1:58:75:63:65" ,
-    preSharedKey : "12345678" ,
-    isHiddenSsid : false ,
-    securityType : 3
+    ssid: "TP-LINK_6365",
+    bssid: "6C:B1:58:75:63:65",
+    preSharedKey: "12345678",
+    isHiddenSsid: false,
+    securityType: 3
   }
   private controller: CustomDialogController;
   onClickOk!: (value: Object) => void;
@@ -41,9 +41,9 @@ export default struct AddTargetDialog {
         Column() {
           Row() {
             Text("ssid").fontSize($r('app.float.font_18')).width("18%")
-            TextInput({ placeholder : $r('app.string.input_candidate_wifi_ssid') })
+            TextInput({ placeholder: $r('app.string.input_candidate_wifi_ssid') })
               .placeholderColor(Color.Grey)
-              .placeholderFont({ size : $r('app.float.font_16') })
+              .placeholderFont({ size: $r('app.float.font_16') })
               .caretColor(Color.Blue)
               .width(ConfigData.WH_80_100)
               .fontSize($r('app.float.font_16'))
@@ -53,14 +53,14 @@ export default struct AddTargetDialog {
               })
           }
           .width(CommonConstants.FULL_WIDTH)
-          .margin({ top : CommonConstants.DIALOG_INPUT_MARGIN })
-          // .height( CommonConstants.TEXT_INPUT_HEIGHT )
-          // .backgroundColor( $r( 'app.color.input_background' ) )
+          .margin({ top: CommonConstants.DIALOG_INPUT_MARGIN })
+          // .height( CommonConstants.TEXT_INPUT_HEIGHT)
+          // .backgroundColor( $r( 'app.color.input_background'))
           Row() {
             Text("bssid").fontSize($r('app.float.font_18')).width("18%")
-            TextInput({ placeholder : $r('app.string.input_candidate_wifi_bssid') })
+            TextInput({ placeholder: $r('app.string.input_candidate_wifi_bssid') })
               .placeholderColor(Color.Grey)
-              .placeholderFont({ size : $r('app.float.font_16') })
+              .placeholderFont({ size: $r('app.float.font_16') })
               .caretColor(Color.Blue)
               .width(ConfigData.WH_80_100)
               .fontSize($r('app.float.font_16'))
@@ -70,15 +70,15 @@ export default struct AddTargetDialog {
               })
           }
           .width(CommonConstants.FULL_WIDTH)
-          .margin({ top : CommonConstants.DIALOG_INPUT_MARGIN })
-          // .height( CommonConstants.TEXT_INPUT_HEIGHT )
-          // .backgroundColor( $r( 'app.color.input_background' ) )
+          .margin({ top: CommonConstants.DIALOG_INPUT_MARGIN })
+          // .height( CommonConstants.TEXT_INPUT_HEIGHT)
+          // .backgroundColor( $r( 'app.color.input_background'))
 
           Row() {
             Text("preSharedKey").fontSize($r('app.float.font_16')).width("28%")
-            TextInput({ placeholder : $r('app.string.input_candidate_wifi_preSharedKey') })
+            TextInput({ placeholder: $r('app.string.input_candidate_wifi_preSharedKey') })
               .placeholderColor(Color.Grey)
-              .placeholderFont({ size : $r('app.float.font_16') })
+              .placeholderFont({ size: $r('app.float.font_16') })
               .caretColor(Color.Blue)
               .width(ConfigData.WH_70_100)
               .fontSize($r('app.float.font_16'))
@@ -88,15 +88,15 @@ export default struct AddTargetDialog {
               })
           }
           .width(CommonConstants.FULL_WIDTH)
-          .margin({ top : CommonConstants.DIALOG_INPUT_MARGIN })
-          // .height( CommonConstants.TEXT_INPUT_HEIGHT )
-          // .backgroundColor( $r( 'app.color.input_background' ) )
+          .margin({ top: CommonConstants.DIALOG_INPUT_MARGIN })
+          // .height( CommonConstants.TEXT_INPUT_HEIGHT)
+          // .backgroundColor( $r( 'app.color.input_background'))
 
           Row() {
             Text("isHiddenSsid").fontSize($r('app.float.font_16')).width("28%")
-            TextInput({ placeholder : $r('app.string.input_candidate_wifi_isHiddenSsid') })
+            TextInput({ placeholder: $r('app.string.input_candidate_wifi_isHiddenSsid') })
               .placeholderColor(Color.Grey)
-              .placeholderFont({ size : $r('app.float.font_16') })
+              .placeholderFont({ size: $r('app.float.font_16') })
               .caretColor(Color.Blue)
               .width(ConfigData.WH_70_100)
               .fontSize($r('app.float.font_16'))
@@ -106,29 +106,29 @@ export default struct AddTargetDialog {
               })
           }
           .width(CommonConstants.FULL_WIDTH)
-          .margin({ top : CommonConstants.DIALOG_INPUT_MARGIN })
-          // .height( CommonConstants.TEXT_INPUT_HEIGHT )
-          // .backgroundColor( $r( 'app.color.input_background' ) )
+          .margin({ top: CommonConstants.DIALOG_INPUT_MARGIN })
+          // .height( CommonConstants.TEXT_INPUT_HEIGHT)
+          // .backgroundColor( $r( 'app.color.input_background'))
 
           Row() {
             Text("securityType").fontSize($r('app.float.font_16')).width("28%")
             Column() {
               Select([
-                { value : 'WIFI_SEC_TYPE_INVALID' },
-                { value : 'WIFI_SEC_TYPE_OPEN' },
-                { value : 'WIFI_SEC_TYPE_WEP' },
-                { value : 'WIFI_SEC_TYPE_PSK' },
-                { value : 'WIFI_SEC_TYPE_SAE' }
-              ])
+                { value: 'WIFI_SEC_TYPE_INVALID' },
+                { value: 'WIFI_SEC_TYPE_OPEN' },
+                { value: 'WIFI_SEC_TYPE_WEP' },
+                { value: 'WIFI_SEC_TYPE_PSK' },
+                { value: 'WIFI_SEC_TYPE_SAE' }
+])
                 .fontColor($r('app.color.title_black_color'))
                 .optionBgColor($r('app.color.input_background'))
                 .selectedOptionBgColor($r('app.color.input_background'))
                 .selectedOptionFontColor($r('app.color.input_background'))
                 .selected(3)
                 .value('WIFI_SEC_TYPE_PSK')
-                .font({ size : 16 })
-                .selectedOptionFont({ size : 17 })
-                .optionFont({ size : 15 })
+                .font({ size: 16 })
+                .selectedOptionFont({ size: 17 })
+                .optionFont({ size: 15 })
                 .width(ConfigData.WH_100_100)
                 .onSelect((index: number) => {
                   this.wifiCandidateConfig.securityType = index;
@@ -140,7 +140,7 @@ export default struct AddTargetDialog {
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
           .width(CommonConstants.FULL_WIDTH)
-          .margin({ top : CommonConstants.DIALOG_INPUT_MARGIN })
+          .margin({ top: CommonConstants.DIALOG_INPUT_MARGIN })
 
           Blank()
           Row() {

@@ -76,13 +76,6 @@ void ConvertBackupCfgToDeviceCfg(const WifiBackupConfig &backupCfg, WifiDeviceCo
 
 void ConvertDeviceCfgToBackupCfg(const WifiDeviceConfig &config, WifiBackupConfig &backupCfg);
 
-void ConvertHotspotBackupCfgToDeviceCfg(const HotspotBackupConfig &backupCfg, HotspotConfig &config);
- 
-void ConvertHotspotCfgToBackupCfg(const HotspotConfig &config, HotspotBackupConfig &backupCfg);
- 
-void ConvertBlockListBackupCfgToDeviceCfg(const HotspotBackupConfig &backupCfg, StationInfo &config);
- 
-void ConvertBlockListCfgToBackupCfg(const StationInfo &config, HotspotBackupConfig &backupCfg);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif  // OHOS_WIFI_BACKUP_CONFIG_H

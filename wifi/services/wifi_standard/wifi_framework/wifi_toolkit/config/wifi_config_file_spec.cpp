@@ -2029,6 +2029,8 @@ int SetTClassKeyValue<HotspotBackupConfig>(HotspotBackupConfig &item, const std:
     std::string tmpValue = value;
     if (key == "hotspotConfig") {
         item.hotspotConfig = CheckDataLegal(tmpValue);
+    } else if (key == "passwdDefault") {
+        item.passwdDefault = static_cast<bool>(CheckDataLegal(tmpValue));
     } else if (key == "preSharedKey") {
         item.preSharedKey = value;
     } else if (key == "band") {
@@ -2041,7 +2043,7 @@ int SetTClassKeyValue<HotspotBackupConfig>(HotspotBackupConfig &item, const std:
         item.deviceIpAddr = value;
     } else {
         LOGE("Invalid config key value");
-        errorKeyValue++;
+        errorKeyValue = 1;
     }
     return errorKeyValue;
 }

@@ -63,6 +63,7 @@ struct WifiBackupConfig {
 
 struct HotspotBackupConfig {
     bool hotspotConfig;
+    bool passwdDefault;
     std::string preSharedKey;
     BandType band;
     std::string deviceName;

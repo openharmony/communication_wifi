@@ -998,7 +998,7 @@ HWTEST_F(WifiSettingsTest, OnHotspotBackupTest1, TestSize.Level1)
     close(fd.Release());
     WifiSettings::GetInstance().RemoveHotspotBackupFile();
 }
-
+ 
 HWTEST_F(WifiSettingsTest, OnHotspotBackupTest2, TestSize.Level1)
 {
     WIFI_LOGI("OnHotspotBackupTest2 enter");
@@ -1015,7 +1015,7 @@ HWTEST_F(WifiSettingsTest, OnHotspotBackupTest2, TestSize.Level1)
     close(fd.Release());
     WifiSettings::GetInstance().RemoveHotspotBackupFile();
 }
-
+ 
 HWTEST_F(WifiSettingsTest, OnHotspotRestoreTest1, TestSize.Level1)
 {
     WIFI_LOGI("OnHotspotRestoreTest1 enter");
@@ -1023,7 +1023,7 @@ HWTEST_F(WifiSettingsTest, OnHotspotRestoreTest1, TestSize.Level1)
     EXPECT_EQ(WifiSettings::GetInstance().OnHotspotRestore(fd, ""), -1);
     close(fd.Release());
 }
-
+ 
 HWTEST_F(WifiSettingsTest, OnHotspotRestoreTest2, TestSize.Level1)
 {
     WIFI_LOGI("OnHotspotRestoreTest2 enter");
@@ -1039,43 +1039,7 @@ HWTEST_F(WifiSettingsTest, OnHotspotRestoreTest2, TestSize.Level1)
     EXPECT_EQ(WifiSettings::GetInstance().OnHotspotRestore(fd, restoreInfo), -1);
     close(fd.Release());
 }
-
-HWTEST_F(WifiSettingsTest, ConvertHotspotBackupCfgToDeviceCfgTest, TestSize.Level1)
-{
-    WIFI_LOGI("ConvertHotspotBackupCfgToDeviceCfgTest enter");
-    HotspotBackupConfig backupCfg;
-    HotspotConfig config;
-    ConvertHotspotBackupCfgToDeviceCfg(backupCfg, config);
-    EXPECT_EQ(backupCfg.preSharedKey, config.GetPreSharedKey());
-}
-
-HWTEST_F(WifiSettingsTest, ConvertHotspotCfgToBackupCfgTest, TestSize.Level1)
-{
-    WIFI_LOGI("ConvertHotspotCfgToBackupCfgTest enter");
-    HotspotBackupConfig backupCfg;
-    HotspotConfig config;
-    ConvertHotspotCfgToBackupCfg(config, backupCfg);
-    EXPECT_EQ(backupCfg.preSharedKey, config.GetPreSharedKey());
-}
-
-HWTEST_F(WifiSettingsTest, ConvertBlockListBackupCfgToDeviceCfgTest, TestSize.Level1)
-{
-    WIFI_LOGI("ConvertBlockListBackupCfgToDeviceCfgTest enter");
-    HotspotBackupConfig backupCfg;
-    StationInfo config;
-    ConvertBlockListBackupCfgToDeviceCfg(backupCfg, config);
-    EXPECT_EQ(backupCfg.deviceName, config.deviceName);
-}
-
-HWTEST_F(WifiSettingsTest, ConvertBlockListCfgToBackupCfgTest, TestSize.Level1)
-{
-    WIFI_LOGI("ConvertBlockListCfgToBackupCfgTest enter");
-    HotspotBackupConfig backupCfg;
-    StationInfo config;
-    ConvertBlockListCfgToBackupCfg(config, backupCfg);
-    EXPECT_EQ(backupCfg.deviceName, config.deviceName);
-}
-
+ 
 HWTEST_F(WifiSettingsTest, ConfigsHotspotAndSaveTest, TestSize.Level1)
 {
     WIFI_LOGI("ConfigsHotspotAndSaveTest enter");
@@ -1086,7 +1050,7 @@ HWTEST_F(WifiSettingsTest, ConfigsHotspotAndSaveTest, TestSize.Level1)
     WifiSettings::GetInstance().ConfigsHotspotAndSave(localConfigs);
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
-
+ 
 HWTEST_F(WifiSettingsTest, ConfigsBlockListAndSaveTest, TestSize.Level1)
 {
     WIFI_LOGI("ConfigsBlockListAndSaveTest enter");

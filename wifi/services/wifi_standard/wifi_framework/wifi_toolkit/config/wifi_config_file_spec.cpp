@@ -933,6 +933,8 @@ int SetTClassKeyValue<HotspotConfig>(HotspotConfig &item, const std::string &key
         item.SetLeaseTime(CheckDataLegal(tmpValue));
     } else if (key == "randomMac") {
         item.SetRandomMac(value);
+    } else if (key == "passwdDefault") {
+        item.SetPasswdDefault(CheckDataLegal(tmpValue));
     } else {
         LOGE("Invalid config key value");
     }
@@ -974,6 +976,7 @@ std::string OutTClassString<HotspotConfig>(HotspotConfig &item)
     ss << "    " <<"ipAddress=" << item.GetIpAddress() << std::endl;
     ss << "    " <<"leaseTime=" << static_cast<int>(item.GetLeaseTime()) << std::endl;
     ss << "    " <<"randomMac=" << item.GetRandomMac() << std::endl;
+    ss << "    " <<"passwdDefault=" << item.GetPasswdDefault() << std::endl;
     ss << "    " <<"</HotspotConfig>" << std::endl;
     return ss.str();
 }
@@ -2071,6 +2074,7 @@ std::string OutTClassString<HotspotBackupConfig>(HotspotBackupConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<HotspotBackupConfig>" << std::endl;
+    ss << "    " <<"passwdDefault=" << item.passwdDefault << std::endl;
     ss << "    " <<"hotspotConfig=" << item.hotspotConfig << std::endl;
     ss << "    " <<"preSharedKey=" << item.preSharedKey << std::endl;
     ss << "    " <<"band=" << (int)item.band << std::endl;

@@ -25,8 +25,6 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotMgrServiceImpl");
 
 namespace OHOS {
 namespace Wifi {
-const std::string EXTENSION_BACKUP = "backup";
-const std::string EXTENSION_RESTORE = "restore";
 const int HOTSPOT_IDL_ERROR_OFFSET = 3500000;
 std::mutex WifiHotspotMgrServiceImpl::g_instanceLock;
 std::mutex WifiHotspotMgrServiceImpl::g_hotspotMutex;
@@ -56,9 +54,9 @@ WifiHotspotMgrServiceImpl::~WifiHotspotMgrServiceImpl()
 int32_t WifiHotspotMgrServiceImpl::OnExtension(const std::string& extension, MessageParcel& data, MessageParcel& reply)
 {
     WIFI_LOGI("extension is %{public}s.", extension.c_str());
-    if (extension == EXTENSION_BACKUP) {
+    if (extension == "backup") {
         return WifiHotspotServiceImpl::OnBackup(data, reply);
-    } else if (extension == EXTENSION_RESTORE) {
+    } else if (extension == "restore") {
         return WifiHotspotServiceImpl::OnRestore(data, reply);
     }
     return 0;

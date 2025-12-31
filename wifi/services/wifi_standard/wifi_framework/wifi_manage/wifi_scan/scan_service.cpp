@@ -112,7 +112,6 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         WIFI_LOGE("InitScanMonitor failed.\n");
         return false;
     }
-
     pScanMonitor->SetScanStateMachine(pScanStateMachine);
     int delayMs = 100;
     pScanStateMachine->MessageExecutedLater(static_cast<int>(CMD_SCAN_PREPARE), delayMs);
@@ -2796,6 +2795,15 @@ bool ScanService::AllowScanByMovingFreeze(ScanMode appRunMode)
     return true;
 }
 
+bool ScanService::AllowLpScan(ScanType scanType)
+{
+    if (WifiConfigCenter::GetInstance().GetLpScanAbility() && (scanType != ScanType::SCAN_TYPE_PNO &&
+        scanType != ScanType::SCAN_TYPE_SYSTEMTIMER)) {
+        return true;
+    }
+    return false;
+}
+
 bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
 {
     LOGD("Enter AllowScanByHid2dState.\n");
@@ -2829,16 +2837,19 @@ bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
     // scene bit 0-2 is valid, 0x01: video, 0x02: audio, 0x04: file,
     // scene & 0x07 > 0 means one of them takes effect.
     if ((softbusScene.scene & 0x07) > 0) {
+        if ((softbusScene.scene & 0x07) <= 0x03 && AllowLpScan(scanType)) {
+            scanStyle = SCAN_TYPE_LOW_PRIORITY;
+            WIFI_LOGI("LP Scan is allowed in cast/softbus hid2d.");
+            return true;
+        }
         WIFI_LOGW("Scan is not allowed in softbus hid2d.");
         RecordScanLimitInfo(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
             ScanLimitType::HID2D_SOFTBUS);
         return false;
     } else if ((castScene.scene & 0x07) > 0) {
-        WIFI_LOGW("Scan is not allowed in csat hid2d.");
         RecordScanLimitInfo(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
             ScanLimitType::HID2D_CAST);
-        if (WifiConfigCenter::GetInstance().GetLpScanAbility() && (scanType != ScanType::SCAN_TYPE_PNO &&
-            scanType != ScanType::SCAN_TYPE_SYSTEMTIMER)) {
+        if (AllowLpScan(scanType)) {
             scanStyle = SCAN_TYPE_LOW_PRIORITY;
             WIFI_LOGI("LP Scan is allowed in cast hid2d.");
             return true;
@@ -2846,9 +2857,14 @@ bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
         WIFI_LOGW("Scan is not allowed in cast hid2d.");
         return false;
     } else if ((miracastScene.scene & 0x07) > 0) {
-        WIFI_LOGW("Scan is not allowed in miracast hid2d.");
         RecordScanLimitInfo(WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
             ScanLimitType::HID2D_MIRACAST);
+        if (AllowLpScan(scanType)) {
+            scanStyle = SCAN_TYPE_LOW_PRIORITY;
+            WIFI_LOGI("LP Scan is allowed in miracast hid2d.");
+            return true;
+        }
+        WIFI_LOGW("Scan is not allowed in miracast hid2d.");
         return false;
     } else if ((shareScene.scene & 0x07) > 0) {
         WIFI_LOGW("Scan is not allowed in share hid2d.");
@@ -2887,8 +2903,7 @@ bool ScanService::AllowScanByGameScene(ScanType scanType, int &scanStyle)
     WifiNetworkControlInfo NetworkControlInfo = WifiConfigCenter::GetInstance().GetNetworkControlInfo();
     if (NetworkControlInfo.state == GameSceneId::MSG_GAME_ENTER_PVP_BATTLE ||
         NetworkControlInfo.state == GameSceneId::MSG_GAME_STATE_FOREGROUND) {
-        if (WifiConfigCenter::GetInstance().GetLpScanAbility() && (scanType != ScanType::SCAN_TYPE_PNO &&
-            scanType != ScanType::SCAN_TYPE_SYSTEMTIMER)) {
+        if (AllowLpScan(scanType)) {
             scanStyle = SCAN_TYPE_LOW_PRIORITY;
             WIFI_LOGI("LP Scan is allowed in GameScene.");
             return true;
@@ -3052,6 +3067,11 @@ void ScanService::InitChipsetInfo()
                 isChipsetInfoObtained = false;
     } else {
         isChipsetInfoObtained = true;
+    }
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr) {
+        pEnhanceService->SetChipSetInfos(chipsetCategory, chipsetFeatrureCapability);
+        WifiConfigCenter::GetInstance().SetLpScanAbility(pEnhanceService->IsSupportLpScanAbility());
     }
 }
 

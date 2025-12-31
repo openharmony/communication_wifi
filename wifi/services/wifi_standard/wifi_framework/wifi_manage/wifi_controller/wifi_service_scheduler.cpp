@@ -490,7 +490,6 @@ ErrCode WifiServiceScheduler::StartWifiStaService(int instId)
         WIFI_LOGE("get pEnhance service failed!");
         return WIFI_OPT_FAILED;
     }
-    WifiConfigCenter::GetInstance().SetLpScanAbility(pEnhanceService->IsSupportLpScanAbility());
     errCode = pService->SetEnhanceService(pEnhanceService);
     WifiConfigCenter::GetInstance().SetDfsControlData(pEnhanceService->GetDfsControlData());
     if (errCode != WIFI_OPT_SUCCESS) {

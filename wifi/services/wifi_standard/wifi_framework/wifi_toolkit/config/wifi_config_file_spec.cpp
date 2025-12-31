@@ -2021,16 +2021,6 @@ std::string OutTClassString<WifiBackupConfig>(WifiBackupConfig &item)
        << OutPutWifiProxyConfig(item.wifiProxyconfig) << OutPutWifiBackupConfigPrivacy(item);
     return ss.str();
 }
-
-static void ClearHotspotBackupConfig(HotspotBackupConfig &item)
-{
-    item.hotspotConfig = true;
-    item.band = BandType::BAND_2GHZ;
-    item.deviceName.clear();
-    item.deviceBssid.clear();
-    item.deviceIpAddr.clear();
-    return;
-}
  
 template<>
 int SetTClassKeyValue<HotspotBackupConfig>(HotspotBackupConfig &item, const std::string &key, const std::string &value)
@@ -2059,7 +2049,11 @@ int SetTClassKeyValue<HotspotBackupConfig>(HotspotBackupConfig &item, const std:
 template<>
 void ClearTClass<HotspotBackupConfig>(HotspotBackupConfig &item)
 {
-    ClearHotspotBackupConfig(item);
+    item.hotspotConfig = true;
+    item.band = BandType::BAND_2GHZ;
+    item.deviceName.clear();
+    item.deviceBssid.clear();
+    item.deviceIpAddr.clear();
     return;
 }
  

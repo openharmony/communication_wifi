@@ -197,6 +197,9 @@ int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parc
         return HandleHotspotIdlRet(WIFI_OPT_FAILED);
     }
     HotspotConfig innerConfig = config;
+    if (innerConfig.GetPreSharedKey() != lastConfig.GetPreSharedKey() || !lastConfig.GetPasswdDefault()){
+        innerConfig.SetPasswdDefault(false);
+    }
     if (lastConfig.GetRandomMac() != "") {
         std::string mac = "";
         if (config.GetSsid() != lastConfig.GetSsid() ||
@@ -1196,13 +1199,17 @@ ErrCode WifiHotspotServiceImpl::OnBackup(MessageParcel& data, MessageParcel& rep
     UniqueFd fd(-1);
     std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
     std::string backupInfo = data.ReadString();
+    WIFI_LOGE("OnBackup %{public}s", backupInfo.c_str());
     int ret = WifiSettings::GetInstance().OnHotspotBackup(fd, backupInfo);
     std::fill(backupInfo.begin(), backupInfo.end(), 0);
     if (ret < 0) {
         WIFI_LOGE("OnBackup fail: backup data fail!");
         replyCode = WifiSettings::GetInstance().SetBackupReplyCode(EXTENSION_ERROR_CODE);
+        close(fd.Release());
+        WifiSettings::GetInstance().RemoveHotspotBackupFile();
+        return WIFI_OPT_FAILED;
     }
-    if (reply.WriteFileDescriptor(fd) == false || reply.WriteString(replyCode) == false) {
+    if (!reply.WriteFileDescriptor(fd) || !reply.WriteString(replyCode)) {
         close(fd.Release());
         WifiSettings::GetInstance().RemoveHotspotBackupFile();
         WIFI_LOGE("OnBackup fail: reply write fail!");
@@ -1223,8 +1230,11 @@ ErrCode WifiHotspotServiceImpl::OnRestore(MessageParcel& data, MessageParcel& re
     if (ret < 0) {
         WIFI_LOGE("OnRestore fail: restore data fail!");
         replyCode = WifiSettings::GetInstance().SetBackupReplyCode(EXTENSION_ERROR_CODE);
+        close(fd.Release());
+        WifiSettings::GetInstance().RemoveHotspotBackupFile();
+        return WIFI_OPT_FAILED;
     }
-    if (reply.WriteString(replyCode) == false) {
+    if (!reply.WriteString(replyCode)) {
         close(fd.Release());
         WifiSettings::GetInstance().RemoveHotspotBackupFile();
         WIFI_LOGE("OnRestore fail: reply write fail!");

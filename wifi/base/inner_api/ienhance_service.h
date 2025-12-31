@@ -448,6 +448,13 @@ public:
     virtual void OnFoldStateChanged(const int foldStatus) = 0;
 
     /**
+     * @Description set chipsetinfo
+     *
+     * @return void
+     */
+    virtual void SetChipSetInfos(int chipsetCategory, int chipsetFeatureCapability) = 0;
+
+    /**
      * @Description check lp scan ability
      *
      * @return bool

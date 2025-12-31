@@ -110,12 +110,28 @@ HWTEST_F(WifiSettingsTest, SetDeviceAfterConnectTest, TestSize.Level1)
     EXPECT_EQ(result, WIFI_OPT_RETURN);
 }
 
-HWTEST_F(WifiSettingsTest, SetDeviceAfterDisconnectTest, TestSize.Level1)
+HWTEST_F(WifiSettingsTest, SetDeviceAfterDisconnectFailTest, TestSize.Level1)
 {
-    WIFI_LOGE("SetDeviceAfterDisconnectTest enter!");
-    int result = WifiSettings::GetInstance().SetDeviceAfterDisconnect(NETWORK_ID);
-    WIFI_LOGE("SetDeviceAfterDisconnectTest result(%{public}d)", result);
+    WifiSettings obj;
+    int result = obj.SetDeviceAfterDisconnect(NETWORK_ID);
     EXPECT_EQ(result, WIFI_OPT_RETURN);
+}
+
+HWTEST_F(WifiSettingsTest, SetDeviceAfterDisconnectSuccessTest, TestSize.Level1)
+{
+    WifiDeviceConfig config;
+    config.networkId = NETWORK_ID;
+    config.ssid = "test_ssid5";
+
+    WifiSettings obj;
+    obj.AddDeviceConfig(config);
+
+    int result = obj.SetDeviceAfterDisconnect(NETWORK_ID);
+    EXPECT_EQ(result, 0);
+
+    WifiDeviceConfig updatedConfig;
+    obj.GetDeviceConfig(NETWORK_ID, updatedConfig);
+    EXPECT_NE(updatedConfig.lastDisconnectTime, -1); // lastDisconnectTime should be recorded
 }
 
 HWTEST_F(WifiSettingsTest, SetDeviceAfterConnectSuccessTest, TestSize.Level1)

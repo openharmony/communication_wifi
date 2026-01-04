@@ -36,7 +36,6 @@ DEFINE_WIFILOG_HOTSPOT_LABEL("WifiHotspotServiceImpl");
 
 namespace OHOS {
 namespace Wifi {
-constexpr int EXTENSION_ERROR_CODE = 13500099;
 const int HOTSPOT_IDL_ERROR_OFFSET = 3500000;
 
 WifiHotspotServiceImpl::WifiHotspotServiceImpl()

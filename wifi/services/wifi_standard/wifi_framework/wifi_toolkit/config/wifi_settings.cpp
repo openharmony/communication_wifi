@@ -1065,9 +1065,9 @@ int WifiSettings::OnHotspotRestore(UniqueFd &fd, const std::string &restoreInfo)
         LOGE("OnHotspotRestore fail to get config from backup.");
         return ret;
     }
-    LOGI("OnHotspotRestore end. hotspot Restore count: %{public}zu block Restore count: %{public}zu %{public}d",
+    LOGI("OnHotspotRestore end. hotspot Restore count: %{public}zu block Restore count: %{public}zu",
         hotspotConfigs.size(),
-        blockInfos.size(), hotspotConfigs[0].GetPasswdDefault());
+        blockInfos.size());
     SyncHotspotConfig();
     ConfigsHotspotAndSave(hotspotConfigs);
     SyncBlockList();

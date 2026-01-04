@@ -501,6 +501,7 @@ private:
     StaService *pStaService;
     std::mutex mutex;
     int m_instId;
+    bool isEnabled_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -190,13 +190,17 @@ int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parc
         WIFI_LOGE("SetHotspotConfig:VerifyConfigValidity failed!");
         return HandleHotspotIdlRet(validRetval);
     }
+    return SetHotspotConfigExtral(config);
+}
+
+ErrCode WifiHotspotServiceImpl::SetHotspotConfigExtral(const HotspotConfig &config) {
     HotspotConfig lastConfig;
     if (WifiSettings::GetInstance().GetHotspotConfig(lastConfig, m_id) != 0) {
         WIFI_LOGE("Instance %{public}d %{public}s GetHotspotConfig error", m_id, __func__);
-        return HandleHotspotIdlRet(WIFI_OPT_FAILED);
+        return WIFI_OPT_FAILED;
     }
     HotspotConfig innerConfig = config;
-    if (innerConfig.GetPreSharedKey() != lastConfig.GetPreSharedKey() || !lastConfig.GetPasswdDefault()){
+    if (innerConfig.GetPreSharedKey() != lastConfig.GetPreSharedKey() || !lastConfig.GetPasswdDefault()) {
         innerConfig.SetPasswdDefault(false);
     }
     if (lastConfig.GetRandomMac() != "") {

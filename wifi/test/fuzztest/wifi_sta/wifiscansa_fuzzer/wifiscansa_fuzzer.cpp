@@ -227,6 +227,15 @@ void WifiScanGetScanOnlyAvailableFuzzTest(FuzzedDataProvider& FDP)
     pWifiScanServiceImpl.GetScanOnlyAvailable(bScanOnlyAvailable);
 }
 
+void WifiScanRegisterCallBackFuzzTest(FuzzedDataProvider& FDP)
+{
+    std::vector<std::string> events;
+    int32_t pid = FDP.ConsumeIntegral<int32_t>();
+    int32_t tokenId = FDP.ConsumeIntegral<int32_t>();
+    sptr<IRemoteObject> remoteObj = nullptr;
+    pWifiScanServiceImpl.RegisterCallBack(remoteObj, pid, tokenId, events);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -250,6 +259,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::WifiScanGetScanInfoListFuzzTest(FDP);
     OHOS::Wifi::WifiScanGetScanOnlyAvailableFuzzTest(FDP);
     OHOS::Wifi::SetScanOnlyAvailableFuzzTest(FDP);
+    OHOS::Wifi::WifiScanRegisterCallBackFuzzTest(FDP);
     return 0;
 }
 }

@@ -694,6 +694,10 @@ int32_t WifiScanServiceImpl::RegisterCallBack(
  
     do {
         sptr<IRemoteObject> remote = cbParcel;
+        if (remote == nullptr) {
+            WIFI_LOGE("Remote object is null, cannot register callback");
+            return WIFI_OPT_FAILED;
+        }
         sptr<IWifiScanCallback> callback = nullptr;
         callback = iface_cast<IWifiScanCallback>(remote);
         if (callback == nullptr) {

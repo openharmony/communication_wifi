@@ -197,7 +197,7 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfigExtral(const HotspotConfig &conf
     HotspotConfig lastConfig;
     if (WifiSettings::GetInstance().GetHotspotConfig(lastConfig, m_id) != 0) {
         WIFI_LOGE("Instance %{public}d %{public}s GetHotspotConfig error", m_id, __func__);
-        return WIFI_OPT_FAILED;
+        return HandleHotspotIdlRet(WIFI_OPT_FAILED);
     }
     HotspotConfig innerConfig = config;
     if (innerConfig.GetPreSharedKey() != lastConfig.GetPreSharedKey() || !lastConfig.GetPasswdDefault()) {

@@ -193,7 +193,7 @@ int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parc
     return SetHotspotConfigExtral(config);
 }
 
-ErrCode WifiHotspotServiceImpl::SetHotspotConfigExtral(const HotspotConfig &config) {
+int32_t WifiHotspotServiceImpl::SetHotspotConfigExtral(const HotspotConfig &config) {
     HotspotConfig lastConfig;
     if (WifiSettings::GetInstance().GetHotspotConfig(lastConfig, m_id) != 0) {
         WIFI_LOGE("Instance %{public}d %{public}s GetHotspotConfig error", m_id, __func__);
@@ -219,7 +219,7 @@ ErrCode WifiHotspotServiceImpl::SetHotspotConfigExtral(const HotspotConfig &conf
         WifiSettings::GetInstance().SetHotspotConfig(innerConfig, m_id);
         WifiSettings::GetInstance().SyncHotspotConfig();
     }
-    return WIFI_OPT_SUCCESS;
+    return HandleHotspotIdlRet(WIFI_OPT_SUCCESS);
 }
 
 int32_t WifiHotspotServiceImpl::GetLocalOnlyHotspotConfig(HotspotConfigParcel &parcelresult)

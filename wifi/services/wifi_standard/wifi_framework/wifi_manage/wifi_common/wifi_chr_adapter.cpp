@@ -640,7 +640,7 @@ void EnhanceWriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6In
     cJSON_AddNumberToObject(root, "IPV6_ROUTE_LIFE_TIME", ipv6Info.routerLifeTime);
     std::string ipv6Address;
     for (const auto& pair : ipv6Info.IpAddrMap) {
-        ipv6Address += Ipv6Anonymize(pair.first) + ":" + std::to_string(pair.second) + ";";
+        ipv6Address += Ipv6Anonymize(pair.first) + "|" + std::to_string(pair.second) + ";";
     }
     cJSON_AddStringToObject(root, "IPV6_IPADDRMAP", ipv6Address.c_str());
     char *jsonStr = cJSON_PrintUnformatted(root);

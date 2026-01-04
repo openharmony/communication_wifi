@@ -210,7 +210,6 @@ int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parc
         }
         innerConfig.SetRandomMac(mac);
     }
-
     if (!IsApServiceRunning() ||
         WifiServiceManager::GetInstance().ApServiceSetHotspotConfig(innerConfig, m_id) == false) {
         WifiSettings::GetInstance().SetHotspotConfig(innerConfig, m_id);

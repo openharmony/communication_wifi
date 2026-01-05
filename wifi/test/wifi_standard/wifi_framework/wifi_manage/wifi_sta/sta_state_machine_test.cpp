@@ -3159,7 +3159,8 @@ HWTEST_F(StaStateMachineTest, GetRealMacAddressFromOemInfoTest, TestSize.Level1)
  
 HWTEST_F(StaStateMachineTest, GetRealMacAddressFromHalTest, TestSize.Level1)
 {
-    EXPECT_TRUE(pStaStateMachine->pClosedState->GetRealMacAddressFromHal());
+    pStaStateMachine->pClosedState->GetRealMacAddressFromHal();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
 #ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE

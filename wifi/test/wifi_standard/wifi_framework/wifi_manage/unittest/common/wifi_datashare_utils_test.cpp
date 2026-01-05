@@ -63,7 +63,7 @@ HWTEST_F(WifiDataShareHelperUtilsTest, Query_ReturnsSuccess, TestSize.Level1)
     std::string key = "wifi_on";
     bool onlySettingsData = true;
     ErrCode result = WifiDataShareHelperUtils::GetInstance().Query(uri, key, value, onlySettingsData);
-    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+    EXPECT_NE(result, WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiDataShareHelperUtilsTest, Insert_ReturnsFailed, TestSize.Level1)

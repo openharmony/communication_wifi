@@ -552,6 +552,10 @@ bool WifiControllerMachine::ShouldEnableWifi(int id)
         return false;
     }
 #endif
+    if (WifiManager::GetInstance().GetWifiTogglerManager()->IsSatelliteStateStart()) {
+        WIFI_LOGI("Statellite is start no need start wifi.");
+        return false;
+    }
     if (WifiConfigCenter::GetInstance().GetWifiToggledEnable(id) != WIFI_STATE_DISABLED || IsScanOnlyEnable()) {
         WIFI_LOGI("Should start wifi or scanonly.");
         return true;

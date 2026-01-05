@@ -823,15 +823,19 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
         return;
     }
     unsigned int uindex =  static_cast<unsigned int>(index);
-
+ 
     config.keyMgmtBitset |= (1 << uindex);
     if (config.keyMgmt == KEY_MGMT_WPA_PSK) {
-        uindex = static_cast<unsigned int>(FindKeyMgmtPosition(KEY_MGMT_SAE));
-        config.keyMgmtBitset |= (1 << uindex);
+        int saeIndex = FindKeyMgmtPosition(KEY_MGMT_SAE);
+        if (saeIndex >= 0) {
+            config.keyMgmtBitset |= (1 << static_cast<unsigned int>(saeIndex));
+        }
     }
     if (config.keyMgmt == KEY_MGMT_SAE) {
-        uindex = static_cast<unsigned int>(FindKeyMgmtPosition(KEY_MGMT_WPA_PSK));
-        config.keyMgmtBitset |= (1 << uindex);
+        int pskIndex = FindKeyMgmtPosition(KEY_MGMT_WPA_PSK);
+        if (pskIndex >= 0) {
+            config.keyMgmtBitset |= (1 << static_cast<unsigned int>(pskIndex));
+        }
     }
 }
 

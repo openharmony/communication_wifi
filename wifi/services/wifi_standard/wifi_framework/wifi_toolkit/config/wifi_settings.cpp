@@ -1043,6 +1043,101 @@ void WifiSettings::RemoveBackupFile()
 {
     remove(BACKUP_CONFIG_FILE_PATH);
 }
+
+void WifiSettings::RemoveHotspotBackupFile()
+{
+    remove(HOTSPOT_BACKUP_CONFIG_FILE_PATH);
+}
+
+int WifiSettings::OnHotspotRestore(UniqueFd &fd, const std::string &restoreInfo)
+{
+    LOGI("OnHotspotRestore enter.");
+    std::string key;
+    std::string iv;
+    std::string version;
+    ParseBackupJson(restoreInfo, key, iv, version);
+    std::vector<HotspotConfig> hotspotConfigs;
+    std::vector<StationInfo> blockInfos;
+    int ret = 0;
+    ret = GetHotspotConfigbyBackupFile(hotspotConfigs, blockInfos, fd, key, iv);
+    std::fill(key.begin(), key.end(), 0);
+    if (ret < 0) {
+        LOGE("OnHotspotRestore fail to get config from backup.");
+        return ret;
+    }
+    LOGI("OnHotspotRestore end. hotspot Restore count: %{public}zu block Restore count: %{public}zu",
+        hotspotConfigs.size(),
+        blockInfos.size());
+    SyncHotspotConfig();
+    ConfigsHotspotAndSave(hotspotConfigs);
+    SyncBlockList();
+    ConfigsBlockListAndSave(blockInfos);
+    InitHotspotConfig();
+    return 0;
+}
+ 
+int WifiSettings::OnHotspotBackup(UniqueFd &fd, const std::string &backupInfo)
+{
+    LOGI("OnHotspotBackup enter.");
+    std::string key;
+    std::string iv;
+    std::string version;
+    ParseBackupJson(backupInfo, key, iv, version);
+    if (key.size() == 0 || iv.size() == 0) {
+        LOGE("OnHotspotBackup key or iv is empty.");
+        return -1;
+    }
+    std::vector<HotspotBackupConfig> hotspotBackupConfigs;
+    SyncHotspotConfig();
+    HotspotCfgBackup(hotspotBackupConfigs);
+    WifiConfigFileImpl<HotspotBackupConfig> hotspotBackupConfig;
+    hotspotBackupConfig.SetConfigFilePath(HOTSPOT_BACKUP_CONFIG_FILE_PATH);
+    hotspotBackupConfig.SetEncryptionInfo(key, iv);
+    hotspotBackupConfig.SetValue(hotspotBackupConfigs);
+    hotspotBackupConfig.SaveConfig();
+    hotspotBackupConfig.UnsetEncryptionInfo();
+    std::fill(key.begin(), key.end(), 0);
+ 
+    fd = UniqueFd(open(HOTSPOT_BACKUP_CONFIG_FILE_PATH, O_RDONLY));
+    if (fd.Get() < 0) {
+        LOGE("OnHotspotBackup open fail.");
+        return -1;
+    }
+    LOGI("OnHotspotBackup end. Backup count: %{public}zu, fd: %{public}d.", hotspotBackupConfigs.size(), fd.Get());
+    return 0;
+}
+ 
+void WifiSettings::HotspotCfgBackup(std::vector<HotspotBackupConfig>& hotspotBackupConfigs)
+{
+    std::vector<StationInfo> blockInfos;
+    std::vector<HotspotConfig> hotspotConfigs;
+    {
+        std::unique_lock<std::mutex> lock(mApMutex);
+        mSavedBlockInfo.LoadConfig();
+        mSavedBlockInfo.GetValue(blockInfos);
+        mSavedHotspotConfig.LoadConfig();
+        mSavedHotspotConfig.GetValue(hotspotConfigs);
+    }
+ 
+    for (auto &config : blockInfos) {
+        HotspotBackupConfig backupConfig;
+        backupConfig.hotspotConfig = false;
+        backupConfig.deviceName = config.deviceName;
+        backupConfig.deviceBssid = config.bssid;
+        backupConfig.deviceIpAddr = config.ipAddr;
+        hotspotBackupConfigs.push_back(backupConfig);
+    }
+    std::vector<StationInfo>().swap(blockInfos);
+    HotspotBackupConfig backupConfig;
+    if (!hotspotConfigs.empty()) {
+        backupConfig.hotspotConfig = true;
+        backupConfig.passwdDefault = hotspotConfigs[0].GetPasswdDefault();
+        backupConfig.preSharedKey = hotspotConfigs[0].GetPreSharedKey();
+        backupConfig.band = hotspotConfigs[0].GetBand();
+        hotspotBackupConfigs.push_back(backupConfig);
+    }
+    std::vector<HotspotConfig>().swap(hotspotConfigs);
+}
 #endif
 
 bool WifiSettings::AddRandomMac(WifiStoreRandomMac &randomMacInfo)
@@ -1237,6 +1332,7 @@ void WifiSettings::ClearHotspotConfig()
     config.SetBandWidth(AP_BANDWIDTH_DEFAULT);
     config.SetSsid(g_defaultApSsid.empty()? GetDefaultApSsid() : g_defaultApSsid);
     config.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
+    config.SetPasswdDefault(true);
     auto ret = mHotspotConfig.emplace(0, config);
     if (!ret.second) {
         mHotspotConfig[0] = config;
@@ -1990,6 +2086,7 @@ void WifiSettings::InitDefaultHotspotConfig()
     cfg.SetBandWidth(AP_BANDWIDTH_DEFAULT);
     cfg.SetSsid(g_defaultApSsid.empty()? GetDefaultApSsid() : g_defaultApSsid);
     cfg.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
+    cfg.SetPasswdDefault(true);
     auto ret = mHotspotConfig.emplace(0, cfg);
     if (!ret.second) {
         mHotspotConfig[0] = cfg;
@@ -2334,6 +2431,54 @@ void WifiSettings::ConfigsDeduplicateAndSave(std::vector<WifiDeviceConfig> &newC
     ReloadDeviceConfig();
 }
 
+void WifiSettings::ConfigsHotspotAndSave(std::vector<HotspotConfig> &newConfigs)
+{
+    if (newConfigs.empty()) {
+        LOGE("HotspotConfig Configs is empty!");
+        return;
+    }
+    std::vector<HotspotConfig> localConfigs;
+    std::unique_lock<std::mutex> lock(mApMutex);
+    mSavedHotspotConfig.LoadConfig();
+    mSavedHotspotConfig.GetValue(localConfigs);
+    if (!localConfigs.empty()) {
+        if (!newConfigs[0].GetPasswdDefault()) {
+            localConfigs[0].SetPreSharedKey(newConfigs[0].GetPreSharedKey());
+        }
+        localConfigs[0].SetBand(newConfigs[0].GetBand());
+        mSavedHotspotConfig.SetValue(localConfigs);
+        mSavedHotspotConfig.SaveConfig();
+    }
+    std::vector<HotspotConfig>().swap(newConfigs);
+    std::vector<HotspotConfig>().swap(localConfigs);
+}
+ 
+void WifiSettings::ConfigsBlockListAndSave(std::vector<StationInfo> &newConfigs)
+{
+    if (newConfigs.empty()) {
+        LOGE("BlockList Configs is empty!");
+        return;
+    }
+    std::vector<StationInfo> localConfigs;
+    std::vector<StationInfo> blockListConfigs;
+    std::unique_lock<std::mutex> lock(mApMutex);
+    mSavedBlockInfo.LoadConfig();
+    mSavedBlockInfo.GetValue(localConfigs);
+    localConfigs.insert(localConfigs.end(), newConfigs.begin(), newConfigs.end());
+    std::vector<StationInfo>().swap(newConfigs);
+    std::map<std::string, StationInfo> stationInfoMap;
+    for (const auto &localConfig : localConfigs) {
+        if (stationInfoMap.find(localConfig.bssid) == stationInfoMap.end()) {
+            stationInfoMap[localConfig.bssid] = localConfig;
+            blockListConfigs.push_back(localConfig);
+        }
+    }
+    mSavedBlockInfo.SetValue(blockListConfigs);
+    mSavedBlockInfo.SaveConfig();
+    std::vector<StationInfo>().swap(localConfigs);
+    std::vector<StationInfo>().swap(blockListConfigs);
+}
+
 void WifiSettings::ParseBackupJson(const std::string &backupInfo, std::string &key, std::string &iv,
     std::string &version)
 {
@@ -2441,6 +2586,55 @@ int WifiSettings::GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceCon
         WifiDeviceConfig config;
         ConvertBackupCfgToDeviceCfg(backupCfg, config);
         deviceConfigs.push_back(config);
+    }
+    return 0;
+}
+
+int WifiSettings::GetHotspotConfigbyBackupFile(std::vector<HotspotConfig> &hotspotConfigs,
+    std::vector<StationInfo> &stationInfos, UniqueFd &fd, const std::string &key, const std::string &iv)
+{
+    if (key.size() == 0 || iv.size() == 0) {
+        LOGE("GetHotspotConfigbyBackupFile key or iv is empty.");
+        return -1;
+    }
+    struct stat statBuf;
+    if (fd.Get() < 0 || fstat(fd.Get(), &statBuf) < 0) {
+        LOGE("GetHotspotConfigbyBackupFile fstat fd fail.");
+        return -1;
+    }
+    int destFd = open(HOTSPOT_BACKUP_CONFIG_FILE_PATH, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+    if (destFd < 0) {
+        LOGE("GetHotspotConfigbyBackupFile open file fail.");
+        return -1;
+    }
+    if (sendfile(destFd, fd.Get(), nullptr, statBuf.st_size) < 0) {
+        LOGE("GetHotspotConfigbyBackupFile fd sendfile(size: %{public}d) to destFd fail.",
+            static_cast<int>(statBuf.st_size));
+        close(destFd);
+        return -1;
+    }
+    close(destFd);
+    WifiConfigFileImpl<HotspotBackupConfig> hotspotBackupConfig;
+    hotspotBackupConfig.SetConfigFilePath(HOTSPOT_BACKUP_CONFIG_FILE_PATH);
+    hotspotBackupConfig.SetEncryptionInfo(key, iv);
+    hotspotBackupConfig.LoadConfig();
+    std::vector<HotspotBackupConfig> backupConfigs;
+    hotspotBackupConfig.GetValue(backupConfigs);
+    hotspotBackupConfig.UnsetEncryptionInfo();
+    for (const auto &backupCfg : backupConfigs) {
+        if (backupCfg.hotspotConfig) {
+            HotspotConfig config;
+            config.SetPasswdDefault(backupCfg.passwdDefault);
+            config.SetPreSharedKey(backupCfg.preSharedKey);
+            config.SetBand(backupCfg.band);
+            hotspotConfigs.push_back(config);
+        } else {
+            StationInfo config;
+            config.deviceName = backupCfg.deviceName;
+            config.bssid = backupCfg.deviceBssid;
+            config.ipAddr = backupCfg.deviceIpAddr;
+            stationInfos.push_back(config);
+        }
     }
     return 0;
 }

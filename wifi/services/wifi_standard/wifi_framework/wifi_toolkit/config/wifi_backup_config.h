@@ -16,6 +16,7 @@
 #ifndef OHOS_WIFI_BACKUP_CONFIG_H
 #define OHOS_WIFI_BACKUP_CONFIG_H
 #include "wifi_msg.h"
+#include "wifi_ap_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -58,6 +59,17 @@ struct WifiBackupConfig {
         isAllowAutoConnect = true;
         lastDisconnectTime = -1;
     }
+};
+
+struct HotspotBackupConfig {
+    bool hotspotConfig;
+    bool passwdDefault;
+    std::string preSharedKey;
+    BandType band;
+    std::string deviceName;
+    std::string deviceBssid;
+    std::string deviceIpAddr;
+    HotspotBackupConfig() {}
 };
 
 void ConvertBackupCfgToDeviceCfg(const WifiBackupConfig &backupCfg, WifiDeviceConfig &config);

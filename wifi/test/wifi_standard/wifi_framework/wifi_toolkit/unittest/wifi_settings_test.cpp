@@ -1005,6 +1005,80 @@ HWTEST_F(WifiSettingsTest, GetSubstringByBytesTest, TestSize.Level1)
     std::string result = WifiSettings::GetInstance().GetSubstringByBytes(ssid, HOTSPOT_NAME_MAX_LENGTH);
     EXPECT_EQ(result, ssid);
 }
+
+HWTEST_F(WifiSettingsTest, OnHotspotBackupTest1, TestSize.Level1)
+{
+    WIFI_LOGI("OnHotspotBackupTest1 enter");
+    UniqueFd fd(-1);
+    EXPECT_EQ(WifiSettings::GetInstance().OnHotspotBackup(fd, ""), -1);
+    close(fd.Release());
+    WifiSettings::GetInstance().RemoveHotspotBackupFile();
+}
+ 
+HWTEST_F(WifiSettingsTest, OnHotspotBackupTest2, TestSize.Level1)
+{
+    WIFI_LOGI("OnHotspotBackupTest2 enter");
+    UniqueFd fd(-1);
+    std::string backupInfo = R"(
+        [{
+            "detail": [{
+                "encryption_symkey": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+                "gcmParams_iv": "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
+            }]
+        }]
+    )";
+    EXPECT_EQ(WifiSettings::GetInstance().OnHotspotBackup(fd, backupInfo), 0);
+    close(fd.Release());
+    WifiSettings::GetInstance().RemoveHotspotBackupFile();
+}
+ 
+HWTEST_F(WifiSettingsTest, OnHotspotRestoreTest1, TestSize.Level1)
+{
+    WIFI_LOGI("OnHotspotRestoreTest1 enter");
+    UniqueFd fd(-1);
+    EXPECT_EQ(WifiSettings::GetInstance().OnHotspotRestore(fd, ""), -1);
+    close(fd.Release());
+}
+ 
+HWTEST_F(WifiSettingsTest, OnHotspotRestoreTest2, TestSize.Level1)
+{
+    WIFI_LOGI("OnHotspotRestoreTest2 enter");
+    UniqueFd fd(-1);
+    std::string restoreInfo = R"(
+        [{
+            "detail": [{
+                "encryption_symkey": "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0",
+                "gcmParams_iv": "1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1"
+            }]
+        }]
+    )";
+    EXPECT_EQ(WifiSettings::GetInstance().OnHotspotRestore(fd, restoreInfo), -1);
+    close(fd.Release());
+}
+ 
+HWTEST_F(WifiSettingsTest, ConfigsHotspotAndSaveTest, TestSize.Level1)
+{
+    WIFI_LOGI("ConfigsHotspotAndSaveTest enter");
+    std::vector<HotspotConfig> localConfigs;
+    WifiConfigFileImpl<HotspotConfig> mSavedHotspotConfig;
+    mSavedHotspotConfig.LoadConfig();
+    mSavedHotspotConfig.GetValue(localConfigs);
+    WifiSettings::GetInstance().ConfigsHotspotAndSave(localConfigs);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+ 
+HWTEST_F(WifiSettingsTest, ConfigsBlockListAndSaveTest, TestSize.Level1)
+{
+    WIFI_LOGI("ConfigsBlockListAndSaveTest enter");
+    StationInfo config;
+    config.deviceName = "ALN-AL10";
+    config.bssid = "00:1A:2B:3C:4D:5E";
+    config.ipAddr = "192.168.43.2";
+    std::vector<StationInfo> configs;
+    configs.push_back(config);
+    WifiSettings::GetInstance().ConfigsBlockListAndSave(configs);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
 #endif
 }  // namespace Wifi
 }  // namespace OHO

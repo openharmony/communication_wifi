@@ -183,8 +183,11 @@
         "OHOS::Wifi::WifiSettings::SyncDeviceConfig()";
         "OHOS::Wifi::WifiSettings::OnRestore(OHOS::UniqueFdAddDeletor<OHOS::DefaultDeleter>&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiSettings::OnBackup(OHOS::UniqueFdAddDeletor<OHOS::DefaultDeleter>&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+        "OHOS::Wifi::WifiSettings::OnHotspotRestore(OHOS::UniqueFdAddDeletor<OHOS::DefaultDeleter>&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
+        "OHOS::Wifi::WifiSettings::OnHotspotBackup(OHOS::UniqueFdAddDeletor<OHOS::DefaultDeleter>&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiSettings::SetBackupReplyCode(int)";
         "OHOS::Wifi::WifiSettings::RemoveBackupFile()";
+        "OHOS::Wifi::WifiSettings::RemoveHotspotBackupFile()";
         "OHOS::Wifi::WifiSettings::GetRandomMac(OHOS::Wifi::WifiStoreRandomMac&)";
         "OHOS::Wifi::WifiSettings::SyncHotspotConfig()";
         "OHOS::Wifi::WifiSettings::SetHotspotConfig(OHOS::Wifi::HotspotConfig const&, int)";

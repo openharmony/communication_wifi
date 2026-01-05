@@ -51,6 +51,17 @@ WifiHotspotMgrServiceImpl::WifiHotspotMgrServiceImpl()
 WifiHotspotMgrServiceImpl::~WifiHotspotMgrServiceImpl()
 {}
 
+int32_t WifiHotspotMgrServiceImpl::OnExtension(const std::string& extension, MessageParcel& data, MessageParcel& reply)
+{
+    WIFI_LOGI("extension is %{public}s.", extension.c_str());
+    if (extension == "backup") {
+        return WifiHotspotServiceImpl::OnBackup(data, reply);
+    } else if (extension == "restore") {
+        return WifiHotspotServiceImpl::OnRestore(data, reply);
+    }
+    return 0;
+}
+
 void WifiHotspotMgrServiceImpl::OnStart()
 {
     WIFI_LOGI("Start ap service!");

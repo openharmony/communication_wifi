@@ -86,6 +86,7 @@ struct HotspotConfig {
         leaseTime = DHCP_LEASE_TIME;
         apBandWidth = AP_BANDWIDTH_DEFAULT;
         randomMac = "";
+        passwdDefault = true;
     }
 
     inline void SetSsid(const std::string &newSsid)
@@ -180,6 +181,16 @@ struct HotspotConfig {
     {
         return randomMac;
     }
+
+    inline void SetPasswdDefault(const bool defaultType)
+    {
+        passwdDefault = defaultType;
+    }
+ 
+    inline bool GetPasswdDefault() const
+    {
+        return passwdDefault;
+    }
 private:
     std::string ssid;         /* Hotspot name, The string length range is 1~32 */
     std::string preSharedKey; /* Hotspot password ,The string length range is 8~63 */
@@ -191,6 +202,7 @@ private:
     int32_t leaseTime;
     int32_t apBandWidth;
     std::string randomMac;
+    bool passwdDefault;
 };
 
 struct StationInfo {

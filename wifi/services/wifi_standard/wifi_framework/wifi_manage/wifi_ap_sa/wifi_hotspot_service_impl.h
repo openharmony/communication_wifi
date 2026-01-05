@@ -305,6 +305,8 @@ public:
      */
     ErrCode TransRandomToRealMac(StationInfo &updateInfo, const StationInfo &info);
     static int32_t HandleHotspotIdlRet(ErrCode originRet);
+    static ErrCode OnBackup(MessageParcel& data, MessageParcel& reply);
+    static ErrCode OnRestore(MessageParcel& data, MessageParcel& reply);
 private:
     ErrCode CheckCanEnableHotspot(const ServiceType type);
     ErrCode VerifyGetStationListPermission();
@@ -315,6 +317,7 @@ private:
     static void StationsInfoDump(std::string& result);
     ErrCode VerifyConfigValidity(const HotspotConfig &config);
     ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback, const std::vector<std::string> &event);
+    int32_t SetHotspotConfigExtral(const HotspotConfig &config);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     void ProcessMacAddressRandomization(std::vector<StationInfo> &infos);
 #endif

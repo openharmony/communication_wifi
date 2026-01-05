@@ -3157,5 +3157,20 @@ HWTEST_F(SelfCureStateMachineTest, UpdateSelfcureStateTest, TestSize.Level1)
     pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_HIGH_RESET_WIFI_ON, false);
     EXPECT_FALSE(pSelfCureStateMachine_->isSelfCureOnGoing_);
 }
+
+HWTEST_F(SelfCureStateMachineTest, UpdateAutoJoinBlockTimeTest, TestSize.Level1)
+{
+    const std::string conditionName = "TEST_CONDITION";
+    int64_t blockTimeMs = 1000;
+    pSelfCureStateMachine_->UpdateAutoJoinBlockTime(conditionName, blockTimeMs);
+    EXPECT_TRUE(g_errLog.find("service failed!") != std::string::npos);
+}
+
+HWTEST_F(SelfCureStateMachineTest, RemoveAutoJoinBlockTimeTest, TestSize.Level1)
+{
+    const std::string conditionName = "TEST_CONDITION";
+    pSelfCureStateMachine_->RemoveAutoJoinBlockTime(conditionName);
+    EXPECT_TRUE(g_errLog.find("service failed!") != std::string::npos);
+}
 } // namespace Wifi
 } // namespace OHOS

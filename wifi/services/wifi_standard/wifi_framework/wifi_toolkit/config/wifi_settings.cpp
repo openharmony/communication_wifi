@@ -823,7 +823,7 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
         return;
     }
     unsigned int uindex =  static_cast<unsigned int>(index);
- 
+
     config.keyMgmtBitset |= (1 << uindex);
     if (config.keyMgmt == KEY_MGMT_WPA_PSK) {
         int saeIndex = FindKeyMgmtPosition(KEY_MGMT_SAE);

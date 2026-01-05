@@ -142,13 +142,17 @@ public:
 
     /**
      * return wifi supplierId
+     *
+     * @param instId instance id
      */
-    uint32_t GetSupplierId();
+    uint32_t GetSupplierId(int instId);
  
      /**
      * set wifi supplierId to 0
+     *
+     * @param instId instance id
      */
-    void ResetSupplierId();
+    void ResetSupplierId(int instId);
 
 public:
     class NetConnCallback : public NetManagerStandard::NetSupplierCallbackBase {

@@ -55,6 +55,11 @@ typedef enum {
 using P2pEnhanceCallback = std::function<void(const std::string &, int32_t, int32_t)>;
 using SensorEnhanceCallback = std::function<void(int)>;
 using MovementEnhanceCallback = std::function<void(int32_t movementType, int32_t movementValue)>;
+using GenelinkEnhanceCallback = std::function<void(int, int)>;
+
+struct StaEnhanceCallback {
+    GenelinkEnhanceCallback OnGenelinkEvent { nullptr };
+};
 class IEnhanceService {
 public:
     virtual ~IEnhanceService() = default;
@@ -476,6 +481,31 @@ public:
      * @return void
      */
     virtual void NotifyWifiDisconnectReason(const int reason, const int subReason) = 0;
+
+    /**
+     * @Description Genelink interface for exchanging information between WiFi and Enhance
+     *
+     * @param eventId - event id
+     * @param commParam - common parameter
+     * @return int - operation result
+     */
+    virtual int GenelinkInterface(int eventId, int commParam) = 0;
+
+    /**
+     * @Description Notify selected wifi config to enhance module
+     *
+     * @param config - selected wifi config
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode NotifyGenelinkSelectedConfig(WifiDeviceConfig &config) = 0;
+
+    /**
+     * @Description register STA callback event
+     *
+     * @param callback callback struct
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RegisterStaEnhanceCallback(StaEnhanceCallback callback) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -402,8 +402,8 @@
         "OHOS::Wifi::WifiNetAgent::RestoreWifiConnection()";
         "OHOS::Wifi::WifiNetAgent::InitWifiNetAgent(OHOS::Wifi::WifiNetAgentCallbacks const&)";
         "OHOS::Wifi::WifiNetAgent::RequestNetwork(const int, const int)";
-        "OHOS::Wifi::WifiNetAgent::GetSupplierId()";
-        "OHOS::Wifi::WifiNetAgent::ResetSupplierId()";
+        "OHOS::Wifi::WifiNetAgent::GetSupplierId(int)";
+        "OHOS::Wifi::WifiNetAgent::ResetSupplierId(int)";
         "OHOS::Wifi::WifiDumper::DeviceDump(std::__h::function<void (std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)>, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
         "OHOS::Wifi::WifiDumper::ScanDump(std::__h::function<void (std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)>, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
         "OHOS::Wifi::WifiDumper::P2pDump(std::__h::function<void (std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)>, std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";

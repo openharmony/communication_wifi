@@ -933,6 +933,8 @@ int SetTClassKeyValue<HotspotConfig>(HotspotConfig &item, const std::string &key
         item.SetLeaseTime(CheckDataLegal(tmpValue));
     } else if (key == "randomMac") {
         item.SetRandomMac(value);
+    } else if (key == "passwdDefault") {
+        item.SetPasswdDefault(CheckDataLegal(tmpValue));
     } else {
         LOGE("Invalid config key value");
     }
@@ -974,6 +976,7 @@ std::string OutTClassString<HotspotConfig>(HotspotConfig &item)
     ss << "    " <<"ipAddress=" << item.GetIpAddress() << std::endl;
     ss << "    " <<"leaseTime=" << static_cast<int>(item.GetLeaseTime()) << std::endl;
     ss << "    " <<"randomMac=" << item.GetRandomMac() << std::endl;
+    ss << "    " <<"passwdDefault=" << item.GetPasswdDefault() << std::endl;
     ss << "    " <<"</HotspotConfig>" << std::endl;
     return ss.str();
 }
@@ -2016,6 +2019,65 @@ std::string OutTClassString<WifiBackupConfig>(WifiBackupConfig &item)
     std::ostringstream ss;
     ss << OutPutWifiBackupConfig(item) << OutPutWifiIpConfig(item.wifiIpConfig)
        << OutPutWifiProxyConfig(item.wifiProxyconfig) << OutPutWifiBackupConfigPrivacy(item);
+    return ss.str();
+}
+ 
+template<>
+int SetTClassKeyValue<HotspotBackupConfig>(HotspotBackupConfig &item, const std::string &key, const std::string &value)
+{
+    int errorKeyValue = 0;
+    std::string tmpValue = value;
+    if (key == "hotspotConfig") {
+        item.hotspotConfig = CheckDataLegal(tmpValue);
+    } else if (key == "passwdDefault") {
+        item.passwdDefault = static_cast<bool>(CheckDataLegal(tmpValue));
+    } else if (key == "preSharedKey") {
+        item.preSharedKey = value;
+    } else if (key == "band") {
+        item.band = static_cast<BandType>(CheckDataLegal(tmpValue));
+    } else if (key == "deviceName") {
+        item.deviceName = value;
+    } else if (key == "deviceBssid") {
+        item.deviceBssid = value;
+    }  else if (key == "deviceIpAddr") {
+        item.deviceIpAddr = value;
+    } else {
+        LOGE("Invalid config key value");
+        errorKeyValue = 1;
+    }
+    return errorKeyValue;
+}
+ 
+template<>
+void ClearTClass<HotspotBackupConfig>(HotspotBackupConfig &item)
+{
+    item.hotspotConfig = true;
+    item.band = BandType::BAND_2GHZ;
+    item.deviceName.clear();
+    item.deviceBssid.clear();
+    item.deviceIpAddr.clear();
+    return;
+}
+ 
+template <>
+std::string GetTClassName<HotspotBackupConfig>()
+{
+    return "HotspotBackupConfig";
+}
+ 
+template <>
+std::string OutTClassString<HotspotBackupConfig>(HotspotBackupConfig &item)
+{
+    std::ostringstream ss;
+    ss << "    " <<"<HotspotBackupConfig>" << std::endl;
+    ss << "    " <<"passwdDefault=" << item.passwdDefault << std::endl;
+    ss << "    " <<"hotspotConfig=" << item.hotspotConfig << std::endl;
+    ss << "    " <<"preSharedKey=" << item.preSharedKey << std::endl;
+    ss << "    " <<"band=" << (int)item.band << std::endl;
+    ss << "    " <<"deviceName=" << item.deviceName << std::endl;
+    ss << "    " <<"deviceBssid=" << item.deviceBssid << std::endl;
+    ss << "    " <<"deviceIpAddr=" << item.deviceIpAddr << std::endl;
+    ss << "    " <<"</HotspotBackupConfig>" << std::endl;
     return ss.str();
 }
 #endif

@@ -190,12 +190,20 @@ int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parc
         WIFI_LOGE("SetHotspotConfig:VerifyConfigValidity failed!");
         return HandleHotspotIdlRet(validRetval);
     }
+    return SetHotspotConfigExtral(config);
+}
+
+int32_t WifiHotspotServiceImpl::SetHotspotConfigExtral(const HotspotConfig &config)
+{
     HotspotConfig lastConfig;
     if (WifiSettings::GetInstance().GetHotspotConfig(lastConfig, m_id) != 0) {
         WIFI_LOGE("Instance %{public}d %{public}s GetHotspotConfig error", m_id, __func__);
         return HandleHotspotIdlRet(WIFI_OPT_FAILED);
     }
     HotspotConfig innerConfig = config;
+    if (innerConfig.GetPreSharedKey() != lastConfig.GetPreSharedKey() || !lastConfig.GetPasswdDefault()) {
+        innerConfig.SetPasswdDefault(false);
+    }
     if (lastConfig.GetRandomMac() != "") {
         std::string mac = "";
         if (config.GetSsid() != lastConfig.GetSsid() ||
@@ -207,13 +215,12 @@ int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parc
         }
         innerConfig.SetRandomMac(mac);
     }
-
     if (!IsApServiceRunning() ||
         WifiServiceManager::GetInstance().ApServiceSetHotspotConfig(innerConfig, m_id) == false) {
         WifiSettings::GetInstance().SetHotspotConfig(innerConfig, m_id);
         WifiSettings::GetInstance().SyncHotspotConfig();
     }
-    return WIFI_OPT_SUCCESS;
+    return HandleHotspotIdlRet(WIFI_OPT_SUCCESS);
 }
 
 int32_t WifiHotspotServiceImpl::GetLocalOnlyHotspotConfig(HotspotConfigParcel &parcelresult)
@@ -1188,6 +1195,57 @@ int32_t WifiHotspotServiceImpl::HandleHotspotIdlRet(ErrCode originRet)
     } else {
         return originRet + HOTSPOT_IDL_ERROR_OFFSET;
     }
+}
+
+ErrCode WifiHotspotServiceImpl::OnBackup(MessageParcel& data, MessageParcel& reply)
+{
+    UniqueFd fd(-1);
+    std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
+    std::string backupInfo = data.ReadString();
+    WIFI_LOGE("OnBackup %{public}s", backupInfo.c_str());
+    int ret = WifiSettings::GetInstance().OnHotspotBackup(fd, backupInfo);
+    std::fill(backupInfo.begin(), backupInfo.end(), 0);
+    if (ret < 0) {
+        WIFI_LOGE("OnBackup fail: backup data fail!");
+        replyCode = WifiSettings::GetInstance().SetBackupReplyCode(EXTENSION_ERROR_CODE);
+        close(fd.Release());
+        WifiSettings::GetInstance().RemoveHotspotBackupFile();
+        return WIFI_OPT_FAILED;
+    }
+    if (!reply.WriteFileDescriptor(fd) || !reply.WriteString(replyCode)) {
+        close(fd.Release());
+        WifiSettings::GetInstance().RemoveHotspotBackupFile();
+        WIFI_LOGE("OnBackup fail: reply write fail!");
+        return WIFI_OPT_FAILED;
+    }
+    close(fd.Release());
+    WifiSettings::GetInstance().RemoveHotspotBackupFile();
+    return WIFI_OPT_SUCCESS;
+}
+ 
+ErrCode WifiHotspotServiceImpl::OnRestore(MessageParcel& data, MessageParcel& reply)
+{
+    UniqueFd fd(data.ReadFileDescriptor());
+    std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
+    std::string restoreInfo = data.ReadString();
+    int ret = WifiSettings::GetInstance().OnHotspotRestore(fd, restoreInfo);
+    std::fill(restoreInfo.begin(), restoreInfo.end(), 0);
+    if (ret < 0) {
+        WIFI_LOGE("OnRestore fail: restore data fail!");
+        replyCode = WifiSettings::GetInstance().SetBackupReplyCode(EXTENSION_ERROR_CODE);
+        close(fd.Release());
+        WifiSettings::GetInstance().RemoveHotspotBackupFile();
+        return WIFI_OPT_FAILED;
+    }
+    if (!reply.WriteString(replyCode)) {
+        close(fd.Release());
+        WifiSettings::GetInstance().RemoveHotspotBackupFile();
+        WIFI_LOGE("OnRestore fail: reply write fail!");
+        return WIFI_OPT_FAILED;
+    }
+    close(fd.Release());
+    WifiSettings::GetInstance().RemoveHotspotBackupFile();
+    return WIFI_OPT_SUCCESS;
 }
 }  // namespace Wifi
 }  // namespace OHOS

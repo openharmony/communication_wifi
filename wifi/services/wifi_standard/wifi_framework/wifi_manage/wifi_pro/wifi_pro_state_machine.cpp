@@ -35,6 +35,7 @@
 #include "wifi_pro_chr.h"
 #include "wifi_channel_helper.h"
 #include "ienhance_service.h"
+#include "wifi_enhance_defs.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -581,6 +582,36 @@ ErrCode WifiProStateMachine::FullScan()
     }
     WifiProChr::GetInstance().RecordScanChrCnt(CHR_EVENT_WIFIPRO_FULL_SCAN_CNT);
     return pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO);
+}
+
+bool WifiProStateMachine::GenelinkSelectNetwork(const std::vector<InterScanInfo> &scanInfos)
+{
+#ifndef OHOS_ARCH_LITE
+    IEnhanceService  *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        return false;
+    }
+
+    int type = pEnhanceService->GenelinkInterface(MultiLinkDefs::QUERY_SELECT_NETWORK_TYPE, 0);
+    if (type != MultiLinkDefs::SELECT_NETWORK_MASTER && type != MultiLinkDefs::SELECT_NETWORK_SLAVE) {
+        return false;
+    }
+
+    NetworkSelectionResult selectionResult;
+    NetworkSelectType networkSelectType = NetworkSelectType::AUTO_CONNECT;
+    std::unique_ptr<NetworkSelectionManager> pNetworkSelection = std::make_unique<NetworkSelectionManager>();
+    std::string failReason;
+    if (pNetworkSelection->SelectNetwork(selectionResult, networkSelectType, scanInfos, failReason)) {
+        selectionResult.wifiDeviceConfig.bssid = selectionResult.interScanInfo.bssid;
+        WIFI_LOGI("%{public}s select network result, ssid: %{public}s, bssid: %{public}s", __func__,
+            SsidAnonymize(selectionResult.interScanInfo.ssid).c_str(),
+            MacAnonymize(selectionResult.interScanInfo.bssid).c_str());
+        selectionResult.wifiDeviceConfig.rssi = selectionResult.interScanInfo.rssi;
+        pEnhanceService->NotifyGenelinkSelectedConfig(selectionResult.wifiDeviceConfig);
+        return true;
+    }
+#endif
+    return false;
 }
 
 void WifiProStateMachine::ProcessSwitchResult(const InternalMessagePtr msg)
@@ -1347,8 +1378,12 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
         WIFI_LOGI("HandleScanResultInHasNet, msg is nullptr.");
         return;
     }
+
     std::vector<InterScanInfo> scanInfos;
     msg->GetMessageObj(scanInfos);
+    if (pWifiProStateMachine_->GenelinkSelectNetwork(scanInfos)) {
+        return;
+    }
     WifiProChr::GetInstance().RecordCountWiFiPro(true);
     if (pWifiProStateMachine_->isWifi2WifiSwitching_) {
         WIFI_LOGI("HandleScanResultInHasNet, Wifi2WifiSwitching.");

@@ -644,7 +644,7 @@ int WifiSettings::GetCandidateConfigWithoutUid(const std::string &ssid, const st
 }
 
 int WifiSettings::GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
-    WifiDeviceConfig &config)
+    WifiDeviceConfig &config, int instId)
 {
     std::vector<WifiDeviceConfig> configs;
     if (GetAllCandidateConfig(uid, configs) != 0) {
@@ -652,7 +652,7 @@ int WifiSettings::GetCandidateConfig(const int uid, const std::string &ssid, con
     }
 
     for (const auto &it : configs) {
-        if (it.ssid == ssid && it.keyMgmt == keymgmt) {
+        if (it.ssid == ssid && it.keyMgmt == keymgmt && it.instanceId == instId) {
             config = it;
             return it.networkId;
         }

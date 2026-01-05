@@ -65,7 +65,7 @@ WifiScanParamsParcel *WifiScanParamsParcel::Unmarshalling(Parcel &parcel)
         return nullptr;
     }
 
-    if (size < 0|| size > MAX_FREQS_SIZE) {
+    if (size > MAX_FREQS_SIZE) {
         return nullptr;
     }
     params->freqs.reserve(size);

@@ -5744,12 +5744,6 @@ void StaStateMachine::InvokeOnStaConnChanged(OperateResState state, const WifiLi
             }
             break;
         case OperateResState::DISCONNECT_DISCONNECTED:
-            // record lastDisconnectTime
-            if (WifiSettings::GetInstance().SetDeviceAfterDisconnect(info.networkId) == 0) {
-                WifiSettings::GetInstance().SyncDeviceConfig();
-            } else {
-                WIFI_LOGI("SetDeviceAfterDisconnect failed...");
-            }
             WriteWifiConnectionHiSysEvent(static_cast<int>(WifiConnectionType::DISCONNECT), "");
             if (m_instId == INSTID_WLAN0) {
 #ifndef OHOS_ARCH_LITE

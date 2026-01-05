@@ -157,6 +157,7 @@ HWTEST_F(WifiSettingsTest, SetDeviceAfterConnectSuccessTest, TestSize.Level1)
     WifiDeviceConfig updatedConfig;
     WifiSettings::GetInstance().GetDeviceConfig(NETWORK_ID, updatedConfig);
     EXPECT_NE(updatedConfig.lastConnectTime, 0);
+    EXPECT_EQ(updatedConfig.lastDisconnectTime, updatedConfig.lastConnectTime);
     EXPECT_EQ(updatedConfig.numRebootsSinceLastUse, 0);
     EXPECT_EQ(updatedConfig.numAssociation, 11);
     EXPECT_EQ(updatedConfig.networkSelectionStatus.networkDisableCount, 0);
@@ -186,6 +187,7 @@ HWTEST_F(WifiSettingsTest, SetDeviceAfterConnectInvalidRssiTest, TestSize.Level1
     WifiDeviceConfig updatedConfig;
     WifiSettings::GetInstance().GetDeviceConfig(NETWORK_ID + 1, updatedConfig);
     EXPECT_NE(updatedConfig.lastConnectTime, 0);
+    EXPECT_EQ(updatedConfig.lastDisconnectTime, updatedConfig.lastConnectTime);
     EXPECT_EQ(updatedConfig.numRebootsSinceLastUse, 0);
     EXPECT_EQ(updatedConfig.numAssociation, 11);
     EXPECT_EQ(updatedConfig.networkSelectionStatus.networkDisableCount, 0);
@@ -215,6 +217,7 @@ HWTEST_F(WifiSettingsTest, SetDeviceAfterConnectNoConnectChoiceTest, TestSize.Le
     WifiDeviceConfig updatedConfig;
     WifiSettings::GetInstance().GetDeviceConfig(NETWORK_ID + 2, updatedConfig);
     EXPECT_NE(updatedConfig.lastConnectTime, 0);
+    EXPECT_EQ(updatedConfig.lastDisconnectTime, updatedConfig.lastConnectTime);
     EXPECT_EQ(updatedConfig.numRebootsSinceLastUse, 0);
     EXPECT_EQ(updatedConfig.numAssociation, 11);
     EXPECT_EQ(updatedConfig.networkSelectionStatus.networkDisableCount, 0);

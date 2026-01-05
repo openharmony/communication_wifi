@@ -222,6 +222,8 @@ public:
         bool RestrictedByMdm(WifiDeviceConfig &config);
 #endif
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
+        void UpdateLinkedInfoAfterConnect(const std::string& bssid);
+        void SwitchToNextStateAfterConnect();
         bool NotAllowConnectToNetwork(int networkId, const std::string& bssid, int connTriggerMode);
         bool NotExistInScanList(WifiDeviceConfig &config);
         void DealHiddenSsidConnectMiss(int networkId);

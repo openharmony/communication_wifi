@@ -64,7 +64,7 @@ WifiScanParamsParcel *WifiScanParamsParcel::Unmarshalling(Parcel &parcel)
     if (!parcel.ReadUint32(size)) {
         return nullptr;
     }
-    
+
     if (size < 0|| size > MAX_FREQS_SIZE) {
         return nullptr;
     }

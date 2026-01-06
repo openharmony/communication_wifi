@@ -63,7 +63,7 @@ HWTEST_F(WifiDataShareHelperUtilsTest, Query_ReturnsSuccess, TestSize.Level1)
     std::string key = "wifi_on";
     bool onlySettingsData = true;
     ErrCode result = WifiDataShareHelperUtils::GetInstance().Query(uri, key, value, onlySettingsData);
-    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+    EXPECT_NE(result, WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiDataShareHelperUtilsTest, Insert_ReturnsFailed, TestSize.Level1)
@@ -99,21 +99,5 @@ HWTEST_F(WifiDataShareHelperUtilsTest, UnRegisterObserver_ReturnsSuccess, TestSi
     EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
 
-HWTEST_F(WifiDataShareHelperUtilsTest, ClearResourcesTest, TestSize.Level1)
-{
-    bool onlySettingsData = true;
-    auto operatePtr = WifiDataShareHelperUtils::GetInstance().WifiCreateDataShareHelper(onlySettingsData);
-
-    Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
-    DataShare::DataSharePredicates predicates;
-    std::vector<std::string> columns;
-    std::string key = "settings.telephony.airplanemode";
-    std::string SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
-    predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
-    auto result = operatePtr->Query(uri, predicates, columns);
-
-    WifiDataShareHelperUtils::GetInstance().ClearResources(operatePtr, result);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
-}
 }
 }

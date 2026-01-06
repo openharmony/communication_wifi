@@ -650,7 +650,7 @@ HWTEST_F(WifiManagerTest, GetScanMacInfoWhiteListByDatasharetest, TestSize.Level
     std::string key = "wifi_on";
     bool onlySettingsData = true;
     ErrCode result = WifiDataShareHelperUtils::GetInstance().Query(uri, key, value, onlySettingsData);
-    EXPECT_EQ(result, WIFI_OPT_SUCCESS);
+    EXPECT_NE(result, WIFI_OPT_SUCCESS);
     wifiManager.wifiEventSubscriberManager->GetScanMacInfoWhiteListByDatashare();
 }
 

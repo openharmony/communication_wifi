@@ -81,6 +81,7 @@ public:
         void HandleDhcpOfferPacketRcv(const IpInfo &info);
         void HandleP2pEnhanceStateChange(int state);
     private:
+        bool HandleExtMsg(InternalMessagePtr msg);
         SelfCureStateMachine *pSelfCureStateMachine_;
     };
 
@@ -389,6 +390,7 @@ private:
     void UpdateSelfcureState(int currentCureLevel, bool isSelfCureOnGoing);
     void HandleSelfCureNormal();
     void HandleSelfCureException(int reasonCode);
+    void HandleSelfCureDisconnectNormal();
     void HandleSelfCureDisconnectException();
     void StopSelfCureDelay(int status, int delay);
     void HandleSceStopSelfCure(int status);
@@ -397,6 +399,9 @@ private:
     void NotifySelfCureCompleted(int status);
     void HandleConnectFailed();
     void ForceStopSelfCure();
+    bool CheckSelfCureWifiResultExt(SelfCureState selfCureL2State);
+    void UpdateAutoJoinBlockTime(const std::string& conditionName, int64_t blockTimeMs);
+    void RemoveAutoJoinBlockTime(const std::string& conditionName);
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap_;

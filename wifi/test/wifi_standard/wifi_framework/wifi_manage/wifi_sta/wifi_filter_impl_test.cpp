@@ -128,7 +128,7 @@ HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterOpenStale, TestSize.Level1)
     EXPECT_FALSE(longUnusedOpenWifiFilter->DoFilter(networkCandidate));
 }
 
-HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterNeverConnected, TestSize.Level1)
+HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterIgnoreCase, TestSize.Level1)
 {
     InterScanInfo scanInfo;
     scanInfo.bssid = "00:11:22:33:44:55";
@@ -136,11 +136,11 @@ HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterNeverConnected, TestSize.Le
     scanInfo.securityType = WifiSecurity::OPEN;
     scanInfo.riskType = WifiRiskType::OPEN;
     NetworkSelection::NetworkCandidate networkCandidate(scanInfo);
-    networkCandidate.wifiDeviceConfig.lastDisconnectTime = -1;
+    networkCandidate.wifiDeviceConfig.lastDisconnectTime = -1; // 不符合本场景特征，不做拦截
     networkCandidate.wifiDeviceConfig.networkId = 1;
     
     auto longUnusedOpenWifiFilter = std::make_shared<NetworkSelection::LongUnusedOpenWifiFilter>();
-    EXPECT_FALSE(longUnusedOpenWifiFilter->DoFilter(networkCandidate));
+    EXPECT_TRUE(longUnusedOpenWifiFilter->DoFilter(networkCandidate));
 }
 
 HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterInWhiteList, TestSize.Level1)

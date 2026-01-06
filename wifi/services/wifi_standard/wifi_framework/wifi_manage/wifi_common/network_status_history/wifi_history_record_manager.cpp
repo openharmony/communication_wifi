@@ -296,9 +296,22 @@ void WifiHistoryRecordManager::UpdateConnectionTime(bool isNeedNext)
                 lastSecondsOfDay, currentSecondsOfDay);
         }
         HomeApJudgeProcess();
+        // Periodically save last disconnect time for current linked wifi,
+        // in case this information cannot be saved in certain conditions. e.g shutdown case.
+        UpdateDisconnectTime();
     }
     if (isNeedNext) {
         NextUpdateApInfoTimer();
+    }
+}
+
+void WifiHistoryRecordManager::UpdateDisconnectTime()
+{
+    // record lastDisconnectTime
+    if (WifiSettings::GetInstance().SetDeviceAfterDisconnect(connectedApInfo_.networkId_) == 0) {
+        WifiSettings::GetInstance().SyncDeviceConfig();
+    } else {
+        WIFI_LOGE("SetDeviceAfterDisconnect failed...");
     }
 }
 

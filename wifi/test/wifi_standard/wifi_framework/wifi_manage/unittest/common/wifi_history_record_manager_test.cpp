@@ -368,6 +368,28 @@ HWTEST_F(WifiHistoryRecordManagerTest, UpdateConnectionTimeTest, TestSize.Level1
     EXPECT_TRUE(testTotalUseTime != 0);
 }
 
+HWTEST_F(WifiHistoryRecordManagerTest, UpdateDisconnectTimeTest_Success, TestSize.Level1)
+{
+    WifiHistoryRecordManager obj;
+    int testNetworkId = 12;
+    obj.connectedApInfo_.networkId_ = testNetworkId;
+    EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterDisconnect(testNetworkId))
+        .WillOnce(Return(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(1);
+    obj.UpdateDisconnectTime();
+}
+
+HWTEST_F(WifiHistoryRecordManagerTest, UpdateDisconnectTimeTest_Failure, TestSize.Level1)
+{
+    WifiHistoryRecordManager obj;
+    int testNetworkId = 34;
+    obj.connectedApInfo_.networkId_ = testNetworkId;
+    EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceAfterDisconnect(testNetworkId))
+        .WillOnce(Return(-1));
+    EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(0);
+    obj.UpdateDisconnectTime();
+}
+
 HWTEST_F(WifiHistoryRecordManagerTest, IsAbnormalTimeRecordsTest, TestSize.Level1)
 {
     WIFI_LOGI("IsAbnormalTimeRecordsTest enter");

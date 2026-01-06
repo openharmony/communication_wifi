@@ -1266,6 +1266,21 @@ void CesEventSubscriber::OnReceiveConnectivityChangedEvent(const OHOS::EventFwk:
     WIFI_LOGI("%{public}s net: %{public}d code: %{public}d", __FUNCTION__, bearType, code);
     WifiSensorScene::GetInstance().OnConnectivityChanged(bearType, code);
     AppNetworkSpeedLimitService::GetInstance().HandleNetworkConnectivityChange(bearType, code);
+    if (firstFoldState_.load() && IsSignalSmoothingEnable() &&
+        bearType == NetManagerStandard::NetBearType::BEARER_WIFI) {
+        auto foldStatus = Rosen::DisplayManagerLite::GetInstance().GetFoldStatus();
+        for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
+            if (pService != nullptr) {
+                pService->OnFoldStateChanged(static_cast<int>(foldStatus));
+            }
+        }
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnFoldStateChanged(static_cast<int>(foldStatus));
+        }
+        firstFoldState_.store(false);
+    }
 }
 
 void WifiEventSubscriberManager::RegisterNetworkStateChangeEvent()

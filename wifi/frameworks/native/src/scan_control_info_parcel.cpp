@@ -16,6 +16,8 @@
 
 namespace OHOS {
 namespace Wifi {
+#define MAX_SCAN_SIZE 1024
+
 ScanControlInfoParcel::ScanControlInfoParcel(const ScanControlInfo &info)
 {
     for (const auto &forbidMode : info.scanForbidList) {
@@ -101,6 +103,10 @@ ScanControlInfoParcel *ScanControlInfoParcel::Unmarshalling(Parcel &parcel)
 
     if (!parcel.ReadUint32(size))
         return nullptr;
+
+    if (size > MAX_SCAN_SIZE) {
+        return nullptr;
+    }
     info->scanForbidList.reserve(size);
 
     for (uint32_t i = 0; i < size; i++) {
@@ -122,6 +128,10 @@ ScanControlInfoParcel *ScanControlInfoParcel::Unmarshalling(Parcel &parcel)
 
     if (!parcel.ReadUint32(size))
         return nullptr;
+
+    if (size > MAX_SCAN_SIZE) {
+        return nullptr;
+    }
     info->scanIntervalList.reserve(size);
 
     for (uint32_t i = 0; i < size; i++) {

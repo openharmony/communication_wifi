@@ -21,7 +21,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { SymbolGlyphModifier } from '@kit.ArkUI';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
-  validateURL, getIsInOOBE, getHmosUAComplexRegex, harmonyUserAgentSet
+  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet
 } from '../common/utils';
 import {
   updateFinalUrl,updateOnHttpErrorReceive,updateOnErrorReceive,updateOnSslErrorEvent,updateAboutToDisappear
@@ -433,11 +433,11 @@ struct Index {
   
   private setUA():void {
     hilog.info(DOMAIN, TAG, '%{public}s', 'setUA enter.');
-    this.harmonyUA = harmonyUserAgentSet.harmonyUACompatible;
+    this.harmonyUA = HarmonyUserAgentSet.harmonyUACompatible;
     let pattern:RegExp|undefined = getHmosUAComplexRegex();
     if (pattern) {
       if (pattern.test(extractDomain(this.webUrl))){
-        this.harmonyUA = harmonyUserAgentSet.harmonyUAHmos;
+        this.harmonyUA = HarmonyUserAgentSet.harmonyUAHmos;
         hilog.info(DOMAIN, TAG, '%{public}s', 'setUA harmonyUAHmos.');
       }
     }

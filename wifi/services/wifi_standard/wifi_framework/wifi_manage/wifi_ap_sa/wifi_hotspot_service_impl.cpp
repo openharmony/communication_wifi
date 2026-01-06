@@ -1202,7 +1202,6 @@ ErrCode WifiHotspotServiceImpl::OnBackup(MessageParcel& data, MessageParcel& rep
     UniqueFd fd(-1);
     std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
     std::string backupInfo = data.ReadString();
-    WIFI_LOGE("OnBackup %{public}s", backupInfo.c_str());
     int ret = WifiSettings::GetInstance().OnHotspotBackup(fd, backupInfo);
     std::fill(backupInfo.begin(), backupInfo.end(), 0);
     if (ret < 0) {

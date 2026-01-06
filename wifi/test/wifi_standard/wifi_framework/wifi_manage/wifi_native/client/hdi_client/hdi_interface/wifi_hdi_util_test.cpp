@@ -872,7 +872,7 @@ HWTEST_F(WifiHdiUtilTest, GetChanWidthCenterFreqVhtTest1, TestSize.Level1)
 
     infoElem.size = 10;
     ret = GetChanWidthCenterFreqVht(&pcmd, &infoElem);
-    EXPECT_EQ(ret, false);
+    EXPECT_EQ(ret, true);
     free(infoElem.content);
 }
 

@@ -190,6 +190,22 @@ bool SelfCureStateMachine::DefaultState::ExecuteStateMsg(InternalMessagePtr msg)
             break;
         }
         default:
+            ret = HandleExtMsg(msg);
+            break;
+    }
+    return ret;
+}
+
+bool SelfCureStateMachine::DefaultState::HandleExtMsg(InternalMessagePtr msg)
+{
+    bool ret = NOT_EXECUTED;
+    switch (msg->GetMessageName()) {
+        case WIFI_CURE_ON_DISCONNECT_TIMEOUT:
+            pSelfCureStateMachine_->SetSelfCureWifiTimeOut(SelfCureState::SCE_WIFI_DISCONNECT_STATE);
+            pSelfCureStateMachine_->CheckSelfCureDisconnectState();
+            ret = EXECUTED;
+            break;
+        default:
             WIFI_LOGD("DefaultState-msgCode=%{public}d not handled.\n", msg->GetMessageName());
             break;
     }
@@ -2753,6 +2769,7 @@ bool SelfCureStateMachine::CheckSelfCureWifiResult(int event)
     if (selfCureL2State_ == SelfCureState::SCE_WIFI_INVALID_STATE) {
         return false;
     }
+    WIFI_LOGI("CheckSelfCureWifiResult: event=%{public}d", event);
     WifiState wifiState = static_cast<WifiState>(WifiConfigCenter::GetInstance().GetWifiState(instId_));
     if (wifiState == WifiState::DISABLING || wifiState == WifiState::DISABLED) {
         if (!WifiConfigCenter::GetInstance().GetWifiSelfcureReset()) {
@@ -2791,6 +2808,20 @@ bool SelfCureStateMachine::CheckSelfCureWifiResult(int event)
             break;
         case SelfCureState::SCE_WIFI_DISCONNECT_STATE:
             CheckSelfCureDisconnectState();
+            break;
+        default:
+            retValue = CheckSelfCureWifiResultExt(selfCureL2State_);
+            break;
+    }
+    return retValue;
+}
+
+bool SelfCureStateMachine::CheckSelfCureWifiResultExt(SelfCureState wifiSelfCureState)
+{
+    bool retValue = true;
+    switch (wifiSelfCureState) {
+        case SelfCureState::SCE_WIFI_ON_DISCONNECT_MIDDLE_STATE:
+            HandleSelfCureNormal();
             break;
         default:
             retValue = false;
@@ -2862,30 +2893,22 @@ void SelfCureStateMachine::HandleSelfCureNormal()
             SetSelfCureWifiTimeOut(SCE_WIFI_ON_STATE);
             break;
         }
-        case SelfCureState::SCE_WIFI_DISCONNECT_STATE:  // fall through
         case SelfCureState::SCE_WIFI_ON_STATE: {
-            WIFI_HILOG_COMM_INFO("HandleSelfCureNormal wifi on OK or disconnect ok! -> wifi connect");
-            if (selfCureL2State_ == SelfCureState::SCE_WIFI_ON_STATE) {
-                UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_HIGH_RESET_WIFI_ON, true);
-            }
-            int networkId = WifiConfigCenter::GetInstance().GetLastNetworkId();
-            IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(instId_);
-            if (pStaService == nullptr) {
-                WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
-                return;
-            }
-            if (pStaService->ConnectToNetwork(networkId, NETWORK_SELECTED_BY_SELFCURE) != WIFI_OPT_SUCCESS) {
-                WIFI_LOGE("connect to network failed");
-                HandleSelfCureException(SCE_WIFI_STATUS_FAIL);
-                return;
-            }
-            SetSelfCureWifiTimeOut(SCE_WIFI_CONNECT_STATE);
+            UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_HIGH_RESET_WIFI_ON, true);
+            SetSelfCureWifiTimeOut(SCE_WIFI_ON_DISCONNECT_MIDDLE_STATE);
+            break;
+        }
+        case SelfCureState::SCE_WIFI_DISCONNECT_STATE: {
+            HandleSelfCureDisconnectNormal();
             break;
         }
         case SelfCureState::SCE_WIFI_CONNECT_STATE:
         case SelfCureState::SCE_WIFI_REASSOC_STATE:
             WIFI_LOGI("HandleSelfCureNormal, wifi connect/reassoc/reconnect ok!");
             StopSelfCureDelay(SCE_WIFI_STATUS_SUCC, WIFI_CURE_CONN_SUCCESS_MS);
+            break;
+        case SelfCureState::SCE_WIFI_ON_DISCONNECT_MIDDLE_STATE:
+            WIFI_LOGI("HandleSelfCureNormal, wifi is on, auto enter SCE_WIFI_DISCONNECT_STATE later");
             break;
         default:
             WIFI_LOGE("HandleSelfCureNormal, unvalid selfCureL2State_");
@@ -2924,16 +2947,38 @@ void SelfCureStateMachine::HandleSelfCureException(int reasonCode)
             IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(instId_);
             if (pStaService == nullptr) {
                 WIFI_LOGE("pStaService get failed");
+                StopSelfCureDelay(SCE_WIFI_STATUS_FAIL, 0);
                 return;
             }
             pStaService->Disconnect();
             SetSelfCureWifiTimeOut(SCE_WIFI_DISCONNECT_STATE);
             break;
         }
+        case SelfCureState::SCE_WIFI_ON_DISCONNECT_MIDDLE_STATE:
+            WIFI_LOGI("HandleSelfCureException, middle state should not fail");
+            break;
         default:
             WIFI_LOGE("HandleSelfCureException, unvalid selfCureL2State_");
             break;
     }
+}
+
+void SelfCureStateMachine::HandleSelfCureDisconnectNormal()
+{
+    WIFI_HILOG_COMM_INFO("HandleSelfCureNormal wifi disconnect ok! -> wifi connect");
+    int networkId = WifiConfigCenter::GetInstance().GetLastNetworkId();
+    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(instId_);
+    if (pStaService == nullptr) {
+        WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
+        HandleSelfCureException(SCE_WIFI_STATUS_FAIL);
+        return;
+    }
+    if (pStaService->ConnectToNetwork(networkId, NETWORK_SELECTED_BY_SELFCURE) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("connect to network failed");
+        HandleSelfCureException(SCE_WIFI_STATUS_FAIL);
+        return;
+    }
+    SetSelfCureWifiTimeOut(SCE_WIFI_CONNECT_STATE);
 }
 
 void SelfCureStateMachine::HandleSelfCureDisconnectException()
@@ -2943,6 +2988,7 @@ void SelfCureStateMachine::HandleSelfCureDisconnectException()
     IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(instId_);
     if (pStaService == nullptr) {
         WIFI_LOGE("pStaService get failed");
+        StopSelfCureDelay(SCE_WIFI_STATUS_FAIL, 0);
         return;
     }
     if (pStaService->ConnectToNetwork(networkId, NETWORK_SELECTED_BY_SELFCURE) != WIFI_OPT_SUCCESS) {
@@ -2959,15 +3005,18 @@ void SelfCureStateMachine::SetSelfCureWifiTimeOut(SelfCureState wifiSelfCureStat
     switch (selfCureL2State_) {
         case SelfCureState::SCE_WIFI_OFF_STATE:
             WIFI_LOGI("SetSelfCureWifiTimeOut send delay message CMD_SELFCURE_WIFI_OFF_TIMEOUT");
+            UpdateAutoJoinBlockTime("SelfCureL2IsRunning", WIFI_CURE_OFF_TIMEOUT_MS);
             MessageExecutedLater(WIFI_CURE_RESET_OFF_TIMEOUT, WIFI_CURE_OFF_TIMEOUT_MS);
             break;
         case SelfCureState::SCE_WIFI_ON_STATE:
             WIFI_LOGI("SetSelfCureWifiTimeOut send delay message CMD_SELFCURE_WIFI_ON_TIMEOUT");
+            UpdateAutoJoinBlockTime("SelfCureL2IsRunning", WIFI_CURE_ON_TIMEOUT_MS);
             MessageExecutedLater(WIFI_CURE_RESET_ON_TIMEOUT, WIFI_CURE_ON_TIMEOUT_MS);
             break;
         case SelfCureState::SCE_WIFI_REASSOC_STATE:
             WIFI_LOGI("SetSelfCureWifiTimeOut send delay message CMD_SELFCURE_WIFI_REASSOC_TIMEOUT");
             selfCureNetworkLastState_ = DetailedState::DISCONNECTED;
+            UpdateAutoJoinBlockTime("SelfCureL2IsRunning", WIFI_CURE_REASSOC_TIMEOUT_MS);
             MessageExecutedLater(WIFI_CURE_REASSOC_TIMEOUT, WIFI_CURE_REASSOC_TIMEOUT_MS);
             break;
         case SelfCureState::SCE_WIFI_CONNECT_STATE: {
@@ -2976,11 +3025,19 @@ void SelfCureStateMachine::SetSelfCureWifiTimeOut(SelfCureState wifiSelfCureStat
             if (WifiConfigCenter::GetInstance().GetScreenState() != MODE_STATE_OPEN) {
                 delayMs += WIFI_CURE_CONNECT_TIMEOUT_MS;
             }
+            UpdateAutoJoinBlockTime("SelfCureL2IsRunning", delayMs);
             MessageExecutedLater(WIFI_CURE_CONNECT_TIMEOUT, delayMs);
             break;
         }
         case SelfCureState::SCE_WIFI_DISCONNECT_STATE:
+            WIFI_LOGI("SetSelfCureWifiTimeOut send delay message CMD_SELFCURE_WIFI_DISCONNECT_TIMEOUT");
+            UpdateAutoJoinBlockTime("SelfCureL2IsRunning", WIFI_CURE_DISCONNECT_TIMEOUT_MS);
             MessageExecutedLater(WIFI_CURE_DISCONNECT_TIMEOUT, WIFI_CURE_DISCONNECT_TIMEOUT_MS);
+            break;
+        case SelfCureState::SCE_WIFI_ON_DISCONNECT_MIDDLE_STATE:
+            WIFI_LOGI("SetSelfCureWifiTimeOut send delay message CMD_SELFCURE_WIFI_ON_DISCONNECT_TIMEOUT");
+            UpdateAutoJoinBlockTime("SelfCureL2IsRunning", WIFI_CURE_ON_DISCONNECT_TIMEOUT_MS);
+            MessageExecutedLater(WIFI_CURE_ON_DISCONNECT_TIMEOUT, WIFI_CURE_ON_DISCONNECT_TIMEOUT_MS);
             break;
         default:
             WIFI_LOGW("SetSelfCureWifiTimeOut, unvalid selfcurestate");
@@ -3026,6 +3083,8 @@ void SelfCureStateMachine::ResetSelfCureParam()
     StopTimer(WIFI_CURE_REASSOC_TIMEOUT);
     StopTimer(WIFI_CURE_CONNECT_TIMEOUT);
     StopTimer(WIFI_CURE_DISCONNECT_TIMEOUT);
+    StopTimer(WIFI_CURE_ON_DISCONNECT_TIMEOUT);
+    RemoveAutoJoinBlockTime("SelfCureL2IsRunning");
 }
 
 void SelfCureStateMachine::HandleConnectFailed()
@@ -3057,6 +3116,29 @@ void SelfCureStateMachine::HandleConnectFailed()
         return;
     }
     pStaService->Disconnect();
+}
+
+void SelfCureStateMachine::UpdateAutoJoinBlockTime(const std::string& conditionName, int64_t blockTimeMs)
+{
+    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(instId_);
+    if (pStaService == nullptr) {
+        WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
+        return;
+    }
+    int64_t autoConnectRecoveryTime = GetCurrentTimeMilliSeconds() + blockTimeMs;
+    pStaService->RegisterAutoJoinCondition(conditionName, [autoConnectRecoveryTime] {
+        return GetCurrentTimeMilliSeconds() > autoConnectRecoveryTime;
+    });
+}
+
+void SelfCureStateMachine::RemoveAutoJoinBlockTime(const std::string& conditionName)
+{
+    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(instId_);
+    if (pStaService == nullptr) {
+        WIFI_LOGE("Get %{public}s service failed!", WIFI_SERVICE_STA);
+        return;
+    }
+    pStaService->DeregisterAutoJoinCondition(conditionName);
 }
 } // namespace Wifi
 } // namespace OHOS

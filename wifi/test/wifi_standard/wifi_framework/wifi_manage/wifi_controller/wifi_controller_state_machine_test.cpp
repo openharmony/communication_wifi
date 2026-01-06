@@ -683,7 +683,7 @@ HWTEST_F(WifiControllerMachineTest, IsLocalOnlyHotspotTest, TestSize.Level1)
     EXPECT_TRUE(pWifiControllerMachine->isLocalOnlyHotspot_);
 }
 
-HWTEST_F(WifiControllerMachineTest, ShouldEnableWifiTest01, TestSize.Level1)
+HWTEST_F(WifiControllerMachineTest, HandleSoftapCloseTest01, TestSize.Level1)
 {
     WifiManager::GetInstance().GetWifiTogglerManager()->SetSatelliteStartState(false);
     EXPECT_EQ(WifiManager::GetInstance().GetWifiTogglerManager()->IsSatelliteStateStart(), false);

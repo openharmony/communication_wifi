@@ -196,7 +196,7 @@ export function loadUAWhiteList(context: common.Context): void {
     const decoder = util.TextDecoder.create('utf-8');
     const jsonString = decoder.decodeToString(rawContent);
     const config = JSON.parse(jsonString) as object;
-    const filePath: string = config?.["configPath"];
+    const filePath: string = config?.['configPath'];
     let file = fs.openSync(filePath, fs.OpenMode.READ_ONLY);
     hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList success open file')
     const stat = fs.statSync(file.fd);
@@ -207,14 +207,14 @@ export function loadUAWhiteList(context: common.Context): void {
     let bufU8 = new Uint8Array(buf, 0, buf.byteLength)
     const jsonRaw = decoder.decodeToString(bufU8);
     const jsonConfig = JSON.parse(jsonRaw) as object;
-    const hmosWhiteList: string[] = jsonConfig?.["PortalUAWhiteList"]?.["Hmos"];
+    const hmosWhiteList: string[] = jsonConfig?.['PortalUAWhiteList']?.['Hmos'];
     if (hmosWhiteList && hmosWhiteList.length > 0) {
-      hmosComplexRegex_ = new RegExp(hmosWhiteList.join("|"));
+      hmosComplexRegex_ = new RegExp(hmosWhiteList.join('|'));
       hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList hmosWhiteList size:' + hmosWhiteList.length)
     }
   } catch (err) {
     hilog.error(DOMAIN, 'TAG', '%{public}s', 'Failed loadUAWhiteList error message: ' + err.message +
-      ", error code: " + err.code);
+      ', error code: ' + err.code);
   }
 }
  

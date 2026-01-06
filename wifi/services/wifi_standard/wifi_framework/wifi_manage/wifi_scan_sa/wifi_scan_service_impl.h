@@ -108,7 +108,7 @@ private:
     ServiceRunningState mState;
 #else
     int m_instId{0};
-    bool mSingleCallback;
+    bool mSingleCallback = false;
     std::mutex deathRecipientMutex;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
 #endif

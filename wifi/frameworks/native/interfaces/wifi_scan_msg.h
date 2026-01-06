@@ -204,6 +204,7 @@ struct WifiScanInfo {
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;
         isHiLinkNetwork = 0;
+        disappearCount = 0;
         isHiLinkProNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
         riskType = WifiRiskType::INVALID;

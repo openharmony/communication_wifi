@@ -68,7 +68,7 @@ public:
     void OnReceiveForceSleepEvent(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     bool lastSleepState = false;
-    std::atomic<bool> firstFoldState_ = true; 
+    std::atomic<bool> firstFoldState_ = true;
 };
 
 class NotificationEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {

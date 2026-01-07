@@ -877,10 +877,10 @@ bool HigherCategoryFilter::Filter(NetworkCandidate &networkCandidate)
     WifiCategory currentCategory = scanConfig->GetWifiCategoryRecord(currentConnection.bssid);
     WifiCategory candidateCategory = scanConfig->GetWifiCategoryRecord(networkCandidate.interScanInfo.bssid);
     if (static_cast<int>(candidateCategory) > static_cast<int>(WifiCategory::DEFAULT) &&
-        static_cast<int>(candidateCategory) >= static_cast<int>(currentCategory)) {
+        static_cast<int>(candidateCategory) > static_cast<int>(currentCategory)) {
         WIFI_LOGD("HigherCategoryFilter: candidate %{public}s (cat %d) >= current %{public}s (cat %d) and > WIFI5",
-                  MacAnonymize(networkCandidate.interScanInfo.bssid).c_str(), static_cast<int>(candidateCategory),
-                  MacAnonymize(currentConnection.bssid).c_str(), static_cast<int>(currentCategory));
+                  SsidAnonymize(networkCandidate.interScanInfo.ssid).c_str(), static_cast<int>(candidateCategory),
+                  SsidAnonymize(currentConnection.ssid).c_str(), static_cast<int>(currentCategory));
         return true;
     }
     networkCandidate.filtedReason[filterName].insert(FiltedReason::NOT_HIGHER_CATEGORY);

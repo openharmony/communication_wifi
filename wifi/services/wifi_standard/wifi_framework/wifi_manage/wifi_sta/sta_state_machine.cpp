@@ -3964,8 +3964,11 @@ void StaStateMachine::DhcpResultNotify::UpdateNetLinkInfoForIpV6(IpInfo &ipInfo,
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetDeviceConfig(pStaStateMachine->linkedInfo.networkId, config,
         pStaStateMachine->m_instId);
-    WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
-        pStaStateMachine->m_instId);
+    if (ipv6Info.IpAddrMap.size() != 1 ||
+        ipv6Info.IpAddrMap.begin()->second != static_cast<int>(AddrTypeIpV6::ADDR_TYPE_LINK_LOCAL)) {
+        WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
+            pStaStateMachine->m_instId);
+    }
     EnhanceWriteDhcpInfoHiSysEvent(ipInfo, ipv6Info);
 #endif
 }

@@ -336,8 +336,8 @@ HWTEST_F(WifiNetAgentTest, LogNetCapsTest001, TestSize.Level1)
 HWTEST_F(WifiNetAgentTest, GetSupplierId001, TestSize.Level1)
 {
     WifiNetAgent wifiNetAgent;
-    wifiNetAgent.ResetSupplierId();
-    uint32_t tmpSupplierId = wifiNetAgent.GetSupplierId();
+    wifiNetAgent.ResetSupplierId(0);
+    uint32_t tmpSupplierId = wifiNetAgent.GetSupplierId(0);
     EXPECT_EQ(tmpSupplierId, 0);
 }
 

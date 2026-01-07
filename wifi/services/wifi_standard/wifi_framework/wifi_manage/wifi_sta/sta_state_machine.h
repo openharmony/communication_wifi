@@ -68,6 +68,7 @@ constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 constexpr int CMD_LINK_SWITCH_DETECT_TIMEOUT = 0x07;
 constexpr int CMD_NO_INTERNET_TIMEOUT = 0x08;
 constexpr int CMD_IPV6_DELAY_TIMEOUT = 0x09;
+constexpr int CMD_AP_RECONN_TIMEOUT_CHECK = 0x11;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
@@ -117,6 +118,8 @@ constexpr int RSSI_OFFSET_DEFAULT = 5;
 constexpr int RSSI_OFFSET_MAX = 10;
 
 constexpr unsigned int BIT_MLO_CONNECT = 0x80;
+
+constexpr int STA_AP_RECONNECT_TIMEOUT = 5000; // 5s
 
 #define DNS_IP_ADDR_LEN 15
 #define WIFI_FIRST_DNS_NAME "const.wifi.wifi_first_dns"
@@ -219,6 +222,8 @@ public:
         bool RestrictedByMdm(WifiDeviceConfig &config);
 #endif
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
+        void UpdateLinkedInfoAfterConnect(const std::string& bssid);
+        void SwitchToNextStateAfterConnect();
         bool NotAllowConnectToNetwork(int networkId, const std::string& bssid, int connTriggerMode);
         bool NotExistInScanList(WifiDeviceConfig &config);
         void DealHiddenSsidConnectMiss(int networkId);
@@ -248,6 +253,7 @@ public:
         void DealWpaStateChange(InternalMessagePtr msg);
         void DealMloStateChange(InternalMessagePtr msg);
         void DealWpaCustomEapAuthEvent(InternalMessagePtr msg);
+        bool NeedIgnoreDisconnectEvent(InternalMessagePtr msg);
     };
     /**
      * @Description  Definition of member function of SeparatedState class in StaStateMachine.
@@ -384,6 +390,22 @@ public:
         StaStateMachine *pStaStateMachine;
     };
 
+    /**
+     * @Description  Definition of member function of ApReconnectState class in StaStateMachine.
+     *
+     */
+    class ApReconnectState : public State {
+    public:
+        explicit ApReconnectState(StaStateMachine *staStateMachine);
+        ~ApReconnectState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
+
+    private:
+        StaStateMachine *pStaStateMachine;
+    };
+
     class DhcpResultNotify {
     public:
         /**
@@ -437,6 +459,7 @@ public:
         void TryToSaveIpV4ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToSaveIpV6ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
+        void UpdateNetLinkInfoForIpV6(IpInfo &ipInfo, IpV6Info &ipv6Info);
         void TryToJumpToConnectedState(int iptype);
         void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
         void SaveDhcpResultExt(DhcpResult *dest, DhcpResult *source);
@@ -1026,6 +1049,9 @@ private:
     void ResetWifi7WurInfo();
     void UpdateLinkedInfoFromScanInfo();
     void SetSupportedWifiCategory();
+    void RegisterEnhanceServiceStaCallback();
+    void OnEnhanceServiceStaEvent(int eventId, int param);
+    void UnRegisterEnhanceServiceStaCallback();
 #endif
     void SetConnectMethod(int connectMethod);
     void FillSuiteB192Cfg(WifiHalDeviceConfig &halDeviceConfig) const;
@@ -1066,6 +1092,7 @@ private:
     sptr<NetStateObserver> m_NetWorkState;
     IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */
     ISelfCureService *selfCureService_ = nullptr;
+    StaEnhanceCallback staEnhanceCallback_;
 #endif
 
     int targetNetworkId_;
@@ -1075,6 +1102,7 @@ private:
     bool enableSignalPoll;
     bool isRoam;
     bool isCurrentRoaming_ = false;
+    bool isWaitForReconnect_ = false;
     int64_t lastTimestamp;
     bool autoPullBrowserFlag;
     PortalState portalState;
@@ -1095,6 +1123,7 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
+    ApReconnectState *pApReConnectState;
     int m_instId;
     std::map<std::string, time_t> wpa3BlackMap;
     std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];

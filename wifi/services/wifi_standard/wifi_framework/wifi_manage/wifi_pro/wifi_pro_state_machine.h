@@ -295,6 +295,7 @@ private:
     bool IsKeepCurrWifiConnectedExtral();
     void Handle5GWifiTo2GWifi();
     void HandleHigherCategoryToLowerCategory();
+    bool GenelinkSelectNetwork(const std::vector<InterScanInfo> &scanInfos);
 };
 } // namespace Wifi
 } // namespace OHOS

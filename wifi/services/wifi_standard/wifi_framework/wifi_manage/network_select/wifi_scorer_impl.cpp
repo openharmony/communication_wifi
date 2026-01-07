@@ -269,6 +269,8 @@ SavedNetworkScorer::SavedNetworkScorer(const std::string &scorerName) : Composit
     AddScorer(std::make_shared<Network5gBonusScorer>());
     ExternalWifiCommonBuildManager::GetInstance().BuildScore(
         TagType::HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI_CATEGORY_TAG, *this);
+    ExternalWifiCommonBuildManager::GetInstance().BuildScore(
+        TagType::HAS_INTERNET_NETWORK_SELECTOR_SCORE_GENELINK_TAG, *this);
 }
 
 NoInternetNetworkStatusHistoryScorer::NoInternetNetworkStatusHistoryScorer()
@@ -297,6 +299,8 @@ ApQualityScorer::ApQualityScorer(const std::string &scorerName) : CompositeWifiS
     AddScorer(std::make_shared<Network5gBonusScorer>());
     ExternalWifiCommonBuildManager::GetInstance().BuildScore(
         TagType::HAS_INTERNET_NETWORK_SELECTOR_SCORE_WIFI_CATEGORY_TAG, *this);
+    ExternalWifiCommonBuildManager::GetInstance().BuildScore(
+        TagType::HAS_INTERNET_NETWORK_SELECTOR_SCORE_GENELINK_TAG, *this);
     AddScorer(std::make_shared<SecurityBonusScorer>());
 }
 }

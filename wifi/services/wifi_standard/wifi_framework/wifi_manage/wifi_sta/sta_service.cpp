@@ -885,7 +885,8 @@ int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfi
 {
     int ret = -1;
     if (config.uid > WIFI_INVALID_UID) {
-        ret = WifiSettings::GetInstance().GetCandidateConfig(config.uid, config.ssid, config.keyMgmt, outConfig);
+        ret = WifiSettings::GetInstance().GetCandidateConfig(config.uid, config.ssid, config.keyMgmt, outConfig,
+            m_instId);
     } else {
         ret = WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, outConfig, m_instId);
     }
@@ -900,9 +901,9 @@ ErrCode StaService::OnSystemAbilityChanged(int systemAbilityid, bool add)
 #ifndef OHOS_ARCH_LITE
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     if (systemAbilityid == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID) {
-        uint32_t supplierId = WifiNetAgent::GetInstance().GetSupplierId();
+        uint32_t supplierId = WifiNetAgent::GetInstance().GetSupplierId(m_instId);
         if ((add && !m_connMangerStatus) || (supplierId == INVALID_SUPPLIER_ID)) {
-            WifiNetAgent::GetInstance().ResetSupplierId();
+            WifiNetAgent::GetInstance().ResetSupplierId(m_instId);
             pStaStateMachine->OnNetManagerRestart();
         }
         m_connMangerStatus = add;

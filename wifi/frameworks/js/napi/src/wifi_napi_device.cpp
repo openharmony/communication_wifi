@@ -1821,7 +1821,13 @@ NO_SANITIZE("cfi") napi_value GetDeviceMacAddress(napi_env env, napi_callback_in
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     napi_value addr;
     napi_create_string_utf8(env, macAddr.c_str(), NAPI_AUTO_LENGTH, &addr);
-    return addr;
+    napi_value result = nullptr;
+    napi_create_array_with_length(env, 1, &result);
+    napi_status status = napi_set_element(env, result, 0, addr);
+    if (status != napi_ok) {
+        WIFI_LOGE("GetDeviceMacAddress napi set element error: %{public}d", status);
+    }
+    return result;
 }
 
 NO_SANITIZE("cfi") napi_value IsBandTypeSupported(napi_env env, napi_callback_info info)

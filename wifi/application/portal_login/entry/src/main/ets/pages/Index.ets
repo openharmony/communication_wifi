@@ -312,8 +312,13 @@ struct Index {
             showClose: true,
             title: { title: $r('app.string.site_setting_single_website_title', extractDomain(this.webUrl)) },
             onDisappear: () => {
-              this.webviewController.setCustomUserAgent(this.selectedUA);
-              this.webviewController.refresh();
+              try {
+                this.webviewController.setCustomUserAgent(this.selectedUA);
+                this.webviewController.refresh();
+              } catch (error) {
+                hilog.error(DOMAIN, TAG, '%{public}s',
+                  `Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
+              }
             }
           })
       }
@@ -361,7 +366,12 @@ struct Index {
           if (this.isPhone && this.selectedUA === this.harmonyUA) {
             this.setUA();
             this.selectedUA = this.harmonyUA;
-            this.webviewController.setCustomUserAgent(this.selectedUA);
+            try {
+              this.webviewController.setCustomUserAgent(this.selectedUA);
+            } catch (error) {
+              hilog.error(DOMAIN, TAG, '%{public}s',
+                `onPageBegin Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
+            }
           }
         })
         .onProgressChange((event) => {

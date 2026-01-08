@@ -261,6 +261,10 @@ void ScanService::HandleInnerEventReport(ScanInnerEventType innerEvent)
             RestartSystemScanTimeOut();
             break;
         }
+        case RESTART_COMMON_SCAN_TIMER: {
+            RestartCommonScanAfterLpScanFailed();
+            break;
+        }
         case SYSTEM_SINGLE_SCAN_TIMER: {
             HandleSystemSingleScanTimeOut();
             break;
@@ -284,7 +288,7 @@ ErrCode ScanService::Scan(ScanType scanType, int scanStyle)
         WIFI_LOGE("scanStyle is %{public}d, but do not support LP scan.\n", scanStyle);
         return WIFI_OPT_FAILED;
     }
- 
+
     if (ScanControlInner(scanType, scanStyle) != WIFI_OPT_SUCCESS) {
         return WIFI_OPT_FAILED;
     }
@@ -637,6 +641,7 @@ int ScanService::StoreRequestScanConfig(const ScanConfig &scanConfig, const Inte
         static_cast<int64_t>(times.tv_sec) * SECOND_TO_MICRO_SECOND + times.tv_nsec / SECOND_TO_MILLI_SECOND;
     storeScanConfig.fullScanFlag = scanConfig.fullScanFlag;
     storeScanConfig.scanType = scanConfig.scanType;
+    storeScanConfig.scanStyle = scanConfig.scanStyle;
     storeScanConfig.scanningWithParamFlag = scanConfig.scanningWithParamFlag;
 
     std::unique_lock<std::mutex> lock(scanConfigMapMutex);
@@ -653,12 +658,20 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
     std::unique_lock<std::mutex> lock(scanConfigMapMutex);
     bool needRestartSystemScan = false;
     bool needReportScanResult = false;
+    /* Indicates if LP scan failed */
+    bool lpScanFailed = true;
+
     for (std::vector<int>::iterator reqIter = requestIndexList.begin(); reqIter != requestIndexList.end(); ++reqIter) {
         ScanConfigMap::iterator configIter = scanConfigMap.find(*reqIter);
         /* No configuration found. */
         if (configIter == scanConfigMap.end()) {
             continue;
         }
+ 
+        if (configIter->second.scanStyle != SCAN_TYPE_LOW_PRIORITY) {
+            lpScanFailed = false;
+        }
+
         if (configIter->second.scanType != ScanType::SCAN_TYPE_SYSTEMTIMER) {
             needReportScanResult = true;
         } else {
@@ -667,11 +680,10 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
         }
         scanConfigMap.erase(*reqIter);
     }
-    if (pScanStateMachine != nullptr && needRestartSystemScan && systemScanFailedNum < MAX_SYSTEM_SCAN_FAILED_NUM
-        && staStatus == static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
-        pScanStateMachine->StopTimer(static_cast<int>(RESTART_SYSTEM_SCAN_TIMER));
-        pScanStateMachine->StartTimer(static_cast<int>(RESTART_SYSTEM_SCAN_TIMER), RESTART_SYSTEM_SCAN_TIME);
-    }
+ 
+    HandleSystemScanFailed(needRestartSystemScan);
+    HandleLpScanFailed(lpScanFailed);
+
     if (needReportScanResult) {
         /* Notification of the end of scanning. */
         ReportScanFinishEvent(static_cast<int>(ScanHandleNotify::SCAN_FAIL));
@@ -679,6 +691,44 @@ void ScanService::HandleCommonScanFailed(std::vector<int> &requestIndexList)
     }
     WifiCommonEventHelper::PublishScanFinishedEvent(static_cast<int>(ScanHandleNotify::SCAN_FAIL), "OnScanFinished");
     return;
+}
+
+void ScanService::HandleSystemScanFailed(bool needRestartSystemScan)
+{
+    if (pScanStateMachine != nullptr && needRestartSystemScan && systemScanFailedNum < MAX_SYSTEM_SCAN_FAILED_NUM &&
+        staStatus == static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED)) {
+        pScanStateMachine->StopTimer(static_cast<int>(RESTART_SYSTEM_SCAN_TIMER));
+        pScanStateMachine->StartTimer(static_cast<int>(RESTART_SYSTEM_SCAN_TIMER), RESTART_SYSTEM_SCAN_TIME);
+    }
+}
+ 
+void ScanService::HandleLpScanFailed(bool lpScanFailed)
+{
+    if (!lpScanFailed) {
+        return;
+    }
+    WIFI_LOGI("LP Scan is aborted.");
+    Hid2dUpperScene softbusScene;
+    Hid2dUpperScene castScene;
+    Hid2dUpperScene miracastScene;
+    WifiP2pLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(SOFT_BUS_SERVICE_UID, softbusScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID, castScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(MIRACAST_SERVICE_UID, miracastScene);
+    WifiNetworkControlInfo NetworkControlInfo = WifiConfigCenter::GetInstance().GetNetworkControlInfo();
+ 
+    if (((softbusScene.scene & 0x07) > 0 && (softbusScene.scene & 0x07) <= 0x03) ||
+        (castScene.scene & 0x07) > 0 || (miracastScene.scene & 0x07) > 0 ||
+        NetworkControlInfo.state == GameSceneId::MSG_GAME_ENTER_PVP_BATTLE ||
+        NetworkControlInfo.state == GameSceneId::MSG_GAME_STATE_FOREGROUND) {
+        WIFI_LOGD("can not restart common scan after Lp scan failed.");
+        return;
+    }
+ 
+    if (pScanStateMachine != nullptr) {
+        pScanStateMachine->StopTimer(static_cast<int>(RESTART_COMMON_SCAN_TIMER));
+        pScanStateMachine->StartTimer(static_cast<int>(RESTART_COMMON_SCAN_TIMER), RESTART_COMMON_SCAN_TIME);
+    }
 }
 
 void ScanService::HandleCommonScanInfo(
@@ -1625,6 +1675,14 @@ void ScanService::RestartSystemScanTimeOut()
 void ScanService::HandleSystemSingleScanTimeOut()
 {
     StartSingleScanWithoutControlTimer();
+}
+
+void ScanService::RestartCommonScanAfterLpScanFailed()
+{
+    WIFI_LOGI("Enter RestartCommonScanAfterLpScanFailed.\n");
+    if (Scan(ScanType::SCAN_DEFAULT) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("RestartCommonScan failed.");
+    }
 }
 
 void ScanService::GetScanControlInfo()

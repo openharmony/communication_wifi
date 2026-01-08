@@ -50,6 +50,12 @@ typedef enum HalScanResult {
     HAL_PNO_SCAN_OVER_OK = 3,       /* PNO Scan success notification */
 } HalScanResult;
 
+typedef enum Hal80211ScanCmd {
+    HAL_CMD_NEW_SCAN_RESULTS = 34,
+    HAL_CMD_SCAN_ABORTED = 35,
+    HAL_CMD_SCHED_SCAN_RESULTS = 77,
+} Hal80211ScanCmd;
+ 
 typedef enum HalConnectStatus {
     HAL_WPA_CB_CONNECTED = 1,
     HAL_WPA_CB_DISCONNECTED = 2,

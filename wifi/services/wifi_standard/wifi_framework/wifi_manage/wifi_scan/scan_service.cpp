@@ -708,6 +708,7 @@ void ScanService::HandleLpScanFailed(bool lpScanFailed)
     if (!lpScanFailed) {
         return;
     }
+
     WIFI_LOGI("LP Scan is aborted.");
     Hid2dUpperScene softbusScene;
     Hid2dUpperScene castScene;
@@ -725,7 +726,6 @@ void ScanService::HandleLpScanFailed(bool lpScanFailed)
         WIFI_LOGD("can not restart common scan after Lp scan failed.");
         return;
     }
- 
     if (pScanStateMachine != nullptr) {
         pScanStateMachine->StopTimer(static_cast<int>(RESTART_COMMON_SCAN_TIMER));
         pScanStateMachine->StartTimer(static_cast<int>(RESTART_COMMON_SCAN_TIMER), RESTART_COMMON_SCAN_TIME);

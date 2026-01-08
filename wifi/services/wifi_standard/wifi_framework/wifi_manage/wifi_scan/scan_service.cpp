@@ -717,7 +717,7 @@ void ScanService::HandleLpScanFailed(bool lpScanFailed)
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID, castScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(MIRACAST_SERVICE_UID, miracastScene);
     WifiNetworkControlInfo NetworkControlInfo = WifiConfigCenter::GetInstance().GetNetworkControlInfo();
- 
+
     if (((softbusScene.scene & 0x07) > 0 && (softbusScene.scene & 0x07) <= 0x03) ||
         (castScene.scene & 0x07) > 0 || (miracastScene.scene & 0x07) > 0 ||
         NetworkControlInfo.state == GameSceneId::MSG_GAME_ENTER_PVP_BATTLE ||

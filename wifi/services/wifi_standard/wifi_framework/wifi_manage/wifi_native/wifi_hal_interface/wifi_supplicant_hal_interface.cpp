@@ -144,11 +144,15 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode, int instId) c
     return WIFI_HAL_OPT_FAILED;
 }
 
-void WifiSupplicantHalInterface::NotifyScanResultEvent()
+void WifiSupplicantHalInterface::NotifyScanResultEvent(uint32_t event)
 {
     std::lock_guard<std::mutex> lock(mSupplicantHalMutex);
     if (mCallback.onScanNotify) {
-        mCallback.onScanNotify(HAL_SINGLE_SCAN_OVER_OK);
+        if (event == HAL_CMD_SCAN_ABORTED) {
+            mCallback.onScanNotify(HAL_SINGLE_SCAN_FAILED);
+        } else {
+            mCallback.onScanNotify(HAL_SINGLE_SCAN_OVER_OK);
+        }
     }
 }
 }  // namespace Wifi

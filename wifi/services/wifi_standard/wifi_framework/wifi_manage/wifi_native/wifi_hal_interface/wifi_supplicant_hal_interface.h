@@ -136,7 +136,7 @@ public:
      */
     WifiErrorNo WpaSetPowerMode(bool mode, int instId) const;
 
-    void NotifyScanResultEvent();
+    void NotifyScanResultEvent(uint32_t event);
 private:
     SupplicantEventCallback mCallback;
     static std::mutex mSupplicantHalMutex;

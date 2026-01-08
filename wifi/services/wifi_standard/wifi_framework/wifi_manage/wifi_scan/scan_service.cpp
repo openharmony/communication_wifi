@@ -112,6 +112,7 @@ bool ScanService::InitScanService(const IScanSerivceCallbacks &scanSerivceCallba
         WIFI_LOGE("InitScanMonitor failed.\n");
         return false;
     }
+
     pScanMonitor->SetScanStateMachine(pScanStateMachine);
     int delayMs = 100;
     pScanStateMachine->MessageExecutedLater(static_cast<int>(CMD_SCAN_PREPARE), delayMs);

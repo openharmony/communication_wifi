@@ -471,6 +471,7 @@ struct Index {
     if (retryFlag) {
       updateOnHttpErrorReceive(RETRY_CODE);
       if (this.retryCount < MAX_RETRY) {
+        this.retryCount++;
         try {
           this.webviewController.loadUrl(this.defaultUrl);
           hilog.info(DOMAIN, 'TAG', '%{public}s', 'handleHttpError retryCount:' + this.retryCount);

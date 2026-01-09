@@ -3290,41 +3290,53 @@ HWTEST_F(ScanServiceTest, AllowLpScanTest02, TestSize.Level1)
 HWTEST_F(ScanServiceTest, HandleSystemScanFailedTest01, TestSize.Level1)
 {
     pScanService->systemScanFailedNum = 0;
-    pScanService->staStatus = static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED);
-    pScanService->HandleSystemScanFailed(false);
+    pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_ASSOCIATING);
+    pScanService->HandleSystemScanFailed();
 }
 
 HWTEST_F(ScanServiceTest, HandleSystemScanFailedTest02, TestSize.Level1)
 {
     pScanService->systemScanFailedNum = 0;
     pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
-    pScanService->HandleSystemScanFailed(false);
-}
-
-HWTEST_F(ScanServiceTest, HandleSystemScanFailedTest03, TestSize.Level1)
-{
-    pScanService->systemScanFailedNum = 0;
-    pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
-    pScanService->HandleSystemScanFailed(true);
+    pScanService->HandleSystemScanFailed();
 }
 
 HWTEST_F(ScanServiceTest, HandleLpScanFailedTest01, TestSize.Level1)
 {
-    pScanService->HandleLpScanFailed(false);
+    Hid2dUpperScene softbusScene;
+    softbusScene.scene = 0x07;
+    WifiConfigCenter::GetInstance().SetHid2dUpperScene(1024, softbusScene);
+    pScanService->HandleLpScanFailed();
 }
 
 HWTEST_F(ScanServiceTest, HandleLpScanFailedTest02, TestSize.Level1)
 {
     Hid2dUpperScene softbusScene;
-    softbusScene.scene = 0x07;
+    softbusScene.scene = 0x05;
     WifiConfigCenter::GetInstance().SetHid2dUpperScene(1024, softbusScene);
-    pScanService->HandleLpScanFailed(false);
+    pScanService->HandleLpScanFailed();
 }
 
 HWTEST_F(ScanServiceTest, RestartCommonScanAfterLpScanFailedTest01, TestSize.Level1)
 {
     pScanService->scanStartedFlag = false;
     pScanService->RestartCommonScanAfterLpScanFailed();
+}
+
+HWTEST_F(ScanServiceTest, AllowCommonScanOnLpScanFailureTest01, TestSize.Level1)
+{
+    Hid2dUpperScene softbusScene;
+    softbusScene.scene = 0x05;
+    WifiConfigCenter::GetInstance().SetHid2dUpperScene(1024, softbusScene);
+    pScanService->AllowCommonScanOnLpScanFailure();
+}
+
+HWTEST_F(ScanServiceTest, AllowCommonScanOnLpScanFailureTest02, TestSize.Level1)
+{
+    Hid2dUpperScene castScene;
+    castScene.scene = 0x07;
+    WifiConfigCenter::GetInstance().SetHid2dUpperScene(5526, castScene);
+    pScanService->AllowCommonScanOnLpScanFailure();
 }
 } // namespace Wifi
 } // namespace OHOS

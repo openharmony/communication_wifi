@@ -720,7 +720,6 @@ bool ScanService::AllowCommonScanOnLpScanFailure()
     Hid2dUpperScene softbusScene;
     Hid2dUpperScene castScene;
     Hid2dUpperScene miracastScene;
-    WifiP2pLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(SOFT_BUS_SERVICE_UID, softbusScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID, castScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(MIRACAST_SERVICE_UID, miracastScene);

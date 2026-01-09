@@ -554,15 +554,18 @@ private:
     /**
      * @Description System scanning failure processing, restart after a delay.
      *
-     * @param needRestartSystemScan - need to restart system scan
      */
-    void HandleSystemScanFailed(bool needRestartSystemScan);
+    void HandleSystemScanFailed();
     /**
      * @Description LP scanning failure processing, restart common scan after a delay.
      *
-     * @param lpScanFailed - LP Scan failure status; true = failed, false = success
      */
-    void HandleLpScanFailed(bool lpScanFailed);
+    void HandleLpScanFailed();
+    /**
+     * @Description Determine whether to allow common scan when LP scan fails.
+     *
+     */
+    bool AllowCommonScanOnLpScanFailure();
     /**
      * @Description Callback function for obtaining the PNO scanning result
      *

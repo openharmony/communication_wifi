@@ -61,6 +61,7 @@ private:
     Pref5gStatisticsInfo perf5gChrInfo_;
     std::atomic<bool> isNewBssidConnected_ = true;
     const int apMaxNum_ = 20;
+    bool lpScanFlag_ = true;
     void UpdateCurrentApInfo(InterScanInfo &wifiScanInfo);
     void UpdateRelationApInfo(std::vector<WifiDeviceConfig> &wifiDeviceConfigs, std::vector<InterScanInfo> &scanInfos);
     void GetCandidateRelationApInfo(std::vector<CandidateRelationApInfo> &candidateRelationApInfos,

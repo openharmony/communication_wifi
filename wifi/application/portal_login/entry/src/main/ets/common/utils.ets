@@ -201,7 +201,7 @@ export function loadUAWhiteList(context: common.Context): void {
     const config = JSON.parse(jsonString) as object;
     const filePath: string = config?.['configPath'];
     let file = fs.openSync(filePath, fs.OpenMode.READ_ONLY);
-    hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList success open file')
+    hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList success open file');
     const stat = fs.statSync(file.fd);
     const fileSize = stat.size;
     let buf = new ArrayBuffer(fileSize);
@@ -213,7 +213,7 @@ export function loadUAWhiteList(context: common.Context): void {
     const hmosWhiteList: string[] = jsonConfig?.['PortalUAWhiteList']?.['Hmos'];
     if (hmosWhiteList && hmosWhiteList.length > 0) {
       hmosComplexRegex_ = new RegExp(hmosWhiteList.join('|'));
-      hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList hmosWhiteList size:' + hmosWhiteList.length)
+      hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList hmosWhiteList size:' + hmosWhiteList.length);
     }
     const retryListObj: object[] = jsonConfig?.["PortalUAWhiteList"]?.["RetryList"];
     for (let i = 0; i < retryListObj.length; i++) {

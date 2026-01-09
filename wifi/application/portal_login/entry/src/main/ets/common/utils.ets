@@ -17,8 +17,9 @@ import { Want, common } from '@kit.AbilityKit'
 import { connection } from '@kit.NetworkKit'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { hilog } from '@kit.PerformanceAnalysisKit'
-import { url } from '@kit.ArkTS'
+import { url, util, JSON } from '@kit.ArkTS'
 import { updateInitUrl, updateBindNetTime, updateBindNetSuccess } from './chr';
+import { fileIo as fs } from '@kit.CoreFileKit';
 
 const DOMAIN = 0x01560
 const TAG = 'Utils';
@@ -28,6 +29,7 @@ let url_: string = '';
 let netId_: number = -1;
 let shouldShowBrowseItem_: boolean = true;
 let isInOOBE_: boolean = false;
+let hmosComplexRegex_: RegExp | undefined;
 
 export function setShouldShowBrowseItem(want: Want): void {
   if (want.parameters) {
@@ -175,8 +177,47 @@ export function extractDomain(urlString: string): string {
 
 export enum UserAgentSet {
   harmonyUA = '',
-  mobileUA = 'Mozilla/5.0 (Linux; Android 12; BRA-AL00) AppleWebKit/537.36 (KHTML, like Gecko) ' + 
-  'Chrome/100.0.4896.75 Mobile Safari/537.36',
+  mobileUA = 'Mozilla/5.0 (Linux; Android 12;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.196 ' +
+    'HuaweiBrowser/16.0.1.301 Mobile Safari/537.36',
   desktopUA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' +
-    'Chrome/114.0.0.0 Safari/537.36'
+    'Chrome/114.0.5735.196 Safari/537.36'
+}
+ 
+export enum HarmonyUserAgentSet {
+  harmonyUAHmos = 'Mozilla/5.0 (Phone; OpenHarmony 6.0;) AppleWebKit/537.36 (KHTML, like Gecko) ' +
+    'Chrome/132.0.0.0 Safari/537.36 ArkWeb/6.0.0.120 Mobile HuaweiBrowser/5.1.11.312',
+  harmonyUACompatible = 'Mozilla/5.0 (Phone; OpenHarmony 6.0; Android 10.0;) AppleWebKit/537.36 (KHTML, like Gecko) ' +
+    'Chrome/132.0.0.0 Safari/537.36 ArkWeb/6.0.0.120 Mobile HuaweiBrowser/5.1.11.312',
+}
+
+export function loadUAWhiteList(context: common.Context): void {
+  try {
+    const rawContent: Uint8Array = context.resourceManager.getRawFileContentSync('config.json');
+    const decoder = util.TextDecoder.create('utf-8');
+    const jsonString = decoder.decodeToString(rawContent);
+    const config = JSON.parse(jsonString) as object;
+    const filePath: string = config?.['configPath'];
+    let file = fs.openSync(filePath, fs.OpenMode.READ_ONLY);
+    hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList success open file')
+    const stat = fs.statSync(file.fd);
+    const fileSize = stat.size;
+    let buf = new ArrayBuffer(fileSize);
+    fs.readSync(file.fd, buf);
+    fs.closeSync(file.fd);
+    let bufU8 = new Uint8Array(buf, 0, buf.byteLength)
+    const jsonRaw = decoder.decodeToString(bufU8);
+    const jsonConfig = JSON.parse(jsonRaw) as object;
+    const hmosWhiteList: string[] = jsonConfig?.['PortalUAWhiteList']?.['Hmos'];
+    if (hmosWhiteList && hmosWhiteList.length > 0) {
+      hmosComplexRegex_ = new RegExp(hmosWhiteList.join('|'));
+      hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList hmosWhiteList size:' + hmosWhiteList.length)
+    }
+  } catch (err) {
+    hilog.error(DOMAIN, 'TAG', '%{public}s', 'Failed loadUAWhiteList error message: ' + err.message +
+      ', error code: ' + err.code);
+  }
+}
+ 
+export function getHmosUAComplexRegex(): RegExp|undefined {
+  return hmosComplexRegex_;
 }

@@ -21,7 +21,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { SymbolGlyphModifier } from '@kit.ArkUI';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
-  validateURL, getIsInOOBE
+  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet
 } from '../common/utils';
 import {
   updateFinalUrl,updateOnHttpErrorReceive,updateOnErrorReceive,updateOnSslErrorEvent,updateAboutToDisappear
@@ -102,6 +102,7 @@ struct Index {
   private isNetBind: boolean = false;
   @State timerCount: number = 10;
   private timerId: number = -1;
+  private isPhone: boolean = false;
 
   @Builder
   ContextMenu() {
@@ -311,8 +312,13 @@ struct Index {
             showClose: true,
             title: { title: $r('app.string.site_setting_single_website_title', extractDomain(this.webUrl)) },
             onDisappear: () => {
-              this.webviewController.setCustomUserAgent(this.selectedUA);
-              this.webviewController.refresh();
+              try {
+                this.webviewController.setCustomUserAgent(this.selectedUA);
+                this.webviewController.refresh();
+              } catch (error) {
+                hilog.error(DOMAIN, TAG, '%{public}s',
+                  `Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
+              }
             }
           })
       }
@@ -347,16 +353,26 @@ struct Index {
         .onControllerAttached(() => {
           try {
             this.harmonyUA = this.webviewController.getUserAgent();
-            const isPhone = /Phone/i.test(this.harmonyUA);
+            this.isPhone = /Phone/i.test(this.harmonyUA);
             this.selectedUA = this.harmonyUA;
-            hilog.info(DOMAIN, TAG, '%{public}s', 'UA isPhone: '  + isPhone);
+            hilog.info(DOMAIN, TAG, '%{public}s', 'UA isPhone: '  + this.isPhone);
           } catch (error) {
-            hilog.error(DOMAIN, TAG, '%{public}s', `Failed to set UA. Code:${error.code}, message:${error.message}`);
+            hilog.error(DOMAIN, TAG, '%{public}s', `Failed to get UA. Code:${error.code}, message:${error.message}`);
           }
         })
         .onPageBegin(() => {
           updateFinalUrl(this.webUrl);
           this.loadProgress = 0;
+          if (this.isPhone && this.selectedUA === this.harmonyUA) {
+            this.setUA();
+            this.selectedUA = this.harmonyUA;
+            try {
+              this.webviewController.setCustomUserAgent(this.selectedUA);
+            } catch (error) {
+              hilog.error(DOMAIN, TAG, '%{public}s',
+                `onPageBegin Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
+            }
+          }
         })
         .onProgressChange((event) => {
           this.loadProgress = event.newProgress;
@@ -399,6 +415,7 @@ struct Index {
             primaryButton: {
               value: $r('app.string.confirm_dialog_cancel'),
               action: () => {
+                hilog.info(DOMAIN, TAG, 'primaryButton handleCancel');
                 event.handler.handleCancel();
               }
             },
@@ -406,11 +423,13 @@ struct Index {
               value: $r('app.string.ssl_error_dialog_continue_btn'),
               fontColor: $r('sys.color.warning'),
               action: () => {
+                hilog.info(DOMAIN, TAG, 'secondaryButton handleConfirm');
                 event.handler.handleConfirm();
               }
             },
             cancel: () => {
-              event.handler.handleCancel();
+              hilog.info(DOMAIN, TAG, 'cancel handleConfirm');
+              event.handler.handleConfirm();
             }
           })
         })
@@ -422,6 +441,18 @@ struct Index {
     .padding({ top: px2vp(this.topRectHeight) })
   }
   
+  private setUA():void {
+    hilog.info(DOMAIN, TAG, '%{public}s', 'setUA enter.');
+    this.harmonyUA = HarmonyUserAgentSet.harmonyUACompatible;
+    let pattern:RegExp|undefined = getHmosUAComplexRegex();
+    if (pattern) {
+      if (pattern.test(extractDomain(this.webUrl))){
+        this.harmonyUA = HarmonyUserAgentSet.harmonyUAHmos;
+        hilog.info(DOMAIN, TAG, '%{public}s', 'setUA harmonyUAHmos.');
+      }
+    }
+  }
+
   private startCountdown() {
     this.timerId = setInterval(() => {
       hilog.info(DOMAIN, TAG, '%{public}s', 'Timer count is:' + this.timerCount);
@@ -469,6 +500,13 @@ struct Index {
     }
     emitter.on('WANT_UPDATE', () => {
       hilog.info(DOMAIN, TAG, '%{public}s', 'on new want.');
+      try {
+        this.webviewController.clearSslCache();
+        hilog.info(DOMAIN, TAG, '%{public}s', 'clearSslCache');
+      } catch (error) {
+        let err: BusinessError = error as BusinessError;
+        hilog.error(DOMAIN, TAG, '%{public}s', `Failed to clearSslCache. Code:${err.code}, message:${err.message}`);
+      }
       this.isNetBind = false;
       this.timerCount = 10;
       this.isLoaded = false;

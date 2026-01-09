@@ -16,7 +16,7 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
-import { setUrl, setNetId, setShouldShowBrowseItem, setIsInOOBE, getIsInOOBE } from '../common/utils';
+import { setUrl, setNetId, setShouldShowBrowseItem, setIsInOOBE, getIsInOOBE, loadUAWhiteList } from '../common/utils';
 import { updateOnNewWant, updateOnBackground } from '../common/chr';
 import { emitter } from '@kit.BasicServicesKit';
 import { BusinessError } from '@kit.BasicServicesKit';
@@ -36,6 +36,7 @@ export default class EntryAbility extends UIAbility {
       hilog.info(DOMAIN, TAG, '%{public}s', 'in oobe.');
       setIsInOOBE(true);
     }
+    loadUAWhiteList(this.context.getApplicationContext());
   }
 
   onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {

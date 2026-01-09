@@ -21,7 +21,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { SymbolGlyphModifier } from '@kit.ArkUI';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
-  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet
+  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl
 } from '../common/utils';
 import {
   updateFinalUrl,updateOnHttpErrorReceive,updateOnErrorReceive,updateOnSslErrorEvent,updateAboutToDisappear

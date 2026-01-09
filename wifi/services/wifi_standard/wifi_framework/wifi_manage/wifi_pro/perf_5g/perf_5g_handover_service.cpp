@@ -689,7 +689,7 @@ void Perf5gHandoverService::RssiUpdate(int32_t rssi)
         return;
     }
     int scanStyle = SCAN_DEFAULT_TYPE;
-    if (lpScanFlag_) {
+    if (lpScanFlag_.load()) {
         scanStyle = WifiConfigCenter::GetInstance().GetLpScanAbility() && !HasHiddenNetworkSsid() ?
             SCAN_TYPE_LOW_PRIORITY : SCAN_DEFAULT_TYPE;
     } else {

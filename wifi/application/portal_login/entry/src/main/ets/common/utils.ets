@@ -215,12 +215,12 @@ export function loadUAWhiteList(context: common.Context): void {
       hmosComplexRegex_ = new RegExp(hmosWhiteList.join('|'));
       hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList hmosWhiteList size:' + hmosWhiteList.length);
     }
-    const retryListObj: object[] = jsonConfig?.["PortalUAWhiteList"]?.["RetryList"];
+    const retryListObj: object[] = jsonConfig?.['PortalUAWhiteList']?.['RetryList'];
     for (let i = 0; i < retryListObj.length; i++) {
-      retryList_.push([retryListObj[i]?.["Url"], retryListObj[i]?.["HttpCode"]])
+      retryList_.push([retryListObj[i]?.['Url'], retryListObj[i]?.['HttpCode']])
     }
     hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList retryList size:' + retryList_.length);
-    defaultUrl_ = jsonConfig?.["PortalUAWhiteList"]?.["DefaultUrl"];
+    defaultUrl_ = jsonConfig?.['PortalUAWhiteList']?.['DefaultUrl'];
     hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList defaultUrl size:' + defaultUrl_.length);
   } catch (err) {
     hilog.error(DOMAIN, 'TAG', '%{public}s', 'Failed loadUAWhiteList error message: ' + err.message +

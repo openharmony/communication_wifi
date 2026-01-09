@@ -715,6 +715,27 @@ void ScanService::HandleLpScanFailed()
     }
 }
 
+bool ScanService::AllowCommonScanOnLpScanFailure()
+{
+    Hid2dUpperScene softbusScene;
+    Hid2dUpperScene castScene;
+    Hid2dUpperScene miracastScene;
+    WifiP2pLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(SOFT_BUS_SERVICE_UID, softbusScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID, castScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(MIRACAST_SERVICE_UID, miracastScene);
+    WifiNetworkControlInfo NetworkControlInfo = WifiConfigCenter::GetInstance().GetNetworkControlInfo();
+
+    if (((softbusScene.scene & 0x07) > 0 && (softbusScene.scene & 0x07) <= 0x03) ||
+        (castScene.scene & 0x07) > 0 || (miracastScene.scene & 0x07) > 0 ||
+        NetworkControlInfo.state == GameSceneId::MSG_GAME_ENTER_PVP_BATTLE ||
+        NetworkControlInfo.state == GameSceneId::MSG_GAME_STATE_FOREGROUND) {
+        WIFI_LOGW("can not restart common scan after Lp scan failed.");
+        return false;
+    }
+    return true;
+}
+
 void ScanService::HandleCommonScanInfo(
     std::vector<int> &requestIndexList, std::vector<InterScanInfo> &scanInfoList)
 {

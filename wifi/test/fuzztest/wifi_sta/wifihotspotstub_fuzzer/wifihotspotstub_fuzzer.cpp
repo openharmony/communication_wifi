@@ -92,7 +92,7 @@ void OnIsHotspotActiveFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_IS_HOTSPOT_ACTIVE), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_IS_HOTSPOT_ACTIVE), datas);
 }
 
 void OnGetApStateWifiFuzzTest()
@@ -106,7 +106,7 @@ void OnGetApStateWifiFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_HOTSPOT_STATE), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_HOTSPOT_STATE), datas);
 }
 
 void OnGetHotspotConfigFuzzTest()
@@ -120,7 +120,7 @@ void OnGetHotspotConfigFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_HOTSPOT_CONFIG), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_HOTSPOT_CONFIG), datas);
 }
 
 void OnSetApConfigWifiFuzzTest()
@@ -134,7 +134,7 @@ void OnSetApConfigWifiFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_HOTSPOT_CONFIG), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_HOTSPOT_CONFIG), datas);
 }
 
 void OnGetStationListFuzzTest()
@@ -148,7 +148,7 @@ void OnGetStationListFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_STATION_LIST), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_STATION_LIST), datas);
 }
 
 void OnAddBlockListFuzzTest()
@@ -162,7 +162,7 @@ void OnAddBlockListFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_ADD_BLOCK_LIST), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_ADD_BLOCK_LIST), datas);
 }
 
 void OnDelBlockListFuzzTest()
@@ -176,7 +176,7 @@ void OnDelBlockListFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_DEL_BLOCK_LIST), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_DEL_BLOCK_LIST), datas);
 }
 
 void OnGetBlockListsFuzzTest()
@@ -190,7 +190,7 @@ void OnGetBlockListsFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_BLOCK_LISTS), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_BLOCK_LISTS), datas);
 }
 
 void OnGetValidBandsFuzzTest()
@@ -204,7 +204,7 @@ void OnGetValidBandsFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_VALID_BANDS), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_VALID_BANDS), datas);
 }
 
 void OnDisassociateStaFuzzTest()
@@ -218,7 +218,7 @@ void OnDisassociateStaFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_DISASSOCIATE_STA), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_DISASSOCIATE_STA), datas);
 }
 
 void OnGetValidChannelsFuzzTest()
@@ -232,7 +232,7 @@ void OnGetValidChannelsFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_VALID_CHANNELS), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_VALID_CHANNELS), datas);
 }
 
 void OnRegisterCallBackFuzzTest()
@@ -246,7 +246,7 @@ void OnRegisterCallBackFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_REGISTER_CALL_BACK), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_REGISTER_CALL_BACK), datas);
 }
 
 void OnGetSupportedPowerModelFuzzTest()
@@ -260,7 +260,7 @@ void OnGetSupportedPowerModelFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_SUPPORTED_POWER_MODEL), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_SUPPORTED_POWER_MODEL), datas);
 }
 
 void OnGetPowerModelFuzzTest()
@@ -274,7 +274,7 @@ void OnGetPowerModelFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_POWER_MODEL), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_POWER_MODEL), datas);
 }
 
 void OnSetPowerModelFuzzTest()
@@ -288,7 +288,7 @@ void OnSetPowerModelFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_POWER_MODEL), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_POWER_MODEL), datas);
 }
 
 void OnIsHotspotDualBandSupportedFuzzTest()
@@ -302,7 +302,7 @@ void OnIsHotspotDualBandSupportedFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_IS_HOTSPOT_DUAL_BAND_SUPPORTED), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_IS_HOTSPOT_DUAL_BAND_SUPPORTED), datas);
 }
 
 void OnIsOpenSoftApAllowedFuzzTest()
@@ -316,7 +316,7 @@ void OnIsOpenSoftApAllowedFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_IS_OPEN_SOFT_AP_ALLOWED), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_IS_OPEN_SOFT_AP_ALLOWED), datas);
 }
 
 void OnSetApIdleTimeoutFuzzTest()
@@ -330,7 +330,7 @@ void OnSetApIdleTimeoutFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_SET_HOTSPOT_IDLE_TIMEOUT), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_SET_HOTSPOT_IDLE_TIMEOUT), datas);
 }
 
 void OnGetApIfaceNameFuzzTest()
@@ -344,7 +344,7 @@ void OnGetApIfaceNameFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_AP_IFACE_NAME), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_AP_IFACE_NAME), datas);
 }
 
 void OnEnableWifiApTest()
@@ -358,7 +358,7 @@ void OnEnableWifiApTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_STATION_LIST), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_STATION_LIST), datas);
 }
 
 void OnDisableWifiApTest()
@@ -372,7 +372,7 @@ void OnDisableWifiApTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_ENABLE_HOTSPOT), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_ENABLE_HOTSPOT), datas);
 }
 
 void OnEnableWifiFuzzTest()
@@ -385,7 +385,7 @@ void OnEnableWifiFuzzTest()
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     MessageParcel reply;
     MessageOption option;
-    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_STATION_LIST),
+    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_STATION_LIST),
         datas, reply, option);
 }
 
@@ -399,7 +399,7 @@ void OnDisableWifiFuzzTest()
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     MessageParcel reply;
     MessageOption option;
-    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_ENABLE_HOTSPOT),
+    pWifiDeviceStub->OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_ENABLE_HOTSPOT),
         datas, reply, option);
 }
 
@@ -414,7 +414,7 @@ void OnGetSupportedFeaturesFuzzTest()
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
     datas.WriteInt32(tmpInt);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
-    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotIpcCode::COMMAND_GET_SUPPORTED_FEATURES), datas);
+    OnRemoteRequest(static_cast<uint32_t>(WifiHotspotInterfaceCode::COMMAND_GET_SUPPORTED_FEATURES), datas);
 }
 
 bool DoSomethingHotSpotMgrStubTest()

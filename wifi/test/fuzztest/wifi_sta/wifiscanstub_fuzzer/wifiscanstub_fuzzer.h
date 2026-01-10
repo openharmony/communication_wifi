@@ -17,10 +17,9 @@
 #define WIFI_FUZZ_SCAN_STUB_H
 
 #define FUZZ_PROJECT_NAME "wifiscanstub_fuzzer"
-#define MIN_TRANSACTION_ID 1
 
-enum class WifiScanIpcCode {
-    COMMAND_SET_SCAN_CONTROL_INFO = MIN_TRANSACTION_ID,
+enum class WifiScanInterfaceCode {
+    COMMAND_SET_SCAN_CONTROL_INFO = 1,
     COMMAND_SCAN,
     COMMAND_ADVANCE_SCAN,
     COMMAND_IS_WIFI_CLOSED_SCAN,

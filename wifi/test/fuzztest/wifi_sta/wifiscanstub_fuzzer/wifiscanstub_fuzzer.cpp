@@ -40,7 +40,7 @@
 namespace OHOS {
 namespace Wifi {
 constexpr size_t U32_AT_SIZE_ZERO = 4;
-const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiScan";
+const std::u16string FORMMGR_INTERFACE_TOKEN = u"OHOS.wifi.IWifiScan";
 const std::u16string FORMMGR_INTERFACE_TOKEN_DEVICE = u"ohos.wifi.IWifiDeviceService";
 const std::u16string FORMMGR_INTERFACE_TOKEN_SCAN_EX = u"ohos.wifi.IWifiScanMgr";
 static bool g_isInsted = false;

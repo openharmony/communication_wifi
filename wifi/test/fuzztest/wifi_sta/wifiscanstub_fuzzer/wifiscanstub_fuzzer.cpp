@@ -84,7 +84,7 @@ void OnSetScanControlInfoFuzzTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_SCAN_CONTROL_INFO), datas);
+    OnRemoteRequest(static_cast<uint32_t>(IWifiScanIpcCode::COMMAND_SET_SCAN_CONTROL_INFO), datas);
 }
 
 void OnScanByParamsFuzzTest(const uint8_t* data, size_t size)
@@ -96,7 +96,7 @@ void OnScanByParamsFuzzTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SPECIFIED_PARAMS_SCAN), datas);
+    OnRemoteRequest(static_cast<uint32_t>(IWifiScanIpcCode::COMMAND_ADVANCE_SCAN), datas);
 }
 
 void OnIsWifiClosedScanFuzzTest(const uint8_t* data, size_t size)
@@ -108,7 +108,7 @@ void OnIsWifiClosedScanFuzzTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE), datas);
+    OnRemoteRequest(static_cast<uint32_t>(IWifiScanIpcCode::COMMAND_IS_WIFI_CLOSED_SCAN), datas);
 }
 
 void OnGetScanInfoListFuzzTest(const uint8_t* data, size_t size)
@@ -120,7 +120,7 @@ void OnGetScanInfoListFuzzTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_SCAN_INFO_LIST), datas);
+    OnRemoteRequest(static_cast<uint32_t>(IWifiScanIpcCode::COMMAND_GET_SCAN_INFO_LIST), datas);
 }
 
 void OnRegisterCallBackFuzzTest(const uint8_t* data, size_t size)
@@ -132,7 +132,7 @@ void OnRegisterCallBackFuzzTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_REGISTER_SCAN_CALLBACK), datas);
+    OnRemoteRequest(static_cast<uint32_t>(IWifiScanIpcCode::COMMAND_REGISTER_CALL_BACK), datas);
 }
 
 void OnStartWifiPnoScanFuzzTest(const uint8_t* data, size_t size)
@@ -144,7 +144,7 @@ void OnStartWifiPnoScanFuzzTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_START_PNO_SCAN), datas);
+    OnRemoteRequest(static_cast<uint32_t>(IWifiScanIpcCode::COMMAND_START_WIFI_PNO_SCAN), datas);
 }
 
 void OnScanFuzzTest(const uint8_t* data, size_t size)
@@ -156,7 +156,7 @@ void OnScanFuzzTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_FULL_SCAN), datas);
+    OnRemoteRequest(static_cast<uint32_t>(IWifiScanIpcCode::COMMAND_SCAN), datas);
 }
 
 void OnSetScanOnlyAvailableTest(const uint8_t* data, size_t size)
@@ -168,7 +168,7 @@ void OnSetScanOnlyAvailableTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_SET_WIFI_SCAN_ONLY), datas);
+    OnRemoteRequest(static_cast<uint32_t>(IWifiScanIpcCode::COMMAND_SET_SCAN_ONLY_AVAILABLE), datas);
 }
 
 void OnGetScanOnlyAvailableTest(const uint8_t* data, size_t size)
@@ -180,7 +180,7 @@ void OnGetScanOnlyAvailableTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_GET_WIFI_SCAN_ONLY), datas);
+    OnRemoteRequest(static_cast<uint32_t>(IWifiScanIpcCode::COMMAND_SET_SCAN_ONLY_AVAILABLE), datas);
 }
 
 void OnEnableWifiFuzzTest(const uint8_t* data, size_t size)
@@ -216,7 +216,7 @@ void OnGetSupportedFeaturesFuzzTest(const uint8_t* data, size_t size)
     }
     datas.WriteInt32(0);
     datas.WriteBuffer(data, size);
-    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), datas);
+    OnRemoteRequest(static_cast<uint32_t>(IWifiScanIpcCode::COMMAND_GET_SUPPORTED_FEATURES), datas);
 }
 
 bool DoSomethingScanMgrStubTest(const uint8_t* data, size_t size)

@@ -18,7 +18,7 @@
 
 #define FUZZ_PROJECT_NAME "wifihotspotstub_fuzzer"
 
-enum class IWifiHotspotIpcCode {
+enum class WifiHotspotIpcCode {
     COMMAND_IS_HOTSPOT_ACTIVE = 1,
     COMMAND_IS_HOTSPOT_DUAL_BAND_SUPPORTED,
     COMMAND_IS_OPEN_SOFT_AP_ALLOWED,

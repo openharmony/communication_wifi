@@ -18,9 +18,11 @@
 
 namespace OHOS {
 namespace Wifi {
+constexpr int GROUP_REMOVE_TIMEOUT = 3000;
+
 DEFINE_WIFILOG_P2P_LABEL("P2pGroupRemoveState");
-P2pGroupRemoveState::P2pGroupRemoveState()
-    : State("P2pGroupRemoveState")
+P2pGroupRemoveState::P2pGroupRemoveState(P2pStateMachine &stateMachine)
+    : State("P2pGroupRemoveState"), p2pStateMachine(stateMachine)
 {}
 void P2pGroupRemoveState::GoInState()
 {
@@ -30,6 +32,7 @@ void P2pGroupRemoveState::GoInState()
 void P2pGroupRemoveState::GoOutState()
 {
     WIFI_LOGI("             GoOutState");
+    p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_DISABLE_TIMEOUT));
 }
 
 bool P2pGroupRemoveState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -37,6 +40,11 @@ bool P2pGroupRemoveState::ExecuteStateMsg(InternalMessagePtr msg)
     WIFI_LOGI("P2pGroupRemoveState");
     int msgName = msg->GetMessageName();
     switch (static_cast<P2P_STATE_MACHINE_CMD>(msgName)) {
+        case P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE: {
+            p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_DISABLE_TIMEOUT),
+                GROUP_REMOVE_TIMEOUT);
+            return EXECUTED;
+        }
         case P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP: {
             return EXECUTED;
         }

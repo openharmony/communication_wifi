@@ -31,7 +31,7 @@ public:
      * @param None
      * @return None
      */
-    P2pGroupRemoveState();
+    explicit P2pGroupRemoveState(P2pStateMachine &stateMachine);
 
     /**
      * @Description Destroy the P2pGroupRemoveState object
@@ -60,6 +60,9 @@ public:
      * @return - bool true:success   false:fail
      */
     bool ExecuteStateMsg(InternalMessagePtr msg) override;
+
+private:
+    P2pStateMachine &p2pStateMachine;
 };
 } // namespace Wifi
 } // namespace OHOS

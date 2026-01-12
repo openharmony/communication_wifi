@@ -145,6 +145,8 @@ private:
      */
     virtual bool ProcessCmdHid2dCreateGroup(const InternalMessagePtr msg) const;
 
+    virtual bool ProcessCmdDisableTimeout(const InternalMessagePtr msg) const;
+
     WifiErrorNo CreateGroupByConfig(int netId, const WifiP2pConfigInternal &config, int freq) const;
 
     int GetGroupFreq(WifiP2pConfigInternal &config) const;

@@ -58,7 +58,7 @@ public:
           mockP2pIdleState(p2pStateMachine, groupManager, deviceManager),
           mockP2pInvitingState(p2pStateMachine, groupManager, deviceManager),
           mockProvisionDiscoveryState(p2pStateMachine, groupManager, deviceManager),
-          mockP2pGroupRemoveState(),
+          mockP2pGroupRemoveState(p2pStateMachine),
           p2pStateMachine(mockP2pMonitor, groupManager, deviceManager, svrManager,
               mockAuthorizingNegotiationRequestState, mockGroupFormedState, mockGroupNegotiationState,
               mockInvitationReceivedState, mockInvitationRequestState, mockP2pDefaultState,

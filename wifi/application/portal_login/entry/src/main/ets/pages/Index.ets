@@ -21,7 +21,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { SymbolGlyphModifier } from '@kit.ArkUI';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
-  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet
+  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl
 } from '../common/utils';
 import {
   updateFinalUrl,updateOnHttpErrorReceive,updateOnErrorReceive,updateOnSslErrorEvent,updateAboutToDisappear
@@ -31,6 +31,8 @@ import { emitter } from '@kit.BasicServicesKit';
 
 const DOMAIN = 0x01560;
 const TAG = 'Pages';
+const RETRY_CODE = 999;
+const MAX_RETRY = 3;
 
 @Styles function pressedStyles() {
   .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
@@ -83,6 +85,7 @@ struct Index {
   private webviewController: webview.WebviewController = new webview.WebviewController();
   private context = getContext(this) as common.UIAbilityContext;
   @State private webUrl: string = getUrl();
+  private defaultUrl: string = getDefaultUrl();
   private harmonyUA: string = UserAgentSet.harmonyUA;
   private mobileUA: string = UserAgentSet.mobileUA;
   private desktopUA:string = UserAgentSet.desktopUA;
@@ -103,6 +106,7 @@ struct Index {
   @State timerCount: number = 10;
   private timerId: number = -1;
   private isPhone: boolean = false;
+  @State retryCount: number = 0;
 
   @Builder
   ContextMenu() {
@@ -395,8 +399,10 @@ struct Index {
         })
         .onHttpErrorReceive((event) => {
           if (event) {
-            updateOnHttpErrorReceive(event.response.getResponseCode());
-            hilog.info(DOMAIN, TAG, 'getResponseCode:' + event.response.getResponseCode());
+            let errorCode = event.response.getResponseCode();
+            let failedUrl = event.request.getRequestUrl();
+            hilog.info(DOMAIN, TAG, 'getResponseCode:' + errorCode);
+            this.handleHttpError(errorCode, failedUrl);
           }
         })
         .onErrorReceive((event) => {
@@ -450,6 +456,32 @@ struct Index {
         this.harmonyUA = HarmonyUserAgentSet.harmonyUAHmos;
         hilog.info(DOMAIN, TAG, '%{public}s', 'setUA harmonyUAHmos.');
       }
+    }
+  }
+
+  private handleHttpError(code:number, url:string) {
+    const retryList:StringNumberPair[] = getRetryList();
+    let retryFlag = false;
+    for (let i = 0;i < retryList.length;i++) {
+      if (retryList[i][0] === extractDomain(url) && retryList[i][1] === code) {
+        retryFlag = true;
+        break;
+      }
+    }
+    if (retryFlag) {
+      updateOnHttpErrorReceive(RETRY_CODE);
+      if (this.retryCount < MAX_RETRY) {
+        this.retryCount++;
+        try {
+          this.webviewController.loadUrl(this.defaultUrl);
+          hilog.info(DOMAIN, 'TAG', '%{public}s', 'handleHttpError retryCount:' + this.retryCount);
+        } catch (error) {
+          let err: BusinessError = error as BusinessError;
+          hilog.error(DOMAIN, 'TAG', '%{public}s', `retry Failed to load url.Code:${err.code},message:${err.message}`);
+        }
+      }
+    } else {
+      updateOnHttpErrorReceive(code);
     }
   }
 

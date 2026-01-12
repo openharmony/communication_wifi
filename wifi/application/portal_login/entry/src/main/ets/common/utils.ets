@@ -30,6 +30,9 @@ let netId_: number = -1;
 let shouldShowBrowseItem_: boolean = true;
 let isInOOBE_: boolean = false;
 let hmosComplexRegex_: RegExp | undefined;
+export type StringNumberPair = [string, number];
+let retryList_: StringNumberPair[] = [];
+let defaultUrl_: string = '';
 
 export function setShouldShowBrowseItem(want: Want): void {
   if (want.parameters) {
@@ -198,20 +201,27 @@ export function loadUAWhiteList(context: common.Context): void {
     const config = JSON.parse(jsonString) as object;
     const filePath: string = config?.['configPath'];
     let file = fs.openSync(filePath, fs.OpenMode.READ_ONLY);
-    hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList success open file')
+    hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList success open file');
     const stat = fs.statSync(file.fd);
     const fileSize = stat.size;
     let buf = new ArrayBuffer(fileSize);
     fs.readSync(file.fd, buf);
     fs.closeSync(file.fd);
-    let bufU8 = new Uint8Array(buf, 0, buf.byteLength)
+    let bufU8 = new Uint8Array(buf, 0, buf.byteLength);
     const jsonRaw = decoder.decodeToString(bufU8);
     const jsonConfig = JSON.parse(jsonRaw) as object;
     const hmosWhiteList: string[] = jsonConfig?.['PortalUAWhiteList']?.['Hmos'];
     if (hmosWhiteList && hmosWhiteList.length > 0) {
       hmosComplexRegex_ = new RegExp(hmosWhiteList.join('|'));
-      hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList hmosWhiteList size:' + hmosWhiteList.length)
+      hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList hmosWhiteList size:' + hmosWhiteList.length);
     }
+    const retryListObj: object[] = jsonConfig?.['PortalUAWhiteList']?.['RetryList'];
+    for (let i = 0; i < retryListObj.length; i++) {
+      retryList_.push([retryListObj[i]?.['Url'], retryListObj[i]?.['HttpCode']])
+    }
+    hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList retryList size:' + retryList_.length);
+    defaultUrl_ = jsonConfig?.['PortalUAWhiteList']?.['DefaultUrl'];
+    hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList defaultUrl size:' + defaultUrl_.length);
   } catch (err) {
     hilog.error(DOMAIN, 'TAG', '%{public}s', 'Failed loadUAWhiteList error message: ' + err.message +
       ', error code: ' + err.code);
@@ -220,4 +230,12 @@ export function loadUAWhiteList(context: common.Context): void {
  
 export function getHmosUAComplexRegex(): RegExp|undefined {
   return hmosComplexRegex_;
+}
+ 
+export function getRetryList(): StringNumberPair[] {
+  return retryList_;
+}
+ 
+export function getDefaultUrl(): string {
+  return defaultUrl_;
 }

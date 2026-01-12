@@ -75,6 +75,8 @@ void P2pGroupOperatingState::Init()
         [this](const InternalMessagePtr msg) { return this->ProcessCmdDeleteGroup(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP,
         [this](const InternalMessagePtr msg) { return this->ProcessCmdHid2dCreateGroup(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_DISABLE_TIMEOUT,
+        [this](const InternalMessagePtr msg) { return this->ProcessCmdDisableTimeout(msg); }));
 }
 
 bool P2pGroupOperatingState::ProcessCmdCreateRptGroup(const InternalMessagePtr msg) const
@@ -456,6 +458,24 @@ bool P2pGroupOperatingState::ExecuteStateMsg(InternalMessagePtr msg)
 void P2pGroupOperatingState::SetEnhanceService(IEnhanceService* enhanceService)
 {
     enhanceService_ = enhanceService;
+}
+
+bool P2pGroupOperatingState::ProcessCmdDisableTimeout(const InternalMessagePtr msg) const
+{
+    WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
+    if (!groupManager.GetCurrentGroup().IsGroupOwner()) {
+        p2pStateMachine.StopP2pDhcpClient();
+    } else {
+        if (!p2pStateMachine.StopDhcpServer()) {
+            WIFI_LOGW("failed to stop Dhcp server.");
+        }
+    }
+    WifiP2pGroupInfo invalidGroup;
+    groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, invalidGroup);
+    p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
+    p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
+    return EXECUTED;
 }
 
 }  // namespace Wifi

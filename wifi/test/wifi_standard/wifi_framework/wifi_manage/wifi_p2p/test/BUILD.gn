@@ -87,6 +87,7 @@ ohos_unittest("wifi_p2p_test") {
     "p2p_group_formation_state_test.cpp",
     "p2p_group_join_state_test.cpp",
     "p2p_group_operating_state_test.cpp",
+    "p2p_group_remove_test.cpp",
     "p2p_idle_state_test.cpp",
     "p2p_inviting_state_test.cpp",
     "p2p_monitor_test.cpp",

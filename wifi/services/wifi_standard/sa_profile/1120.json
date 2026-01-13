@@ -8,7 +8,8 @@
                 "auto-restart":true,
                 "distributed":false,
                 "dump-level":1,
-                "extension":["backup", "restore"]
+                "extension":["backup", "restore"],
+                "min_hdi_proxy_version": []
             }
         ]
 }

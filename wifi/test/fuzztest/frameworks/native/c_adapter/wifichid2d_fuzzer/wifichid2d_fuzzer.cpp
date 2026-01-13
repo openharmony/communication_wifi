@@ -47,7 +47,7 @@ void Hid2dRequestGcIpTest(const uint8_t* data, size_t size)
 {
     FuzzedDataProvider FDP(data, size);
 
-   std::vector<uint8_t> gcMac = FDP.ConsumeBytes<uint8_t>(MACLEN);
+    std::vector<uint8_t> gcMac = FDP.ConsumeBytes<uint8_t>(MACLEN);
     if (gcMac.size() != MACLEN) {
         return;
     }

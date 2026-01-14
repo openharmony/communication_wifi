@@ -30,6 +30,17 @@ constexpr const int UNKNOWN_UID = -1;
 constexpr const int UNKNOWN_MODE = -1;
 constexpr const int POWER_MODE_FREQUENCY_DEFAULT = 0;
 
+enum PowerSceneFlag : uint32_t {
+    POWER_SCENE_NONE = 0,
+    POWER_SCENE_GAME = (1 << 0),
+    POWER_SCENE_LOW_LATENCY = (1 << 1)
+};
+
+enum LowLatencySceneId : int {
+    MSG_LOW_LATENCY_EXIT = 0,
+    MSG_LOW_LATENCY_ENTER = 1,
+};
+
 struct AsyncParamInfo {
     int controlId;
     int limitMode;
@@ -81,9 +92,11 @@ private:
         const int uid = -1);
     void HighPriorityTransmit(int uid, int protocol, int enable);
     void GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
+    void LowLatencyNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
     void VideoCallNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
     void LogSpeedLimitConfigs();
-    void SetGamePowerMode(bool gameActive);
+    void SetActivePowerScenes(PowerSceneFlag scene, bool active);
+    void UpdatePowerModeByScenes();
     void ResetPowerMode();
     void CheckAndResetGamePowerMode(const std::string &bundleName);
     void UpdateAncoAppInfos(const WifiNetworkControlInfo &networkControlInfo);
@@ -109,7 +122,8 @@ private:
     std::unique_ptr<WifiEventHandler> m_asyncSendLimit = nullptr;
     int64_t m_delayTime;
     std::atomic<bool> isVpnConnected_ = false;
-    std::atomic<int> cachedGamePowerMode_ = UNKNOWN_MODE;
+    std::atomic<int> cachedPowerMode_ = UNKNOWN_MODE;
+    std::atomic<uint32_t> activePowerScenes_{POWER_SCENE_NONE};
 };
 } // namespace Wifi
 } // namespace OHOS

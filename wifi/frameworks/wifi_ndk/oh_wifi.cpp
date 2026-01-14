@@ -31,7 +31,7 @@ static Wifi_ResultCode WifiErrCodeToResultCode(OHOS::Wifi::ErrCode errCode)
             return WIFI_INVALID_PARAM;
         case OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED:
             return WIFI_NOT_SUPPORTED;
-        case OHOS::Wifi::WIFI_OPT_STA_NOT_OPENED
+        case OHOS::Wifi::WIFI_OPT_STA_NOT_OPENED:
             return WIFI_STA_DISABLED;
         default:
             return WIFI_OPERATION_FAILED;

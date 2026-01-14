@@ -35,6 +35,7 @@ namespace {
     const int ON = 1;
     const int OFF = 0;
     const std::string ASYNC_WORK_NAME = "SendLimitInfo";
+    const std::string LOW_LATENCY_EXIT_ASYNC_WORK_NAME = "LowLatencyExit";
     const std::string HANDLE_WIFI_CONNECT_CHANGED = "HandleWifiConnectStateChanged";
     const std::string HANDLE_FOREGROUND_APP_CHANGED = "HandleForegroundAppChangedAction";
     const std::string LIMIT_SPEED = "LimitSpeed";
@@ -42,6 +43,7 @@ namespace {
     const int GAME_BOOST_ENABLE = 1;
     const int GAME_BOOST_DISABLE = 0;
     const int BOOST_UDP_TYPE = 17;
+    constexpr int64_t LOW_LATENCY_EXIT_TIMEOUT = 3 * 60 * 1000;
 }
 
 AppNetworkSpeedLimitService::AppNetworkSpeedLimitService()
@@ -314,6 +316,8 @@ void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParam
             WifiConfigCenter::GetInstance().SetNetworkControlInfo(asyncParamInfo.networkControlInfo);
         } else if (asyncParamInfo.networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_VIDEO_CALL) {
             VideoCallNetworkSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
+        } else if (asyncParamInfo.networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_LOW_LATENCY) {
+            LowLatencyNetworkSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
         } else {
             UpdateAncoAppInfos(asyncParamInfo.networkControlInfo);
             UpdateNoSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
@@ -534,7 +538,7 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
     switch (networkControlInfo.state) {
         case GameSceneId::MSG_GAME_STATE_START:
         case GameSceneId::MSG_GAME_STATE_FOREGROUND:
-            SetGamePowerMode(false);
+            SetActivePowerScenes(POWER_SCENE_GAME, false);
             if (AppParser::GetInstance().IsOverGameRtt(networkControlInfo.bundleName, networkControlInfo.rtt)) {
                 SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
                     networkControlInfo.uid);
@@ -545,16 +549,37 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
             break;
         case GameSceneId::MSG_GAME_STATE_BACKGROUND:
         case GameSceneId::MSG_GAME_STATE_END:
-            SetGamePowerMode(false);
+            SetActivePowerScenes(POWER_SCENE_GAME, false);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_OFF, GAME_BOOST_DISABLE, networkControlInfo.uid);
             break;
         case GameSceneId::MSG_GAME_ENTER_PVP_BATTLE:
-            SetGamePowerMode(true);
+            SetActivePowerScenes(POWER_SCENE_GAME, true);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE, networkControlInfo.uid);
             break;
         case GameSceneId::MSG_GAME_EXIT_PVP_BATTLE:
-            SetGamePowerMode(false);
+            SetActivePowerScenes(POWER_SCENE_GAME, false);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_3, GAME_BOOST_DISABLE, networkControlInfo.uid);
+            break;
+        default:
+            WIFI_LOGE("%{public}s there is no such state.", __FUNCTION__);
+            break;
+    }
+}
+
+void AppNetworkSpeedLimitService::LowLatencyNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)
+{
+    WIFI_LOGI("%{public}s enter, low latency state is %{public}d", __FUNCTION__, networkControlInfo.state);
+    switch (networkControlInfo.state) {
+        case LowLatencySceneId::MSG_LOW_LATENCY_ENTER:
+            m_asyncSendLimit->RemoveAsyncTask(LOW_LATENCY_EXIT_ASYNC_WORK_NAME);
+            m_asyncSendLimit->PostAsyncTask([this]() {
+                    this->SetActivePowerScenes(POWER_SCENE_LOW_LATENCY, false);
+                }, LOW_LATENCY_EXIT_ASYNC_WORK_NAME, LOW_LATENCY_EXIT_TIMEOUT);
+            SetActivePowerScenes(POWER_SCENE_LOW_LATENCY, true);
+            break;
+        case LowLatencySceneId::MSG_LOW_LATENCY_EXIT:
+            m_asyncSendLimit->RemoveAsyncTask(LOW_LATENCY_EXIT_ASYNC_WORK_NAME);
+            SetActivePowerScenes(POWER_SCENE_LOW_LATENCY, false);
             break;
         default:
             WIFI_LOGE("%{public}s there is no such state.", __FUNCTION__);
@@ -605,48 +630,69 @@ void AppNetworkSpeedLimitService::HandleNetworkConnectivityChange(int32_t bearTy
     }
 }
 
-void AppNetworkSpeedLimitService::SetGamePowerMode(bool gameActive)
+void AppNetworkSpeedLimitService::SetActivePowerScenes(PowerSceneFlag scene, bool active)
 {
-    if (!m_isWifiConnected && gameActive) {
-        WIFI_LOGI("%{public}s WiFi not connected, skip activating power mode", __FUNCTION__);
+    if (!m_isWifiConnected && active) {
+        WIFI_LOGI("Set power scenes %{public}d skipped: WiFi not connected.", static_cast<int>(scene));
         return;
     }
-    int powerMode = gameActive ? POWER_MODE_ON : POWER_MODE_OFF;
-    int cachedMode = cachedGamePowerMode_;
-    if (cachedMode == powerMode) {
-        WIFI_LOGD("%{public}s Power mode already set to %{public}d, skip redundant HAL call",
-            __FUNCTION__, powerMode);
-        return;
-    }
-    int frequency = POWER_MODE_FREQUENCY_DEFAULT;
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode("wlan0", frequency, powerMode);
-    if (ret != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("%{public}s SetPmMode failed, gameActive=%{public}d, ret=%{public}d",
-            __FUNCTION__, gameActive, ret);
+
+    uint32_t oldScenes = activePowerScenes_.load();
+    uint32_t newScenes;
+    if (active) {
+        newScenes = oldScenes | static_cast<uint32_t>(scene);
     } else {
-        cachedGamePowerMode_ = powerMode;
+        newScenes = oldScenes & ~static_cast<uint32_t>(scene);
+    }
+
+    if (oldScenes == newScenes) {
+        WIFI_LOGD("Set power scenes %{public}d skipped: Scenes has not changed.", static_cast<int>(scene));
+        return;
+    }
+
+    WIFI_LOGI("Set power scenes %{public}d -> %{public}d.", static_cast<int>(oldScenes), static_cast<int>(newScenes));
+    activePowerScenes_.store(newScenes);
+    UpdatePowerModeByScenes();
+}
+
+void AppNetworkSpeedLimitService::UpdatePowerModeByScenes()
+{
+    int cachedMode = cachedPowerMode_.load();
+    int targetMode = (activePowerScenes_.load() != POWER_SCENE_NONE) ? POWER_MODE_ON : POWER_MODE_OFF;
+    if (cachedMode == targetMode) {
+        WIFI_LOGD("Set power mode %{public}d skipped: Mode has not changed.", targetMode);
+        return;
+    }
+
+    int frequency = POWER_MODE_FREQUENCY_DEFAULT;
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode("wlan0", frequency, targetMode);
+    if (ret != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("Set power mode failed, targetMode: %{public}d, ret: %{public}d.", targetMode, ret);
+    } else {
+        cachedPowerMode_.store(targetMode);
+        WIFI_LOGI("Set power mode %{public}d -> %{public}d.", cachedMode, targetMode);
     }
 }
- 
+
 void AppNetworkSpeedLimitService::ResetPowerMode()
 {
-    int cachedMode = cachedGamePowerMode_;
-    if (cachedMode == POWER_MODE_OFF) {
+    activePowerScenes_.store(POWER_SCENE_NONE);
+    if (cachedPowerMode_.load() == POWER_MODE_OFF) {
         return;
     }
     int frequency = POWER_MODE_FREQUENCY_DEFAULT;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode("wlan0", frequency, POWER_MODE_OFF);
     if (ret != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("Reset power mode failed, ret=%{public}d", ret);
+        WIFI_LOGE("Reset power mode failed, ret: %{public}d.", ret);
     } else {
-        cachedGamePowerMode_ = POWER_MODE_OFF;
+        cachedPowerMode_.store(POWER_MODE_OFF);
+        WIFI_LOGI("Reset power mode to OFF.");
     }
 }
  
 void AppNetworkSpeedLimitService::CheckAndResetGamePowerMode(const std::string &bundleName)
 {
-    int cachedMode = cachedGamePowerMode_;
-    if (cachedMode != POWER_MODE_ON) {
+    if ((activePowerScenes_.load() & POWER_SCENE_GAME) == 0) {
         return;
     }
     bool isGame = AppParser::GetInstance().IsRssGameApp(bundleName);
@@ -658,7 +704,7 @@ void AppNetworkSpeedLimitService::CheckAndResetGamePowerMode(const std::string &
     // Foreground app is not a game, but in no-sleep mode
     WIFI_LOGI("%{public}s Non-game app [%{public}s], resetting power mode to normal sleep",
         __FUNCTION__, bundleName.c_str());
-    ResetPowerMode();
+    SetActivePowerScenes(POWER_SCENE_GAME, false);
 }
 } // namespace Wifi
 } // namespace OHOS

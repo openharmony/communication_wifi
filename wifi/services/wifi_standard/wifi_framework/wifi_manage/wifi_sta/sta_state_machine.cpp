@@ -4289,6 +4289,9 @@ std::string StaStateMachine::GetSuitableKeyMgmtForWpaMixed(const WifiDeviceConfi
             }
         }
     }
+    if (candidateKeyMgmtList.empty()) {
+        return config.keyMgmt;
+    }
     for (auto keyMgmt : candidateKeyMgmtList) {
         if (keyMgmt == KEY_MGMT_SAE) {
             return KEY_MGMT_SAE;

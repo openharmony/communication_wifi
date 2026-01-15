@@ -1262,7 +1262,8 @@ void WifiProStateMachine::WifiHasNetState::StartScanWithDynamicStrategy(int32_t 
  
 bool WifiProStateMachine::WifiHasNetState::IsSatisfiedLpScanCondition()
 {
-    if (!WifiConfigCenter::GetInstance().GetLpScanAbility()) {
+    IEnhanceService  *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr || !pEnhanceService->IsSupportLpScanAbility()) {
         WIFI_LOGE("do not satisfy Lp scan condition.");
         return false;
     }

@@ -19,12 +19,14 @@
 #include "wificp2p_fuzzer.h"
 #include "wifi_fuzz_common_func.h"
 #include "kits/c/wifi_p2p.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 static void GetP2pEnableStatusTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     P2pState state = P2P_STATE_NONE;
     if (size > 0) {
-        int temp = static_cast<int>(data[0]) % P2P_STATE_CLOSED;
+        int temp = FDP.ConsumeIntegral<int>() % P2P_STATE_CLOSED;
         state = static_cast<P2pState>(temp);
     }
     (void)GetP2pEnableStatus(&state);
@@ -32,19 +34,21 @@ static void GetP2pEnableStatusTest(const uint8_t* data, size_t size)
 
 static void GStartP2pListenTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     int index = 0;
     int period = 0;
     int interval = 0;
 
     if (index >= TWO) {
-        period = static_cast<int>(data[index++]);
-        interval = static_cast<int>(data[index++]);
+        period = FDP.ConsumeIntegral<int>();
+        interval = FDP.ConsumeIntegral<int>();
     }
     (void)StartP2pListen(period, interval);
 }
 
 static void CreateGroupTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     WifiP2pConfig config;
     if (size > sizeof(WifiP2pConfig)) {
         if (memcpy_s(config.devAddr, COMMON_MAC_LEN, data, COMMON_MAC_LEN) != EOK) {
@@ -58,9 +62,8 @@ static void CreateGroupTest(const uint8_t* data, size_t size)
         if (memcpy_s(config.groupName, P2P_NAME_LENGTH, data + COMMON_MAC_LEN, P2P_NAME_LENGTH - 1) != EOK) {
             return;
         }
-        int index = 0;
-        config.netId = static_cast<int>(OHOS::Wifi::U32_AT(data));
-        config.groupOwnerIntent = static_cast<int>(data[index++]);
+        config.netId = FDP.ConsumeIntegral<int>();
+        config.groupOwnerIntent = FDP.ConsumeIntegral<int>();
         config.goBand = GO_BAND_AUTO;
     }
     (void)CreateGroup(&config);
@@ -68,6 +71,7 @@ static void CreateGroupTest(const uint8_t* data, size_t size)
 
 static void DeleteGroupTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     WifiP2pGroupInfo group;
 
     if (size > sizeof(WifiP2pGroupInfo)) {
@@ -86,18 +90,18 @@ static void DeleteGroupTest(const uint8_t* data, size_t size)
         if (memcpy_s(group.goIpAddress, IP_ADDR_STR_LEN, data, IP_ADDR_STR_LEN - 1) != EOK) {
             return;
         }
-        int index = 0;
-        group.isP2pGroupOwner = static_cast<int>(data[index++]);
-        group.networkId = static_cast<int>(data[index++]);
-        group.frequency = static_cast<int>(data[index++]);
-        group.isP2pPersistent = static_cast<int>(data[index++]);
-        group.clientDevicesSize = static_cast<int>(data[index++]);
+        group.isP2pGroupOwner = FDP.ConsumeIntegral<int>();
+        group.networkId = FDP.ConsumeIntegral<int>();
+        group.frequency = FDP.ConsumeIntegral<int>();
+        group.isP2pPersistent = FDP.ConsumeIntegral<int>();
+        group.clientDevicesSize = FDP.ConsumeIntegral<int>();
     }
     (void)DeleteGroup(&group);
 }
 
 static void P2pConnectTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     WifiP2pConfig config;
     if (size > sizeof(WifiP2pConfig)) {
         if (memcpy_s(config.devAddr, COMMON_MAC_LEN, data, COMMON_MAC_LEN) != EOK) {
@@ -111,9 +115,8 @@ static void P2pConnectTest(const uint8_t* data, size_t size)
         if (memcpy_s(config.groupName, P2P_NAME_LENGTH, data + COMMON_MAC_LEN, P2P_NAME_LENGTH - 1) != EOK) {
             return;
         }
-        int index = 0;
-        config.netId = static_cast<int>(OHOS::Wifi::U32_AT(data));
-        config.groupOwnerIntent = static_cast<int>(data[index++]);
+        config.netId = FDP.ConsumeIntegral<int>();
+        config.groupOwnerIntent = FDP.ConsumeIntegral<int>();
         config.goBand = GO_BAND_AUTO;
     }
     (void)P2pConnect(&config);
@@ -121,6 +124,7 @@ static void P2pConnectTest(const uint8_t* data, size_t size)
 
 static void GetCurrentGroupTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     WifiP2pGroupInfo groupInfo;
 
     if (size > sizeof(WifiP2pGroupInfo)) {
@@ -139,24 +143,25 @@ static void GetCurrentGroupTest(const uint8_t* data, size_t size)
         if (memcpy_s(groupInfo.goIpAddress, IP_ADDR_STR_LEN, data, IP_ADDR_STR_LEN - 1) != EOK) {
             return;
         }
-        int index = 0;
-        groupInfo.isP2pGroupOwner = static_cast<int>(data[index++]);
-        groupInfo.networkId = static_cast<int>(data[index++]);
-        groupInfo.frequency = static_cast<int>(data[index++]);
-        groupInfo.isP2pPersistent = static_cast<int>(data[index++]);
-        groupInfo.clientDevicesSize = static_cast<int>(data[index++]);
+        groupInfo.isP2pGroupOwner = FDP.ConsumeIntegral<int>();
+        groupInfo.networkId = FDP.ConsumeIntegral<int>();
+        groupInfo.frequency = FDP.ConsumeIntegral<int>();
+        groupInfo.isP2pPersistent = FDP.ConsumeIntegral<int>();
+        groupInfo.clientDevicesSize = FDP.ConsumeIntegral<int>();
     }
     (void)GetCurrentGroup(&groupInfo);
 }
 
 static void GetP2pConnectedStatusTest(const uint8_t* data, size_t size)
 {
-    int status = static_cast<int>(data[0]);
+    FuzzedDataProvider FDP(data, size);
+    int status = FDP.ConsumeIntegral<int>();
     (void)GetP2pConnectedStatus(&status);
 }
 
 static void QueryP2pLocalDeviceTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     WifiP2pDevice deviceInfo;
     if (size >= sizeof(WifiP2pDevice)) {
         if (memcpy_s(deviceInfo.deviceName, P2P_NAME_LENGTH, data, P2P_NAME_LENGTH - 1) != EOK) {
@@ -174,21 +179,21 @@ static void QueryP2pLocalDeviceTest(const uint8_t* data, size_t size)
         if (memcpy_s(deviceInfo.primaryDeviceType, DEVICE_TYPE_LENGTH, data, DEVICE_TYPE_LENGTH - 1) != EOK) {
             return;
         }
-        int index = 0;
-        deviceInfo.status = static_cast<P2pDeviceStatus>(static_cast<int>(data[index++]) % PDS_UNAVAILABLE);
-        deviceInfo.wfdInfo.wfdEnabled = static_cast<int>(data[index++]);
-        deviceInfo.wfdInfo.deviceInfo = static_cast<int>(data[index++]);
-        deviceInfo.wfdInfo.ctrlPort = static_cast<int>(data[index++]);
-        deviceInfo.wfdInfo.maxThroughput = static_cast<int>(data[index++]);
-        deviceInfo.supportWpsConfigMethods = static_cast<unsigned int>(data[index++]);
-        deviceInfo.deviceCapabilitys = static_cast<int>(data[index++]);
-        deviceInfo.groupCapabilitys = static_cast<int>(data[index++]);
+        deviceInfo.status = static_cast<P2pDeviceStatus>(FDP.ConsumeIntegral<int>() % PDS_UNAVAILABLE);
+        deviceInfo.wfdInfo.wfdEnabled = FDP.ConsumeIntegral<int>();
+        deviceInfo.wfdInfo.deviceInfo = FDP.ConsumeIntegral<int>();
+        deviceInfo.wfdInfo.ctrlPort = FDP.ConsumeIntegral<int>();
+        deviceInfo.wfdInfo.maxThroughput = FDP.ConsumeIntegral<int>();
+        deviceInfo.supportWpsConfigMethods = FDP.ConsumeIntegral<unsigned int>();
+        deviceInfo.deviceCapabilitys = FDP.ConsumeIntegral<int>();
+        deviceInfo.groupCapabilitys = FDP.ConsumeIntegral<int>();
     }
     (void)QueryP2pLocalDevice(&deviceInfo);
 }
 
 static void QueryP2pDevicesTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     WifiP2pDevice clientDevices;
     int retSize = 0;
     int msize = 0;
@@ -208,22 +213,22 @@ static void QueryP2pDevicesTest(const uint8_t* data, size_t size)
         if (memcpy_s(clientDevices.primaryDeviceType, DEVICE_TYPE_LENGTH, data, DEVICE_TYPE_LENGTH - 1) != EOK) {
             return;
         }
-        int index = 0;
-        clientDevices.status = static_cast<P2pDeviceStatus>(static_cast<int>(data[index++]) % PDS_UNAVAILABLE);
-        clientDevices.wfdInfo.wfdEnabled = static_cast<int>(data[index++]);
-        clientDevices.wfdInfo.deviceInfo = static_cast<int>(data[index++]);
-        clientDevices.wfdInfo.ctrlPort = static_cast<int>(data[index++]);
-        clientDevices.wfdInfo.maxThroughput = static_cast<int>(data[index++]);
-        clientDevices.supportWpsConfigMethods = static_cast<unsigned int>(data[index++]);
-        clientDevices.deviceCapabilitys = static_cast<int>(data[index++]);
-        clientDevices.groupCapabilitys = static_cast<int>(data[index++]);
-        msize = static_cast<int>(data[index++]);
+        clientDevices.status = static_cast<P2pDeviceStatus>(FDP.ConsumeIntegral<int>() % PDS_UNAVAILABLE);
+        clientDevices.wfdInfo.wfdEnabled = FDP.ConsumeIntegral<int>();
+        clientDevices.wfdInfo.deviceInfo = FDP.ConsumeIntegral<int>();
+        clientDevices.wfdInfo.ctrlPort = FDP.ConsumeIntegral<int>();
+        clientDevices.wfdInfo.maxThroughput = FDP.ConsumeIntegral<int>();
+        clientDevices.supportWpsConfigMethods = FDP.ConsumeIntegral<unsigned int>();
+        clientDevices.deviceCapabilitys = FDP.ConsumeIntegral<int>();
+        clientDevices.groupCapabilitys = FDP.ConsumeIntegral<int>();
+        msize = FDP.ConsumeIntegral<int>();
     }
     (void)QueryP2pDevices(&clientDevices, msize, &retSize);
 }
 
 static void QueryP2pGroupsTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     WifiP2pGroupInfo groupInfo;
     int msize = 0;
 
@@ -243,13 +248,12 @@ static void QueryP2pGroupsTest(const uint8_t* data, size_t size)
         if (memcpy_s(groupInfo.goIpAddress, IP_ADDR_STR_LEN, data, IP_ADDR_STR_LEN - 1) != EOK) {
             return;
         }
-        int index = 0;
-        groupInfo.isP2pGroupOwner =  static_cast<int>(data[index++]);
-        groupInfo.networkId =  static_cast<int>(data[index++]);
-        groupInfo.frequency =  static_cast<int>(data[index++]);
-        groupInfo.isP2pPersistent =  static_cast<int>(data[index++]);
-        groupInfo.clientDevicesSize =  static_cast<int>(data[index++]);
-        msize = static_cast<int>(data[0]);
+        groupInfo.isP2pGroupOwner =  FDP.ConsumeIntegral<int>();
+        groupInfo.networkId =  FDP.ConsumeIntegral<int>();
+        groupInfo.frequency =  FDP.ConsumeIntegral<int>();
+        groupInfo.isP2pPersistent =  FDP.ConsumeIntegral<int>();
+        groupInfo.clientDevicesSize =  FDP.ConsumeIntegral<int>();
+        msize = FDP.ConsumeIntegral<int>();
     }
     (void)QueryP2pGroups(&groupInfo, msize);
 }

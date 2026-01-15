@@ -3160,7 +3160,6 @@ HWTEST_F(ScanServiceTest, AllowScanByGameScene03, TestSize.Level1)
     WifiNetworkControlInfo networkControlInfo;
     networkControlInfo.state = GameSceneId::MSG_GAME_ENTER_PVP_BATTLE;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetNetworkControlInfo()).WillRepeatedly(Return(networkControlInfo));
- 
     int scanStyle = SCAN_TYPE_LOW_PRIORITY;
     EXPECT_FALSE(pScanService->AllowScanByGameScene(ScanType::SCAN_TYPE_PNO, scanStyle));
 }

@@ -354,6 +354,11 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanTy
     if (scanConfig.scanStyle != SCAN_TYPE_LOW_PRIORITY) {
         if (!params.ssid.empty()) {
             scanConfig.hiddenNetworkSsid.push_back(params.ssid);
+            // for gbk hiddenNetworkSsID
+            std::string gbkSsid = WifiCodeConvertUtil::Utf8ToGbk(params.ssid);
+            if (gbkSsid != params.ssid && !gbkSsid.empty()) {
+                scanConfig.hiddenNetworkSsid.push_back(gbkSsid);
+            }
         } else if (!GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
             /*
             * Invoke the interface provided by the configuration center to obtain the
@@ -2301,6 +2306,13 @@ bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetwo
             iter = deviceConfigs.erase(iter);
         } else {
             ++iter;
+        }
+        if (iter->networkSelectionStatus.connectChoice == iter->networkId) {
+            hiddenNetworkSsid.push_back(iter->ssid);
+            std::string gbkSsid = WifiCodeConvertUtil::Utf8ToGbk(iter->ssid);
+            if (gbkSsid != iter->ssid && ! gbkSsid.empty()) {
+                hiddenNetworkSsid.push_back(gbkSsid);
+            }
         }
     }
     std::sort(deviceConfigs.begin(), deviceConfigs.end(), [](WifiDeviceConfig deviceA, WifiDeviceConfig deviceB) {

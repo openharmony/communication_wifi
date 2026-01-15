@@ -60,6 +60,7 @@ private:
     bool inMonitor_ = false;
     Pref5gStatisticsInfo perf5gChrInfo_;
     std::atomic<bool> isNewBssidConnected_ = true;
+    std::atomic<bool> lpScanFlag_ = false;
     const int apMaxNum_ = 20;
     void UpdateCurrentApInfo(InterScanInfo &wifiScanInfo);
     void UpdateRelationApInfo(std::vector<WifiDeviceConfig> &wifiDeviceConfigs, std::vector<InterScanInfo> &scanInfos);

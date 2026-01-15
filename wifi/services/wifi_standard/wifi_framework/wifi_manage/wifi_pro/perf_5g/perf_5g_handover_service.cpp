@@ -688,9 +688,15 @@ void Perf5gHandoverService::RssiUpdate(int32_t rssi)
     if (connectedAp_->canNotPerf) {
         return;
     }
-    int scanStyle = WifiConfigCenter::GetInstance().GetLpScanAbility() && !HasHiddenNetworkSsid() ?
-        SCAN_TYPE_LOW_PRIORITY : SCAN_DEFAULT_TYPE;
+    int scanStyle = SCAN_DEFAULT_TYPE;
+    if (lpScanFlag_.load()) {
+        scanStyle = WifiConfigCenter::GetInstance().GetLpScanAbility() && !HasHiddenNetworkSsid() ?
+            SCAN_TYPE_LOW_PRIORITY : SCAN_DEFAULT_TYPE;
+    } else {
+        scanStyle = SCAN_DEFAULT_TYPE;
+    }
     ActiveScan(rssi, scanStyle);
+    lpScanFlag_ = !lpScanFlag_;
 }
 bool Perf5gHandoverService::HasHiddenNetworkSsid() const
 {

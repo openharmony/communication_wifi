@@ -1610,7 +1610,7 @@ void HalDeviceManager::RegisterChipHdiDeathCallback(OnChipServiceDied cb)
 int32_t ChipIfaceCallback::OnScanResultsCallback(uint32_t event)
 {
     LOGD("OnScanResultsCallback, event:%{public}d", event);
-    OHOS::Wifi::WifiSupplicantHalInterface::GetInstance().NotifyScanResultEvent();
+    OHOS::Wifi::WifiSupplicantHalInterface::GetInstance().NotifyScanResultEvent(event);
     return 0;
 }
 

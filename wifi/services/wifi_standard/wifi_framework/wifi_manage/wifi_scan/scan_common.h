@@ -99,12 +99,14 @@ struct StoreScanConfig {
     bool fullScanFlag;          /* Flag of scan without specifying parameters */
     ScanType scanType;            /* Flag indicating whether the request is an external scan. */
     bool scanningWithParamFlag; /* Flag Indicating whether scanning with parameter */
+    int scanStyle;              /* Type of scan to triggered the WiFi chip */
     StoreScanConfig()
     {
         scanTime = 0;
         fullScanFlag = false;
         scanType = ScanType::SCAN_TYPE_SYSTEMTIMER;
         scanningWithParamFlag = false;
+        scanStyle = SCAN_DEFAULT_TYPE;
     }
 };
 
@@ -159,6 +161,7 @@ enum ScanInnerEventType {
     RESTART_PNO_SCAN_TIMER = 202,  /* Restart after PNO scanning fails */
     RESTART_SYSTEM_SCAN_TIMER = 203,
     SYSTEM_SINGLE_SCAN_TIMER = 204, /* Automatic scanning in sta disconnected && screen on && hid2d scan controled */
+    RESTART_COMMON_SCAN_TIMER = 205, /* Restart common scan after LP scan failed */
     SCAN_INNER_EVENT_INVALID       /* Invalid value */
 };
 

@@ -884,7 +884,6 @@ void WifiP2pServiceImplFuzzTest03()
     WifiP2pConfig updateConfig {};
     WifiP2pConfig config {};
     mWifiP2pServiceImpl.ConvertMac(updateConfig, config);
-
 }
 
 void WifiP2pStubFuzzTest()

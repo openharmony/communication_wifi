@@ -916,6 +916,31 @@ void WifiP2pStubFuzzTest()
     OHOS::Wifi::OnQueryP2pServicesFuzzTest();
     OHOS::Wifi::OnRegisterCallBackFuzzTest();
     OHOS::Wifi::OnGetSupportedFeaturesFuzzTest();
+}
+
+/* Fuzzer entry point */
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+{
+    if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
+        return 0;
+    }
+    Init();
+    FuzzedDataProvider fdp(data, size);
+    OHOS::Wifi::FDP = &fdp;
+    OHOS::Wifi::WifiP2pStubFuzzTest();
+    OHOS::Wifi::OnHid2dSetUpperSceneFuzzTest();
+    OHOS::Wifi::DoSomethingInterestingWithMyAPI();
+    OHOS::Wifi::WifiP2pServiceImplFuzzTest();
+    OHOS::Wifi::Hid2dIsWideBandwidthSupportedFuzzTest();
+    OHOS::Wifi::OnRemoveGroupClientFuzzTest();
+    OHOS::Wifi::OnHid2dSetGroupTypeTest();
+    OHOS::Wifi::OnSetP2pHighPerffTest();
+    OHOS::Wifi::OnGetSupportChanForBandTest();
+    OHOS::Wifi::OnSetMiracastSinkConfigTest();
+    OHOS::Wifi::DoSomethingInterestingWithMyAPIS();
+    OHOS::Wifi::WifiP2pServiceImplFuzzTest01();
+    OHOS::Wifi::WifiP2pServiceImplFuzzTest02();
+    OHOS::Wifi::WifiP2pServiceImplFuzzTest03();
     OHOS::Wifi::OnSetP2pDeviceNameFuzzTest();
     OHOS::Wifi::OnSetP2pWfdInfoFuzzTest();
     OHOS::Wifi::OnHid2dRequestGcIpFuzzTest();
@@ -931,31 +956,6 @@ void WifiP2pStubFuzzTest()
     OHOS::Wifi::OnHid2dGetSelfWifiCfgInfoFuzzTest();
     OHOS::Wifi::OnHid2dSetPeerWifiCfgInfoFuzzTest();
     OHOS::Wifi::OnQueryP2pLocalDeviceFuzzTest();
-    OHOS::Wifi::OnHid2dSetUpperSceneFuzzTest();
-    OHOS::Wifi::DoSomethingInterestingWithMyAPI();
-    OHOS::Wifi::WifiP2pServiceImplFuzzTest();
-    OHOS::Wifi::Hid2dIsWideBandwidthSupportedFuzzTest();
-    OHOS::Wifi::OnRemoveGroupClientFuzzTest();
-    OHOS::Wifi::OnHid2dSetGroupTypeTest();
-    OHOS::Wifi::OnSetP2pHighPerffTest();
-    OHOS::Wifi::OnGetSupportChanForBandTest();
-    OHOS::Wifi::OnSetMiracastSinkConfigTest();
-    OHOS::Wifi::DoSomethingInterestingWithMyAPIS();
-    OHOS::Wifi::WifiP2pServiceImplFuzzTest01();
-    OHOS::Wifi::WifiP2pServiceImplFuzzTest02();
-    OHOS::Wifi::WifiP2pServiceImplFuzzTest03();
-}
-
-/* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
-{
-    if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
-        return 0;
-    }
-    Init();
-    FuzzedDataProvider fdp(data, size);
-    OHOS::Wifi::FDP = &fdp;
-    OHOS::Wifi::WifiP2pStubFuzzTest();
     sleep(U32_AT_SIZE_ZERO);
     return 0;
 }

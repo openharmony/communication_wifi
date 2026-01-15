@@ -301,8 +301,10 @@ public:
 
     /**
      * @Description on notification receive
+     *
+     * @param notificationId - notification Id
      */
-    virtual void OnNotificationReceive() = 0;
+    virtual void OnNotificationReceive(int notificationId) = 0;
  
     /**
      * @Description on dialog receive

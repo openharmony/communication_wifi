@@ -411,8 +411,6 @@ void AllowAutoSelectDeviceTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->AllowAutoSelectDevice(scanInfo, info);
 }
 
-
-
 void StaAutoConnectServiceFuzzTest(FuzzedDataProvider& FDP)
 {
     std::string conditionName = FDP.ConsumeBytesAsString(NUM_BYTES);

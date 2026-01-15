@@ -1506,7 +1506,7 @@ bool WifiProStateMachine::WifiHasNetState::TryHigherCategoryNetworkSelection(
 
     // IsAutoReconnectPreferred 返回 true 意味着选出了一个更优的网络, 且不是当前网络
     WIFI_LOGI("TryHigherCategoryNetworkSelection: AUTO_CONNECT selected %{public}s as winner, attempting switch.",
-              MacAnonymize(outSelectionResult.interScanInfo.bssid).c_str());
+              SsidAnonymize(outSelectionResult.interScanInfo.ssid).c_str());
     if (!pWifiProStateMachine_->TryWifi2Wifi(outSelectionResult)) {
         WIFI_LOGI("TryHigherCategoryNetworkSelection: TryWifi2Wifi failed to start connection.");
         pWifiProStateMachine_->Wifi2WifiFinish();

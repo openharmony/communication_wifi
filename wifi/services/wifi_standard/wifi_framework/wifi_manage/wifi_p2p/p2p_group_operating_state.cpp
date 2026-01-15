@@ -240,7 +240,7 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessagePtr msg
     }
     SharedLinkManager::IncreaseSharedLink();
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_CONNECTED);
-    (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true);
+    WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     return EXECUTED;
 }

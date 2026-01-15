@@ -230,6 +230,7 @@ bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
         case DISCONNECTED_SCAN_TIMER:
         case RESTART_PNO_SCAN_TIMER:
         case RESTART_SYSTEM_SCAN_TIMER:
+        case RESTART_COMMON_SCAN_TIMER:
         case SYSTEM_SINGLE_SCAN_TIMER:
             pScanStateMachine->ReportScanInnerEvent((ScanInnerEventType)msg->GetMessageName());
             return true;

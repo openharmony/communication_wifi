@@ -122,7 +122,7 @@ WifiErrorNo WifiSupplicantHalInterface::WpaSetPowerMode(bool mode, int instId) c
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
-void WifiSupplicantHalInterface::NotifyScanResultEvent()
+void WifiSupplicantHalInterface::NotifyScanResultEvent(uint32_t event)
 {
 }
 }  // namespace Wifi

@@ -944,10 +944,11 @@ void NotificationEventSubscriber::OnReceiveNotificationEvent(int notificationId)
                 pService->StartPortalCertification();
             }
         }
-    } else if (notificationId == static_cast<int>(WifiNotificationId::WIFI_5G_CONN_NOTIFICATION_ID)) {
+    } else if (notificationId == static_cast<int>(WifiNotificationId::WIFI_5G_CONN_NOTIFICATION_ID) ||
+                notificationId == static_cast<int>(WifiNotificationId::WIFI_TRIBAND_CONN_NOTIFICATION_ID)) {
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
         if (pEnhanceService != nullptr) {
-            pEnhanceService->OnNotificationReceive();
+            pEnhanceService->OnNotificationReceive(notificationId);
         }
     }
 }

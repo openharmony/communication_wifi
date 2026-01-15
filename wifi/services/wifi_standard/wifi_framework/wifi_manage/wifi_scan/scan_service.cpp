@@ -285,7 +285,8 @@ ErrCode ScanService::Scan(ScanType scanType, int scanStyle)
         WIFI_LOGE("Scan service has not started.\n");
         return WIFI_OPT_FAILED;
     }
-    if (!WifiConfigCenter::GetInstance().GetLpScanAbility() && scanStyle == SCAN_TYPE_LOW_PRIORITY) {
+    if (scanStyle == SCAN_TYPE_LOW_PRIORITY && (mEnhanceService == nullptr ||
+        !mEnhanceService->IsSupportLpScanAbility())) {
         WIFI_LOGE("scanStyle is %{public}d, but do not support LP scan.\n", scanStyle);
         return WIFI_OPT_FAILED;
     }
@@ -325,7 +326,8 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanTy
     WIFI_LOGI("Enter ScanWithParam, freqs num:%{public}d.\n", (int)params.freqs.size());
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanType(scanType);
  
-    if (!WifiConfigCenter::GetInstance().GetLpScanAbility() && params.scanStyle == SCAN_TYPE_LOW_PRIORITY) {
+    if (params.scanStyle == SCAN_TYPE_LOW_PRIORITY && (mEnhanceService == nullptr ||
+        !mEnhanceService->IsSupportLpScanAbility())) {
         WIFI_LOGE("scanStyle is %{public}d, but do not support LP scan.\n", params.scanStyle);
         return WIFI_OPT_FAILED;
     }
@@ -2858,8 +2860,8 @@ bool ScanService::AllowScanByMovingFreeze(ScanMode appRunMode)
 
 bool ScanService::AllowLpScan(ScanType scanType)
 {
-    if (WifiConfigCenter::GetInstance().GetLpScanAbility() && (scanType != ScanType::SCAN_TYPE_PNO &&
-        scanType != ScanType::SCAN_TYPE_SYSTEMTIMER)) {
+    if (mEnhanceService != nullptr && mEnhanceService->IsSupportLpScanAbility() &&
+        (scanType != ScanType::SCAN_TYPE_PNO && scanType != ScanType::SCAN_TYPE_SYSTEMTIMER)) {
         return true;
     }
     return false;
@@ -3132,7 +3134,6 @@ void ScanService::InitChipsetInfo()
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService != nullptr) {
         pEnhanceService->SetChipSetInfos(chipsetCategory, chipsetFeatrureCapability);
-        WifiConfigCenter::GetInstance().SetLpScanAbility(pEnhanceService->IsSupportLpScanAbility());
     }
 }
 

@@ -39,6 +39,7 @@ namespace Wifi {
 FuzzedDataProvider *FDP = nullptr;
 const int32_t NUM_BYTES = 1;
 constexpr size_t U32_AT_SIZE_ZERO = 4;
+constexpr int TWO = 2;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";
 const std::u16string FORMMGR_INTERFACE_TOKEN_DEVICE = u"ohos.wifi.IWifiDeviceService";
 static bool g_isInsted = false;
@@ -79,9 +80,8 @@ void OnDiscoverDevicesFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_DEVICES), datas);
 }
@@ -94,9 +94,8 @@ void OnStopDiscoverDevicesFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_DISCOVER_DEVICES), datas);
 }
@@ -109,9 +108,8 @@ void OnDiscoverServicesFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISCOVER_SERVICES), datas);
 }
@@ -124,9 +122,8 @@ void OnStopDiscoverServicesFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_DISCOVER_SERVICES), datas);
 }
@@ -138,9 +135,8 @@ void OnRequestServiceFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REQUEST_SERVICES), datas);
 }
@@ -152,9 +148,8 @@ void OnPutLocalP2pServiceFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_PUT_LOCAL_SERVICES), datas);
 }
@@ -166,9 +161,8 @@ void OnDeleteLocalP2pServiceFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DELETE_LOCAL_SERVICES), datas);
 }
@@ -180,9 +174,8 @@ void OnStartP2pListenFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_START_LISTEN), datas);
 }
@@ -194,9 +187,8 @@ void OnStopP2pListenFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_STOP_LISTEN), datas);
 }
@@ -208,9 +200,8 @@ void OnCreateGroupFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CREATE_GROUP), datas);
 }
@@ -222,9 +213,8 @@ void OnRemoveGroupFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP), datas);
 }
@@ -236,9 +226,8 @@ void OnRemoveGroupClientFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT), datas);
 }
@@ -250,9 +239,8 @@ void OnDeleteGroupFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DELETE_GROUP), datas);
 }
@@ -264,9 +252,8 @@ void OnP2pConnectFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CONNECT), datas);
 }
@@ -278,9 +265,8 @@ void OnP2pCancelConnectFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_CANCEL_CONNECT), datas);
 }
@@ -292,9 +278,8 @@ void OnQueryP2pLinkedInfoFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_INFO), datas);
 }
@@ -306,9 +291,8 @@ void OnGetCurrentGroupFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_CURRENT_GROUP), datas);
 }
@@ -320,9 +304,8 @@ void OnGetP2pEnableStatusFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_ENABLE_STATUS), datas);
 }
@@ -334,9 +317,8 @@ void OnGetP2pDiscoverStatusFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_DISCOVER_STATUS), datas);
 }
@@ -348,9 +330,8 @@ void OnGetP2pConnectedStatusFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_CONNECTED_STATUS), datas);
 }
@@ -362,9 +343,8 @@ void OnQueryP2pDevicesFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_DEVICES), datas);
 }
@@ -376,9 +356,8 @@ void OnQueryP2pGroupsFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_GROUPS), datas);
 }
@@ -390,9 +369,8 @@ void OnQueryP2pServicesFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_SERVICES), datas);
 }
@@ -404,20 +382,18 @@ void OnRegisterCallBackFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_REGISTER_CALLBACK), datas);
 }
 
 void OnGetSupportedFeaturesFuzzTest()
 {
-    MessageParcel datas;
+MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     MessageParcel reply;
     MessageOption option;
@@ -432,9 +408,8 @@ void OnSetP2pDeviceNameFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_SET_DEVICE_NAME), datas);
 }
@@ -446,9 +421,8 @@ void OnSetP2pWfdInfoFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_SET_WFD_INFO), datas);
 }
@@ -460,9 +434,8 @@ void OnHid2dRequestGcIpFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_APPLY_IP), datas);
 }
@@ -474,9 +447,8 @@ void OnHid2dSharedlinkIncreaseFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_INCREASE), datas);
 }
@@ -488,9 +460,8 @@ void OnHid2dSharedlinkDecreaseFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_SHARED_LINK_DECREASE), datas);
 }
@@ -503,9 +474,8 @@ void OnHid2dCreateGroupFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CREATE_GROUP), datas);
 }
@@ -517,9 +487,8 @@ void OnHid2dRemoveGcGroupFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_REMOVE_GC_GROUP), datas);
 }
@@ -530,9 +499,8 @@ void OnHid2dConnectFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CONNECT), datas);
 }
@@ -544,9 +512,8 @@ void OnHid2dConfigIPAddrFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_CONFIG_IP), datas);
 }
@@ -558,9 +525,8 @@ void OnHid2dReleaseIPAddrFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_HID2D_RELEASE_IP), datas);
 }
@@ -572,9 +538,8 @@ void OnHid2dGetRecommendChannelFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_P2P_RECOMMENDED_CHANNEL), datas);
 }
@@ -586,9 +551,8 @@ void OnHid2dGetChannelListFor5GFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_5G_CHANNEL_LIST), datas);
 }
@@ -600,9 +564,8 @@ void OnHid2dGetSelfWifiCfgInfoFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_GET_SELF_WIFI_CFG), datas);
 }
@@ -627,9 +590,8 @@ void OnQueryP2pLocalDeviceFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_LOCAL_DEVICE), datas);
 }
@@ -641,9 +603,8 @@ void OnHid2dSetUpperSceneFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_UPPER_SCENE), datas);
 }
@@ -655,9 +616,8 @@ void DoSomethingInterestingWithMyAPIS()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_ENABLE), datas);
 }
@@ -669,9 +629,8 @@ void DoSomethingInterestingWithMyAPI()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_DISABLE), datas);
 }
@@ -680,9 +639,8 @@ void OnEnableWifiFuzzTest()
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     MessageParcel reply;
     MessageOption option;
@@ -694,9 +652,8 @@ void OnDisableWifiFuzzTest()
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     MessageParcel reply;
     MessageOption option;
@@ -707,10 +664,9 @@ void OnDisableWifiFuzzTest()
 void OnDiscoverPeersFuzzTest()
 {
     MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     MessageParcel reply;
     MessageOption option;
@@ -722,9 +678,8 @@ void OnDisableRandomMacFuzzTest()
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     MessageParcel reply;
     MessageOption option;
@@ -736,9 +691,8 @@ void OnCheckCanUseP2pFuzzTest()
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     MessageParcel reply;
     MessageOption option;
@@ -749,10 +703,9 @@ void OnCheckCanUseP2pFuzzTest()
 void Hid2dIsWideBandwidthSupportedFuzzTest()
 {
     MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_DEVICE);
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     MessageParcel reply;
     MessageOption option;
@@ -799,9 +752,8 @@ void WifiP2pServiceImplFuzzTest()
         LOGE("WriteInterfaceToken failed!");
         return;
     }
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES), datas);
     pWifiP2pServiceImpl->WriteWifiP2pServiceInfo(datas, srvInfo);
@@ -814,9 +766,8 @@ void OnGetSupportChanForBandTest()
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     MessageParcel reply;
     MessageOption option;
@@ -824,14 +775,12 @@ void OnGetSupportChanForBandTest()
         static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_GET_SUPPORT_CHANN_FOR_BAND),
         datas, reply, option);
 }
-
 void OnSetP2pHighPerfTest()
 {
     MessageParcel datas;
     datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
-    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
     std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
-    datas.WriteInt32(tmpInt);
+    datas.WriteInt32(0);
     datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
     MessageParcel reply;
     MessageOption option;
@@ -852,6 +801,90 @@ void OnHid2dSetGroupTypeTest()
     pWifiDeviceStub->OnRemoteRequest(
         static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_P2P_GROUP_ALIVE_MODE),
         datas, reply, option);
+}
+
+void OnSetP2pHighPerffTest()
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(
+        static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_SET_P2P_HIGH_PERF_MODE),
+        datas, reply, option);
+}
+
+void OnSetMiracastSinkConfigTest()
+{
+    MessageParcel datas;
+    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN);
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(0);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
+    MessageParcel reply;
+    MessageOption option;
+    pWifiDeviceStub->OnRemoteRequest(
+        static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_SET_MIRACAST_SINK_CONFIG),
+        datas, reply, option);
+}
+
+void WifiP2pServiceImplFuzzTest01()
+{
+    WifiP2pServiceImpl mWifiP2pServiceImpl;
+    mWifiP2pServiceImpl.CheckCanEnableP2p();
+    mWifiP2pServiceImpl.EnableP2p();
+    mWifiP2pServiceImpl.MonitorCfgChange();
+    mWifiP2pServiceImpl.CheckCanUseP2p();
+    mWifiP2pServiceImpl.CheckAndStopDualWifi();
+}
+
+void WifiP2pServiceImplFuzzTest02()
+{
+    WifiP2pServiceImpl mWifiP2pServiceImpl;
+    Hid2dConnectConfig config;
+    std::string ifName = FDP->ConsumeBytesAsString(NUM_BYTES);
+    IpAddrInfo ipInfo;
+    ipInfo.ip = FDP->ConsumeBytesAsString(NUM_BYTES);
+    ipInfo.gateway = FDP->ConsumeBytesAsString(NUM_BYTES);
+    ipInfo.netmask = FDP->ConsumeBytesAsString(NUM_BYTES);
+    mWifiP2pServiceImpl.Hid2dConnect(config);
+    mWifiP2pServiceImpl.Hid2dConfigIPAddr(ifName, ipInfo);
+    Hid2dUpperScene scene1;
+    scene1.mac = FDP->ConsumeBytesAsString(NUM_BYTES);
+    scene1.scene = FDP->ConsumeIntegral<unsigned int>();
+    scene1.fps = FDP->ConsumeIntegral<int>();
+    scene1.bw = FDP->ConsumeIntegral<unsigned int>();
+    scene1.setTime = FDP->ConsumeIntegral<int64_t>();
+    mWifiP2pServiceImpl.WifiP2pServiceImpl::Hid2dSetUpperScene(ifName, scene1);
+    std::string result = FDP->ConsumeBytesAsString(NUM_BYTES);
+    mWifiP2pServiceImpl.SaBasicDump(result);
+    int32_t channelid = FDP->ConsumeIntegral<int32_t>();
+    mWifiP2pServiceImpl.DiscoverPeers(channelid);
+    int setmode = FDP->ConsumeIntegral<int>();
+    mWifiP2pServiceImpl.DisableRandomMac(setmode);
+    bool isSupport = FDP->ConsumeBool();
+    mWifiP2pServiceImpl.Hid2dIsWideBandwidthSupported(isSupport);
+    std::string config01 = FDP->ConsumeBytesAsString(NUM_BYTES);
+    mWifiP2pServiceImpl.SetMiracastSinkConfig(config01);
+}
+
+void WifiP2pServiceImplFuzzTest03()
+{
+    WifiP2pServiceImpl mWifiP2pServiceImpl;
+    std::vector<int> channels;
+    int band = FDP->ConsumeIntegral<int>();
+    mWifiP2pServiceImpl.GetSupportedChanForBand(channels, band);
+    bool isEnable = FDP->ConsumeBool();
+    mWifiP2pServiceImpl.SetP2pHighPerf(isEnable);
+    GroupLiveType groupType = static_cast<GroupLiveType>(FDP->ConsumeIntegral<int>() % TWO);
+    mWifiP2pServiceImpl.Hid2dSetGroupType(groupType);
+    WifiP2pConfig updateConfig {};
+    WifiP2pConfig config {};
+    mWifiP2pServiceImpl.ConvertMac(updateConfig, config);
+
 }
 
 void WifiP2pStubFuzzTest()
@@ -882,6 +915,7 @@ void WifiP2pStubFuzzTest()
     OHOS::Wifi::OnQueryP2pGroupsFuzzTest();
     OHOS::Wifi::OnQueryP2pServicesFuzzTest();
     OHOS::Wifi::OnRegisterCallBackFuzzTest();
+    OHOS::Wifi::OnGetSupportedFeaturesFuzzTest();
     OHOS::Wifi::OnSetP2pDeviceNameFuzzTest();
     OHOS::Wifi::OnSetP2pWfdInfoFuzzTest();
     OHOS::Wifi::OnHid2dRequestGcIpFuzzTest();
@@ -902,6 +936,14 @@ void WifiP2pStubFuzzTest()
     OHOS::Wifi::WifiP2pServiceImplFuzzTest();
     OHOS::Wifi::Hid2dIsWideBandwidthSupportedFuzzTest();
     OHOS::Wifi::OnRemoveGroupClientFuzzTest();
+    OHOS::Wifi::OnHid2dSetGroupTypeTest();
+    OHOS::Wifi::OnSetP2pHighPerffTest();
+    OHOS::Wifi::OnGetSupportChanForBandTest();
+    OHOS::Wifi::OnSetMiracastSinkConfigTest();
+    OHOS::Wifi::DoSomethingInterestingWithMyAPIS();
+    OHOS::Wifi::WifiP2pServiceImplFuzzTest01();
+    OHOS::Wifi::WifiP2pServiceImplFuzzTest02();
+    OHOS::Wifi::WifiP2pServiceImplFuzzTest03();
 }
 
 /* Fuzzer entry point */

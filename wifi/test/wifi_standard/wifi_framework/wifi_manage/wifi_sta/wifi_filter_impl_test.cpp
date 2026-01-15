@@ -798,6 +798,59 @@ HWTEST_F(WifiFilterImplTest, HigherCategoryFilterTest_CandidateIsLower_ShouldFil
     EXPECT_FALSE(filter->DoFilter(candidate));
 }
 
+HWTEST_F(WifiFilterImplTest, HigherCategoryFilterTest_2GCandidate_ShouldFilter, TestSize.Level1)
+{
+    auto filter = std::make_shared<NetworkSelection::HigherCategoryFilter>();
+    WifiLinkedInfo currentLinkInfo;
+    currentLinkInfo.bssid = "11:22:33:44:55:66";
+    currentLinkInfo.networkId = 1;
+    currentLinkInfo.ssid = "Current5GWiFi7";
+    currentLinkInfo.band = static_cast<int>(BandType::BAND_5GHZ);
+    InterScanInfo candidateScanInfo;
+    candidateScanInfo.bssid = "AA:BB:CC:DD:EE:FF";
+    candidateScanInfo.ssid = "Candidate24GWiFi7";
+    candidateScanInfo.band = static_cast<int>(BandType::BAND_2GHZ);
+    NetworkSelection::NetworkCandidate candidate(candidateScanInfo);
+
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(Invoke([&](WifiLinkedInfo& info, int32_t) {
+            info = currentLinkInfo;
+            return 0;
+        }));
+    EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetWifiCategoryRecord(currentLinkInfo.bssid))
+        .WillRepeatedly(Return(WifiCategory::WIFI7));
+    EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetWifiCategoryRecord(candidateScanInfo.bssid))
+        .WillRepeatedly(Return(WifiCategory::WIFI7));
+
+    // Act & Assert: 2.4G WiFi7 不应通过过滤
+    EXPECT_FALSE(filter->DoFilter(candidate));
+}
+
+HWTEST_F(WifiFilterImplTest, HigherCategoryFilterTest_CandidateIsSame_ShouldFilter, TestSize.Level1)
+{
+    auto filter = std::make_shared<NetworkSelection::HigherCategoryFilter>();
+    WifiLinkedInfo currentLinkInfo;
+    currentLinkInfo.bssid = "11:22:33:44:55:66";
+    currentLinkInfo.networkId = 1;
+    InterScanInfo candidateScanInfo;
+    candidateScanInfo.bssid = "AA:BB:CC:DD:EE:FF";
+    NetworkSelection::NetworkCandidate candidate(candidateScanInfo);
+
+    // Arrange: Mock the behavior of WifiConfigCenter
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(Invoke([&](WifiLinkedInfo& info, int32_t) {
+            info = currentLinkInfo;
+            return 0;
+        }));
+    EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetWifiCategoryRecord(currentLinkInfo.bssid))
+        .WillRepeatedly(Return(WifiCategory::WIFI7));
+    EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetWifiCategoryRecord(candidateScanInfo.bssid))
+        .WillRepeatedly(Return(WifiCategory::WIFI7));
+
+    // Act & Assert
+    EXPECT_FALSE(filter->DoFilter(candidate));
+}
+
 HWTEST_F(WifiFilterImplTest, Perf5gBlackListFilterTest_BssidInList_ShouldFilter, TestSize.Level1)
 {
     auto filter = std::make_shared<NetworkSelection::Perf5gBlackListFilter>();

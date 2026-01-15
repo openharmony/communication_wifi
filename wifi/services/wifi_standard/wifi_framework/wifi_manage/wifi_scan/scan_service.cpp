@@ -2307,13 +2307,6 @@ bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetwo
         } else {
             ++iter;
         }
-        if (iter->networkSelectionStatus.connectChoice == iter->networkId) {
-            hiddenNetworkSsid.push_back(iter->ssid);
-            std::string gbkSsid = WifiCodeConvertUtil::Utf8ToGbk(iter->ssid);
-            if (gbkSsid != iter->ssid && ! gbkSsid.empty()) {
-                hiddenNetworkSsid.push_back(gbkSsid);
-            }
-        }
     }
     std::sort(deviceConfigs.begin(), deviceConfigs.end(), [](WifiDeviceConfig deviceA, WifiDeviceConfig deviceB) {
         time_t aTime = deviceA.lastHasInternetTime == -1 ? deviceA.lastConnectTime : deviceA.lastHasInternetTime;

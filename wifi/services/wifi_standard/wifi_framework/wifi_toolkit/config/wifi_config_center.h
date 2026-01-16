@@ -374,10 +374,6 @@ public:
     void SetDfsControlData(DfsControlData dfsControlData);
  
     DfsControlData GetDfsControlData();
- 
-    void SetLpScanAbility(bool isSupportLpScan);
- 
-    bool GetLpScanAbility();
 
     bool IsSameKeyMgmt(std::string scanKeyMgmt, std::string keyMgmt);
 #ifndef OHOS_ARCH_LITE
@@ -518,7 +514,6 @@ private:
     int mDeviceType = ProductDeviceType::DEFAULT;
     DfsControlData dfsControlData_ = DfsControlData();
     std::atomic<bool> browserOn_ {false};
-    std::atomic<bool> isSupportLpScan_ {false};
 };
 } // namespace Wifi
 } // namespace OHOS

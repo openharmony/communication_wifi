@@ -50,6 +50,7 @@ const int ASSETID = 6226;
 #endif
 #ifdef HAS_NETMANAGER_EVENT_PART
 inline const std::string WIFI_EVENT_BG_CONTINUOUS_TASK_STATE = "ohos.event.notification.wifi.BGCTTASK_STATE";
+inline const std::string WIFI_EVENT_ACC_TASK_STATE = "ohos.event.notification.wifi.ACCTASK_STATE";
 #endif
 class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:

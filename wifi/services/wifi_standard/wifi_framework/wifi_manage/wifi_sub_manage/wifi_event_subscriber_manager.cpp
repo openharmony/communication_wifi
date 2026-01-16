@@ -1119,6 +1119,7 @@ void WifiEventSubscriberManager::RegisterNetmgrEvent()
     }
     OHOS::EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(WIFI_EVENT_BG_CONTINUOUS_TASK_STATE);
+    matchingSkills.AddEvent(WIFI_EVENT_ACC_TASK_STATE);
     WIFI_LOGI("RegisterNetmgrEvent start");
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
@@ -1164,6 +1165,17 @@ NetmgrEventSubscriber::~NetmgrEventSubscriber()
 
 void NetmgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
+    std::string action = eventData.GetWant().GetAction();
+    if (action == WIFI_EVENT_ACC_TASK_STATE) {
+        uint32_t accTaskState = eventData.GetCode();
+        WIFI_LOGI("NetmgrEventSubscriber OnReceiveEvent by AccTask %{public}d", accTaskState);
+        WifiNetworkControlInfo networkControlInfo;
+        networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_LOW_LATENCY;
+        networkControlInfo.state = accTaskState;
+        AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
+        return;
+    }
+
     uint32_t bgContinuousTaskState = eventData.GetCode();
     WIFI_LOGI("NetmgrEventSubscriber OnReceiveEvent by BgTaskAware %{public}d", bgContinuousTaskState);
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();

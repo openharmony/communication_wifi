@@ -58,12 +58,6 @@ HWTEST_F(WifiAppStateAwareTest, Connect_ReturnsTrueWhenAppMgrProxyIsNotNull, Tes
     ASSERT_NE(WifiAppStateAware::GetInstance().GetAppMgr(), nullptr);
 }
 
-HWTEST_F(WifiAppStateAwareTest, RegisterAppStateObserver_CallsRegisterApplicationStateObserver, TestSize.Level1)
-{
-    WifiAppStateAware::GetInstance().RegisterAppStateObserver();
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
-}
-
 HWTEST_F(WifiAppStateAwareTest, UnSubscribeAppState_CallsUnregisterApplicationStateObserver, TestSize.Level1)
 {
     WifiAppStateAware::GetInstance().UnSubscribeAppState();

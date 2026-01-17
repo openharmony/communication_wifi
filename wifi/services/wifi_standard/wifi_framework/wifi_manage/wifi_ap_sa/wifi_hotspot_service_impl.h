@@ -321,8 +321,8 @@ private:
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     void ProcessMacAddressRandomization(std::vector<StationInfo> &infos);
 #endif
-    int m_id;
-    bool mSingleCallback;
+    int m_id = 0;
+    bool mSingleCallback = false;
     std::mutex deathRecipientMutex;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
 };

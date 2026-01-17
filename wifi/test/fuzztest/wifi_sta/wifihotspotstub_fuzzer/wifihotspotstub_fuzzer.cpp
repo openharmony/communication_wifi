@@ -555,6 +555,14 @@ void WifiHotspotServiceImplFuzzTest05()
 }
 
 
+void WifiHotspotServiceImplFuzzTest06()
+{
+    WifiHotspotServiceImpl mWifiHotspotServiceImpl;
+    ServiceTypeParcel parcelType = ServiceTypeParcel::DEFAULT;
+    mWifiHotspotServiceImpl.DisableHotspot(parcelType);
+}
+
+
 void WifiHotSpotStubFuzzTest()
 {
     Init();

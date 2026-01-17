@@ -19,8 +19,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <unistd.h>
-#include "wifi_hotspot_stub.h"
-#include "wifi_hotspot_service_impl.h"
 #include "wifi_p2p_stub.h"
 #include "wifi_device_stub.h"
 #include "wifi_scan_stub.h"
@@ -40,7 +38,6 @@ namespace OHOS {
 namespace Wifi {
 constexpr size_t MAP_SCAN_NUMS = 20;
 constexpr size_t MAP_P2P_NUMS = 50;
-constexpr size_t MAP_HOTSPOT_NUMS = 40;
 constexpr size_t MAP_DEVICE_NUMS = 60;
 constexpr size_t U32_AT_SIZE_ZERO = 4;
 const std::u16string FORMMGR_INTERFACE_TOKEN = u"ohos.wifi.IWifiP2pService";
@@ -48,7 +45,6 @@ const std::u16string FORMMGR_INTERFACE_TOKEN_DEVICE = u"ohos.wifi.IWifiDeviceSer
 const std::u16string FORMMGR_INTERFACE_TOKEN_HOSPOT = u"ohos.wifi.IWifiHotspotService";
 const std::u16string FORMMGR_INTERFACE_TOKEN_SCAN = u"ohos.wifi.IWifiScan";
 std::shared_ptr<WifiDeviceStub> pWifiDeviceStub = std::make_shared<WifiDeviceServiceImpl>();
-std::shared_ptr<WifiHotspotStub> pWifiHotspotStub = std::make_shared<WifiHotspotServiceImpl>();
 sptr<WifiP2pStub> pWifiP2pStub = WifiP2pServiceImpl::GetInstance();
 std::shared_ptr<WifiScanStub> pWifiScanStub = std::make_shared<WifiScanServiceImpl>();
 
@@ -79,23 +75,6 @@ bool DoSomethingP2pStubTets(const uint8_t* data, size_t size)
     MessageParcel reply;
     MessageOption option;
     pWifiP2pStub->OnRemoteRequest(code, datas, reply, option);
-    return true;
-}
-
-
-bool DoSomethingHotSpotStubTest(const uint8_t* data, size_t size)
-{
-    uint32_t code = U32_AT(data) % MAP_HOTSPOT_NUMS +
-        static_cast<uint32_t>(HotspotInterfaceCode::WIFI_SVR_CMD_ENABLE_WIFI_AP);
-    LOGI("wifihotspotstub_fuzzer code(0x%{public}x) size(%{public}zu)", code, size);
-    MessageParcel datas;
-    datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN_HOSPOT);
-    datas.WriteInt32(0);
-    datas.WriteBuffer(data, size);
-    datas.RewindRead(0);
-    MessageParcel reply;
-    MessageOption option;
-    pWifiHotspotStub->OnRemoteRequest(code, datas, reply, option);
     return true;
 }
 
@@ -198,7 +177,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     }
     OHOS::Wifi::DoSomethingScanStubTest(data, size);
     OHOS::Wifi::DoSomethingP2pStubTets(data, size);
-    OHOS::Wifi::DoSomethingHotSpotStubTest(data, size);
     OHOS::Wifi::DoSomethingDeviceStubTest(data, size);
     OHOS::Wifi::OnEnableSemiWifiTest(data, size);
     OHOS::Wifi::OnStartRoamToNetworkTest(data, size);

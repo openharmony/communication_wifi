@@ -69,7 +69,12 @@ struct HotspotBackupConfig {
     std::string deviceName;
     std::string deviceBssid;
     std::string deviceIpAddr;
-    HotspotBackupConfig() : band(BandType::UNKNOWN) {};
+    HotspotBackupConfig()
+    {
+        hotspotConfig = false;
+        passwdDefault = false;
+        band = BandType::BAND_2GHZ;
+    }
 };
 
 void ConvertBackupCfgToDeviceCfg(const WifiBackupConfig &backupCfg, WifiDeviceConfig &config);

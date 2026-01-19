@@ -122,8 +122,6 @@ HWTEST_F(WifiCountryCodePolicyTest, HandleScanResultActionTest, TestSize.Level1)
     info2.infoElems = std::move(infoElems2);
     list.push_back(info2);
 
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
-        .WillOnce(DoAll(SetArgReferee<0>(list), Return(0)));
     m_wifiCountryCodePolicy->HandleScanResultAction();
 }
 
@@ -159,8 +157,6 @@ HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultFailTest, 
 {
     WIFI_LOGI("StatisticCountryCodeFromScanResultFailTest enter");
     std::vector<WifiScanInfo> wifiScanInfoList;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
-        .WillOnce(DoAll(SetArgReferee<0>(wifiScanInfoList), Return(0)));
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->StatisticCountryCodeFromScanResult(code));
 }
@@ -190,9 +186,6 @@ HWTEST_F(WifiCountryCodePolicyTest, StatisticCountryCodeFromScanResultSuccessTes
     infoElems2.push_back(elem2);
     info2.infoElems = std::move(infoElems2);
     wifiScanInfoList.push_back(info2);
-
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
-        .WillOnce(DoAll(SetArgReferee<0>(wifiScanInfoList), Return(0)));
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->StatisticCountryCodeFromScanResult(code));
 }
@@ -312,8 +305,6 @@ HWTEST_F(WifiCountryCodePolicyTest, GetWifiCountryCodeByAPSuccessTest, TestSize.
     infoElems1.push_back(elem1);
     info1.infoElems = std::move(infoElems1);
     wifiScanInfoList.push_back(info1);
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
-        .WillOnce(DoAll(SetArgReferee<0>(wifiScanInfoList), Return(0)));
 
     std::string code;
     EXPECT_EQ(ErrCode::WIFI_OPT_FAILED, m_wifiCountryCodePolicy->GetWifiCountryCodeByAP(code));

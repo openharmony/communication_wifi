@@ -215,9 +215,10 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessagePtr msg
     std::string goAddr = group.GetOwner().GetDeviceAddress();
     if (group.IsGroupOwner()) { /* append setting the device name if this is GO */
         WifiP2pDevice thisDevice = deviceManager.GetThisDevice();
-        thisDevice.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
-        thisDevice.SetDeviceAddress(goAddr);
-        group.SetOwner(thisDevice);
+        WifiP2pDevice tempDevice = thisDevice;
+        tempDevice.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
+        tempDevice.SetDeviceAddress(goAddr);
+        group.SetOwner(tempDevice);
         group.SetExplicitGroup(WifiConfigCenter::GetInstance().IsExplicitGroup());
     } else {
         WifiP2pDevice dev = deviceManager.GetDevices(goAddr);
@@ -241,9 +242,7 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessagePtr msg
     }
     SharedLinkManager::IncreaseSharedLink();
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_CONNECTED);
-    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("SetP2pPowerSave() failed!");
-    }
+    WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     return EXECUTED;
 }

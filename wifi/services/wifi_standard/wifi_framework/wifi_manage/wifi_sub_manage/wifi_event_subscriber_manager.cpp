@@ -1167,7 +1167,7 @@ void NetmgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
 {
     std::string action = eventData.GetWant().GetAction();
     if (action == WIFI_EVENT_ACC_TASK_STATE) {
-        uint32_t accTaskState = static_cast<uint32_t>(eventData.GetCode());
+        int32_t accTaskState = static_cast<uint32_t>(eventData.GetCode());
         WIFI_LOGI("NetmgrEventSubscriber OnReceiveEvent by AccTask %{public}d", accTaskState);
         WifiNetworkControlInfo networkControlInfo;
         networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_LOW_LATENCY;

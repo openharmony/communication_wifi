@@ -1484,6 +1484,8 @@ bool WifiProStateMachine::WifiHasNetState::TryHigherCategoryNetworkSelection(
     // 设置WiFi7+强场切换原因，使用统一的网络选择接口
     WifiSwitchReason previousReason = pWifiProStateMachine_->wifiSwitchReason_;
     pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_HIGHER_CATEGORY);
+    // 同步 CHR 的切换开始原因，确保后续打点记录使用正确的 switch reason
+    WifiProChr::GetInstance().RecordWifiProStartTime(WIFI_SWITCH_REASON_HIGHER_CATEGORY);
 
       // 1. 使用新的辅助函数获取所有 Higher Category 候选网络
     std::vector<InterScanInfo> higherCategoryCandidates;
@@ -1493,6 +1495,7 @@ bool WifiProStateMachine::WifiHasNetState::TryHigherCategoryNetworkSelection(
         WIFI_LOGI("TryHigherCategoryNetworkSelection: No suitable higher category network found.");
         pWifiProStateMachine_->Wifi2WifiFinish();
         pWifiProStateMachine_->SetSwitchReason(previousReason);
+        WifiProChr::GetInstance().RecordWifiProStartTime(previousReason);
         return false;
     }
 
@@ -1502,6 +1505,7 @@ bool WifiProStateMachine::WifiHasNetState::TryHigherCategoryNetworkSelection(
         WIFI_LOGI("TryHigherCategoryNetworkSelection: AUTO_CONNECT selection failed, skip switching.");
         pWifiProStateMachine_->Wifi2WifiFinish();
         pWifiProStateMachine_->SetSwitchReason(previousReason);
+        WifiProChr::GetInstance().RecordWifiProStartTime(previousReason);
         return false;
     }
 
@@ -1512,6 +1516,7 @@ bool WifiProStateMachine::WifiHasNetState::TryHigherCategoryNetworkSelection(
         WIFI_LOGI("TryHigherCategoryNetworkSelection: TryWifi2Wifi failed to start connection.");
         pWifiProStateMachine_->Wifi2WifiFinish();
         pWifiProStateMachine_->SetSwitchReason(previousReason);
+        WifiProChr::GetInstance().RecordWifiProStartTime(previousReason);
         return false;
     }
     return true;
@@ -1626,7 +1631,6 @@ bool WifiProStateMachine::GetFilteredCandidates(const std::vector<InterScanInfo>
 
     WIFI_LOGI("GetFilteredCandidates: Found %{public}zu candidates for select type %{public}d.",
         outCandidates.size(), static_cast<int>(selectType));
-    WifiProChr::GetInstance().RecordSelectNetChrCnt(true);
     return true;
 }
 
@@ -1681,8 +1685,10 @@ bool WifiProStateMachine::IsAutoReconnectPreferred(
     // If winner is not the current network, then a higher-category candidate won
     if (selectionResult.interScanInfo.bssid != pCurrWifiInfo_->bssid) {
         WIFI_LOGI("IsAutoReconnectPreferred: A higher-category candidate was selected by AUTO_CONNECT. Allow switch.");
+        WifiProChr::GetInstance().RecordSelectNetChrCnt(true);
         return true;
     }
+    WifiProChr::GetInstance().RecordSelectNetChrCnt(false);
     return false;
 }
 /* --------------------------- state machine no net state ------------------------------ */

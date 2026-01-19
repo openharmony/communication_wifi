@@ -199,6 +199,7 @@ static napi_value WifiLinkTypeInit(napi_env env)
     SetNamedPropertyByInteger(env, wifiLinkType, static_cast<int>(WifiLinkTypeJs::WIFI7_MLSR), "WIFI7_MLSR");
     SetNamedPropertyByInteger(env, wifiLinkType, static_cast<int>(WifiLinkTypeJs::WIFI7_EMLSR), "WIFI7_EMLSR");
     SetNamedPropertyByInteger(env, wifiLinkType, static_cast<int>(WifiLinkTypeJs::WIFI7_STR), "WIFI7_STR");
+    SetNamedPropertyByInteger(env, wifiLinkType, static_cast<int>(WifiLinkTypeJs::WIFI7_LEGACY), "WIFI7_LEGACY");
     return wifiLinkType;
 }
 static napi_value WifiDetailStateInit(napi_env env)

@@ -200,7 +200,8 @@ enum WifiLinkType:int32_t {
     WIFI7_SINGLE_LINK = 1,
     WIFI7_MLSR = 2,
     WIFI7_EMLSR = 3,
-    WIFI7_STR = 4
+    WIFI7_STR = 4,
+    WIFI7_LEGACY = 5 //非MLO接入
 };
 
 enum class DisconnectedReason {

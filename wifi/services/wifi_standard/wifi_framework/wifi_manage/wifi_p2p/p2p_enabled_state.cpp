@@ -20,6 +20,7 @@
 #include "wifi_settings.h"
 #include "p2p_state_machine.h"
 #include "wifi_logger.h"
+#include "p2p_native_define.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pEnabledState");
 
@@ -29,8 +30,6 @@ const int CHANNEL_INDEX_OF_DISCOVER = 16;
 const int TIMEOUT_MASK_OF_DISCOVER = 0x00FF;
 const int DISCOVER_TIMEOUT_S = 120;
 // miracast
-const int CMD_TYPE_SET = 2;
-const int DATA_TYPE_SET_LISTEN_MODE = 4;
 const std::string ONEHOP_LISTEN_MODE = "1";
 
 P2pEnabledState::P2pEnabledState(P2pStateMachine &stateMachine, WifiP2pGroupManager &groupMgr,
@@ -660,7 +659,8 @@ bool P2pEnabledState::ProcessCmdDiscoverPeers(InternalMessagePtr msg) const
 {
     WIFI_LOGI("P2P ProcessCmdDiscoverPeers recv CMD: %{public}d", msg->GetMessageName());
     const int channelid = msg->GetParam1();
-    WifiP2PHalInterface::GetInstance().DeliverP2pData(CMD_TYPE_SET, DATA_TYPE_SET_LISTEN_MODE, ONEHOP_LISTEN_MODE);
+    WifiP2PHalInterface::GetInstance().DeliverP2pData(static_cast<int>(P2P_SET_DELIVER_DATA),
+        static_cast<int>(DATA_TYPE_SET_LISTEN_MODE), ONEHOP_LISTEN_MODE);
     p2pStateMachine.CancelSupplicantSrvDiscReq();
     int ret = AddScanChannelInTimeout(channelid, DISCOVER_TIMEOUT_S);
     int retCode = WifiP2PHalInterface::GetInstance().P2pFind(ret);

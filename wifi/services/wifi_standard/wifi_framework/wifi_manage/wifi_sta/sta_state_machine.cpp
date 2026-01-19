@@ -3968,6 +3968,8 @@ void StaStateMachine::DhcpResultNotify::UpdateNetLinkInfoForIpV6(IpInfo &ipInfo,
         ipv6Info.IpAddrMap.begin()->second != static_cast<int>(AddrTypeIpV6::ADDR_TYPE_LINK_LOCAL)) {
         WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
             pStaStateMachine->m_instId);
+    } else {
+        WIFI_LOGI("UpdateNetLinkInfoForIpV6 only link local address, not update netlink info.");
     }
     EnhanceWriteDhcpInfoHiSysEvent(ipInfo, ipv6Info);
 #endif

@@ -1171,7 +1171,7 @@ void NetmgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData
         WIFI_LOGI("NetmgrEventSubscriber OnReceiveEvent by AccTask %{public}d", accTaskState);
         WifiNetworkControlInfo networkControlInfo;
         networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_LOW_LATENCY;
-        networkControlInfo.state = static_cast<int>(accTaskState);
+        networkControlInfo.state = accTaskState;
         AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
         return;
     }

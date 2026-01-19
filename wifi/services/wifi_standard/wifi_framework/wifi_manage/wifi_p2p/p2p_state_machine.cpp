@@ -42,6 +42,7 @@
 #ifndef OHOS_ARCH_LITE
 #include "power_mgr_client.h"
 #endif
+#include "p2p_native_define.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
@@ -50,8 +51,6 @@ namespace OHOS {
 namespace Wifi {
 const std::string DEFAULT_P2P_IPADDR = "192.168.49.1";
 //miracast
-const int CMD_TYPE_SET = 2;
-const int DATA_TYPE_P2P_BUSINESS = 1;
 const int ARP_TIMEOUT = 100;
 const int DEFAULT_TEMP_ID = -100;
 const std::string CARRY_DATA_MIRACAST = "1";
@@ -1357,7 +1356,8 @@ void P2pStateMachine::ClearGroup() const
 bool P2pStateMachine::HandlerDisableRandomMac(int setmode) const
 {
     WifiP2PHalInterface::GetInstance().SetRandomMacAddr(setmode);
-    WifiP2PHalInterface::GetInstance().DeliverP2pData(CMD_TYPE_SET, DATA_TYPE_P2P_BUSINESS, CARRY_DATA_MIRACAST);
+    WifiP2PHalInterface::GetInstance().DeliverP2pData(static_cast<int>(P2P_SET_DELIVER_DATA),
+        static_cast<int>(DATA_TYPE_P2P_BUSINESS), CARRY_DATA_MIRACAST);
     return EXECUTED;
 }
 

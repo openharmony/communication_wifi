@@ -89,6 +89,7 @@ private:
     void HandleSwitchFailed(Perf5gSwitchResult switchResult);
     void OnDisconnected();
     bool IsValidAp(int32_t relationApIndex);
+    bool isNotAllowedPerf(WifiLinkedInfo &wifiLinkedInfo, WifiDeviceConfig &wifiDeviceConfig);
 };
 }
 }

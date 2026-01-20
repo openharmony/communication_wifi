@@ -61,19 +61,8 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
     InitConnectedAp(wifiLinkedInfo, wifiDeviceConfig);
     connectedAp_->is5gAfterPerf = is5gAfterPerf;
     connectedAp_->perf5gStrategyName = strategyName;
-    bool isItCustNetwork = false;
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService != nullptr) {
-        isItCustNetwork = pEnhanceService->IsItCustNetwork(wifiDeviceConfig);
-    }
-    bool isEnterprise = DualBandUtils::IsEnterprise(wifiDeviceConfig);
-    connectedAp_->canNotPerf = isEnterprise || wifiLinkedInfo.isDataRestricted || isItCustNetwork ||
-        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE || connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR;
-    WIFI_HILOG_COMM_INFO("OnConnected, canNotPerf:isEnterprise(%{public}d),isItCustNetwork(%{public}d),"
-        "isPortal(%{public}d),isDataRestricted(%{public}d),openNet(%{public}d), isEMLSR(%{public}d)", isEnterprise,
-        isItCustNetwork, wifiDeviceConfig.isPortal, wifiLinkedInfo.isDataRestricted,
-        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE, connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR);
-    if (connectedAp_->canNotPerf) {
+
+    if (isNotAllowedPerf(wifiLinkedInfo, wifiDeviceConfig)) {
         WIFI_LOGI("OnConnected, ap is not allow perf 5g");
         return;
     }
@@ -95,6 +84,23 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
         isNewBssidConnected_.store(false);
     }
     PrintRelationAps();
+}
+
+bool Perf5gHandoverService::isNotAllowedPerf(WifiLinkedInfo &wifiLinkedInfo, WifiDeviceConfig &wifiDeviceConfig)
+{
+    bool isItCustNetwork = false;
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr) {
+        isItCustNetwork = pEnhanceService->IsItCustNetwork(wifiDeviceConfig);
+    }
+    bool isEnterprise = DualBandUtils::IsEnterprise(wifiDeviceConfig);
+    connectedAp_->canNotPerf = isEnterprise || wifiLinkedInfo.isDataRestricted || isItCustNetwork ||
+        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE || connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR;
+    WIFI_HILOG_COMM_INFO("OnConnected, canNotPerf:isEnterprise(%{public}d),isItCustNetwork(%{public}d),"
+        "isPortal(%{public}d),isDataRestricted(%{public}d),openNet(%{public}d), isEMLSR(%{public}d)", isEnterprise,
+        isItCustNetwork, wifiDeviceConfig.isPortal, wifiLinkedInfo.isDataRestricted,
+        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE, connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR);
+    return connectedAp_->canNotPerf;
 }
 
 // Encapsulate the function into external and internal types.

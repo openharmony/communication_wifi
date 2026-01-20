@@ -75,7 +75,6 @@ void DualBandRepostitory::DeleteAll(std::unordered_set<std::string> &bssids)
 }
 void DualBandRepostitory::RemoveDuplicateDatas()
 {
-    WIFI_LOGI("DualBandRepostitory::RemoveDuplicateDatas");
     pDualBandDataSource_->RemoveDuplicateDatas();
 }
 void DualBandRepostitory::SaveApInfo(ApInfo &apInfo)

@@ -1184,6 +1184,17 @@ public:
         EXPECT_EQ(true, pScanService->GetHiddenNetworkSsidList(hiddenNetworkSsid));
     }
 
+    void GetHiddenNetworkSsidListSuccess3()
+    {
+        std::vector<WifiDeviceConfig> deviceConfigs;
+        WifiDeviceConfig cfg;
+        cfg.hiddenSSID = true;
+        cfg.ssid = "测试代码";
+        deviceConfigs.push_back(cfg);
+        std::vector<std::string> hiddenNetworkSsid;
+        EXPECT_EQ(true, pScanService->GetHiddenNetworkSsidList(hiddenNetworkSsid));
+    }
+
     void GetHiddenNetworkSsidListFail()
     {
         std::vector<std::string> hiddenNetworkSsid;
@@ -2641,6 +2652,11 @@ HWTEST_F(ScanServiceTest, GetHiddenNetworkSsidListSuccess, TestSize.Level1)
 HWTEST_F(ScanServiceTest, GetHiddenNetworkSsidListSuccess2, TestSize.Level1)
 {
     GetHiddenNetworkSsidListSuccess2();
+}
+
+HWTEST_F(ScanServiceTest, GetHiddenNetworkSsidListSuccess3, TestSize.Level1)
+{
+    GetHiddenNetworkSsidListSuccess3();
 }
 
 HWTEST_F(ScanServiceTest, GetHiddenNetworkSsidListFail, TestSize.Level1)

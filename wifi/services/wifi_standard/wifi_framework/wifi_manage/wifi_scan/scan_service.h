@@ -156,6 +156,13 @@ public:
      */
     virtual ErrCode ScanWithParam(const WifiScanParams &params, ScanType scanType);
     /**
+     * @Description Convert scanned hotspots to GBK.
+     *
+     * @param ssid - ssid of saved networks[in]
+     * @param hiddenNetworkSsidList it is hiddenNetworkSsidList[out]
+     */
+    virtual void AddSsidToHiddenNetworkList(const std::string ssid, std::vector<std::string>& hiddenNetworkSsidList);
+    /**
      * @Description Disable/Restore the scanning operation.
      *
      * * @param params - disable or not.

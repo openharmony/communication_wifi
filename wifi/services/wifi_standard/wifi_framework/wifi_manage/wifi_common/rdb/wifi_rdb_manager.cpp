@@ -150,7 +150,7 @@ bool WifiRdbManager::RemoveDuplicateDatas()
         WHERE id NOT IN (
             SELECT MAX(t1.id)
             FROM perf_ap_record t1
-            GROUP BY 
+            GROUP BY
                 t1.bssid
         );
     )";
@@ -160,7 +160,7 @@ bool WifiRdbManager::RemoveDuplicateDatas()
         WHERE id NOT IN (
             SELECT MAX(t1.id)
             FROM perf_ap_relation t1
-            GROUP BY 
+            GROUP BY
                 t1.bssid24g, t1.relationBssid5g
         );
     )";

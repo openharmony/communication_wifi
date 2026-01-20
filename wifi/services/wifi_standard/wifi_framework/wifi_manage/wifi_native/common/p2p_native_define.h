@@ -25,6 +25,6 @@
 
  enum DeliverSetType {
     DATA_TYPE_P2P_BUSINESS = 1,
-    DTAT_TYPE_SET_LISTEN_MODE = 4,
+    DATA_TYPE_SET_LISTEN_MODE = 4,
  };
  

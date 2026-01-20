@@ -165,14 +165,56 @@ int32_t WifiHotspotServiceImpl::GetHotspotConfig(HotspotConfigParcel &parcelconf
     return WIFI_OPT_SUCCESS;
 }
 
-int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parcelconfig)
+bool WifiHotspotServiceImpl::CheckHotspot160MParam(BandType band, int bandwidth, int channel)
 {
-    HotspotConfig config = parcelconfig.ToHotspotConfig();
+    if ((band != BandType::BAND_5GHZ && bandwidth == AP_BANDWIDTH_160) ||
+        (bandwidth != AP_BANDWIDTH_160 && bandwidth != AP_BANDWIDTH_DEFAULT) ||
+        (band == BandType::BAND_5GHZ && bandwidth == AP_BANDWIDTH_160 &&
+        ((channel < AP_CHANNEL_5G_160M_SET_BEGIN) || (channel > AP_CHANNEL_5G_160M_SET_END)))) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool WifiHotspotServiceImpl::CheckHostspot160MCountryCode()
+{
+    std::string countryCode;
+    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
+    transform(countryCode.begin(), countryCode.end(), countryCode.begin(), ::toupper);
+    if (countryCode == "CN" || countryCode == "TW" || countryCode == "SG" || countryCode == "KR") {
+        WIFI_LOGD("CheckHostspot160MCountryCode countryCode %{public}s", countryCode.c_str());
+        return true;
+    } else {
+        WIFI_LOGE("CheckHostspot160MCountryCode Error countryCode %{public}s", countryCode.c_str());
+        return false;
+    }
+}
+
+ErrCode WifiHotspotServiceImpl::HostspotBandwidthConfig(HotspotConfig &config)
+{
     int dataRead = config.GetChannel();
     int channel = dataRead & 0x000000FF;
     int bandwidth = (dataRead & 0x00FF0000) >> 16;
     config.SetBandWidth(bandwidth);
     config.SetChannel(channel);
+    if (config.GetSsid().c_str() == nullptr || config.GetPreSharedKey().c_str() == nullptr ||
+        !CheckHotspot160MParam(config.GetBand(), config.GetBandWidth(), config.GetChannel())) {
+        return WIFI_OPT_INVALID_PARAM;
+    } else if ((!CheckHostspot160MCountryCode()) && config.GetBandWidth() == AP_BANDWIDTH_160) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parcelconfig)
+{
+    HotspotConfig config = parcelconfig.ToHotspotConfig();
+    ErrCode ret = HostspotBandwidthConfig(config);
+    if (ret != ErrCode::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SetHotspotConfig:HostspotBandwidthConfig failed!");
+        return HandleHotspotIdlRet(ret);
+    }
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("Inst%{public}d %{public}s, pid:%{public}d, uid:%{public}d, band:%{public}d, "
         "channel:%{public}d", m_id, __func__, GetCallingPid(), GetCallingUid(),

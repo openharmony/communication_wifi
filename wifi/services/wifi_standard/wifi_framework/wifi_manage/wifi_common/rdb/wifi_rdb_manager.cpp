@@ -137,6 +137,48 @@ bool WifiRdbManager::Delete(int &deletedRowCount, const NativeRdb::AbsRdbPredica
     return true;
 }
 
+bool WifiRdbManager::RemoveDuplicateDatas()
+{
+    auto rdbStore = GetRdbStore();
+    if (rdbStore == nullptr) {
+        WIFI_LOGE("rdbStore is null");
+        return false;
+    }
+ 
+    std::string apRecordSql = R"(
+        DELETE FROM perf_ap_record
+        WHERE id NOT IN (
+            SELECT MAX(t1.id)
+            FROM perf_ap_record t1
+            GROUP BY 
+                t1.networkId, t1.ssid, t1.bssid, t1.keyMgmt, t1.frequency
+        );
+    )";
+ 
+ 
+    std::string apRelationSql = R"(
+        DELETE FROM perf_ap_relation
+        WHERE id NOT IN (
+            SELECT MAX(t1.id)
+            FROM perf_ap_relation t1
+            GROUP BY 
+                t1.bssid24g, t1.relationBssid5g, t1.relateType
+        );
+    )";
+ 
+    int32_t ret1 = rdbStore->ExecuteSql(apRecordSql);
+    if (ret1 != NativeRdb::E_OK) {
+        WIFI_LOGE("Remove perf_ap_record duplicateDatas fail!");
+        return false;
+    }
+    int32_t ret2 = rdbStore->ExecuteSql(apRelationSql);
+    if (ret2 != NativeRdb::E_OK) {
+        WIFI_LOGE("Remove perf_ap_relation duplicateDatas fail!");
+        return false;
+    }
+    return true;
+}
+
 std::shared_ptr<NativeRdb::RdbStore> WifiRdbManager::GetRdbStore()
 {
     std::lock_guard<std::mutex> lock(mutexLock_);

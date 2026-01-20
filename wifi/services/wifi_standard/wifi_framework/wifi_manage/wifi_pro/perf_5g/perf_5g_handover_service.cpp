@@ -77,8 +77,10 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
             isNewBssidConnected_.store(false);
             return;
         }
-        pDualBandRepostitory_->RemoveDuplicateDatas();
         LoadRelationApInfo();
+        if (RemoveRelationApDuplicates(relationAps_)) {
+            pDualBandRepostitory_->RemoveDuplicateDatas();
+        }
         perf5gChrInfo_.Reset();
         perf5gChrInfo_.connectTime = std::chrono::steady_clock::now();
         isNewBssidConnected_.store(false);

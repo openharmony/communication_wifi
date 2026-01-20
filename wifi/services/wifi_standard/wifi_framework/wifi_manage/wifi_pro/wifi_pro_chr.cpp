@@ -404,17 +404,19 @@ cJSON *WifiProChr::FillWifiProStatisticsJson()
     cJSON_AddNumberToObject(root, "NONET_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::NONET_SUCC]);
     cJSON_AddNumberToObject(root, "QOE_SLOW_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::QOE_SUCCC]);
     cJSON_AddNumberToObject(
-        root, "HIGHER_CATEGORY_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::HIGHER_CATEGORY_SUCC]);
+        root, "HIGH_CATEGORY_SELECT_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::HIGHER_CATEGORY_SUCC]);
     cJSON_AddNumberToObject(
         root, "POOR_LINK_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::POORLINK_FAILED]);
     cJSON_AddNumberToObject(root, "NONET_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::NONET_FAILED]);
     cJSON_AddNumberToObject(
         root, "QOE_SLOW_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::QOESLOW_FAILED]);
+    cJSON_AddNumberToObject(
+        root, "HIGH_CATEGORY_SELECT_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::HIGHER_CATEGORY_FAILED]);
     cJSON_AddNumberToObject(root, "POOR_LINK_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::POORLINK_SUCC]);
     cJSON_AddNumberToObject(root, "NONET_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::NONET_SUCC]);
     cJSON_AddNumberToObject(root, "QOE_SLOW_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::QOE_SUCCC]);
     cJSON_AddNumberToObject(
-        root, "HIGHER_CATEGORY_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::HIGHER_CATEGORY_SUCC]);
+        root, "HIGH_CATEGORY_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::HIGHER_CATEGORY_SUCC]);
     cJSON_AddNumberToObject(
         root, "POOR_LINK_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::POORLINK_FAILED]);
         
@@ -426,6 +428,8 @@ void WifiProChr::FillWifiProStatisticsJsons(cJSON *root)
 {
     cJSON_AddNumberToObject(root, "NONET_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::NONET_FAILED]);
     cJSON_AddNumberToObject(root, "QOE_SLOW_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::QOESLOW_FAILED]);
+    cJSON_AddNumberToObject(
+        root, "HIGH_CATEGORY_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::HIGHER_CATEGORY_FAILED]);
     cJSON_AddNumberToObject(root, "TIME_LEVEL1_CNT", wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL1]);
     cJSON_AddNumberToObject(root, "TIME_LEVEL2_CNT", wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL2]);
     cJSON_AddNumberToObject(root, "TIME_LEVEL3_CNT", wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL3]);
@@ -452,6 +456,8 @@ void WifiProChr::FillWifiProStatisticsJsons(cJSON *root)
     cJSON_AddNumberToObject(
         root, "REASON_NOT_SWITCH_NOT_AUTOSWITCH", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_NOT_ALLOW_AUTOSWITCH]);
     cJSON_AddNumberToObject(root, "REASON_NOT_SWITCH_DISABLED", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_DISABLED]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_USER_SELECT", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_USER_SELECT]);
     cJSON_AddNumberToObject(root, "GATEWAYIP_SAME_CNT", gatewayIpSameCnt_);
     cJSON_AddNumberToObject(root, "GATEWAYIP_DIFF_CNT", gatewayIpDiffCnt_);
     cJSON_AddNumberToObject(root, "GATEWAYIP_UNKNOWN_CNT", gatewayIpUnknownCnt_);

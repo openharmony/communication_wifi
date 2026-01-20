@@ -544,13 +544,19 @@ void Perf5gHandoverService::AddRelationApInfo(RelationAp &relationAp)
     if (IsValid5GHz(connectedAp_->apInfo.frequency)) {
         RelationInfo relation(relationAp.apInfo_.bssid, connectedAp_->apInfo.bssid);
         relationAp.relationInfo_ = relation;
-        relationAps_.push_back(relationAp);
+        auto iter = std::find(relationAps_.begin(), relationAps_.end(), relationAp);
+        if (iter == relationAps_.end()) {
+            relationAps_.push_back(relationAp);
+        }
         WIFI_LOGI("AddRelationApInfo, relation 2.4g ap(%{public}s) is added",
             MacAnonymize(relationAp.apInfo_.bssid).data());
     } else {
         RelationInfo relation(connectedAp_->apInfo.bssid, relationAp.apInfo_.bssid);
         relationAp.relationInfo_ = relation;
-        relationAps_.push_back(relationAp);
+        auto iter = std::find(relationAps_.begin(), relationAps_.end(), relationAp);
+        if (iter == relationAps_.end()) {
+            relationAps_.push_back(relationAp);
+        }
         WIFI_LOGI("AddRelationApInfo, relation 5g ap(%{public}s) is added",
             MacAnonymize(relationAp.apInfo_.bssid).data());
     }

@@ -13,7 +13,10 @@
  * limitations under the License.
  */
 
- enum P2pDeliverCmd {
+#ifndef P2P_NATIVE_DEFINE_H
+#define P2P_NATIVE_DEFINE_H
+
+enum P2pDeliverCmd {
     P2P_REMOVE_GROUP_CLIENT = 0,
     P2P_REJECT,
     P2P_SET_DELIVER_DATA,
@@ -21,10 +24,11 @@
     P2P_CREATE_TEMP_GROUP,
     P2P_CANCEL_WPS_PBC,
     EVENT_MAX,
- };
+};
 
- enum DeliverSetType {
+enum DeliverSetType {
     DATA_TYPE_P2P_BUSINESS = 1,
     DATA_TYPE_SET_LISTEN_MODE = 4,
- };
+};
  
+#endif

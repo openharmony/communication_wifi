@@ -79,6 +79,7 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
         }
         LoadRelationApInfo();
         if (RemoveRelationApDuplicates(relationAps_)) {
+            WIFI_LOGI("The records fetched from databases may contain duplicate rows.");
             pDualBandRepostitory_->RemoveDuplicateDatas();
         }
         perf5gChrInfo_.Reset();

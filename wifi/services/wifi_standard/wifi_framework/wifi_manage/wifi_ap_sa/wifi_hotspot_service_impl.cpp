@@ -168,6 +168,11 @@ int32_t WifiHotspotServiceImpl::GetHotspotConfig(HotspotConfigParcel &parcelconf
 int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parcelconfig)
 {
     HotspotConfig config = parcelconfig.ToHotspotConfig();
+    int dataRead = config.GetChannel();
+    int channel = dataRead & 0x000000FF;
+    int bandwidth = (dataRead & 0x00FF0000) >> 16;
+    config.SetBandWidth(bandwidth);
+    config.SetChannel(channel);
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("Inst%{public}d %{public}s, pid:%{public}d, uid:%{public}d, band:%{public}d, "
         "channel:%{public}d", m_id, __func__, GetCallingPid(), GetCallingUid(),

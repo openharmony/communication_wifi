@@ -31,6 +31,7 @@ public:
     virtual bool QueryApInfo(std::string &bssid, SwitchableApInfo &apInfo);
     virtual bool QueryRelationInfo(std::string &bssid, std::vector<RelationInfo> &relationInfos);
     virtual bool DeleteAll(std::unordered_set<std::string> &bssids);
+    virtual bool RemoveDuplicateDatas();
     virtual bool SaveApInfo(SwitchableApInfo &apInfo);
     virtual void SaveApInfos(std::vector<SwitchableApInfo> &apInfos);
     virtual void SaveRelationInfos(std::vector<RelationInfo> &relationInfos);

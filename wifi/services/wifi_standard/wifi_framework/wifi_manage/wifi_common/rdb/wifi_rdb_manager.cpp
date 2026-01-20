@@ -144,28 +144,27 @@ bool WifiRdbManager::RemoveDuplicateDatas()
         WIFI_LOGE("rdbStore is null");
         return false;
     }
- 
+
     std::string apRecordSql = R"(
         DELETE FROM perf_ap_record
         WHERE id NOT IN (
             SELECT MAX(t1.id)
             FROM perf_ap_record t1
             GROUP BY 
-                t1.networkId, t1.ssid, t1.bssid, t1.keyMgmt, t1.frequency
+                t1.bssid
         );
     )";
- 
- 
+
     std::string apRelationSql = R"(
         DELETE FROM perf_ap_relation
         WHERE id NOT IN (
             SELECT MAX(t1.id)
             FROM perf_ap_relation t1
             GROUP BY 
-                t1.bssid24g, t1.relationBssid5g, t1.relateType
+                t1.bssid24g, t1.relationBssid5g
         );
     )";
- 
+
     int32_t ret1 = rdbStore->ExecuteSql(apRecordSql);
     if (ret1 != NativeRdb::E_OK) {
         WIFI_LOGE("Remove perf_ap_record duplicateDatas fail!");

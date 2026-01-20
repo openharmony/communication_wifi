@@ -355,7 +355,7 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanTy
         if (!params.ssid.empty()) {
             scanConfig.hiddenNetworkSsid.push_back(params.ssid);
             // for gbk hiddenNetworkSsID
-            AddSsidToHiddenNetworkList(iter->ssid, hiddenNetworkSsid);
+            AddSsidToHiddenNetworkList(params.ssid, hiddenNetworkSsid);
         } else if (!GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
             /*
             * Invoke the interface provided by the configuration center to obtain the

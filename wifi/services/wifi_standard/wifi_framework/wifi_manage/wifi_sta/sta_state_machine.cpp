@@ -1082,13 +1082,6 @@ void StaStateMachine::LinkState::DealNetworkRemoved(InternalMessagePtr msg)
     int networkId = msg->GetParam1();
     WIFI_LOGI("DealNetworkRemoved networkid = %{public}d linkinfo.networkid = %{public}d targetNetworkId_ = %{public}d",
         networkId, pStaStateMachine->linkedInfo.networkId, pStaStateMachine->targetNetworkId_);
-    std::string ssid = pStaStateMachine->linkedInfo.ssid;
-    std::string bssid = pStaStateMachine->linkedInfo.bssid;
-    IpCacheInfo ipCacheInfo;
-    if ((strncpy_s(ipCacheInfo.bssid, MAC_ADDR_MAX_LEN, bssid.c_str(), bssid.length()) == EOK) &&
-        (strncpy_s(ipCacheInfo.ssid, SSID_MAX_LEN, ssid.c_str(), ssid.length()) == EOK)) {
-        DealWifiDhcpCache(WIFI_DHCP_CACHE_REMOVE, ipCacheInfo);
-    }
     if (pStaStateMachine->linkedInfo.networkId == networkId || pStaStateMachine->targetNetworkId_ == networkId) {
         std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
         WIFI_LOGI("Enter StartDisConnectToNetwork ifaceName:%{public}s!", ifaceName.c_str());
@@ -3968,8 +3961,6 @@ void StaStateMachine::DhcpResultNotify::UpdateNetLinkInfoForIpV6(IpInfo &ipInfo,
         ipv6Info.IpAddrMap.begin()->second != static_cast<int>(AddrTypeIpV6::ADDR_TYPE_LINK_LOCAL)) {
         WifiNetAgent::GetInstance().OnStaMachineUpdateNetLinkInfo(ipInfo, ipv6Info, config.wifiProxyconfig,
             pStaStateMachine->m_instId);
-    } else {
-        WIFI_LOGI("UpdateNetLinkInfoForIpV6 only link local address, not update netlink info.");
     }
     EnhanceWriteDhcpInfoHiSysEvent(ipInfo, ipv6Info);
 #endif

@@ -545,18 +545,20 @@ void Perf5gHandoverService::AddRelationApInfo(RelationAp &relationAp)
         RelationInfo relation(relationAp.apInfo_.bssid, connectedAp_->apInfo.bssid);
         relationAp.relationInfo_ = relation;
         auto iter = std::find(relationAps_.begin(), relationAps_.end(), relationAp);
-        if (iter == relationAps_.end()) {
-            relationAps_.push_back(relationAp);
+        if (iter != relationAps_.end()) {
+            relationAps_.erase(iter);
         }
+        relationAps_.push_back(relationAp);
         WIFI_LOGI("AddRelationApInfo, relation 2.4g ap(%{public}s) is added",
             MacAnonymize(relationAp.apInfo_.bssid).data());
     } else {
         RelationInfo relation(connectedAp_->apInfo.bssid, relationAp.apInfo_.bssid);
         relationAp.relationInfo_ = relation;
         auto iter = std::find(relationAps_.begin(), relationAps_.end(), relationAp);
-        if (iter == relationAps_.end()) {
-            relationAps_.push_back(relationAp);
+        if (iter != relationAps_.end()) {
+            relationAps_.erase(iter);
         }
+        relationAps_.push_back(relationAp);
         WIFI_LOGI("AddRelationApInfo, relation 5g ap(%{public}s) is added",
             MacAnonymize(relationAp.apInfo_.bssid).data());
     }
@@ -777,7 +779,7 @@ void Perf5gHandoverService::LoadRelationApInfo()
     }
 }
 
-bool Perf5gHandoverService::RemoveRelationApDuplicates(std::vector<RelationAp> &relationAps)
+void Perf5gHandoverService::RemoveRelationApDuplicates(std::vector<RelationAp> &relationAps)
 {
     int32_t num = static_cast<int32_t>(relationAps.size());
     std::sort(relationAps.begin(), relationAps.end());
@@ -785,11 +787,11 @@ bool Perf5gHandoverService::RemoveRelationApDuplicates(std::vector<RelationAp> &
     relationAps.erase(last, relationAps.end());
     WIFI_LOGI("removeRelationApDuplicates, before:%{public}d after:%{public}d",
         num, static_cast<int32_t>(relationAps.size()));
-    return num != relationAps.size();
 }
 
 void Perf5gHandoverService::PrintRelationAps()
 {
+    RemoveRelationApDuplicates(relationAps_);
     std::stringstream associateInfo;
     for (auto iter : relationAps_) {
         if (associateInfo.rdbuf() ->in_avail() != 0) {

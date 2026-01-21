@@ -198,7 +198,7 @@ ErrCode WifiHotspotServiceImpl::HostspotBandwidthConfig(HotspotConfig &config)
     int bandwidth = (dataRead & 0x00FF0000) >> 16;
     config.SetBandWidth(bandwidth);
     config.SetChannel(channel);
-    if (config.GetSsid().empty() || config.GetPreSharedKey().empty() ||
+    if (config.GetSsid().empty() ||
         !CheckHotspot160MParam(config.GetBand(), config.GetBandWidth(), config.GetChannel())) {
         return WIFI_OPT_INVALID_PARAM;
     } else if ((!CheckHostspot160MCountryCode()) && config.GetBandWidth() == AP_BANDWIDTH_160) {

@@ -72,6 +72,14 @@ HWTEST_F(ScanInterfaceTest, ScanWithParamSuccess, TestSize.Level1)
     EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->ScanWithParam(wifiScanParams, false));
 }
 
+HWTEST_F(ScanInterfaceTest, ScanWithParamSuccess2, TestSize.Level1)
+{
+    WifiScanParams wifiScanParams;
+    wifiScanParams.ssid = "测试代码";
+    wifiScanParams.bssid = "a3:b1:d7:f2:d2:c2";
+    EXPECT_EQ(WIFI_OPT_SUCCESS, pScanInterface->ScanWithParam(wifiScanParams, false));
+}
+
 HWTEST_F(ScanInterfaceTest, OnScreenStateChangedSuccess1, TestSize.Level1)
 {
     int screenState = MODE_STATE_OPEN;

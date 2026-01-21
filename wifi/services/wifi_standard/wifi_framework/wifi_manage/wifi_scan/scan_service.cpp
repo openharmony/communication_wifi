@@ -361,6 +361,8 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanTy
     if (scanConfig.scanStyle != SCAN_TYPE_LOW_PRIORITY) {
         if (!params.ssid.empty()) {
             scanConfig.hiddenNetworkSsid.push_back(params.ssid);
+            // for gbk hiddenNetworkSsID
+            AddSsidToHiddenNetworkList(params.ssid, scanConfig.hiddenNetworkSsid);
         } else if (!GetHiddenNetworkSsidList(scanConfig.hiddenNetworkSsid)) {
             /*
             * Invoke the interface provided by the configuration center to obtain the
@@ -382,6 +384,14 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanTy
         return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
+}
+
+void ScanService::AddSsidToHiddenNetworkList(const std::string ssid, std::vector<std::string>& hiddenNetworkSsidList)
+{
+    std::string gbkSsid = WifiCodeConvertUtil::Utf8ToGbk(ssid);
+    if (gbkSsid != ssid && !gbkSsid.empty()) {
+        hiddenNetworkSsidList.push_back(gbkSsid);
+    }
 }
 
 ErrCode ScanService::ScanControlInner(ScanType scanType, int &scanStyle)
@@ -2362,9 +2372,16 @@ bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetwo
     for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end();) {
         if (!iter->hiddenSSID) {
             iter = deviceConfigs.erase(iter);
-        } else {
-            ++iter;
+            continue;
         }
+        if (iter->networkSelectionStatus.connectChoice != iter->networkId) {
+            ++iter;
+            continue;
+        }
+        // Add the user-selected SSID to the scan list with priority.
+        hiddenNetworkSsid.push_back(iter->ssid);
+        AddSsidToHiddenNetworkList(iter->ssid, hiddenNetworkSsid);
+        iter = deviceConfigs.erase(iter);
     }
     std::sort(deviceConfigs.begin(), deviceConfigs.end(), [](WifiDeviceConfig deviceA, WifiDeviceConfig deviceB) {
         time_t aTime = deviceA.lastHasInternetTime == -1 ? deviceA.lastConnectTime : deviceA.lastHasInternetTime;
@@ -2374,10 +2391,7 @@ bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetwo
     for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); ++iter) {
         hiddenNetworkSsid.push_back(iter->ssid);
         // for gbk hiddenNetworkSsID
-        std::string gbkSsid = WifiCodeConvertUtil::Utf8ToGbk(iter->ssid);
-        if (gbkSsid != iter->ssid && !gbkSsid.empty()) {
-            hiddenNetworkSsid.push_back(gbkSsid);
-        }
+        AddSsidToHiddenNetworkList(iter->ssid, hiddenNetworkSsid);
     }
 
     WIFI_LOGI("Find %{public}d hidden NetworkSsid.\n", (int)hiddenNetworkSsid.size());

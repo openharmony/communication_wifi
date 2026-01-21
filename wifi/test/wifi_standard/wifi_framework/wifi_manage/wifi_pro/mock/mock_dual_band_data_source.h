@@ -50,6 +50,10 @@ public:
     {
         return true;
     }
+    bool RemoveDuplicateDatas() override
+    {
+        return true;
+    }
 };
 }
 }

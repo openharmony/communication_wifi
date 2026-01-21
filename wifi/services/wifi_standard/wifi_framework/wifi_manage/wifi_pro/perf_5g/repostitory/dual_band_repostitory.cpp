@@ -73,6 +73,10 @@ void DualBandRepostitory::DeleteAll(std::unordered_set<std::string> &bssids)
 {
     pDualBandDataSource_->DeleteAll(bssids);
 }
+void DualBandRepostitory::RemoveDuplicateDatas()
+{
+    pDualBandDataSource_->RemoveDuplicateDatas();
+}
 void DualBandRepostitory::SaveApInfo(ApInfo &apInfo)
 {
     SwitchableApInfo switchableApInfo(apInfo);

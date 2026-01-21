@@ -90,6 +90,7 @@ private:
     void OnDisconnected();
     void RemoveRelationApDuplicates(std::vector<RelationAp> &relationAps);
     bool IsValidAp(int32_t relationApIndex);
+    bool isNotAllowedPerf(WifiLinkedInfo &wifiLinkedInfo, WifiDeviceConfig &wifiDeviceConfig);
 };
 }
 }

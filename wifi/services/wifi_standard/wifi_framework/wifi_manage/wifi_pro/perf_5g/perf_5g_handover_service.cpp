@@ -61,19 +61,8 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
     InitConnectedAp(wifiLinkedInfo, wifiDeviceConfig);
     connectedAp_->is5gAfterPerf = is5gAfterPerf;
     connectedAp_->perf5gStrategyName = strategyName;
-    bool isItCustNetwork = false;
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService != nullptr) {
-        isItCustNetwork = pEnhanceService->IsItCustNetwork(wifiDeviceConfig);
-    }
-    bool isEnterprise = DualBandUtils::IsEnterprise(wifiDeviceConfig);
-    connectedAp_->canNotPerf = isEnterprise || wifiLinkedInfo.isDataRestricted || isItCustNetwork ||
-        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE || connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR;
-    WIFI_HILOG_COMM_INFO("OnConnected, canNotPerf:isEnterprise(%{public}d),isItCustNetwork(%{public}d),"
-        "isPortal(%{public}d),isDataRestricted(%{public}d),openNet(%{public}d), isEMLSR(%{public}d)", isEnterprise,
-        isItCustNetwork, wifiDeviceConfig.isPortal, wifiLinkedInfo.isDataRestricted,
-        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE, connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR);
-    if (connectedAp_->canNotPerf) {
+
+    if (isNotAllowedPerf(wifiLinkedInfo, wifiDeviceConfig)) {
         WIFI_LOGI("OnConnected, ap is not allow perf 5g");
         return;
     }
@@ -88,12 +77,30 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
             isNewBssidConnected_.store(false);
             return;
         }
+        pDualBandRepostitory_->RemoveDuplicateDatas();
         LoadRelationApInfo();
         perf5gChrInfo_.Reset();
         perf5gChrInfo_.connectTime = std::chrono::steady_clock::now();
         isNewBssidConnected_.store(false);
     }
     PrintRelationAps();
+}
+
+bool Perf5gHandoverService::isNotAllowedPerf(WifiLinkedInfo &wifiLinkedInfo, WifiDeviceConfig &wifiDeviceConfig)
+{
+    bool isItCustNetwork = false;
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr) {
+        isItCustNetwork = pEnhanceService->IsItCustNetwork(wifiDeviceConfig);
+    }
+    bool isEnterprise = DualBandUtils::IsEnterprise(wifiDeviceConfig);
+    connectedAp_->canNotPerf = isEnterprise || wifiLinkedInfo.isDataRestricted || isItCustNetwork ||
+        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE || connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR;
+    WIFI_HILOG_COMM_INFO("OnConnected, canNotPerf:isEnterprise(%{public}d),isItCustNetwork(%{public}d),"
+        "isPortal(%{public}d),isDataRestricted(%{public}d),openNet(%{public}d), isEMLSR(%{public}d)", isEnterprise,
+        isItCustNetwork, wifiDeviceConfig.isPortal, wifiLinkedInfo.isDataRestricted,
+        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE, connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR);
+    return connectedAp_->canNotPerf;
 }
 
 // Encapsulate the function into external and internal types.
@@ -537,12 +544,20 @@ void Perf5gHandoverService::AddRelationApInfo(RelationAp &relationAp)
     if (IsValid5GHz(connectedAp_->apInfo.frequency)) {
         RelationInfo relation(relationAp.apInfo_.bssid, connectedAp_->apInfo.bssid);
         relationAp.relationInfo_ = relation;
+        auto iter = std::find(relationAps_.begin(), relationAps_.end(), relationAp);
+        if (iter != relationAps_.end()) {
+            relationAps_.erase(iter);
+        }
         relationAps_.push_back(relationAp);
         WIFI_LOGI("AddRelationApInfo, relation 2.4g ap(%{public}s) is added",
             MacAnonymize(relationAp.apInfo_.bssid).data());
     } else {
         RelationInfo relation(connectedAp_->apInfo.bssid, relationAp.apInfo_.bssid);
         relationAp.relationInfo_ = relation;
+        auto iter = std::find(relationAps_.begin(), relationAps_.end(), relationAp);
+        if (iter != relationAps_.end()) {
+            relationAps_.erase(iter);
+        }
         relationAps_.push_back(relationAp);
         WIFI_LOGI("AddRelationApInfo, relation 5g ap(%{public}s) is added",
             MacAnonymize(relationAp.apInfo_.bssid).data());

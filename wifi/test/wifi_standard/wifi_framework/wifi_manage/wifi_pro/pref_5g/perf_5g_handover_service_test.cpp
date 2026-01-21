@@ -104,5 +104,20 @@ HWTEST_F(Perf5gHandoverServiceTest, PrintRelationApsTest1, TestSize.Level1)
     perf5gHandoverService_->PrintRelationAps();
     EXPECT_EQ(perf5gHandoverService_->connectedAp_ == nullptr, false);
 }
+HWTEST_F(Perf5gHandoverServiceTest, isNotAllowedPerfTest1, TestSize.Level1)
+{
+    WifiLinkedInfo wifiLinkedInfo;
+    wifiLinkedInfo.isDataRestricted = true;
+    WifiDeviceConfig wifiDeviceConfig;
+    perf5gHandoverService_->connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR;
+    EXPECT_TRUE(perf5gHandoverService_->isNotAllowedPerf(wifiLinkedInfo, wifiDeviceConfig));
+}
+HWTEST_F(Perf5gHandoverServiceTest, isNotAllowedPerfTest2, TestSize.Level1)
+{
+    WifiLinkedInfo wifiLinkedInfo;
+    WifiDeviceConfig wifiDeviceConfig;
+    wifiDeviceConfig.keyMgmt = KEY_MGMT_NONE;
+    EXPECT_TRUE(perf5gHandoverService_->isNotAllowedPerf(wifiLinkedInfo, wifiDeviceConfig));
+}
 }
 }

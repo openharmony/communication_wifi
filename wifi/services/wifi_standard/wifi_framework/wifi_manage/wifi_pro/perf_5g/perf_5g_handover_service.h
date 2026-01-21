@@ -88,7 +88,7 @@ private:
     void InitConnectedAp(WifiLinkedInfo &wifiLinkedInfo, WifiDeviceConfig &wifiDeviceConfig);
     void HandleSwitchFailed(Perf5gSwitchResult switchResult);
     void OnDisconnected();
-    bool RemoveRelationApDuplicates(std::vector<RelationAp> &relationAps);
+    void RemoveRelationApDuplicates(std::vector<RelationAp> &relationAps);
     bool IsValidAp(int32_t relationApIndex);
     bool isNotAllowedPerf(WifiLinkedInfo &wifiLinkedInfo, WifiDeviceConfig &wifiDeviceConfig);
 };

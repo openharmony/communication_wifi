@@ -210,11 +210,6 @@ ErrCode WifiHotspotServiceImpl::HostspotBandwidthConfig(HotspotConfig &config)
 int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parcelconfig)
 {
     HotspotConfig config = parcelconfig.ToHotspotConfig();
-    ErrCode ret = HostspotBandwidthConfig(config);
-    if (ret != ErrCode::WIFI_OPT_SUCCESS) {
-        WIFI_LOGE("SetHotspotConfig:HostspotBandwidthConfig failed!");
-        return HandleHotspotIdlRet(ret);
-    }
 #ifndef OHOS_ARCH_LITE
     WIFI_LOGI("Inst%{public}d %{public}s, pid:%{public}d, uid:%{public}d, band:%{public}d, "
         "channel:%{public}d", m_id, __func__, GetCallingPid(), GetCallingUid(),
@@ -231,6 +226,11 @@ int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parc
     if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetHotspotConfig:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
         return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
+    }
+    ErrCode ret = HostspotBandwidthConfig(config);
+    if (ret != ErrCode::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SetHotspotConfig:HostspotBandwidthConfig failed!");
+        return HandleHotspotIdlRet(ret);
     }
     ErrCode validRetval = VerifyConfigValidity(config);
     if (validRetval != ErrCode::WIFI_OPT_SUCCESS) {

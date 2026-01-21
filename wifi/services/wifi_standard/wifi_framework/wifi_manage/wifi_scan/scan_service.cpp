@@ -379,7 +379,7 @@ ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanTy
     return WIFI_OPT_SUCCESS;
 }
 
-void AddSsidToHiddenNetworkList(const std::string ssid, std::vector<std::string>& hiddenNetworkSsidList)
+void ScanService::AddSsidToHiddenNetworkList(const std::string ssid, std::vector<std::string>& hiddenNetworkSsidList)
 {
     std::string gbkSsid = WifiCodeConvertUtil::Utf8ToGbk(ssid);
     if (gbkSsid != ssid && !gbkSsid.empty()) {

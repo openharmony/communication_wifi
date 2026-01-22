@@ -47,21 +47,24 @@ void IncreaseSharedLinkFuzzerTest1(FuzzedDataProvider& FDP)
     pShareManager.IncreaseSharedLink();
 }
 
-void IncreaseSharedLinkFuzzerTest2(const uint8_t *data)
+void IncreaseSharedLinkFuzzerTest2(const uint8_t *data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     SharedLinkManager pShareManager;
-    int callingUid = static_cast<int>(data[0]);
+    int callingUid = FDP.ConsumeIntegralInRange<int>(0, STATE_NUM);
     pShareManager.IncreaseSharedLink(callingUid);
 }
 
-void DecreaseSharedLinkFuzzerTest(const uint8_t *data)
+void DecreaseSharedLinkFuzzerTest(const uint8_t *data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     SharedLinkManager pShareManager;
-    int callingUid = static_cast<int>(data[0]);
+    int callingUid = FDP.ConsumeIntegralInRange<int>(0, STATE_NUM);
     pShareManager.DecreaseSharedLink(callingUid);
 }
-void ClearUidCountFuzzerTest(const uint8_t *data)
+void ClearUidCountFuzzerTest(const uint8_t *data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     SharedLinkManager pShareManager;
     int uid = static_cast<int>(data[0]);
     pShareManager.ClearUidCount(uid);
@@ -90,11 +93,11 @@ void IpPoolFuzzerTest()
     pIpPool.ReleaseIp(gcMac);
 }
 
-void WifiHid2dServiceUtilsFuzzerTest(const uint8_t *data)
+void WifiHid2dServiceUtilsFuzzerTest(const uint8_t *data, size_t size)
 {
-    IncreaseSharedLinkFuzzerTest2(data);
-    DecreaseSharedLinkFuzzerTest(data);
-    ClearUidCountFuzzerTest(data);
+    IncreaseSharedLinkFuzzerTest2(data, size);
+    DecreaseSharedLinkFuzzerTest(data, size);
+    ClearUidCountFuzzerTest(data, size);
 }
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
@@ -103,7 +106,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     if ((data == nullptr) || (size <= OHOS::Wifi::U32_AT_SIZE_ZERO)) {
         return 0;
     }
-    OHOS::Wifi::WifiHid2dServiceUtilsFuzzerTest(data);
+    OHOS::Wifi::WifiHid2dServiceUtilsFuzzerTest(data, size);
     OHOS::Wifi::IncreaseSharedLinkFuzzerTest1(FDP);
     OHOS::Wifi::CheckNeedRemoveGroupFuzzerTest(FDP);
     OHOS::Wifi::GetGroupUidFuzzerTest(FDP);

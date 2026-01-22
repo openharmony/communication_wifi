@@ -460,6 +460,7 @@ public:
         void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToSaveIpV6ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void UpdateNetLinkInfoForIpV6(IpInfo &ipInfo, IpV6Info &ipv6Info);
+        bool IsIpv6AllZero(const std::string &ipv6);
         void TryToJumpToConnectedState(int iptype);
         void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
         void SaveDhcpResultExt(DhcpResult *dest, DhcpResult *source);

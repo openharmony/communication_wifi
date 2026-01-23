@@ -462,7 +462,7 @@ struct Index {
 
   private async handleFullScreenChange() {
     let orientation = window.Orientation.UNSPECIFIED;
-    if (!this.isVisible){
+    if (!this.isActionBarVisible){
       orientation = window.Orientation.AUTO_ROTATION;
     }
     try {

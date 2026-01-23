@@ -461,9 +461,9 @@ struct Index {
   }
 
   private async handleFullScreenChange() {
-    const windowClass = await window.getLastWindow(this.context);
     if (this.isActionBarVisible){
       try {
+        const windowClass = await window.getLastWindow(this.context);
         await windowClass.setPreferredOrientation(window.Orientation.UNSPECIFIED);
         hilog.info(DOMAIN, TAG, '%{public}s', 'Orientation UNSPECIFIED');
       } catch (error) {
@@ -473,6 +473,7 @@ struct Index {
       }
     } else {
       try {
+        const windowClass = await window.getLastWindow(this.context);
         await windowClass.setPreferredOrientation(window.Orientation.AUTO_ROTATION);
         hilog.info(DOMAIN, TAG, '%{public}s', 'Orientation AUTO_ROTATION');
       } catch (error) {

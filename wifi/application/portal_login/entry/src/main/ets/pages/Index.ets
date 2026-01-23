@@ -461,26 +461,18 @@ struct Index {
   }
 
   private async handleFullScreenChange() {
-    if (this.isActionBarVisible){
-      try {
-        const windowClass = await window.getLastWindow(this.context);
-        await windowClass.setPreferredOrientation(window.Orientation.UNSPECIFIED);
-        hilog.info(DOMAIN, TAG, '%{public}s', 'Orientation UNSPECIFIED');
-      } catch (error) {
-        let err: BusinessError = error as BusinessError;
-        hilog.error(DOMAIN, 'TAG', '%{public}s',
-          `Orientation UNSPECIFIED failed.Code:${err.code},message:${err.message}`);
-      }
-    } else {
-      try {
-        const windowClass = await window.getLastWindow(this.context);
-        await windowClass.setPreferredOrientation(window.Orientation.AUTO_ROTATION);
-        hilog.info(DOMAIN, TAG, '%{public}s', 'Orientation AUTO_ROTATION');
-      } catch (error) {
-        let err: BusinessError = error as BusinessError;
-        hilog.error(DOMAIN, 'TAG', '%{public}s',
-          `Orientation AUTO_ROTATION failed.Code:${err.code},message:${err.message}`);
-      }
+    let orientation = window.Orientation.UNSPECIFIED;
+    if (!this.isVisible){
+      orientation = window.Orientation.AUTO_ROTATION;
+    }
+    try {
+      const windowClass = await window.getLastWindow(this.context);
+      await windowClass.setPreferredOrientation(orientation);
+      hilog.info(DOMAIN, TAG, '%{public}s', 'Orientation' + orientation);
+    } catch (error) {
+      let err: BusinessError = error as BusinessError;
+      hilog.error(DOMAIN, 'TAG', '%{public}s',
+        `Orientation failed.Code:${err.code},message:${err.message}.` + orientation);
     }
   }
 

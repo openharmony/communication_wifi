@@ -18,7 +18,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { i18n, resourceManager  } from '@kit.LocalizationKit';
 import { common, OpenLinkOptions } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { SymbolGlyphModifier } from '@kit.ArkUI';
+import { SymbolGlyphModifier, window } from '@kit.ArkUI';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
   validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl
@@ -107,6 +107,7 @@ struct Index {
   private timerId: number = -1;
   private isPhone: boolean = false;
   @State retryCount: number = 0;
+  @State isActionBarVisible: boolean = true;
 
   @Builder
   ContextMenu() {
@@ -331,6 +332,8 @@ struct Index {
         minHeight: '56vp'
       })
       .backgroundColor($r('sys.color.ohos_id_color_background'))
+      .visibility(this.isActionBarVisible ? Visibility.Visible :
+        Visibility.None)
 
       Web({ src: '', controller: this.webviewController })
         .javaScriptAccess(true)
@@ -439,6 +442,16 @@ struct Index {
             }
           })
         })
+        .onFullScreenEnter((event) => {
+          hilog.info(DOMAIN, TAG, '%{public}s', 'onFullScreenEnter.');
+          this.isActionBarVisible = false;
+          this.handleFullScreenChange();
+        })
+        .onFullScreenExit(() => {
+          hilog.info(DOMAIN, TAG, '%{public}s', 'onFullScreenExit.');
+          this.isActionBarVisible = true;
+          this.handleFullScreenChange();
+        })
         .darkMode(this.mode)
         .forceDarkAccess(this.access)
         .backgroundColor($r('sys.color.ohos_id_color_background'))
@@ -446,7 +459,30 @@ struct Index {
     }
     .padding({ top: px2vp(this.topRectHeight) })
   }
-  
+
+  private async handleFullScreenChange() {
+    const windowClass = await window.getLastWindow(this.context);
+    if (this.isActionBarVisible){
+      try {
+        await windowClass.setPreferredOrientation(window.Orientation.UNSPECIFIED);
+        hilog.info(DOMAIN, TAG, '%{public}s', 'Orientation UNSPECIFIED');
+      } catch (error) {
+        let err: BusinessError = error as BusinessError;
+        hilog.error(DOMAIN, 'TAG', '%{public}s',
+          `Orientation UNSPECIFIED failed.Code:${err.code},message:${err.message}`);
+      }
+    } else {
+      try {
+        await windowClass.setPreferredOrientation(window.Orientation.AUTO_ROTATION);
+        hilog.info(DOMAIN, TAG, '%{public}s', 'Orientation AUTO_ROTATION');
+      } catch (error) {
+        let err: BusinessError = error as BusinessError;
+        hilog.error(DOMAIN, 'TAG', '%{public}s',
+          `Orientation AUTO_ROTATION failed.Code:${err.code},message:${err.message}`);
+      }
+    }
+  }
+
   private setUA():void {
     hilog.info(DOMAIN, TAG, '%{public}s', 'setUA enter.');
     this.harmonyUA = HarmonyUserAgentSet.harmonyUACompatible;

@@ -20,15 +20,6 @@
 #include "wifi_hdi_wpa_proxy.h"
 #include "i_wifi_struct.h"
 
-enum P2pRemoveGroupEvent {
-    P2P_REMOVE_GROUP_CLIENT = 0,
-    P2P_REJECT,
-    P2P_SET_MIRACAST_SINK_CONFIG,
-    P2P_CREATE_TEMP_GROUP,
-    P2P_CANCEL_WPS_PBC,
-    EVENT_MAX,
-};
-
 #ifdef __cplusplus
 extern "C" {
 #endif

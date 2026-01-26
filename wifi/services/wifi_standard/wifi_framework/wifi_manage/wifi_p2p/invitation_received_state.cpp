@@ -30,9 +30,13 @@ InvitationReceivedState::InvitationReceivedState(
 void InvitationReceivedState::GoInState()
 {
     WIFI_LOGI("             GoInState");
+#ifndef NON_SEPERATE_P2P
     p2pStateMachine.NotifyUserInvitationReceivedMessage();
     p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_TIME_OUT),
         WSC_DIALOG_SELECT_TIMEOUT);
+#else
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT), "");
+#endif
 }
 
 void InvitationReceivedState::GoOutState()

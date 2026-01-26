@@ -67,6 +67,7 @@ public:
     void ReceiveNetworkControlInfo(const WifiNetworkControlInfo &networkControlInfo);
     void LimitSpeed(const int controlId, const int limitMode);
     void HandleNetworkConnectivityChange(int32_t bearType, int32_t code);
+    void UpdateGameRttData(int rtt);
 
 private:
     void Init();
@@ -124,6 +125,7 @@ private:
     std::atomic<bool> isVpnConnected_ = false;
     std::atomic<int> cachedPowerMode_ = UNKNOWN_MODE;
     std::atomic<uint32_t> activePowerScenes_{POWER_SCENE_NONE};
+    std::atomic<bool> isFirstRtt_{false};
 };
 } // namespace Wifi
 } // namespace OHOS

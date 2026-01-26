@@ -64,7 +64,7 @@ export function validateURL(urlString: string): boolean {
   try {
     const urlObject = url.URL.parseURL(urlString);
     if (urlObject && urlObject.hostname) {
-      hilog.info(DOMAIN, TAG, '%{public}s', 'validateURL:' + safeAnonymize(urlObject as string));
+      hilog.info(DOMAIN, TAG, '%{public}s', 'validateURL:' + safeAnonymize(urlString));
       return true;
     }
   } catch (error) {

@@ -51,7 +51,7 @@ export function updateBindNetSuccess() {
   isBindNetSuccess_ = 1;
 }
  
-function safeAnonymize(str: string): string {
+export function safeAnonymize(str: string): string {
   if (typeof str !== 'string' || str.length === 0) {
     return str;
   }

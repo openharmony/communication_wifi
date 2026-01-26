@@ -482,6 +482,7 @@
         "OHOS::Wifi::ApConfigUse::UpdateApChannelConfig(OHOS::Wifi::HotspotConfig&) const";
         "OHOS::Wifi::WifiSettings::IsRandomMacDisabled(int)";
         "OHOS::Wifi::WifiSettings::SetRandomMacDisabled(bool, int)";
+        "OHOS::Wifi::WifiCommonEventHelper::PublishHideDropDownWindowEvent()";
     };
     local:
         *;

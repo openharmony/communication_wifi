@@ -52,6 +52,7 @@
 #include "cellular_data_client.h"
 #include "telephony_observer_client.h"
 #endif
+#include <regex>
 
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 
@@ -71,6 +72,7 @@ const std::string WIFI_STANDBY_NAP = "napped";
 const std::string WIFI_STANDBY_SLEEPING = "sleeping";
 const std::string ENTER_SETTINGS = "usual.event.wlan.ENTER_SETTINGS_WLAN_PAGE";
 const std::string WLAN_PAGE_ENTER = "enterWlanPage";
+const std::string GAME_INFO_NOTIFY = "usual.event.gameservice.GAME_INFO_NOTIFY";
 
 bool WifiEventSubscriberManager::mIsMdmForbidden = false;
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
@@ -98,7 +100,8 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_ENTER_FORCE_SLEEP, &
     CesEventSubscriber::OnReceiveForceSleepEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_EXIT_FORCE_SLEEP, &
-    CesEventSubscriber::OnReceiveForceSleepEvent}
+    CesEventSubscriber::OnReceiveForceSleepEvent},
+    {GAME_INFO_NOTIFY, &CesEventSubscriber::OnReceiveGameInfoNotifyEvent}
 };
 
 WifiEventSubscriberManager::WifiEventSubscriberManager()
@@ -836,6 +839,21 @@ void CesEventSubscriber::OnReceiveForceSleepEvent(const OHOS::EventFwk::CommonEv
         WifiManager::GetInstance().InstallPacketFilterProgram(modeState, i);
     }
 #endif
+}
+
+void CesEventSubscriber::OnReceiveGameInfoNotifyEvent(const OHOS::EventFwk::CommonEventData &eventData)
+{
+    auto value = eventData.GetWant().GetStringParam("value");
+    if (value.find("netLatency") != std::string::npos) {
+        std::regex pattern(R"(\"netLatency\":\"total:(\d+)\")");
+        std::smatch matches;
+
+        if (std::regex_search(value, matches, pattern)) {
+            std::string totalStr = matches[1].str();
+            int total = CheckDataLegal(totalStr);
+            AppNetworkSpeedLimitService::GetInstance().UpdateGameRttData(total);
+        }
+    }
 }
 
 void WifiEventSubscriberManager::RegisterNotificationEvent()

@@ -553,6 +553,7 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_OFF, GAME_BOOST_DISABLE, networkControlInfo.uid);
             break;
         case GameSceneId::MSG_GAME_ENTER_PVP_BATTLE:
+            isFirstRtt_.store(true);
             SetActivePowerScenes(POWER_SCENE_GAME, true);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE, networkControlInfo.uid);
             break;
@@ -705,6 +706,22 @@ void AppNetworkSpeedLimitService::CheckAndResetGamePowerMode(const std::string &
     WIFI_LOGI("%{public}s Non-game app [%{public}s], resetting power mode to normal sleep",
         __FUNCTION__, bundleName.c_str());
     SetActivePowerScenes(POWER_SCENE_GAME, false);
+}
+
+void AppNetworkSpeedLimitService::UpdateGameRttData(int rtt)
+{
+    if (!isFirstRtt_.exchange(false)) {
+        WIFI_LOGD("%{public}s not waiting for first rtt, ignore", __FUNCTION__);
+        return;
+    }
+    
+    WIFI_LOGI("%{public}s first rtt received: %{public}d", __FUNCTION__, rtt);
+    if (rtt > 0) {
+        WIFI_LOGI("%{public}s online PVP mode detected, keep no-sleep", __FUNCTION__);
+    } else {
+        WIFI_LOGI("%{public}s single player mode detected, allow sleep", __FUNCTION__);
+        SetActivePowerScenes(POWER_SCENE_GAME, false);
+    }
 }
 } // namespace Wifi
 } // namespace OHOS

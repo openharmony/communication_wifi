@@ -24,7 +24,8 @@ import {
   validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl
 } from '../common/utils';
 import {
-  updateFinalUrl,updateOnHttpErrorReceive,updateOnErrorReceive,updateOnSslErrorEvent,updateAboutToDisappear
+  updateFinalUrl,updateOnHttpErrorReceive,updateOnErrorReceive,updateOnSslErrorEvent,updateAboutToDisappear,
+  safeAnonymize
 } from '../common/chr';
 import { connection } from '@kit.NetworkKit';
 import { emitter } from '@kit.BasicServicesKit';
@@ -388,7 +389,7 @@ struct Index {
           this.loadProgress = 100;
           if (event) {
             this.webUrl = event.url;
-            hilog.info(DOMAIN, TAG, '%{public}s', 'Url:' + extractDomain(this.webUrl));
+            hilog.info(DOMAIN, TAG, '%{public}s', 'Url:' + safeAnonymize(this.webUrl));
             if (event.url == 'about:blank') {
               hilog.info(DOMAIN, TAG, '%{public}s', 'about:blank exit.');
               exitApp(this.context);
@@ -541,7 +542,7 @@ struct Index {
           }
           try {
             this.webviewController.loadUrl(this.webUrl);
-            hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + extractDomain(this.webUrl));
+            hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + safeAnonymize(this.webUrl));
           } catch (error) {
             let err: BusinessError = error as BusinessError;
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed to load url. Code:${err.code}, message:${err.message}`);

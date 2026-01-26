@@ -42,6 +42,7 @@
 #ifndef OHOS_ARCH_LITE
 #include "power_mgr_client.h"
 #endif
+#include "wifi_common_event_helper.h"
 #include "p2p_native_define.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
@@ -759,6 +760,8 @@ void P2pStateMachine::NotifyUserInvitationReceivedMessage()
             savedP2pConfig.GetWpsInfo().GetPin() + '_' + deviceName);
     } else if (wpsInfo == WpsMethod::WPS_METHOD_KEYPAD) {
         WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::P2P_WSC_KEYPAD_DIALOG, deviceName);
+        /* Hide drop down window to avoid the dialog box displayed below the drop down window */
+        WifiCommonEventHelper::PublishHideDropDownWindowEvent();
     }
 }
 

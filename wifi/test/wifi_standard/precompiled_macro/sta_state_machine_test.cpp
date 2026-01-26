@@ -1176,5 +1176,21 @@ HWTEST_F(StaStateMachineTest, HandleStaticIpv6_NonStaticIpv6_Test, TestSize.Leve
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
+HWTEST_F(StaStateMachineTest, IsIpv6AllZero_TestCases, TestSize.Level1)
+{
+    // empty string -> false
+    EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->IsIpv6AllZero(""));
+    // literal "0" -> true
+    EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->IsIpv6AllZero("0"));
+    // unspecified addresses -> true
+    EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->IsIpv6AllZero("::"));
+    EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->IsIpv6AllZero("0:0:0:0:0:0:0:0"));
+    // loopback and link-local -> false
+    EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->IsIpv6AllZero("::1"));
+    EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->IsIpv6AllZero("fe80::1"));
+    // invalid string -> false
+    EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->IsIpv6AllZero("zzz"));
+}
+
 }
 }

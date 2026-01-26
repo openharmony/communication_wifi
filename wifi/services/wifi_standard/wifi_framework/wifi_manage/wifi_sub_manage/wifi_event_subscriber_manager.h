@@ -67,6 +67,7 @@ public:
     void OnReceiveUserUnlockedEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveConnectivityChangedEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveForceSleepEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveGameInfoNotifyEvent(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     bool lastSleepState = false;
     std::atomic<bool> firstFoldState_ = true;

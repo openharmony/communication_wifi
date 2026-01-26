@@ -31,6 +31,8 @@ public:
     void SetUp() override
     {
         wifiLocalSecurityDetect_ = std::make_unique<WifiLocalSecurityDetect>();
+        wifiLocalSecurityDetect_->dnsResultCallback_ =
+            sptr<WifiLocalSecurityDetect::LocalSecurityDetectDnsResultCallback>::MakeSptr();
     }
     void TearDown() override {}
     std::unique_ptr<WifiLocalSecurityDetect> wifiLocalSecurityDetect_;

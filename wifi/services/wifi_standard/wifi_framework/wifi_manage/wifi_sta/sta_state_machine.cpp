@@ -3873,6 +3873,26 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV4Result(IpInfo &ipInfo, IpV6
     }
 }
 
+bool StaStateMachine::DhcpResultNotify::IsIpv6AllZero(const std::string &ipv6)
+{
+    if (ipv6.empty()) {
+        return false;
+    }
+    if (ipv6 == "0") {
+        return true;
+    }
+    struct in6_addr addr;
+    if (inet_pton(AF_INET6, ipv6.c_str(), &addr) != 1) {
+        return false;
+    }
+    unsigned char orResult = 0;
+    constexpr int ipv6ByteLen = 16;
+    for (int i = 0; i < ipv6ByteLen; ++i) {
+        orResult |= addr.s6_addr[i];
+    }
+    return orResult == 0;
+}
+
 void StaStateMachine::DhcpResultNotify::TryToSaveIpV6ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result)
 {
     if (result == nullptr) {
@@ -3894,10 +3914,10 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6ResultExt(IpInfo &ipInfo, I
     if (!ipv6Info.uniqueLocalAddress2.empty()) {
         ipv6Info.IpAddrMap[ipv6Info.uniqueLocalAddress2] = static_cast<int>(AddrTypeIpV6::ADDR_TYPE_UNIQUE_LOCAL_2);
     }
-    if (ipv6Info.primaryDns.length() > 0 && ipv6Info.primaryDns != "0") {
+    if (ipv6Info.primaryDns.length() > 0 && !IsIpv6AllZero(ipv6Info.primaryDns)) {
         ipv6Info.dnsAddr.push_back(ipv6Info.primaryDns);
     }
-    if (ipv6Info.secondDns.length() > 0 && ipv6Info.secondDns != "0") {
+    if (ipv6Info.secondDns.length() > 0 && !IsIpv6AllZero(ipv6Info.secondDns)) {
         ipv6Info.dnsAddr.push_back(ipv6Info.secondDns);
     }
 }

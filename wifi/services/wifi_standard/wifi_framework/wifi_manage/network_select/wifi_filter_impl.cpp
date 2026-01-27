@@ -33,7 +33,6 @@ constexpr int SIGNAL_LEVEL_TWO = 2;
 constexpr int POOR_PORTAL_RECHECK_DELAYED_SECONDS = 2 * RECHECK_DELAYED_SECONDS;
 constexpr int32_t MIN_SIGNAL_LEVEL_INTERVAL = 2;
 constexpr int32_t SIGNAL_LEVEL_THREE = 3;
-constexpr int32_t MIN_RSSI_INTERVAL = 8;
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
 constexpr int LONG_TIME_UNUSED_THRESHOLD = 15 * 24 * 60 * 60;
 #endif
@@ -734,7 +733,8 @@ bool ValidConfigNetworkFilter::Filter(NetworkCandidate &networkCandidate)
     return true;
 }
 
-WifiSwitchThresholdFilter::WifiSwitchThresholdFilter() : SimpleWifiFilter("WifiSwitchThreshold") {}
+WifiSwitchThresholdFilter::WifiSwitchThresholdFilter(int minRssiInterval)
+    : SimpleWifiFilter("WifiSwitchThreshold"), minRssiInterval_(minRssiInterval) {}
 
 WifiSwitchThresholdFilter::~WifiSwitchThresholdFilter()
 {
@@ -751,9 +751,9 @@ bool WifiSwitchThresholdFilter::Filter(NetworkCandidate &networkCandidate)
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     auto &interScanInfo = networkCandidate.interScanInfo;
 
-    if (interScanInfo.rssi - linkedInfo.rssi < MIN_RSSI_INTERVAL) {
-        WIFI_LOGI("WifiSwitchThresholdFilter, scan rssi:%{public}d, cur rssi:%{public}d, skip candidate:%{public}s",
-            interScanInfo.rssi, linkedInfo.rssi, networkCandidate.ToString().c_str());
+    if (interScanInfo.rssi - linkedInfo.rssi < minRssiInterval_) {
+        WIFI_LOGI("WifiSwitchThresholdFilter: scan=%{public}d, cur=%{public}d, thr=%{public}d, skip=%{public}s",
+            interScanInfo.rssi, linkedInfo.rssi, minRssiInterval_, networkCandidate.ToString().c_str());
         networkCandidate.filtedReason[filterName].insert(FiltedReason::LESS_THAN_8RSSI);
         return false;
     }
@@ -878,11 +878,11 @@ bool HigherCategoryFilter::Filter(NetworkCandidate &networkCandidate)
     WifiCategory candidateCategory = scanConfig->GetWifiCategoryRecord(networkCandidate.interScanInfo.bssid);
     if (static_cast<int>(candidateCategory) > static_cast<int>(WifiCategory::DEFAULT) &&
         static_cast<int>(candidateCategory) > static_cast<int>(currentCategory)) {
-        WIFI_LOGD("HigherCategoryFilter: candidate %{public}s (cat %d) >= current %{public}s (cat %d) and > WIFI5",
-                  SsidAnonymize(networkCandidate.interScanInfo.ssid).c_str(), static_cast<int>(candidateCategory),
-                  SsidAnonymize(currentConnection.ssid).c_str(), static_cast<int>(currentCategory));
         return true;
     }
+    WIFI_LOGI("HigherCategoryFilter: candidate %{public}s (cat %{public}d) <= current %{public}s (cat %{public}d)",
+        SsidAnonymize(networkCandidate.interScanInfo.ssid).c_str(), static_cast<int>(candidateCategory),
+        SsidAnonymize(currentConnection.ssid).c_str(), static_cast<int>(currentCategory));
     networkCandidate.filtedReason[filterName].insert(FiltedReason::NOT_HIGHER_CATEGORY);
     return false;
 }
@@ -894,7 +894,7 @@ Perf5gBlackListFilter::~Perf5gBlackListFilter() {}
 bool Perf5gBlackListFilter::Filter(NetworkCandidate &networkCandidate)
 {
     if (NetworkBlockListManager::GetInstance().IsInPerf5gBlocklist(networkCandidate.interScanInfo.bssid)) {
-        WIFI_LOGD("Perf5gBlackListFilter: bssid %{public}s is in perf5g blocklist",
+        WIFI_LOGI("Perf5gBlackListFilter: bssid %{public}s is in perf5g blocklist",
                   MacAnonymize(networkCandidate.interScanInfo.bssid).c_str());
         networkCandidate.filtedReason[filterName].insert(FiltedReason::BLOCKLIST_AP);
         return false;

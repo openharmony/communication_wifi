@@ -1480,6 +1480,11 @@ bool WifiProStateMachine::WifiHasNetState::TryHigherCategoryNetworkSelection(
         WifiProChr::GetInstance().RecordReasonNotSwitchChrCnt(WIFIPRO_USER_SELECT);
         return false;
     }
+    int32_t signalLevel = WifiProUtils::GetSignalLevel(pWifiProStateMachine_->instId_);
+    if (signalLevel < SIG_LEVEL_3) {
+        WIFI_LOGI("TryHigherCategoryNetworkSelection: current signal level %{public}d, skip switching.", signalLevel);
+        return false;
+    }
     WIFI_LOGI("TryHigherCategoryNetworkSelection: Starting higher category network selection.");
     // 设置WiFi7+强场切换原因，使用统一的网络选择接口
     WifiSwitchReason previousReason = pWifiProStateMachine_->wifiSwitchReason_;

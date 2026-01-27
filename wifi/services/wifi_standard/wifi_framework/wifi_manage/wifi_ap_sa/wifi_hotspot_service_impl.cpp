@@ -194,8 +194,9 @@ bool WifiHotspotServiceImpl::CheckHostspot160MCountryCode()
 ErrCode WifiHotspotServiceImpl::HostspotBandwidthConfig(HotspotConfig &config)
 {
     int dataRead = config.GetChannel();
-    int channel = dataRead & 0x000000FF;
-    int bandwidth = (dataRead & 0x00FF0000) >> 16;
+    unsigned int unsignedDataRead = static_cast<unsigned int>(dataRead);
+    int channel = unsignedDataRead & 0x000000FF;
+    int bandwidth = (unsignedDataRead & 0x00FF0000) >> 16;
     config.SetBandWidth(bandwidth);
     config.SetChannel(channel);
     if (config.GetSsid().empty() || config.GetPreSharedKey().empty() ||

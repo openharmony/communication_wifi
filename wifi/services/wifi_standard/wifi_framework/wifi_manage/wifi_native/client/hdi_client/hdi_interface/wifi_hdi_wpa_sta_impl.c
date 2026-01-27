@@ -213,6 +213,10 @@ WifiErrorNo HdiWpaStaStart(const char *ifaceName, int instId)
         LOGE("HdiWpaStaStart ifaceName is null");
         return WIFI_HAL_OPT_FAILED;
     }
+    if (IsHdiWpaStarted() == WIFI_HAL_OPT_OK) {
+        LOGE("HdiWpaStaStart: HdiWpa already started, HdiWpaStaStart success");
+        return WIFI_HAL_OPT_OK;
+    }
     LOGI("HdiWpaStaStart enter! ifaceName = %{public}s, instId = %{public}d", ifaceName, instId);
     if (SetHdiStaIfaceName(ifaceName, instId) != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaStaStart: set sta iface name failed!");

@@ -77,7 +77,6 @@ HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterOpenNotStale, TestSize.Leve
     time_t now = time(nullptr);
     if (now == (time_t)(-1)) {
         GTEST_SKIP() << "time() returned invalid value, skipping test.";
-        return;
     }
     networkCandidate.wifiDeviceConfig.lastDisconnectTime = now - 1 * 24 * 60 * 60; //1天前断开
     networkCandidate.wifiDeviceConfig.networkId = 1;
@@ -98,7 +97,6 @@ HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterNonOpen, TestSize.Level1)
     if (now == (time_t)(-1)) {
         // time()返回非法值，跳过测试或标记为失败
         GTEST_SKIP() << "time() returned invalid value, skipping test.";
-        return;
     }
     networkCandidate.wifiDeviceConfig.lastDisconnectTime = now - 20 * 24 * 60 * 60;
     networkCandidate.wifiDeviceConfig.networkId = 1;
@@ -119,7 +117,6 @@ HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterOpenStale, TestSize.Level1)
     if (now == (time_t)(-1)) {
         // time()返回非法值，跳过测试或标记为失败
         GTEST_SKIP() << "time() returned invalid value, skipping test.";
-        return;
     }
     networkCandidate.wifiDeviceConfig.lastDisconnectTime = now - (15 * 24 * 60 * 60 + 1000); //超过阈值
     networkCandidate.wifiDeviceConfig.networkId = 1;

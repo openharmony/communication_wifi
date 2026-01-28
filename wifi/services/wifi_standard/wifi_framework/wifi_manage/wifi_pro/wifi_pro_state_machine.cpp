@@ -586,32 +586,52 @@ ErrCode WifiProStateMachine::FullScan()
 
 bool WifiProStateMachine::GenelinkSelectNetwork(const std::vector<InterScanInfo> &scanInfos)
 {
+    bool ret = false;
 #ifndef OHOS_ARCH_LITE
     IEnhanceService  *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
-        return false;
+        return ret;
     }
 
     int type = pEnhanceService->GenelinkInterface(MultiLinkDefs::QUERY_SELECT_NETWORK_TYPE, 0);
     if (type != MultiLinkDefs::SELECT_NETWORK_MASTER && type != MultiLinkDefs::SELECT_NETWORK_SLAVE) {
-        return false;
+        return ret;
     }
+
+    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(INSTID_WLAN0);
+    if (pStaService == nullptr && type == MultiLinkDefs::SELECT_NETWORK_MASTER) {
+        return ret;
+    }
+    // notify genelink that selection start
+    pEnhanceService->GenelinkInterface(MultiLinkDefs::NOTIFY_SELECT_NETWORK, MultiLinkDefs::SELECT_NETWORK_START);
 
     NetworkSelectionResult selectionResult;
     NetworkSelectType networkSelectType = NetworkSelectType::AUTO_CONNECT;
     std::unique_ptr<NetworkSelectionManager> pNetworkSelection = std::make_unique<NetworkSelectionManager>();
     std::string failReason;
-    if (pNetworkSelection->SelectNetwork(selectionResult, networkSelectType, scanInfos, failReason)) {
-        selectionResult.wifiDeviceConfig.bssid = selectionResult.interScanInfo.bssid;
-        WIFI_LOGI("%{public}s select network result, ssid: %{public}s, bssid: %{public}s", __func__,
-            SsidAnonymize(selectionResult.interScanInfo.ssid).c_str(),
-            MacAnonymize(selectionResult.interScanInfo.bssid).c_str());
-        selectionResult.wifiDeviceConfig.rssi = selectionResult.interScanInfo.rssi;
-        pEnhanceService->NotifyGenelinkSelectedConfig(selectionResult.wifiDeviceConfig);
-        return true;
+    ret = pNetworkSelection->SelectNetwork(selectionResult, networkSelectType, scanInfos, failReason);
+    // notify genelink that selection is done regardless of result
+    pEnhanceService->GenelinkInterface(MultiLinkDefs::NOTIFY_SELECT_NETWORK, MultiLinkDefs::SELECT_NETWORK_STOP);
+    if (!ret) {
+        WIFI_LOGI("%{public}s failed: reason:%{public}s", __func__, failReason.c_str());
+        return ret;
     }
+
+    std::string &targetBssid = selectionResult.interScanInfo.bssid;
+    selectionResult.wifiDeviceConfig.bssid = selectionResult.interScanInfo.bssid;
+    WIFI_LOGI("%{public}s select network result, ssid: %{public}s, bssid: %{public}s", __func__,
+        SsidAnonymize(selectionResult.interScanInfo.ssid).c_str(), MacAnonymize(targetBssid).c_str());
+    selectionResult.wifiDeviceConfig.rssi = selectionResult.interScanInfo.rssi;
+
+    ErrCode code = pEnhanceService->NotifyGenelinkSelectedConfig(selectionResult.wifiDeviceConfig);
+    if (type == MultiLinkDefs::SELECT_NETWORK_MASTER && code == WIFI_OPT_SUCCESS) {
+        code = pStaService->StartConnectToBssid(selectionResult.wifiDeviceConfig.networkId, targetBssid,
+            NETWORK_SELECTED_BY_GENELINK);
+        WIFI_LOGE("genelink: ConnectToNetwork %{public}s.", code == WIFI_OPT_SUCCESS ? "true" : "false");
+    }
+    ret = (code == WIFI_OPT_SUCCESS);
 #endif
-    return false;
+    return ret;
 }
 
 void WifiProStateMachine::ProcessSwitchResult(const InternalMessagePtr msg)

@@ -627,6 +627,9 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
             __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
         if (bssid == linkedInfo.bssid) {
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
+            if (type == NETWORK_SELECTED_BY_GENELINK) {
+                pStaStateMachine->StartConnectToBssid(networkId, bssid, type);
+            }
             return WIFI_OPT_SUCCESS;
         } else if (linkedInfo.isMloConnected) {
             std::vector<WifiLinkedInfo> mloInfo;
@@ -636,7 +639,7 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
             }
             if (std::find_if(mloInfo.begin(), mloInfo.end(),
                 [bssid](WifiLinkedInfo &info) { return bssid == info.bssid; }) == mloInfo.end()) {
-                    pStaStateMachine->StartConnectToBssid(networkId, bssid);
+                    pStaStateMachine->StartConnectToBssid(networkId, bssid, type);
                 return WIFI_OPT_SUCCESS;
             }
             if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_MLSR) {
@@ -648,7 +651,7 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
                 return WIFI_OPT_SUCCESS;
             }
         }
-        pStaStateMachine->StartConnectToBssid(networkId, bssid);
+        pStaStateMachine->StartConnectToBssid(networkId, bssid, type);
     } else {
         LOGI("%{public}s switch to target network", __FUNCTION__);
         auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);

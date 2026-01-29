@@ -67,6 +67,12 @@ namespace MultiLinkDefs {
     const int NOTIFY_SWITCH_CHAIN = 103;
     const int NOTIFY_NETWORK_READY = 104;
     const int NOTIFY_STA_DISABLE = 105;
+    const int NOTIFY_SELECT_NETWORK = 106;
+    const int NOTIFY_QUIT_DUAL_WLAN = 107;
+
+    // NOTIFY_SELECT_NETWORK
+    const int SELECT_NETWORK_START = 1;
+    const int SELECT_NETWORK_STOP = 0;
 
     // Event callback from enhance to wifi
     const int CBK_EVENT_REDHCP = 20;

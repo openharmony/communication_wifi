@@ -52,7 +52,7 @@ void BaseAddress::Dump() const
             ipType = "NONE";
             break;
     }
-    LOGI("TYPE: [%{public}s] address [%s/%zu]", ipType.c_str(), ipAddress_.c_str(), prefixLength_);
+    LOGI("TYPE: [%{public}s] address [%s/%zu]", ipType.c_str(), IpAnonymize(ipAddress_.c_str()), prefixLength_);
 }
 }  // namespace Wifi
 }  // namespace OHOS

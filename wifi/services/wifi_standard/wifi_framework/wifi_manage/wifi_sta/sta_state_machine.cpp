@@ -156,7 +156,6 @@ constexpr int32_t FAST_RECONNECT_INTERVAL_MIN = 10;
 constexpr int32_t FAST_RECONNECT_INTERVAL_MAX = 60;
 constexpr int32_t FAST_RECONNECT_DELAY_TIME_US = 100 * 1000;
 
-
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       targetNetworkId_(INVALID_NETWORK_ID),
@@ -990,11 +989,9 @@ bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(int reason, const std
         WIFI_LOGI("self cure going, dont ignroe disconnect event");
         return false;
     }
-
     if (TryFastReconnect(reason, bssid)) {
         return true;
     }
-
     if (pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::QUERY_IGNORE_DISCONN_REQUIRED,
         pStaStateMachine->m_instId) == MultiLinkDefs::IGNORE_DISCONNECT) {
         pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::NOTIFY_CHAIN_DISCONNECTED,

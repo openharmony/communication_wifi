@@ -16,6 +16,7 @@
 #include "base_address.h"
 #include <string>
 #include "wifi_log.h"
+#include "wifi_common_util.h"
 
 #undef LOG_TAG
 #define LOG_TAG "OHWIFI_UTIL_BaseAddress"
@@ -52,7 +53,7 @@ void BaseAddress::Dump() const
             ipType = "NONE";
             break;
     }
-    LOGI("TYPE: [%{public}s] address [%s/%zu]", ipType.c_str(), IpAnonymize(ipAddress_.c_str()), prefixLength_);
+    LOGI("TYPE: [%{public}s] address [%s/%zu]", ipType.c_str(), IpAnonymize(ipAddress_.c_str()).c_str(), prefixLength_);
 }
 }  // namespace Wifi
 }  // namespace OHOS

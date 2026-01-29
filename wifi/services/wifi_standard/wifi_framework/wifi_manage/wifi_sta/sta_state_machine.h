@@ -488,8 +488,9 @@ public:
      *
      * @param networkId - the networkId
      * @param bssid - the mac address of network(in)
+     * @param type - select network type: SelectedType
      */
-    void StartConnectToBssid(const int32_t networkId, std::string bssid);
+    void StartConnectToBssid(const int32_t networkId, std::string bssid, int32_t type = NETWORK_SELECTED_BY_USER);
     /**
      * @Description Register sta callback function
      *

@@ -740,7 +740,13 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
     if (NotAllowConnectToNetwork(networkId, bssid, connTriggerMode)) {
         return;
     }
-
+#ifndef OHOS_ARCH_LITE
+    if (pStaStateMachine->m_instId == INSTID_WLAN0 && connTriggerMode != NETWORK_SELECTED_BY_GENELINK &&
+        pStaStateMachine->enhanceService_ != nullptr) {
+        pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::NOTIFY_QUIT_DUAL_WLAN, 0);
+        WIFI_LOGI("notify enhance service quit dual_wlan mode");
+    }
+#endif
     if (pStaStateMachine->StartConnectToNetwork(networkId, bssid, connTriggerMode) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Connect to network failed: %{public}d.\n", networkId);
         pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::FAILED);
@@ -5469,7 +5475,7 @@ void StaStateMachine::ReportMdmRestrictedEvent(const std::string &ssid, const st
 }
 #endif
 
-void StaStateMachine::StartConnectToBssid(const int32_t networkId, std::string bssid)
+void StaStateMachine::StartConnectToBssid(const int32_t networkId, std::string bssid, int32_t type)
 {
     InternalMessagePtr msg = CreateMessage();
     if (msg == nullptr) {
@@ -5487,6 +5493,13 @@ void StaStateMachine::StartConnectToBssid(const int32_t networkId, std::string b
     if (WifiSettings::GetInstance().WhetherSetWhiteListConfig() &&
         !WifiSettings::GetInstance().FindWifiWhiteListConfig(config.ssid, config.bssid, 0)) {
         return;
+    }
+#endif
+#ifndef OHOS_ARCH_LITE
+    if (m_instId == INSTID_WLAN0 && type != NETWORK_SELECTED_BY_GENELINK &&
+        enhanceService_ != nullptr) {
+        enhanceService_->GenelinkInterface(MultiLinkDefs::NOTIFY_QUIT_DUAL_WLAN, 0);
+        WIFI_LOGI("notify enhance service quit dual_wlan mode");
     }
 #endif
     msg->SetMessageName(WIFI_SVR_COM_STA_START_ROAM);

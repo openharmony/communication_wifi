@@ -62,11 +62,12 @@ void DecreaseSharedLinkFuzzerTest(const uint8_t *data, size_t size)
     int callingUid = FDP.ConsumeIntegralInRange<int>(0, STATE_NUM);
     pShareManager.DecreaseSharedLink(callingUid);
 }
+
 void ClearUidCountFuzzerTest(const uint8_t *data, size_t size)
 {
     FuzzedDataProvider FDP(data, size);
     SharedLinkManager pShareManager;
-    int uid = static_cast<int>(data[0]);
+    int uid = FDP.ConsumeIntegralInRange<int>(0, STATE_NUM);
     pShareManager.ClearUidCount(uid);
 }
 

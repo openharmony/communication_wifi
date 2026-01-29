@@ -369,6 +369,15 @@ public:
         pStaStateMachine->StartConnectToNetwork(0, "wifitest/123", 0);
     }
 
+    void StartConnectToNetworkSuccess2()
+    {
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
+        pStaStateMachine->StartConnectToNetwork(0, "wifitest/123", NETWORK_SELECTED_BY_FAST_RECONNECT);
+    }
+
     void StartConnectToNetworkFail1()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).WillRepeatedly(Return(1));
@@ -2268,6 +2277,11 @@ HWTEST_F(StaStateMachineTest, StartConnectToNetworkSuccess, TestSize.Level1)
     StartConnectToNetworkSuccess();
 }
 
+HWTEST_F(StaStateMachineTest, StartConnectToNetworkSuccess2, TestSize.Level1)
+{
+    StartConnectToNetworkSuccess2();
+}
+
 HWTEST_F(StaStateMachineTest, StartConnectToNetworkFail1, TestSize.Level1)
 {
     StartConnectToNetworkFail1();
@@ -3207,6 +3221,24 @@ HWTEST_F(StaStateMachineTest, DealDisconnectEventInLinkStateTest01, TestSize.Lev
     pStaStateMachine->pLinkState->pStaStateMachine->targetNetworkId_ = 0;
     pStaStateMachine->pLinkState->DealDisconnectEventInLinkState(msg);
     EXPECT_TRUE(currentState == pStaStateMachine->linkedInfo.connState);
+}
+
+HWTEST_F(StaStateMachineTest, TryFastReconnectTest01, TestSize.Level1)
+{
+    int reason = 3;
+    std::string bssid = "xx:xx:xx:xx:xx:xx";
+    bool ret = pStaStateMachine->linkedInfo->TryFastReconnect(reason, bssid);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(StaStateMachineTest, TryFastReconnectTest02, TestSize.Level1)
+{
+    int reason = static_cast<int>(Wifi80211ReasonCode::WLAN_REASON_CLASS2_FRAME_FROM_NONAUTH_STA);
+    std::string bssid = "xx:xx:xx:xx:xx:xx";
+    pStaStateMachine->linkedInfo->rssi = -99;
+    pStaStateMachine->linkedInfo->band = 2;
+    bool ret = pStaStateMachine->linkedInfo->TryFastReconnect(reason, bssid);
+    EXPECT_FALSE(ret);
 }
 
 HWTEST_F(StaStateMachineTest, NotAllowConnectToNetworkTest01, TestSize.Level1)

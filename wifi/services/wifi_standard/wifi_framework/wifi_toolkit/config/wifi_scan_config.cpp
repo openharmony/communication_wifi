@@ -370,7 +370,6 @@ int WifiScanConfig::GetScanInfoList(std::vector<WifiScanInfo> &results)
                 SsidAnonymize(iter->ssid).c_str(), MacAnonymize(iter->bssid).c_str());
             mWifiCategoryRecord.erase(iter->bssid);
             iter = mWifiScanInfoList.erase(iter);
-            
             continue;
         }
         if (iter->timestamp > currentTime - WIFI_GET_SCAN_INFO_VALID_TIMESTAMP) {

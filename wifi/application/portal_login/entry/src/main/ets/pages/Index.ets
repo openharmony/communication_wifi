@@ -24,7 +24,7 @@ import {
   validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl
 } from '../common/utils';
 import {
-  updateFinalUrl,updateOnHttpErrorReceive,updateOnErrorReceive,updateOnSslErrorEvent,updateAboutToDisappear,
+  updateFinalUrl, updateOnHttpErrorReceive, updateOnErrorReceive, updateOnSslErrorEvent, updateAboutToDisappear,
   safeAnonymize
 } from '../common/chr';
 import { connection } from '@kit.NetworkKit';
@@ -99,8 +99,6 @@ struct Index {
   private contextMenuWidth = 224;
   private netConnect: connection.NetConnection = connection.createNetConnection();
   private isInOOBE: boolean = getIsInOOBE();
-  @State mode: WebDarkMode = WebDarkMode.Auto;
-  @State access: boolean = true;
   @StorageProp('topRectHeight') topRectHeight: number = 0;
   private isLoaded: boolean = false;
   private isNetBind: boolean = false;
@@ -453,8 +451,7 @@ struct Index {
           this.isActionBarVisible = true;
           this.handleFullScreenChange();
         })
-        .darkMode(this.mode)
-        .forceDarkAccess(this.access)
+        .darkMode(WebDarkMode.Off)
         .backgroundColor($r('sys.color.ohos_id_color_background'))
         .width('100%')
     }

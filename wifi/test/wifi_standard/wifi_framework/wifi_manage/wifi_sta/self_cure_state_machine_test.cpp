@@ -40,6 +40,7 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
+using ::testing::An;
 
 namespace OHOS {
 namespace Wifi {
@@ -3171,6 +3172,40 @@ HWTEST_F(SelfCureStateMachineTest, RemoveAutoJoinBlockTimeTest, TestSize.Level1)
     const std::string conditionName = "TEST_CONDITION";
     pSelfCureStateMachine_->RemoveAutoJoinBlockTime(conditionName);
     EXPECT_TRUE(g_errLog.find("service failed!") != std::string::npos);
+}
+
+HWTEST_F(SelfCureStateMachineTest, SetDeviceConfigForUpdateByIdTest, TestSize.Level1)
+{
+    const int networkId = 145;
+    WifiDeviceConfig config;
+    config.networkId = networkId;
+    config.ssid = "test_wifi";
+    config.preSharedKey = "12345678";
+    config.keyMgmt = "WPA-PSK";
+    config.uid = -1;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<1>(config), Return(0)));
+    pSelfCureStateMachine_->SetDeviceConfigForUpdateById(networkId);
+    EXPECT_EQ(pSelfCureStateMachine_->deviceConfigForUpdate_.networkId, networkId);
+}
+
+HWTEST_F(SelfCureStateMachineTest, UpdateLastNetworkIdTest, TestSize.Level1)
+{
+    const int networkId = 145;
+    const int networkId2 = 146;
+    WifiDeviceConfig config;
+    config.networkId = networkId;
+    config.ssid = "test_wifi";
+    config.preSharedKey = "12345678";
+    config.keyMgmt = "WPA-PSK";
+    config.uid = -1;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLastNetworkId()).WillOnce(Return(networkId2));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(
+        An<const std::string &>(), An<const std::string &>(), _, An<int>()))
+        .WillRepeatedly(DoAll(SetArgReferee<2>(config), Return(0)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetLastNetworkId(_)).Times(1);
+    pSelfCureStateMachine_->UpdateLastNetworkId(config.uid, config.ssid, config.keyMgmt);
+    EXPECT_TRUE(g_errLog.find("update last networkId") != std::string::npos);
 }
 } // namespace Wifi
 } // namespace OHOS

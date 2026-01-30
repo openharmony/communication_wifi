@@ -3227,7 +3227,7 @@ HWTEST_F(StaStateMachineTest, TryFastReconnectTest01, TestSize.Level1)
 {
     int reason = 3;
     std::string bssid = "xx:xx:xx:xx:xx:xx";
-    bool ret = pStaStateMachine->linkedInfo->TryFastReconnect(reason, bssid);
+    bool ret = pStaStateMachine->pLinkState->TryFastReconnect(reason, bssid);
     EXPECT_FALSE(ret);
 }
 
@@ -3235,9 +3235,9 @@ HWTEST_F(StaStateMachineTest, TryFastReconnectTest02, TestSize.Level1)
 {
     int reason = static_cast<int>(Wifi80211ReasonCode::WLAN_REASON_CLASS2_FRAME_FROM_NONAUTH_STA);
     std::string bssid = "xx:xx:xx:xx:xx:xx";
-    pStaStateMachine->linkedInfo->rssi = -99;
-    pStaStateMachine->linkedInfo->band = 2;
-    bool ret = pStaStateMachine->linkedInfo->TryFastReconnect(reason, bssid);
+    pStaStateMachine->linkedInfo.rssi = -99;
+    pStaStateMachine->linkedInfo.band = 2;
+    bool ret = pStaStateMachine->pLinkState->TryFastReconnect(reason, bssid);
     EXPECT_FALSE(ret);
 }
 

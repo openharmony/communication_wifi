@@ -252,6 +252,7 @@ public:
         void DealNetworkRemoved(InternalMessagePtr msg);
         void DealWpaStateChange(InternalMessagePtr msg);
         void DealMloStateChange(InternalMessagePtr msg);
+        void DealWpaCustomEapAuthEvent(InternalMessagePtr msg);
         bool NeedIgnoreDisconnectEvent(int reason, const std::string &bssid);
         bool TryFastReconnect(int reason, const std::string &bssid);
     };

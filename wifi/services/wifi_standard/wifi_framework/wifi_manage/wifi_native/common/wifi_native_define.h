@@ -147,7 +147,6 @@ typedef enum Wifi80211ReasonCode {
     WLAN_REASON_CLASS3_FRAME_FROM_NONASSOC_STA = 7,
     WLAN_REASON_IE_IN_4WAY_DIFFERS = 17,
     WLAN_REASON_DISASSOC_LOW_ACK = 34,
-
 } Wifi80211ReasonCode;
 
 typedef enum Wifi80211AuthType {

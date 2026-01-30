@@ -150,7 +150,7 @@ const std::vector<Wifi80211ReasonCode> g_fastReconnectWlanReasons = {
     Wifi80211ReasonCode::WLAN_REASON_CLASS2_FRAME_FROM_NONAUTH_STA,
     Wifi80211ReasonCode::WLAN_REASON_CLASS3_FRAME_FROM_NONASSOC_STA,
     Wifi80211ReasonCode::WLAN_REASON_DISASSOC_LOW_ACK,
-}
+};
 
 constexpr int32_t FAST_RECONNECT_INTERVAL_MIN = 10;
 constexpr int32_t FAST_RECONNECT_INTERVAL_MAX = 60;
@@ -1019,7 +1019,7 @@ bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string 
     int32_t fastConnectInterval = pStaStateMachine->enableSignalPoll ?
         FAST_RECONNECT_INTERVAL_MIN : FAST_RECONNECT_INTERVAL_MAX;
     if (disconnectInterval <= fastConnectInterval) {
-        WIFI_LOGI("%{public}s cannot fast reconnect, disconect interval:%{public}d", __FUNCTION__, disconnectInterval);
+        WIFI_LOGI("%{public}s cannot fast reconnect, disconnect interval:%{public}d", __FUNCTION__, disconnectInterval);
         return false;
     }
     WifiScanParams params;
@@ -1028,14 +1028,14 @@ bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string 
     if (pScanService != nullptr &&
         pScanService->ScanWithParam(params, true, ScanType::SCAN_TYPE_FAST_RECONNECT) == WIFI_OPT_SUCCESS) {
         usleep(FAST_RECONNECT_DELAY_TIME_US); // wait 100ms for single channel scan callback
-        if (pStaStateMachine->StartConnectToNetwork(pStaStateMachine->linkedInfo->networkId, bssid,
+        if (pStaStateMachine->StartConnectToNetwork(pStaStateMachine->linkedInfo.networkId, bssid,
             NETWORK_SELECTED_BY_FAST_RECONNECT) == WIFI_OPT_SUCCESS) {
-            WIFI_LOGI("%{public}s try to fast reconnect, networkId:%{public}d",
-                __FUNCTION__, pStaStateMachine->linkedInfo->networkId, MacAnonymize(bssid).c_str());
+            WIFI_LOGI("%{public}s try to fast reconnect, networkId:%{public}d, bssid:%{public}s",
+                __FUNCTION__, pStaStateMachine->linkedInfo.networkId, MacAnonymize(bssid).c_str());
             return true;
         }
     }
-    WIFI_LOGI("%{public}s scan or connect fail", __FUNCTION__);
+    WIFI_LOGW("%{public}s scan or connect fail", __FUNCTION__);
     return false;
 }
 

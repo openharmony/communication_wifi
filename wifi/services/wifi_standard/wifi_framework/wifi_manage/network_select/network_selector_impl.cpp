@@ -435,6 +435,7 @@ HigherCategoryNetworkSelector::HigherCategoryNetworkSelector()
     andFilters->AddFilter(make_shared<HigherCategoryFilter>());
     andFilters->AddFilter(make_shared<Perf5gBlackListFilter>());
     andFilters->AddFilter(make_shared<ValidConfigNetworkFilter>());
+    andFilters->AddFilter(make_shared<WifiSwitchThresholdFilter>(0));
     SetWifiFilter(andFilters);
 }
 

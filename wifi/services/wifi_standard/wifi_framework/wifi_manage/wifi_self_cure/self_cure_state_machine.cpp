@@ -2890,10 +2890,14 @@ void SelfCureStateMachine::HandleSelfCureNormal()
 {
     switch (selfCureL2State_) {
         case SelfCureState::SCE_WIFI_OFF_STATE: {
+            int networkId = WifiConfigCenter::GetInstance().GetLastNetworkId();
+            SetDeviceConfigForUpdateById(networkId);
             SetSelfCureWifiTimeOut(SCE_WIFI_ON_STATE);
             break;
         }
         case SelfCureState::SCE_WIFI_ON_STATE: {
+            UpdateLastNetworkId(deviceConfigForUpdate_.uid, deviceConfigForUpdate_.ssid,
+                deviceConfigForUpdate_.keyMgmt);
             UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_HIGH_RESET_WIFI_ON, true);
             SetSelfCureWifiTimeOut(SCE_WIFI_ON_DISCONNECT_MIDDLE_STATE);
             break;
@@ -3139,6 +3143,32 @@ void SelfCureStateMachine::RemoveAutoJoinBlockTime(const std::string& conditionN
         return;
     }
     pStaService->DeregisterAutoJoinCondition(conditionName);
+}
+
+void SelfCureStateMachine::SetDeviceConfigForUpdateById(int networkId)
+{
+    WifiDeviceConfig config;
+    if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config) != 0) {
+        WIFI_LOGW("%{public}s, can't find device config by networkId %{public}d", __func__, networkId);
+    }
+    deviceConfigForUpdate_ = config;
+}
+
+void SelfCureStateMachine::UpdateLastNetworkId(int uid, const std::string& ssid, const std::string& keyMgmt)
+{
+    WifiDeviceConfig config;
+    // Note that instId of GetCandidateConfig and GetDeviceConfig is 0.
+    if (uid > WIFI_INVALID_UID) {
+        WifiSettings::GetInstance().GetCandidateConfig(uid, ssid, keyMgmt, config, 0);
+    } else {
+        WifiSettings::GetInstance().GetDeviceConfig(ssid, keyMgmt, config);
+    }
+    int lastNetworkId = WifiConfigCenter::GetInstance().GetLastNetworkId();
+    if (config.networkId == lastNetworkId) {
+        return;
+    }
+    WifiConfigCenter::GetInstance().SetLastNetworkId(config.networkId);
+    WIFI_LOGI("%{public}s, update last networkId: %{public}d -> %{public}d", __func__, lastNetworkId, config.networkId);
 }
 } // namespace Wifi
 } // namespace OHOS

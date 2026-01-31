@@ -18,7 +18,8 @@ import { connection } from '@kit.NetworkKit'
 import { BusinessError } from '@kit.BasicServicesKit'
 import { hilog } from '@kit.PerformanceAnalysisKit'
 import { url, util, JSON } from '@kit.ArkTS'
-import { updateInitUrl, updateBindNetTime, updateBindNetSuccess } from './chr';
+import { updateInitUrl, updateBindNetTime, updateBindNetSuccess,
+  safeAnonymize } from './chr';
 import { fileIo as fs } from '@kit.CoreFileKit';
 
 const DOMAIN = 0x01560
@@ -63,7 +64,7 @@ export function validateURL(urlString: string): boolean {
   try {
     const urlObject = url.URL.parseURL(urlString);
     if (urlObject && urlObject.hostname) {
-      hilog.info(DOMAIN, TAG, '%{public}s', 'validateURL:' + urlObject.hostname);
+      hilog.info(DOMAIN, TAG, '%{public}s', 'validateURL:' + safeAnonymize(urlString));
       return true;
     }
   } catch (error) {

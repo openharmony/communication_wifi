@@ -382,6 +382,7 @@ struct Index {
           }
           try {
             this.webviewController.runJavaScript(modifyCode);
+            hilog.info(DOMAIN, TAG, '%{public}s', 'runJavaScript enter.');
           } catch (error) {
             hilog.error(DOMAIN, TAG, '%{public}s',
               `onPageBegin Failed runJavaScript. Code:${error.code}, message:${error.message}`);

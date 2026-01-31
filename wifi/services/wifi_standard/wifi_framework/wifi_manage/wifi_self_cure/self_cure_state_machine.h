@@ -402,6 +402,8 @@ private:
     bool CheckSelfCureWifiResultExt(SelfCureState selfCureL2State);
     void UpdateAutoJoinBlockTime(const std::string& conditionName, int64_t blockTimeMs);
     void RemoveAutoJoinBlockTime(const std::string& conditionName);
+    void SetDeviceConfigForUpdateById(int networkId);
+    void UpdateLastNetworkId(int uid, const std::string& ssid, const std::string& keyMgmt);
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap_;
@@ -446,6 +448,7 @@ private:
     SelfCureState selfCureL2State_ = SelfCureState::SCE_WIFI_INVALID_STATE;
     std::mutex detectionMtx_;
     std::condition_variable detectionCond_;
+    WifiDeviceConfig deviceConfigForUpdate_;
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -18,6 +18,8 @@
 #include "network_selection.h"
 
 namespace OHOS::Wifi::NetworkSelection {
+constexpr int32_t DEFAULT_MIN_RSSI_INTERVAL = 8;
+
 class HiddenWifiFilter final : public SimpleWifiFilter {
 public:
     HiddenWifiFilter();
@@ -84,10 +86,12 @@ protected:
  
 class WifiSwitchThresholdFilter final : public SimpleWifiFilter {
 public:
-    WifiSwitchThresholdFilter();
+    explicit WifiSwitchThresholdFilter(int32_t minRssiInterval = DEFAULT_MIN_RSSI_INTERVAL);
     ~WifiSwitchThresholdFilter() override;
 protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
+private:
+    int32_t minRssiInterval_;
 };
 
 class WifiSwitchThresholdQoeFilter final : public SimpleWifiFilter {

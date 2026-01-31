@@ -3953,9 +3953,12 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
     TryToSaveIpV6ResultExt(ipInfo, ipv6Info, result);
     if (result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
         for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
-            if (std::find(ipv6Info.dnsAddr.begin(), ipv6Info.dnsAddr.end(), result->dnsList.dnsAddr[i]) ==
-                ipv6Info.dnsAddr.end()) {
-                ipv6Info.dnsAddr.push_back(result->dnsList.dnsAddr[i]);
+            std::string dns = result->dnsList.dnsAddr[i];
+            if (IsIpv6AllZero(dns)) {
+                continue;
+            }
+            if (std::find(ipv6Info.dnsAddr.begin(), ipv6Info.dnsAddr.end(), dns) == ipv6Info.dnsAddr.end()) {
+                ipv6Info.dnsAddr.push_back(dns);
             }
         }
         WIFI_LOGI("TryToSaveIpV6Result ipv6Info dnsAddr size:%{public}zu", ipv6Info.dnsAddr.size());

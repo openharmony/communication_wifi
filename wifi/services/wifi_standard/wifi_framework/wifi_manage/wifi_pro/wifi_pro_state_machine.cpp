@@ -1865,8 +1865,9 @@ bool WifiProStateMachine::WifiNoNetState::HandleHttpResultInNoNet(InternalMessag
     if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED)) {
         if (!WifiProUtils::IsUserSelectNetwork()) {
             pWifiProStateMachine_->FullScan();
+        } else {
+            WIFI_LOGI("user actively select no-net network, do not allow scan.");
         }
-        WIFI_LOGI("user actively select no-net network, do not allow scan.");
         return EXECUTED;
     }
     return NOT_EXECUTED;

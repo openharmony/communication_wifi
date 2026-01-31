@@ -379,6 +379,13 @@ struct Index {
                 `onPageBegin Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
             }
           }
+          try {
+            const combinedCode = `Object.defineProperty(navigator, 'platform', { get: () => 'Linux aarch64' });`;
+            this.webviewController.runJavaScript(combinedCode);
+          } catch (error) {
+            hilog.error(DOMAIN, TAG, '%{public}s',
+              `onPageBegin Failed runJavaScript. Code:${error.code}, message:${error.message}`);
+          }
         })
         .onProgressChange((event) => {
           this.loadProgress = event.newProgress;

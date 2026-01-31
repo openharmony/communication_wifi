@@ -18,13 +18,14 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { i18n, resourceManager  } from '@kit.LocalizationKit';
 import { common, OpenLinkOptions } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { SymbolGlyphModifier } from '@kit.ArkUI';
+import { SymbolGlyphModifier, window } from '@kit.ArkUI';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
   validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl
 } from '../common/utils';
 import {
-  updateFinalUrl,updateOnHttpErrorReceive,updateOnErrorReceive,updateOnSslErrorEvent,updateAboutToDisappear
+  updateFinalUrl, updateOnHttpErrorReceive, updateOnErrorReceive, updateOnSslErrorEvent, updateAboutToDisappear,
+  safeAnonymize
 } from '../common/chr';
 import { connection } from '@kit.NetworkKit';
 import { emitter } from '@kit.BasicServicesKit';
@@ -98,8 +99,6 @@ struct Index {
   private contextMenuWidth = 224;
   private netConnect: connection.NetConnection = connection.createNetConnection();
   private isInOOBE: boolean = getIsInOOBE();
-  @State mode: WebDarkMode = WebDarkMode.Auto;
-  @State access: boolean = true;
   @StorageProp('topRectHeight') topRectHeight: number = 0;
   private isLoaded: boolean = false;
   private isNetBind: boolean = false;
@@ -107,6 +106,7 @@ struct Index {
   private timerId: number = -1;
   private isPhone: boolean = false;
   @State retryCount: number = 0;
+  @State isActionBarVisible: boolean = true;
 
   @Builder
   ContextMenu() {
@@ -331,6 +331,8 @@ struct Index {
         minHeight: '56vp'
       })
       .backgroundColor($r('sys.color.ohos_id_color_background'))
+      .visibility(this.isActionBarVisible ? Visibility.Visible :
+        Visibility.None)
 
       Web({ src: '', controller: this.webviewController })
         .javaScriptAccess(true)
@@ -385,7 +387,7 @@ struct Index {
           this.loadProgress = 100;
           if (event) {
             this.webUrl = event.url;
-            hilog.info(DOMAIN, TAG, '%{public}s', 'Url:' + extractDomain(this.webUrl));
+            hilog.info(DOMAIN, TAG, '%{public}s', 'Url:' + safeAnonymize(this.webUrl));
             if (event.url == 'about:blank') {
               hilog.info(DOMAIN, TAG, '%{public}s', 'about:blank exit.');
               exitApp(this.context);
@@ -439,14 +441,39 @@ struct Index {
             }
           })
         })
-        .darkMode(this.mode)
-        .forceDarkAccess(this.access)
+        .onFullScreenEnter((event) => {
+          hilog.info(DOMAIN, TAG, '%{public}s', 'onFullScreenEnter.');
+          this.isActionBarVisible = false;
+          this.handleFullScreenChange();
+        })
+        .onFullScreenExit(() => {
+          hilog.info(DOMAIN, TAG, '%{public}s', 'onFullScreenExit.');
+          this.isActionBarVisible = true;
+          this.handleFullScreenChange();
+        })
+        .darkMode(WebDarkMode.Off)
         .backgroundColor($r('sys.color.ohos_id_color_background'))
         .width('100%')
     }
     .padding({ top: px2vp(this.topRectHeight) })
   }
-  
+
+  private async handleFullScreenChange() {
+    let orientation = window.Orientation.UNSPECIFIED;
+    if (!this.isActionBarVisible){
+      orientation = window.Orientation.AUTO_ROTATION;
+    }
+    try {
+      const windowClass = await window.getLastWindow(this.context);
+      await windowClass.setPreferredOrientation(orientation);
+      hilog.info(DOMAIN, TAG, '%{public}s', 'Orientation' + orientation);
+    } catch (error) {
+      let err: BusinessError = error as BusinessError;
+      hilog.error(DOMAIN, 'TAG', '%{public}s',
+        `Orientation failed.Code:${err.code},message:${err.message}.` + orientation);
+    }
+  }
+
   private setUA():void {
     hilog.info(DOMAIN, TAG, '%{public}s', 'setUA enter.');
     this.harmonyUA = HarmonyUserAgentSet.harmonyUACompatible;
@@ -512,7 +539,7 @@ struct Index {
           }
           try {
             this.webviewController.loadUrl(this.webUrl);
-            hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + extractDomain(this.webUrl));
+            hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + safeAnonymize(this.webUrl));
           } catch (error) {
             let err: BusinessError = error as BusinessError;
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed to load url. Code:${err.code}, message:${err.message}`);

@@ -21,7 +21,8 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { SymbolGlyphModifier, window } from '@kit.ArkUI';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
-  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl
+  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl,
+  modifyCode
 } from '../common/utils';
 import {
   updateFinalUrl, updateOnHttpErrorReceive, updateOnErrorReceive, updateOnSslErrorEvent, updateAboutToDisappear,
@@ -380,8 +381,7 @@ struct Index {
             }
           }
           try {
-            const combinedCode = `Object.defineProperty(navigator, 'platform', { get: () => 'Linux aarch64' });`;
-            this.webviewController.runJavaScript(combinedCode);
+            this.webviewController.runJavaScript(modifyCode);
           } catch (error) {
             hilog.error(DOMAIN, TAG, '%{public}s',
               `onPageBegin Failed runJavaScript. Code:${error.code}, message:${error.message}`);

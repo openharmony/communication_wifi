@@ -3253,7 +3253,6 @@ HWTEST_F(StaStateMachineTest, UpdateNetDetectHistoryTest03, TestSize.Level1)
     config.networkId = 1;
     config.ipv4OnlyNetState = 1;
     config.dualStackNetState = 1;
-    config.hasIpv6SelfcureDone = false;
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
         WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
     pStaStateMachine->pLinkedState->UpdateNetDetectHistory(EnumNetWorkState::NETWORK_NOTWORKING);
@@ -3268,7 +3267,6 @@ HWTEST_F(StaStateMachineTest, UpdateNetDetectHistoryTest04, TestSize.Level1)
     config.networkId = 1;
     config.ipv4OnlyNetState = -1;
     config.dualStackNetState = 1;
-    config.hasIpv6SelfcureDone = true;
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
         WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
     pStaStateMachine->pLinkedState->UpdateNetDetectHistory(EnumNetWorkState::NETWORK_NOTWORKING);

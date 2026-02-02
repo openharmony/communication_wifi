@@ -359,6 +359,7 @@ public:
 #endif
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
+        void UpdateNetDetectHistory(EnumNetWorkState networkState);
         void DealNetworkCheck(InternalMessagePtr msg);
         void FoldStatusNotify(InternalMessagePtr msg);
         bool ProcessMessageByMacros(InternalMessagePtr msg);

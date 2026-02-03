@@ -349,8 +349,9 @@ void P2pStateMachine::SetWifiP2pInfoWhenGroupFormed(const std::string &groupOwne
 
 bool P2pStateMachine::IsMatchClientDevice(std::vector<GcInfo> &gcInfos, WifiP2pDevice &device, GcInfo &gcInfo)
 {
-    std::vector<OHOS::Wifi::WifiP2pDevice> deviceList;
-    if (deviceManager.GetDevicesList(deviceList) <= 0) {
+    WifiP2pGroupInfo groupInfo = groupManager.GetCurrentGroup();
+    std::vector<OHOS::Wifi::WifiP2pDevice> deviceList = groupInfo.GetClientDevices();
+    if (deviceList.size() <= 0) {
         WIFI_LOGE("deviceList.size <= 0 ");
         return false;
     }

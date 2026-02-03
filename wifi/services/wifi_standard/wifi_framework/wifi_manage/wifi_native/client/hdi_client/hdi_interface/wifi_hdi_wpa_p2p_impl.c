@@ -124,6 +124,10 @@ static WifiErrorNo AddP2pRandomMacFlag()
 WifiErrorNo HdiWpaP2pStart(const char *ifaceName, const bool hasPersisentGroup)
 {
     LOGI("HdiWpaP2pStart enter");
+    if (IsHdiWpaStarted() == WIFI_HAL_OPT_OK) {
+        LOGE("HdiWpaP2pStart: HdiWpa already started, HdiWpaP2pStart success");
+        return WIFI_HAL_OPT_OK;
+    }
     if (SetHdiP2pIfaceName(ifaceName) != WIFI_HAL_OPT_OK) {
         LOGE("HdiWpaP2pStart: set p2p iface name failed!");
         return WIFI_HAL_OPT_FAILED;

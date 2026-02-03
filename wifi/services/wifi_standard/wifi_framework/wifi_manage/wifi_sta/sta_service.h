@@ -92,6 +92,9 @@ public:
     virtual ErrCode StartConnectToBssid(const int32_t networkId, const std::string bssid,
         int32_t type = NETWORK_SELECTED_BY_USER) const;
 
+    virtual void StartConnectToBssidExt(const int32_t networkId, const std::string bssid,
+        int32_t type = NETWORK_SELECTED_BY_USER) const;
+    
     /**
      * @Description connect to user select ssid and bssid network
      *

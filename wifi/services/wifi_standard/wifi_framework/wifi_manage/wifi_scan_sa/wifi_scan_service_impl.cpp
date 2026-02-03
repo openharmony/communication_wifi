@@ -278,7 +278,6 @@ bool WifiScanServiceImpl::IsWifiScanAllowed(int &scanStyle, bool externFlag)
 {
     WifiScanDeviceInfo scanInfo;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(scanInfo);
-    scanInfo.scanStyle = SCAN_DEFAULT_TYPE;
     if (externFlag) {
         if (WifiConfigCenter::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
             WIFI_LOGW("extern scan not allow when wifi disable");
@@ -299,6 +298,7 @@ bool WifiScanServiceImpl::IsWifiScanAllowed(int &scanStyle, bool externFlag)
         scanInfo.isSystemApp = WifiAuthCenter::IsSystemAccess();
         bool allowScan = pEnhanceService->IsScanAllowed(scanInfo);
         scanStyle = scanInfo.scanStyle;
+        scanInfo.scanStyle = SCAN_DEFAULT_TYPE;
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->SaveScanDeviceInfo(scanInfo);
         return allowScan;
     }

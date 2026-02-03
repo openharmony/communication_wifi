@@ -4616,8 +4616,10 @@ void StaStateMachine::DealMloConnectionLinkInfo()
         WIFI_LOGI("%{public}s GetConnectionMloLinkedInfo from wpas fail", __FUNCTION__);
         return;
     }
-    WIFI_LOGI("%{public}s mloLinkedInfo0: %{public}s, mloLinkedInfo1 %{public}s",
-        __FUNCTION__, MacAnonymize(mloLinkedInfo[0].bssid).c_str(), MacAnonymize(mloLinkedInfo[1].bssid).c_str());
+    for (auto& info : mloLinkedInfo) {
+        WIFI_LOGI("%{public}s mloLinkedInfo: %{public}s",
+            __FUNCTION__, MacAnonymize(info.bssid).c_str());
+    }
     WifiConfigCenter::GetInstance().SaveMloLinkedInfo(mloLinkedInfo, m_instId);
     WifiConfigCenter::GetInstance().SetMloWifiLinkedMaxSpeed(m_instId);
 }

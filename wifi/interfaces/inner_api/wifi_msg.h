@@ -882,6 +882,8 @@ struct WifiDeviceConfig {
     time_t lastDetectTime;
     time_t lastDisconnectTime;
     WifiRiskType riskType;
+    int ipv4OnlyNetState {-1};
+    int dualStackNetState {-1};
 
     WifiDeviceConfig()
     {

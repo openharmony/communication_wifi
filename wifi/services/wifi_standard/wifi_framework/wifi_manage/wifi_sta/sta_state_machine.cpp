@@ -3131,7 +3131,49 @@ void StaStateMachine::LinkedState::NetDetectionNotify(InternalMessagePtr msg)
         WIFI_LOGW("Failed to obtain portal url.");
     }
     WIFI_HILOG_COMM_INFO("netdetection, netstate:%{public}d url:%{private}s\n", netstate, url.c_str());
+    UpdateNetDetectHistory(netstate);
     pStaStateMachine->HandleNetCheckResult(netstate, url);
+}
+
+void StaStateMachine::LinkedState::UpdateNetDetectHistory(EnumNetWorkState networkState)
+{
+    if (WifiSettings::GetInstance().GetSignalLevel(pStaStateMachine->linkedInfo.rssi,
+        pStaStateMachine->linkedInfo.band, pStaStateMachine->m_instId) < RSSI_LEVEL_2) {
+        WIFI_LOGD("%{public}s signal level less 2", __FUNCTION__);
+        return;
+    }
+    WifiDeviceConfig config = pStaStateMachine->getCurrentWifiDeviceConfig();
+    if (config.networkId == INVALID_NETWORK_ID) {
+        WIFI_LOGW("%{public}s fail to get deviceconfig", __FUNCTION__);
+        return;
+    }
+    if (config.dualStackNetState != -1 && config.ipv4OnlyNetState != -1) {
+        WIFI_LOGD("%{public}s only update firt connect netDetect record", __FUNCTION__);
+        return;
+    }
+    IpInfo ipInfo;
+    IpV6Info ipv6Info;
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, pStaStateMachine->m_instId);
+    WifiConfigCenter::GetInstance().GetIpv6Info(ipv6Info, pStaStateMachine->m_instId);
+    if (ipInfo.ipAddress != 0 && !ipv6Info.globalIpV6Address.empty()) {
+        config.dualStackNetState = static_cast<int>(networkState);
+    } else if (ipInfo.ipAddress != 0 && ipv6Info.globalIpV6Address.empty()) {
+        config.ipv4OnlyNetState = static_cast<int>(networkState);
+    } else {
+        WIFI_LOGD("%{public}s ip not found", __FUNCTION__);
+        return;
+    }
+    WIFI_LOGI("%{public}s DualStack:%{public}d, Ipv4Only:%{public}d", __FUNCTION__,
+        config.dualStackNetState, config.ipv4OnlyNetState);
+    if (static_cast<EnumNetWorkState>(config.dualStackNetState) == EnumNetWorkState::NETWORK_NOTWORKING &&
+        static_cast<EnumNetWorkState>(config.ipv4OnlyNetState) == EnumNetWorkState::NETWORK_IS_WORKING) {
+        if (pStaStateMachine->selfCureService_ != nullptr) {
+            WIFI_LOGI("%{public}s disable ipv6", __FUNCTION__);
+            pStaStateMachine->selfCureService_->NotifyIpv6FailureDetected(true);
+            pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_REASSOCIATE_NETWORK);
+        }
+    }
+    WifiSettings::GetInstance().AddDeviceConfig(config);
 }
 
 void StaStateMachine::LinkedState::DealNetworkCheck(InternalMessagePtr msg)

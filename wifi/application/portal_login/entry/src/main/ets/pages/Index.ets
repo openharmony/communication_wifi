@@ -367,6 +367,7 @@ struct Index {
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed to get UA. Code:${error.code}, message:${error.message}`);
           }
         })
+        .javaScriptOnDocumentStart([{ script: modifyCode, scriptRules: ["*"] }])
         .onPageBegin(() => {
           updateFinalUrl(this.webUrl);
           this.loadProgress = 0;

@@ -654,9 +654,8 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
                 return WIFI_OPT_SUCCESS;
             }
         }
-        LOGI("%{public}s linkedInfo.bssid: %{public}s, bssid %{public}s, isMloConnected %{public}d",
-            __FUNCTION__, MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str(),
-            linkedInfo.isMloConnected);
+        LOGI("%{public}s linkedInfo.bssid: %{public}s, bssid %{public}s",
+            __FUNCTION__, MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
         pStaStateMachine->StartConnectToBssid(networkId, bssid, type);
     } else {
         StartConnectToBssidExt(networkId, bssid, type);

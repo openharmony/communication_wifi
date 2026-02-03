@@ -80,6 +80,13 @@ WifiErrorNo HdiWpaStart();
 WifiErrorNo HdiWpaStop();
 
 /**
+ * @Description check wpa hdi already started.
+ *
+ * @return WifiErrorNo - operation result
+ */
+WifiErrorNo IsHdiWpaStarted();
+
+/**
  * @Description check wpa hdi already stopped.
  *
  * @return WifiErrorNo - operation result

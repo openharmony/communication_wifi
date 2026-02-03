@@ -144,6 +144,18 @@ const std::map<int, int> portalEventValues = {
     {PortalState::EXPERIED, HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED}
 };
 
+const std::vector<Wifi80211ReasonCode> g_fastReconnectWlanReasons = {
+    Wifi80211ReasonCode::WLAN_REASON_UNSPECIFIED,
+    Wifi80211ReasonCode::WLAN_REASON_PREV_AUTH_NOT_VALID,
+    Wifi80211ReasonCode::WLAN_REASON_CLASS2_FRAME_FROM_NONAUTH_STA,
+    Wifi80211ReasonCode::WLAN_REASON_CLASS3_FRAME_FROM_NONASSOC_STA,
+    Wifi80211ReasonCode::WLAN_REASON_DISASSOC_LOW_ACK,
+};
+
+constexpr int32_t FAST_RECONNECT_INTERVAL_MIN = 10;
+constexpr int32_t FAST_RECONNECT_INTERVAL_MAX = 60;
+constexpr int32_t FAST_RECONNECT_DELAY_TIME_US = 100 * 1000;
+
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       targetNetworkId_(INVALID_NETWORK_ID),
@@ -966,7 +978,7 @@ void StaStateMachine::LinkState::DealWpaCustomEapAuthEvent(InternalMessagePtr ms
 #endif
 }
 
-bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(InternalMessagePtr msg)
+bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(int reason, const std::string &bssid)
 {
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine->enhanceService_ == nullptr || pStaStateMachine->m_instId != INSTID_WLAN0) {
@@ -977,7 +989,9 @@ bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(InternalMessagePtr ms
         WIFI_LOGI("self cure going, dont ignroe disconnect event");
         return false;
     }
-
+    if (TryFastReconnect(reason, bssid)) {
+        return true;
+    }
     if (pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::QUERY_IGNORE_DISCONN_REQUIRED,
         pStaStateMachine->m_instId) == MultiLinkDefs::IGNORE_DISCONNECT) {
         pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::NOTIFY_CHAIN_DISCONNECTED,
@@ -986,6 +1000,42 @@ bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(InternalMessagePtr ms
         return true;
     }
 #endif
+    return false;
+}
+
+bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string &bssid)
+{
+    if (std::find(g_fastReconnectWlanReasons.begin(), g_fastReconnectWlanReasons.end(),
+        static_cast<Wifi80211ReasonCode>(reason)) == g_fastReconnectWlanReasons.end()) {
+        return false;
+    }
+    if (WifiSettings::GetInstance().GetSignalLevel(pStaStateMachine->linkedInfo.rssi,
+        pStaStateMachine->linkedInfo.band, pStaStateMachine->m_instId) < RSSI_LEVEL_2) {
+        WIFI_LOGI("%{public}s signal level less 2", __FUNCTION__);
+        return false;
+    }
+    WifiDeviceConfig wifiDeviceConfig = pStaStateMachine->getCurrentWifiDeviceConfig();
+    int32_t disconnectInterval = static_cast<int32_t>(time(nullptr) - wifiDeviceConfig.lastConnectTime);
+    int32_t fastConnectInterval = pStaStateMachine->enableSignalPoll ?
+        FAST_RECONNECT_INTERVAL_MIN : FAST_RECONNECT_INTERVAL_MAX;
+    if (disconnectInterval <= fastConnectInterval) {
+        WIFI_LOGI("%{public}s cannot fast reconnect, disconnect interval:%{public}d", __FUNCTION__, disconnectInterval);
+        return false;
+    }
+    WifiScanParams params;
+    params.freqs.push_back(pStaStateMachine->linkedInfo.frequency);
+    IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(pStaStateMachine->m_instId);
+    if (pScanService != nullptr &&
+        pScanService->ScanWithParam(params, true, ScanType::SCAN_TYPE_FAST_RECONNECT) == WIFI_OPT_SUCCESS) {
+        usleep(FAST_RECONNECT_DELAY_TIME_US); // wait 100ms for single channel scan callback
+        if (pStaStateMachine->StartConnectToNetwork(pStaStateMachine->linkedInfo.networkId, bssid,
+            NETWORK_SELECTED_BY_FAST_RECONNECT) == WIFI_OPT_SUCCESS) {
+            WIFI_LOGI("%{public}s try to fast reconnect, networkId:%{public}d, bssid:%{public}s",
+                __FUNCTION__, pStaStateMachine->linkedInfo.networkId, MacAnonymize(bssid).c_str());
+            return true;
+        }
+    }
+    WIFI_LOGW("%{public}s scan or connect fail", __FUNCTION__);
     return false;
 }
 
@@ -1001,7 +1051,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     WIFI_LOGI("Enter DealDisconnectEventInLinkState m_instId = %{public}d reason:%{public}d, bssid:%{public}s",
         pStaStateMachine->m_instId, reason, MacAnonymize(bssid).c_str());
 
-    if (NeedIgnoreDisconnectEvent(msg)) {
+    if (NeedIgnoreDisconnectEvent(reason, bssid)) {
         pStaStateMachine->SwitchState(pStaStateMachine->pApReConnectState);
         return;
     }
@@ -3422,7 +3472,15 @@ bool StaStateMachine::ApReconnectState::ExecuteStateMsg(InternalMessagePtr msg)
             ret = EXECUTED;
             break;
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT:
-            pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+            if (!pStaStateMachine->CanArpReachable() && pStaStateMachine->enhanceService_ != nullptr &&
+                pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::QUERY_RECONNECT_ALLOWED,
+                pStaStateMachine->m_instId) != MultiLinkDefs::ALLOW_IN_CONN_STATE) {
+                WIFI_LOGI("ApReconnectState arp is not reachable");
+                pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
+            } else {
+                WIFI_LOGI("ApReconnectState arp is reachable");
+                pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+            }
             ret = EXECUTED;
         default:
             WIFI_LOGI("ApReconnectState-msgCode=%{public}d not handled.", msg->GetMessageName());
@@ -5176,7 +5234,9 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     } else {
         WIFI_LOGI("SetBssid bssid=%{public}s", MacAnonymize(apBssid).c_str());
     }
-    SetRandomMac(deviceConfig, apBssid);
+    if (connTriggerMode != NETWORK_SELECTED_BY_FAST_RECONNECT) {
+        SetRandomMac(deviceConfig, apBssid);
+    }
     WIFI_LOGI("StartConnectToNetwork SetRandomMac targetNetworkId_:%{public}d, bssid:%{public}s", targetNetworkId_,
         MacAnonymize(apBssid).c_str());
     EnhanceWriteWifiConnectionInfoHiSysEvent(networkId);

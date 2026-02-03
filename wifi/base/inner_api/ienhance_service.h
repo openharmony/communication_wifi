@@ -508,6 +508,14 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode RegisterStaEnhanceCallback(StaEnhanceCallback callback) = 0;
+
+    /**
+     * @Description Set game latency gain statistics feature enabled state
+     *
+     * @param enabled - whether the feature is enabled
+     * @param featureName - feature name to distinguish different gain scenarios
+     */
+    virtual void SetGameLatencyFeatureEnabled(bool enabled, const std::string& featureName) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

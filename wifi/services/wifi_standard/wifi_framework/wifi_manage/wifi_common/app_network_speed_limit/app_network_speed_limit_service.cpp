@@ -24,6 +24,8 @@
 #include "wifi_global_func.h"
 #include "net_all_capabilities.h"
 #include "net_supplier_info.h"
+#include "wifi_service_manager.h"
+#include "ienhance_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -40,6 +42,8 @@ namespace {
     const std::string HANDLE_FOREGROUND_APP_CHANGED = "HandleForegroundAppChangedAction";
     const std::string LIMIT_SPEED = "LimitSpeed";
     const std::string RECEIVE_NETWORK_CONTROL = "ReceiveNetworkControlInfo";
+    const std::string FEATURE_GAME_NO_SLEEP = "GameNoSleep";
+    const std::string FEATURE_VPN_NO_LIMIT = "VpnNoLimit";
     const int GAME_BOOST_ENABLE = 1;
     const int GAME_BOOST_DISABLE = 0;
     const int BOOST_UDP_TYPE = 17;
@@ -628,6 +632,8 @@ void AppNetworkSpeedLimitService::HandleNetworkConnectivityChange(int32_t bearTy
     if (preVpnState != currentVpnState) {
         WIFI_LOGI("%{public}s VPN connection state changed: %{public}d -> %{public}d",
             __FUNCTION__, preVpnState, currentVpnState);
+        // Report VPN background no-speed-limit gain statistics
+        ReportGameLatencyFeature(currentVpnState, FEATURE_VPN_NO_LIMIT);
     }
 }
 
@@ -671,6 +677,8 @@ void AppNetworkSpeedLimitService::UpdatePowerModeByScenes()
         WIFI_LOGE("Set power mode failed, targetMode: %{public}d, ret: %{public}d.", targetMode, ret);
     } else {
         cachedPowerMode_.store(targetMode);
+        // Report game battle no-sleep gain statistics
+        ReportGameLatencyFeature(targetMode == POWER_MODE_ON, FEATURE_GAME_NO_SLEEP);
         WIFI_LOGI("Set power mode %{public}d -> %{public}d.", cachedMode, targetMode);
     }
 }
@@ -722,6 +730,16 @@ void AppNetworkSpeedLimitService::UpdateGameRttData(int rtt)
         WIFI_LOGI("%{public}s single player mode detected, allow sleep", __FUNCTION__);
         SetActivePowerScenes(POWER_SCENE_GAME, false);
     }
+}
+
+void AppNetworkSpeedLimitService::ReportGameLatencyFeature(bool enabled, const std::string& featureName)
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGD("%{public}s: pEnhanceService is null", __FUNCTION__);
+        return;
+    }
+    pEnhanceService->SetGameLatencyFeatureEnabled(enabled, featureName);
 }
 } // namespace Wifi
 } // namespace OHOS

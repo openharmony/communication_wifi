@@ -28,7 +28,7 @@ struct CountryDefaultBandFreqs {
     std::vector<int> freqs;
 };
 
-const std::vector<CountryDefaultBandFreqs> g_countryDefaultFreqs = {
+inline const std::vector<CountryDefaultBandFreqs> g_countryDefaultFreqs = {
     /* CN 2.4G valid frequencies */
     { "CN", BandType::BAND_2GHZ, {2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472} },
     /* CN 5G valid frequencies, exclude radar frequencies */

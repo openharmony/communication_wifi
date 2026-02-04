@@ -164,7 +164,7 @@ enum PortalState {
     EXPERIED
 };
 
-const std::string WPA_BSSID_ANY = "any";
+inline const std::string WPA_BSSID_ANY = "any";
 
 class StaStateMachine : public StateMachine {
 #ifndef OHOS_ARCH_LITE

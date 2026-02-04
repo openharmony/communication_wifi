@@ -72,8 +72,8 @@ struct WifiCloseServiceMsg {
 };
 
 constexpr uint32_t PROP_SUPPORT_SAPCOEXIST_LEN = 10;
-const std::string SUPPORT_SAPCOEXIST_PROP = "const.wifi.support_sapcoexist";
-const std::string SUPPORT_SAPCOEXIST = "true";
+inline const std::string SUPPORT_SAPCOEXIST_PROP = "const.wifi.support_sapcoexist";
+inline const std::string SUPPORT_SAPCOEXIST = "true";
 constexpr uint32_t SUPPORT_SAPCOEXIST_LEN = 7;
 
 const int CAC_STOP_BY_DEFAULT_REASON = 0;

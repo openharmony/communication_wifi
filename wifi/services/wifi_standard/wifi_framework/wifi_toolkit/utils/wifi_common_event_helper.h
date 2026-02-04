@@ -44,6 +44,7 @@ inline const std::string COMMON_EVENT_WIFI_P2P_PEERS_DISCOVERY_STATE_CHANGED =
 inline const std::string COMMON_EVENT_WIFI_P2P_CURRENT_DEVICE_STATE_CHANGED =
     "usual.event.wifi.p2p.CURRENT_DEVICE_CHANGE";
 inline const std::string COMMON_EVENT_WIFI_P2P_GROUP_STATE_CHANGED = "usual.event.wifi.p2p.GROUP_STATE_CHANGED";
+
 inline const std::string COMMON_EVENT_WIFI_SELF_CURE_STATE_CHANGED = "usual.event.wifi.selfcure.STATE_CHANGED";
 inline const std::string COMMON_EVENT_VOWIFI_SIGNAL_DETECT_INTERRUPT =
     "usual.event.wifi.VOWIFI_SIGNAL_DETECT_INTERRUPT";

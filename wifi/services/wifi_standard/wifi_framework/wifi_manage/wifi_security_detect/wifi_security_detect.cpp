@@ -67,7 +67,9 @@ void WifiSecurityDetect::DealStaConnChanged(OperateResState state, const WifiLin
             SecurityDetect(info);
         }
     } else if (state == OperateResState::DISCONNECT_DISCONNECTED) {
-        PopupNotification(WifiNotification::CLOSE, info.networkId);
+        if (isSecureWifiPoped_.load()) {
+            PopupNotification(WifiNotification::CLOSE, info.networkId);
+        }
         currentConnectedNetworkId_.store(-1);
         networkDetecting_.store(false);
     } else {
@@ -412,6 +414,7 @@ void WifiSecurityDetect::SecurityDetect(const WifiLinkedInfo &info)
         PopupNotification(config.isSecureWifi ? WifiNotification::CLOSE : WifiNotification::OPEN, info.networkId);
         WifiSettings::GetInstance().AddDeviceConfig(config);
         WifiSettings::GetInstance().SyncDeviceConfig();
+        isSecureWifiPoped_.store(result ? false : true);
         return WIFI_OPT_SUCCESS;
     });
 }

@@ -83,6 +83,7 @@ private:
     std::atomic<int> currentConnectedNetworkId_ {-1};
     std::atomic<bool> datashareReady_ {false};
     std::atomic<bool> networkDetecting_ {false};
+    std::atomic<bool> isSecureWifiPoped_ {false};
     std::mutex shareSecurityObserverMutex_;
     std::mutex shareDetectMutex_;
     std::atomic<bool> isSecurityDetectObservered_ {false};

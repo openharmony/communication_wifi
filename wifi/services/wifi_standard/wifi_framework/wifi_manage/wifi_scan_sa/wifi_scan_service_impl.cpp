@@ -298,6 +298,7 @@ bool WifiScanServiceImpl::IsWifiScanAllowed(int &scanStyle, bool externFlag)
         scanInfo.isSystemApp = WifiAuthCenter::IsSystemAccess();
         bool allowScan = pEnhanceService->IsScanAllowed(scanInfo);
         scanStyle = scanInfo.scanStyle;
+        scanInfo.scanStyle = SCAN_DEFAULT_TYPE;
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->SaveScanDeviceInfo(scanInfo);
         return allowScan;
     }

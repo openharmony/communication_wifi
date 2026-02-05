@@ -118,10 +118,10 @@ constexpr auto GetAllValidNames(std::integer_sequence<int, Is...>)
 }
 
 template <typename E>
-constexpr auto ENUM_NAMES_V = GetAllValidNames<E>(TEST_INTEGER_SEQUENCE_V);
+inline constexpr auto ENUM_NAMES_V = GetAllValidNames<E>(TEST_INTEGER_SEQUENCE_V);
 
 template <typename E>
-constexpr auto ENUM_VALUES_V = GetAllValidValues<E>(TEST_INTEGER_SEQUENCE_V);
+inline constexpr auto ENUM_VALUES_V = GetAllValidValues<E>(TEST_INTEGER_SEQUENCE_V);
 
 template <typename E>
 constexpr std::string_view Enum2string(E V)

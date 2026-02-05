@@ -34,7 +34,7 @@ enum class HotspotConfigType {
     UNUSED,
 };
 
-const std::unordered_map<std::string, HotspotConfigType> g_hotspotConfigMap = {
+inline const std::unordered_map<std::string, HotspotConfigType> g_hotspotConfigMap = {
     {XML_TAG_SOFTAP_SSID, HotspotConfigType::SOFTAP_SSID},
     {XML_SECURITY_TYPE, HotspotConfigType::SECURITYTYPE},
     {XML_PASSPHRASE, HotspotConfigType::PASSPHRASE},

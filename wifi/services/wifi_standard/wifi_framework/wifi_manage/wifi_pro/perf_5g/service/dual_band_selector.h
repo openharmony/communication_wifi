@@ -81,10 +81,10 @@ private:
         std::string connectedApBssid);
 };
 namespace SelectStrategyName {
-    const std::string AP_5G_SCORE = "AP_5G_SCORE";
-    const std::string SAME_AP_5G = "SAME_AP_5G";
-    const std::string AP_5G_SCORE_GREATER_24G = "AP_5G_SCORE_GREATER_24G";
-    const std::string LEARNING_ALG = "LEARNING_ALG";
+    inline const std::string AP_5G_SCORE = "AP_5G_SCORE";
+    inline const std::string SAME_AP_5G = "SAME_AP_5G";
+    inline const std::string AP_5G_SCORE_GREATER_24G = "AP_5G_SCORE_GREATER_24G";
+    inline const std::string LEARNING_ALG = "LEARNING_ALG";
 }
 }  // namespace Wifi
 }  // namespace OHOS

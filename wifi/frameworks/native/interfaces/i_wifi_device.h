@@ -692,6 +692,9 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode SetBtCoexistState(CoexistState state, CoexistReason reason) = 0;
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
 };
 }  // namespace Wifi
 }  // namespace OHOS

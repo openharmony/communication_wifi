@@ -134,16 +134,19 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     NetworkSelectionResult networkSelectionResult;
     std::string failReason = "";
-    if ((pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT,
+    if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT,
         scanInfos, failReason) ||
-        SelectNetworkFailConnectChoiceNetWork(networkSelectionResult, scanInfos)) &&
-        !OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
+        SelectNetworkFailConnectChoiceNetWork(networkSelectionResult, scanInfos)) {
+        std::string bssid = "";
         SelectedType selectedType = NETWORK_SELECTED_BY_AUTO;
+        if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) { 
+             bssid = networkSelectionResult.interScanInfo.bssid; 
+        }
         if (IsCandidateWithUserSelectChoiceHidden(networkSelectionResult)) {
             WIFI_LOGI("AutoSelectDevice select user choise hidden network");
             selectedType = NETWORK_SELECTED_BY_USER;
         }
-        ConnectNetwork(networkSelectionResult, selectedType);
+        ConnectNetwork(networkSelectionResult, selectedType, bssid);
     } else {
         WIFI_LOGI("AutoSelectDevice return fail.");
         std::vector<WifiDeviceConfig> savedConfigs;
@@ -190,9 +193,8 @@ bool StaAutoConnectService::SelectNetworkFailConnectChoiceNetWork(NetworkSelecti
     return false;
 }
 
-void StaAutoConnectService::ConnectNetwork(NetworkSelectionResult &networkSelectionResult, SelectedType &selectedType)
+void StaAutoConnectService::ConnectNetwork(NetworkSelectionResult &networkSelectionResult, SelectedType &selectedType, const std::string &bssid)
 {
-    std::string &bssid = networkSelectionResult.interScanInfo.bssid;
     int networkId = networkSelectionResult.wifiDeviceConfig.networkId;
     std::string &ssid = networkSelectionResult.wifiDeviceConfig.ssid;
     WIFI_LOGI("AutoSelectDevice networkId: %{public}d, ssid: %{public}s, bssid: %{public}s.",

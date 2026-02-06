@@ -680,7 +680,10 @@ public:
      * @param reason - conflict reason
      * @return ErrCode - operation result
      */
-    virtual ErrCode SetBtCoexistState(CoexistState state, CoexistReason reason) = 0;
+    virtual ErrCode SetBtCoexistState(CoexistState state, CoexistReason reason)
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
 };
 }  // namespace Wifi
 }  // namespace OHOS

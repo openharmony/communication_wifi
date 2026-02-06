@@ -43,6 +43,8 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int MAX_DECRYPT_DEVICE_CONFIG_NUM = 400;
+static const int MAX_FILE_SIZE = 1024 * 1024;
+static const int MIN_FILE_SIZE = 0;
 std::string g_defaultApSsid;
 #ifdef DTFUZZ_TEST
 static WifiSettings* gWifiSettings = nullptr;
@@ -2514,12 +2516,20 @@ int WifiSettings::GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConf
         LOGE("GetConfigbyBackupXml fstat fd fail.");
         return -1;
     }
-    char *buffer = (char *)malloc(statBuf.st_size);
+
+    int fileSize = statBuf.st_size;
+    if (fileSize > MAX_FILE_SIZE || fileSize < MIN_FILE_SIZE) {
+        WIFI_LOGE("fileSize illegal");
+        fclose(file);
+        return nullptr;
+    }
+ 
+    char *buffer = (char *)malloc(fileSize);
     if (buffer == nullptr) {
         LOGE("GetConfigbyBackupXml malloc fail.");
         return -1;
     }
-    ssize_t bufferLen = read(fd.Get(), buffer, statBuf.st_size);
+    ssize_t bufferLen = read(fd.Get(), buffer, fileSize);
     if (bufferLen < 0) {
         LOGE("GetConfigbyBackupXml read fail.");
         free(buffer);
@@ -2527,7 +2537,7 @@ int WifiSettings::GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConf
         return -1;
     }
     std::string backupData = std::string(buffer, buffer + bufferLen);
-    if (memset_s(buffer, statBuf.st_size, 0, statBuf.st_size) != EOK) {
+    if (memset_s(buffer, fileSize, 0, fileSize) != EOK) {
         LOGE("GetConfigbyBackupXml memset_s fail.");
         free(buffer);
         buffer = nullptr;

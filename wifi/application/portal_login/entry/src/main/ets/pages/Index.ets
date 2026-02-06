@@ -452,7 +452,7 @@ struct Index {
           this.handleFullScreenChange();
         })
         .darkMode(WebDarkMode.Off)
-        .backgroundColor($r('sys.color.ohos_id_color_background'))
+        .backgroundColor(Color.White)
         .width('100%')
     }
     .padding({ top: px2vp(this.topRectHeight) })

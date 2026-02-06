@@ -172,7 +172,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
 }
 
 bool StaAutoConnectService::SelectNetworkFailConnectChoiceNetWork(NetworkSelectionResult &networkSelectionResult,
-        const std::vector<InterScanInfo> &scanInfos)
+    const std::vector<InterScanInfo> &scanInfos)
 {
     std::vector<NetworkSelection::NetworkCandidate> networkCandidates;
     pNetworkSelectionManager->GetAllDeviceConfigs(networkCandidates, scanInfos);

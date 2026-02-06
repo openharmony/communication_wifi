@@ -140,7 +140,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
         std::string bssid = "";
         SelectedType selectedType = NETWORK_SELECTED_BY_AUTO;
         if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) { 
-             bssid = networkSelectionResult.interScanInfo.bssid; 
+            bssid = networkSelectionResult.interScanInfo.bssid; 
         }
         if (IsCandidateWithUserSelectChoiceHidden(networkSelectionResult)) {
             WIFI_LOGI("AutoSelectDevice select user choise hidden network");

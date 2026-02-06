@@ -100,6 +100,9 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_IS_RANDOMMAC_DISABLED = 0x1053, /* Is RandomMac Disabled */
     WIFI_SVR_CMD_SET_RANDOMMAC_DISABLED = 0x1054, /* Set Is RandomMac Disabled */
 
+    /* BT WiFi co-exist */
+    WIFI_SVR_CMD_SET_BT_COEXIST_STATE = 0x1055, /* Set BT Co-exist State */
+
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */
     WIFI_CBK_CMD_CONNECTION_CHANGE = 0x3001,    /* STA connection state change event */

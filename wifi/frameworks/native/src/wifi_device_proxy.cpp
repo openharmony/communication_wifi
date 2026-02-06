@@ -3020,5 +3020,36 @@ ErrCode WifiDeviceProxy::SetRandomMacDisabled(bool isRandomMacDisabled)
     }
     return ErrCode(reply.ReadInt32());
 }
+
+ErrCode WifiDeviceProxy::SetBtCoexistState(CoexistState state, CoexistReason reason)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(state);
+    data.WriteInt32(reason);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_BT_COEXIST_STATE),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Bt Co-exist State (%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_BT_COEXIST_STATE), error);
+        return WIFI_OPT_FAILED;
+    }
+ 
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
 }  // namespace Wifi
 }  // namespace OHOS

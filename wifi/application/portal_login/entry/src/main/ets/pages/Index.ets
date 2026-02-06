@@ -361,7 +361,7 @@ struct Index {
             this.harmonyUA = this.webviewController.getUserAgent();
             this.isPhone = /Phone/i.test(this.harmonyUA);
             this.selectedUA = this.harmonyUA;
-            hilog.info(DOMAIN, TAG, '%{public}s', 'UA isPhone: '  + this.isPhone);
+            hilog.info(DOMAIN, TAG, '%{public}s', 'UA isPhone:'  + this.isPhone);
           } catch (error) {
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed to get UA. Code:${error.code}, message:${error.message}`);
           }

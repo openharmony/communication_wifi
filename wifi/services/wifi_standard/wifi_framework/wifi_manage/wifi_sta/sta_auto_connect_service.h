@@ -244,8 +244,8 @@ private:
 
     bool SelectNetworkFailConnectChoiceNetWork(NetworkSelectionResult &networkSelectionResult,
         const std::vector<InterScanInfo> &scanInfos);
-
-    void ConnectNetwork(NetworkSelectionResult &networkSelectionResult, SelectedType &selectedType);
+    void ConnectNetwork(NetworkSelectionResult &networkSelectionResult, SelectedType &selectedType,
+        const std::string &bssid);
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -139,7 +139,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
         SelectNetworkFailConnectChoiceNetWork(networkSelectionResult, scanInfos)) {
         std::string bssid = "";
         SelectedType selectedType = NETWORK_SELECTED_BY_AUTO;
-        if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) { 
+        if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
             bssid = networkSelectionResult.interScanInfo.bssid; 
         }
         if (IsCandidateWithUserSelectChoiceHidden(networkSelectionResult)) {

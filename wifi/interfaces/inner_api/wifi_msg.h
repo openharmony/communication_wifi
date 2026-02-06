@@ -103,6 +103,19 @@ enum WifiRestrictedType {
     MDM_INVALID_LIST = 2
 };
 
+enum CoexistState : int {
+    ALLOW_DATA_TRANS,
+    NOT_ALLOW_DATA_TRANS,
+    ALLOW_CONNECT,
+    NOT_ALLOW_CONNECT,
+};
+ 
+enum CoexistReason : int {
+    KEYBOARD_MOUSE_SCENE,
+    D2D_SCENE,
+    OTHER_SCENE,
+};
+
 enum GameSceneId : int {
     MSG_GAME_STATE_START = 0,
     MSG_GAME_STATE_END = 1,

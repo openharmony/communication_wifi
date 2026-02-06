@@ -241,6 +241,11 @@ private:
      * @Return true if candidate is user choice hidden network otherwise false
      */
     bool IsCandidateWithUserSelectChoiceHidden(NetworkSelectionResult &candidate);
+
+    bool SelectNetworkFailConnectChoiceNetWork(NetworkSelectionResult &networkSelectionResult,
+        const std::vector<InterScanInfo> &scanInfos);
+
+    void ConnectNetwork(NetworkSelectionResult &networkSelectionResult, SelectedType &selectedType);
 };
 }  // namespace Wifi
 }  // namespace OHOS

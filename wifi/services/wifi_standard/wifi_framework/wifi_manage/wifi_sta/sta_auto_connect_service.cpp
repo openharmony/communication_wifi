@@ -119,8 +119,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
 
     WifiLinkedInfo info;
     WifiConfigCenter::GetInstance().GetLinkedInfo(info, m_instId);
-    if (info.supplicantState == SupplicantState::ASSOCIATING ||
-        info.supplicantState == SupplicantState::ASSOCIATED ||
+    if (info.supplicantState == SupplicantState::ASSOCIATING || info.supplicantState == SupplicantState::ASSOCIATED ||
         info.supplicantState == SupplicantState::AUTHENTICATING ||
         info.supplicantState == SupplicantState::FOUR_WAY_HANDSHAKE ||
         info.supplicantState == SupplicantState::GROUP_HANDSHAKE) {
@@ -135,27 +134,16 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     NetworkSelectionResult networkSelectionResult;
     std::string failReason = "";
-
-    if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT,
-        scanInfos, failReason)) {
-        std::string bssid = "";
+    if ((pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT,
+        scanInfos, failReason) ||
+        SelectNetworkFailConnectChoiceNetWork(networkSelectionResult, scanInfos)) &&
+        !OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
         SelectedType selectedType = NETWORK_SELECTED_BY_AUTO;
-        if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
-            bssid = networkSelectionResult.interScanInfo.bssid;
-        }
         if (IsCandidateWithUserSelectChoiceHidden(networkSelectionResult)) {
             WIFI_LOGI("AutoSelectDevice select user choise hidden network");
             selectedType = NETWORK_SELECTED_BY_USER;
         }
-        int networkId = networkSelectionResult.wifiDeviceConfig.networkId;
-        std::string &ssid = networkSelectionResult.wifiDeviceConfig.ssid;
-        WIFI_LOGI("AutoSelectDevice networkId: %{public}d, ssid: %{public}s, bssid: %{public}s.", networkId,
-                  SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());
-        auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
-        message->SetParam1(networkId);
-        message->SetParam2(selectedType);
-        message->AddStringMessageBody(bssid);
-        pStaStateMachine->SendMessage(message);
+        ConnectNetwork(networkSelectionResult, selectedType);
     } else {
         WIFI_LOGI("AutoSelectDevice return fail.");
         std::vector<WifiDeviceConfig> savedConfigs;
@@ -181,6 +169,39 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
             callBackItem.OnAutoSelectNetworkRes(networkSelectionResult.wifiDeviceConfig.networkId, m_instId);
         }
     }
+}
+
+bool StaAutoConnectService::SelectNetworkFailConnectChoiceNetWork(NetworkSelectionResult &networkSelectionResult,
+        const std::vector<InterScanInfo> &scanInfos)
+{
+    std::vector<NetworkSelection::NetworkCandidate> networkCandidates;
+    pNetworkSelectionManager->GetAllDeviceConfigs(networkCandidates, scanInfos);
+    if (networkCandidates.size() == 0) {
+        return false;
+    }
+    for (const auto &candidate : networkCandidates) {
+        if (candidate.wifiDeviceConfig.networkSelectionStatus.connectChoice != INVALID_NETWORK_ID) {
+            networkSelectionResult.wifiDeviceConfig = candidate.wifiDeviceConfig;
+            networkSelectionResult.interScanInfo = candidate.interScanInfo;
+            WIFI_LOGI("SelectNetworkFailConnectChoiceNetWork success");
+            return true;
+        }
+    }
+    return false;
+}
+
+void StaAutoConnectService::ConnectNetwork(NetworkSelectionResult &networkSelectionResult, SelectedType &selectedType)
+{
+    std::string &bssid = networkSelectionResult.interScanInfo.bssid;
+    int networkId = networkSelectionResult.wifiDeviceConfig.networkId;
+    std::string &ssid = networkSelectionResult.wifiDeviceConfig.ssid;
+    WIFI_LOGI("AutoSelectDevice networkId: %{public}d, ssid: %{public}s, bssid: %{public}s.",
+        networkId, SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());
+    auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
+    message->SetParam1(networkId);
+    message->SetParam2(selectedType);
+    message->AddStringMessageBody(bssid);
+    pStaStateMachine->SendMessage(message);
 }
 
 bool StaAutoConnectService::IsAutoConnectFailByP2PEnhanceFilter(const std::vector<InterScanInfo> &scanInfos)

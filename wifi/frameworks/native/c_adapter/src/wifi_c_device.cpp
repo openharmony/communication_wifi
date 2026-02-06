@@ -571,6 +571,15 @@ NO_SANITIZE("cfi") WifiErrorCode SetRandomMacDisabled(bool isRandomMacDisabled)
 {
     return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
 }
+
+NO_SANITIZE("cfi") WifiErrorCode SetBtCoexistState(CoexistState state, CoexistReason reason)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    OHOS::Wifi::CoexistState tempState = static_cast<OHOS::Wifi::CoexistState>(state);
+    OHOS::Wifi::CoexistReason tempReason = static_cast<OHOS::Wifi::CoexistReason>(reason);
+    return GetCErrorCode(wifiDevicePtr->SetBtCoexistState(tempState, tempReason));
+}
+
 #ifndef OHOS_ARCH_LITE
 NO_SANITIZE("cfi") WifiErrorCode GetWifiProtect(OHOS::Wifi::WifiProtectMode mode)
 {

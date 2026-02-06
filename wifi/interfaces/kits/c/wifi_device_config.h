@@ -297,5 +297,18 @@ typedef struct {
     int powerParamLen;
 } WifiLowPowerParam;
 
+/* BT co-exist State and Reason */
+typedef enum {
+    ALLOW_DATA_TRANS,
+    NOT_ALLOW_DATA_TRANS,
+    ALLOW_CONNECT,
+    NOT_ALLOW_CONNECT
+} CoexistState;
+ 
+typedef enum {
+    KEYBOARD_MOUSE_SCENE,
+    D2D_SCENE,
+    OTHER_SCENE
+} CoexistReason;
 #endif // WIFI_LITE_WIFI_DEVICE_CONFIG_H
 /** @} */

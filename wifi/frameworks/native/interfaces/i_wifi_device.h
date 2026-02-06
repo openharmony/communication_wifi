@@ -683,6 +683,15 @@ public:
     {
         return WIFI_OPT_NOT_SUPPORTED;
     }
+
+    /**
+     * @Description Set bt co-exist state when service conflict
+     *
+     * @param state - bt co-exist state
+     * @param reason - conflict reason
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetBtCoexistState(CoexistState state, CoexistReason reason) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

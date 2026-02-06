@@ -381,6 +381,16 @@ WifiErrorCode IsRandomMacDisabled(bool *isRandomMacDisabled);
      */
 WifiErrorCode SetRandomMacDisabled(bool isRandomMacDisabled);
 
+/**
+     * @Description Set bt co-exist state when service conflict
+     *
+     * @param state - bt co-exist state
+     * @param reason - conflict reason
+     * @return Returns {@link WIFI_SUCCESS} set randommacdisabled successfully; returns an error code defined in
+ * {@link WifiErrorCode} otherwise.
+     */
+WifiErrorCode SetBtCoexistState(CoexistState state, CoexistReason reason);
+
 #ifdef __cplusplus
 }
 #endif

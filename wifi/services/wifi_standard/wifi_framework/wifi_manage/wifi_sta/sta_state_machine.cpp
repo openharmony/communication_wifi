@@ -1906,12 +1906,6 @@ void StaStateMachine::ApLinkedState::DealWpaLinkFailEventInApLinked(InternalMess
 void StaStateMachine::StartDisConnectToNetwork()
 {
     WIFI_LOGI("Enter StartDisConnectToNetwork m_instId:%{public}d!", m_instId);
-#ifndef OHOS_ARCH_LITE
-    if (m_instId == INSTID_WLAN0 && enhanceService_ != nullptr) {
-        enhanceService_->GenelinkInterface(MultiLinkDefs::NOTIFY_QUIT_DUAL_WLAN, 0);
-        WIFI_LOGI("notify enhance service quit dual_wlan mode");
-    }
-#endif
     /* Save connection information to WifiSettings. */
     SaveLinkstate(ConnState::DISCONNECTING, DetailedState::DISCONNECTING);
     InvokeOnStaConnChanged(OperateResState::DISCONNECT_DISCONNECTING, linkedInfo);

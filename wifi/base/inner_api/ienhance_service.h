@@ -510,6 +510,15 @@ public:
     virtual ErrCode RegisterStaEnhanceCallback(StaEnhanceCallback callback) = 0;
 
     /**
+     * @Description Set bt co-exist state when service conflict
+     *
+     * @param state - bt co-exist state
+     * @param reason - conflict reason
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetBtCoexistState(CoexistState state, CoexistReason reason) = 0;
+
+    /**
      * @Description Set game latency gain statistics feature enabled state
      *
      * @param enabled - whether the feature is enabled

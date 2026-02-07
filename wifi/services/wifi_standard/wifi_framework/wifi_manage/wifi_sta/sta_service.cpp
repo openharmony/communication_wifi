@@ -21,6 +21,7 @@
 #include "wifi_country_code_manager.h"
 #include "wifi_notification_util.h"
 #include "wifi_history_record_manager.h"
+#include "wifi_enhance_defs.h"
 #endif
 #include "wifi_logger.h"
 #include "wifi_sta_hal_interface.h"
@@ -766,6 +767,15 @@ ErrCode StaService::Disconnect() const
         }
     }
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+#ifndef OHOS_ARCH_LITE
+    if (m_instId == INSTID_WLAN0) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->GenelinkInterface(MultiLinkDefs::NOTIFY_QUIT_DUAL_WLAN, 0);
+            WIFI_LOGI("notify enhance service quit dual_wlan mode");
+        }
+    }
+#endif
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISCONNECT);
     return WIFI_OPT_SUCCESS;
 }

@@ -283,5 +283,10 @@ void AppStateObserver::OnForegroundApplicationChanged(const AppExecFwk::AppState
         __func__, appStateData.bundleName.c_str(), appStateData.uid, appStateData.state, appStateData.isFocused);
     WifiAppStateAware::GetInstance().OnForegroundAppChanged(appStateData);
 }
+
+void AppStateObserver::OnProcessCreated(const AppExecFwk::ProcessData &processData)
+{
+    WifiAppStateAware::GetInstance().HandleProcessCreatedEvent(processData);
+}
 } // namespace Wifi
 } // namespace OHOS

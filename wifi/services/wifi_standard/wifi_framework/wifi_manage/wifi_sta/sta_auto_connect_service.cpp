@@ -139,8 +139,8 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
         SelectNetworkFailConnectChoiceNetWork(networkSelectionResult, scanInfos)) {
         std::string bssid = "";
         SelectedType selectedType = NETWORK_SELECTED_BY_AUTO;
-        if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
-            bssid = networkSelectionResult.interScanInfo.bssid;
+        if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) { 
+             bssid = networkSelectionResult.interScanInfo.bssid; 
         }
         if (IsCandidateWithUserSelectChoiceHidden(networkSelectionResult)) {
             WIFI_LOGI("AutoSelectDevice select user choise hidden network");
@@ -187,13 +187,19 @@ bool StaAutoConnectService::SelectNetworkFailConnectChoiceNetWork(NetworkSelecti
             networkSelectionResult.wifiDeviceConfig = candidate.wifiDeviceConfig;
             networkSelectionResult.interScanInfo = candidate.interScanInfo;
             WIFI_LOGI("SelectNetworkFailConnectChoiceNetWork success");
+            std::vector<WifiDeviceConfig> savedNetwork;
+            WifiSettings::GetInstance().GetDeviceConfig(savedNetwork);
+            for (auto &config : savedNetwork) {
+                config.networkSelectionStatus.connectChoice = INVALID_NETWORK_ID;
+            }
             return true;
         }
     }
     return false;
 }
 
-void StaAutoConnectService::ConnectNetwork(NetworkSelectionResult &networkSelectionResult, SelectedType &selectedType, const std::string &bssid)
+void StaAutoConnectService::ConnectNetwork(NetworkSelectionResult &networkSelectionResult, SelectedType &selectedType,
+    const std::string &bssid)
 {
     int networkId = networkSelectionResult.wifiDeviceConfig.networkId;
     std::string &ssid = networkSelectionResult.wifiDeviceConfig.ssid;

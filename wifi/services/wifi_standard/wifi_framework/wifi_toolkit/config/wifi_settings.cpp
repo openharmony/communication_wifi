@@ -43,7 +43,7 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int MAX_DECRYPT_DEVICE_CONFIG_NUM = 400;
-static const int MAX_FILE_SIZE = 1024 * 1024;
+static const int MAX_FILE_SIZE = 1024 * 1024 * 1024;
 static const int MIN_FILE_SIZE = 0;
 std::string g_defaultApSsid;
 #ifdef DTFUZZ_TEST

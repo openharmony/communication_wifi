@@ -144,7 +144,7 @@ void AppNetworkSpeedLimitService::HandleProcessCreatedEvent(const AppExecFwk::Pr
     }
     AsyncParamInfo asyncParamInfo;
     asyncParamInfo.funcName = HANDLE_PROCESS_CREATED_EVENT;
-    asyncParamInfo.bundleName = appStateData.bundleName;
+    asyncParamInfo.bundleName = processData.bundleName;
     AsyncLimitSpeed(asyncParamInfo);
 }
 
@@ -211,8 +211,8 @@ ErrCode AppNetworkSpeedLimitService::GetAppList(std::vector<AppExecFwk::RunningP
     } else {
         for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
             if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_BACKGROUND
-                || iter->state == AppExecFwk::AppProcessState::APP_STATE_CREATE
-                || iter->state == AppExecFwk::AppProcessState::APP_STATE_READY) {
+                || iter->state_ == AppExecFwk::AppProcessState::APP_STATE_CREATE
+                || iter->state_ == AppExecFwk::AppProcessState::APP_STATE_READY) {
                 appList.push_back(*iter);
             }
         }
@@ -357,7 +357,7 @@ void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParam
     } else if (asyncParamInfo.funcName == HANDLE_FOREGROUND_APP_CHANGED) {
         ForegroundAppChangedAction(asyncParamInfo.bundleName);
     } else if (asyncParamInfo.funcName == HANDLE_PROCESS_CREATED_EVENT) {
-        BackGroundAppChangedAction(asyncParamInfo.bundleName);
+        BackgroundAppChangedAction(asyncParamInfo.bundleName);
     } else if (asyncParamInfo.funcName == LIMIT_SPEED) {
         SendLimitCmd2Drv(asyncParamInfo.controlId, asyncParamInfo.limitMode, m_isHighPriorityTransmit);
     } else if (asyncParamInfo.funcName == RECEIVE_NETWORK_CONTROL) {
@@ -582,7 +582,7 @@ void AppNetworkSpeedLimitService::ForegroundAppChangedAction(const std::string &
     }
 }
 
-void AppNetworkSpeedLimitService::BackGroundAppChangedAction(const std::string &bundleName)
+void AppNetworkSpeedLimitService::BackgroundAppChangedAction(const std::string &bundleName)
 {
     WIFI_LOGI("%{public}s accept background limit speed bundleName: %{public}s ", __FUNCTION__, bundleName.c_str());
     if (m_isWifiConnected && m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] != BG_LIMIT_OFF) {

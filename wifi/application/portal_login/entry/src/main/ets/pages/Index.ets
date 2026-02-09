@@ -361,7 +361,7 @@ struct Index {
             this.harmonyUA = this.webviewController.getUserAgent();
             this.isPhone = /Phone/i.test(this.harmonyUA);
             this.selectedUA = this.harmonyUA;
-            hilog.info(DOMAIN, TAG, '%{public}s', 'UA isPhone: '  + this.isPhone);
+            hilog.info(DOMAIN, TAG, '%{public}s', 'UA isPhone:'  + this.isPhone);
           } catch (error) {
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed to get UA. Code:${error.code}, message:${error.message}`);
           }
@@ -452,7 +452,7 @@ struct Index {
           this.handleFullScreenChange();
         })
         .darkMode(WebDarkMode.Off)
-        .backgroundColor($r('sys.color.ohos_id_color_background'))
+        .backgroundColor(Color.White)
         .width('100%')
     }
     .padding({ top: px2vp(this.topRectHeight) })

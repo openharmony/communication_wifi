@@ -677,11 +677,6 @@ State *StateMachineHandler::ExecuteTreeStateMsg(InternalMessagePtr msg)
         return nullptr;
     }
 
-    if (curStateInfo->state) {
-        LOGD("ExecuteTreeStateMsg, State machine: %{public}s execute Cmd:%{public}d",
-            curStateInfo->state->GetStateName().c_str(), msg->GetMessageName());
-    }
-
     while (curStateInfo->state && (!curStateInfo->state->ExecuteStateMsg(msg))) {
         curStateInfo = curStateInfo->upperStateInfo;
 

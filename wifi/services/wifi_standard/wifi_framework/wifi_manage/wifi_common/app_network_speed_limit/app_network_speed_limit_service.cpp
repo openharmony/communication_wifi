@@ -592,7 +592,9 @@ void AppNetworkSpeedLimitService::BackGroundAppChangedAction(const std::string &
         SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_TEMP, m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP],
             m_isHighPriorityTransmit);
     }
-    SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+    if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+    }
 }
 
 void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)

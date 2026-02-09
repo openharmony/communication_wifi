@@ -142,12 +142,10 @@ void AppNetworkSpeedLimitService::HandleProcessCreatedEvent(const AppExecFwk::Pr
     if (m_bgUidSet.count(processData.uid) > 0) {
         return;
     }
-
     AsyncParamInfo asyncParamInfo;
     asyncParamInfo.funcName = HANDLE_PROCESS_CREATED_EVENT;
     asyncParamInfo.bundleName = appStateData.bundleName;
     AsyncLimitSpeed(asyncParamInfo);
-
 }
 
 bool AppNetworkSpeedLimitService::ShouldLimitSpeedInBackground(const std::string &bundleName)
@@ -358,7 +356,7 @@ void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParam
         WifiConnectStateChanged();
     } else if (asyncParamInfo.funcName == HANDLE_FOREGROUND_APP_CHANGED) {
         ForegroundAppChangedAction(asyncParamInfo.bundleName);
-    } else if (asyncParamInfo.funcName == HANDLE_FOREGROUND_APP_CHANGED) {
+    } else if (asyncParamInfo.funcName == HANDLE_PROCESS_CREATED_EVENT) {
         BackGroundAppChangedAction(asyncParamInfo.bundleName);
     } else if (asyncParamInfo.funcName == LIMIT_SPEED) {
         SendLimitCmd2Drv(asyncParamInfo.controlId, asyncParamInfo.limitMode, m_isHighPriorityTransmit);

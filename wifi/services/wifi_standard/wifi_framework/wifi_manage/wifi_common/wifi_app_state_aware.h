@@ -79,6 +79,13 @@ public:
      * @param appStateData Application Process data.
      */
     void OnForegroundApplicationChanged(const AppExecFwk::AppStateData &appStateData) override;
+
+    /**
+     * Process created callback.
+     *
+     * @param processData Process data.
+     */
+    void OnProcessCreated(const AppExecFwk::ProcessData &processData) override;
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -191,6 +191,7 @@ bool StaAutoConnectService::SelectNetworkFailConnectChoiceNetWork(NetworkSelecti
             WifiSettings::GetInstance().GetDeviceConfig(savedNetwork);
             for (auto &config : savedNetwork) {
                 config.networkSelectionStatus.connectChoice = INVALID_NETWORK_ID;
+                WifiSettings::GetInstance().AddDeviceConfig(config);
             }
             return true;
         }

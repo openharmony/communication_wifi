@@ -190,8 +190,8 @@ bool StaAutoConnectService::SelectNetworkFailConnectChoiceNetWork(NetworkSelecti
             WIFI_LOGI("SelectNetworkFailConnectChoiceNetWork success, ssid: %{public}s, bssid: %{public}s",
                 SsidAnonymize(candidate.interScanInfo.ssid).c_str(),
                 SsidAnonymize(candidate.wifiDeviceConfig.bssid).c_str());
-                isFind = true;
-                break;
+            isFind = true;
+            break;
         }
     }
     std::vector<WifiDeviceConfig> savedNetwork;

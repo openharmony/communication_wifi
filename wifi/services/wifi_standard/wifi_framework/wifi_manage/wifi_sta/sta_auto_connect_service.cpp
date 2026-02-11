@@ -182,25 +182,29 @@ bool StaAutoConnectService::SelectNetworkFailConnectChoiceNetWork(NetworkSelecti
     if (networkCandidates.size() == 0) {
         return false;
     }
+    bool isFind = false;
     for (const auto &candidate : networkCandidates) {
         if (candidate.wifiDeviceConfig.networkSelectionStatus.connectChoice != INVALID_NETWORK_ID) {
             networkSelectionResult.wifiDeviceConfig = candidate.wifiDeviceConfig;
             networkSelectionResult.interScanInfo = candidate.interScanInfo;
-            WIFI_LOGI("SelectNetworkFailConnectChoiceNetWork success, ssid: %{public}s, bssid: %{public}s", 
+            WIFI_LOGI("SelectNetworkFailConnectChoiceNetWork success, ssid: %{public}s, bssid: %{public}s",
                 SsidAnonymize(candidate.interScanInfo.ssid).c_str(),
                 SsidAnonymize(candidate.wifiDeviceConfig.bssid).c_str());
-            std::vector<WifiDeviceConfig> savedNetwork;
-            WifiSettings::GetInstance().GetDeviceConfig(savedNetwork);
-            for (auto &config : savedNetwork) {
-                if (config.networkSelectionStatus.connectChoice != INVALID_NETWORK_ID) {
-                    config.networkSelectionStatus.connectChoice = INVALID_NETWORK_ID;
-                    WifiSettings::GetInstance().AddDeviceConfig(config);
-                }
-            }
-            return true;
+                isFind = true;
+                break;
         }
     }
-    return false;
+    std::vector<WifiDeviceConfig> savedNetwork;
+    WifiSettings::GetInstance().GetDeviceConfig(savedNetwork);
+    if (isFind) {
+        for (auto &config : savedNetwork) {
+            if (config.networkSelectionStatus.connectChoice != INVALID_NETWORK_ID) {
+                config.networkSelectionStatus.connectChoice = INVALID_NETWORK_ID;
+                WifiSettings::GetInstance().AddDeviceConfig(config);
+            }
+        }
+    }
+    return isFind;
 }
 
 void StaAutoConnectService::ConnectNetwork(NetworkSelectionResult &networkSelectionResult, SelectedType &selectedType,

@@ -186,12 +186,16 @@ bool StaAutoConnectService::SelectNetworkFailConnectChoiceNetWork(NetworkSelecti
         if (candidate.wifiDeviceConfig.networkSelectionStatus.connectChoice != INVALID_NETWORK_ID) {
             networkSelectionResult.wifiDeviceConfig = candidate.wifiDeviceConfig;
             networkSelectionResult.interScanInfo = candidate.interScanInfo;
-            WIFI_LOGI("SelectNetworkFailConnectChoiceNetWork success");
+            WIFI_LOGI("SelectNetworkFailConnectChoiceNetWork success, ssid: %{public}s, bssid: %{public}s", 
+                SsidAnonymize(candidate.interScanInfo.ssid).c_str(),
+                SsidAnonymize(candidate.wifiDeviceConfig.bssid).c_str());
             std::vector<WifiDeviceConfig> savedNetwork;
             WifiSettings::GetInstance().GetDeviceConfig(savedNetwork);
             for (auto &config : savedNetwork) {
-                config.networkSelectionStatus.connectChoice = INVALID_NETWORK_ID;
-                WifiSettings::GetInstance().AddDeviceConfig(config);
+                if (config.networkSelectionStatus.connectChoice != INVALID_NETWORK_ID) {
+                    config.networkSelectionStatus.connectChoice = INVALID_NETWORK_ID;
+                    WifiSettings::GetInstance().AddDeviceConfig(config);
+                }
             }
             return true;
         }

@@ -1177,8 +1177,8 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
             WIFI_LOGI("create new WifiDeviceCallBackProxy!");
         }
 
-        int pid = data.ReadInt32();
-        int tokenId = data.ReadInt32();
+        int pid = static_cast<int>(GetCallingPid());
+        int tokenId = static_cast<int>(GetCallingTokenId());
         int eventNum = data.ReadInt32();
         std::vector<std::string> event;
         if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
@@ -1418,8 +1418,8 @@ void WifiDeviceStub::OnReceiveNetworkControlInfo(uint32_t code, MessageParcel &d
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     WifiNetworkControlInfo networkControlInfo;
-    networkControlInfo.uid = data.ReadInt32();
-    networkControlInfo.pid = data.ReadInt32();
+    networkControlInfo.uid = static_cast<int>(GetCallingUid());
+    networkControlInfo.pid = static_cast<int>(GetCallingPid());
     networkControlInfo.bundleName = data.ReadString();
     networkControlInfo.state = data.ReadInt32();
     networkControlInfo.sceneId = data.ReadInt32();

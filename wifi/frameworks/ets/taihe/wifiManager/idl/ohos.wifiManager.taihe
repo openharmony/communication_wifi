@@ -397,6 +397,7 @@ function DisableWifi(): void;
 function EnableSemiWifi(): void;
 
 function GetDeviceConfigs(): Array<WifiDeviceConfig>;
+function GetDeviceConfig(networkId: i32): WifiDeviceConfig;
 function Disconnect(): void;
 function ConnectToNetwork(networkId: i32): void;
 function GetDeviceMacAddress(): Array<String>;

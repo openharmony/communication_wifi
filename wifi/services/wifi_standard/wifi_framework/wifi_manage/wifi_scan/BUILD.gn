@@ -24,6 +24,7 @@ local_base_sources = [
   "scan_monitor.cpp",
   "scan_service.cpp",
   "scan_state_machine.cpp",
+  "scan_chr.cpp",
 ]
 
 local_base_include_dirs = [
@@ -129,6 +130,7 @@ if (defined(ohos_lite)) {
       "c_utils:utils",
       "common_event_service:cesfwk_innerkits",
       "hilog:libhilog",
+      "hisysevent:libhisysevent",
       "samgr:samgr_proxy",
       "ipc:ipc_single",
     ]

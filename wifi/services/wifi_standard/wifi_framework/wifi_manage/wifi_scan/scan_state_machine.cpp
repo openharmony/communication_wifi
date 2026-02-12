@@ -21,6 +21,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
 #include "wifi_common_event_helper.h"
+#include "scan_chr.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -938,6 +939,9 @@ bool ScanStateMachine::StartSingleCommonScan(WifiHalScanParam &scanParam)
     }
 
     WIFI_LOGI("Begin call Scan.\n");
+    /* scan Chr */
+    WifiScanChr::GetInstance().RecordScanChrCountInfo(scanParam);
+
     WifiCommonEventHelper::PublishScanStartEvent(COMMON_SCAN_START, "");
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().Scan(
         WifiConfigCenter::GetInstance().GetStaIfaceName(), scanParam);
@@ -1102,6 +1106,9 @@ void ScanStateMachine::CommonScanInfoProcess()
         ReportCommonScanFailedAndClear(true);
         return;
     }
+    /* Scan Chr */
+    WifiScanChr::GetInstance().RecordScanChrApCountInfo(runningScanSettings, scanStatusReport);
+    
     FilterScanResult(scanStatusReport.scanInfoList);
     GetRunningIndexList(scanStatusReport.requestIndexList);
 

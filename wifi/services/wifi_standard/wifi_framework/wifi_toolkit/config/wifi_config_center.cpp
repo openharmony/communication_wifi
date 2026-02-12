@@ -1178,6 +1178,16 @@ int WifiConfigCenter::GetFreezeModeState() const
     return mFreezeModeState.load();
 }
 
+void WifiConfigCenter::SetScanStyle(int scanStyle)
+{
+    scanStyle_ = scanStyle;
+}
+ 
+int WifiConfigCenter::GetScanStyle() const
+{
+    return scanStyle_.load();
+}
+ 
 void WifiConfigCenter::SetNoChargerPlugModeState(int state)
 {
     mNoChargerPlugModeState = state;

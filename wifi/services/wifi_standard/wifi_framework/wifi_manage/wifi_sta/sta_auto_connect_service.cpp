@@ -194,9 +194,9 @@ bool StaAutoConnectService::SelectNetworkFailConnectChoiceNetWork(NetworkSelecti
             break;
         }
     }
-    std::vector<WifiDeviceConfig> savedNetwork;
-    WifiSettings::GetInstance().GetDeviceConfig(savedNetwork);
     if (isFind) {
+        std::vector<WifiDeviceConfig> savedNetwork;
+        WifiSettings::GetInstance().GetDeviceConfig(savedNetwork);
         for (auto &config : savedNetwork) {
             if (config.networkSelectionStatus.connectChoice != INVALID_NETWORK_ID) {
                 config.networkSelectionStatus.connectChoice = INVALID_NETWORK_ID;

@@ -1418,8 +1418,8 @@ void WifiDeviceStub::OnReceiveNetworkControlInfo(uint32_t code, MessageParcel &d
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     WifiNetworkControlInfo networkControlInfo;
-    networkControlInfo.uid = static_cast<int>(GetCallingUid());
-    networkControlInfo.pid = static_cast<int>(GetCallingPid());
+    networkControlInfo.uid = data.ReadInt32();
+    networkControlInfo.pid = data.ReadInt32();
     networkControlInfo.bundleName = data.ReadString();
     networkControlInfo.state = data.ReadInt32();
     networkControlInfo.sceneId = data.ReadInt32();

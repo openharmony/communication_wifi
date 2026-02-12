@@ -1177,8 +1177,8 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
             WIFI_LOGI("create new WifiDeviceCallBackProxy!");
         }
 
-        int pid = data.ReadInt32();
-        int tokenId = data.ReadInt32();
+        int pid = static_cast<int>(GetCallingPid());
+        int tokenId = static_cast<int>(GetCallingTokenId());
         int eventNum = data.ReadInt32();
         std::vector<std::string> event;
         if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {

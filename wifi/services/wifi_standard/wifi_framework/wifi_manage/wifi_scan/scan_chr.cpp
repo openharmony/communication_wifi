@@ -21,48 +21,25 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiScanChr");
+const int64_t SCAN_CHR_DELAY_TIME = 10 * 1000; // ms
+const int64_t USE_1000 = 1000;
 
 WifiScanChr::WifiScanChr()
 {
     WIFI_LOGI("%{public}s enter", __FUNCTION__);
-    Init();
+    lastUpdateTime_ = GetElapsedMicrosecondsSinceBoot() / USE_1000;
 }
 
 WifiScanChr::~WifiScanChr()
 {
     WIFI_LOGI("%{public}s exit", __FUNCTION__);
-    Exit();
+    ClearScanChrHistoryData();
 }
 
 WifiScanChr &WifiScanChr::GetInstance()
 {
     static WifiScanChr instance;
     return instance;
-}
-
-void WifiScanChr::Init()
-{
-    WIFI_LOGI("%{public}s enter", __FUNCTION__);
-    if (scanChrThread_) {
-        WIFI_LOGW("scanChrThread_ already initialized");
-        return;
-    }
-    scanChrThread_ =  std::make_unique<WifiEventHandler>("scanChrThread");
-    if (!scanChrThread_) {
-        WIFI_LOGE("Failed to create scanChrThread_");
-        return;
-    }
-    func_ = std::bind([this]() { this->WriteScanChrStatisticData(); });
-    scanChrThread_->PostAsyncTask(func_, SCAN_CHR_DELAY_TIME);
-}
-
-void WifiScanChr::Exit()
-{
-    WIFI_LOGI("%{public}s exit", __FUNCTION__);
-    if (scanChrThread_) {
-        scanChrThread_.reset();
-    }
-    ClearScanChrHistoryData();
 }
 
 void WifiScanChr::RecordScanChrCountInfo(const WifiHalScanParam &runningScanSettings,
@@ -110,6 +87,12 @@ void WifiScanChr::RecordScanChrCommonInfo(ScanChrParam scanChrParam, uint32_t st
     } else {
         WIFI_LOGE("%{public}s: Invalid scanChrParam.", __FUNCTION__);
     }
+    int64_t currentTime = GetElapsedMicrosecondsSinceBoot() / USE_1000;
+    if (currentTime - lastUpdateTime_ > SCAN_CHR_DELAY_TIME) {
+        lastUpdateTime_ = currentTime;
+        WriteScanChrStatisticData();
+        WIFI_LOGI("%{public}s UpdateScanChrData success", __FUNCTION__);
+    }
 }
 
 void WifiScanChr::RecordScanChrLimitInfo(const WifiScanDeviceInfo &wifiScanDeviceInfo,
@@ -151,7 +134,6 @@ void WifiScanChr::WriteScanChrStatisticData()
     WIFI_LOGI("%{public}s enter", __FUNCTION__);
     WriteWifiScanInfoHiSysEvent(scanInfo_);
     ClearScanChrHistoryData();
-    scanChrThread_->PostAsyncTask(func_, SCAN_CHR_DELAY_TIME);
 }
 
 void WifiScanChr::ClearScanChrHistoryData()

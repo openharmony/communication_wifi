@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Wifi {
-const int64_t SCAN_CHR_DELAY_TIME = 10 * 1000; // ms
+const int64_t SCAN_CHR_DELAY_TIME = 2 * 60 * 60 * 1000; // ms
 
 enum class ScanChrParam {
     FC_LP_SCAN_CNT, /* Count of full-channel LP scan */

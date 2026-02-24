@@ -1120,7 +1120,7 @@ void WriteWifiScanInfoHiSysEvent(const ScanStatisticInfo &scanStatisticInfo)
         cJSON_Delete(root);
         return;
     }
-    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_SCAN_INFO", "EVENT_VALUE", std::string(jsonStr));
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_SCAN_STATS", "EVENT_VALUE", std::string(jsonStr));
     cJSON_free(jsonStr);
     cJSON_Delete(root);
 }

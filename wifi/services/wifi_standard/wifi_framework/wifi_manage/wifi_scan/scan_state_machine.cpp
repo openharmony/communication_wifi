@@ -939,9 +939,7 @@ bool ScanStateMachine::StartSingleCommonScan(WifiHalScanParam &scanParam)
     }
 
     WIFI_LOGI("Begin call Scan.\n");
-    /* scan Chr */
-    WifiScanChr::GetInstance().RecordScanChrCountInfo(scanParam);
-
+    WifiConfigCenter::GetInstance().SetScanStyle(scanParam.scanStyle);
     WifiCommonEventHelper::PublishScanStartEvent(COMMON_SCAN_START, "");
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().Scan(
         WifiConfigCenter::GetInstance().GetStaIfaceName(), scanParam);
@@ -1107,7 +1105,7 @@ void ScanStateMachine::CommonScanInfoProcess()
         return;
     }
     /* Scan Chr */
-    WifiScanChr::GetInstance().RecordScanChrApCountInfo(runningScanSettings, scanStatusReport);
+    WifiScanChr::GetInstance().RecordScanChrCountInfo(runningScanSettings, scanStatusReport);
     
     FilterScanResult(scanStatusReport.scanInfoList);
     GetRunningIndexList(scanStatusReport.requestIndexList);

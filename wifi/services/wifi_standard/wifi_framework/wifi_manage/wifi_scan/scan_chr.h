@@ -25,8 +25,6 @@
 
 namespace OHOS {
 namespace Wifi {
-const int64_t SCAN_CHR_DELAY_TIME = 2 * 60 * 60 * 1000; // ms
-
 enum class ScanChrParam {
     FC_LP_SCAN_CNT, /* Count of full-channel LP scan */
     FC_LP_SCAN_AP_CNT, /* Count of APs detected by full-channel LP scan */
@@ -63,10 +61,7 @@ const std::map<ScanChrParam, uint32_t ScanStatisticInfo::*> g_scanParamMap = {
 
 class WifiScanChr {
 public:
-    WifiScanChr();
     ~WifiScanChr();
-    void Init();
-    void Exit();
     static WifiScanChr &GetInstance();
     void RecordScanChrCountInfo(const WifiHalScanParam &runningScanSettings,
         const ScanStatusReport &scanStatusReport);
@@ -75,6 +70,7 @@ public:
         const ScanLimitType &scanLimitType);
 
 private:
+    WifiScanChr();
     void WriteScanChrStatisticData();
     void ClearScanChrHistoryData();
 
@@ -84,6 +80,7 @@ private:
     std::function<void()> func_ = nullptr;
     std::mutex scanChrCommonInfoMutex_;
     std::mutex scanChrLimitInfoMutex_;
+    int64_t lastUpdateTime_ = -1;
 };
 
 }

@@ -68,8 +68,7 @@ public:
     void Init();
     void Exit();
     static WifiScanChr &GetInstance();
-    void RecordScanChrCountInfo(const WifiHalScanParam &scanParam);
-    void RecordScanChrApCountInfo(const WifiHalScanParam &runningScanSettings,
+    void RecordScanChrCountInfo(const WifiHalScanParam &runningScanSettings,
         const ScanStatusReport &scanStatusReport);
     void RecordScanChrCommonInfo(ScanChrParam scanChrParam, uint32_t statisticValue = 1);
     void RecordScanChrLimitInfo(const WifiScanDeviceInfo &wifiScanDeviceInfo,

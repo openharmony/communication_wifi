@@ -81,7 +81,7 @@ void WifiScanChr::RecordScanChrCountInfo(const WifiHalScanParam &runningScanSett
             WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::FC_SCAN_AP_CNT,
                 scanStatusReport.scanInfoList.size());
         } else {
-            WIFI_LOGE("RecordScanChrCountInfo: unsupported scanStyle=%d", runningScanSettings.scanStyle);
+            WIFI_LOGE("RecordScanChrCountInfo: unsupported scanStyle=%{public}d", runningScanSettings.scanStyle);
         }
     } else {
         if (runningScanSettings.scanStyle == SCAN_TYPE_LOW_PRIORITY) {
@@ -97,7 +97,7 @@ void WifiScanChr::RecordScanChrCountInfo(const WifiHalScanParam &runningScanSett
             WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::NFC_SCAN_AP_CNT,
                 scanStatusReport.scanInfoList.size());
         } else {
-            WIFI_LOGE("RecordScanChrCountInfo: unsupported scanStyle=%d", runningScanSettings.scanStyle);
+            WIFI_LOGE("RecordScanChrCountInfo: unsupported scanStyle=%{public}d", runningScanSettings.scanStyle);
         }
     }
 }

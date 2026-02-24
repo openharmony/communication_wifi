@@ -65,36 +65,7 @@ void WifiScanChr::Exit()
     ClearScanChrHistoryData();
 }
 
-void WifiScanChr::RecordScanChrCountInfo(const WifiHalScanParam &scanParam)
-{
-    WifiConfigCenter::GetInstance().SetScanStyle(scanParam.scanStyle);
-    ChannelsTable channelsTable;
-    WifiChannelHelper::GetInstance().GetValidChannels(channelsTable);
-    if (scanParam.scanFreqs.empty() || scanParam.scanFreqs.size() ==
-        (channelsTable[BandType::BAND_2GHZ].size() + channelsTable[BandType::BAND_5GHZ].size())) {
-        if (scanParam.scanStyle == SCAN_TYPE_LOW_PRIORITY) {
-            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::FC_LP_SCAN_CNT);
-        } else if (scanParam.scanStyle == SCAN_DEFAULT_TYPE) {
-            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::FC_SCAN_CNT);
-        } else {
-            WIFI_LOGE("RecordScanChrCountInfo: unsupported scanStyle=%d", scanParam.scanStyle);
-        }
-    } else {
-        if (scanParam.scanStyle == SCAN_TYPE_LOW_PRIORITY) {
-            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::NFC_LP_SCAN_CNT);
-            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::NFC_LP_SCAN_CHANNEL_CNT,
-                scanParam.scanFreqs.size());
-        } else if (scanParam.scanStyle == SCAN_DEFAULT_TYPE) {
-            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::NFC_SCAN_CNT);
-            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::NFC_SCAN_CHANNEL_CNT,
-                scanParam.scanFreqs.size());
-        } else {
-            WIFI_LOGE("RecordScanChrCountInfo: unsupported scanStyle=%d", scanParam.scanStyle);
-        }
-    }
-}
-
-void WifiScanChr::RecordScanChrApCountInfo(const WifiHalScanParam &runningScanSettings,
+void WifiScanChr::RecordScanChrCountInfo(const WifiHalScanParam &runningScanSettings,
     const ScanStatusReport &scanStatusReport)
 {
     ChannelsTable channelsTable;
@@ -102,23 +73,31 @@ void WifiScanChr::RecordScanChrApCountInfo(const WifiHalScanParam &runningScanSe
     if (runningScanSettings.scanFreqs.empty() || runningScanSettings.scanFreqs.size() ==
         (channelsTable[BandType::BAND_2GHZ].size() + channelsTable[BandType::BAND_5GHZ].size())) {
         if (runningScanSettings.scanStyle == SCAN_TYPE_LOW_PRIORITY) {
+            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::FC_LP_SCAN_CNT);
             WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::FC_LP_SCAN_AP_CNT,
                 scanStatusReport.scanInfoList.size());
         } else if (runningScanSettings.scanStyle == SCAN_DEFAULT_TYPE) {
+            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::FC_SCAN_CNT);
             WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::FC_SCAN_AP_CNT,
                 scanStatusReport.scanInfoList.size());
         } else {
-            WIFI_LOGE("RecordScanChrApCountInfo: unsupported scanStyle=%d", runningScanSettings.scanStyle);
+            WIFI_LOGE("RecordScanChrCountInfo: unsupported scanStyle=%d", runningScanSettings.scanStyle);
         }
     } else {
         if (runningScanSettings.scanStyle == SCAN_TYPE_LOW_PRIORITY) {
+            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::NFC_LP_SCAN_CNT);
+            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::NFC_LP_SCAN_CHANNEL_CNT,
+                runningScanSettings.scanFreqs.size());
             WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::NFC_LP_SCAN_AP_CNT,
                 scanStatusReport.scanInfoList.size());
         } else if (runningScanSettings.scanStyle == SCAN_DEFAULT_TYPE) {
+            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::NFC_SCAN_CNT);
+            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::NFC_SCAN_CHANNEL_CNT,
+                runningScanSettings.scanFreqs.size());
             WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::NFC_SCAN_AP_CNT,
                 scanStatusReport.scanInfoList.size());
         } else {
-            WIFI_LOGE("RecordScanChrApCountInfo: unsupported scanStyle=%d", runningScanSettings.scanStyle);
+            WIFI_LOGE("RecordScanChrCountInfo: unsupported scanStyle=%d", runningScanSettings.scanStyle);
         }
     }
 }

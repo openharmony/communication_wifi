@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiScanChr");
-const int64_t SCAN_CHR_DELAY_TIME = 10 * 1000; // ms
+const int64_t SCAN_CHR_DELAY_TIME = 2 * 60 * 60 * 1000; // ms
 const int64_t USE_1000 = 1000;
 
 WifiScanChr::WifiScanChr()

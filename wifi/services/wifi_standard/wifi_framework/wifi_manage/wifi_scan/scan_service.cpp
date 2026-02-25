@@ -3067,8 +3067,12 @@ void ScanService::SystemScanConnectedPolicy(int &interval)
 {
     WIFI_LOGI("Enter SystemScanConnectedPolicy");
     WifiLinkedInfo linkedInfo;
+    WifiDeviceConfig wifiDeviceConfig;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
-    if (linkedInfo.detailedState == DetailedState::WORKING) {
+    WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, wifiDeviceConfig);
+    if (linkedInfo.detailedState == DetailedState::WORKING || (WifiProUtils::IsUserSelectNetwork() &&
+        linkedInfo.detailedState == DetailedState::NOTWORKING &&
+        !NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory))) {
         interval = SYSTEM_SCAN_INTERVAL_ONE_HOUR;
     } else {
         interval *= DOUBLE_SCAN_INTERVAL;

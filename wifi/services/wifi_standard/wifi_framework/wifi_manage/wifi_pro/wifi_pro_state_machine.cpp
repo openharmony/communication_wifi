@@ -1883,6 +1883,8 @@ bool WifiProStateMachine::WifiNoNetState::HandleHttpResultInNoNet(InternalMessag
         } else {
             pWifiProStateMachine_->FullScan();
         }
+        return EXECUTED;
+    }
     return NOT_EXECUTED;
 }
 

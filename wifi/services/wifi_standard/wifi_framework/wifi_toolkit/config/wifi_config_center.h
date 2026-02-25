@@ -324,6 +324,10 @@ public:
 
     int GetFreezeModeState() const;
 
+    void SetScanStyle(int scanStyle);
+ 
+    int GetScanStyle() const;
+ 
     void SetNoChargerPlugModeState(int state);
 
     int GetNoChargerPlugModeState() const;
@@ -455,7 +459,8 @@ private:
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;
     bool isNeedFastScan = false;
     WifiNetworkControlInfo networkControlInfoRecord;
-    
+    std::atomic<int> scanStyle_ = 0xFF;
+
     // AP
     std::mutex mApMutex;
     std::atomic<bool> mSoftapToggled {false};

@@ -561,7 +561,21 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
         WIFI_LOGE("TryWifi2Wifi: ConnectToNetwork failed.");
         return false;
     }
+    /* Record Chr: WiFi switches triggered by scans of a specific scanStyle */
+    RecordChrApSwitchCountInfo();
     return true;
+}
+
+void WifiProStateMachine::RecordChrApSwitchCountInfo()
+{
+    ScanStatisticInfo scanStatisticInfo;
+    int scanStyle = WifiConfigCenter::GetInstance().GetScanStyle();
+    if (scanStyle == SCAN_TYPE_LOW_PRIORITY) {
+        scanStatisticInfo.lpScanApSwtCnt++;
+    } else if (scanStyle == SCAN_DEFAULT_TYPE) {
+        scanStatisticInfo.scanApSwtCnt++;
+    }
+    WriteWifiScanInfoHiSysEvent(scanStatisticInfo);
 }
 
 ErrCode WifiProStateMachine::FullScan()

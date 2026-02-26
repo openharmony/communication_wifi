@@ -40,6 +40,7 @@ ohos_unittest("precompiled_macro_unittest") {
   sources = [
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_sta_hal_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_supplicant_hal_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/wifi_pro_utils.cpp",
     "scan_service_test.cpp",
     "sta_state_machine_test.cpp",
     "sta_state_machine_test1.cpp",

@@ -72,6 +72,7 @@ ohos_unittest("wifi_scan_unittest") {
     "scan_monitor_test.cpp",
     "scan_service_test.cpp",
     "scan_state_machine_test.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/wifi_pro_utils.cpp",
   ]
 
   include_dirs = [

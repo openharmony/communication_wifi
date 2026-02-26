@@ -717,6 +717,16 @@ HWTEST_F(WifiProStateMachineTest, wifiNoNetStateHandleHttpResultInNoNet03, TestS
     EXPECT_EQ(wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_, false);
 }
 
+HWTEST_F(WifiProStateMachineTest, wifiNoNetStateHandleHttpResultInNoNet04, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(EVENT_CHECK_WIFI_INTERNET_RESULT);
+    msg->SetParam1(20);
+    pWifiProStateMachine_->isFirstDectectHasNet_ = false;
+    pWifiProStateMachine_->pWifiNoNetState_->HandleHttpResultInNoNet(msg);
+    EXPECT_EQ(wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_, false);
+}
+
 HWTEST_F(WifiProStateMachineTest, WifiPortalStateGoInStateTest01, TestSize.Level1)
 {
     wifiPortalState_->GoInState();

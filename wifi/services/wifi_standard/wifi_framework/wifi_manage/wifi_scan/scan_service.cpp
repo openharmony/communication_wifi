@@ -28,6 +28,8 @@
 #include "wifi_sensor_scene.h"
 #include "wifi_service_manager.h"
 #include "scan_chr.h"
+#include "wifi_pro_utils.h"
+#include "network_status_history_manager.h"
 DEFINE_WIFILOG_SCAN_LABEL("ScanService");
 
 #define MIN(A, B) (((A) >= (B)) ? (B) : (A))
@@ -3070,9 +3072,11 @@ void ScanService::SystemScanConnectedPolicy(int &interval)
     WifiDeviceConfig wifiDeviceConfig;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, m_instId);
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, wifiDeviceConfig);
-    if (linkedInfo.detailedState == DetailedState::WORKING || (WifiProUtils::IsUserSelectNetwork() &&
-        linkedInfo.detailedState == DetailedState::NOTWORKING &&
-        !NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory))) {
+    if (linkedInfo.detailedState == DetailedState::WORKING) {
+        interval = SYSTEM_SCAN_INTERVAL_ONE_HOUR;
+    } else if (WifiProUtils::IsUserSelectNetwork() &&
+        !NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory)) {
+        WIFI_LOGI("user actively select no-net network and no-net in history, set interval as one hour.");
         interval = SYSTEM_SCAN_INTERVAL_ONE_HOUR;
     } else {
         interval *= DOUBLE_SCAN_INTERVAL;

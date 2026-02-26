@@ -468,7 +468,6 @@ bool WifiProStateMachine::TrySelfCure(bool forceNoHttpCheck)
         if (linkedInfo.rssi > SELF_CURE_RSSI_THRESHOLD &&
             lastCheckNetState == OperateResState::CONNECT_NETWORK_DISABLED) {
             pSelfCureService->NotifyInternetFailureDetected(forceNoHttpCheck);
-            isSelfCure_.store(true);
         } else {
             WIFI_LOGI("Failure to meet the conditions for selfcure.");
         }
@@ -1894,6 +1893,7 @@ void WifiProStateMachine::WifiNoNetState::HandleReuqestSelfCure()
         WIFI_LOGI("SelfCure has already been done.");
         return;
     }
+    isSelfCure_.store(true);
     if (pWifiProStateMachine_->TrySelfCure(false)) {
         pWifiProStateMachine_->Wifi2WifiFinish();
     }

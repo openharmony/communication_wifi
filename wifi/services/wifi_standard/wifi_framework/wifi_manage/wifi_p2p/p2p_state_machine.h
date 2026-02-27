@@ -46,7 +46,8 @@ namespace OHOS {
 namespace Wifi {
 inline const int MIN_GROUP_NAME_LENGTH = 9;
 inline const int MAX_GROUP_NAME_LENGTH = 32;
-inline const int MAX_CLIENT_SIZE = 16;
+// Maximum number of IP addresses allocated by the DHCP server that can be saved to a file
+inline const int MAX_CLIENT_SIZE = 256;
 inline const int DISC_TIMEOUT_S = 120;
 inline const int WSC_DIALOG_SELECT_TIMEOUT = 30000;
 enum {

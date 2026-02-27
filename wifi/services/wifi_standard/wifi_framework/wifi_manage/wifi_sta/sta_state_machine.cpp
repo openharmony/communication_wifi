@@ -3482,6 +3482,7 @@ bool StaStateMachine::ApReconnectState::ExecuteStateMsg(InternalMessagePtr msg)
                 pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
             }
             ret = EXECUTED;
+            [[fallthrough]];
         default:
             WIFI_LOGI("ApReconnectState-msgCode=%{public}d not handled.", msg->GetMessageName());
             break;

@@ -784,8 +784,7 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const std::string &ifName, const H
     std::vector<uint8_t> ssidUtf8;
     std::string modeString;
     std::string fileContext;
-    std::string protocolType;
-    protocolType = config.GetBand() == BandType::BAND_5GHZ ? "ieee80211ax" : "ieee80211n";
+    std::string protocolType = config.GetBand() == BandType::BAND_5GHZ ? "ieee80211ax" : "ieee80211n";
     ssid2String = StringToHex(config.GetSsid());
     if (!GetEncryptionString(config, encryptionString)) {
         LOGE("set psk failed");

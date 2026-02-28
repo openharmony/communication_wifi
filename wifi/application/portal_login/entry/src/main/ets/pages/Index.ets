@@ -340,6 +340,15 @@ struct Index {
         .geolocationAccess(false)
         .domStorageAccess(true)
         .overviewModeAccess(false)
+        .onPermissionRequest((event) => {
+          if (event) {
+            const permissions: string[] = event.request.getAccessibleResource();
+            if (permissions.includes('TYPE_VIDEO_CAPTURE')) {
+              this.Camera();
+              event.request.grant(event.request.getAccessibleResource());
+            }
+          }
+        })
         .onOverrideUrlLoading((request) => {
           this.webUrl = request.getRequestUrl();
           if (validateURL(this.webUrl) && !this.webUrl.startsWith('http') && !this.webUrl.startsWith('https')) {

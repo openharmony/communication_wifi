@@ -894,7 +894,6 @@ private:
     WifiErrorNo HandleMloLinkData(char *staData, uint32_t staDataLen, std::vector<WifiLinkedInfo> &mloLinkInfo);
     WifiErrorNo HandleMloSignalPollData(char *staData, uint32_t staDataLen,
         std::vector<WifiMloSignalInfo> &mloSignalInfo);
-    void SetProtocolType(const BandType &Band, std::string &protocolType);
 };
 }  // namespace Wifi
 }  // namespace OHOS

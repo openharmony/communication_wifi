@@ -776,15 +776,6 @@ bool WifiHdiWpaClient::WriteConfigToFile(const std::string &fileContext)
     return true;
 }
 
-void WifiHdiWpaClient::SetProtocolType(const BandType &Band, std::string &protocolType)
-{
-    if (Band == BandType::BAND_5GHZ) {
-        protocolType = "ieee80211ax";
-    } else {
-        protocolType = "ieee80211n";
-    }
-}
-
 WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const std::string &ifName, const HotspotConfig &config, int id)
 {
     std::string ssid2String;
@@ -794,7 +785,7 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const std::string &ifName, const H
     std::string modeString;
     std::string fileContext;
     std::string protocolType;
-    SetProtocolType(config.GetBand(), protocolType);
+    protocolType = config.GetBand() == BandType::BAND_5GHZ ? "ieee80211ax" : "ieee80211n";
     ssid2String = StringToHex(config.GetSsid());
     if (!GetEncryptionString(config, encryptionString)) {
         LOGE("set psk failed");

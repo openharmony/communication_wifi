@@ -16,7 +16,7 @@
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { i18n, resourceManager  } from '@kit.LocalizationKit';
-import { common, OpenLinkOptions } from '@kit.AbilityKit';
+import { common, OpenLinkOptions, abilityAccessCtrl } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { SymbolGlyphModifier, window } from '@kit.ArkUI';
 import {

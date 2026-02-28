@@ -344,7 +344,7 @@ struct Index {
           if (event) {
             const permissions: string[] = event.request.getAccessibleResource();
             if (permissions.includes('TYPE_VIDEO_CAPTURE')) {
-              this.Camera();
+              this.requestCamera();
               event.request.grant(event.request.getAccessibleResource());
             }
           }
@@ -465,6 +465,18 @@ struct Index {
         .width('100%')
     }
     .padding({ top: px2vp(this.topRectHeight) })
+  }
+
+  private requestCamera() {
+    let atManager = abilityAccessCtrl.createAtManager();
+    atManager.requestPermissionsFromUser(this.uiContext.getHostContext(), ['ohos.permission.CAMERA'])
+      .then((data) => {
+        console.info('data:' + JSON.stringify(data));
+        console.info('data permissions:' + data.permissions);
+        console.info('data authResults:' + data.authResults);
+      }).catch((error: BusinessError) => {
+      console.error(`Failed to request permissions from user. Code is ${error.code}, message is ${error.message}`);
+    })
   }
 
   private async handleFullScreenChange() {

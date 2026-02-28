@@ -469,7 +469,7 @@ struct Index {
 
   private requestCamera() {
     let atManager = abilityAccessCtrl.createAtManager();
-    atManager.requestPermissionsFromUser(this.uiContext.getHostContext(), ['ohos.permission.CAMERA'])
+    atManager.requestPermissionsFromUser(this.getUIContext().getHostContext(), ['ohos.permission.CAMERA'])
       .then((data) => {
         console.info('data:' + JSON.stringify(data));
         console.info('data permissions:' + data.permissions);

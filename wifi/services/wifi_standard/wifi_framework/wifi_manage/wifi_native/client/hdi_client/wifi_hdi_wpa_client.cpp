@@ -776,6 +776,22 @@ bool WifiHdiWpaClient::WriteConfigToFile(const std::string &fileContext)
     return true;
 }
 
+void WifiHdiWpaClient::SetProtocolType(const BandType &Band, std::string &protocolType)
+{
+    switch (Band) {
+        case BandType::BAND_2GHZ:
+            protocolType = "ieee80211n";
+            break;
+        case BandType::BAND_5GHZ:
+            protocolType = "ieee80211ax";
+            break;
+        default:
+            LOGE("unsupport band type");
+            protocolType = "ieee80211n";
+            break;
+    }
+}
+
 WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const std::string &ifName, const HotspotConfig &config, int id)
 {
     std::string ssid2String;
@@ -784,6 +800,8 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const std::string &ifName, const H
     std::vector<uint8_t> ssidUtf8;
     std::string modeString;
     std::string fileContext;
+    std::string protocolType;
+    SetProtocolType(config.GetBand(), protocolType);
     ssid2String = StringToHex(config.GetSsid());
     if (!GetEncryptionString(config, encryptionString)) {
         LOGE("set psk failed");
@@ -797,13 +815,14 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const std::string &ifName, const H
         "ctrl_interface=/data/service/el1/public/wifi/sockets/wpa\n"
         "ssid2=%s\n"
         "%s\n"
-        "ieee80211n=1\n"
+        "%s=1\n"
         "%s\n"
         "ignore_broadcast_ssid=0\n"
         "wowlan_triggers=any\n"
         "%s\n",
         ifName.c_str(), ssid2String.c_str(),
         channelString.c_str(),
+        protocolType.c_str(),
         modeString.c_str(),
         encryptionString.c_str());
     if (!WriteConfigToFile(fileContext)) {

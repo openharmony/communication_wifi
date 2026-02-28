@@ -778,17 +778,10 @@ bool WifiHdiWpaClient::WriteConfigToFile(const std::string &fileContext)
 
 void WifiHdiWpaClient::SetProtocolType(const BandType &Band, std::string &protocolType)
 {
-    switch (Band) {
-        case BandType::BAND_2GHZ:
-            protocolType = "ieee80211n";
-            break;
-        case BandType::BAND_5GHZ:
-            protocolType = "ieee80211ax";
-            break;
-        default:
-            LOGE("unsupport band type");
-            protocolType = "ieee80211n";
-            break;
+    if (Band == BandType::BAND_5GHZ) {
+        protocolType = "ieee80211ax";
+    } else {
+        protocolType = "ieee80211n";
     }
 }
 

@@ -978,6 +978,7 @@ bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(int reason, const std
         return false;
     }
     if (TryFastReconnect(reason, bssid, locallyGenerated)) {
+        pStaStateMachine->pApReConnectState->SetFastReconnectState(true);
         return true;
     }
     if (pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::QUERY_IGNORE_DISCONN_REQUIRED,
@@ -1001,8 +1002,8 @@ bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string 
         GetWifiEnhanceConfig(WifiEnhanceConfigType::FAST_RECONNECT));
     
     if (!config.alwaysFastReconnectFlag) {
-        if (std::find(config.wlanReasonWhiteList.begin(), config.wlanReasonWhiteList.end(),
-            static_cast<Wifi80211ReasonCode>(reason)) == config.wlanReasonWhiteList.end()) {
+        if (std::find(config.wlanReasonWhiteList.begin(), config.wlanReasonWhiteList.end(), reason) ==
+            config.wlanReasonWhiteList.end()) {
             return false;
         }
     }

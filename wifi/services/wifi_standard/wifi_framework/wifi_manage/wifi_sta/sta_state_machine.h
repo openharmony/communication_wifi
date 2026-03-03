@@ -164,7 +164,7 @@ enum PortalState {
     EXPERIED
 };
 
-const std::string WPA_BSSID_ANY = "any";
+inline const std::string WPA_BSSID_ANY = "any";
 
 class StaStateMachine : public StateMachine {
 #ifndef OHOS_ARCH_LITE
@@ -253,7 +253,8 @@ public:
         void DealWpaStateChange(InternalMessagePtr msg);
         void DealMloStateChange(InternalMessagePtr msg);
         void DealWpaCustomEapAuthEvent(InternalMessagePtr msg);
-        bool NeedIgnoreDisconnectEvent(InternalMessagePtr msg);
+        bool NeedIgnoreDisconnectEvent(int reason, const std::string &bssid);
+        bool TryFastReconnect(int reason, const std::string &bssid);
     };
     /**
      * @Description  Definition of member function of SeparatedState class in StaStateMachine.
@@ -359,6 +360,7 @@ public:
 #endif
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
+        void UpdateNetDetectHistory(EnumNetWorkState networkState);
         void DealNetworkCheck(InternalMessagePtr msg);
         void FoldStatusNotify(InternalMessagePtr msg);
         bool ProcessMessageByMacros(InternalMessagePtr msg);

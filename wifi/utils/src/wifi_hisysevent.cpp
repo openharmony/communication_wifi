@@ -1089,6 +1089,42 @@ void WritePositionAutoOpenWlanHiSysEvent(const std::string updateType)
     cJSON_Delete(root);
 }
 
+void WriteWifiScanInfoHiSysEvent(const ScanStatisticInfo &scanStatisticInfo)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "FC_LP_SCAN_CNT", scanStatisticInfo.fcLpScanCnt);
+    cJSON_AddNumberToObject(root, "FC_LP_SCAN_AP_CNT", scanStatisticInfo.fcLpScanApCnt);
+ 
+    cJSON_AddNumberToObject(root, "NFC_LP_SCAN_CNT", scanStatisticInfo.nfcLpScanCnt);
+    cJSON_AddNumberToObject(root, "NFC_LP_SCAN_CHANNEL_CNT", scanStatisticInfo.nfcLpScanChannelCnt);
+    cJSON_AddNumberToObject(root, "NFC_LP_SCAN_AP_CNT", scanStatisticInfo.nfcLpScanApCnt);
+ 
+    cJSON_AddNumberToObject(root, "FC_SCAN_CNT", scanStatisticInfo.fcScanCnt);
+    cJSON_AddNumberToObject(root, "FC_SCAN_AP_CNT", scanStatisticInfo.fcScanApCnt);
+ 
+    cJSON_AddNumberToObject(root, "NFC_SCAN_CNT", scanStatisticInfo.nfcScanCnt);
+    cJSON_AddNumberToObject(root, "NFC_SCAN_CHANNEL_CNT", scanStatisticInfo.nfcScanChannelCnt);
+    cJSON_AddNumberToObject(root, "NFC_SCAN_AP_CNT", scanStatisticInfo.nfcScanApCnt);
+ 
+    cJSON_AddNumberToObject(root, "LP_SCAN_UNCTRL_CNT", scanStatisticInfo.lpScanUnctrlCnt);
+    cJSON_AddNumberToObject(root, "LP_SCAN_AP_SWT_CNT", scanStatisticInfo.lpScanApSwtCnt);
+    cJSON_AddNumberToObject(root, "SCAN_AP_SWT_CNT", scanStatisticInfo.scanApSwtCnt);
+    cJSON_AddNumberToObject(root, "LP_SCAN_ABORT_CNT", scanStatisticInfo.lpScanAbortCnt);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_SCAN_STATS", "EVENT_VALUE", std::string(jsonStr));
+    cJSON_free(jsonStr);
+    cJSON_Delete(root);
+}
+
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
 void WriteWifiRiskInfoHiSysEvent(const WifiRiskInfo &wifiRiskInfo)
 {

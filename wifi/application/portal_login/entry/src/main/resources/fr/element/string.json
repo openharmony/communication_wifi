@@ -30,7 +30,7 @@
         },
         {
             "name":"compatibility_mode_of_the_mobile_version",
-            "value":"Site mobile",
+            "value":"Site pour mobile",
             "attr":{
                 "priority":"translate"
             }

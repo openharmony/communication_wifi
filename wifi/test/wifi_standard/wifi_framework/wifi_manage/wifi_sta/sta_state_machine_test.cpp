@@ -369,6 +369,15 @@ public:
         pStaStateMachine->StartConnectToNetwork(0, "wifitest/123", 0);
     }
 
+    void StartConnectToNetworkSuccess2()
+    {
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
+        pStaStateMachine->StartConnectToNetwork(0, "wifitest/123", NETWORK_SELECTED_BY_FAST_RECONNECT);
+    }
+
     void StartConnectToNetworkFail1()
     {
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).WillRepeatedly(Return(1));
@@ -2268,6 +2277,11 @@ HWTEST_F(StaStateMachineTest, StartConnectToNetworkSuccess, TestSize.Level1)
     StartConnectToNetworkSuccess();
 }
 
+HWTEST_F(StaStateMachineTest, StartConnectToNetworkSuccess2, TestSize.Level1)
+{
+    StartConnectToNetworkSuccess2();
+}
+
 HWTEST_F(StaStateMachineTest, StartConnectToNetworkFail1, TestSize.Level1)
 {
     StartConnectToNetworkFail1();
@@ -3209,6 +3223,24 @@ HWTEST_F(StaStateMachineTest, DealDisconnectEventInLinkStateTest01, TestSize.Lev
     EXPECT_TRUE(currentState == pStaStateMachine->linkedInfo.connState);
 }
 
+HWTEST_F(StaStateMachineTest, TryFastReconnectTest01, TestSize.Level1)
+{
+    int reason = 3;
+    std::string bssid = "xx:xx:xx:xx:xx:xx";
+    bool ret = pStaStateMachine->pLinkState->TryFastReconnect(reason, bssid);
+    EXPECT_FALSE(ret);
+}
+
+HWTEST_F(StaStateMachineTest, TryFastReconnectTest02, TestSize.Level1)
+{
+    int reason = static_cast<int>(Wifi80211ReasonCode::WLAN_REASON_CLASS2_FRAME_FROM_NONAUTH_STA);
+    std::string bssid = "xx:xx:xx:xx:xx:xx";
+    pStaStateMachine->linkedInfo.rssi = -99;
+    pStaStateMachine->linkedInfo.band = 2;
+    bool ret = pStaStateMachine->pLinkState->TryFastReconnect(reason, bssid);
+    EXPECT_FALSE(ret);
+}
+
 HWTEST_F(StaStateMachineTest, NotAllowConnectToNetworkTest01, TestSize.Level1)
 {
     pStaStateMachine->targetNetworkId_ = 0;
@@ -3220,6 +3252,57 @@ HWTEST_F(StaStateMachineTest, HasMultiBssidApTest01, TestSize.Level1)
     WifiDeviceConfig config;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(AtLeast(0));
     EXPECT_FALSE(pStaStateMachine->HasMultiBssidAp(config));
+}
+
+HWTEST_F(StaStateMachineTest, UpdateNetDetectHistoryTest01, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.rssi = -90;
+    pStaStateMachine->linkedInfo.band = 2;
+    WifiDeviceConfig config;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
+        WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    pStaStateMachine->pLinkedState->UpdateNetDetectHistory(EnumNetWorkState::NETWORK_NOTWORKING);
+    EXPECT_EQ(config.ipv4OnlyNetState, -1);
+}
+
+HWTEST_F(StaStateMachineTest, UpdateNetDetectHistoryTest02, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.rssi = -30;
+    pStaStateMachine->linkedInfo.band = 2;
+    WifiDeviceConfig config;
+    config.networkId = INVALID_NETWORK_ID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
+        WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    pStaStateMachine->pLinkedState->UpdateNetDetectHistory(EnumNetWorkState::NETWORK_NOTWORKING);
+    EXPECT_EQ(config.ipv4OnlyNetState, -1);
+}
+
+HWTEST_F(StaStateMachineTest, UpdateNetDetectHistoryTest03, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.rssi = -30;
+    pStaStateMachine->linkedInfo.band = 2;
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.ipv4OnlyNetState = 1;
+    config.dualStackNetState = 1;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
+        WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    pStaStateMachine->pLinkedState->UpdateNetDetectHistory(EnumNetWorkState::NETWORK_NOTWORKING);
+    EXPECT_EQ(config.ipv4OnlyNetState, 1);
+}
+
+HWTEST_F(StaStateMachineTest, UpdateNetDetectHistoryTest04, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.rssi = -30;
+    pStaStateMachine->linkedInfo.band = 2;
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.ipv4OnlyNetState = -1;
+    config.dualStackNetState = 1;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).
+        WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    pStaStateMachine->pLinkedState->UpdateNetDetectHistory(EnumNetWorkState::NETWORK_NOTWORKING);
+    EXPECT_EQ(config.ipv4OnlyNetState, -1);
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -784,6 +784,7 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const std::string &ifName, const H
     std::vector<uint8_t> ssidUtf8;
     std::string modeString;
     std::string fileContext;
+    std::string protocolType = config.GetBand() == BandType::BAND_5GHZ ? "ieee80211ax" : "ieee80211n";
     ssid2String = StringToHex(config.GetSsid());
     if (!GetEncryptionString(config, encryptionString)) {
         LOGE("set psk failed");
@@ -797,13 +798,14 @@ WifiErrorNo WifiHdiWpaClient::SetSoftApConfig(const std::string &ifName, const H
         "ctrl_interface=/data/service/el1/public/wifi/sockets/wpa\n"
         "ssid2=%s\n"
         "%s\n"
-        "ieee80211n=1\n"
+        "%s=1\n"
         "%s\n"
         "ignore_broadcast_ssid=0\n"
         "wowlan_triggers=any\n"
         "%s\n",
         ifName.c_str(), ssid2String.c_str(),
         channelString.c_str(),
+        protocolType.c_str(),
         modeString.c_str(),
         encryptionString.c_str());
     if (!WriteConfigToFile(fileContext)) {

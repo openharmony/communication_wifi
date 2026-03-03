@@ -88,7 +88,7 @@ struct BeaconAbnormalInfo {
 };
 
 /* StaCallBackNameEventIdMap */
-static std::map<std::string, int> g_staCallBackNameEventIdMap = {
+inline const std::map<std::string, int> g_staCallBackNameEventIdMap = {
     { EVENT_STA_POWER_STATE_CHANGE, WIFI_CBK_MSG_STATE_CHANGE },
     { EVENT_STA_CONN_STATE_CHANGE, WIFI_CBK_MSG_CONNECTION_CHANGE },
     { EVENT_STA_RSSI_STATE_CHANGE, WIFI_CBK_MSG_RSSI_CHANGE },
@@ -100,14 +100,14 @@ static std::map<std::string, int> g_staCallBackNameEventIdMap = {
 };
 
 /* ApCallBackNameEventIdMap */
-static std::map<std::string, int> g_apCallBackNameEventIdMap = {
+inline const std::map<std::string, int> g_apCallBackNameEventIdMap = {
     { EVENT_HOTSPOT_STATE_CHANGE, WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE },
     { EVENT_HOTSPOT_STA_JOIN, WIFI_CBK_MSG_HOTSPOT_STATE_JOIN },
     { EVENT_HOTSPOT_STA_LEAVE, WIFI_CBK_MSG_HOTSPOT_STATE_LEAVE },
 };
 
 /* P2PCallBackNameEventIdMap */
-static std::map<std::string, int> g_p2pCallBackNameEventIdMap = {
+inline const std::map<std::string, int> g_p2pCallBackNameEventIdMap = {
     { EVENT_P2P_STATE_CHANGE, WIFI_CBK_MSG_P2P_STATE_CHANGE },
     { EVENT_P2P_PERSISTENT_GROUP_CHANGE, WIFI_CBK_MSG_PERSISTENT_GROUPS_CHANGE },
     { EVENT_P2P_DEVICE_STATE_CHANGE, WIFI_CBK_MSG_THIS_DEVICE_CHANGE },

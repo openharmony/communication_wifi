@@ -21,7 +21,8 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { SymbolGlyphModifier, window } from '@kit.ArkUI';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
-  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl
+  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl,
+  modifyCode
 } from '../common/utils';
 import {
   updateFinalUrl, updateOnHttpErrorReceive, updateOnErrorReceive, updateOnSslErrorEvent, updateAboutToDisappear,
@@ -366,6 +367,7 @@ struct Index {
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed to get UA. Code:${error.code}, message:${error.message}`);
           }
         })
+        .javaScriptOnDocumentStart([{ script: modifyCode, scriptRules: ["*"] }])
         .onPageBegin(() => {
           updateFinalUrl(this.webUrl);
           this.loadProgress = 0;
@@ -378,6 +380,13 @@ struct Index {
               hilog.error(DOMAIN, TAG, '%{public}s',
                 `onPageBegin Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
             }
+          }
+          try {
+            this.webviewController.runJavaScript(modifyCode);
+            hilog.info(DOMAIN, TAG, '%{public}s', 'runJavaScript enter.');
+          } catch (error) {
+            hilog.error(DOMAIN, TAG, '%{public}s',
+              `onPageBegin Failed runJavaScript. Code:${error.code}, message:${error.message}`);
           }
         })
         .onProgressChange((event) => {

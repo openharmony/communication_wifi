@@ -641,6 +641,9 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
             if (std::find_if(mloInfo.begin(), mloInfo.end(),
                 [bssid](WifiLinkedInfo &info) { return bssid == info.bssid; }) == mloInfo.end()) {
                     pStaStateMachine->StartConnectToBssid(networkId, bssid, type);
+                    LOGI("%{public}s linkedInfo.bssid: %{public}s, bssid %{public}s, isMloConnected %{public}d",
+                        __FUNCTION__, MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str(),
+                        linkedInfo.isMloConnected);
                 return WIFI_OPT_SUCCESS;
             }
             if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_MLSR) {
@@ -652,16 +655,23 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
                 return WIFI_OPT_SUCCESS;
             }
         }
+        LOGI("%{public}s linkedInfo.bssid: %{public}s, bssid %{public}s",
+            __FUNCTION__, MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
         pStaStateMachine->StartConnectToBssid(networkId, bssid, type);
     } else {
-        LOGI("%{public}s switch to target network", __FUNCTION__);
-        auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
-        message->SetParam1(networkId);
-        message->SetParam2(type);
-        message->AddStringMessageBody(bssid);
-        pStaStateMachine->SendMessage(message);
+        StartConnectToBssidExt(networkId, bssid, type);
     }
     return WIFI_OPT_SUCCESS;
+}
+
+void StaService::StartConnectToBssidExt(const int32_t networkId, const std::string bssid, int32_t type) const
+{
+    LOGI("%{public}s switch to target network", __FUNCTION__);
+    auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
+    message->SetParam1(networkId);
+    message->SetParam2(type);
+    message->AddStringMessageBody(bssid);
+    pStaStateMachine->SendMessage(message);
 }
 
 ErrCode StaService::StartConnectToUserSelectNetwork(int networkId, std::string bssid) const

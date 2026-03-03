@@ -525,6 +525,14 @@ public:
      * @param featureName - feature name to distinguish different gain scenarios
      */
     virtual void SetGameLatencyFeatureEnabled(bool enabled, const std::string& featureName) = 0;
+
+    /**
+     * @Description Get Wifi enhance config by type
+     *
+     * @param type - Wifi enhance config type
+     * @return EnhanceConfigVariant - variant config
+     */
+    virtual EnhanceConfigVariant GetWifiEnhanceConfig(WifiEnhanceConfigType type) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

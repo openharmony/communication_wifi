@@ -2,7 +2,7 @@
     "string":[
         {
             "name":"compatibility_mode_of_the_PC_version",
-            "value":"Desktop-Website",
+            "value":"Desktop-Version",
             "attr":{
                 "priority":"LT"
             }
@@ -30,7 +30,7 @@
         },
         {
             "name":"compatibility_mode_of_the_mobile_version",
-            "value":"Mobile Website",
+            "value":"Mobile-Version",
             "attr":{
                 "priority":"LT"
             }

@@ -679,6 +679,15 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode SetRandomMacDisabled(bool isRandomMacDisabled) override;
+
+    /**
+     * @Description Set bt co-exist state when service conflict
+     *
+     * @param state - bt co-exist state
+     * @param reason - conflict reason
+     * @return ErrCode - operation result
+     */
+    ErrCode SetBtCoexistState(CoexistState state, CoexistReason reason) override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

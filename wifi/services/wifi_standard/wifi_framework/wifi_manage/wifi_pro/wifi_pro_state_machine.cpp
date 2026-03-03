@@ -561,7 +561,21 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
         WIFI_LOGE("TryWifi2Wifi: ConnectToNetwork failed.");
         return false;
     }
+    /* Record Chr: WiFi switches triggered by scans of a specific scanStyle */
+    RecordChrApSwitchCountInfo();
     return true;
+}
+
+void WifiProStateMachine::RecordChrApSwitchCountInfo()
+{
+    ScanStatisticInfo scanStatisticInfo;
+    int scanStyle = WifiConfigCenter::GetInstance().GetScanStyle();
+    if (scanStyle == SCAN_TYPE_LOW_PRIORITY) {
+        scanStatisticInfo.lpScanApSwtCnt++;
+    } else if (scanStyle == SCAN_DEFAULT_TYPE) {
+        scanStatisticInfo.scanApSwtCnt++;
+    }
+    WriteWifiScanInfoHiSysEvent(scanStatisticInfo);
 }
 
 ErrCode WifiProStateMachine::FullScan()
@@ -1863,7 +1877,16 @@ bool WifiProStateMachine::WifiNoNetState::HandleHttpResultInNoNet(InternalMessag
     }
     int32_t state = msg->GetParam1();
     if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED)) {
-        pWifiProStateMachine_->FullScan();
+        WifiLinkedInfo linkedInfo;
+        WifiDeviceConfig wifiDeviceConfig;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+        WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, wifiDeviceConfig);
+        if (WifiProUtils::IsUserSelectNetwork() &&
+            !NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory)) {
+            WIFI_LOGI("user actively select no-net network, do not allow scan.");
+        } else {
+            pWifiProStateMachine_->FullScan();
+        }
         return EXECUTED;
     }
     return NOT_EXECUTED;

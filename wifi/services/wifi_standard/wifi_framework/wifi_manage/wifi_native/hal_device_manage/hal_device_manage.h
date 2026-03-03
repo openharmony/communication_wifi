@@ -50,7 +50,11 @@ using NetlinkReportCallback = std::function<void(int, const std::vector<uint8_t>
 using OnChipServiceDied = std::function<void(void)>;
 
 constexpr IfaceType IFACE_TYPE_DEFAULT = (IfaceType)255;
-const std::vector<IfaceType> IFACE_TYPES_BY_PRIORITY = {IfaceType::AP, IfaceType::STA, IfaceType::P2P};
+inline const std::vector<IfaceType> IFACE_TYPES_BY_PRIORITY = {
+    IfaceType::AP,
+    IfaceType::STA,
+    IfaceType::P2P
+};
 
 struct InterfaceCacheEntry {
     sptr<IConcreteChip> chip;

@@ -292,11 +292,27 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessagePtr msg
 
 bool P2pGroupOperatingState::ProcessCmdDisable(const InternalMessagePtr msg) const
 {
-    /**
-     * Before disabling P2P, you need to remove the group.
-     */
+    WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
+    if (group.GetP2pGroupStatus() == P2pGroupStatus::GS_STARTED) {
+        if (p2pStateMachine.p2pDevIface == group.GetInterface()) {
+            p2pStateMachine.p2pDevIface = "";
+        }
+        WifiNetAgent::GetInstance().DelInterfaceAddress(group.GetInterface(),
+            group.IsGroupOwner() ? group.GetGoIpAddress() : group.GetGcIpAddress(), P2P_IP_ADDR_PREFIX_LEN);
+        /* do not judge remove result, because can not recv callback in close wpa */
+        WifiP2PHalInterface::GetInstance().GroupRemove(group.GetInterface());
+        if (!groupManager.GetCurrentGroup().IsGroupOwner()) {
+            p2pStateMachine.StopP2pDhcpClient();
+        } else {
+            p2pStateMachine.StopDhcpServer();
+        }
+        WifiP2pGroupInfo invalidGroup;
+        groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, invalidGroup);
+    }
+    p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
     p2pStateMachine.DelayMessage(msg);
-    return ProcessCmdRemoveGroup(msg);
+    p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
+    return EXECUTED;
 }
 
 bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessagePtr msg) const

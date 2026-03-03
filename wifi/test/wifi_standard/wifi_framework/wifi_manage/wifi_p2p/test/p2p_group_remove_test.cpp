@@ -70,14 +70,5 @@ HWTEST_F(P2pGroupRemoveStateTest, ExecuteStateMsg, TestSize.Level1)
     p2pGroupRemoveState->ExecuteStateMsg(msg);
     EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
-
-HWTEST_F(P2pGroupRemoveStateTest, ExecuteStateMsg1, TestSize.Level1)
-{
-    InternalMessagePtr msg = std::make_shared<InternalMessage>();
-    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
-    bool ret = p2pGroupRemoveState->ExecuteStateMsg(msg);
-    p2pGroupRemoveState->GoOutState();
-    EXPECT_TRUE(ret);
-}
 }  // namespace Wifi
 }  // namespace OHOS

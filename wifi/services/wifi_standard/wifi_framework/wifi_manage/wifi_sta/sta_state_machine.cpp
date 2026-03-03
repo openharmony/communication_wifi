@@ -144,6 +144,18 @@ const std::map<int, int> portalEventValues = {
     {PortalState::EXPERIED, HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED}
 };
 
+const std::vector<Wifi80211ReasonCode> g_fastReconnectWlanReasons = {
+    Wifi80211ReasonCode::WLAN_REASON_UNSPECIFIED,
+    Wifi80211ReasonCode::WLAN_REASON_PREV_AUTH_NOT_VALID,
+    Wifi80211ReasonCode::WLAN_REASON_CLASS2_FRAME_FROM_NONAUTH_STA,
+    Wifi80211ReasonCode::WLAN_REASON_CLASS3_FRAME_FROM_NONASSOC_STA,
+    Wifi80211ReasonCode::WLAN_REASON_DISASSOC_LOW_ACK,
+};
+
+constexpr int32_t FAST_RECONNECT_INTERVAL_MIN = 10;
+constexpr int32_t FAST_RECONNECT_INTERVAL_MAX = 60;
+constexpr int32_t FAST_RECONNECT_DELAY_TIME_US = 100 * 1000;
+
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       targetNetworkId_(INVALID_NETWORK_ID),
@@ -966,7 +978,7 @@ void StaStateMachine::LinkState::DealWpaCustomEapAuthEvent(InternalMessagePtr ms
 #endif
 }
 
-bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(InternalMessagePtr msg)
+bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(int reason, const std::string &bssid)
 {
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine->enhanceService_ == nullptr || pStaStateMachine->m_instId != INSTID_WLAN0) {
@@ -977,7 +989,9 @@ bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(InternalMessagePtr ms
         WIFI_LOGI("self cure going, dont ignroe disconnect event");
         return false;
     }
-
+    if (TryFastReconnect(reason, bssid)) {
+        return true;
+    }
     if (pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::QUERY_IGNORE_DISCONN_REQUIRED,
         pStaStateMachine->m_instId) == MultiLinkDefs::IGNORE_DISCONNECT) {
         pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::NOTIFY_CHAIN_DISCONNECTED,
@@ -986,6 +1000,42 @@ bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(InternalMessagePtr ms
         return true;
     }
 #endif
+    return false;
+}
+
+bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string &bssid)
+{
+    if (std::find(g_fastReconnectWlanReasons.begin(), g_fastReconnectWlanReasons.end(),
+        static_cast<Wifi80211ReasonCode>(reason)) == g_fastReconnectWlanReasons.end()) {
+        return false;
+    }
+    if (WifiSettings::GetInstance().GetSignalLevel(pStaStateMachine->linkedInfo.rssi,
+        pStaStateMachine->linkedInfo.band, pStaStateMachine->m_instId) < RSSI_LEVEL_2) {
+        WIFI_LOGI("%{public}s signal level less 2", __FUNCTION__);
+        return false;
+    }
+    WifiDeviceConfig wifiDeviceConfig = pStaStateMachine->getCurrentWifiDeviceConfig();
+    int32_t disconnectInterval = static_cast<int32_t>(time(nullptr) - wifiDeviceConfig.lastConnectTime);
+    int32_t fastConnectInterval = pStaStateMachine->enableSignalPoll ?
+        FAST_RECONNECT_INTERVAL_MIN : FAST_RECONNECT_INTERVAL_MAX;
+    if (disconnectInterval <= fastConnectInterval) {
+        WIFI_LOGI("%{public}s cannot fast reconnect, disconnect interval:%{public}d", __FUNCTION__, disconnectInterval);
+        return false;
+    }
+    WifiScanParams params;
+    params.freqs.push_back(pStaStateMachine->linkedInfo.frequency);
+    IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(pStaStateMachine->m_instId);
+    if (pScanService != nullptr &&
+        pScanService->ScanWithParam(params, true, ScanType::SCAN_TYPE_FAST_RECONNECT) == WIFI_OPT_SUCCESS) {
+        usleep(FAST_RECONNECT_DELAY_TIME_US); // wait 100ms for single channel scan callback
+        if (pStaStateMachine->StartConnectToNetwork(pStaStateMachine->linkedInfo.networkId, bssid,
+            NETWORK_SELECTED_BY_FAST_RECONNECT) == WIFI_OPT_SUCCESS) {
+            WIFI_LOGI("%{public}s try to fast reconnect, networkId:%{public}d, bssid:%{public}s",
+                __FUNCTION__, pStaStateMachine->linkedInfo.networkId, MacAnonymize(bssid).c_str());
+            return true;
+        }
+    }
+    WIFI_LOGW("%{public}s scan or connect fail", __FUNCTION__);
     return false;
 }
 
@@ -1001,7 +1051,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     WIFI_LOGI("Enter DealDisconnectEventInLinkState m_instId = %{public}d reason:%{public}d, bssid:%{public}s",
         pStaStateMachine->m_instId, reason, MacAnonymize(bssid).c_str());
 
-    if (NeedIgnoreDisconnectEvent(msg)) {
+    if (NeedIgnoreDisconnectEvent(reason, bssid)) {
         pStaStateMachine->SwitchState(pStaStateMachine->pApReConnectState);
         return;
     }
@@ -3131,7 +3181,49 @@ void StaStateMachine::LinkedState::NetDetectionNotify(InternalMessagePtr msg)
         WIFI_LOGW("Failed to obtain portal url.");
     }
     WIFI_HILOG_COMM_INFO("netdetection, netstate:%{public}d url:%{private}s\n", netstate, url.c_str());
+    UpdateNetDetectHistory(netstate);
     pStaStateMachine->HandleNetCheckResult(netstate, url);
+}
+
+void StaStateMachine::LinkedState::UpdateNetDetectHistory(EnumNetWorkState networkState)
+{
+    if (WifiSettings::GetInstance().GetSignalLevel(pStaStateMachine->linkedInfo.rssi,
+        pStaStateMachine->linkedInfo.band, pStaStateMachine->m_instId) < RSSI_LEVEL_2) {
+        WIFI_LOGD("%{public}s signal level less 2", __FUNCTION__);
+        return;
+    }
+    WifiDeviceConfig config = pStaStateMachine->getCurrentWifiDeviceConfig();
+    if (config.networkId == INVALID_NETWORK_ID) {
+        WIFI_LOGW("%{public}s fail to get deviceconfig", __FUNCTION__);
+        return;
+    }
+    if (config.dualStackNetState != -1 && config.ipv4OnlyNetState != -1) {
+        WIFI_LOGD("%{public}s only update firt connect netDetect record", __FUNCTION__);
+        return;
+    }
+    IpInfo ipInfo;
+    IpV6Info ipv6Info;
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, pStaStateMachine->m_instId);
+    WifiConfigCenter::GetInstance().GetIpv6Info(ipv6Info, pStaStateMachine->m_instId);
+    if (ipInfo.ipAddress != 0 && !ipv6Info.globalIpV6Address.empty()) {
+        config.dualStackNetState = static_cast<int>(networkState);
+    } else if (ipInfo.ipAddress != 0 && ipv6Info.globalIpV6Address.empty()) {
+        config.ipv4OnlyNetState = static_cast<int>(networkState);
+    } else {
+        WIFI_LOGD("%{public}s ip not found", __FUNCTION__);
+        return;
+    }
+    WIFI_LOGI("%{public}s DualStack:%{public}d, Ipv4Only:%{public}d", __FUNCTION__,
+        config.dualStackNetState, config.ipv4OnlyNetState);
+    if (static_cast<EnumNetWorkState>(config.dualStackNetState) == EnumNetWorkState::NETWORK_NOTWORKING &&
+        static_cast<EnumNetWorkState>(config.ipv4OnlyNetState) == EnumNetWorkState::NETWORK_IS_WORKING) {
+        if (pStaStateMachine->selfCureService_ != nullptr) {
+            WIFI_LOGI("%{public}s disable ipv6", __FUNCTION__);
+            pStaStateMachine->selfCureService_->NotifyIpv6FailureDetected(true);
+            pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_REASSOCIATE_NETWORK);
+        }
+    }
+    WifiSettings::GetInstance().AddDeviceConfig(config);
 }
 
 void StaStateMachine::LinkedState::DealNetworkCheck(InternalMessagePtr msg)
@@ -3380,8 +3472,17 @@ bool StaStateMachine::ApReconnectState::ExecuteStateMsg(InternalMessagePtr msg)
             ret = EXECUTED;
             break;
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT:
-            pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+            if (!pStaStateMachine->CanArpReachable() && pStaStateMachine->enhanceService_ != nullptr &&
+                pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::QUERY_RECONNECT_ALLOWED,
+                pStaStateMachine->m_instId) != MultiLinkDefs::ALLOW_IN_CONN_STATE) {
+                WIFI_LOGI("ApReconnectState arp is not reachable");
+                pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
+            } else {
+                WIFI_LOGI("ApReconnectState arp is reachable");
+                pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+            }
             ret = EXECUTED;
+            break;
         default:
             WIFI_LOGI("ApReconnectState-msgCode=%{public}d not handled.", msg->GetMessageName());
             break;
@@ -3963,9 +4064,12 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6
     TryToSaveIpV6ResultExt(ipInfo, ipv6Info, result);
     if (result->dnsList.dnsNumber <= DHCP_DNS_MAX_NUMBER) {
         for (uint32_t i = 0; i < result->dnsList.dnsNumber; i++) {
-            if (std::find(ipv6Info.dnsAddr.begin(), ipv6Info.dnsAddr.end(), result->dnsList.dnsAddr[i]) ==
-                ipv6Info.dnsAddr.end()) {
-                ipv6Info.dnsAddr.push_back(result->dnsList.dnsAddr[i]);
+            std::string dns = result->dnsList.dnsAddr[i];
+            if (IsIpv6AllZero(dns)) {
+                continue;
+            }
+            if (std::find(ipv6Info.dnsAddr.begin(), ipv6Info.dnsAddr.end(), dns) == ipv6Info.dnsAddr.end()) {
+                ipv6Info.dnsAddr.push_back(dns);
             }
         }
         WIFI_LOGI("TryToSaveIpV6Result ipv6Info dnsAddr size:%{public}zu", ipv6Info.dnsAddr.size());
@@ -5131,7 +5235,9 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     } else {
         WIFI_LOGI("SetBssid bssid=%{public}s", MacAnonymize(apBssid).c_str());
     }
-    SetRandomMac(deviceConfig, apBssid);
+    if (connTriggerMode != NETWORK_SELECTED_BY_FAST_RECONNECT) {
+        SetRandomMac(deviceConfig, apBssid);
+    }
     WIFI_LOGI("StartConnectToNetwork SetRandomMac targetNetworkId_:%{public}d, bssid:%{public}s", targetNetworkId_,
         MacAnonymize(apBssid).c_str());
     EnhanceWriteWifiConnectionInfoHiSysEvent(networkId);

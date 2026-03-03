@@ -176,15 +176,11 @@ void P2pStateMachine::InitializeThisDevice()
         WIFI_LOGW("Failed to obtain P2pVendorConfig information.");
     }
     WIFI_LOGI("%{public}s: random mac is %{public}s", __func__, p2pVendorCfg.GetRandomMacSupport() ? "true" : "false");
-    if (p2pVendorCfg.GetDeviceName().empty()) {
-        deviceName = WifiSettings::GetInstance().GetDefaultApSsid();
-        p2pVendorCfg.SetDeviceName(deviceName);
-        ret = WifiSettings::GetInstance().SetP2pVendorConfig(p2pVendorCfg);
-        if (ret < 0) {
-            WIFI_LOGW("Failed to Set P2pVendorConfig information.");
-        }
-    } else {
-        deviceName = p2pVendorCfg.GetDeviceName();
+    deviceName = WifiSettings::GetInstance().GetDefaultApSsid();
+    p2pVendorCfg.SetDeviceName(deviceName);
+    ret = WifiSettings::GetInstance().SetP2pVendorConfig(p2pVendorCfg);
+    if (ret < 0) {
+        WIFI_LOGW("Failed to Set P2pVendorConfig information.");
     }
     deviceManager.GetThisDevice().SetDeviceName(deviceName);
     deviceManager.GetThisDevice().SetPrimaryDeviceType(p2pVendorCfg.GetPrimaryDeviceType());
@@ -353,8 +349,9 @@ void P2pStateMachine::SetWifiP2pInfoWhenGroupFormed(const std::string &groupOwne
 
 bool P2pStateMachine::IsMatchClientDevice(std::vector<GcInfo> &gcInfos, WifiP2pDevice &device, GcInfo &gcInfo)
 {
-    std::vector<OHOS::Wifi::WifiP2pDevice> deviceList;
-    if (deviceManager.GetDevicesList(deviceList) <= 0) {
+    WifiP2pGroupInfo groupInfo = groupManager.GetCurrentGroup();
+    std::vector<OHOS::Wifi::WifiP2pDevice> deviceList = groupInfo.GetClientDevices();
+    if (deviceList.size() <= 0) {
         WIFI_LOGE("deviceList.size <= 0 ");
         return false;
     }

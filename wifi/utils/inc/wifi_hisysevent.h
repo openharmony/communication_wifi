@@ -160,6 +160,23 @@ struct IodStatisticInfo {
     int32_t indoorConnShortTime = 0;
 };
 
+struct ScanStatisticInfo {
+    uint32_t fcLpScanCnt = 0;
+    uint32_t fcLpScanApCnt = 0;
+    uint32_t nfcLpScanCnt = 0;
+    uint32_t nfcLpScanChannelCnt = 0;
+    uint32_t nfcLpScanApCnt = 0;
+    uint32_t fcScanCnt = 0;
+    uint32_t fcScanApCnt = 0;
+    uint32_t nfcScanCnt = 0;
+    uint32_t nfcScanChannelCnt = 0;
+    uint32_t nfcScanApCnt = 0;
+    uint32_t lpScanUnctrlCnt = 0;
+    uint32_t lpScanApSwtCnt = 0;
+    uint32_t scanApSwtCnt = 0;
+    uint32_t lpScanAbortCnt = 0;
+};
+
 struct MdmRestrictedInfo {
     std::string ssid = "";
     std::string bssid = "";
@@ -291,6 +308,8 @@ void WriteMdmHiSysEvent(const MdmRestrictedInfo &mdmRestrictedInfo);
 void WriteWifiConfigStatusHiSysEvent(const std::string &packageName, WifiConfigReportType reportType);
 
 void WritePositionAutoOpenWlanHiSysEvent(const std::string updateType);
+
+void WriteWifiScanInfoHiSysEvent(const ScanStatisticInfo &scanStatisticInfo);
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
 void WriteWifiRiskInfoHiSysEvent(const WifiRiskInfo &wifiRiskInfo);
 #endif

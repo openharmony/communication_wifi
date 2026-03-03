@@ -727,5 +727,11 @@ ErrCode WifiDeviceImpl::SetRandomMacDisabled(bool isRandomMacDisabled)
     return client_->SetRandomMacDisabled(isRandomMacDisabled);
 }
 
+ErrCode WifiDeviceImpl::SetBtCoexistState(CoexistState state, CoexistReason reason)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->SetBtCoexistState(state, reason);
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -50,6 +50,7 @@
         GetDeviceConfig;
         RemoveDevice;
         SetWifiRestrictedList;
+        SetBtCoexistState;
         AllowAutoConnect;
         DisableDeviceConfig;
         EnableDeviceConfig;

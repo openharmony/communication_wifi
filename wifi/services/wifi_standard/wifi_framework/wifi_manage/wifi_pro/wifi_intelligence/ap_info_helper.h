@@ -28,27 +28,27 @@ namespace OHOS {
 namespace Wifi {
 
 namespace BssidInfoTable {
-    const std::string TABLE_NAME = "bssid_info_table";
-    const std::string BSSID = "bssid";
-    const std::string SSID = "ssid";
-    const std::string TIME = "time";
-    const std::string IN_BLACK_LIST = "inBlacklist";
-    const std::string AUTH_TYPE = "authType";
-    const std::string FREQUENCY = "frequency";
-    const std::string IS_HOME_AP = "isHomeAp";
+    inline const std::string TABLE_NAME = "bssid_info_table";
+    inline const std::string BSSID = "bssid";
+    inline const std::string SSID = "ssid";
+    inline const std::string TIME = "time";
+    inline const std::string IN_BLACK_LIST = "inBlacklist";
+    inline const std::string AUTH_TYPE = "authType";
+    inline const std::string FREQUENCY = "frequency";
+    inline const std::string IS_HOME_AP = "isHomeAp";
 }
-
+ 
 namespace CellIdInfoTable {
-    const std::string TABLE_NAME = "cellid_info_table";
-    const std::string BSSID = "bssid";
-    const std::string CELL_ID = "cellId";
-    const std::string RSSI = "rssi";
+    inline const std::string TABLE_NAME = "cellid_info_table";
+    inline const std::string BSSID = "bssid";
+    inline const std::string CELL_ID = "cellId";
+    inline const std::string RSSI = "rssi";
 }
-
+ 
 namespace NearByApInfoTable {
-    const std::string TABLE_NAME = "nearby_ap_info_table";
-    const std::string BSSID = "bssid";
-    const std::string NEAR_BY_BSSID = "nearbyBssid";
+    inline const std::string TABLE_NAME = "nearby_ap_info_table";
+    inline const std::string BSSID = "bssid";
+    inline const std::string NEAR_BY_BSSID = "nearbyBssid";
 }
 
 struct CellInfoData {

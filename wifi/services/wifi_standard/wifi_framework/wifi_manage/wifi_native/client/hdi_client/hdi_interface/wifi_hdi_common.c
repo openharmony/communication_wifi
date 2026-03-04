@@ -74,12 +74,12 @@ static void DealDigital(u8 *buf, const char **pos, size_t *len)
         case '5':
         case '6':
         case '7':
-            val = **pos++ - '0';
+            val = *(*pos)++ - '0';
             if (**pos >= '0' && **pos <= '7') {
-                val = val * HDI_POS_EIGHT + (**pos++ - '0');
+                val = val * HDI_POS_EIGHT + (*(*pos)++ - '0');
             }
             if (**pos >= '0' && **pos <= '7') {
-                val = val * HDI_POS_EIGHT + (**pos++ - '0');
+                val = val * HDI_POS_EIGHT + (*(*pos)++ - '0');
             }
             buf[(*len)++] = val;
             return;

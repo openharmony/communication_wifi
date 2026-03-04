@@ -23,7 +23,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#ifndef OHOS_ARCH_LITE
 #include <variant>
+#endif
 #include "ip_tools.h"
 #include "wifi_scan_msg.h"
 #include "inter_scan_info.h"
@@ -1257,7 +1259,9 @@ struct WifiFastReconnectConfig {
     std::vector<int> wlanReasonWhiteList {1, 2, 6, 7, 34};
 };
 
+#ifndef OHOS_ARCH_LITE
 using EnhanceConfigVariant = std::variant<WifiFastReconnectConfig>;
+#endif
 
 }  // namespace Wifi
 }  // namespace OHOS

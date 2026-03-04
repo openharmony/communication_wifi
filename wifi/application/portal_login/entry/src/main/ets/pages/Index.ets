@@ -471,11 +471,10 @@ struct Index {
     let atManager = abilityAccessCtrl.createAtManager();
     atManager.requestPermissionsFromUser(this.getUIContext().getHostContext(), ['ohos.permission.CAMERA'])
       .then((data) => {
-        console.info('data:' + JSON.stringify(data));
-        console.info('data permissions:' + data.permissions);
-        console.info('data authResults:' + data.authResults);
+        hilog.info(DOMAIN, TAG, '%{public}s', 'requestPermissions:' + JSON.stringify(data));
       }).catch((error: BusinessError) => {
-      console.error(`Failed to request permissions from user. Code is ${error.code}, message is ${error.message}`);
+        hilog.error(DOMAIN, TAG, '%{public}s',
+          `Failed to request permissions from user. Code is ${error.code}, message is ${error.message}`);
     })
   }
 
@@ -490,7 +489,7 @@ struct Index {
       hilog.info(DOMAIN, TAG, '%{public}s', 'Orientation' + orientation);
     } catch (error) {
       let err: BusinessError = error as BusinessError;
-      hilog.error(DOMAIN, 'TAG', '%{public}s',
+      hilog.error(DOMAIN, TAG, '%{public}s',
         `Orientation failed.Code:${err.code},message:${err.message}.` + orientation);
     }
   }

@@ -81,6 +81,7 @@ public:
     void OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     void OnReceiveNotificationEvent(int notificationId);
+    void OnReceiveDontShowEvent(int notificationId);
     void OnReceiveDialogAcceptEvent(int dialogType, const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveDialogRejectEvent(int dialogType, bool noAction);
     void NotifyCandidateApprovalStatus(CandidateApprovalStatus status);

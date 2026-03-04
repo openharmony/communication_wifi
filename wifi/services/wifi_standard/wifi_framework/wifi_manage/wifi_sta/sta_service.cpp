@@ -901,6 +901,12 @@ void StaService::NotifyDeviceConfigChange(ConfigChange value, WifiDeviceConfig c
     cbMsg.msgData = static_cast<int>(value);
     cbMsg.id = m_instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGD("%{public}s: pEnhanceService is null", __FUNCTION__);
+        return;
+    }
+    pEnhanceService->OnWifiDeviceConfigChange(static_cast<int32_t>(value), config, isRemoveAll);
 #endif
 }
 

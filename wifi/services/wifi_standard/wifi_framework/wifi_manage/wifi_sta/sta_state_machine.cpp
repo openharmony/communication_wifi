@@ -1000,7 +1000,6 @@ bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string 
     }
     WifiFastReconnectConfig config = std::get<WifiFastReconnectConfig>(pStaStateMachine->enhanceService_->
         GetWifiEnhanceConfig(WifiEnhanceConfigType::FAST_RECONNECT));
-    
     if (!config.alwaysFastReconnectFlag) {
         if (std::find(config.wlanReasonWhiteList.begin(), config.wlanReasonWhiteList.end(), reason) ==
             config.wlanReasonWhiteList.end()) {

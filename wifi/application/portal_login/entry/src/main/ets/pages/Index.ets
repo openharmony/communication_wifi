@@ -345,7 +345,7 @@ struct Index {
             const permissions: string[] = event.request.getAccessibleResource();
             if (permissions.includes('TYPE_VIDEO_CAPTURE')) {
               this.requestCamera();
-              event.request.grant(['TYPE_VIDEO_CAPTURE']);
+              event.request.grant(event.request.getAccessibleResource());
             }
           }
         })

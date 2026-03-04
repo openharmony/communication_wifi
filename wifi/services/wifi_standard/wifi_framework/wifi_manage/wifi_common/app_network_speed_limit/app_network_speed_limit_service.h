@@ -106,6 +106,7 @@ private:
     void CheckAndResetGamePowerMode(const std::string &bundleName);
     void UpdateAncoAppInfos(const WifiNetworkControlInfo &networkControlInfo);
     void ReportGameLatencyFeature(bool enabled, const std::string& featureName);
+    void ReportGameSceneChange(int state);
 
 private:
     StaServiceCallback m_staCallback;

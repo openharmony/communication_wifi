@@ -867,6 +867,7 @@ void WifiEventSubscriberManager::RegisterNotificationEvent()
     }
     OHOS::EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(WIFI_EVENT_TAP_NOTIFICATION);
+    matchingSkills.AddEvent(WIFI_EVENT_TAP_DONT_SHOW_AGAIN);
     matchingSkills.AddEvent(WIFI_EVENT_DIALOG_ACCEPT);
     matchingSkills.AddEvent(WIFI_EVENT_DIALOG_REJECT);
     matchingSkills.AddEvent(EVENT_SETTINGS_WLAN_KEEP_CONNECTED);
@@ -936,6 +937,10 @@ void NotificationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEve
         int notificationId = eventData.GetWant().GetIntParam("notificationId", 0);
         WIFI_LOGI("notificationId[%{public}d]", notificationId);
         OnReceiveNotificationEvent(notificationId);
+    } else if (action == WIFI_EVENT_TAP_DONT_SHOW_AGAIN) {
+        int notificationId = eventData.GetWant().GetIntParam("notificationId", 0);
+        WIFI_LOGI("notificationId[%{public}d]", notificationId);
+        OnReceiveDontShowEvent(notificationId);
     } else if (action == WIFI_EVENT_DIALOG_ACCEPT) {
         int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
         WIFI_LOGI("dialogType[%{public}d]", dialogType);
@@ -967,6 +972,16 @@ void NotificationEventSubscriber::OnReceiveNotificationEvent(int notificationId)
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
         if (pEnhanceService != nullptr) {
             pEnhanceService->OnNotificationReceive(notificationId);
+        }
+    }
+}
+
+void NotificationEventSubscriber::OnReceiveDontShowEvent(int notificationId)
+{
+    if (notificationId == static_cast<int>(WifiNotificationId::WIFI_TRIBAND_CONN_NOTIFICATION_ID)) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnDontShowReceive(notificationId);
         }
     }
 }

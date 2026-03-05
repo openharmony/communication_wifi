@@ -32,6 +32,7 @@
 #include "wifi_global_func.h"
 #include "wifi_config_center.h"
 #include "wifi_chr_adapter.h"
+#include "wifi_pro_enhance.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -216,8 +217,14 @@ std::string Perf5gHandoverService::Switch5g()
     int32_t ret;
     WIFI_HILOG_COMM_INFO("Switch5g StartConnectToBssid. bssid(%{public}s)",
         MacAnonymize(selectRelationAp_->apInfo.bssid).data());
+    SelectedType type = NETWORK_SELECTED_BY_WIFIPRO;
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+    if (WifiProEnhance::GetInstance().IsEnhanceSwitchEnable(selectRelationAp_->apInfo.bssid)) {
+        type = NETWORK_SELECTED_BY_WIFIPRO_ENHANCE;
+    }
+#endif
     ret = pStaService->StartConnectToBssid(
-        selectRelationAp_->apInfo.networkId, selectRelationAp_->apInfo.bssid, NETWORK_SELECTED_BY_WIFIPRO);
+        selectRelationAp_->apInfo.networkId, selectRelationAp_->apInfo.bssid, type);
     if (ret == WIFI_OPT_SUCCESS) {
         return selectRelationAp_->apInfo.bssid;
     }

@@ -558,6 +558,24 @@ public:
      * @param isRemoveAll - is remove all device config 1:remove all 0:not remove all
      */
     virtual void OnWifiDeviceConfigChange(int32_t status, const WifiDeviceConfig &config, bool isRemoveAll) = 0;
+
+    /**
+     * @Description Check if the gateways of two BSSIDs are the same
+     *
+     * @param bssid1 - first bssid
+     * @param bssid2 - second bssid
+     * @return bool - true: same gateway; false: different gateway
+     */
+    virtual bool IsSameGateway(const std::string &bssid1, const std::string &bssid2) = 0;
+
+    /**
+     * @Description Update the gateway relationship between the two BSSIDs
+     *
+     * @param bssid1 - first bssid
+     * @param bssid2 - second bssid
+     * @param isSameGateway - true: same gateway; false: different gateway
+     */
+    virtual void UpdateGatewayRelation(std::string &bssid1, std::string &bssid2, bool isSameGateway) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

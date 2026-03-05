@@ -389,6 +389,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getWifiDetailState", GetWifiDetailState),
         DECLARE_WRITABLE_NAPI_FUNCTION("getCountryCode", GetCountryCode),
         DECLARE_NAPI_FUNCTION("getDeviceConfigs", GetDeviceConfigs),
+        DECLARE_NAPI_FUNCTION("getDeviceConfig", GetDeviceConfig),
         DECLARE_NAPI_FUNCTION("updateNetwork", UpdateNetwork),
         DECLARE_NAPI_FUNCTION("updateDeviceConfig", UpdateNetwork),
         DECLARE_NAPI_FUNCTION("getSupportedFeatures", GetSupportedFeatures),

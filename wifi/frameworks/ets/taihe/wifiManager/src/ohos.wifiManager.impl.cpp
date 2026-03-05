@@ -262,6 +262,21 @@ void EnableSemiWifi()
         taihe::copy_data_t{}, result.data(), result.size());
 }
 
+::ohos::wifiManager::WifiDeviceConfig GetDeviceConfig(int32_t networkId)
+{
+    WifiDeviceConfig config;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return MakeWifiDeviceConfig(config);
+    }
+    ErrCode ret = g_wifiDevicePtr->GetDeviceConfig(networkId, config);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetDeviceConfig fail: %{public}d", ret);
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return MakeWifiDeviceConfig(config);
+}
+
 void Disconnect()
 {
     if (g_wifiDevicePtr == nullptr) {
@@ -1711,6 +1726,7 @@ TH_EXPORT_CPP_API_EnableWifi(EnableWifi);
 TH_EXPORT_CPP_API_DisableWifi(DisableWifi);
 TH_EXPORT_CPP_API_EnableSemiWifi(EnableSemiWifi);
 TH_EXPORT_CPP_API_GetDeviceConfigs(GetDeviceConfigs);
+TH_EXPORT_CPP_API_GetDeviceConfig(GetDeviceConfig);
 TH_EXPORT_CPP_API_Disconnect(Disconnect);
 TH_EXPORT_CPP_API_ConnectToNetwork(ConnectToNetwork);
 TH_EXPORT_CPP_API_GetDeviceMacAddress(GetDeviceMacAddress);

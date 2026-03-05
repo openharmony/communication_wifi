@@ -194,6 +194,8 @@ export enum HarmonyUserAgentSet {
     'Chrome/132.0.0.0 Safari/537.36 ArkWeb/6.0.0.120 Mobile HuaweiBrowser/5.1.11.312',
 }
 
+export const modifyCode = `Object.defineProperty(navigator, 'platform', { get: () => 'Linux aarch64' });`;
+
 export function loadUAWhiteList(context: common.Context): void {
   try {
     const rawContent: Uint8Array = context.resourceManager.getRawFileContentSync('config.json');

@@ -305,6 +305,13 @@ public:
      * @param notificationId - notification Id
      */
     virtual void OnNotificationReceive(int notificationId) = 0;
+
+    /**
+     * @Description on dont show again receive
+     *
+     * @param notificationId - notification Id
+     */
+    virtual void OnDontShowReceive(int notificationId) = 0;
  
     /**
      * @Description on dialog receive
@@ -525,6 +532,7 @@ public:
      * @param featureName - feature name to distinguish different gain scenarios
      */
     virtual void SetGameLatencyFeatureEnabled(bool enabled, const std::string& featureName) = 0;
+
 #ifndef OHOS_ARCH_LITE
     /**
      * @Description Get Wifi enhance config by type
@@ -534,6 +542,22 @@ public:
      */
     virtual EnhanceConfigVariant GetWifiEnhanceConfig(WifiEnhanceConfigType type) = 0;
 #endif
+
+    /**
+     * @Description Set game latency gain statistics feature enabled state
+     *
+     * @param state - game scene state
+     */
+    virtual void ReportGameSceneChange(int state) = 0;
+ 
+    /**
+     * @Description receive device config change
+     *
+     * @param status - device config change type, update/remove
+     * @param config - changed config
+     * @param isRemoveAll - is remove all device config 1:remove all 0:not remove all
+     */
+    virtual void OnWifiDeviceConfigChange(int32_t status, const WifiDeviceConfig &config, bool isRemoveAll) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

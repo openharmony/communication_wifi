@@ -23,6 +23,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#ifndef OHOS_ARCH_LITE
+#include <variant>
+#endif
 #include "ip_tools.h"
 #include "wifi_scan_msg.h"
 #include "inter_scan_info.h"
@@ -1242,6 +1245,24 @@ typedef enum {
     CAC_DETECT_IS_NOT_IN_PROGRESS = 1,
     CAC_DETECT_IS_IN_PROGRESS = 2,
 } IsCACDetectInProgress;
+
+enum class WifiEnhanceConfigType {
+    FAST_RECONNECT,
+};
+
+struct WifiFastReconnectConfig {
+    int minSignalLevel {static_cast<int>(SigLevel::SIG_LEVEL_2)};
+    int minTimeIntervalSec {10};
+    int maxTimeIntervalSec {60};
+    int scanWaitTimeMs {100};
+    bool alwaysFastReconnectFlag {false};
+    std::vector<int> wlanReasonWhiteList {1, 2, 6, 7, 34};
+};
+
+#ifndef OHOS_ARCH_LITE
+using EnhanceConfigVariant = std::variant<WifiFastReconnectConfig>;
+#endif
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

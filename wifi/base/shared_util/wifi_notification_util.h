@@ -28,6 +28,7 @@ constexpr int DEFAULT_INVAL_VALUE = -1;
 constexpr int32_t SIGNAL_NUM = 3;
 inline const std::u16string ABILITY_MGR_DESCRIPTOR = u"ohos.aafwk.AbilityManager";
 inline const std::string WIFI_EVENT_TAP_NOTIFICATION = "ohos.event.notification.wifi.TAP_NOTIFICATION";
+inline const std::string WIFI_EVENT_TAP_DONT_SHOW_AGAIN = "ohos.event.notification.wifi.TAP_DONT_SHOW_AGAIN";
 inline const std::string WIFI_EVENT_DIALOG_ACCEPT = "ohos.event.wifi.DIALOG_ACCEPT";
 inline const std::string WIFI_EVENT_DIALOG_REJECT = "ohos.event.wifi.DIALOG_REJECT";
 inline const std::string EVENT_SETTINGS_WLAN_KEEP_CONNECTED = "event.settings.wlan.keep_connected";

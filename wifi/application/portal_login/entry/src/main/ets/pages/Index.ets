@@ -16,12 +16,13 @@
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { i18n, resourceManager  } from '@kit.LocalizationKit';
-import { common, OpenLinkOptions } from '@kit.AbilityKit';
+import { common, OpenLinkOptions, abilityAccessCtrl } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { SymbolGlyphModifier, window } from '@kit.ArkUI';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
-  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl
+  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl,
+  modifyCode
 } from '../common/utils';
 import {
   updateFinalUrl, updateOnHttpErrorReceive, updateOnErrorReceive, updateOnSslErrorEvent, updateAboutToDisappear,
@@ -340,6 +341,15 @@ struct Index {
         .geolocationAccess(false)
         .domStorageAccess(true)
         .overviewModeAccess(false)
+        .onPermissionRequest((event) => {
+          if (event) {
+            const permissions: string[] = event.request.getAccessibleResource();
+            if (permissions.includes('TYPE_VIDEO_CAPTURE')) {
+              this.requestCamera();
+              event.request.grant(event.request.getAccessibleResource());
+            }
+          }
+        })
         .onOverrideUrlLoading((request) => {
           this.webUrl = request.getRequestUrl();
           if (validateURL(this.webUrl) && !this.webUrl.startsWith('http') && !this.webUrl.startsWith('https')) {
@@ -366,6 +376,7 @@ struct Index {
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed to get UA. Code:${error.code}, message:${error.message}`);
           }
         })
+        .javaScriptOnDocumentStart([{ script: modifyCode, scriptRules: ["*"] }])
         .onPageBegin(() => {
           updateFinalUrl(this.webUrl);
           this.loadProgress = 0;
@@ -378,6 +389,13 @@ struct Index {
               hilog.error(DOMAIN, TAG, '%{public}s',
                 `onPageBegin Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
             }
+          }
+          try {
+            this.webviewController.runJavaScript(modifyCode);
+            hilog.info(DOMAIN, TAG, '%{public}s', 'runJavaScript enter.');
+          } catch (error) {
+            hilog.error(DOMAIN, TAG, '%{public}s',
+              `onPageBegin Failed runJavaScript. Code:${error.code}, message:${error.message}`);
           }
         })
         .onProgressChange((event) => {
@@ -458,6 +476,17 @@ struct Index {
     .padding({ top: px2vp(this.topRectHeight) })
   }
 
+  private requestCamera() {
+    let atManager = abilityAccessCtrl.createAtManager();
+    atManager.requestPermissionsFromUser(this.getUIContext().getHostContext(), ['ohos.permission.CAMERA'])
+      .then((data) => {
+        hilog.info(DOMAIN, TAG, '%{public}s', 'requestPermissions:' + JSON.stringify(data));
+      }).catch((error: BusinessError) => {
+        hilog.error(DOMAIN, TAG, '%{public}s',
+          `Failed to request permissions from user. Code is ${error.code}, message is ${error.message}`);
+    })
+  }
+
   private async handleFullScreenChange() {
     let orientation = window.Orientation.UNSPECIFIED;
     if (!this.isActionBarVisible){
@@ -469,7 +498,7 @@ struct Index {
       hilog.info(DOMAIN, TAG, '%{public}s', 'Orientation' + orientation);
     } catch (error) {
       let err: BusinessError = error as BusinessError;
-      hilog.error(DOMAIN, 'TAG', '%{public}s',
+      hilog.error(DOMAIN, TAG, '%{public}s',
         `Orientation failed.Code:${err.code},message:${err.message}.` + orientation);
     }
   }

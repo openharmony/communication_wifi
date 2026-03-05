@@ -1008,7 +1008,7 @@ bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string 
     }
     if (WifiSettings::GetInstance().GetSignalLevel(pStaStateMachine->linkedInfo.rssi,
         pStaStateMachine->linkedInfo.band, pStaStateMachine->m_instId) < config.minSignalLevel) {
-        WIFI_LOGI("%{public}s signal level less: %{public}d", __FUNCTION__, config.minSignalLevel);
+        WIFI_LOGI("%{public}s signal level less %{public}d", __FUNCTION__, config.minSignalLevel);
         return false;
     }
     WifiDeviceConfig wifiDeviceConfig = pStaStateMachine->getCurrentWifiDeviceConfig();

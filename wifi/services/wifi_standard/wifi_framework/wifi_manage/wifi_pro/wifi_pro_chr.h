@@ -90,7 +90,7 @@ public:
 private:
     static constexpr int ARP_CHECK_TIME_MS = 300;
     static constexpr int SIMILAR_BSSID_PREFIX_LEN = 14;
-    static constexpr const char *MAC_ADDR_ALL_ZERO = "00:00:00:00:00:00";
+    static constexpr const char *macAddrAllZero = "00:00:00:00:00:00";
     void DoOneArp(IpInfo &ipInfo, std::string &gatewayIp, std::string &ifaceName);
     bool IsSimilarBssid(std::string &bssid1, std::string &bssid2);
 

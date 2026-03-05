@@ -152,6 +152,13 @@ enum FoldStatus {
     HALF_FOLD,
 };
 
+enum ReconnectType {
+    RECONNECT_TYPE_UNKNOWN = 0,
+    RECONNECT_TYPE_FAST = 1,
+    RECONNECT_TYPE_EHANCE_SWITCH = 2,
+    RECONNECT_TYPE_GENELINK = 3,
+};
+
 inline const int DETECT_TYPE_DEFAULT = 0;
 inline const int DETECT_TYPE_PERIODIC = 1;
 inline const int DETECT_TYPE_CHECK_PORTAL_EXPERIED = 2;
@@ -406,8 +413,15 @@ public:
         void SetFastReconnectState(bool isFastReconnect);
 
     private:
+        void GetGatewayMac(std::string &gatewayMac);
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+        void StartConnectEvent(InternalMessagePtr msg);
+#endif
+        void HandleNetworkConnectionEvent(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
         bool isFastReconnect_ {false};
+        std::string lastBssid_;
+        std::string lastGatewayMac_;
     };
 
     class DhcpResultNotify {
@@ -1149,6 +1163,10 @@ private:
     bool linkSwitchDetectingFlag_{false};
     uint32_t pktDirCnt_ = 0;
     int connectMethod_ = -1;
+    std::mutex httpDetectionMtx_;
+    std::condition_variable httpDetectionCond_;
+    std::atomic<bool> isHttpReachable_{false};
+    int reconnType_ = RECONNECT_TYPE_UNKNOWN;
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
     WifiDataReportService *wifiDataReportService_ = nullptr;

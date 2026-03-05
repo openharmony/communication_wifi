@@ -23,6 +23,7 @@
 #include "ip_tools.h"
 #include "arp_checker.h"
 #include "wifi_msg.h"
+#include "network_black_list_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -265,7 +266,7 @@ void WifiProChr::DoOneArp(IpInfo &ipInfo, std::string &gatewayIp, std::string &i
 
 bool WifiProChr::IsSimilarBssid(std::string &bssid1, std::string &bssid2)
 {
-    if (bssid1 == MAC_ADDR_ALL_ZERO || bssid1.length() < SIMILAR_BSSID_PREFIX_LEN ||
+    if (bssid1 == macAddrAllZero || bssid1.length() < SIMILAR_BSSID_PREFIX_LEN ||
         bssid2.length() < SIMILAR_BSSID_PREFIX_LEN) {
         WIFI_LOGI("IsSimilarBssid zero or invalid len");
         return false;
@@ -285,13 +286,16 @@ void WifiProChr::RecordGatewayInfoAfterSwitch()
         WIFI_LOGI("GatewayInfoAfterSwitch unknown gateway ip");
         return;
     }
- 
+
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, instId);
     std::string gatewayIp = IpTools::ConvertIpv4Address(ipInfo.gateway);
     if (gatewayIp != lastGatewayIp_) {
         WIFI_LOGI("GatewayInfoAfterSwitch diff ip, last: %{public}s now: %{public}s",
             IpAnonymize(lastGatewayIp_).c_str(), IpAnonymize(gatewayIp).c_str());
         lastGatewayIp_ = gatewayIp;
         gatewayIpDiffCnt_++;
+        NetworkBlockListManager::GetInstance().UpdateGatewayRelation(lastBssid_, linkedInfo.bssid, false);
         return;
     }
     gatewayIpSameCnt_++;
@@ -299,7 +303,7 @@ void WifiProChr::RecordGatewayInfoAfterSwitch()
     std::string gatewayMac;
     std::string ifaceName = "wlan0";
     int ret = IpTools::GetGatewayMac(gatewayIp, gatewayMac, ifaceName);
-    if (gatewayMac == MAC_ADDR_ALL_ZERO) {
+    if (gatewayMac == macAddrAllZero) {
         WIFI_LOGI("GatewayInfoAfterSwitch gateway mac all zero, do one arp");
         DoOneArp(ipInfo, gatewayIp, ifaceName);
         ret = IpTools::GetGatewayMac(gatewayIp, gatewayMac, ifaceName);
@@ -313,8 +317,7 @@ void WifiProChr::RecordGatewayInfoAfterSwitch()
         WIFI_LOGI("GatewayInfoAfterSwitch same ip %{public}s, same mac: %{public}s",
             IpAnonymize(gatewayIp).c_str(), MacAnonymize(gatewayMac).c_str());
         gatewayMacSameCnt_++;
-        WifiLinkedInfo linkedInfo;
-        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, instId);
+        NetworkBlockListManager::GetInstance().UpdateGatewayRelation(lastBssid_, linkedInfo.bssid, true);
         if (IsSimilarBssid(lastBssid_, linkedInfo.bssid)) {
             gatewayBssidSimilarCnt_++;
         }
@@ -323,6 +326,7 @@ void WifiProChr::RecordGatewayInfoAfterSwitch()
             IpAnonymize(gatewayIp).c_str(), MacAnonymize(lastGatewayMac_).c_str(), MacAnonymize(gatewayMac).c_str());
         gatewayMacDiffCnt_++;
         lastGatewayMac_ = gatewayMac;
+        NetworkBlockListManager::GetInstance().UpdateGatewayRelation(lastBssid_, linkedInfo.bssid, false);
     }
 }
 

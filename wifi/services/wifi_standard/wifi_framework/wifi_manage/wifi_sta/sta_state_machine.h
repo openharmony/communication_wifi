@@ -253,8 +253,8 @@ public:
         void DealWpaStateChange(InternalMessagePtr msg);
         void DealMloStateChange(InternalMessagePtr msg);
         void DealWpaCustomEapAuthEvent(InternalMessagePtr msg);
-        bool NeedIgnoreDisconnectEvent(int reason, const std::string &bssid);
-        bool TryFastReconnect(int reason, const std::string &bssid);
+        bool NeedIgnoreDisconnectEvent(int reason, const std::string &bssid, int locallyGenerated);
+        bool TryFastReconnect(int reason, const std::string &bssid, int locallyGenerated);
     };
     /**
      * @Description  Definition of member function of SeparatedState class in StaStateMachine.
@@ -403,9 +403,11 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
+        void SetFastReconnectState(bool isFastReconnect);
 
     private:
         StaStateMachine *pStaStateMachine;
+        bool isFastReconnect_ {false};
     };
 
     class DhcpResultNotify {

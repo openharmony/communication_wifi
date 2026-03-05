@@ -144,18 +144,6 @@ const std::map<int, int> portalEventValues = {
     {PortalState::EXPERIED, HISYS_EVENT_PROTAL_STATE_PORTAL_UNVERIFIED}
 };
 
-const std::vector<Wifi80211ReasonCode> g_fastReconnectWlanReasons = {
-    Wifi80211ReasonCode::WLAN_REASON_UNSPECIFIED,
-    Wifi80211ReasonCode::WLAN_REASON_PREV_AUTH_NOT_VALID,
-    Wifi80211ReasonCode::WLAN_REASON_CLASS2_FRAME_FROM_NONAUTH_STA,
-    Wifi80211ReasonCode::WLAN_REASON_CLASS3_FRAME_FROM_NONASSOC_STA,
-    Wifi80211ReasonCode::WLAN_REASON_DISASSOC_LOW_ACK,
-};
-
-constexpr int32_t FAST_RECONNECT_INTERVAL_MIN = 10;
-constexpr int32_t FAST_RECONNECT_INTERVAL_MAX = 60;
-constexpr int32_t FAST_RECONNECT_DELAY_TIME_US = 100 * 1000;
-
 StaStateMachine::StaStateMachine(int instId)
     : StateMachine("StaStateMachine"),
       targetNetworkId_(INVALID_NETWORK_ID),
@@ -978,7 +966,7 @@ void StaStateMachine::LinkState::DealWpaCustomEapAuthEvent(InternalMessagePtr ms
 #endif
 }
 
-bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(int reason, const std::string &bssid)
+bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(int reason, const std::string &bssid, int locallyGenerated)
 {
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine->enhanceService_ == nullptr || pStaStateMachine->m_instId != INSTID_WLAN0) {
@@ -989,7 +977,8 @@ bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(int reason, const std
         WIFI_LOGI("self cure going, dont ignroe disconnect event");
         return false;
     }
-    if (TryFastReconnect(reason, bssid)) {
+    if (TryFastReconnect(reason, bssid, locallyGenerated)) {
+        pStaStateMachine->pApReConnectState->SetFastReconnectState(true);
         return true;
     }
     if (pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::QUERY_IGNORE_DISCONN_REQUIRED,
@@ -1003,21 +992,29 @@ bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(int reason, const std
     return false;
 }
 
-bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string &bssid)
+bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string &bssid, int locallyGenerated)
 {
-    if (std::find(g_fastReconnectWlanReasons.begin(), g_fastReconnectWlanReasons.end(),
-        static_cast<Wifi80211ReasonCode>(reason)) == g_fastReconnectWlanReasons.end()) {
+    if (locallyGenerated != 0) {
+        WIFI_LOGI("%{public}s locallyGenerated disconnect donot reconnect", __FUNCTION__);
         return false;
     }
+    WifiFastReconnectConfig config = std::get<WifiFastReconnectConfig>(pStaStateMachine->enhanceService_->
+        GetWifiEnhanceConfig(WifiEnhanceConfigType::FAST_RECONNECT));
+    if (!config.alwaysFastReconnectFlag) {
+        if (std::find(config.wlanReasonWhiteList.begin(), config.wlanReasonWhiteList.end(), reason) ==
+            config.wlanReasonWhiteList.end()) {
+            return false;
+        }
+    }
     if (WifiSettings::GetInstance().GetSignalLevel(pStaStateMachine->linkedInfo.rssi,
-        pStaStateMachine->linkedInfo.band, pStaStateMachine->m_instId) < RSSI_LEVEL_2) {
-        WIFI_LOGI("%{public}s signal level less 2", __FUNCTION__);
+        pStaStateMachine->linkedInfo.band, pStaStateMachine->m_instId) < config.minSignalLevel) {
+        WIFI_LOGI("%{public}s signal level less %{public}d", __FUNCTION__, config.minSignalLevel);
         return false;
     }
     WifiDeviceConfig wifiDeviceConfig = pStaStateMachine->getCurrentWifiDeviceConfig();
     int32_t disconnectInterval = static_cast<int32_t>(time(nullptr) - wifiDeviceConfig.lastConnectTime);
     int32_t fastConnectInterval = pStaStateMachine->enableSignalPoll ?
-        FAST_RECONNECT_INTERVAL_MIN : FAST_RECONNECT_INTERVAL_MAX;
+        config.minTimeIntervalSec : config.maxTimeIntervalSec;
     if (disconnectInterval <= fastConnectInterval) {
         WIFI_LOGI("%{public}s cannot fast reconnect, disconnect interval:%{public}d", __FUNCTION__, disconnectInterval);
         return false;
@@ -1027,7 +1024,7 @@ bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string 
     IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(pStaStateMachine->m_instId);
     if (pScanService != nullptr &&
         pScanService->ScanWithParam(params, true, ScanType::SCAN_TYPE_FAST_RECONNECT) == WIFI_OPT_SUCCESS) {
-        usleep(FAST_RECONNECT_DELAY_TIME_US); // wait 100ms for single channel scan callback
+        usleep(config.scanWaitTimeMs); // wait 100ms for single channel scan callback
         if (pStaStateMachine->StartConnectToNetwork(pStaStateMachine->linkedInfo.networkId, bssid,
             NETWORK_SELECTED_BY_FAST_RECONNECT) == WIFI_OPT_SUCCESS) {
             WIFI_LOGI("%{public}s try to fast reconnect, networkId:%{public}d, bssid:%{public}s",
@@ -1051,7 +1048,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
     WIFI_LOGI("Enter DealDisconnectEventInLinkState m_instId = %{public}d reason:%{public}d, bssid:%{public}s",
         pStaStateMachine->m_instId, reason, MacAnonymize(bssid).c_str());
 
-    if (NeedIgnoreDisconnectEvent(reason, bssid)) {
+    if (NeedIgnoreDisconnectEvent(reason, bssid, locallyGenerated)) {
         pStaStateMachine->SwitchState(pStaStateMachine->pApReConnectState);
         return;
     }
@@ -3442,6 +3439,7 @@ void StaStateMachine::ApReconnectState::GoInState()
 void StaStateMachine::ApReconnectState::GoOutState()
 {
     WIFI_LOGI("ApReconnectState GoOutState function. stop reconnect timer!");
+    isFastReconnect_ = false;
     pStaStateMachine->isWaitForReconnect_ = false;
     pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_RECONN_TIMEOUT_CHECK));
 }
@@ -3468,7 +3466,12 @@ bool StaStateMachine::ApReconnectState::ExecuteStateMsg(InternalMessagePtr msg)
             break;
         case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT:
         case WIFI_SVR_CMD_STA_DISCONNECT:
-            WIFI_LOGI("Ignore STA_DISCONNECT in ApReconnectState");
+            if (isFastReconnect_) {
+                WIFI_LOGI("ApReconnectState goto separatedState when fast reconnect dixconnect");
+                pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
+            } else {
+                WIFI_LOGI("Ignore STA_DISCONNECT in ApReconnectState");
+            }
             ret = EXECUTED;
             break;
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT:
@@ -3488,6 +3491,11 @@ bool StaStateMachine::ApReconnectState::ExecuteStateMsg(InternalMessagePtr msg)
             break;
     }
     return ret;
+}
+
+void StaStateMachine::ApReconnectState::SetFastReconnectState(bool isFastReconnect)
+{
+    isFastReconnect_ = isFastReconnect;
 }
 
 bool StaStateMachine::CanArpReachable()

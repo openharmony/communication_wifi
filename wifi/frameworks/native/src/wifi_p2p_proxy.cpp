@@ -23,6 +23,15 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pProxy");
 
+constexpr int MAX_BAND = 7;
+constexpr int MAX_BANDWIDTH = 4;
+constexpr int MAX_IFMODE = 3;
+constexpr int MAX_IP_LEN = 15;
+constexpr int P2P_CHANNEL_2G_MAX = 13;
+constexpr int P2P_CHANNEL_5G_MIN = 36;
+constexpr int P2P_CHANNEL_5G_MAX = 165;
+constexpr int IFNAMSIZ = 16;
+
 static sptr<WifiP2pCallbackStub> g_wifiP2pCallbackStub =
     sptr<WifiP2pCallbackStub>(new (std::nothrow) WifiP2pCallbackStub());
 
@@ -1420,6 +1429,17 @@ ErrCode WifiP2pProxy::Hid2dConnect(const Hid2dConnectConfig& config)
 
 ErrCode WifiP2pProxy::Hid2dConfigIPAddr(const std::string& ifName, const IpAddrInfo& ipInfo)
 {
+    if (ifName.empty() || ifName.length() > IFNAMSIZ) {
+        WIFI_LOGE("Invalid interface name length");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+ 
+    if (ipInfo.ip.length() > MAX_IP_LEN ||
+        ipInfo.gateway.length() > MAX_IP_LEN ||
+        ipInfo.netmask.length() > MAX_IP_LEN) {
+        WIFI_LOGE("Invalid IP address length");
+        return WIFI_OPT_INVALID_PARAM;
+    }
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
@@ -1482,6 +1502,13 @@ ErrCode WifiP2pProxy::Hid2dReleaseIPAddr(const std::string& ifName)
 ErrCode WifiP2pProxy::Hid2dGetRecommendChannel(const RecommendChannelRequest& request,
     RecommendChannelResponse& response)
 {
+    if (request.remoteIfMode < 0 || request.remoteIfMode > MAX_IFMODE ||
+        request.localIfMode < 0 || request.localIfMode > MAX_IFMODE ||
+        request.prefBand < 0 || request.prefBand > MAX_BAND ||
+        static_cast<int>(request.prefBandwidth) < 0 || static_cast<int>(request.prefBandwidth) > MAX_BANDWIDTH) {
+        WIFI_LOGE("Invalid parameters for Hid2dGetRecommendChannel");
+        return WIFI_OPT_INVALID_PARAM;
+    }
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
@@ -1692,6 +1719,11 @@ ErrCode WifiP2pProxy::Hid2dSetUpperScene(const std::string& ifName, const Hid2dU
 
 ErrCode WifiP2pProxy::DiscoverPeers(int32_t channelid)
 {
+    if (channelid < 0 || (channelid > P2P_CHANNEL_2G_MAX && channelid < P2P_CHANNEL_5G_MIN) ||
+        channelid > P2P_CHANNEL_5G_MAX) {
+        WIFI_LOGE("Invalid channelid: %{public}d", channelid);
+        return WIFI_OPT_INVALID_PARAM;
+    }
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;

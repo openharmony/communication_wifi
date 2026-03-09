@@ -576,6 +576,13 @@ public:
      * @param isSameGateway - true: same gateway; false: different gateway
      */
     virtual void UpdateGatewayRelation(std::string &bssid1, std::string &bssid2, bool isSameGateway) = 0;
+
+    /**
+     * @Description Get device features.
+     *
+     * @return WifiDeviceFeatures - A structure indicating device features.
+     */
+    virtual WifiDeviceFeatures GetDeviceFeatures() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -36,6 +36,7 @@
 #include "wifi_channel_helper.h"
 #include "ienhance_service.h"
 #include "wifi_enhance_defs.h"
+#include "wifi_pro_enhance.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -557,7 +558,13 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
     WifiProChr::GetInstance().RecordWifiProConnectTime();
     WifiProChr::GetInstance().RecordGatewayInfoBeforeSwitch();
     WIFI_HILOG_COMM_ERROR("TryWifi2Wifi: Switch reason : %{public}s", (g_switchReason[wifiSwitchReason_]).c_str());
-    if (pStaService->StartConnectToBssid(networkId, targetBssid_, NETWORK_SELECTED_BY_WIFIPRO) != WIFI_OPT_SUCCESS) {
+    SelectedType type = NETWORK_SELECTED_BY_WIFIPRO;
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+    if (WifiProEnhance::GetInstance().IsEnhanceSwitchEnable(currentBssid_, targetBssid_)) {
+        type = NETWORK_SELECTED_BY_WIFIPRO_ENHANCE;
+    }
+#endif
+    if (pStaService->StartConnectToBssid(networkId, targetBssid_, type) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("TryWifi2Wifi: ConnectToNetwork failed.");
         return false;
     }

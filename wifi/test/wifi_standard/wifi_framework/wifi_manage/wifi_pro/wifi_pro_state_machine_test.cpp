@@ -923,5 +923,122 @@ HWTEST_F(WifiProStateMachineTest, HandleHigherCategoryToLowerCategoryTest01, Tes
 
     EXPECT_TRUE(NetworkBlockListManager::GetInstance().IsInPerf5gBlocklist(pWifiProStateMachine_->badBssid_));
 }
+
+HWTEST_F(WifiProStateMachineTest, EnhanceSwitchBlocklistAddAndQueryTest01, TestSize.Level1)
+{
+    std::string bssid = "AA:BB:CC:DD:EE:01";
+    // Clean environment and verify initial state.
+    NetworkBlockListManager::GetInstance().CleanEnhanceSwitchBlocklist();
+    EXPECT_FALSE(NetworkBlockListManager::GetInstance().IsInEnhanceSwitchBlocklist(bssid));
+
+    // Query should return true after adding into blocklist.
+    NetworkBlockListManager::GetInstance().AddEnhanceSwitchBlocklist(bssid);
+    EXPECT_TRUE(NetworkBlockListManager::GetInstance().IsInEnhanceSwitchBlocklist(bssid));
+
+    // Duplicate add should not crash.
+    NetworkBlockListManager::GetInstance().AddEnhanceSwitchBlocklist(bssid);
+    EXPECT_TRUE(NetworkBlockListManager::GetInstance().IsInEnhanceSwitchBlocklist(bssid));
+}
+
+HWTEST_F(WifiProStateMachineTest, EnhanceSwitchBlocklistAddEmptyBssidTest01, TestSize.Level1)
+{
+    NetworkBlockListManager::GetInstance().CleanEnhanceSwitchBlocklist();
+    std::string emptyBssid = "";
+    NetworkBlockListManager::GetInstance().AddEnhanceSwitchBlocklist(emptyBssid);
+    EXPECT_FALSE(NetworkBlockListManager::GetInstance().IsInEnhanceSwitchBlocklist(emptyBssid));
+}
+
+HWTEST_F(WifiProStateMachineTest, EnhanceSwitchBlocklistQueryEmptyBssidTest01, TestSize.Level1)
+{
+    std::string emptyBssid = "";
+    EXPECT_FALSE(NetworkBlockListManager::GetInstance().IsInEnhanceSwitchBlocklist(emptyBssid));
+}
+
+HWTEST_F(WifiProStateMachineTest, EnhanceSwitchBlocklistRemoveTest01, TestSize.Level1)
+{
+    std::string bssid = "AA:BB:CC:DD:EE:02";
+    NetworkBlockListManager::GetInstance().CleanEnhanceSwitchBlocklist();
+
+    // Add first and then remove.
+    NetworkBlockListManager::GetInstance().AddEnhanceSwitchBlocklist(bssid);
+    EXPECT_TRUE(NetworkBlockListManager::GetInstance().IsInEnhanceSwitchBlocklist(bssid));
+
+    NetworkBlockListManager::GetInstance().RemoveEnhanceSwitchBlocklist(bssid);
+    EXPECT_FALSE(NetworkBlockListManager::GetInstance().IsInEnhanceSwitchBlocklist(bssid));
+}
+
+HWTEST_F(WifiProStateMachineTest, EnhanceSwitchBlocklistRemoveEmptyTest01, TestSize.Level1)
+{
+    NetworkBlockListManager::GetInstance().CleanEnhanceSwitchBlocklist();
+
+    // Remove a non-existing BSSID from empty list should not crash.
+    NetworkBlockListManager::GetInstance().RemoveEnhanceSwitchBlocklist("AA:BB:CC:DD:EE:03");
+
+    // Remove empty BSSID should not crash.
+    NetworkBlockListManager::GetInstance().RemoveEnhanceSwitchBlocklist("");
+    EXPECT_FALSE(NetworkBlockListManager::GetInstance().IsInEnhanceSwitchBlocklist("AA:BB:CC:DD:EE:03"));
+}
+
+HWTEST_F(WifiProStateMachineTest, EnhanceSwitchBlocklistCleanTest01, TestSize.Level1)
+{
+    std::string bssid1 = "AA:BB:CC:DD:EE:04";
+    std::string bssid2 = "AA:BB:CC:DD:EE:05";
+    NetworkBlockListManager::GetInstance().CleanEnhanceSwitchBlocklist();
+
+    NetworkBlockListManager::GetInstance().AddEnhanceSwitchBlocklist(bssid1);
+    NetworkBlockListManager::GetInstance().AddEnhanceSwitchBlocklist(bssid2);
+    EXPECT_TRUE(NetworkBlockListManager::GetInstance().IsInEnhanceSwitchBlocklist(bssid1));
+    EXPECT_TRUE(NetworkBlockListManager::GetInstance().IsInEnhanceSwitchBlocklist(bssid2));
+
+    NetworkBlockListManager::GetInstance().CleanEnhanceSwitchBlocklist();
+    EXPECT_FALSE(NetworkBlockListManager::GetInstance().IsInEnhanceSwitchBlocklist(bssid1));
+    EXPECT_FALSE(NetworkBlockListManager::GetInstance().IsInEnhanceSwitchBlocklist(bssid2));
+}
+
+HWTEST_F(WifiProStateMachineTest, IsSameGatewayEmptyBssidTest01, TestSize.Level1)
+{
+    // Return false if either BSSID is empty.
+    EXPECT_FALSE(NetworkBlockListManager::GetInstance().IsSameGateway("", "AA:BB:CC:DD:EE:06"));
+    EXPECT_FALSE(NetworkBlockListManager::GetInstance().IsSameGateway("AA:BB:CC:DD:EE:06", ""));
+    EXPECT_FALSE(NetworkBlockListManager::GetInstance().IsSameGateway("", ""));
+}
+
+HWTEST_F(WifiProStateMachineTest, IsSameGatewaySameBssidTest01, TestSize.Level1)
+{
+    std::string bssid = "AA:BB:CC:DD:EE:07";
+    EXPECT_TRUE(NetworkBlockListManager::GetInstance().IsSameGateway(bssid, bssid));
+}
+
+HWTEST_F(WifiProStateMachineTest, IsSameGatewayDiffBssidNoEnhanceServiceTest01, TestSize.Level1)
+{
+    std::string bssid1 = "AA:BB:CC:DD:EE:08";
+    std::string bssid2 = "AA:BB:CC:DD:EE:09";
+    EXPECT_FALSE(NetworkBlockListManager::GetInstance().IsSameGateway(bssid1, bssid2));
+}
+
+HWTEST_F(WifiProStateMachineTest, UpdateGatewayRelationEmptyBssidTest01, TestSize.Level1)
+{
+    std::string empty = "";
+    std::string bssid1 = "AA:BB:CC:DD:EE:0A";
+    std::string bssid2 = "AA:BB:CC:DD:EE:0A";
+
+    // Empty BSSID should not crash.
+    NetworkBlockListManager::GetInstance().UpdateGatewayRelation(empty, bssid1, true);
+    NetworkBlockListManager::GetInstance().UpdateGatewayRelation(bssid1, empty, false);
+
+    // Same BSSID should not trigger update.
+    NetworkBlockListManager::GetInstance().UpdateGatewayRelation(bssid2, bssid2, true);
+    EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, TEN);
+}
+
+HWTEST_F(WifiProStateMachineTest, UpdateGatewayRelationDiffBssidTest01, TestSize.Level1)
+{
+    std::string bssid1 = "AA:BB:CC:DD:EE:0B";
+    std::string bssid2 = "AA:BB:CC:DD:EE:0C";
+
+    NetworkBlockListManager::GetInstance().UpdateGatewayRelation(bssid1, bssid2, true);
+    NetworkBlockListManager::GetInstance().UpdateGatewayRelation(bssid1, bssid2, false);
+    EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, TEN);
+}
 } // namespace Wifi
 } // namespace OHOS

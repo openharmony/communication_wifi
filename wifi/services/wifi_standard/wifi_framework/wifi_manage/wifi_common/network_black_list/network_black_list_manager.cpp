@@ -19,6 +19,8 @@
 #include "network_black_list_manager.h"
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
+#include "ienhance_service.h"
+#include "wifi_service_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -229,6 +231,87 @@ void NetworkBlockListManager::CleanPerf5gBlocklist()
     std::lock_guard<std::mutex> lock(mutex_);
     std::unordered_map<std::string, std::pair<uint32_t, bool>> tempPerf5gBlockMap_;
     perf5gBlockMap_.swap(tempPerf5gBlockMap_);
+}
+
+void NetworkBlockListManager::AddEnhanceSwitchBlocklist(const std::string &bssid)
+{
+    if (bssid.empty()) {
+        WIFI_LOGI("AddEnhanceSwitchBlocklist, bssid is invalid");
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (enhanceSwitchBlockSet_.find(bssid) != enhanceSwitchBlockSet_.end()) {
+        WIFI_LOGI("AddEnhanceSwitchBlocklist, bssid already in blocklist");
+        return;
+    }
+    WIFI_LOGI("AddEnhanceSwitchBlocklist, bssid:%{public}s", MacAnonymize(bssid).c_str());
+    enhanceSwitchBlockSet_.insert(bssid);
+}
+
+bool NetworkBlockListManager::IsInEnhanceSwitchBlocklist(const std::string &bssid)
+{
+    if (bssid.empty()) {
+        return false;
+    }
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (enhanceSwitchBlockSet_.empty()) {
+        return false;
+    }
+    return enhanceSwitchBlockSet_.find(bssid) != enhanceSwitchBlockSet_.end();
+}
+
+void NetworkBlockListManager::RemoveEnhanceSwitchBlocklist(const std::string &bssid)
+{
+    if (bssid.empty()) {
+        WIFI_LOGI("RemoveEnhanceSwitchBlocklist, bssid is invalid");
+        return;
+    }
+
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (enhanceSwitchBlockSet_.empty()) {
+        return;
+    }
+
+    auto iter = enhanceSwitchBlockSet_.find(bssid);
+    if (iter != enhanceSwitchBlockSet_.end()) {
+        WIFI_LOGI("RemoveEnhanceSwitchBlocklist, bssid:%{public}s", MacAnonymize(bssid).c_str());
+        enhanceSwitchBlockSet_.erase(iter);
+    }
+}
+
+void NetworkBlockListManager::CleanEnhanceSwitchBlocklist()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    WIFI_LOGI("CleanEnhanceSwitchBlocklist");
+    enhanceSwitchBlockSet_.clear();
+}
+
+bool NetworkBlockListManager::IsSameGateway(const std::string &bssid1, const std::string &bssid2)
+{
+    if (bssid1.empty() || bssid2.empty()) {
+        return false;
+    }
+    if (bssid1 == bssid2) {
+        return true;
+    }
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr) {
+        return pEnhanceService->IsSameGateway(bssid1, bssid2);
+    }
+    return false;
+}
+
+void NetworkBlockListManager::UpdateGatewayRelation(std::string &bssid1, std::string &bssid2, bool isSameGateway)
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr) {
+        if (bssid1.empty() || bssid2.empty() || bssid1 == bssid2) {
+            return;
+        }
+        return pEnhanceService->UpdateGatewayRelation(bssid1, bssid2, isSameGateway);
+    }
 }
 }  // namespace Wifi
 }  // namespace OHOS

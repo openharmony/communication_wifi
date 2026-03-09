@@ -123,6 +123,13 @@ ohos_static_library("wifi_pro") {
     defines += [ "FEATURE_ITNETWORK_PREFERRED_SUPPORT" ]
   }
 
+  if (wifi_feature_enhance_switch_support) {
+    sources += [
+      "wifi_pro_enhance.cpp",
+    ]
+    defines += [ "FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT" ]
+  }
+
   defines += [ "FEATURE_SELF_CURE_SUPPORT" ]
 
   if (defined(global_parts_info) &&

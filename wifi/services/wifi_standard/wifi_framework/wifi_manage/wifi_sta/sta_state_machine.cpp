@@ -65,6 +65,10 @@
 #include "network_interface.h"
 #include "self_cure_utils.h"
 #include "wifi_enhance_defs.h"
+#include "network_black_list_manager.h"
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+#include "wifi_pro_enhance.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -979,6 +983,7 @@ bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(int reason, const std
     }
     if (TryFastReconnect(reason, bssid, locallyGenerated)) {
         pStaStateMachine->pApReConnectState->SetFastReconnectState(true);
+        pStaStateMachine->reconnType_ = RECONNECT_TYPE_FAST;
         return true;
     }
     if (pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::QUERY_IGNORE_DISCONN_REQUIRED,
@@ -986,6 +991,7 @@ bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(int reason, const std
         pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::NOTIFY_CHAIN_DISCONNECTED,
             pStaStateMachine->m_instId);
         WIFI_LOGI("ignore disconnect event in genelink mode");
+        pStaStateMachine->reconnType_ = RECONNECT_TYPE_GENELINK;
         return true;
     }
 #endif
@@ -2643,9 +2649,17 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
     bool updatePortalAuthTime = false;
     if (netState == SystemNetWorkState::NETWORK_IS_WORKING) {
         HandleNetCheckResultIsWorking(netState, updatePortalAuthTime);
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+        WifiProEnhance::GetInstance().SetEnhanceSwitchEnable(true);
+#endif
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
         HandleNetCheckResultIsPortal(netState, updatePortalAuthTime);
     } else {
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+        if (linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_WIFIPRO_ENHANCE) {
+            WifiProEnhance::GetInstance().SetEnhanceSwitchEnable(false);
+        }
+#endif
         HandleNetCheckResultIsNotWorking(netState);
     }
 #ifndef OHOS_ARCH_LITE
@@ -3042,6 +3056,19 @@ bool StaStateMachine::LinkedState::ProcessMessageByMacros(InternalMessagePtr msg
             }
             break;
         }
+#endif
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+        case WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK:
+            if (msg->GetParam2() == NETWORK_SELECTED_BY_WIFIPRO_ENHANCE) {
+                pStaStateMachine->reconnType_ = RECONNECT_TYPE_EHANCE_SWITCH;
+                pStaStateMachine->SwitchState(pStaStateMachine->pApReConnectState);
+                InternalMessagePtr newMsg = pStaStateMachine->CreateMessage(msg);
+                if (newMsg != nullptr) {
+                    pStaStateMachine->SendMessage(newMsg);
+                }
+                ret = EXECUTED;
+            }
+            break;
 #endif
         default:
             break;
@@ -3441,7 +3468,102 @@ void StaStateMachine::ApReconnectState::GoOutState()
     WIFI_LOGI("ApReconnectState GoOutState function. stop reconnect timer!");
     isFastReconnect_ = false;
     pStaStateMachine->isWaitForReconnect_ = false;
+    pStaStateMachine->reconnType_ = RECONNECT_TYPE_UNKNOWN;
     pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_RECONN_TIMEOUT_CHECK));
+}
+
+void StaStateMachine::ApReconnectState::GetGatewayMac(std::string &gatewayMac)
+{
+    IpInfo ipInfo;
+    WifiConfigCenter::GetInstance().GetIpInfo(ipInfo, pStaStateMachine->m_instId);
+
+    if (ipInfo.gateway == 0) {
+        gatewayMac = "";
+        return;
+    }
+    std::string gatewayIp = IpTools::ConvertIpv4Address(ipInfo.gateway);
+    std::string ifaceName = pStaStateMachine->m_instId == INSTID_WLAN0 ? "wlan0" : "wlan1";
+    if (IpTools::GetGatewayMac(gatewayIp, gatewayMac, ifaceName) != 0) {
+        gatewayMac = "";
+    }
+}
+
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+void StaStateMachine::ApReconnectState::StartConnectEvent(InternalMessagePtr msg)
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("msg is null.");
+        return;
+    }
+    int networkId = msg->GetParam1();
+    int connTriggerMode = msg->GetParam2();
+    auto bssid = msg->GetStringFromMessage();
+    pStaStateMachine->linkedInfo.connTriggerMode = connTriggerMode;
+
+    if (pStaStateMachine->reconnType_ == RECONNECT_TYPE_EHANCE_SWITCH) {
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, pStaStateMachine->m_instId);
+        lastBssid_ = linkedInfo.bssid;
+        GetGatewayMac(lastGatewayMac_);
+    }
+
+    WIFI_LOGI("ReconnectState StartConnect m_instId: %{public}d, networkId:%{public}d, bssid:%{public}s",
+        pStaStateMachine->m_instId, networkId, MacAnonymize(bssid).c_str());
+    if (pStaStateMachine->StartConnectToNetwork(networkId, bssid,
+        NETWORK_SELECTED_BY_WIFIPRO_ENHANCE) != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("ReconnectState StartConnect fail");
+        WifiProEnhance::GetInstance().SetEnhanceSwitchEnable(false);
+        NetworkBlockListManager::GetInstance().AddEnhanceSwitchBlocklist(bssid);
+        pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+    }
+}
+#endif
+
+void StaStateMachine::ApReconnectState::HandleNetworkConnectionEvent(InternalMessagePtr msg)
+{
+    bool isGenelinkConnection = false;
+#ifndef OHOS_ARCH_LITE
+    if (pStaStateMachine->enhanceService_ != nullptr && pStaStateMachine->enhanceService_->GenelinkInterface(
+        MultiLinkDefs::QUERY_RECONNECT_ALLOWED, pStaStateMachine->m_instId) == MultiLinkDefs::ALLOW_IN_CONN_STATE) {
+            isGenelinkConnection = true;
+    }
+#endif
+    std::string bssid = msg->GetStringFromMessage();
+    pStaStateMachine->linkedInfo.networkId = pStaStateMachine->targetNetworkId_;
+    pStaStateMachine->AfterApLinkedprocess(bssid);
+    if (isGenelinkConnection) {
+        pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+        return;
+    }
+
+    bool arpRet = pStaStateMachine->CanArpReachable();
+    if (pStaStateMachine->reconnType_ == RECONNECT_TYPE_EHANCE_SWITCH) {
+        if (arpRet) {
+            std::string currentGatewayMac;
+            std::string macAddrAllZero = "00:00:00:00:00:00";
+            GetGatewayMac(currentGatewayMac);
+            if (!currentGatewayMac.empty() && currentGatewayMac != macAddrAllZero &&
+                !lastGatewayMac_.empty() && lastGatewayMac_ != macAddrAllZero) {
+                bool isSameGateway = (currentGatewayMac == lastGatewayMac_);
+                NetworkBlockListManager::GetInstance().UpdateGatewayRelation(lastBssid_, bssid, isSameGateway);
+                WIFI_LOGI("enhance switch (%{public}s, %{public}s) same gateway: %{public}d",
+                    MacAnonymize(lastBssid_).c_str(), MacAnonymize(bssid).c_str(), isSameGateway);
+            }
+        } else {
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+            WifiProEnhance::GetInstance().SetEnhanceSwitchEnable(false);
+#endif
+            NetworkBlockListManager::GetInstance().AddEnhanceSwitchBlocklist(bssid);
+            WIFI_LOGI("add %{public}s to enhance switch blocklist", MacAnonymize(bssid).c_str());
+        }
+    }
+    if (!arpRet) {
+        WIFI_LOGI("ApReconnectState arp is not reachable");
+        pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
+    } else {
+        WIFI_LOGI("ApReconnectState arp is reachable");
+        pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
+    }
 }
 
 bool StaStateMachine::ApReconnectState::ExecuteStateMsg(InternalMessagePtr msg)
@@ -3475,17 +3597,15 @@ bool StaStateMachine::ApReconnectState::ExecuteStateMsg(InternalMessagePtr msg)
             ret = EXECUTED;
             break;
         case WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT:
-            if (!pStaStateMachine->CanArpReachable() && pStaStateMachine->enhanceService_ != nullptr &&
-                pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::QUERY_RECONNECT_ALLOWED,
-                pStaStateMachine->m_instId) != MultiLinkDefs::ALLOW_IN_CONN_STATE) {
-                WIFI_LOGI("ApReconnectState arp is not reachable");
-                pStaStateMachine->SwitchState(pStaStateMachine->pGetIpState);
-            } else {
-                WIFI_LOGI("ApReconnectState arp is reachable");
-                pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);
-            }
+            HandleNetworkConnectionEvent(msg);
             ret = EXECUTED;
             break;
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+        case WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK:
+            StartConnectEvent(msg);
+            ret = EXECUTED;
+            break;
+#endif
         default:
             WIFI_LOGI("ApReconnectState-msgCode=%{public}d not handled.", msg->GetMessageName());
             break;
@@ -4621,6 +4741,9 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
     if (networkStatus == NetworkStatus::NO_INTERNET && IsGoodSignalQuality()) {
         wifiDeviceConfig.noInternetAccess = true;
     }
+    if (linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_WIFIPRO_ENHANCE && wifiDeviceConfig.noInternetAccess) {
+        return; // dont record no internet information to config
+    }
     WifiSettings::GetInstance().AddDeviceConfig(wifiDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
 }
@@ -5247,7 +5370,8 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     } else {
         WIFI_LOGI("SetBssid bssid=%{public}s", MacAnonymize(apBssid).c_str());
     }
-    if (connTriggerMode != NETWORK_SELECTED_BY_FAST_RECONNECT) {
+    if (connTriggerMode != NETWORK_SELECTED_BY_FAST_RECONNECT &&
+        connTriggerMode != NETWORK_SELECTED_BY_WIFIPRO_ENHANCE) {
         SetRandomMac(deviceConfig, apBssid);
     }
     WIFI_LOGI("StartConnectToNetwork SetRandomMac targetNetworkId_:%{public}d, bssid:%{public}s", targetNetworkId_,

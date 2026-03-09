@@ -91,12 +91,8 @@ bool P2pGroupOperatingState::ProcessCmdCreateRptGroup(const InternalMessagePtr m
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     if (linkedInfo.connState == CONNECTED && !config.GetPassphrase().empty() && !config.GetGroupName().empty() &&
         config.GetPassphrase().length() >= MIN_PSK_LEN && config.GetPassphrase().length() <= MAX_PSK_LEN) {
-        bool sameFreq = (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) &&
-                         config.GetGoBand() == GroupOwnerBand::GO_BAND_5GHZ) ||
-                        (linkedInfo.band == static_cast<int>(BandType::BAND_2GHZ) &&
-                         config.GetGoBand() == GroupOwnerBand::GO_BAND_2GHZ);
-        int freq = sameFreq ? linkedInfo.frequency : p2pStateMachine.GetAvailableFreqByBand(config.GetGoBand());
-        WIFI_LOGI("Create rpt group.");
+        int freq = p2pStateMachine.GetAvailableFreqByBand(config.GetGoBand());
+        WIFI_LOGI("Create rpt group. p2p freq is %{public}d", freq);
         WifiConfigCenter::GetInstance().SetExplicitGroup(true);
         if (p2pStateMachine.DealCreateRptGroupWithConfig(config, freq)) {
             ret = WIFI_HAL_OPT_OK;
@@ -178,11 +174,11 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessagePtr msg)
         WIFI_LOGE("Invalid parameter.");
     }
     if (WifiErrorNo::WIFI_HAL_OPT_FAILED == ret) {
-        WIFI_LOGE("p2p configure to CreateGroup failed.");
+        WIFI_LOGE("p2p configure to CreateGroup failed. p2p freq is %{public}d", freq);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateGroup, WIFI_OPT_FAILED);
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     } else {
-        WIFI_LOGI("p2p configure to CreateGroup successful.");
+        WIFI_LOGI("p2p configure to CreateGroup successful. p2p freq is %{public}d", freq);
         p2pStateMachine.MessageExecutedLater(
             static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT), CREATE_GROUP_TIMEOUT);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateGroup, WIFI_OPT_SUCCESS);

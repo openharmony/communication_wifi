@@ -189,6 +189,25 @@ public:
     virtual void SetDfsControlData(DfsControlData dfsControlData) = 0;
     virtual DfsControlData GetDfsControlData() = 0;
     virtual bool IsSameKeyMgmt(std::string scanKeyMgmt, std::string keyMgmt);
+    virtual void SetWifiStaCloseTime(int instId = 0) = 0;
+    virtual double GetWifiStaInterval(int instId = 0) = 0;
+    virtual bool GetChangeDeviceConfig(ConfigChange& value, WifiDeviceConfig &config) = 0;
+    virtual std::string GetRandomMacAddr(WifiMacAddrInfoType type, std::string bssid) = 0;
+    virtual void ClearMacAddrPairs(WifiMacAddrInfoType type) = 0;
+    virtual std::set<int> GetAllWifiLinkedNetworkId() = 0;
+    virtual bool HasWifiActive() = 0;
+    virtual void RemoveMacAddrPairInfo(WifiMacAddrInfoType type, std::string bssid, int bssidType) = 0;
+    virtual void SetCurrentP2pGroupInfo(const WifiP2pGroupInfo &group) = 0;
+    virtual int GetP2pDiscoverState() = 0;
+    virtual int SetP2pDiscoverState(int state) = 0;
+    virtual int SaveP2pCreatorUid(int uid) = 0;
+    virtual int GetP2pCreatorUid() = 0;
+    virtual void SetExplicitGroup(bool isExplicit) = 0;
+    virtual bool IsExplicitGroup() = 0;
+    virtual void SetGnssFixState(const int &state) = 0;
+    virtual int GetGnssFixState() const = 0;
+    virtual void SetPowerSavingModeState(const int &state) = 0;
+    virtual uint64_t GetThreadStartTime(void) const = 0;
 };
 
 class WifiConfigCenter : public MockWifiConfigCenter {
@@ -358,6 +377,25 @@ public:
     MOCK_METHOD1(SetDfsControlData, void(DfsControlData dfsControlData));
     MOCK_METHOD0(GetDfsControlData, DfsControlData());
     MOCK_METHOD2(IsSameKeyMgmt, bool(std::string scanKeyMgmt, std::string keyMgmt));
+    MOCK_METHOD1(SetWifiStaCloseTime, void(int instId));
+    MOCK_METHOD1(GetWifiStaInterval, double(int instId));
+    MOCK_METHOD2(GetChangeDeviceConfig, bool(ConfigChange& value, WifiDeviceConfig &config));
+    MOCK_METHOD2(GetRandomMacAddr, std::string(WifiMacAddrInfoType type, std::string bssid));
+    MOCK_METHOD1(ClearMacAddrPairs, void(WifiMacAddrInfoType type));
+    MOCK_METHOD0(GetAllWifiLinkedNetworkId, std::set<int>());
+    MOCK_METHOD0(HasWifiActive, bool());
+    MOCK_METHOD3(RemoveMacAddrPairInfo, void(WifiMacAddrInfoType type, std::string bssid, int bssidType));
+    MOCK_METHOD1(SetCurrentP2pGroupInfo, void(const WifiP2pGroupInfo &group));
+    MOCK_METHOD0(GetP2pDiscoverState, int());
+    MOCK_METHOD1(SetP2pDiscoverState, int(int state));
+    MOCK_METHOD1(SaveP2pCreatorUid, int(int uid));
+    MOCK_METHOD0(GetP2pCreatorUid, int());
+    MOCK_METHOD1(SetExplicitGroup, void(bool isExplicit));
+    MOCK_METHOD0(IsExplicitGroup, bool());
+    MOCK_METHOD1(SetGnssFixState, void(const int &state));
+    MOCK_CONST_METHOD0(GetGnssFixState, int());
+    MOCK_METHOD1(SetPowerSavingModeState, void(const int &state));
+    MOCK_CONST_METHOD0(GetThreadStartTime, uint64_t());
 private:
     WifiConfigCenter();
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;

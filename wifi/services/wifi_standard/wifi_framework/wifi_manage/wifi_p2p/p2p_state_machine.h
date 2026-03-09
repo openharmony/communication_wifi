@@ -258,6 +258,15 @@ private:
      * @Description Get the list of frequencies by band.
      *
      * @param band - specified band
+     * @param freqList - the list of frequencies by band
+     * @return true - success
+     * @return false - fail
+     */
+    virtual bool GetAllFreqsByBand(GroupOwnerBand band, std::vector<int>& freqList) const;
+    /**
+     * @Description Get available frequency by band.
+     *
+     * @param band - specified band
      * @return int - a random available frequency
      */
     virtual int GetAvailableFreqByBand(GroupOwnerBand band) const;
@@ -478,6 +487,7 @@ private:
     static DHCPTYPE m_isNeedDhcp;
     std::string p2pDevIface;
     static std::mutex m_gcJoinmutex;
+    IEnhanceService* pEnhanceService { nullptr };
 
 public:
     std::vector<std::string> curClientList;

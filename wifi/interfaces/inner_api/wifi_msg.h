@@ -1263,6 +1263,9 @@ struct WifiFastReconnectConfig {
 using EnhanceConfigVariant = std::variant<WifiFastReconnectConfig>;
 #endif
 
+struct WifiDeviceFeatures {
+    bool isP2pSupportDfsOffload { false };
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

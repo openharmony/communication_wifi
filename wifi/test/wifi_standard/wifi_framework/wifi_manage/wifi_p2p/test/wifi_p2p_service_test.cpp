@@ -19,11 +19,14 @@
 #include "wifi_hid2d_msg.h"
 #include "wifi_p2p_msg.h"
 #include "wifi_p2p_service.h"
-#include "wifi_config_center.h"
+#include "mock_wifi_config_center.h"
 #include "wifi_country_code_manager.h"
 
+using ::testing::_;
 using ::testing::Return;
 using ::testing::ext::TestSize;
+using ::testing::SetArgReferee;
+using ::testing::DoAll;
 
 namespace OHOS {
 namespace Wifi {
@@ -148,7 +151,8 @@ HWTEST_F(WifiP2pServiceTest, GetCurrentGroup, TestSize.Level1)
 {
     WifiP2pLinkedInfo p2pInfo;
     p2pInfo.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
-    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pInfo(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(p2pInfo), Return(0)));
     WifiP2pGroupInfo group;
     EXPECT_EQ(pWifiP2pService->GetCurrentGroup(group), ErrCode::WIFI_OPT_FAILED);
 }
@@ -236,7 +240,8 @@ HWTEST_F(WifiP2pServiceTest, GetCurrentGroupTest001, TestSize.Level1)
 {
     WifiP2pLinkedInfo p2pInfo;
     p2pInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
-    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pInfo(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(p2pInfo), Return(0)));
     WifiP2pGroupInfo group;
     EXPECT_EQ(pWifiP2pService->GetCurrentGroup(group), ErrCode::WIFI_OPT_SUCCESS);
 }
@@ -269,7 +274,8 @@ HWTEST_F(WifiP2pServiceTest, Hid2dRequestGcIpTest001, TestSize.Level1)
 
     WifiP2pLinkedInfo p2pInfo;
     p2pInfo.SetConnectState(P2pConnectedState::P2P_DISCONNECTED);
-    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pInfo(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(p2pInfo), Return(0)));
     WifiP2pGroupInfo group;
     EXPECT_EQ(pWifiP2pService->GetCurrentGroup(group), ErrCode::WIFI_OPT_FAILED);
     EXPECT_EQ(pWifiP2pService->Hid2dRequestGcIp(deviceName, strIpAddr), ErrCode::WIFI_OPT_SUCCESS);
@@ -282,7 +288,8 @@ HWTEST_F(WifiP2pServiceTest, Hid2dRequestGcIpTest002, TestSize.Level1)
 
     WifiP2pLinkedInfo p2pInfo;
     p2pInfo.SetConnectState(P2pConnectedState::P2P_CONNECTED);
-    WifiConfigCenter::GetInstance().SaveP2pInfo(p2pInfo);
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pInfo(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(p2pInfo), Return(0)));
     WifiP2pGroupInfo group;
     EXPECT_EQ(pWifiP2pService->GetCurrentGroup(group), ErrCode::WIFI_OPT_SUCCESS);
     EXPECT_EQ(pWifiP2pService->Hid2dRequestGcIp(deviceName, strIpAddr), ErrCode::WIFI_OPT_SUCCESS);

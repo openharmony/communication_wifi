@@ -232,7 +232,7 @@ bool WifiProStateMachine::HasWifiSwitchRecord()
         int64_t now = WifiProUtils::GetCurrentTimeMs();
         // less than 14 days
         if (now - pCurrWifiDeviceConfig_->lastTrySwitchWifiTimestamp < WIFI_SWITCH_RECORD_MAX_TIME) {
-            WIFI_LOGI("HasWifiSwitchRecord, has switch record in 14 days");
+            WIFI_LOGD("HasWifiSwitchRecord, has switch record in 14 days");
             return true;
         }
     }
@@ -1210,7 +1210,7 @@ void WifiProStateMachine::WifiHasNetState::HandleRssiChangedInHasNet(const Inter
     }
 
     int32_t signalLevel = WifiProUtils::GetSignalLevel(pWifiProStateMachine_->instId_);
-    WIFI_LOGI("HasNetState, signalLevel:%{public}d.", signalLevel);
+    WIFI_LOGD("HasNetState, signalLevel:%{public}d.", signalLevel);
     if (signalLevel == SIG_LEVEL_4) {
         rssiLevel2Or3ScanedCounter_ = 0;
         rssiLevel0Or1ScanedCounter_ = 0;
@@ -1459,7 +1459,7 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
 
 bool WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const std::vector<InterScanInfo> &scanInfos)
 {
-    WIFI_LOGI("wifi to wifi step 1: select network.");
+    WIFI_LOGD("wifi to wifi step 1: select network.");
     if (!pWifiProStateMachine_->SelectNetwork(pWifiProStateMachine_->networkSelectionResult_, scanInfos)) {
         WIFI_LOGI("wifi to wifi step X: Wifi2Wifi select network fail.");
         pWifiProStateMachine_->Wifi2WifiFinish();
@@ -1664,7 +1664,7 @@ bool WifiProStateMachine::GetFilteredCandidates(const std::vector<InterScanInfo>
     selector->GetBestCandidates(bestCandidates);
 
     if (bestCandidates.empty()) {
-        WIFI_LOGI("GetFilteredCandidates: Selector filtered out all candidates.");
+        WIFI_LOGD("GetFilteredCandidates: Selector filtered out all candidates.");
         WifiProChr::GetInstance().RecordSelectNetChrCnt(false);
         return false;
     }

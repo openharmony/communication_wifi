@@ -292,7 +292,7 @@ ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
 
 ErrCode StaInterface::DeliverAudioState(int state)
 {
-    WIFI_LOGI("Enter DeliverAudioState");
+    WIFI_LOGD("Enter DeliverAudioState");
     return WIFI_OPT_SUCCESS;
 }
 

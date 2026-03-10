@@ -3766,7 +3766,7 @@ void StaStateMachine::DealAudioStateChangedEvent(InternalMessagePtr msg)
         return;
     }
     int isAudioOn = msg->GetParam1();
-    WIFI_LOGI("DealScreenOffPoll, Receive msg: isAudioOn=%{public}d", isAudioOn);
+    WIFI_LOGD("DealScreenOffPoll, Receive msg: isAudioOn=%{public}d", isAudioOn);
     isAudioOn_ = isAudioOn;
     if (WifiConfigCenter::GetInstance().GetScreenState() == MODE_STATE_CLOSE) {
         if (isAudioOn_ == AUDIO_OFF) {

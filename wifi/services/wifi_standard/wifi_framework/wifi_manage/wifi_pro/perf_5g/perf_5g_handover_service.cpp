@@ -529,7 +529,7 @@ void Perf5gHandoverService::StopMonitor()
 }
 void Perf5gHandoverService::ActiveScan(int32_t rssi, int scanStyle)
 {
-    WIFI_LOGI("Enter ActiveScan, rssi: %{public}d, scanStyle: %{public}d", rssi, scanStyle);
+    WIFI_LOGD("Enter ActiveScan, rssi: %{public}d, scanStyle: %{public}d", rssi, scanStyle);
     if (pWifiScanController_ == nullptr) {
         return;
     }

@@ -27,9 +27,6 @@ constexpr int MAX_BAND = 7;
 constexpr int MAX_BANDWIDTH = 4;
 constexpr int MAX_IFMODE = 3;
 constexpr int MAX_IP_LEN = 15;
-constexpr int P2P_CHANNEL_2G_MAX = 13;
-constexpr int P2P_CHANNEL_5G_MIN = 36;
-constexpr int P2P_CHANNEL_5G_MAX = 165;
 constexpr int IFNAMSIZ = 16;
 
 static sptr<WifiP2pCallbackStub> g_wifiP2pCallbackStub =
@@ -1719,8 +1716,7 @@ ErrCode WifiP2pProxy::Hid2dSetUpperScene(const std::string& ifName, const Hid2dU
 
 ErrCode WifiP2pProxy::DiscoverPeers(int32_t channelid)
 {
-    if (channelid < 0 || (channelid > P2P_CHANNEL_2G_MAX && channelid < P2P_CHANNEL_5G_MIN) ||
-        channelid > P2P_CHANNEL_5G_MAX) {
+    if (channelid < 0) {
         WIFI_LOGE("Invalid channelid: %{public}d", channelid);
         return WIFI_OPT_INVALID_PARAM;
     }

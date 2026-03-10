@@ -177,6 +177,13 @@ struct ScanStatisticInfo {
     uint32_t lpScanAbortCnt = 0;
 };
 
+struct AppNetworkSpeedLimitStatisticInfo {
+    std::string speedLimitScenarioAndLevel = "";
+    std::string speedLimitForegroundAppInfo = "";
+    std::string speedLimitBackgroundAppInfo = "";
+    int speedLimitGameState = -1;
+};
+
 struct MdmRestrictedInfo {
     std::string ssid = "";
     std::string bssid = "";
@@ -310,6 +317,8 @@ void WriteWifiConfigStatusHiSysEvent(const std::string &packageName, WifiConfigR
 void WritePositionAutoOpenWlanHiSysEvent(const std::string updateType);
 
 void WriteWifiScanInfoHiSysEvent(const ScanStatisticInfo &scanStatisticInfo);
+
+void WriteWifiAppNetWorkSpeedLimitCommonInfoHiSysEvent(const AppNetworkSpeedLimitStatisticInfo &info);
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
 void WriteWifiRiskInfoHiSysEvent(const WifiRiskInfo &wifiRiskInfo);
 #endif

@@ -250,6 +250,7 @@ int64_t GetCurrentTimeSeconds();
  * @return Returns the time, in milliseconds
  */
 int64_t GetCurrentTimeMilliSeconds();
+
 /**
  * @Description GetElapsedMicrosecondsSinceBoot
  *

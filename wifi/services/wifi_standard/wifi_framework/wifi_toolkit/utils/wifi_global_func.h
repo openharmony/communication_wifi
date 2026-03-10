@@ -198,6 +198,22 @@ std::string JoinVecToString(const std::vector<T> &vec, const std::string &delimi
     return joinedStr;
 }
 
+template <typename T>
+std::string JoinUnorderedSetToString(const std::unordered_set<T> &uset, const std::string &delimiter)
+{
+    if (uset.empty()) {
+        return "";
+    }
+    std::stringstream ss;
+    std::copy(uset.begin(), uset.end(), std::ostream_iterator<T>(ss, delimiter.c_str()));
+    std::string joinedStr = ss.str();
+ 
+    if (joinedStr.size() > delimiter.size()) {
+        joinedStr.erase(joinedStr.size() - delimiter.size());
+    }
+    return joinedStr;
+}
+
 /**
  * @Description splitting numeric strings based on characters
  *

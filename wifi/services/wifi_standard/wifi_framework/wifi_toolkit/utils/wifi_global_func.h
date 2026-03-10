@@ -207,7 +207,6 @@ std::string JoinUnorderedSetToString(const std::unordered_set<T> &uset, const st
     std::stringstream ss;
     std::copy(uset.begin(), uset.end(), std::ostream_iterator<T>(ss, delimiter.c_str()));
     std::string joinedStr = ss.str();
- 
     if (joinedStr.size() > delimiter.size()) {
         joinedStr.erase(joinedStr.size() - delimiter.size());
     }

@@ -23,9 +23,11 @@
 #include "define.h"
 #include "app_mgr_interface.h"
 #include "sta_service_callback.h"
+#include "app_network_speed_limit_chr.h"
 
 namespace OHOS {
 namespace Wifi {
+const std::string UNKNOWN_BUNDLENAME = "-1";
 constexpr const int UNKNOWN_UID = -1;
 constexpr const int UNKNOWN_MODE = -1;
 constexpr const int POWER_MODE_FREQUENCY_DEFAULT = 0;
@@ -85,6 +87,8 @@ private:
     bool CheckNetWorkCanBeLimited(const int controlId);
     void UpdateSpeedLimitConfigs(const int enable);
     void UpdateNoSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
+    void UpdateBackgroundAppConfigs(const int enable);
+    void UpdateForegroundAppConfigs();
     bool IsLimitSpeedBgApp(const int controlId, const std::string &bundleName, const int enable);
     bool IsLimitSpeedBgApp(const int controlId, const AppExecFwk::RunningProcessInfo &processInfo, const int enable);
     bool IsTopNLimitSpeedSceneInNow();
@@ -107,6 +111,7 @@ private:
     void UpdateAncoAppInfos(const WifiNetworkControlInfo &networkControlInfo);
     void ReportGameLatencyFeature(bool enabled, const std::string& featureName);
     void ReportGameSceneChange(int state);
+    void RecordAppNetworkSpeedLimitServiceChr(const std::string &records);
 
 private:
     StaServiceCallback m_staCallback;
@@ -117,6 +122,8 @@ private:
     std::unordered_set<int> m_bgUidSet;
     std::unordered_set<int> m_bgPidSet;
     std::unordered_set<int> m_fgUidSet;
+    std::unordered_set<std::string> m_bgSpeedLimitAppBundleNameSet;
+    std::unordered_set<std::string> m_fgAppBundleNameSet;
     int m_lastLimitSpeedMode{UNKNOWN_MODE};
     std::unordered_set<int> m_lastBgUidSet;
     std::unordered_set<int> m_lastBgPidSet;

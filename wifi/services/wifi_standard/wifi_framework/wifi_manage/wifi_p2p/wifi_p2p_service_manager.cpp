@@ -316,7 +316,7 @@ WifiP2pServiceResponseList WifiP2pServiceManager::ProcessServiceRequestList(cons
 void WifiP2pServiceManager::ProcessServiceResponseList(const WifiP2pServiceResponseList &rspList) const
 {
     const std::vector<WifiP2pServiceResponse> &list = rspList.GetServiceResponseList();
-
+    std::unique_lock<std::mutex> lock(serviceMutex);
     for (const auto &response : list) {
         for (const auto &service : localServicesInfo) {
             if (response.GetProtocolType() == service.GetServicerProtocolType()) {

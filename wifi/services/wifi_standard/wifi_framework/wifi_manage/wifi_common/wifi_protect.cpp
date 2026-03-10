@@ -56,6 +56,7 @@ void WifiProtect::SetProtectType(const WifiProtectType &protectType)
 
 WifiProtectType WifiProtect::GetProtectType() const
 {
+    std::unique_lock<std::mutex> lock(mMutex);
     return mType;
 }
 

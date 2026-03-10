@@ -121,7 +121,7 @@ private:
     WifiProtectType mType {WifiProtectType::WIFI_PROTECT_COMMON};
     WifiProtectMode mMode {WifiProtectMode::WIFI_PROTECT_NO_HELD};
     long mAcqTimestamp {0};
-    std::mutex mMutex;
+    mutable std::mutex mMutex;
 #ifndef OHOS_ARCH_LITE
     int mAppState {6};
 #endif

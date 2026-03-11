@@ -1125,6 +1125,30 @@ void WriteWifiScanInfoHiSysEvent(const ScanStatisticInfo &scanStatisticInfo)
     cJSON_Delete(root);
 }
 
+void WriteWifiAppNetWorkSpeedLimitCommonInfoHiSysEvent(const AppNetworkSpeedLimitStatisticInfo &info)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object.");
+        return;
+    }
+    cJSON_AddStringToObject(root, "LIMIT_SCENARIO_LEVEL", info.speedLimitScenarioAndLevel.c_str());
+    cJSON_AddStringToObject(root, "FG_APP_INFO", info.speedLimitForegroundAppInfo.c_str());
+    cJSON_AddStringToObject(root, "BG_SPEED_LIMIT_APP_INFO",
+        info.speedLimitBackgroundAppInfo.c_str());
+    cJSON_AddNumberToObject(root, "GAME_STATE", info.speedLimitGameState);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+ 
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "BG_SPEED_LIMIT", "EVENT_VALUE", std::string(jsonStr));
+    cJSON_free(jsonStr);
+    cJSON_Delete(root);
+}
+
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
 void WriteWifiRiskInfoHiSysEvent(const WifiRiskInfo &wifiRiskInfo)
 {

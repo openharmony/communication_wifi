@@ -26,6 +26,7 @@
 #include "net_supplier_info.h"
 #include "wifi_service_manager.h"
 #include "ienhance_service.h"
+#include "app_network_speed_limit_chr.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -265,12 +266,24 @@ void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int enable)
     m_bgUidSet.clear();
     m_bgPidSet.clear();
     m_fgUidSet.clear();
+    m_fgAppBundleNameSet.clear();
+    m_bgSpeedLimitAppBundleNameSet.clear();
     if (m_limitSpeedMode == BgLimitLevel::BG_LIMIT_OFF) {
         m_bgUidSet.insert(UNKNOWN_UID);
         m_bgPidSet.insert(UNKNOWN_UID);
         m_fgUidSet.insert(UNKNOWN_UID);
+        m_fgAppBundleNameSet.insert(UNKNOWN_BUNDLENAME);
+        m_bgSpeedLimitAppBundleNameSet.insert(UNKNOWN_BUNDLENAME);
         return;
     }
+
+    UpdateBackgroundAppConfigs(enable);
+    UpdateForegroundAppConfigs();
+    FilterLimitSpeedConfigs();
+}
+
+void AppNetworkSpeedLimitService::UpdateBackgroundAppConfigs(const int enable)
+{
     std::vector<AppExecFwk::RunningProcessInfo> bgAppList;
     std::vector<WifiNetworkControlInfo> bgAncoAppList;
     if (GetAppList(bgAppList, false) < 0) {
@@ -285,14 +298,20 @@ void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int enable)
             if (IsLimitSpeedBgApp(record.first, *iter, enable)) {
                 m_bgUidSet.insert(iter->uid_);
                 m_bgPidSet.insert(iter->pid_);
+                m_bgSpeedLimitAppBundleNameSet.insert(iter->bundleNames.begin(), iter->bundleNames.end());
             }
         }
         for (auto iter = bgAncoAppList.begin(); iter != bgAncoAppList.end(); ++iter) {
             if (IsLimitSpeedBgApp(record.first, iter->bundleName, enable)) {
                 m_bgUidSet.insert(iter->uid);
+                m_bgSpeedLimitAppBundleNameSet.insert(iter->bundleName);
             }
         }
     }
+}
+
+void AppNetworkSpeedLimitService::UpdateForegroundAppConfigs()
+{
     std::vector<AppExecFwk::RunningProcessInfo> fgAppList;
     std::vector<WifiNetworkControlInfo> fgAncoAppList;
     if (GetAppList(fgAppList, true) < 0) {
@@ -301,11 +320,12 @@ void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int enable)
     GetAncoAppList(fgAncoAppList, true);
     for (auto iter = fgAppList.begin(); iter != fgAppList.end(); ++iter) {
         m_fgUidSet.insert(iter->uid_);
+        m_fgAppBundleNameSet.insert(iter->bundleNames.begin(), iter->bundleNames.end());
     }
     for (auto iter = fgAncoAppList.begin(); iter != fgAncoAppList.end(); ++iter) {
         m_fgUidSet.insert(iter->uid);
+        m_fgAppBundleNameSet.insert(iter->bundleName);
     }
-    FilterLimitSpeedConfigs();
 }
 
 bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const std::string &bundleName,
@@ -447,12 +467,34 @@ void AppNetworkSpeedLimitService::LogSpeedLimitConfigs()
         recordsStr += std::to_string(record.second);
         recordsStr += ",";
     }
+    if (!recordsStr.empty()) {
+        recordsStr.pop_back();
+    }
+    /* AppNetworkSpeedLimitChr */
+    RecordAppNetworkSpeedLimitServiceChr(recordsStr);
+    /* AppNetworkSpeedLimitLogs Print */
     WIFI_LOGI("%{public}s speed limit records= %{public}s, limitMode: %{public}d, m_wifiConnected: %{public}d",
         __FUNCTION__, recordsStr.c_str(), m_lastLimitSpeedMode, m_isWifiConnected.load());
     WIFI_LOGI("%{public}s bgUidSet: %{public}s; bgPidSet: %{public}s; fgUidSet: %{public}s", __FUNCTION__,
         JoinVecToString(std::vector<int>(m_lastBgUidSet.begin(), m_lastBgUidSet.end()), ",").c_str(),
         JoinVecToString(std::vector<int>(m_lastBgPidSet.begin(), m_lastBgPidSet.end()), ",").c_str(),
         JoinVecToString(std::vector<int>(m_lastFgUidSet.begin(), m_lastFgUidSet.end()), ",").c_str());
+}
+
+void AppNetworkSpeedLimitService::RecordAppNetworkSpeedLimitServiceChr(const std::string &records)
+{
+    AppNetworkSpeedLimitStatisticInfo appSpeedLimitInfo;
+    appSpeedLimitInfo.speedLimitScenarioAndLevel = records;
+    appSpeedLimitInfo.speedLimitForegroundAppInfo =
+        JoinUnorderedSetToString(m_fgAppBundleNameSet, ",");
+    appSpeedLimitInfo.speedLimitBackgroundAppInfo =
+        JoinUnorderedSetToString(m_bgSpeedLimitAppBundleNameSet, ",");
+ 
+    if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] != BG_LIMIT_OFF) {
+        appSpeedLimitInfo.speedLimitGameState =
+            WifiConfigCenter::GetInstance().GetNetworkControlInfo().state;
+    }
+    AppNetworkSpeedLimitChr::GetInstance().RecordAppNetworkSpeedLimitCommonInfo(appSpeedLimitInfo);
 }
 
 void AppNetworkSpeedLimitService::ReceiveNetworkControlInfo(const WifiNetworkControlInfo &networkControlInfo)

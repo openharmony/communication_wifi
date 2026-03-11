@@ -201,6 +201,14 @@ std::string Perf5gHandoverService::Switch5g()
         selectRelationAp_.reset();
         return "";
     }
+    WifiLinkedInfo linkedInfoWlan0;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfoWlan0, 0);
+    selectRelationAp_->apInfo.bssid = linkedInfoWlan0.bssid;
+    if (linkedInfoWlan0.networkId != INVALID_NETWORK_ID && selectRelationAp_->apInfo.bssid == linkedInfoWlan0.bssid) {
+        WIFI_LOGI("Switch5g : TarAp is wlan0.");
+        selectRelationAp_.reset();
+        return "";
+    }
     WifiLinkedInfo linkedInfoWlan1;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfoWlan1, 1);
     if (linkedInfoWlan1.networkId != INVALID_NETWORK_ID && selectRelationAp_->apInfo.bssid == linkedInfoWlan1.bssid) {

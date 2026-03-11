@@ -28,6 +28,7 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiProService");
+constexpr int32_t WIFI_SWITCH_DELAY_TIME = 1000; // ms
 
 WifiProService::WifiProService(int32_t instId)
     : instId_(instId)
@@ -159,7 +160,14 @@ void WifiProService::HandleScanResult(const std::vector<InterScanInfo> &scanInfo
         return;
     }
     if (WifiConfigCenter::GetInstance().GetWifiMidState(instId_) == WifiOprMidState::RUNNING) {
-        pWifiProStateMachine_->SendMessage(EVENT_HANDLE_SCAN_RESULT, scanInfos);
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+        if (WifiProUtils::IsSupplicantConnectingProcess(linkedInfo.supplicantState)) {
+            WIFI_LOGI("Delay the switch while connecting.");
+            pWifiProStateMachine_->SendMessage(EVENT_HANDLE_SCAN_RESULT, WIFI_SWITCH_DELAY_TIME);
+        } else {
+            pWifiProStateMachine_->SendMessage(EVENT_HANDLE_SCAN_RESULT, scanInfos);
+        }
     }
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
     if (pWifiIntelligenceStateMachine_ != nullptr) {

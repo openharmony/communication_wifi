@@ -114,6 +114,14 @@ HWTEST_F(WifiProServiceTest, HandleScanResultTest01, TestSize.Level1)
     EXPECT_NE(wifiProService_->instId_, TEN);
 }
 
+HWTEST_F(WifiProServiceTest, HandleScanResultTest02, TestSize.Level1)
+{
+    wifiProService_->pWifiProStateMachine_  == nullptr;
+    std::vector<InterScanInfo> scanInfos;
+    wifiProService_->HandleScanResult(scanInfos);
+    EXPECT_NE(wifiProService_->instId_, TEN);
+}
+
 HWTEST_F(WifiProServiceTest, HandleQoeReportTest01, TestSize.Level1)
 {
     NetworkLagType networkLagType = NetworkLagType::WIFIPRO_QOE_REPORT;

@@ -20,10 +20,13 @@
 #include "p2p_group_operating_state.h"
 #include "mock_p2p_monitor.h"
 #include "mock_wifi_settings.h"
+#include "mock_wifi_config_center.h"
 
 using ::testing::_;
 using ::testing::Return;
 using ::testing::ext::TestSize;
+using ::testing::SetArgReferee;
+using ::testing::DoAll;
 
 namespace OHOS {
 namespace Wifi {
@@ -249,6 +252,30 @@ HWTEST_F(P2pGroupOperatingStateTest, ProcessGroupRemovedEvt, TestSize.Level1)
 
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_EVENT_PROV_DISC_PBC_REQ));
     EXPECT_FALSE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(P2pGroupOperatingStateTest, ProcessCmdCreateRptGroup, TestSize.Level1)
+{
+    WifiP2pConfig config;
+    config.SetPassphrase("12345678");
+    config.SetGroupName("test");
+    WifiP2pConfigInternal configInternal(config);
+    WpsInfo wps;
+    wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
+    configInternal.SetWpsInfo(wps);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_RPT_GROUP));
+    msg->SetMessageObj(configInternal);
+
+    WifiLinkedInfo info;
+    info.connState = ConnState::CONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillOnce(DoAll(SetArgReferee<0>(info), Return(0)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), SetExplicitGroup(_)).WillOnce(Return());
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupAdd(_, _, _))
+        .WillRepeatedly(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+
+    EXPECT_TRUE(pP2pGroupOperatingState->ExecuteStateMsg(msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

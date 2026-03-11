@@ -1121,7 +1121,7 @@ ErrCode StaService::DeliverAudioState(int state)
     }
     if (isEnableBackAudio) {
         CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-        WIFI_LOGI("DealScreenOffPoll deliver audio state.");
+        WIFI_LOGD("DealScreenOffPoll deliver audio state.");
         pStaStateMachine->SendMessage(WIFI_AUDIO_STATE_CHANGED_NOTIFY_EVENT, state);
     }
     return WIFI_OPT_SUCCESS;

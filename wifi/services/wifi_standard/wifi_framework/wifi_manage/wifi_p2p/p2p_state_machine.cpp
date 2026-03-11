@@ -1031,6 +1031,42 @@ void P2pStateMachine::HandleP2pServiceResp(const WifiP2pServiceResponse &resp, c
     return;
 }
 
+bool P2pStateMachine::GetAllFreqsByBand(GroupOwnerBand band, std::vector<int>& freqList) const
+{
+    bool isP2pSupportDfsOffload = false;
+    if (pEnhanceService != nullptr) {
+        isP2pSupportDfsOffload = pEnhanceService->GetDeviceFeatures().isP2pSupportDfsOffload;
+    } else {
+        WIFI_LOGE("pEnhanceService is nullptr");
+    }
+    WIFI_LOGI("chip%{public}s support dfs offload", isP2pSupportDfsOffload ? "" : " not");
+    const std::string p2pIfaceName = WifiConfigCenter::GetInstance().GetP2pIfaceName();
+    if (band == GroupOwnerBand::GO_BAND_AUTO) {
+        if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(p2pIfaceName,
+            static_cast<int>(ScanBandType::SCAN_BAND_UNSPECIFIED), freqList) == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
+            return false;
+        }
+    } else if (band == GroupOwnerBand::GO_BAND_2GHZ) {
+        if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(p2pIfaceName,
+            static_cast<int>(ScanBandType::SCAN_BAND_24_GHZ), freqList) == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
+            return false;
+        }
+    } else if (band == GroupOwnerBand::GO_BAND_5GHZ && isP2pSupportDfsOffload) {
+        if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(p2pIfaceName,
+            static_cast<int>(ScanBandType::SCAN_BAND_5_GHZ_WITH_DFS), freqList) == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
+            return false;
+        }
+    } else if (band == GroupOwnerBand::GO_BAND_5GHZ && !isP2pSupportDfsOffload) {
+        if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(p2pIfaceName,
+            static_cast<int>(ScanBandType::SCAN_BAND_5_GHZ), freqList) == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
+            return false;
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
+
 int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
 {
     std::vector<int> freqList;
@@ -1038,9 +1074,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
         WIFI_LOGE("Not 2.4GHz or 5GHz band!");
         return 0;
     }
-    if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(
-        WifiConfigCenter::GetInstance().GetP2pIfaceName(), static_cast<int>(band), freqList) ==
-        WifiErrorNo::WIFI_HAL_OPT_FAILED) {
+    if (!GetAllFreqsByBand(band, freqList)) {
         constexpr int DEFAULT_5G_FREQUENCY = 5745; // channal:149, frequency:5745
         if (band == GroupOwnerBand::GO_BAND_5GHZ) {
             WIFI_LOGE("Get support frequencies failed, use default 5g frequency!");
@@ -1398,6 +1432,7 @@ bool P2pStateMachine::GetConnectedStationInfo(std::map<std::string, StationInfo>
 
 void P2pStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
 {
+    pEnhanceService = enhanceService;
     p2pGroupOperatingState.SetEnhanceService(enhanceService);
 }
 

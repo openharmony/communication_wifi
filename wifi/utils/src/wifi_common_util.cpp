@@ -899,7 +899,7 @@ int CheckDataLegalHex(const std::string &data)
 int CheckDataLegal(std::string &data, int base)
 {
     if (data.empty() || data.size() > MAX_INT32_LENGTH) {
-        WIFI_LOGD("CheckDataLegal: invalid data:%{private}s", data.c_str());
+        WIFI_LOGE("CheckDataLegal: invalid data:%{private}s", data.c_str());
         return 0;
     }
  

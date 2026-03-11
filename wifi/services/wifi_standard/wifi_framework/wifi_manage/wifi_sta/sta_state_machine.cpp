@@ -798,7 +798,8 @@ bool StaStateMachine::InitState::NotAllowConnectToNetwork(int networkId, const s
     }
 
     if (config.hiddenSSID && NotExistInScanList(config) &&
-        !pStaStateMachine->selfCureService_->IsSelfCureL2Connecting()) {
+        (pStaStateMachine->selfCureService_ == nullptr ||
+        !pStaStateMachine->selfCureService_->IsSelfCureL2Connecting())) {
         DealHiddenSsidConnectMiss(networkId);
         return true;
     }

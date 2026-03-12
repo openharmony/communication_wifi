@@ -116,7 +116,7 @@ HWTEST_F(WifiProServiceTest, HandleScanResultTest01, TestSize.Level1)
 
 HWTEST_F(WifiProServiceTest, HandleScanResultTest02, TestSize.Level1)
 {
-    wifiProService_->pWifiProStateMachine_  == nullptr;
+    wifiProService_->pWifiProStateMachine_  = nullptr;
     std::vector<InterScanInfo> scanInfos;
     wifiProService_->HandleScanResult(scanInfos);
     EXPECT_NE(wifiProService_->instId_, TEN);

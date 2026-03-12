@@ -43,7 +43,7 @@ public:
 #ifndef OHOS_ARCH_LITE
     ErrCode SatelliteToggled(int state);
     void SetSatelliteStartState(bool state);
-    bool IsSatelliteStateStart() const;
+    bool IsSatelliteStateStart();
 #endif
     void StartWifiToggledTimer();
     void StopWifiToggledTimer();

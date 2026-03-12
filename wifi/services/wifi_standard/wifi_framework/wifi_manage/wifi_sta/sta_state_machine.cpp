@@ -4235,8 +4235,6 @@ void StaStateMachine::DhcpResultNotify::DealDhcpJump()
     EnhanceWriteIsInternetHiSysEvent(CONNECTED_NETWORK);
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
     pStaStateMachine->SaveLinkstate(ConnState::CONNECTED, DetailedState::CONNECTED);
-    pStaStateMachine->InvokeOnStaConnChanged(
-        OperateResState::CONNECT_AP_CONNECTED, pStaStateMachine->linkedInfo);
     /* Delay to wait for the network adapter information to take effect. */
     pStaStateMachine->DealSetStaConnectFailedCount(0, true);
     pStaStateMachine->SwitchState(pStaStateMachine->pLinkedState);

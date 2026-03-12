@@ -23,11 +23,7 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pProxy");
 
-constexpr int MAX_BAND = 7;
-constexpr int MAX_BANDWIDTH = 4;
-constexpr int MAX_IFMODE = 3;
-constexpr int MAX_IP_LEN = 15;
-constexpr int IFNAMSIZ = 16;
+constexpr int MAX_IPNAMSIZ = 16;
 
 static sptr<WifiP2pCallbackStub> g_wifiP2pCallbackStub =
     sptr<WifiP2pCallbackStub>(new (std::nothrow) WifiP2pCallbackStub());
@@ -1426,17 +1422,18 @@ ErrCode WifiP2pProxy::Hid2dConnect(const Hid2dConnectConfig& config)
 
 ErrCode WifiP2pProxy::Hid2dConfigIPAddr(const std::string& ifName, const IpAddrInfo& ipInfo)
 {
-    if (ifName.empty() || ifName.length() > IFNAMSIZ) {
+    if (ifName.empty() || ifName.length() > MAX_IPNAMSIZ) {
         WIFI_LOGE("Invalid interface name length");
         return WIFI_OPT_INVALID_PARAM;
     }
  
-    if (ipInfo.ip.length() > MAX_IP_LEN ||
-        ipInfo.gateway.length() > MAX_IP_LEN ||
-        ipInfo.netmask.length() > MAX_IP_LEN) {
-        WIFI_LOGE("Invalid IP address length");
-        return WIFI_OPT_INVALID_PARAM;
-    }
+    if (ipInfo.ip.length() > MAX_IPNAMSIZ ||
+ 	    ipInfo.gateway.length() > MAX_IPNAMSIZ ||
+ 	    ipInfo.netmask.length() > MAX_IPNAMSIZ) {
+ 	    WIFI_LOGE("Invalid IP address length");
+ 	    return WIFI_OPT_INVALID_PARAM;
+ 	}
+
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
@@ -1499,13 +1496,6 @@ ErrCode WifiP2pProxy::Hid2dReleaseIPAddr(const std::string& ifName)
 ErrCode WifiP2pProxy::Hid2dGetRecommendChannel(const RecommendChannelRequest& request,
     RecommendChannelResponse& response)
 {
-    if (request.remoteIfMode < 0 || request.remoteIfMode > MAX_IFMODE ||
-        request.localIfMode < 0 || request.localIfMode > MAX_IFMODE ||
-        request.prefBand < 0 || request.prefBand > MAX_BAND ||
-        static_cast<int>(request.prefBandwidth) < 0 || static_cast<int>(request.prefBandwidth) > MAX_BANDWIDTH) {
-        WIFI_LOGE("Invalid parameters for Hid2dGetRecommendChannel");
-        return WIFI_OPT_INVALID_PARAM;
-    }
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;

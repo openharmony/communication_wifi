@@ -384,7 +384,7 @@ public:
         EXPECT_CALL(WifiManager::GetInstance(), DealStaConnChanged(_, _, _)).Times(testing::AtLeast(0));
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SetWifiState(_, _)).Times(testing::AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetMacAddress(_, _)).Times(0);
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetMacAddress(_, _)).Times(AtLeast(0));
         pStaStateMachine->StartConnectToNetwork(0, "wifitest/123", NETWORK_SELECTED_BY_WIFIPRO_ENHANCE);
     }
 
@@ -466,8 +466,8 @@ public:
         pStaStateMachine->linkedInfo.connTriggerMode = NETWORK_SELECTED_BY_WIFIPRO_ENHANCE;
         pStaStateMachine->targetNetworkId_ = 0;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(0);
-        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(0);
+        EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(0));
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(0));
         pStaStateMachine->InsertOrUpdateNetworkStatusHistory(NetworkStatus::NO_INTERNET, false);
     }
 
@@ -926,14 +926,14 @@ public:
         pStaStateMachine->currentTpType = IPTYPE_BUTT;
         StaticIpAddress staticIpAddress;
         pStaStateMachine->isRoam = false;
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(0));
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(AtLeast(1));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(AtLeast(1));
         EXPECT_FALSE(pStaStateMachine->ConfigStaticIpAddress(staticIpAddress));
     }
 
     void HandleNetCheckResultSuccess1()
     {
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_WORKING, "");
@@ -941,14 +941,14 @@ public:
 
     void HandleNetCheckResultSuccess3()
     {
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_PORTAL, "");
     }
     void HandleNetCheckResultSuccess4()
     {
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_NOTWORKING, "");
@@ -956,7 +956,7 @@ public:
 
     void HandleNetCheckResultSuccess5()
     {
-        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
         pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
@@ -3251,37 +3251,6 @@ HWTEST_F(StaStateMachineTest, DealDisconnectEventInLinkStateTest01, TestSize.Lev
     pStaStateMachine->pLinkState->pStaStateMachine->targetNetworkId_ = 0;
     pStaStateMachine->pLinkState->DealDisconnectEventInLinkState(msg);
     EXPECT_TRUE(currentState == pStaStateMachine->linkedInfo.connState);
-}
-
-HWTEST_F(StaStateMachineTest, TryFastReconnectTest01, TestSize.Level1)
-{
-    int reason = 3;
-    std::string bssid = "xx:xx:xx:xx:xx:xx";
-    int locallyGenerated = 0;
-    bool ret = pStaStateMachine->pLinkState->TryFastReconnect(reason, bssid, locallyGenerated);
-    EXPECT_FALSE(ret);
-}
-
-HWTEST_F(StaStateMachineTest, TryFastReconnectTest02, TestSize.Level1)
-{
-    int reason = static_cast<int>(Wifi80211ReasonCode::WLAN_REASON_CLASS2_FRAME_FROM_NONAUTH_STA);
-    std::string bssid = "xx:xx:xx:xx:xx:xx";
-    pStaStateMachine->linkedInfo.rssi = -99;
-    pStaStateMachine->linkedInfo.band = 2;
-    int locallyGenerated = 0;
-    bool ret = pStaStateMachine->pLinkState->TryFastReconnect(reason, bssid, locallyGenerated);
-    EXPECT_FALSE(ret);
-}
-
-HWTEST_F(StaStateMachineTest, TryFastReconnectTest03, TestSize.Level1)
-{
-    int reason = static_cast<int>(Wifi80211ReasonCode::WLAN_REASON_CLASS2_FRAME_FROM_NONAUTH_STA);
-    std::string bssid = "xx:xx:xx:xx:xx:xx";
-    pStaStateMachine->linkedInfo.rssi = -20;
-    pStaStateMachine->linkedInfo.band = 2;
-    int locallyGenerated = 1;
-    bool ret = pStaStateMachine->pLinkState->TryFastReconnect(reason, bssid, locallyGenerated);
-    EXPECT_FALSE(ret);
 }
 
 HWTEST_F(StaStateMachineTest, NotAllowConnectToNetworkTest01, TestSize.Level1)

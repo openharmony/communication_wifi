@@ -245,7 +245,7 @@ void WifiProStateMachine::RefreshConnectedNetWork()
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     WIFI_LOGD("RefreshConnectedNetWork, connState:%{public}d,"
         "supplicantState:%{public}d.", linkedInfo.connState, static_cast<int32_t>(linkedInfo.supplicantState));
-    if (!WifiProUtils::IsSupplicantConnecting(linkedInfo.supplicantState)) {
+    if (!WifiProUtils::IsSupplicantConnectionProcess(linkedInfo.supplicantState)) {
         currentBssid_ = "";
         currentSsid_ = "";
         currentRssi_ = DEFAULT_RSSI;

@@ -212,7 +212,7 @@ bool WifiTogglerManager::IsInterfaceUp(std::string &iface)
     return false;
 }
 
-bool WifiTogglerManager::IsSatelliteStateStart() const
+bool WifiTogglerManager::IsSatelliteStateStart()
 {
     return false;
 }

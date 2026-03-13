@@ -562,6 +562,7 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
 #ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
     if (WifiProEnhance::GetInstance().IsEnhanceSwitchEnable(currentBssid_, targetBssid_)) {
         type = NETWORK_SELECTED_BY_WIFIPRO_ENHANCE;
+        WifiProChr::GetInstance().RecordSwitchEnhanceStart();
     }
 #endif
     if (pStaService->StartConnectToBssid(networkId, targetBssid_, type) != WIFI_OPT_SUCCESS) {

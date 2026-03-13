@@ -24,6 +24,9 @@
 #include "wifi_global_func.h"
 #include "net_all_capabilities.h"
 #include "net_supplier_info.h"
+#include "wifi_service_manager.h"
+#include "ienhance_service.h"
+#include "app_network_speed_limit_chr.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -35,13 +38,18 @@ namespace {
     const int ON = 1;
     const int OFF = 0;
     const std::string ASYNC_WORK_NAME = "SendLimitInfo";
+    const std::string LOW_LATENCY_EXIT_ASYNC_WORK_NAME = "LowLatencyExit";
     const std::string HANDLE_WIFI_CONNECT_CHANGED = "HandleWifiConnectStateChanged";
     const std::string HANDLE_FOREGROUND_APP_CHANGED = "HandleForegroundAppChangedAction";
+    const std::string HANDLE_PROCESS_CREATED_EVENT = "HandleProcessCreatedEvent";
     const std::string LIMIT_SPEED = "LimitSpeed";
     const std::string RECEIVE_NETWORK_CONTROL = "ReceiveNetworkControlInfo";
+    const std::string FEATURE_GAME_NO_SLEEP = "GameNoSleep";
+    const std::string FEATURE_VPN_NO_LIMIT = "VpnNoLimit";
     const int GAME_BOOST_ENABLE = 1;
     const int GAME_BOOST_DISABLE = 0;
     const int BOOST_UDP_TYPE = 17;
+    constexpr int64_t LOW_LATENCY_EXIT_TIMEOUT = 3 * 60 * 1000;
 }
 
 AppNetworkSpeedLimitService::AppNetworkSpeedLimitService()
@@ -124,6 +132,36 @@ void AppNetworkSpeedLimitService::HandleForegroundAppChangedAction(const AppExec
     }
 }
 
+void AppNetworkSpeedLimitService::HandleProcessCreatedEvent(const AppExecFwk::ProcessData &processData)
+{
+    if (processData.state == AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) {
+        return;
+    }
+    if (!ShouldLimitSpeedInBackground(processData.bundleName)) {
+        return;
+    }
+    if (m_bgUidSet.count(processData.uid) > 0) {
+        return;
+    }
+    AsyncParamInfo asyncParamInfo;
+    asyncParamInfo.funcName = HANDLE_PROCESS_CREATED_EVENT;
+    asyncParamInfo.bundleName = processData.bundleName;
+    AsyncLimitSpeed(asyncParamInfo);
+}
+
+bool AppNetworkSpeedLimitService::ShouldLimitSpeedInBackground(const std::string &bundleName)
+{
+    for (auto &record : m_bgLimitRecordMap) {
+        if (!CheckNetWorkCanBeLimited(record.first) || record.second == BG_LIMIT_OFF) {
+            continue;
+        }
+        if (IsLimitSpeedBgApp(record.first, bundleName, m_isHighPriorityTransmit)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void AppNetworkSpeedLimitService::LimitSpeed(const int controlId, const int limitMode)
 {
     WIFI_LOGI("%{public}s enter, controlId=%{public}d, limitMode=%{public}d", __FUNCTION__, controlId, limitMode);
@@ -173,7 +211,9 @@ ErrCode AppNetworkSpeedLimitService::GetAppList(std::vector<AppExecFwk::RunningP
         }
     } else {
         for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
-            if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_BACKGROUND) {
+            if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_BACKGROUND
+                || iter->state_ == AppExecFwk::AppProcessState::APP_STATE_CREATE
+                || iter->state_ == AppExecFwk::AppProcessState::APP_STATE_READY) {
                 appList.push_back(*iter);
             }
         }
@@ -226,12 +266,24 @@ void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int enable)
     m_bgUidSet.clear();
     m_bgPidSet.clear();
     m_fgUidSet.clear();
+    m_fgAppBundleNameSet.clear();
+    m_bgSpeedLimitAppBundleNameSet.clear();
     if (m_limitSpeedMode == BgLimitLevel::BG_LIMIT_OFF) {
         m_bgUidSet.insert(UNKNOWN_UID);
         m_bgPidSet.insert(UNKNOWN_UID);
         m_fgUidSet.insert(UNKNOWN_UID);
+        m_fgAppBundleNameSet.insert(UNKNOWN_BUNDLENAME);
+        m_bgSpeedLimitAppBundleNameSet.insert(UNKNOWN_BUNDLENAME);
         return;
     }
+
+    UpdateBackgroundAppConfigs(enable);
+    UpdateForegroundAppConfigs();
+    FilterLimitSpeedConfigs();
+}
+
+void AppNetworkSpeedLimitService::UpdateBackgroundAppConfigs(const int enable)
+{
     std::vector<AppExecFwk::RunningProcessInfo> bgAppList;
     std::vector<WifiNetworkControlInfo> bgAncoAppList;
     if (GetAppList(bgAppList, false) < 0) {
@@ -243,17 +295,23 @@ void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int enable)
             continue;
         }
         for (auto iter = bgAppList.begin(); iter != bgAppList.end(); ++iter) {
-            if (IsLimitSpeedBgApp(record.first, iter->processName_, enable)) {
+            if (IsLimitSpeedBgApp(record.first, *iter, enable)) {
                 m_bgUidSet.insert(iter->uid_);
                 m_bgPidSet.insert(iter->pid_);
+                m_bgSpeedLimitAppBundleNameSet.insert(iter->bundleNames.begin(), iter->bundleNames.end());
             }
         }
         for (auto iter = bgAncoAppList.begin(); iter != bgAncoAppList.end(); ++iter) {
             if (IsLimitSpeedBgApp(record.first, iter->bundleName, enable)) {
                 m_bgUidSet.insert(iter->uid);
+                m_bgSpeedLimitAppBundleNameSet.insert(iter->bundleName);
             }
         }
     }
+}
+
+void AppNetworkSpeedLimitService::UpdateForegroundAppConfigs()
+{
     std::vector<AppExecFwk::RunningProcessInfo> fgAppList;
     std::vector<WifiNetworkControlInfo> fgAncoAppList;
     if (GetAppList(fgAppList, true) < 0) {
@@ -262,11 +320,12 @@ void AppNetworkSpeedLimitService::UpdateSpeedLimitConfigs(const int enable)
     GetAncoAppList(fgAncoAppList, true);
     for (auto iter = fgAppList.begin(); iter != fgAppList.end(); ++iter) {
         m_fgUidSet.insert(iter->uid_);
+        m_fgAppBundleNameSet.insert(iter->bundleNames.begin(), iter->bundleNames.end());
     }
     for (auto iter = fgAncoAppList.begin(); iter != fgAncoAppList.end(); ++iter) {
         m_fgUidSet.insert(iter->uid);
+        m_fgAppBundleNameSet.insert(iter->bundleName);
     }
-    FilterLimitSpeedConfigs();
 }
 
 bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const std::string &bundleName,
@@ -293,6 +352,17 @@ bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const s
     return false;
 }
 
+bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId,
+    const AppExecFwk::RunningProcessInfo &processInfo, const int enable)
+{
+    for (auto &name : processInfo.bundleNames) {
+        if (IsLimitSpeedBgApp(controlId, name, enable)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void AppNetworkSpeedLimitService::AsyncLimitSpeed(const AsyncParamInfo &asyncParamInfo)
 {
     m_asyncSendLimit->PostAsyncTask([asyncParamInfo, this]() {
@@ -306,6 +376,8 @@ void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParam
         WifiConnectStateChanged();
     } else if (asyncParamInfo.funcName == HANDLE_FOREGROUND_APP_CHANGED) {
         ForegroundAppChangedAction(asyncParamInfo.bundleName);
+    } else if (asyncParamInfo.funcName == HANDLE_PROCESS_CREATED_EVENT) {
+        BackgroundAppChangedAction(asyncParamInfo.bundleName);
     } else if (asyncParamInfo.funcName == LIMIT_SPEED) {
         SendLimitCmd2Drv(asyncParamInfo.controlId, asyncParamInfo.limitMode, m_isHighPriorityTransmit);
     } else if (asyncParamInfo.funcName == RECEIVE_NETWORK_CONTROL) {
@@ -314,6 +386,8 @@ void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParam
             WifiConfigCenter::GetInstance().SetNetworkControlInfo(asyncParamInfo.networkControlInfo);
         } else if (asyncParamInfo.networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_VIDEO_CALL) {
             VideoCallNetworkSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
+        } else if (asyncParamInfo.networkControlInfo.sceneId == BG_LIMIT_CONTROL_ID_LOW_LATENCY) {
+            LowLatencyNetworkSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
         } else {
             UpdateAncoAppInfos(asyncParamInfo.networkControlInfo);
             UpdateNoSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
@@ -393,12 +467,34 @@ void AppNetworkSpeedLimitService::LogSpeedLimitConfigs()
         recordsStr += std::to_string(record.second);
         recordsStr += ",";
     }
+    if (!recordsStr.empty()) {
+        recordsStr.pop_back();
+    }
+    /* AppNetworkSpeedLimitChr */
+    RecordAppNetworkSpeedLimitServiceChr(recordsStr);
+    /* AppNetworkSpeedLimitLogs Print */
     WIFI_LOGI("%{public}s speed limit records= %{public}s, limitMode: %{public}d, m_wifiConnected: %{public}d",
         __FUNCTION__, recordsStr.c_str(), m_lastLimitSpeedMode, m_isWifiConnected.load());
     WIFI_LOGI("%{public}s bgUidSet: %{public}s; bgPidSet: %{public}s; fgUidSet: %{public}s", __FUNCTION__,
         JoinVecToString(std::vector<int>(m_lastBgUidSet.begin(), m_lastBgUidSet.end()), ",").c_str(),
         JoinVecToString(std::vector<int>(m_lastBgPidSet.begin(), m_lastBgPidSet.end()), ",").c_str(),
         JoinVecToString(std::vector<int>(m_lastFgUidSet.begin(), m_lastFgUidSet.end()), ",").c_str());
+}
+
+void AppNetworkSpeedLimitService::RecordAppNetworkSpeedLimitServiceChr(const std::string &records)
+{
+    AppNetworkSpeedLimitStatisticInfo appSpeedLimitInfo;
+    appSpeedLimitInfo.speedLimitScenarioAndLevel = records;
+    appSpeedLimitInfo.speedLimitForegroundAppInfo =
+        JoinUnorderedSetToString(m_fgAppBundleNameSet, ",");
+    appSpeedLimitInfo.speedLimitBackgroundAppInfo =
+        JoinUnorderedSetToString(m_bgSpeedLimitAppBundleNameSet, ",");
+ 
+    if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] != BG_LIMIT_OFF) {
+        appSpeedLimitInfo.speedLimitGameState =
+            WifiConfigCenter::GetInstance().GetNetworkControlInfo().state;
+    }
+    AppNetworkSpeedLimitChr::GetInstance().RecordAppNetworkSpeedLimitCommonInfo(appSpeedLimitInfo);
 }
 
 void AppNetworkSpeedLimitService::ReceiveNetworkControlInfo(const WifiNetworkControlInfo &networkControlInfo)
@@ -528,13 +624,27 @@ void AppNetworkSpeedLimitService::ForegroundAppChangedAction(const std::string &
     }
 }
 
+void AppNetworkSpeedLimitService::BackgroundAppChangedAction(const std::string &bundleName)
+{
+    WIFI_LOGI("%{public}s accept background limit speed bundleName: %{public}s ", __FUNCTION__, bundleName.c_str());
+    if (m_isWifiConnected && m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] != BG_LIMIT_OFF) {
+        WIFI_LOGI("%{public}s high temp speed limit is running, update background app list", __FUNCTION__);
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_TEMP, m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP],
+            m_isHighPriorityTransmit);
+    }
+    if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+    }
+}
+
 void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)
 {
     WIFI_LOGI("%{public}s enter game limit configs, game state is %{public}d", __FUNCTION__, networkControlInfo.state);
+    ReportGameSceneChange(networkControlInfo.state);
     switch (networkControlInfo.state) {
         case GameSceneId::MSG_GAME_STATE_START:
         case GameSceneId::MSG_GAME_STATE_FOREGROUND:
-            SetGamePowerMode(false);
+            SetActivePowerScenes(POWER_SCENE_GAME, false);
             if (AppParser::GetInstance().IsOverGameRtt(networkControlInfo.bundleName, networkControlInfo.rtt)) {
                 SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
                     networkControlInfo.uid);
@@ -545,16 +655,38 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
             break;
         case GameSceneId::MSG_GAME_STATE_BACKGROUND:
         case GameSceneId::MSG_GAME_STATE_END:
-            SetGamePowerMode(false);
+            SetActivePowerScenes(POWER_SCENE_GAME, false);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_OFF, GAME_BOOST_DISABLE, networkControlInfo.uid);
             break;
         case GameSceneId::MSG_GAME_ENTER_PVP_BATTLE:
-            SetGamePowerMode(true);
+            isFirstRtt_.store(true);
+            SetActivePowerScenes(POWER_SCENE_GAME, true);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE, networkControlInfo.uid);
             break;
         case GameSceneId::MSG_GAME_EXIT_PVP_BATTLE:
-            SetGamePowerMode(false);
+            SetActivePowerScenes(POWER_SCENE_GAME, false);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_3, GAME_BOOST_DISABLE, networkControlInfo.uid);
+            break;
+        default:
+            WIFI_LOGE("%{public}s there is no such state.", __FUNCTION__);
+            break;
+    }
+}
+
+void AppNetworkSpeedLimitService::LowLatencyNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)
+{
+    WIFI_LOGI("%{public}s enter, low latency state is %{public}d", __FUNCTION__, networkControlInfo.state);
+    switch (networkControlInfo.state) {
+        case LowLatencySceneId::MSG_LOW_LATENCY_ENTER:
+            m_asyncSendLimit->RemoveAsyncTask(LOW_LATENCY_EXIT_ASYNC_WORK_NAME);
+            m_asyncSendLimit->PostAsyncTask([this]() {
+                    this->SetActivePowerScenes(POWER_SCENE_LOW_LATENCY, false);
+                }, LOW_LATENCY_EXIT_ASYNC_WORK_NAME, LOW_LATENCY_EXIT_TIMEOUT);
+            SetActivePowerScenes(POWER_SCENE_LOW_LATENCY, true);
+            break;
+        case LowLatencySceneId::MSG_LOW_LATENCY_EXIT:
+            m_asyncSendLimit->RemoveAsyncTask(LOW_LATENCY_EXIT_ASYNC_WORK_NAME);
+            SetActivePowerScenes(POWER_SCENE_LOW_LATENCY, false);
             break;
         default:
             WIFI_LOGE("%{public}s there is no such state.", __FUNCTION__);
@@ -602,51 +734,76 @@ void AppNetworkSpeedLimitService::HandleNetworkConnectivityChange(int32_t bearTy
     if (preVpnState != currentVpnState) {
         WIFI_LOGI("%{public}s VPN connection state changed: %{public}d -> %{public}d",
             __FUNCTION__, preVpnState, currentVpnState);
+        // Report VPN background no-speed-limit gain statistics
+        ReportGameLatencyFeature(currentVpnState, FEATURE_VPN_NO_LIMIT);
     }
 }
 
-void AppNetworkSpeedLimitService::SetGamePowerMode(bool gameActive)
+void AppNetworkSpeedLimitService::SetActivePowerScenes(PowerSceneFlag scene, bool active)
 {
-    if (!m_isWifiConnected && gameActive) {
-        WIFI_LOGI("%{public}s WiFi not connected, skip activating power mode", __FUNCTION__);
+    if (!m_isWifiConnected && active) {
+        WIFI_LOGI("Set power scenes %{public}d skipped: WiFi not connected.", static_cast<int>(scene));
         return;
     }
-    int powerMode = gameActive ? POWER_MODE_ON : POWER_MODE_OFF;
-    int cachedMode = cachedGamePowerMode_;
-    if (cachedMode == powerMode) {
-        WIFI_LOGD("%{public}s Power mode already set to %{public}d, skip redundant HAL call",
-            __FUNCTION__, powerMode);
-        return;
-    }
-    int frequency = POWER_MODE_FREQUENCY_DEFAULT;
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode("wlan0", frequency, powerMode);
-    if (ret != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("%{public}s SetPmMode failed, gameActive=%{public}d, ret=%{public}d",
-            __FUNCTION__, gameActive, ret);
+
+    uint32_t oldScenes = activePowerScenes_.load();
+    uint32_t newScenes;
+    if (active) {
+        newScenes = oldScenes | static_cast<uint32_t>(scene);
     } else {
-        cachedGamePowerMode_ = powerMode;
+        newScenes = oldScenes & ~static_cast<uint32_t>(scene);
+    }
+
+    if (oldScenes == newScenes) {
+        WIFI_LOGD("Set power scenes %{public}d skipped: Scenes has not changed.", static_cast<int>(scene));
+        return;
+    }
+
+    WIFI_LOGI("Set power scenes %{public}d -> %{public}d.", static_cast<int>(oldScenes), static_cast<int>(newScenes));
+    activePowerScenes_.store(newScenes);
+    UpdatePowerModeByScenes();
+}
+
+void AppNetworkSpeedLimitService::UpdatePowerModeByScenes()
+{
+    int cachedMode = cachedPowerMode_.load();
+    int targetMode = (activePowerScenes_.load() != POWER_SCENE_NONE) ? POWER_MODE_ON : POWER_MODE_OFF;
+    if (cachedMode == targetMode) {
+        WIFI_LOGD("Set power mode %{public}d skipped: Mode has not changed.", targetMode);
+        return;
+    }
+
+    int frequency = POWER_MODE_FREQUENCY_DEFAULT;
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode("wlan0", frequency, targetMode);
+    if (ret != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("Set power mode failed, targetMode: %{public}d, ret: %{public}d.", targetMode, ret);
+    } else {
+        cachedPowerMode_.store(targetMode);
+        // Report game battle no-sleep gain statistics
+        ReportGameLatencyFeature(targetMode == POWER_MODE_ON, FEATURE_GAME_NO_SLEEP);
+        WIFI_LOGI("Set power mode %{public}d -> %{public}d.", cachedMode, targetMode);
     }
 }
- 
+
 void AppNetworkSpeedLimitService::ResetPowerMode()
 {
-    int cachedMode = cachedGamePowerMode_;
-    if (cachedMode == POWER_MODE_OFF) {
+    activePowerScenes_.store(POWER_SCENE_NONE);
+    if (cachedPowerMode_.load() == POWER_MODE_OFF) {
         return;
     }
     int frequency = POWER_MODE_FREQUENCY_DEFAULT;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode("wlan0", frequency, POWER_MODE_OFF);
     if (ret != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("Reset power mode failed, ret=%{public}d", ret);
+        WIFI_LOGE("Reset power mode failed, ret: %{public}d.", ret);
     } else {
-        cachedGamePowerMode_ = POWER_MODE_OFF;
+        cachedPowerMode_.store(POWER_MODE_OFF);
+        WIFI_LOGI("Reset power mode to OFF.");
     }
 }
  
 void AppNetworkSpeedLimitService::CheckAndResetGamePowerMode(const std::string &bundleName)
 {
-    int cachedMode = cachedGamePowerMode_;
-    if (cachedMode != POWER_MODE_ON) {
+    if ((activePowerScenes_.load() & POWER_SCENE_GAME) == 0) {
         return;
     }
     bool isGame = AppParser::GetInstance().IsRssGameApp(bundleName);
@@ -658,7 +815,43 @@ void AppNetworkSpeedLimitService::CheckAndResetGamePowerMode(const std::string &
     // Foreground app is not a game, but in no-sleep mode
     WIFI_LOGI("%{public}s Non-game app [%{public}s], resetting power mode to normal sleep",
         __FUNCTION__, bundleName.c_str());
-    ResetPowerMode();
+    SetActivePowerScenes(POWER_SCENE_GAME, false);
+}
+
+void AppNetworkSpeedLimitService::UpdateGameRttData(int rtt)
+{
+    if (!isFirstRtt_.exchange(false)) {
+        WIFI_LOGD("%{public}s not waiting for first rtt, ignore", __FUNCTION__);
+        return;
+    }
+    
+    WIFI_LOGI("%{public}s first rtt received: %{public}d", __FUNCTION__, rtt);
+    if (rtt > 0) {
+        WIFI_LOGI("%{public}s online PVP mode detected, keep no-sleep", __FUNCTION__);
+    } else {
+        WIFI_LOGI("%{public}s single player mode detected, allow sleep", __FUNCTION__);
+        SetActivePowerScenes(POWER_SCENE_GAME, false);
+    }
+}
+
+void AppNetworkSpeedLimitService::ReportGameLatencyFeature(bool enabled, const std::string& featureName)
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGD("%{public}s: pEnhanceService is null", __FUNCTION__);
+        return;
+    }
+    pEnhanceService->SetGameLatencyFeatureEnabled(enabled, featureName);
+}
+
+void AppNetworkSpeedLimitService::ReportGameSceneChange(int state)
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGD("%{public}s: pEnhanceService is null", __FUNCTION__);
+        return;
+    }
+    pEnhanceService->ReportGameSceneChange(state);
 }
 } // namespace Wifi
 } // namespace OHOS

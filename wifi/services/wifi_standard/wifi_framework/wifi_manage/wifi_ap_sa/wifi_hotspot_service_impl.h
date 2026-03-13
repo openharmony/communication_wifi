@@ -318,11 +318,14 @@ private:
     ErrCode VerifyConfigValidity(const HotspotConfig &config);
     ErrCode RegisterCallBack(const sptr<IWifiHotspotCallback> &callback, const std::vector<std::string> &event);
     int32_t SetHotspotConfigExtral(const HotspotConfig &config);
+    bool CheckHotspot160MParam(BandType band, int bandwidth, int channel);
+    bool CheckHostspot160MCountryCode();
+    ErrCode HostspotBandwidthConfig(HotspotConfig &config);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     void ProcessMacAddressRandomization(std::vector<StationInfo> &infos);
 #endif
-    int m_id;
-    bool mSingleCallback;
+    int m_id = 0;
+    bool mSingleCallback = false;
     std::mutex deathRecipientMutex;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
 };

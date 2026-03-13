@@ -59,6 +59,7 @@ public:
     std::shared_ptr<NativeRdb::AbsSharedResultSet> QuerySql(const std::string &sql,
         const std::vector<NativeRdb::ValueObject> &bindArgs = {});
     bool Delete(int &deletedRowCount, const NativeRdb::AbsRdbPredicates &predicates);
+    bool RemoveDuplicateDatas();
 private:
     void DelayCloseRdbStore();
     static int32_t CreateEnterpriseApInfoTable(NativeRdb::RdbStore &rdbStore);

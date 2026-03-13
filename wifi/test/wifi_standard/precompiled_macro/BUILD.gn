@@ -40,6 +40,7 @@ ohos_unittest("precompiled_macro_unittest") {
   sources = [
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_sta_hal_interface.cpp",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_native/Mock/mock_wifi_supplicant_hal_interface.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/wifi_pro_utils.cpp",
     "scan_service_test.cpp",
     "sta_state_machine_test.cpp",
     "sta_state_machine_test1.cpp",
@@ -61,6 +62,7 @@ ohos_unittest("precompiled_macro_unittest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/net_eap",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/network_black_list",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
     "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/",
@@ -170,6 +172,13 @@ ohos_unittest("precompiled_macro_unittest") {
   if (wifi_feature_with_extensible_authentication) {
     defines += [ "EXTENSIBLE_AUTHENTICATION" ]
     external_deps += ["netmanager_ext:ethernet_manager_if",]
+  }
+
+  if (wifi_feature_enhance_switch_support) {
+    defines += [ "FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT" ]
+    sources += [
+      "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/wifi_pro_enhance.cpp",
+    ]
   }
 
   part_name = "wifi"

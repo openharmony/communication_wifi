@@ -23,6 +23,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#ifndef OHOS_ARCH_LITE
+#include <variant>
+#endif
 #include "ip_tools.h"
 #include "wifi_scan_msg.h"
 #include "inter_scan_info.h"
@@ -101,6 +104,19 @@ enum WifiRestrictedType {
     MDM_BLOCKLIST = 0,
     MDM_WHITELIST = 1,
     MDM_INVALID_LIST = 2
+};
+
+enum CoexistState : int {
+    ALLOW_DATA_TRANS,
+    NOT_ALLOW_DATA_TRANS,
+    ALLOW_CONNECT,
+    NOT_ALLOW_CONNECT,
+};
+ 
+enum CoexistReason : int {
+    KEYBOARD_MOUSE_SCENE,
+    D2D_SCENE,
+    OTHER_SCENE,
 };
 
 enum GameSceneId : int {
@@ -200,7 +216,8 @@ enum WifiLinkType:int32_t {
     WIFI7_SINGLE_LINK = 1,
     WIFI7_MLSR = 2,
     WIFI7_EMLSR = 3,
-    WIFI7_STR = 4
+    WIFI7_STR = 4,
+    WIFI7_LEGACY = 5 //非MLO接入
 };
 
 enum class DisconnectedReason {
@@ -881,6 +898,8 @@ struct WifiDeviceConfig {
     time_t lastDetectTime;
     time_t lastDisconnectTime;
     WifiRiskType riskType;
+    int ipv4OnlyNetState {-1};
+    int dualStackNetState {-1};
 
     WifiDeviceConfig()
     {
@@ -1089,6 +1108,7 @@ typedef enum {
     BG_LIMIT_CONTROL_ID_WINDOW_VISIBLE,
     BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT,
     BG_LIMIT_CONTROL_ID_VIDEO_CALL,
+    BG_LIMIT_CONTROL_ID_LOW_LATENCY,
 } BgLimitControl;
 
 typedef enum {
@@ -1225,6 +1245,28 @@ typedef enum {
     CAC_DETECT_IS_NOT_IN_PROGRESS = 1,
     CAC_DETECT_IS_IN_PROGRESS = 2,
 } IsCACDetectInProgress;
+
+enum class WifiEnhanceConfigType {
+    FAST_RECONNECT,
+};
+
+struct WifiFastReconnectConfig {
+    int minSignalLevel {static_cast<int>(SigLevel::SIG_LEVEL_2)};
+    int minTimeIntervalSec {10};
+    int maxTimeIntervalSec {60};
+    int scanWaitTimeMs {100};
+    bool alwaysFastReconnectFlag {false};
+    std::vector<int> wlanReasonWhiteList {1, 2, 6, 7, 34};
+};
+
+#ifndef OHOS_ARCH_LITE
+using EnhanceConfigVariant = std::variant<WifiFastReconnectConfig>;
+#endif
+
+struct WifiDeviceFeatures {
+    bool isP2pSupportDfsOffload { false };
+    bool isEnableScanOnlyOnHotspot { false };
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

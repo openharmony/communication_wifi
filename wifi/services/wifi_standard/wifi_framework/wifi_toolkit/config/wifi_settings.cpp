@@ -43,6 +43,8 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int MAX_DECRYPT_DEVICE_CONFIG_NUM = 400;
+static const int MAX_FILE_SIZE = 1024 * 1024 * 1024;
+static const int MIN_FILE_SIZE = 0;
 std::string g_defaultApSsid;
 #ifdef DTFUZZ_TEST
 static WifiSettings* gWifiSettings = nullptr;
@@ -552,6 +554,7 @@ int WifiSettings::SetDeviceAfterConnect(int networkId, int rssi)
     }
     LOGD("Set Device After Connect");
     iter->second.lastConnectTime = time(0);
+    iter->second.lastDisconnectTime = iter->second.lastConnectTime;
     iter->second.numRebootsSinceLastUse = 0;
     iter->second.numAssociation++;
     iter->second.networkSelectionStatus.networkDisableCount = 0;
@@ -644,7 +647,7 @@ int WifiSettings::GetCandidateConfigWithoutUid(const std::string &ssid, const st
 }
 
 int WifiSettings::GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
-    WifiDeviceConfig &config)
+    WifiDeviceConfig &config, int instId)
 {
     std::vector<WifiDeviceConfig> configs;
     if (GetAllCandidateConfig(uid, configs) != 0) {
@@ -652,7 +655,7 @@ int WifiSettings::GetCandidateConfig(const int uid, const std::string &ssid, con
     }
 
     for (const auto &it : configs) {
-        if (it.ssid == ssid && it.keyMgmt == keymgmt) {
+        if (it.ssid == ssid && it.keyMgmt == keymgmt && it.instanceId == instId) {
             config = it;
             return it.networkId;
         }
@@ -826,12 +829,16 @@ void WifiSettings::SetKeyMgmtBitset(WifiDeviceConfig &config)
 
     config.keyMgmtBitset |= (1 << uindex);
     if (config.keyMgmt == KEY_MGMT_WPA_PSK) {
-        uindex = static_cast<unsigned int>(FindKeyMgmtPosition(KEY_MGMT_SAE));
-        config.keyMgmtBitset |= (1 << uindex);
+        int saeIndex = FindKeyMgmtPosition(KEY_MGMT_SAE);
+        if (saeIndex >= 0) {
+            config.keyMgmtBitset |= (1 << static_cast<unsigned int>(saeIndex));
+        }
     }
     if (config.keyMgmt == KEY_MGMT_SAE) {
-        uindex = static_cast<unsigned int>(FindKeyMgmtPosition(KEY_MGMT_WPA_PSK));
-        config.keyMgmtBitset |= (1 << uindex);
+        int pskIndex = FindKeyMgmtPosition(KEY_MGMT_WPA_PSK);
+        if (pskIndex >= 0) {
+            config.keyMgmtBitset |= (1 << static_cast<unsigned int>(pskIndex));
+        }
     }
 }
 
@@ -2509,12 +2516,15 @@ int WifiSettings::GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConf
         LOGE("GetConfigbyBackupXml fstat fd fail.");
         return -1;
     }
-    char *buffer = (char *)malloc(statBuf.st_size);
-    if (buffer == nullptr) {
-        LOGE("GetConfigbyBackupXml malloc fail.");
+    int statBufSize = statBuf.st_size;
+    if (statBufSize > MAX_FILE_SIZE || statBufSize < MIN_FILE_SIZE) {
         return -1;
     }
-    ssize_t bufferLen = read(fd.Get(), buffer, statBuf.st_size);
+    char *buffer = (char *)malloc(statBufSize);
+    if (buffer == nullptr) {
+        return -1;
+    }
+    ssize_t bufferLen = read(fd.Get(), buffer, statBufSize);
     if (bufferLen < 0) {
         LOGE("GetConfigbyBackupXml read fail.");
         free(buffer);
@@ -2522,7 +2532,7 @@ int WifiSettings::GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConf
         return -1;
     }
     std::string backupData = std::string(buffer, buffer + bufferLen);
-    if (memset_s(buffer, statBuf.st_size, 0, statBuf.st_size) != EOK) {
+    if (memset_s(buffer, statBufSize, 0, statBufSize) != EOK) {
         LOGE("GetConfigbyBackupXml memset_s fail.");
         free(buffer);
         buffer = nullptr;
@@ -2530,7 +2540,6 @@ int WifiSettings::GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConf
     }
     free(buffer);
     buffer = nullptr;
-
     std::string wifiBackupXml;
     SplitStringBySubstring(backupData, wifiBackupXml, wifiBackupXmlBegin, wifiBackupXmlEnd);
     std::fill(backupData.begin(), backupData.end(), 0);

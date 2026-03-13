@@ -155,6 +155,7 @@ enum class P2P_STATE_MACHINE_CMD {
     P2P_EVENT_IP_ADDRESS,
     P2P_EVENT_CHR_REPORT,
     P2P_INVITE_REQ_TIMEOUT,
+    P2P_DISABLE_TIMEOUT,
 
     /* if the requests to WPA is not synchronization need protected by a timeout mechanism */
     ENABLE_P2P_TIMED_OUT = 200,

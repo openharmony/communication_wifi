@@ -32,6 +32,7 @@
 #include "wifi_global_func.h"
 #include "wifi_config_center.h"
 #include "wifi_chr_adapter.h"
+#include "wifi_pro_enhance.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -61,19 +62,8 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
     InitConnectedAp(wifiLinkedInfo, wifiDeviceConfig);
     connectedAp_->is5gAfterPerf = is5gAfterPerf;
     connectedAp_->perf5gStrategyName = strategyName;
-    bool isItCustNetwork = false;
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService != nullptr) {
-        isItCustNetwork = pEnhanceService->IsItCustNetwork(wifiDeviceConfig);
-    }
-    bool isEnterprise = DualBandUtils::IsEnterprise(wifiDeviceConfig);
-    connectedAp_->canNotPerf = isEnterprise || wifiLinkedInfo.isDataRestricted || isItCustNetwork ||
-        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE || connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR;
-    WIFI_HILOG_COMM_INFO("OnConnected, canNotPerf:isEnterprise(%{public}d),isItCustNetwork(%{public}d),"
-        "isPortal(%{public}d),isDataRestricted(%{public}d),openNet(%{public}d), isEMLSR(%{public}d)", isEnterprise,
-        isItCustNetwork, wifiDeviceConfig.isPortal, wifiLinkedInfo.isDataRestricted,
-        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE, connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR);
-    if (connectedAp_->canNotPerf) {
+
+    if (isNotAllowedPerf(wifiLinkedInfo, wifiDeviceConfig)) {
         WIFI_LOGI("OnConnected, ap is not allow perf 5g");
         return;
     }
@@ -88,12 +78,30 @@ void Perf5gHandoverService::OnConnected(WifiLinkedInfo &wifiLinkedInfo)
             isNewBssidConnected_.store(false);
             return;
         }
+        pDualBandRepostitory_->RemoveDuplicateDatas();
         LoadRelationApInfo();
         perf5gChrInfo_.Reset();
         perf5gChrInfo_.connectTime = std::chrono::steady_clock::now();
         isNewBssidConnected_.store(false);
     }
     PrintRelationAps();
+}
+
+bool Perf5gHandoverService::isNotAllowedPerf(WifiLinkedInfo &wifiLinkedInfo, WifiDeviceConfig &wifiDeviceConfig)
+{
+    bool isItCustNetwork = false;
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr) {
+        isItCustNetwork = pEnhanceService->IsItCustNetwork(wifiDeviceConfig);
+    }
+    bool isEnterprise = DualBandUtils::IsEnterprise(wifiDeviceConfig);
+    connectedAp_->canNotPerf = isEnterprise || wifiLinkedInfo.isDataRestricted || isItCustNetwork ||
+        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE || connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR;
+    WIFI_HILOG_COMM_INFO("OnConnected, canNotPerf:isEnterprise(%{public}d),isItCustNetwork(%{public}d),"
+        "isPortal(%{public}d),isDataRestricted(%{public}d),openNet(%{public}d), isEMLSR(%{public}d)", isEnterprise,
+        isItCustNetwork, wifiDeviceConfig.isPortal, wifiLinkedInfo.isDataRestricted,
+        wifiDeviceConfig.keyMgmt == KEY_MGMT_NONE, connectedAp_->wifiLinkType == WifiLinkType::WIFI7_EMLSR);
+    return connectedAp_->canNotPerf;
 }
 
 // Encapsulate the function into external and internal types.
@@ -193,6 +201,14 @@ std::string Perf5gHandoverService::Switch5g()
         selectRelationAp_.reset();
         return "";
     }
+    WifiLinkedInfo linkedInfoWlan0;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfoWlan0, 0);
+    selectRelationAp_->apInfo.bssid = linkedInfoWlan0.bssid;
+    if (linkedInfoWlan0.networkId != INVALID_NETWORK_ID && selectRelationAp_->apInfo.bssid == linkedInfoWlan0.bssid) {
+        WIFI_LOGI("Switch5g : TarAp is wlan0.");
+        selectRelationAp_.reset();
+        return "";
+    }
     WifiLinkedInfo linkedInfoWlan1;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfoWlan1, 1);
     if (linkedInfoWlan1.networkId != INVALID_NETWORK_ID && selectRelationAp_->apInfo.bssid == linkedInfoWlan1.bssid) {
@@ -209,8 +225,14 @@ std::string Perf5gHandoverService::Switch5g()
     int32_t ret;
     WIFI_HILOG_COMM_INFO("Switch5g StartConnectToBssid. bssid(%{public}s)",
         MacAnonymize(selectRelationAp_->apInfo.bssid).data());
+    SelectedType type = NETWORK_SELECTED_BY_WIFIPRO;
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+    if (WifiProEnhance::GetInstance().IsEnhanceSwitchEnable(selectRelationAp_->apInfo.bssid)) {
+        type = NETWORK_SELECTED_BY_WIFIPRO_ENHANCE;
+    }
+#endif
     ret = pStaService->StartConnectToBssid(
-        selectRelationAp_->apInfo.networkId, selectRelationAp_->apInfo.bssid, NETWORK_SELECTED_BY_WIFIPRO);
+        selectRelationAp_->apInfo.networkId, selectRelationAp_->apInfo.bssid, type);
     if (ret == WIFI_OPT_SUCCESS) {
         return selectRelationAp_->apInfo.bssid;
     }
@@ -515,7 +537,7 @@ void Perf5gHandoverService::StopMonitor()
 }
 void Perf5gHandoverService::ActiveScan(int32_t rssi, int scanStyle)
 {
-    WIFI_LOGI("Enter ActiveScan, rssi: %{public}d, scanStyle: %{public}d", rssi, scanStyle);
+    WIFI_LOGD("Enter ActiveScan, rssi: %{public}d, scanStyle: %{public}d", rssi, scanStyle);
     if (pWifiScanController_ == nullptr) {
         return;
     }
@@ -537,12 +559,20 @@ void Perf5gHandoverService::AddRelationApInfo(RelationAp &relationAp)
     if (IsValid5GHz(connectedAp_->apInfo.frequency)) {
         RelationInfo relation(relationAp.apInfo_.bssid, connectedAp_->apInfo.bssid);
         relationAp.relationInfo_ = relation;
+        auto iter = std::find(relationAps_.begin(), relationAps_.end(), relationAp);
+        if (iter != relationAps_.end()) {
+            relationAps_.erase(iter);
+        }
         relationAps_.push_back(relationAp);
         WIFI_LOGI("AddRelationApInfo, relation 2.4g ap(%{public}s) is added",
             MacAnonymize(relationAp.apInfo_.bssid).data());
     } else {
         RelationInfo relation(connectedAp_->apInfo.bssid, relationAp.apInfo_.bssid);
         relationAp.relationInfo_ = relation;
+        auto iter = std::find(relationAps_.begin(), relationAps_.end(), relationAp);
+        if (iter != relationAps_.end()) {
+            relationAps_.erase(iter);
+        }
         relationAps_.push_back(relationAp);
         WIFI_LOGI("AddRelationApInfo, relation 5g ap(%{public}s) is added",
             MacAnonymize(relationAp.apInfo_.bssid).data());
@@ -688,9 +718,17 @@ void Perf5gHandoverService::RssiUpdate(int32_t rssi)
     if (connectedAp_->canNotPerf) {
         return;
     }
-    int scanStyle = WifiConfigCenter::GetInstance().GetLpScanAbility() && !HasHiddenNetworkSsid() ?
-        SCAN_TYPE_LOW_PRIORITY : SCAN_DEFAULT_TYPE;
+
+    int scanStyle = SCAN_DEFAULT_TYPE;
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (lpScanFlag_.load()) {
+        scanStyle = pEnhanceService != nullptr && pEnhanceService->IsSupportLpScanAbility() && !HasHiddenNetworkSsid() ?
+            SCAN_TYPE_LOW_PRIORITY : SCAN_DEFAULT_TYPE;
+    } else {
+        scanStyle = SCAN_DEFAULT_TYPE;
+    }
     ActiveScan(rssi, scanStyle);
+    lpScanFlag_ = !lpScanFlag_;
 }
 bool Perf5gHandoverService::HasHiddenNetworkSsid() const
 {

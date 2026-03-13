@@ -23,6 +23,7 @@
 #include "ip_tools.h"
 #include "arp_checker.h"
 #include "wifi_msg.h"
+#include "network_black_list_manager.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -265,7 +266,7 @@ void WifiProChr::DoOneArp(IpInfo &ipInfo, std::string &gatewayIp, std::string &i
 
 bool WifiProChr::IsSimilarBssid(std::string &bssid1, std::string &bssid2)
 {
-    if (bssid1 == MAC_ADDR_ALL_ZERO || bssid1.length() < SIMILAR_BSSID_PREFIX_LEN ||
+    if (bssid1 == macAddrAllZero || bssid1.length() < SIMILAR_BSSID_PREFIX_LEN ||
         bssid2.length() < SIMILAR_BSSID_PREFIX_LEN) {
         WIFI_LOGI("IsSimilarBssid zero or invalid len");
         return false;
@@ -285,13 +286,16 @@ void WifiProChr::RecordGatewayInfoAfterSwitch()
         WIFI_LOGI("GatewayInfoAfterSwitch unknown gateway ip");
         return;
     }
- 
+
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, instId);
     std::string gatewayIp = IpTools::ConvertIpv4Address(ipInfo.gateway);
     if (gatewayIp != lastGatewayIp_) {
         WIFI_LOGI("GatewayInfoAfterSwitch diff ip, last: %{public}s now: %{public}s",
             IpAnonymize(lastGatewayIp_).c_str(), IpAnonymize(gatewayIp).c_str());
         lastGatewayIp_ = gatewayIp;
         gatewayIpDiffCnt_++;
+        NetworkBlockListManager::GetInstance().UpdateGatewayRelation(lastBssid_, linkedInfo.bssid, false);
         return;
     }
     gatewayIpSameCnt_++;
@@ -299,7 +303,7 @@ void WifiProChr::RecordGatewayInfoAfterSwitch()
     std::string gatewayMac;
     std::string ifaceName = "wlan0";
     int ret = IpTools::GetGatewayMac(gatewayIp, gatewayMac, ifaceName);
-    if (gatewayMac == MAC_ADDR_ALL_ZERO) {
+    if (gatewayMac == macAddrAllZero) {
         WIFI_LOGI("GatewayInfoAfterSwitch gateway mac all zero, do one arp");
         DoOneArp(ipInfo, gatewayIp, ifaceName);
         ret = IpTools::GetGatewayMac(gatewayIp, gatewayMac, ifaceName);
@@ -313,8 +317,7 @@ void WifiProChr::RecordGatewayInfoAfterSwitch()
         WIFI_LOGI("GatewayInfoAfterSwitch same ip %{public}s, same mac: %{public}s",
             IpAnonymize(gatewayIp).c_str(), MacAnonymize(gatewayMac).c_str());
         gatewayMacSameCnt_++;
-        WifiLinkedInfo linkedInfo;
-        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, instId);
+        NetworkBlockListManager::GetInstance().UpdateGatewayRelation(lastBssid_, linkedInfo.bssid, true);
         if (IsSimilarBssid(lastBssid_, linkedInfo.bssid)) {
             gatewayBssidSimilarCnt_++;
         }
@@ -323,6 +326,7 @@ void WifiProChr::RecordGatewayInfoAfterSwitch()
             IpAnonymize(gatewayIp).c_str(), MacAnonymize(lastGatewayMac_).c_str(), MacAnonymize(gatewayMac).c_str());
         gatewayMacDiffCnt_++;
         lastGatewayMac_ = gatewayMac;
+        NetworkBlockListManager::GetInstance().UpdateGatewayRelation(lastBssid_, linkedInfo.bssid, false);
     }
 }
 
@@ -404,17 +408,19 @@ cJSON *WifiProChr::FillWifiProStatisticsJson()
     cJSON_AddNumberToObject(root, "NONET_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::NONET_SUCC]);
     cJSON_AddNumberToObject(root, "QOE_SLOW_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::QOE_SUCCC]);
     cJSON_AddNumberToObject(
-        root, "HIGHER_CATEGORY_SELECT_NET_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::HIGHER_CATEGORY_SUCC]);
+        root, "HIGH_CATEGORY_SELECT_SUCC_CNT", selectNetResultCnt_[WifiProEventResult::HIGHER_CATEGORY_SUCC]);
     cJSON_AddNumberToObject(
         root, "POOR_LINK_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::POORLINK_FAILED]);
     cJSON_AddNumberToObject(root, "NONET_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::NONET_FAILED]);
     cJSON_AddNumberToObject(
         root, "QOE_SLOW_SELECT_NET_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::QOESLOW_FAILED]);
+    cJSON_AddNumberToObject(
+        root, "HIGH_CATEGORY_SELECT_FAILED_CNT", selectNetResultCnt_[WifiProEventResult::HIGHER_CATEGORY_FAILED]);
     cJSON_AddNumberToObject(root, "POOR_LINK_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::POORLINK_SUCC]);
     cJSON_AddNumberToObject(root, "NONET_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::NONET_SUCC]);
     cJSON_AddNumberToObject(root, "QOE_SLOW_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::QOE_SUCCC]);
     cJSON_AddNumberToObject(
-        root, "HIGHER_CATEGORY_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::HIGHER_CATEGORY_SUCC]);
+        root, "HIGH_CATEGORY_SWITCH_SUCC_CNT", wifiProResultCnt_[WifiProEventResult::HIGHER_CATEGORY_SUCC]);
     cJSON_AddNumberToObject(
         root, "POOR_LINK_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::POORLINK_FAILED]);
         
@@ -426,6 +432,8 @@ void WifiProChr::FillWifiProStatisticsJsons(cJSON *root)
 {
     cJSON_AddNumberToObject(root, "NONET_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::NONET_FAILED]);
     cJSON_AddNumberToObject(root, "QOE_SLOW_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::QOESLOW_FAILED]);
+    cJSON_AddNumberToObject(
+        root, "HIGH_CATEGORY_SWITCH_FAILED_CNT", wifiProResultCnt_[WifiProEventResult::HIGHER_CATEGORY_FAILED]);
     cJSON_AddNumberToObject(root, "TIME_LEVEL1_CNT", wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL1]);
     cJSON_AddNumberToObject(root, "TIME_LEVEL2_CNT", wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL2]);
     cJSON_AddNumberToObject(root, "TIME_LEVEL3_CNT", wifiProSwitchTimeCnt_[SWITCH_TIME_LEVEL3]);
@@ -452,6 +460,8 @@ void WifiProChr::FillWifiProStatisticsJsons(cJSON *root)
     cJSON_AddNumberToObject(
         root, "REASON_NOT_SWITCH_NOT_AUTOSWITCH", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_NOT_ALLOW_AUTOSWITCH]);
     cJSON_AddNumberToObject(root, "REASON_NOT_SWITCH_DISABLED", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_DISABLED]);
+    cJSON_AddNumberToObject(
+        root, "REASON_NOT_SWITCH_USER_SELECT", reasonNotSwitchCnt_[ReasonNotSwitch::WIFIPRO_USER_SELECT]);
     cJSON_AddNumberToObject(root, "GATEWAYIP_SAME_CNT", gatewayIpSameCnt_);
     cJSON_AddNumberToObject(root, "GATEWAYIP_DIFF_CNT", gatewayIpDiffCnt_);
     cJSON_AddNumberToObject(root, "GATEWAYIP_UNKNOWN_CNT", gatewayIpUnknownCnt_);

@@ -497,7 +497,10 @@ void WifiIntelligenceStateMachine::DisabledState::HandleWifiOpen(InternalMessage
     auto staState = WifiConfigCenter::GetInstance().GetWifiDetailState();
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState();
-    if (staState == WifiDetailState::STATE_SEMI_ACTIVE && !WifiConfigCenter::GetInstance().IsScreenLandscape() &&
+    if (WifiManager::GetInstance().GetWifiTogglerManager()->IsSatelliteStateStart()) {
+        WIFI_LOGE("HandleWifiOpen, open wifi fail, satellite state start.");
+        return;
+    } else if (staState == WifiDetailState::STATE_SEMI_ACTIVE && !WifiConfigCenter::GetInstance().IsScreenLandscape() &&
         screenState == MODE_STATE_OPEN &&
         (apState != WifiOprMidState::OPENING && apState != WifiOprMidState::RUNNING)) {
         WIFI_LOGI("HandleWifiOpen, open wifi.");

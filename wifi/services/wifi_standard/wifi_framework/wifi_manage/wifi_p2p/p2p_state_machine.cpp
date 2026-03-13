@@ -42,6 +42,8 @@
 #ifndef OHOS_ARCH_LITE
 #include "power_mgr_client.h"
 #endif
+#include "wifi_common_event_helper.h"
+#include "p2p_native_define.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pStateMachine");
 #define P2P_PREFIX_LEN 4
@@ -50,8 +52,6 @@ namespace OHOS {
 namespace Wifi {
 const std::string DEFAULT_P2P_IPADDR = "192.168.49.1";
 //miracast
-const int CMD_TYPE_SET = 2;
-const int DATA_TYPE_P2P_BUSINESS = 1;
 const int ARP_TIMEOUT = 100;
 const int DEFAULT_TEMP_ID = -100;
 const std::string CARRY_DATA_MIRACAST = "1";
@@ -176,15 +176,11 @@ void P2pStateMachine::InitializeThisDevice()
         WIFI_LOGW("Failed to obtain P2pVendorConfig information.");
     }
     WIFI_LOGI("%{public}s: random mac is %{public}s", __func__, p2pVendorCfg.GetRandomMacSupport() ? "true" : "false");
-    if (p2pVendorCfg.GetDeviceName().empty()) {
-        deviceName = WifiSettings::GetInstance().GetDefaultApSsid();
-        p2pVendorCfg.SetDeviceName(deviceName);
-        ret = WifiSettings::GetInstance().SetP2pVendorConfig(p2pVendorCfg);
-        if (ret < 0) {
-            WIFI_LOGW("Failed to Set P2pVendorConfig information.");
-        }
-    } else {
-        deviceName = p2pVendorCfg.GetDeviceName();
+    deviceName = WifiSettings::GetInstance().GetDefaultApSsid();
+    p2pVendorCfg.SetDeviceName(deviceName);
+    ret = WifiSettings::GetInstance().SetP2pVendorConfig(p2pVendorCfg);
+    if (ret < 0) {
+        WIFI_LOGW("Failed to Set P2pVendorConfig information.");
     }
     deviceManager.GetThisDevice().SetDeviceName(deviceName);
     deviceManager.GetThisDevice().SetPrimaryDeviceType(p2pVendorCfg.GetPrimaryDeviceType());
@@ -353,8 +349,9 @@ void P2pStateMachine::SetWifiP2pInfoWhenGroupFormed(const std::string &groupOwne
 
 bool P2pStateMachine::IsMatchClientDevice(std::vector<GcInfo> &gcInfos, WifiP2pDevice &device, GcInfo &gcInfo)
 {
-    std::vector<OHOS::Wifi::WifiP2pDevice> deviceList;
-    if (deviceManager.GetDevicesList(deviceList) <= 0) {
+    WifiP2pGroupInfo groupInfo = groupManager.GetCurrentGroup();
+    std::vector<OHOS::Wifi::WifiP2pDevice> deviceList = groupInfo.GetClientDevices();
+    if (deviceList.size() <= 0) {
         WIFI_LOGE("deviceList.size <= 0 ");
         return false;
     }
@@ -760,6 +757,8 @@ void P2pStateMachine::NotifyUserInvitationReceivedMessage()
             savedP2pConfig.GetWpsInfo().GetPin() + '_' + deviceName);
     } else if (wpsInfo == WpsMethod::WPS_METHOD_KEYPAD) {
         WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::P2P_WSC_KEYPAD_DIALOG, deviceName);
+        /* Hide drop down window to avoid the dialog box displayed below the drop down window */
+        WifiCommonEventHelper::PublishHideDropDownWindowEvent();
     }
 }
 
@@ -1032,6 +1031,42 @@ void P2pStateMachine::HandleP2pServiceResp(const WifiP2pServiceResponse &resp, c
     return;
 }
 
+bool P2pStateMachine::GetAllFreqsByBand(GroupOwnerBand band, std::vector<int>& freqList) const
+{
+    bool isP2pSupportDfsOffload = false;
+    if (pEnhanceService != nullptr) {
+        isP2pSupportDfsOffload = pEnhanceService->GetDeviceFeatures().isP2pSupportDfsOffload;
+    } else {
+        WIFI_LOGE("pEnhanceService is nullptr");
+    }
+    WIFI_LOGI("chip%{public}s support dfs offload", isP2pSupportDfsOffload ? "" : " not");
+    const std::string p2pIfaceName = WifiConfigCenter::GetInstance().GetP2pIfaceName();
+    if (band == GroupOwnerBand::GO_BAND_AUTO) {
+        if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(p2pIfaceName,
+            static_cast<int>(ScanBandType::SCAN_BAND_UNSPECIFIED), freqList) == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
+            return false;
+        }
+    } else if (band == GroupOwnerBand::GO_BAND_2GHZ) {
+        if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(p2pIfaceName,
+            static_cast<int>(ScanBandType::SCAN_BAND_24_GHZ), freqList) == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
+            return false;
+        }
+    } else if (band == GroupOwnerBand::GO_BAND_5GHZ && isP2pSupportDfsOffload) {
+        if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(p2pIfaceName,
+            static_cast<int>(ScanBandType::SCAN_BAND_5_GHZ_WITH_DFS), freqList) == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
+            return false;
+        }
+    } else if (band == GroupOwnerBand::GO_BAND_5GHZ && !isP2pSupportDfsOffload) {
+        if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(p2pIfaceName,
+            static_cast<int>(ScanBandType::SCAN_BAND_5_GHZ), freqList) == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
+            return false;
+        }
+    } else {
+        return false;
+    }
+    return true;
+}
+
 int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
 {
     std::vector<int> freqList;
@@ -1039,9 +1074,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
         WIFI_LOGE("Not 2.4GHz or 5GHz band!");
         return 0;
     }
-    if (WifiP2PHalInterface::GetInstance().P2pGetSupportFrequenciesByBand(
-        WifiConfigCenter::GetInstance().GetP2pIfaceName(), static_cast<int>(band), freqList) ==
-        WifiErrorNo::WIFI_HAL_OPT_FAILED) {
+    if (!GetAllFreqsByBand(band, freqList)) {
         constexpr int DEFAULT_5G_FREQUENCY = 5745; // channal:149, frequency:5745
         if (band == GroupOwnerBand::GO_BAND_5GHZ) {
             WIFI_LOGE("Get support frequencies failed, use default 5g frequency!");
@@ -1357,7 +1390,8 @@ void P2pStateMachine::ClearGroup() const
 bool P2pStateMachine::HandlerDisableRandomMac(int setmode) const
 {
     WifiP2PHalInterface::GetInstance().SetRandomMacAddr(setmode);
-    WifiP2PHalInterface::GetInstance().DeliverP2pData(CMD_TYPE_SET, DATA_TYPE_P2P_BUSINESS, CARRY_DATA_MIRACAST);
+    WifiP2PHalInterface::GetInstance().DeliverP2pData(static_cast<int>(P2P_SET_DELIVER_DATA),
+        static_cast<int>(DATA_TYPE_P2P_BUSINESS), CARRY_DATA_MIRACAST);
     return EXECUTED;
 }
 
@@ -1398,6 +1432,7 @@ bool P2pStateMachine::GetConnectedStationInfo(std::map<std::string, StationInfo>
 
 void P2pStateMachine::SetEnhanceService(IEnhanceService* enhanceService)
 {
+    pEnhanceService = enhanceService;
     p2pGroupOperatingState.SetEnhanceService(enhanceService);
 }
 

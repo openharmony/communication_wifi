@@ -125,6 +125,7 @@ private:
     bool CheckIsHomeAp();
     void HomeApJudgeProcess();
     void UpdateConnectionTime(bool isNeedNext);
+    void UpdateDisconnectTime();
     bool IsAbnormalTimeRecords();
     void UpdateStaticTimePoint(const std::time_t &currentTime);
     void StaticDurationInNightAndWeekend(int day, int64_t startTime, int64_t endTime);

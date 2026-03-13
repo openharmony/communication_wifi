@@ -324,6 +324,10 @@ public:
 
     int GetFreezeModeState() const;
 
+    void SetScanStyle(int scanStyle);
+ 
+    int GetScanStyle() const;
+ 
     void SetNoChargerPlugModeState(int state);
 
     int GetNoChargerPlugModeState() const;
@@ -374,10 +378,6 @@ public:
     void SetDfsControlData(DfsControlData dfsControlData);
  
     DfsControlData GetDfsControlData();
- 
-    void SetLpScanAbility(bool isSupportLpScan);
- 
-    bool GetLpScanAbility();
 
     bool IsSameKeyMgmt(std::string scanKeyMgmt, std::string keyMgmt);
 #ifndef OHOS_ARCH_LITE
@@ -459,7 +459,8 @@ private:
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;
     bool isNeedFastScan = false;
     WifiNetworkControlInfo networkControlInfoRecord;
-    
+    std::atomic<int> scanStyle_ = 0xFF;
+
     // AP
     std::mutex mApMutex;
     std::atomic<bool> mSoftapToggled {false};
@@ -518,7 +519,6 @@ private:
     int mDeviceType = ProductDeviceType::DEFAULT;
     DfsControlData dfsControlData_ = DfsControlData();
     std::atomic<bool> browserOn_ {false};
-    std::atomic<bool> isSupportLpScan_ {false};
 };
 } // namespace Wifi
 } // namespace OHOS

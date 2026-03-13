@@ -498,14 +498,19 @@ void WifiNetAgent::InitWifiNetAgent(const WifiNetAgentCallbacks &wifiNetAgentCal
     wifiNetAgentCallbacks_ = wifiNetAgentCallbacks;
 }
 
-void WifiNetAgent::ResetSupplierId()
+void WifiNetAgent::ResetSupplierId(int instId)
 {
-    supplierId = INVALID_SUPPLIER_ID;
+    WIFI_LOGI("%{public}s enter.instId = %{public}d", __func__, instId);
+    if (instId == 0) {
+        supplierId = INVALID_SUPPLIER_ID;
+    } else {
+        supplierIdForWlan1 = INVALID_SUPPLIER_ID;
+    }
 }
  
-uint32_t WifiNetAgent::GetSupplierId()
+uint32_t WifiNetAgent::GetSupplierId(int instId)
 {
-    return supplierId;
+    return (instId == 0) ? supplierId : supplierIdForWlan1;
 }
 
 bool WifiNetAgent::RequestNetwork(const int uid, const int networkId)

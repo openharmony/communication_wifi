@@ -70,14 +70,19 @@ bool WifiProUtils::IsUserSelectNetwork()
     return system::GetParameter("persist.wifi.is_connect_from_user", "") == "1";
 }
 
-bool WifiProUtils::IsSupplicantConnecting(SupplicantState supplicantState)
+bool WifiProUtils::IsSupplicantConnectionProcess(SupplicantState supplicantState)
+{
+    return IsSupplicantConnectingProcess(supplicantState) ||
+        supplicantState == SupplicantState::COMPLETED;
+}
+ 
+bool WifiProUtils::IsSupplicantConnectingProcess(SupplicantState supplicantState)
 {
     return supplicantState == SupplicantState::AUTHENTICATING ||
         supplicantState == SupplicantState::ASSOCIATING ||
         supplicantState == SupplicantState::ASSOCIATED ||
         supplicantState == SupplicantState::FOUR_WAY_HANDSHAKE ||
-        supplicantState == SupplicantState::GROUP_HANDSHAKE ||
-        supplicantState == SupplicantState::COMPLETED;
+        supplicantState == SupplicantState::GROUP_HANDSHAKE;
 }
 
 bool WifiProUtils::IsDefaultNet()

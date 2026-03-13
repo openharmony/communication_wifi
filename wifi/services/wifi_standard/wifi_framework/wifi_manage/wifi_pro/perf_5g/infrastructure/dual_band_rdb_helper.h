@@ -28,6 +28,7 @@ public:
     bool QueryApInfo(std::string &bssid, SwitchableApInfo &apInfo) override;
     bool QueryRelationInfo(std::string &bssid, std::vector<RelationInfo> &relationInfos) override;
     bool DeleteAll(std::unordered_set<std::string> &bssids) override;
+    bool RemoveDuplicateDatas() override;
     bool SaveApInfo(SwitchableApInfo &apInfo) override;
     void SaveApInfos(std::vector<SwitchableApInfo> &apInfos) override;
     void SaveRelationInfos(std::vector<RelationInfo> &relationInfos) override;

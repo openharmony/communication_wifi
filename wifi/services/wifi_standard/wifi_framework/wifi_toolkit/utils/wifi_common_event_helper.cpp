@@ -256,5 +256,17 @@ bool WifiCommonEventHelper::PublishNetCheckResultChange(const int &code, const s
     WIFI_LOGI("PublishNetCheckResultChange code:%{public}d", code);
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_NET_CHECK_RESULT_CHANGE, code, data);
 }
+
+void WifiCommonEventHelper::PublishHideDropDownWindowEvent()
+{
+#ifndef OHOS_ARCH_LITE
+ 	AAFwk::Want want;
+    want.SetAction(COMMON_EVENT_HIDE_DROPDOWN_WINDOW);
+    EventFwk::CommonEventData commonData {want};
+    EventFwk::CommonEventPublishInfo publishInfo;
+    bool isSuccess = EventFwk::CommonEventManager::PublishCommonEvent(commonData, publishInfo, nullptr);
+    WIFI_LOGI("PublishHideDropDownWindowEvent isSuccess: %{public}d", isSuccess);
+#endif
+}
 }  // namespace Wifi
 }  // namespace OHOS

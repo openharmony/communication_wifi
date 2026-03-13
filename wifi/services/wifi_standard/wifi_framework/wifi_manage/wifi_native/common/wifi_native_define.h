@@ -50,6 +50,12 @@ typedef enum HalScanResult {
     HAL_PNO_SCAN_OVER_OK = 3,       /* PNO Scan success notification */
 } HalScanResult;
 
+typedef enum Hal80211ScanCmd {
+    HAL_CMD_NEW_SCAN_RESULTS = 34,
+    HAL_CMD_SCAN_ABORTED = 35,
+    HAL_CMD_SCHED_SCAN_RESULTS = 77,
+} Hal80211ScanCmd;
+ 
 typedef enum HalConnectStatus {
     HAL_WPA_CB_CONNECTED = 1,
     HAL_WPA_CB_DISCONNECTED = 2,
@@ -135,7 +141,12 @@ typedef enum Wifi80211StatusCode {
 } Wifi80211StatusCode;
 
 typedef enum Wifi80211ReasonCode {
+    WLAN_REASON_UNSPECIFIED = 1,
+    WLAN_REASON_PREV_AUTH_NOT_VALID = 2,
+    WLAN_REASON_CLASS2_FRAME_FROM_NONAUTH_STA = 6,
+    WLAN_REASON_CLASS3_FRAME_FROM_NONASSOC_STA = 7,
     WLAN_REASON_IE_IN_4WAY_DIFFERS = 17,
+    WLAN_REASON_DISASSOC_LOW_ACK = 34,
 } Wifi80211ReasonCode;
 
 typedef enum Wifi80211AuthType {

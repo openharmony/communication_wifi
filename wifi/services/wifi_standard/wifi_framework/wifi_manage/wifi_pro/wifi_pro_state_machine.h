@@ -288,6 +288,7 @@ private:
         NetworkSelectType selectType, std::vector<InterScanInfo>& outCandidates);
     bool TryWifi2Wifi(const NetworkSelectionResult &networkSelectionResult);
     ErrCode FullScan();
+    void RecordChrApSwitchCountInfo();
     void ProcessSwitchResult(const InternalMessagePtr msg);
     bool InLandscapeSwitchLimitList();
     bool IsAllowScan(bool hasSwitchRecord);
@@ -295,6 +296,7 @@ private:
     bool IsKeepCurrWifiConnectedExtral();
     void Handle5GWifiTo2GWifi();
     void HandleHigherCategoryToLowerCategory();
+    bool GenelinkSelectNetwork(const std::vector<InterScanInfo> &scanInfos);
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -35,6 +35,8 @@
 #include "wifi_pro_chr.h"
 #include "wifi_channel_helper.h"
 #include "ienhance_service.h"
+#include "wifi_enhance_defs.h"
+#include "wifi_pro_enhance.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -230,7 +232,7 @@ bool WifiProStateMachine::HasWifiSwitchRecord()
         int64_t now = WifiProUtils::GetCurrentTimeMs();
         // less than 14 days
         if (now - pCurrWifiDeviceConfig_->lastTrySwitchWifiTimestamp < WIFI_SWITCH_RECORD_MAX_TIME) {
-            WIFI_LOGI("HasWifiSwitchRecord, has switch record in 14 days");
+            WIFI_LOGD("HasWifiSwitchRecord, has switch record in 14 days");
             return true;
         }
     }
@@ -243,7 +245,7 @@ void WifiProStateMachine::RefreshConnectedNetWork()
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     WIFI_LOGD("RefreshConnectedNetWork, connState:%{public}d,"
         "supplicantState:%{public}d.", linkedInfo.connState, static_cast<int32_t>(linkedInfo.supplicantState));
-    if (!WifiProUtils::IsSupplicantConnecting(linkedInfo.supplicantState)) {
+    if (!WifiProUtils::IsSupplicantConnectionProcess(linkedInfo.supplicantState)) {
         currentBssid_ = "";
         currentSsid_ = "";
         currentRssi_ = DEFAULT_RSSI;
@@ -556,11 +558,31 @@ bool WifiProStateMachine::TryWifi2Wifi(const NetworkSelectionResult &networkSele
     WifiProChr::GetInstance().RecordWifiProConnectTime();
     WifiProChr::GetInstance().RecordGatewayInfoBeforeSwitch();
     WIFI_HILOG_COMM_ERROR("TryWifi2Wifi: Switch reason : %{public}s", (g_switchReason[wifiSwitchReason_]).c_str());
-    if (pStaService->StartConnectToBssid(networkId, targetBssid_, NETWORK_SELECTED_BY_WIFIPRO) != WIFI_OPT_SUCCESS) {
+    SelectedType type = NETWORK_SELECTED_BY_WIFIPRO;
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+    if (WifiProEnhance::GetInstance().IsEnhanceSwitchEnable(currentBssid_, targetBssid_)) {
+        type = NETWORK_SELECTED_BY_WIFIPRO_ENHANCE;
+    }
+#endif
+    if (pStaService->StartConnectToBssid(networkId, targetBssid_, type) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("TryWifi2Wifi: ConnectToNetwork failed.");
         return false;
     }
+    /* Record Chr: WiFi switches triggered by scans of a specific scanStyle */
+    RecordChrApSwitchCountInfo();
     return true;
+}
+
+void WifiProStateMachine::RecordChrApSwitchCountInfo()
+{
+    ScanStatisticInfo scanStatisticInfo;
+    int scanStyle = WifiConfigCenter::GetInstance().GetScanStyle();
+    if (scanStyle == SCAN_TYPE_LOW_PRIORITY) {
+        scanStatisticInfo.lpScanApSwtCnt++;
+    } else if (scanStyle == SCAN_DEFAULT_TYPE) {
+        scanStatisticInfo.scanApSwtCnt++;
+    }
+    WriteWifiScanInfoHiSysEvent(scanStatisticInfo);
 }
 
 ErrCode WifiProStateMachine::FullScan()
@@ -581,6 +603,56 @@ ErrCode WifiProStateMachine::FullScan()
     }
     WifiProChr::GetInstance().RecordScanChrCnt(CHR_EVENT_WIFIPRO_FULL_SCAN_CNT);
     return pScanService->Scan(true, ScanType::SCAN_TYPE_WIFIPRO);
+}
+
+bool WifiProStateMachine::GenelinkSelectNetwork(const std::vector<InterScanInfo> &scanInfos)
+{
+    bool ret = false;
+#ifndef OHOS_ARCH_LITE
+    IEnhanceService  *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        return ret;
+    }
+
+    int type = pEnhanceService->GenelinkInterface(MultiLinkDefs::QUERY_SELECT_NETWORK_TYPE, 0);
+    if (type != MultiLinkDefs::SELECT_NETWORK_MASTER && type != MultiLinkDefs::SELECT_NETWORK_SLAVE) {
+        return ret;
+    }
+
+    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(INSTID_WLAN0);
+    if (pStaService == nullptr && type == MultiLinkDefs::SELECT_NETWORK_MASTER) {
+        return ret;
+    }
+    // notify genelink that selection start
+    pEnhanceService->GenelinkInterface(MultiLinkDefs::NOTIFY_SELECT_NETWORK, MultiLinkDefs::SELECT_NETWORK_START);
+
+    NetworkSelectionResult selectionResult;
+    NetworkSelectType networkSelectType = NetworkSelectType::AUTO_CONNECT;
+    std::unique_ptr<NetworkSelectionManager> pNetworkSelection = std::make_unique<NetworkSelectionManager>();
+    std::string failReason;
+    ret = pNetworkSelection->SelectNetwork(selectionResult, networkSelectType, scanInfos, failReason);
+    // notify genelink that selection is done regardless of result
+    pEnhanceService->GenelinkInterface(MultiLinkDefs::NOTIFY_SELECT_NETWORK, MultiLinkDefs::SELECT_NETWORK_STOP);
+    if (!ret) {
+        WIFI_LOGI("%{public}s failed: reason:%{public}s", __func__, failReason.c_str());
+        return ret;
+    }
+
+    std::string &targetBssid = selectionResult.interScanInfo.bssid;
+    selectionResult.wifiDeviceConfig.bssid = selectionResult.interScanInfo.bssid;
+    WIFI_LOGI("%{public}s select network result, ssid: %{public}s, bssid: %{public}s", __func__,
+        SsidAnonymize(selectionResult.interScanInfo.ssid).c_str(), MacAnonymize(targetBssid).c_str());
+    selectionResult.wifiDeviceConfig.rssi = selectionResult.interScanInfo.rssi;
+
+    ErrCode code = pEnhanceService->NotifyGenelinkSelectedConfig(selectionResult.wifiDeviceConfig);
+    if (type == MultiLinkDefs::SELECT_NETWORK_MASTER && code == WIFI_OPT_SUCCESS) {
+        code = pStaService->StartConnectToBssid(selectionResult.wifiDeviceConfig.networkId, targetBssid,
+            NETWORK_SELECTED_BY_GENELINK);
+        WIFI_LOGE("genelink: ConnectToNetwork %{public}s.", code == WIFI_OPT_SUCCESS ? "true" : "false");
+    }
+    ret = (code == WIFI_OPT_SUCCESS);
+#endif
+    return ret;
 }
 
 void WifiProStateMachine::ProcessSwitchResult(const InternalMessagePtr msg)
@@ -1138,7 +1210,7 @@ void WifiProStateMachine::WifiHasNetState::HandleRssiChangedInHasNet(const Inter
     }
 
     int32_t signalLevel = WifiProUtils::GetSignalLevel(pWifiProStateMachine_->instId_);
-    WIFI_LOGI("HasNetState, signalLevel:%{public}d.", signalLevel);
+    WIFI_LOGD("HasNetState, signalLevel:%{public}d.", signalLevel);
     if (signalLevel == SIG_LEVEL_4) {
         rssiLevel2Or3ScanedCounter_ = 0;
         rssiLevel0Or1ScanedCounter_ = 0;
@@ -1231,7 +1303,8 @@ void WifiProStateMachine::WifiHasNetState::StartScanWithDynamicStrategy(int32_t 
  
 bool WifiProStateMachine::WifiHasNetState::IsSatisfiedLpScanCondition()
 {
-    if (!WifiConfigCenter::GetInstance().GetLpScanAbility()) {
+    IEnhanceService  *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr || !pEnhanceService->IsSupportLpScanAbility()) {
         WIFI_LOGE("do not satisfy Lp scan condition.");
         return false;
     }
@@ -1347,8 +1420,12 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
         WIFI_LOGI("HandleScanResultInHasNet, msg is nullptr.");
         return;
     }
+
     std::vector<InterScanInfo> scanInfos;
     msg->GetMessageObj(scanInfos);
+    if (pWifiProStateMachine_->GenelinkSelectNetwork(scanInfos)) {
+        return;
+    }
     WifiProChr::GetInstance().RecordCountWiFiPro(true);
     if (pWifiProStateMachine_->isWifi2WifiSwitching_) {
         WIFI_LOGI("HandleScanResultInHasNet, Wifi2WifiSwitching.");
@@ -1382,7 +1459,7 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
 
 bool WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const std::vector<InterScanInfo> &scanInfos)
 {
-    WIFI_LOGI("wifi to wifi step 1: select network.");
+    WIFI_LOGD("wifi to wifi step 1: select network.");
     if (!pWifiProStateMachine_->SelectNetwork(pWifiProStateMachine_->networkSelectionResult_, scanInfos)) {
         WIFI_LOGI("wifi to wifi step X: Wifi2Wifi select network fail.");
         pWifiProStateMachine_->Wifi2WifiFinish();
@@ -1444,10 +1521,17 @@ bool WifiProStateMachine::WifiHasNetState::TryHigherCategoryNetworkSelection(
         WifiProChr::GetInstance().RecordReasonNotSwitchChrCnt(WIFIPRO_USER_SELECT);
         return false;
     }
+    int32_t signalLevel = WifiProUtils::GetSignalLevel(pWifiProStateMachine_->instId_);
+    if (signalLevel < SIG_LEVEL_3) {
+        WIFI_LOGI("TryHigherCategoryNetworkSelection: current signal level %{public}d, skip switching.", signalLevel);
+        return false;
+    }
     WIFI_LOGI("TryHigherCategoryNetworkSelection: Starting higher category network selection.");
     // 设置WiFi7+强场切换原因，使用统一的网络选择接口
     WifiSwitchReason previousReason = pWifiProStateMachine_->wifiSwitchReason_;
     pWifiProStateMachine_->SetSwitchReason(WIFI_SWITCH_REASON_HIGHER_CATEGORY);
+    // 同步 CHR 的切换开始原因，确保后续打点记录使用正确的 switch reason
+    WifiProChr::GetInstance().RecordWifiProStartTime(WIFI_SWITCH_REASON_HIGHER_CATEGORY);
 
       // 1. 使用新的辅助函数获取所有 Higher Category 候选网络
     std::vector<InterScanInfo> higherCategoryCandidates;
@@ -1457,6 +1541,7 @@ bool WifiProStateMachine::WifiHasNetState::TryHigherCategoryNetworkSelection(
         WIFI_LOGI("TryHigherCategoryNetworkSelection: No suitable higher category network found.");
         pWifiProStateMachine_->Wifi2WifiFinish();
         pWifiProStateMachine_->SetSwitchReason(previousReason);
+        WifiProChr::GetInstance().RecordWifiProStartTime(previousReason);
         return false;
     }
 
@@ -1466,16 +1551,18 @@ bool WifiProStateMachine::WifiHasNetState::TryHigherCategoryNetworkSelection(
         WIFI_LOGI("TryHigherCategoryNetworkSelection: AUTO_CONNECT selection failed, skip switching.");
         pWifiProStateMachine_->Wifi2WifiFinish();
         pWifiProStateMachine_->SetSwitchReason(previousReason);
+        WifiProChr::GetInstance().RecordWifiProStartTime(previousReason);
         return false;
     }
 
     // IsAutoReconnectPreferred 返回 true 意味着选出了一个更优的网络, 且不是当前网络
     WIFI_LOGI("TryHigherCategoryNetworkSelection: AUTO_CONNECT selected %{public}s as winner, attempting switch.",
-              MacAnonymize(outSelectionResult.interScanInfo.bssid).c_str());
+              SsidAnonymize(outSelectionResult.interScanInfo.ssid).c_str());
     if (!pWifiProStateMachine_->TryWifi2Wifi(outSelectionResult)) {
         WIFI_LOGI("TryHigherCategoryNetworkSelection: TryWifi2Wifi failed to start connection.");
         pWifiProStateMachine_->Wifi2WifiFinish();
         pWifiProStateMachine_->SetSwitchReason(previousReason);
+        WifiProChr::GetInstance().RecordWifiProStartTime(previousReason);
         return false;
     }
     return true;
@@ -1577,7 +1664,7 @@ bool WifiProStateMachine::GetFilteredCandidates(const std::vector<InterScanInfo>
     selector->GetBestCandidates(bestCandidates);
 
     if (bestCandidates.empty()) {
-        WIFI_LOGI("GetFilteredCandidates: Selector filtered out all candidates.");
+        WIFI_LOGD("GetFilteredCandidates: Selector filtered out all candidates.");
         WifiProChr::GetInstance().RecordSelectNetChrCnt(false);
         return false;
     }
@@ -1590,7 +1677,6 @@ bool WifiProStateMachine::GetFilteredCandidates(const std::vector<InterScanInfo>
 
     WIFI_LOGI("GetFilteredCandidates: Found %{public}zu candidates for select type %{public}d.",
         outCandidates.size(), static_cast<int>(selectType));
-    WifiProChr::GetInstance().RecordSelectNetChrCnt(true);
     return true;
 }
 
@@ -1645,8 +1731,10 @@ bool WifiProStateMachine::IsAutoReconnectPreferred(
     // If winner is not the current network, then a higher-category candidate won
     if (selectionResult.interScanInfo.bssid != pCurrWifiInfo_->bssid) {
         WIFI_LOGI("IsAutoReconnectPreferred: A higher-category candidate was selected by AUTO_CONNECT. Allow switch.");
+        WifiProChr::GetInstance().RecordSelectNetChrCnt(true);
         return true;
     }
+    WifiProChr::GetInstance().RecordSelectNetChrCnt(false);
     return false;
 }
 /* --------------------------- state machine no net state ------------------------------ */
@@ -1796,7 +1884,16 @@ bool WifiProStateMachine::WifiNoNetState::HandleHttpResultInNoNet(InternalMessag
     }
     int32_t state = msg->GetParam1();
     if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_DISABLED)) {
-        pWifiProStateMachine_->FullScan();
+        WifiLinkedInfo linkedInfo;
+        WifiDeviceConfig wifiDeviceConfig;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+        WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, wifiDeviceConfig);
+        if (WifiProUtils::IsUserSelectNetwork() &&
+            !NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory)) {
+            WIFI_LOGI("user actively select no-net network, do not allow scan.");
+        } else {
+            pWifiProStateMachine_->FullScan();
+        }
         return EXECUTED;
     }
     return NOT_EXECUTED;

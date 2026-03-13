@@ -85,6 +85,7 @@ ohos_fuzztest("WifiScanServerFuzzTest") {
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_auth_center.cpp",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_netconn_client.cpp",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_scan_state_machine.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro/wifi_pro_utils.cpp",
     "wifiscanserver_fuzzer.cpp",
   ]
 

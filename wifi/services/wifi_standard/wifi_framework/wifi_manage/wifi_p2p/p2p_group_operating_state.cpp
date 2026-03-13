@@ -75,6 +75,8 @@ void P2pGroupOperatingState::Init()
         [this](const InternalMessagePtr msg) { return this->ProcessCmdDeleteGroup(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP,
         [this](const InternalMessagePtr msg) { return this->ProcessCmdHid2dCreateGroup(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::P2P_DISABLE_TIMEOUT,
+        [this](const InternalMessagePtr msg) { return this->ProcessCmdDisableTimeout(msg); }));
 }
 
 bool P2pGroupOperatingState::ProcessCmdCreateRptGroup(const InternalMessagePtr msg) const
@@ -89,12 +91,8 @@ bool P2pGroupOperatingState::ProcessCmdCreateRptGroup(const InternalMessagePtr m
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     if (linkedInfo.connState == CONNECTED && !config.GetPassphrase().empty() && !config.GetGroupName().empty() &&
         config.GetPassphrase().length() >= MIN_PSK_LEN && config.GetPassphrase().length() <= MAX_PSK_LEN) {
-        bool sameFreq = (linkedInfo.band == static_cast<int>(BandType::BAND_5GHZ) &&
-                         config.GetGoBand() == GroupOwnerBand::GO_BAND_5GHZ) ||
-                        (linkedInfo.band == static_cast<int>(BandType::BAND_2GHZ) &&
-                         config.GetGoBand() == GroupOwnerBand::GO_BAND_2GHZ);
-        int freq = sameFreq ? linkedInfo.frequency : p2pStateMachine.GetAvailableFreqByBand(config.GetGoBand());
-        WIFI_LOGI("Create rpt group.");
+        int freq = p2pStateMachine.GetAvailableFreqByBand(config.GetGoBand());
+        WIFI_LOGI("Create rpt group. p2p freq is %{public}d", freq);
         WifiConfigCenter::GetInstance().SetExplicitGroup(true);
         if (p2pStateMachine.DealCreateRptGroupWithConfig(config, freq)) {
             ret = WIFI_HAL_OPT_OK;
@@ -176,11 +174,11 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessagePtr msg)
         WIFI_LOGE("Invalid parameter.");
     }
     if (WifiErrorNo::WIFI_HAL_OPT_FAILED == ret) {
-        WIFI_LOGE("p2p configure to CreateGroup failed.");
+        WIFI_LOGE("p2p configure to CreateGroup failed. p2p freq is %{public}d", freq);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateGroup, WIFI_OPT_FAILED);
         p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
     } else {
-        WIFI_LOGI("p2p configure to CreateGroup successful.");
+        WIFI_LOGI("p2p configure to CreateGroup successful. p2p freq is %{public}d", freq);
         p2pStateMachine.MessageExecutedLater(
             static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT), CREATE_GROUP_TIMEOUT);
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::CreateGroup, WIFI_OPT_SUCCESS);
@@ -213,9 +211,10 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessagePtr msg
     std::string goAddr = group.GetOwner().GetDeviceAddress();
     if (group.IsGroupOwner()) { /* append setting the device name if this is GO */
         WifiP2pDevice thisDevice = deviceManager.GetThisDevice();
-        thisDevice.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
-        thisDevice.SetDeviceAddress(goAddr);
-        group.SetOwner(thisDevice);
+        WifiP2pDevice tempDevice = thisDevice;
+        tempDevice.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
+        tempDevice.SetDeviceAddress(goAddr);
+        group.SetOwner(tempDevice);
         group.SetExplicitGroup(WifiConfigCenter::GetInstance().IsExplicitGroup());
     } else {
         WifiP2pDevice dev = deviceManager.GetDevices(goAddr);
@@ -239,9 +238,7 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessagePtr msg
     }
     SharedLinkManager::IncreaseSharedLink();
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_CONNECTED);
-    if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("SetP2pPowerSave() failed!");
-    }
+    WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true);
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     return EXECUTED;
 }
@@ -291,11 +288,27 @@ bool P2pGroupOperatingState::ProcessGroupRemovedEvt(const InternalMessagePtr msg
 
 bool P2pGroupOperatingState::ProcessCmdDisable(const InternalMessagePtr msg) const
 {
-    /**
-     * Before disabling P2P, you need to remove the group.
-     */
+    WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
+    if (group.GetP2pGroupStatus() == P2pGroupStatus::GS_STARTED) {
+        if (p2pStateMachine.p2pDevIface == group.GetInterface()) {
+            p2pStateMachine.p2pDevIface = "";
+        }
+        WifiNetAgent::GetInstance().DelInterfaceAddress(group.GetInterface(),
+            group.IsGroupOwner() ? group.GetGoIpAddress() : group.GetGcIpAddress(), P2P_IP_ADDR_PREFIX_LEN);
+        /* do not judge remove result, because can not recv callback in close wpa */
+        WifiP2PHalInterface::GetInstance().GroupRemove(group.GetInterface());
+        if (!groupManager.GetCurrentGroup().IsGroupOwner()) {
+            p2pStateMachine.StopP2pDhcpClient();
+        } else {
+            p2pStateMachine.StopDhcpServer();
+        }
+        WifiP2pGroupInfo invalidGroup;
+        groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, invalidGroup);
+    }
+    p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
     p2pStateMachine.DelayMessage(msg);
-    return ProcessCmdRemoveGroup(msg);
+    p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
+    return EXECUTED;
 }
 
 bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessagePtr msg) const
@@ -456,6 +469,24 @@ bool P2pGroupOperatingState::ExecuteStateMsg(InternalMessagePtr msg)
 void P2pGroupOperatingState::SetEnhanceService(IEnhanceService* enhanceService)
 {
     enhanceService_ = enhanceService;
+}
+
+bool P2pGroupOperatingState::ProcessCmdDisableTimeout(const InternalMessagePtr msg) const
+{
+    WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
+    if (!groupManager.GetCurrentGroup().IsGroupOwner()) {
+        p2pStateMachine.StopP2pDhcpClient();
+    } else {
+        if (!p2pStateMachine.StopDhcpServer()) {
+            WIFI_LOGW("failed to stop Dhcp server.");
+        }
+    }
+    WifiP2pGroupInfo invalidGroup;
+    groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, invalidGroup);
+    p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_DISCONNECTED);
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE));
+    p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
+    return EXECUTED;
 }
 
 }  // namespace Wifi

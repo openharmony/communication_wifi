@@ -55,6 +55,11 @@ typedef enum {
 using P2pEnhanceCallback = std::function<void(const std::string &, int32_t, int32_t)>;
 using SensorEnhanceCallback = std::function<void(int)>;
 using MovementEnhanceCallback = std::function<void(int32_t movementType, int32_t movementValue)>;
+using GenelinkEnhanceCallback = std::function<void(int, int)>;
+
+struct StaEnhanceCallback {
+    GenelinkEnhanceCallback OnGenelinkEvent { nullptr };
+};
 class IEnhanceService {
 public:
     virtual ~IEnhanceService() = default;
@@ -296,8 +301,17 @@ public:
 
     /**
      * @Description on notification receive
+     *
+     * @param notificationId - notification Id
      */
-    virtual void OnNotificationReceive() = 0;
+    virtual void OnNotificationReceive(int notificationId) = 0;
+
+    /**
+     * @Description on dont show again receive
+     *
+     * @param notificationId - notification Id
+     */
+    virtual void OnDontShowReceive(int notificationId) = 0;
  
     /**
      * @Description on dialog receive
@@ -476,6 +490,99 @@ public:
      * @return void
      */
     virtual void NotifyWifiDisconnectReason(const int reason, const int subReason) = 0;
+
+    /**
+     * @Description Genelink interface for exchanging information between WiFi and Enhance
+     *
+     * @param eventId - event id
+     * @param commParam - common parameter
+     * @return int - operation result
+     */
+    virtual int GenelinkInterface(int eventId, int commParam) = 0;
+
+    /**
+     * @Description Notify selected wifi config to enhance module
+     *
+     * @param config - selected wifi config
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode NotifyGenelinkSelectedConfig(WifiDeviceConfig &config) = 0;
+
+    /**
+     * @Description register STA callback event
+     *
+     * @param callback callback struct
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode RegisterStaEnhanceCallback(StaEnhanceCallback callback) = 0;
+
+    /**
+     * @Description Set bt co-exist state when service conflict
+     *
+     * @param state - bt co-exist state
+     * @param reason - conflict reason
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetBtCoexistState(CoexistState state, CoexistReason reason) = 0;
+
+    /**
+     * @Description Set game latency gain statistics feature enabled state
+     *
+     * @param enabled - whether the feature is enabled
+     * @param featureName - feature name to distinguish different gain scenarios
+     */
+    virtual void SetGameLatencyFeatureEnabled(bool enabled, const std::string& featureName) = 0;
+
+#ifndef OHOS_ARCH_LITE
+    /**
+     * @Description Get Wifi enhance config by type
+     *
+     * @param type - Wifi enhance config type
+     * @return EnhanceConfigVariant - variant config
+     */
+    virtual EnhanceConfigVariant GetWifiEnhanceConfig(WifiEnhanceConfigType type) = 0;
+#endif
+
+    /**
+     * @Description Set game latency gain statistics feature enabled state
+     *
+     * @param state - game scene state
+     */
+    virtual void ReportGameSceneChange(int state) = 0;
+ 
+    /**
+     * @Description receive device config change
+     *
+     * @param status - device config change type, update/remove
+     * @param config - changed config
+     * @param isRemoveAll - is remove all device config 1:remove all 0:not remove all
+     */
+    virtual void OnWifiDeviceConfigChange(int32_t status, const WifiDeviceConfig &config, bool isRemoveAll) = 0;
+
+    /**
+     * @Description Check if the gateways of two BSSIDs are the same
+     *
+     * @param bssid1 - first bssid
+     * @param bssid2 - second bssid
+     * @return bool - true: same gateway; false: different gateway
+     */
+    virtual bool IsSameGateway(const std::string &bssid1, const std::string &bssid2) = 0;
+
+    /**
+     * @Description Update the gateway relationship between the two BSSIDs
+     *
+     * @param bssid1 - first bssid
+     * @param bssid2 - second bssid
+     * @param isSameGateway - true: same gateway; false: different gateway
+     */
+    virtual void UpdateGatewayRelation(std::string &bssid1, std::string &bssid2, bool isSameGateway) = 0;
+
+    /**
+     * @Description Get device features.
+     *
+     * @return WifiDeviceFeatures - A structure indicating device features.
+     */
+    virtual WifiDeviceFeatures GetDeviceFeatures() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

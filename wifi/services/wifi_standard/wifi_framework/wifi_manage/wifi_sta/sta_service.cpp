@@ -21,6 +21,7 @@
 #include "wifi_country_code_manager.h"
 #include "wifi_notification_util.h"
 #include "wifi_history_record_manager.h"
+#include "wifi_enhance_defs.h"
 #endif
 #include "wifi_logger.h"
 #include "wifi_sta_hal_interface.h"
@@ -627,6 +628,9 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
             __FUNCTION__,  MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
         if (bssid == linkedInfo.bssid) {
             LOGI("%{public}s current linkedBssid equal to target bssid", __FUNCTION__);
+            if (type == NETWORK_SELECTED_BY_GENELINK) {
+                pStaStateMachine->StartConnectToBssid(networkId, bssid, type);
+            }
             return WIFI_OPT_SUCCESS;
         } else if (linkedInfo.isMloConnected) {
             std::vector<WifiLinkedInfo> mloInfo;
@@ -636,7 +640,10 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
             }
             if (std::find_if(mloInfo.begin(), mloInfo.end(),
                 [bssid](WifiLinkedInfo &info) { return bssid == info.bssid; }) == mloInfo.end()) {
-                    pStaStateMachine->StartConnectToBssid(networkId, bssid);
+                    pStaStateMachine->StartConnectToBssid(networkId, bssid, type);
+                    LOGI("%{public}s linkedInfo.bssid: %{public}s, bssid %{public}s, isMloConnected %{public}d",
+                        __FUNCTION__, MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str(),
+                        linkedInfo.isMloConnected);
                 return WIFI_OPT_SUCCESS;
             }
             if (linkedInfo.wifiLinkType == WifiLinkType::WIFI7_MLSR) {
@@ -648,16 +655,23 @@ ErrCode StaService::StartConnectToBssid(const int32_t networkId, const std::stri
                 return WIFI_OPT_SUCCESS;
             }
         }
-        pStaStateMachine->StartConnectToBssid(networkId, bssid);
+        LOGI("%{public}s linkedInfo.bssid: %{public}s, bssid %{public}s",
+            __FUNCTION__, MacAnonymize(linkedInfo.bssid).c_str(), MacAnonymize(bssid).c_str());
+        pStaStateMachine->StartConnectToBssid(networkId, bssid, type);
     } else {
-        LOGI("%{public}s switch to target network", __FUNCTION__);
-        auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
-        message->SetParam1(networkId);
-        message->SetParam2(type);
-        message->AddStringMessageBody(bssid);
-        pStaStateMachine->SendMessage(message);
+        StartConnectToBssidExt(networkId, bssid, type);
     }
     return WIFI_OPT_SUCCESS;
+}
+
+void StaService::StartConnectToBssidExt(const int32_t networkId, const std::string bssid, int32_t type) const
+{
+    LOGI("%{public}s switch to target network", __FUNCTION__);
+    auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
+    message->SetParam1(networkId);
+    message->SetParam2(type);
+    message->AddStringMessageBody(bssid);
+    pStaStateMachine->SendMessage(message);
 }
 
 ErrCode StaService::StartConnectToUserSelectNetwork(int networkId, std::string bssid) const
@@ -763,6 +777,15 @@ ErrCode StaService::Disconnect() const
         }
     }
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
+#ifndef OHOS_ARCH_LITE
+    if (m_instId == INSTID_WLAN0) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->GenelinkInterface(MultiLinkDefs::NOTIFY_QUIT_DUAL_WLAN, 0);
+            WIFI_LOGI("notify enhance service quit dual_wlan mode");
+        }
+    }
+#endif
     pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_DISCONNECT);
     return WIFI_OPT_SUCCESS;
 }
@@ -878,6 +901,12 @@ void StaService::NotifyDeviceConfigChange(ConfigChange value, WifiDeviceConfig c
     cbMsg.msgData = static_cast<int>(value);
     cbMsg.id = m_instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGD("%{public}s: pEnhanceService is null", __FUNCTION__);
+        return;
+    }
+    pEnhanceService->OnWifiDeviceConfigChange(static_cast<int32_t>(value), config, isRemoveAll);
 #endif
 }
 
@@ -885,7 +914,8 @@ int StaService::FindDeviceConfig(const WifiDeviceConfig &config, WifiDeviceConfi
 {
     int ret = -1;
     if (config.uid > WIFI_INVALID_UID) {
-        ret = WifiSettings::GetInstance().GetCandidateConfig(config.uid, config.ssid, config.keyMgmt, outConfig);
+        ret = WifiSettings::GetInstance().GetCandidateConfig(config.uid, config.ssid, config.keyMgmt, outConfig,
+            m_instId);
     } else {
         ret = WifiSettings::GetInstance().GetDeviceConfig(config.ssid, config.keyMgmt, outConfig, m_instId);
     }
@@ -900,9 +930,9 @@ ErrCode StaService::OnSystemAbilityChanged(int systemAbilityid, bool add)
 #ifndef OHOS_ARCH_LITE
     CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
     if (systemAbilityid == COMM_NET_CONN_MANAGER_SYS_ABILITY_ID) {
-        uint32_t supplierId = WifiNetAgent::GetInstance().GetSupplierId();
+        uint32_t supplierId = WifiNetAgent::GetInstance().GetSupplierId(m_instId);
         if ((add && !m_connMangerStatus) || (supplierId == INVALID_SUPPLIER_ID)) {
-            WifiNetAgent::GetInstance().ResetSupplierId();
+            WifiNetAgent::GetInstance().ResetSupplierId(m_instId);
             pStaStateMachine->OnNetManagerRestart();
         }
         m_connMangerStatus = add;
@@ -1091,7 +1121,7 @@ ErrCode StaService::DeliverAudioState(int state)
     }
     if (isEnableBackAudio) {
         CHECK_NULL_AND_RETURN(pStaStateMachine, WIFI_OPT_FAILED);
-        WIFI_LOGI("DealScreenOffPoll deliver audio state.");
+        WIFI_LOGD("DealScreenOffPoll deliver audio state.");
         pStaStateMachine->SendMessage(WIFI_AUDIO_STATE_CHANGED_NOTIFY_EVENT, state);
     }
     return WIFI_OPT_SUCCESS;

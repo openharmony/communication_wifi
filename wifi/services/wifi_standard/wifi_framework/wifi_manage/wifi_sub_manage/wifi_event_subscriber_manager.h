@@ -50,6 +50,7 @@ const int ASSETID = 6226;
 #endif
 #ifdef HAS_NETMANAGER_EVENT_PART
 inline const std::string WIFI_EVENT_BG_CONTINUOUS_TASK_STATE = "ohos.event.notification.wifi.BGCTTASK_STATE";
+inline const std::string WIFI_EVENT_ACC_TASK_STATE = "ohos.event.notification.wifi.ACCTASK_STATE";
 #endif
 class CesEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
 public:
@@ -66,8 +67,10 @@ public:
     void OnReceiveUserUnlockedEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveConnectivityChangedEvent(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveForceSleepEvent(const OHOS::EventFwk::CommonEventData &eventData);
+    void OnReceiveGameInfoNotifyEvent(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     bool lastSleepState = false;
+    std::atomic<bool> firstFoldState_ = true;
 };
 
 class NotificationEventSubscriber : public OHOS::EventFwk::CommonEventSubscriber {
@@ -78,6 +81,7 @@ public:
     void OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     void OnReceiveNotificationEvent(int notificationId);
+    void OnReceiveDontShowEvent(int notificationId);
     void OnReceiveDialogAcceptEvent(int dialogType, const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveDialogRejectEvent(int dialogType, bool noAction);
     void NotifyCandidateApprovalStatus(CandidateApprovalStatus status);

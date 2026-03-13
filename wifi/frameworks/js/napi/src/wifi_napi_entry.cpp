@@ -199,6 +199,7 @@ static napi_value WifiLinkTypeInit(napi_env env)
     SetNamedPropertyByInteger(env, wifiLinkType, static_cast<int>(WifiLinkTypeJs::WIFI7_MLSR), "WIFI7_MLSR");
     SetNamedPropertyByInteger(env, wifiLinkType, static_cast<int>(WifiLinkTypeJs::WIFI7_EMLSR), "WIFI7_EMLSR");
     SetNamedPropertyByInteger(env, wifiLinkType, static_cast<int>(WifiLinkTypeJs::WIFI7_STR), "WIFI7_STR");
+    SetNamedPropertyByInteger(env, wifiLinkType, static_cast<int>(WifiLinkTypeJs::WIFI7_LEGACY), "WIFI7_LEGACY");
     return wifiLinkType;
 }
 static napi_value WifiDetailStateInit(napi_env env)
@@ -388,6 +389,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getWifiDetailState", GetWifiDetailState),
         DECLARE_WRITABLE_NAPI_FUNCTION("getCountryCode", GetCountryCode),
         DECLARE_NAPI_FUNCTION("getDeviceConfigs", GetDeviceConfigs),
+        DECLARE_NAPI_FUNCTION("getDeviceConfig", GetDeviceConfig),
         DECLARE_NAPI_FUNCTION("updateNetwork", UpdateNetwork),
         DECLARE_NAPI_FUNCTION("updateDeviceConfig", UpdateNetwork),
         DECLARE_NAPI_FUNCTION("getSupportedFeatures", GetSupportedFeatures),

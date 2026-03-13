@@ -555,7 +555,7 @@ ErrCode StaInterface::DeliverStaIfaceData(const std::string &currentMac)
 
 ErrCode StaInterface::DeliverAudioState(int state)
 {
-    WIFI_LOGI("Enter DeliverAudioState");
+    WIFI_LOGD("Enter DeliverAudioState");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
     pStaService->DeliverAudioState(state);

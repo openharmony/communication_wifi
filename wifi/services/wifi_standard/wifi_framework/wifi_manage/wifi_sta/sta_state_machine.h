@@ -68,6 +68,7 @@ constexpr int CMD_AP_ROAMING_TIMEOUT_CHECK = 0X06;
 constexpr int CMD_LINK_SWITCH_DETECT_TIMEOUT = 0x07;
 constexpr int CMD_NO_INTERNET_TIMEOUT = 0x08;
 constexpr int CMD_IPV6_DELAY_TIMEOUT = 0x09;
+constexpr int CMD_AP_RECONN_TIMEOUT_CHECK = 0x11;
 
 constexpr int STA_NETWORK_CONNECTTING_DELAY = 20 * 1000;
 constexpr int STA_SIGNAL_POLL_DELAY = 3 * 1000;
@@ -118,6 +119,8 @@ constexpr int RSSI_OFFSET_MAX = 10;
 
 constexpr unsigned int BIT_MLO_CONNECT = 0x80;
 
+constexpr int STA_AP_RECONNECT_TIMEOUT = 5000; // 5s
+
 #define DNS_IP_ADDR_LEN 15
 #define WIFI_FIRST_DNS_NAME "const.wifi.wifi_first_dns"
 #define WIFI_SECOND_DNS_NAME "const.wifi.wifi_second_dns"
@@ -149,6 +152,13 @@ enum FoldStatus {
     HALF_FOLD,
 };
 
+enum ReconnectType {
+    RECONNECT_TYPE_UNKNOWN = 0,
+    RECONNECT_TYPE_FAST = 1,
+    RECONNECT_TYPE_EHANCE_SWITCH = 2,
+    RECONNECT_TYPE_GENELINK = 3,
+};
+
 inline const int DETECT_TYPE_DEFAULT = 0;
 inline const int DETECT_TYPE_PERIODIC = 1;
 inline const int DETECT_TYPE_CHECK_PORTAL_EXPERIED = 2;
@@ -161,7 +171,7 @@ enum PortalState {
     EXPERIED
 };
 
-const std::string WPA_BSSID_ANY = "any";
+inline const std::string WPA_BSSID_ANY = "any";
 
 class StaStateMachine : public StateMachine {
 #ifndef OHOS_ARCH_LITE
@@ -219,6 +229,8 @@ public:
         bool RestrictedByMdm(WifiDeviceConfig &config);
 #endif
         void HandleNetworkConnectionEvent(InternalMessagePtr msg);
+        void UpdateLinkedInfoAfterConnect(const std::string& bssid);
+        void SwitchToNextStateAfterConnect();
         bool NotAllowConnectToNetwork(int networkId, const std::string& bssid, int connTriggerMode);
         bool NotExistInScanList(WifiDeviceConfig &config);
         void DealHiddenSsidConnectMiss(int networkId);
@@ -248,6 +260,8 @@ public:
         void DealWpaStateChange(InternalMessagePtr msg);
         void DealMloStateChange(InternalMessagePtr msg);
         void DealWpaCustomEapAuthEvent(InternalMessagePtr msg);
+        bool NeedIgnoreDisconnectEvent(int reason, const std::string &bssid, int locallyGenerated);
+        bool TryFastReconnect(int reason, const std::string &bssid, int locallyGenerated);
     };
     /**
      * @Description  Definition of member function of SeparatedState class in StaStateMachine.
@@ -353,6 +367,7 @@ public:
 #endif
         void DhcpResultNotify(InternalMessagePtr msg);
         void NetDetectionNotify(InternalMessagePtr msg);
+        void UpdateNetDetectHistory(EnumNetWorkState networkState);
         void DealNetworkCheck(InternalMessagePtr msg);
         void FoldStatusNotify(InternalMessagePtr msg);
         bool ProcessMessageByMacros(InternalMessagePtr msg);
@@ -382,6 +397,31 @@ public:
         bool HandleNetworkConnectionEvent(InternalMessagePtr msg);
         void DealApRoamingStateTimeout(InternalMessagePtr msg);
         StaStateMachine *pStaStateMachine;
+    };
+
+    /**
+     * @Description  Definition of member function of ApReconnectState class in StaStateMachine.
+     *
+     */
+    class ApReconnectState : public State {
+    public:
+        explicit ApReconnectState(StaStateMachine *staStateMachine);
+        ~ApReconnectState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
+        void SetFastReconnectState(bool isFastReconnect);
+
+    private:
+        void GetGatewayMac(std::string &gatewayMac);
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+        void StartConnectEvent(InternalMessagePtr msg);
+#endif
+        void HandleNetworkConnectionEvent(InternalMessagePtr msg);
+        StaStateMachine *pStaStateMachine;
+        bool isFastReconnect_ {false};
+        std::string lastBssid_;
+        std::string lastGatewayMac_;
     };
 
     class DhcpResultNotify {
@@ -437,6 +477,8 @@ public:
         void TryToSaveIpV4ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
         void TryToSaveIpV6ResultExt(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result);
+        void UpdateNetLinkInfoForIpV6(IpInfo &ipInfo, IpV6Info &ipv6Info);
+        bool IsIpv6AllZero(const std::string &ipv6);
         void TryToJumpToConnectedState(int iptype);
         void SaveDhcpResult(DhcpResult *dest, DhcpResult *source);
         void SaveDhcpResultExt(DhcpResult *dest, DhcpResult *source);
@@ -464,8 +506,9 @@ public:
      *
      * @param networkId - the networkId
      * @param bssid - the mac address of network(in)
+     * @param type - select network type: SelectedType
      */
-    void StartConnectToBssid(const int32_t networkId, std::string bssid);
+    void StartConnectToBssid(const int32_t networkId, std::string bssid, int32_t type = NETWORK_SELECTED_BY_USER);
     /**
      * @Description Register sta callback function
      *
@@ -1026,6 +1069,9 @@ private:
     void ResetWifi7WurInfo();
     void UpdateLinkedInfoFromScanInfo();
     void SetSupportedWifiCategory();
+    void RegisterEnhanceServiceStaCallback();
+    void OnEnhanceServiceStaEvent(int eventId, int param);
+    void UnRegisterEnhanceServiceStaCallback();
 #endif
     void SetConnectMethod(int connectMethod);
     void FillSuiteB192Cfg(WifiHalDeviceConfig &halDeviceConfig) const;
@@ -1066,6 +1112,7 @@ private:
     sptr<NetStateObserver> m_NetWorkState;
     IEnhanceService *enhanceService_ = nullptr;        /* EnhanceService handle */
     ISelfCureService *selfCureService_ = nullptr;
+    StaEnhanceCallback staEnhanceCallback_;
 #endif
 
     int targetNetworkId_;
@@ -1075,6 +1122,7 @@ private:
     bool enableSignalPoll;
     bool isRoam;
     bool isCurrentRoaming_ = false;
+    bool isWaitForReconnect_ = false;
     int64_t lastTimestamp;
     bool autoPullBrowserFlag;
     PortalState portalState;
@@ -1095,6 +1143,7 @@ private:
     GetIpState *pGetIpState;
     LinkedState *pLinkedState;
     ApRoamingState *pApRoamingState;
+    ApReconnectState *pApReConnectState;
     int m_instId;
     std::map<std::string, time_t> wpa3BlackMap;
     std::map<std::string, int> wpa3ConnectFailCountMapArray[WPA3_FAIL_REASON_MAX];
@@ -1114,6 +1163,10 @@ private:
     bool linkSwitchDetectingFlag_{false};
     uint32_t pktDirCnt_ = 0;
     int connectMethod_ = -1;
+    std::mutex httpDetectionMtx_;
+    std::condition_variable httpDetectionCond_;
+    std::atomic<bool> isHttpReachable_{false};
+    int reconnType_ = RECONNECT_TYPE_UNKNOWN;
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
     WifiDataReportService *wifiDataReportService_ = nullptr;

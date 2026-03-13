@@ -157,6 +157,8 @@ void WifiDeviceStub::InitHandleMapEx2()
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnSetRandomMacDisabled(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_RANDOMMAC_DISABLED)] = [this]
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnIsRandomMacDisabled(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_BT_COEXIST_STATE)] = [this]
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnSetBtCoexistState(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -1175,8 +1177,8 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Mess
             WIFI_LOGI("create new WifiDeviceCallBackProxy!");
         }
 
-        int pid = data.ReadInt32();
-        int tokenId = data.ReadInt32();
+        int pid = static_cast<int>(GetCallingPid());
+        int tokenId = static_cast<int>(GetCallingTokenId());
         int eventNum = data.ReadInt32();
         std::vector<std::string> event;
         if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
@@ -1660,6 +1662,17 @@ void WifiDeviceStub::OnSetRandomMacDisabled(uint32_t code, MessageParcel &data, 
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     bool isRandomMacDisabled = data.ReadBool();
     ErrCode ret = SetRandomMacDisabled(isRandomMacDisabled);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnSetBtCoexistState(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    CoexistState state = static_cast<CoexistState>(data.ReadInt32());
+    CoexistReason reason = static_cast<CoexistReason>(data.ReadInt32());
+    ErrCode ret = SetBtCoexistState(state, reason);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     return;

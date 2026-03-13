@@ -18,9 +18,10 @@
 
 namespace OHOS {
 namespace Wifi {
+
 DEFINE_WIFILOG_P2P_LABEL("P2pGroupRemoveState");
-P2pGroupRemoveState::P2pGroupRemoveState()
-    : State("P2pGroupRemoveState")
+P2pGroupRemoveState::P2pGroupRemoveState(P2pStateMachine &stateMachine)
+    : State("P2pGroupRemoveState"), p2pStateMachine(stateMachine)
 {}
 void P2pGroupRemoveState::GoInState()
 {

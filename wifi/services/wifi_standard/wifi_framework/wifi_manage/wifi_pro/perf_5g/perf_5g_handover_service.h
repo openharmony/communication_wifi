@@ -60,6 +60,7 @@ private:
     bool inMonitor_ = false;
     Pref5gStatisticsInfo perf5gChrInfo_;
     std::atomic<bool> isNewBssidConnected_ = true;
+    std::atomic<bool> lpScanFlag_ = false;
     const int apMaxNum_ = 20;
     void UpdateCurrentApInfo(InterScanInfo &wifiScanInfo);
     void UpdateRelationApInfo(std::vector<WifiDeviceConfig> &wifiDeviceConfigs, std::vector<InterScanInfo> &scanInfos);
@@ -89,6 +90,7 @@ private:
     void OnDisconnected();
     void RemoveRelationApDuplicates(std::vector<RelationAp> &relationAps);
     bool IsValidAp(int32_t relationApIndex);
+    bool isNotAllowedPerf(WifiLinkedInfo &wifiLinkedInfo, WifiDeviceConfig &wifiDeviceConfig);
 };
 }
 }

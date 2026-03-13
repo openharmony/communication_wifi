@@ -31,12 +31,16 @@ AuthorizingNegotiationRequestState::AuthorizingNegotiationRequestState(
 void AuthorizingNegotiationRequestState::GoInState()
 {
     WIFI_LOGI("             GoInState");
+#ifndef NON_SEPERATE_P2P
     if (p2pStateMachine.savedP2pConfig.GetWpsInfo().GetWpsMethod() == WpsMethod::WPS_METHOD_PBC ||
         p2pStateMachine.savedP2pConfig.GetWpsInfo().GetPin().empty()) {
         p2pStateMachine.NotifyUserInvitationReceivedMessage();
         p2pStateMachine.StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_TIME_OUT),
             WSC_DIALOG_SELECT_TIMEOUT);
     }
+#else
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT), "");
+#endif
 }
 
 void AuthorizingNegotiationRequestState::GoOutState()

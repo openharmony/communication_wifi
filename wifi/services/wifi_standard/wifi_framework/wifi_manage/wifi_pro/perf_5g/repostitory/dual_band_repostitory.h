@@ -34,6 +34,7 @@ public:
     void LoadRelationApInfo(std::string bssid, std::vector<RelationAp> &relationApInfo,
         std::function<std::string(RelationInfo&)> GetRelationBssidFunc);
     void DeleteAll(std::unordered_set<std::string> &bssids);
+    void RemoveDuplicateDatas();
     void SaveApInfo(ApInfo &apInfo);
     void SaveRelationApInfo(std::vector<RelationAp> &relationApInfo);
     std::vector<RelationAp> QueryRelationApInfos(std::unordered_set<std::string> &bssidSet);

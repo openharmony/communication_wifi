@@ -50,6 +50,7 @@
         GetDeviceConfig;
         RemoveDevice;
         SetWifiRestrictedList;
+        SetBtCoexistState;
         AllowAutoConnect;
         DisableDeviceConfig;
         EnableDeviceConfig;
@@ -95,6 +96,7 @@
             "OHOS::Wifi::WifiScan::GetInstance(int, int)";
             "OHOS::Wifi::WifiHotspot::GetInstance(int, int)";
             "OHOS::Wifi::WifiP2p::GetInstance(int)";
+            "OHOS::Wifi::Hid2d::GetInstance(int)";
             OHOS::Wifi::WifiP2pLinkedInfo::*;
             OHOS::Wifi::WifiP2pDevice::*;
             "OHOS::Wifi::WifiAbilityStatusChange::Init(int)";

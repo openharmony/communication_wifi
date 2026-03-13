@@ -974,6 +974,14 @@ void WriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info)
     cJSON_AddStringToObject(root, "IPV6_SECONDDNS", Ipv6Anonymize(ipv6Info.secondDns).c_str());
     cJSON_AddStringToObject(root, "IPV6_UNIQUELOCALADDR1", Ipv6Anonymize(ipv6Info.uniqueLocalAddress1).c_str());
     cJSON_AddStringToObject(root, "IPV6_UNIQUELOCALADDR2", Ipv6Anonymize(ipv6Info.uniqueLocalAddress2).c_str());
+    cJSON_AddNumberToObject(root, "IPV6_PREFERRED_LIFE_TIME", ipv6Info.preferredLifeTime);
+    cJSON_AddNumberToObject(root, "IPV6_VALID_LIFE_TIME", ipv6Info.validLifeTime);
+    cJSON_AddNumberToObject(root, "IPV6_ROUTE_LIFE_TIME", ipv6Info.routerLifeTime);
+    std::string ipv6Address;
+    for (const auto& pair : ipv6Info.IpAddrMap) {
+        ipv6Address += Ipv6Anonymize(pair.first) + "|" + std::to_string(pair.second) + ";";
+    }
+    cJSON_AddStringToObject(root, "IPV6_IPADDRMAP", ipv6Address.c_str());
     char *jsonStr = cJSON_PrintUnformatted(root);
     if (jsonStr == nullptr) {
         cJSON_Delete(root);
@@ -1078,6 +1086,66 @@ void WritePositionAutoOpenWlanHiSysEvent(const std::string updateType)
     }
     WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "POSITION_AUTO_OPEN_WLAN", "EVENT_VALUE", std::string(jsonStr));
     free(jsonStr);
+    cJSON_Delete(root);
+}
+
+void WriteWifiScanInfoHiSysEvent(const ScanStatisticInfo &scanStatisticInfo)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddNumberToObject(root, "FC_LP_SCAN_CNT", scanStatisticInfo.fcLpScanCnt);
+    cJSON_AddNumberToObject(root, "FC_LP_SCAN_AP_CNT", scanStatisticInfo.fcLpScanApCnt);
+ 
+    cJSON_AddNumberToObject(root, "NFC_LP_SCAN_CNT", scanStatisticInfo.nfcLpScanCnt);
+    cJSON_AddNumberToObject(root, "NFC_LP_SCAN_CHANNEL_CNT", scanStatisticInfo.nfcLpScanChannelCnt);
+    cJSON_AddNumberToObject(root, "NFC_LP_SCAN_AP_CNT", scanStatisticInfo.nfcLpScanApCnt);
+ 
+    cJSON_AddNumberToObject(root, "FC_SCAN_CNT", scanStatisticInfo.fcScanCnt);
+    cJSON_AddNumberToObject(root, "FC_SCAN_AP_CNT", scanStatisticInfo.fcScanApCnt);
+ 
+    cJSON_AddNumberToObject(root, "NFC_SCAN_CNT", scanStatisticInfo.nfcScanCnt);
+    cJSON_AddNumberToObject(root, "NFC_SCAN_CHANNEL_CNT", scanStatisticInfo.nfcScanChannelCnt);
+    cJSON_AddNumberToObject(root, "NFC_SCAN_AP_CNT", scanStatisticInfo.nfcScanApCnt);
+ 
+    cJSON_AddNumberToObject(root, "LP_SCAN_UNCTRL_CNT", scanStatisticInfo.lpScanUnctrlCnt);
+    cJSON_AddNumberToObject(root, "LP_SCAN_AP_SWT_CNT", scanStatisticInfo.lpScanApSwtCnt);
+    cJSON_AddNumberToObject(root, "SCAN_AP_SWT_CNT", scanStatisticInfo.scanApSwtCnt);
+    cJSON_AddNumberToObject(root, "LP_SCAN_ABORT_CNT", scanStatisticInfo.lpScanAbortCnt);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_SCAN_STATS", "EVENT_VALUE", std::string(jsonStr));
+    cJSON_free(jsonStr);
+    cJSON_Delete(root);
+}
+
+void WriteWifiAppNetWorkSpeedLimitCommonInfoHiSysEvent(const AppNetworkSpeedLimitStatisticInfo &info)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object.");
+        return;
+    }
+    cJSON_AddStringToObject(root, "LIMIT_SCENARIO_LEVEL", info.speedLimitScenarioAndLevel.c_str());
+    cJSON_AddStringToObject(root, "FG_APP_INFO", info.speedLimitForegroundAppInfo.c_str());
+    cJSON_AddStringToObject(root, "BG_SPEED_LIMIT_APP_INFO",
+        info.speedLimitBackgroundAppInfo.c_str());
+    cJSON_AddNumberToObject(root, "GAME_STATE", info.speedLimitGameState);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+ 
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "BG_SPEED_LIMIT", "EVENT_VALUE", std::string(jsonStr));
+    cJSON_free(jsonStr);
     cJSON_Delete(root);
 }
 

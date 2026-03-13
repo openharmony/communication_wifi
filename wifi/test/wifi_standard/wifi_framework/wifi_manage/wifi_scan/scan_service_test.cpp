@@ -1184,6 +1184,17 @@ public:
         EXPECT_EQ(true, pScanService->GetHiddenNetworkSsidList(hiddenNetworkSsid));
     }
 
+    void GetHiddenNetworkSsidListSuccess3()
+    {
+        std::vector<WifiDeviceConfig> deviceConfigs;
+        WifiDeviceConfig cfg;
+        cfg.hiddenSSID = true;
+        cfg.ssid = "测试代码";
+        deviceConfigs.push_back(cfg);
+        std::vector<std::string> hiddenNetworkSsid;
+        EXPECT_EQ(true, pScanService->GetHiddenNetworkSsidList(hiddenNetworkSsid));
+    }
+
     void GetHiddenNetworkSsidListFail()
     {
         std::vector<std::string> hiddenNetworkSsid;
@@ -1791,14 +1802,6 @@ public:
             WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_40MHZ, 0, 0, channelUtilization);
             WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_80MHZ, 0, 0, channelUtilization);
             WifiMaxThroughput(FAILEDNUM, true, WifiChannelWidth::WIDTH_INVALID, 0, 0, channelUtilization);
-    }
-
-    void RecordScanLimitInfoTest()
-    {
-        WifiScanDeviceInfo info;
-        info.packageName = "123.test";
-        pScanService->RecordScanLimitInfo(info, ScanLimitType::WIFI_DISABLE);
-        EXPECT_EQ(info.GetScanInitiatorName(), "123.test");
     }
 
     void IsPackageInTrustListTest()
@@ -2643,6 +2646,11 @@ HWTEST_F(ScanServiceTest, GetHiddenNetworkSsidListSuccess2, TestSize.Level1)
     GetHiddenNetworkSsidListSuccess2();
 }
 
+HWTEST_F(ScanServiceTest, GetHiddenNetworkSsidListSuccess3, TestSize.Level1)
+{
+    GetHiddenNetworkSsidListSuccess3();
+}
+
 HWTEST_F(ScanServiceTest, GetHiddenNetworkSsidListFail, TestSize.Level1)
 {
     GetHiddenNetworkSsidListFail();
@@ -2946,17 +2954,6 @@ HWTEST_F(ScanServiceTest, WifiMaxThroughputTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 /**
- * @tc.name: RecordScanLimitInfoTest
- * @tc.desc: RecordScanLimitInfoTest()
- * @tc.type: FUNC
- * @tc.require: issue
-*/
-HWTEST_F(ScanServiceTest, RecordScanLimitInfoTest, TestSize.Level1)
-{
-    RecordScanLimitInfoTest();
-    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
-}
-/**
  * @tc.name: IsPackageInTrustListTest
  * @tc.desc: IsPackageInTrustList()
  * @tc.type: FUNC
@@ -3160,10 +3157,7 @@ HWTEST_F(ScanServiceTest, AllowScanByGameScene03, TestSize.Level1)
     WifiNetworkControlInfo networkControlInfo;
     networkControlInfo.state = GameSceneId::MSG_GAME_ENTER_PVP_BATTLE;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetNetworkControlInfo()).WillRepeatedly(Return(networkControlInfo));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLpScanAbility()).WillRepeatedly(Return(true));
- 
     int scanStyle = SCAN_TYPE_LOW_PRIORITY;
-    EXPECT_TRUE(pScanService->AllowScanByGameScene(ScanType::SCAN_TYPE_EXTERN, scanStyle));
     EXPECT_FALSE(pScanService->AllowScanByGameScene(ScanType::SCAN_TYPE_PNO, scanStyle));
 }
  
@@ -3173,10 +3167,8 @@ HWTEST_F(ScanServiceTest, AllowScanByGameScene04, TestSize.Level1)
     WifiNetworkControlInfo networkControlInfo;
     networkControlInfo.state = GameSceneId::MSG_GAME_ENTER_PVP_BATTLE;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetNetworkControlInfo()).WillRepeatedly(Return(networkControlInfo));
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLpScanAbility()).WillRepeatedly(Return(false));
     int scanStyle = SCAN_TYPE_LOW_PRIORITY;
-    EXPECT_FALSE(pScanService->AllowScanByGameScene(ScanType::SCAN_TYPE_EXTERN, scanStyle));
-    EXPECT_FALSE(pScanService->AllowScanByGameScene(ScanType::SCAN_TYPE_PNO, scanStyle));
+    EXPECT_FALSE(pScanService->AllowScanByGameScene(ScanType::SCAN_TYPE_SYSTEMTIMER, scanStyle));
 }
  
 HWTEST_F(ScanServiceTest, AllowScanByGameScene05, TestSize.Level1)
@@ -3209,7 +3201,7 @@ HWTEST_F(ScanServiceTest, ScanWithParamTest01, TestSize.Level1)
 {
     WifiScanParams params;
     params.scanStyle = SCAN_TYPE_LOW_PRIORITY;
-    WifiConfigCenter::GetInstance().SetLpScanAbility(false);
+    pScanService->SetEnhanceService(nullptr);
     EXPECT_EQ(pScanService->ScanWithParam(params, ScanType::SCAN_TYPE_EXTERN), WIFI_OPT_FAILED);
 }
  
@@ -3262,28 +3254,73 @@ HWTEST_F(ScanServiceTest, AllowScanByHid2dStateTest03, TestSize.Level1)
     bool result = pScanService->AllowScanByHid2dState(ScanType::SCAN_TYPE_EXTERN, scanStyle);
     EXPECT_TRUE(result);
 }
- 
-HWTEST_F(ScanServiceTest, AllowScanByHid2dStateTest04, TestSize.Level1)
-{
-    int scanStyle = 0;
-    Hid2dUpperScene castScene;
-    castScene.scene = 0x07;
-    WifiConfigCenter::GetInstance().SetHid2dUpperScene(5526, castScene);
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLpScanAbility()).WillOnce(Return(true));
-    bool result = pScanService->AllowScanByHid2dState(ScanType::SCAN_TYPE_EXTERN, scanStyle);
-    EXPECT_TRUE(result);
-}
 
 HWTEST_F(ScanServiceTest, AllowLpScanTest01, TestSize.Level1)
 {
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLpScanAbility()).WillRepeatedly(Return(true));
     EXPECT_FALSE(pScanService->AllowLpScan(ScanType::SCAN_TYPE_PNO));
 }
 
 HWTEST_F(ScanServiceTest, AllowLpScanTest02, TestSize.Level1)
 {
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLpScanAbility()).WillRepeatedly(Return(true));
     EXPECT_FALSE(pScanService->AllowLpScan(ScanType::SCAN_TYPE_SYSTEMTIMER));
+}
+
+HWTEST_F(ScanServiceTest, AllowLpScanTest03, TestSize.Level1)
+{
+    pScanService->SetEnhanceService(nullptr);
+    EXPECT_FALSE(pScanService->AllowLpScan(ScanType::SCAN_TYPE_SYSTEMTIMER));
+}
+
+HWTEST_F(ScanServiceTest, HandleSystemScanFailedTest01, TestSize.Level1)
+{
+    pScanService->systemScanFailedNum = 0;
+    pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_ASSOCIATING);
+    pScanService->HandleSystemScanFailed();
+}
+
+HWTEST_F(ScanServiceTest, HandleSystemScanFailedTest02, TestSize.Level1)
+{
+    pScanService->systemScanFailedNum = 0;
+    pScanService->staStatus = static_cast<int>(OperateResState::CONNECT_AP_CONNECTED);
+    pScanService->HandleSystemScanFailed();
+}
+
+HWTEST_F(ScanServiceTest, HandleLpScanFailedTest01, TestSize.Level1)
+{
+    Hid2dUpperScene softbusScene;
+    softbusScene.scene = 0x07;
+    WifiConfigCenter::GetInstance().SetHid2dUpperScene(1024, softbusScene);
+    pScanService->HandleLpScanFailed();
+}
+
+HWTEST_F(ScanServiceTest, HandleLpScanFailedTest02, TestSize.Level1)
+{
+    Hid2dUpperScene softbusScene;
+    softbusScene.scene = 0x05;
+    WifiConfigCenter::GetInstance().SetHid2dUpperScene(1024, softbusScene);
+    pScanService->HandleLpScanFailed();
+}
+
+HWTEST_F(ScanServiceTest, RestartCommonScanAfterLpScanFailedTest01, TestSize.Level1)
+{
+    pScanService->scanStartedFlag = false;
+    pScanService->RestartCommonScanAfterLpScanFailed();
+}
+
+HWTEST_F(ScanServiceTest, AllowCommonScanOnLpScanFailureTest01, TestSize.Level1)
+{
+    Hid2dUpperScene softbusScene;
+    softbusScene.scene = 0x05;
+    WifiConfigCenter::GetInstance().SetHid2dUpperScene(1024, softbusScene);
+    pScanService->AllowCommonScanOnLpScanFailure();
+}
+
+HWTEST_F(ScanServiceTest, AllowCommonScanOnLpScanFailureTest02, TestSize.Level1)
+{
+    Hid2dUpperScene castScene;
+    castScene.scene = 0x07;
+    WifiConfigCenter::GetInstance().SetHid2dUpperScene(5526, castScene);
+    pScanService->AllowCommonScanOnLpScanFailure();
 }
 } // namespace Wifi
 } // namespace OHOS

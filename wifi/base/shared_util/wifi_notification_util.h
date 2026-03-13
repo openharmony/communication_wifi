@@ -28,19 +28,22 @@ constexpr int DEFAULT_INVAL_VALUE = -1;
 constexpr int32_t SIGNAL_NUM = 3;
 inline const std::u16string ABILITY_MGR_DESCRIPTOR = u"ohos.aafwk.AbilityManager";
 inline const std::string WIFI_EVENT_TAP_NOTIFICATION = "ohos.event.notification.wifi.TAP_NOTIFICATION";
+inline const std::string WIFI_EVENT_TAP_DONT_SHOW_AGAIN = "ohos.event.notification.wifi.TAP_DONT_SHOW_AGAIN";
 inline const std::string WIFI_EVENT_DIALOG_ACCEPT = "ohos.event.wifi.DIALOG_ACCEPT";
 inline const std::string WIFI_EVENT_DIALOG_REJECT = "ohos.event.wifi.DIALOG_REJECT";
 inline const std::string EVENT_SETTINGS_WLAN_KEEP_CONNECTED = "event.settings.wlan.keep_connected";
 enum WifiNotificationId {
     WIFI_PORTAL_NOTIFICATION_ID = 101000,
-    WIFI_5G_CONN_NOTIFICATION_ID = 101100
+    WIFI_5G_CONN_NOTIFICATION_ID = 101100,
+    WIFI_TRIBAND_CONN_NOTIFICATION_ID = 101200,
 };
 
 enum WifiNotificationStatus {
     WIFI_PORTAL_CONNECTED = 0,
     WIFI_PORTAL_TIMEOUT = 1,
     WIFI_PORTAL_FOUND = 2,
-    WIFI_5G_CONN_FOUND = 3
+    WIFI_5G_CONN_FOUND = 3,
+    WIFI_TRIBAND_CONN_FOUND = 4,
 };
 
 enum WifiNotificationOpetationType {

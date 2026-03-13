@@ -37,7 +37,7 @@ public:
     virtual void SetUp()
     {
         pMockP2pPendant.reset(new MockP2pPendant());
-        p2pGroupRemoveState.reset(new P2pGroupRemoveState());
+        p2pGroupRemoveState.reset(new P2pGroupRemoveState(pMockP2pPendant->GetP2pStateMachine()));
     }
     virtual void TearDown()
     {
@@ -56,13 +56,11 @@ HWTEST_F(P2pGroupRemoveStateTest, GoInState, TestSize.Level1)
     p2pGroupRemoveState->GoInState();
     EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
-}
 
 HWTEST_F(P2pGroupRemoveStateTest, GoOutState, TestSize.Level1)
 {
     p2pGroupRemoveState->GoOutState();
     EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
-}
 }
 
 HWTEST_F(P2pGroupRemoveStateTest, ExecuteStateMsg, TestSize.Level1)
@@ -71,7 +69,6 @@ HWTEST_F(P2pGroupRemoveStateTest, ExecuteStateMsg, TestSize.Level1)
     msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEVICE_DISCOVERS));
     p2pGroupRemoveState->ExecuteStateMsg(msg);
     EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
-}
 }
 }  // namespace Wifi
 }  // namespace OHOS

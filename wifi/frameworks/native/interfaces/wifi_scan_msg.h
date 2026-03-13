@@ -115,6 +115,7 @@ enum class ScanType {
     SCAN_TYPE_5G_AP,
     SCAN_TYPE_HIDDEN_AP,
     SCAN_TYPE_SINGLE_SCAN_TIMER,
+    SCAN_TYPE_FAST_RECONNECT,
 };
 
 enum ScanBandType {
@@ -204,6 +205,7 @@ struct WifiScanInfo {
         maxSupportedRxLinkSpeed = 0;
         maxSupportedTxLinkSpeed = 0;
         isHiLinkNetwork = 0;
+        disappearCount = 0;
         isHiLinkProNetwork = false;
         supportedWifiCategory = WifiCategory::DEFAULT;
         riskType = WifiRiskType::INVALID;

@@ -32,7 +32,8 @@ public:
     static int32_t GetMaxCounter(bool hasWifiSwitchRecord, int32_t rssiLevel);
     static int64_t GetCurrentTimeMs();
     static bool IsUserSelectNetwork();
-    static bool IsSupplicantConnecting(SupplicantState supplicantState);
+    static bool IsSupplicantConnectionProcess(SupplicantState supplicantState);
+    static bool IsSupplicantConnectingProcess(SupplicantState supplicantState);
     static bool IsDefaultNet();
     static bool IsAppInWhiteLists();
 };

@@ -682,5 +682,70 @@ HWTEST_F(WifiControllerMachineTest, IsLocalOnlyHotspotTest, TestSize.Level1)
     pWifiControllerMachine->IsLocalOnlyHotspot(true);
     EXPECT_TRUE(pWifiControllerMachine->isLocalOnlyHotspot_);
 }
+
+HWTEST_F(WifiControllerMachineTest, IsEnableScanOnlyOnHotspotTest01, TestSize.Level1)
+{
+    // Test case: CoexSupport=false, isEnabletScanOnlyOnHotspot=true => return true
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetCoexSupport()).WillRepeatedly(Return(false));
+    EXPECT_FALSE(pWifiControllerMachine->IsEnableScanOnlyOnHotspot());
+}
+
+HWTEST_F(WifiControllerMachineTest, IsEnableScanOnlyOnHotspotTest02, TestSize.Level1)
+{
+    // Test case: CoexSupport=true, isEnabletScanOnlyOnHotspot=true => return false
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetCoexSupport()).WillRepeatedly(Return(true));
+    EXPECT_FALSE(pWifiControllerMachine->IsEnableScanOnlyOnHotspot());
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleWifiToggleChangeWhileHotspotOpenTest, TestSize.Level1)
+{
+    // Test case: SoftapToggledState=true, IsEnableScanOnlyOnHotspot()=true, WiFi toggle on
+    int id = 0;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(CMD_WIFI_TOGGLED);
+    msg->SetParam1(1);  // isOpen = 1 (WiFi turning on)
+    msg->SetParam2(id);
+ 
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetCoexSupport()).WillRepeatedly(Return(false));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetSoftapToggledState()).WillRepeatedly(Return(true));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiStopState()).WillRepeatedly(Return(false));
+ 
+    EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleSoftapOpenScanOnlySwitchTest, TestSize.Level1)
+{
+    int id = 0;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(CMD_SOFTAP_TOGGLED);
+    msg->SetParam1(1);
+    msg->SetParam2(id);
+ 
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetCoexSupport()).WillRepeatedly(Return(false));
+ 
+    // Set WiFi as not connected
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.connState = ConnState::DISCONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+ 
+    EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleSoftapCloseRecoverWifiTest, TestSize.Level1)
+{
+    int id = 0;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(CMD_SOFTAP_TOGGLED);
+    msg->SetParam1(0);  // close hotspot
+    msg->SetParam2(id);
+ 
+    // Set wifiStateBeforeHotspot_ = true before test
+    pWifiControllerMachine->wifiStateBeforeHotspot_ = true;
+ 
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetCoexSupport()).WillRepeatedly(Return(false));
+ 
+    EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+}
 }
 }

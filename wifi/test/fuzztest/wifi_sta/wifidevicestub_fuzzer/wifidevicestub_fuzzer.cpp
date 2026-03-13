@@ -1405,6 +1405,20 @@ void OnSetRandomMacDisabledTest()
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_RANDOMMAC_DISABLED), datas);
 }
 
+void OnSetBtCoexistStateTest()
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_BT_COEXIST_STATE), datas);
+}
+
 void WifiDeviceFuzzTest()
 {
     OHOS::Wifi::OnInitWifiProtectFuzzTest();
@@ -1452,6 +1466,7 @@ void WifiDeviceFuzzTest()
     OHOS::Wifi::OnLimitSpeedFuzzTest();
     OHOS::Wifi::OnEnableHiLinkHandshakeFuzzTest();
     OHOS::Wifi::OnGetWifiDetailStateFuzzTest();
+    OHOS::Wifi::OnSetBtCoexistStateTest();
 }
 
 void WifiDeviceFuzzTestPart2()

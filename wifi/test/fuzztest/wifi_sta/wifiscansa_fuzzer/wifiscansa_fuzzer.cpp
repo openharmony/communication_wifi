@@ -114,17 +114,17 @@ void SetScanOnlyAvailableFuzzTest(FuzzedDataProvider& FDP)
     pWifiScanServiceImpl.SetScanOnlyAvailable(status);
 }
 
-void StartWifiPnoScanFuzzTest(const uint8_t* data, size_t size)
+void StartWifiPnoScanFuzzTest(FuzzedDataProvider& FDP)
 {
-    bool isStartAction = (static_cast<int>(data[0]) % TWO) ? true : false;
-    int periodMs = static_cast<int>(data[0]);
-    int suspendReason = static_cast<int>(data[0]);
+    bool isStartAction = FDP.ConsumeBool();
+    int periodMs = FDP.ConsumeIntegral<int>();
+    int suspendReason = FDP.ConsumeIntegral<int>();
     pWifiScanServiceImpl.StartWifiPnoScan(isStartAction, periodMs, suspendReason);
 }
 
-void GetSupportedFeaturesFuzzTest(const uint8_t* data, size_t size)
+void GetSupportedFeaturesFuzzTest(FuzzedDataProvider& FDP)
 {
-    long features = static_cast<long>(data[0]);
+    long features = FDP.ConsumeIntegral<long>();
     int64_t featuresInt64 = static_cast<int64_t>(features);
     pWifiScanServiceImpl.GetSupportedFeatures(featuresInt64);
 }
@@ -151,9 +151,9 @@ void WifiScanServiceImplFuzzTest(const uint8_t* data, size_t size)
     pWifiScanServiceImpl.IsInScanMacInfoWhiteList();
 }
 
-void WifiScanMgrServiceImplFuzzTest(const uint8_t* data, size_t size)
+void WifiScanMgrServiceImplFuzzTest(FuzzedDataProvider& FDP)
 {
-    int32_t fd = static_cast<int32_t>(data[0]);
+    int32_t fd = FDP.ConsumeIntegral<int32_t>();
     std::vector<std::u16string> args;
     pWifiScanMgrServiceImpl.Dump(fd, args);
 }
@@ -249,11 +249,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::AdvanceScanFuzzTest();
     OHOS::Wifi::IsWifiScanAllowedFuzzTest(data, size);
     OHOS::Wifi::GetScanInfoListFuzzTest(data, size);
-    OHOS::Wifi::StartWifiPnoScanFuzzTest(data, size);
-    OHOS::Wifi::GetSupportedFeaturesFuzzTest(data, size);
+    OHOS::Wifi::StartWifiPnoScanFuzzTest(FDP);
+    OHOS::Wifi::GetSupportedFeaturesFuzzTest(FDP);
     OHOS::Wifi::RegisterCallBackFuzzTest(data, size);
     OHOS::Wifi::WifiScanServiceImplFuzzTest(data, size);
-    OHOS::Wifi::WifiScanMgrServiceImplFuzzTest(data, size);
+    OHOS::Wifi::WifiScanMgrServiceImplFuzzTest(FDP);
     OHOS::Wifi::WifiScanImplFuzzTest(FDP);
     OHOS::Wifi::WifiScanSendScanInfoFuzzTest(FDP);
     OHOS::Wifi::WifiScanGetScanInfoListFuzzTest(FDP);

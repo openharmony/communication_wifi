@@ -64,6 +64,7 @@ napi_value AllowAutoConnect(napi_env env, napi_callback_info info);
 napi_value DisableNetwork(napi_env env, napi_callback_info info);
 napi_value GetCountryCode(napi_env env, napi_callback_info info);
 napi_value GetDeviceConfigs(napi_env env, napi_callback_info info);
+napi_value GetDeviceConfig(napi_env env, napi_callback_info info);
 napi_value UpdateNetwork(napi_env env, napi_callback_info info);
 napi_value GetSupportedFeatures(napi_env env, napi_callback_info info);
 napi_value IsFeatureSupported(napi_env env, napi_callback_info info);

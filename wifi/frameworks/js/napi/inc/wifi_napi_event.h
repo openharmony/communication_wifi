@@ -81,7 +81,7 @@ public:
 };
 
 static std::shared_mutex g_regInfoMutex;
-static std::map<std::string, std::vector<RegObj>> g_eventRegisterInfo;
+inline std::map<std::string, std::vector<RegObj>> g_eventRegisterInfo;
 
 class NapiEvent {
 public:

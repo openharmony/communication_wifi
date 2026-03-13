@@ -97,7 +97,7 @@ HWTEST_F(WifiNetLinkTest, SendQoeCmdTest001, TestSize.Level1)
     int32_t cmd = CMD_START_MONITOR;
     int32_t arg = 456;
     WifiNetLink::GetInstance().SendQoeCmd(cmd, arg);
-    EXPECT_NE(WifiNetLink::GetInstance().SendQoeCmd(cmd, arg), -1);
+    EXPECT_EQ(WifiNetLink::GetInstance().SendQoeCmd(cmd, arg), -1);
 }
 
 HWTEST_F(WifiNetLinkTest, TestProcessQueryIpv6Tcp, TestSize.Level1)

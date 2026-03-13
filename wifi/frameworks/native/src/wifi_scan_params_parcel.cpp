@@ -16,6 +16,7 @@
 
 namespace OHOS {
 namespace Wifi {
+#define MAX_FREQS_SIZE 512
 
 WifiScanParamsParcel::WifiScanParamsParcel(const WifiScanParams &params)
     : ssid(params.ssid), bssid(params.bssid), band(params.band), freqs(params.freqs)
@@ -64,6 +65,9 @@ WifiScanParamsParcel *WifiScanParamsParcel::Unmarshalling(Parcel &parcel)
         return nullptr;
     }
 
+    if (size > MAX_FREQS_SIZE) {
+        return nullptr;
+    }
     params->freqs.reserve(size);
     for (uint32_t i = 0; i < size; i++) {
         int freq = 0;

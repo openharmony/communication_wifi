@@ -1642,53 +1642,58 @@ static void WapiConfigToJs(const napi_env& env, const WifiDeviceConfig& wifiDevi
     }
 }
 
-static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceConfig>& vecDeviceConfigs,
-    const int idx, napi_value& arrayResult)
+static napi_value DeviceConfigToJs(const napi_env& env, WifiDeviceConfig& config)
 {
-    UpdateSecurityTypeAndPreSharedKey(vecDeviceConfigs[idx]);
+    UpdateSecurityTypeAndPreSharedKey(config);
     napi_value result;
     napi_create_object(env, &result);
-    SetValueUtf8String(env, "ssid", vecDeviceConfigs[idx].ssid.c_str(), result);
-    SetValueUtf8String(env, "bssid", vecDeviceConfigs[idx].userSelectBssid.c_str(), result);
-    SetValueInt32(env, "bssidType", static_cast<int>(vecDeviceConfigs[idx].bssidType), result);
-    SetValueUtf8String(env, "preSharedKey", vecDeviceConfigs[idx].preSharedKey.c_str(), result);
-    SetValueBool(env, "isHiddenSsid", vecDeviceConfigs[idx].hiddenSSID, result);
+    SetValueUtf8String(env, "ssid", config.ssid.c_str(), result);
+    SetValueUtf8String(env, "bssid", config.userSelectBssid.c_str(), result);
+    SetValueInt32(env, "bssidType", static_cast<int>(config.bssidType), result);
+    SetValueUtf8String(env, "preSharedKey", config.preSharedKey.c_str(), result);
+    SetValueBool(env, "isHiddenSsid", config.hiddenSSID, result);
     SetValueInt32(env, "securityType",
-        static_cast<int>(ConvertKeyMgmtToSecType(vecDeviceConfigs[idx].keyMgmt)), result);
-    SetValueInt32(env, "creatorUid", vecDeviceConfigs[idx].uid, result);
+        static_cast<int>(ConvertKeyMgmtToSecType(config.keyMgmt)), result);
+    SetValueInt32(env, "creatorUid", config.uid, result);
     SetValueInt32(env, "configStatus",
-        static_cast<int>(vecDeviceConfigs[idx].networkSelectionStatus.status), result);
+        static_cast<int>(config.networkSelectionStatus.status), result);
     SetValueInt32(env, "disableReason",
-        static_cast<int>(vecDeviceConfigs[idx].networkSelectionStatus.networkSelectionDisableReason), result);
-    SetValueInt32(env, "netId", vecDeviceConfigs[idx].networkId, result);
-    SetValueInt32(env, "randomMacType", static_cast<int>(vecDeviceConfigs[idx].wifiPrivacySetting), result);
+        static_cast<int>(config.networkSelectionStatus.networkSelectionDisableReason), result);
+    SetValueInt32(env, "netId", config.networkId, result);
+    SetValueInt32(env, "randomMacType", static_cast<int>(config.wifiPrivacySetting), result);
     /* not supported currently */
     SetValueUtf8String(env, "randomMacAddr", std::string("").c_str(), result);
-    if (vecDeviceConfigs[idx].wifiIpConfig.assignMethod == AssignIpMethod::STATIC) {
+    if (config.wifiIpConfig.assignMethod == AssignIpMethod::STATIC) {
         SetValueInt32(env, "ipType", static_cast<int>(IpTypeJs::IP_TYPE_STATIC), result);
     } else {
         SetValueInt32(env, "ipType", static_cast<int>(IpTypeJs::IP_TYPE_DHCP), result);
     }
-    SetValueInt32(env, "family", vecDeviceConfigs[idx].wifiIpConfig.staticIpAddress.ipAddress.address.family, result);
-    IpConfigToJs(env, vecDeviceConfigs[idx].wifiIpConfig, result);
-    ProxyConfigToJs(env, vecDeviceConfigs[idx], result);
+    SetValueInt32(env, "family", config.wifiIpConfig.staticIpAddress.ipAddress.address.family, result);
+    IpConfigToJs(env, config.wifiIpConfig, result);
+    ProxyConfigToJs(env, config, result);
 
     napi_value eapCfgObj;
     napi_create_object(env, &eapCfgObj);
-    EapConfigToJs(env, vecDeviceConfigs[idx].wifiEapConfig, eapCfgObj);
+    EapConfigToJs(env, config.wifiEapConfig, eapCfgObj);
     napi_status status = napi_set_named_property(env, result, "eapConfig", eapCfgObj);
     if (status != napi_ok) {
         WIFI_LOGE("failed to set eapConfig!");
     }
 
-    WapiConfigToJs(env, vecDeviceConfigs[idx], result);
-    SetValueBool(env, "isAutoConnectAllowed", vecDeviceConfigs[idx].isAllowAutoConnect, result);
-    SetValueBool(env, "isSecureWifi", vecDeviceConfigs[idx].isSecureWifi, result);
+    WapiConfigToJs(env, config, result);
+    SetValueBool(env, "isAutoConnectAllowed", config.isAllowAutoConnect, result);
+    SetValueBool(env, "isSecureWifi", config.isSecureWifi, result);
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
-    SetValueInt32(env, "riskType", static_cast<int>(vecDeviceConfigs[idx].riskType), result);
+    SetValueInt32(env, "riskType", static_cast<int>(config.riskType), result);
 #endif
+    return result;
+}
 
-    status = napi_set_element(env, arrayResult, idx, result);
+static void DeviceConfigToJsArray(const napi_env& env, std::vector<WifiDeviceConfig>& vecDeviceConfigs,
+    const int idx, napi_value& arrayResult)
+{
+    napi_value result = DeviceConfigToJs(env, vecDeviceConfigs[idx]);
+    napi_status status = napi_set_element(env, arrayResult, idx, result);
     if (status != napi_ok) {
         WIFI_LOGE("Wifi napi set element error: %{public}d", status);
     }
@@ -1713,6 +1718,33 @@ NO_SANITIZE("cfi") napi_value GetDeviceConfigs(napi_env env, napi_callback_info 
         DeviceConfigToJsArray(env, vecDeviceConfigs, i, arrayResult);
     }
     return arrayResult;
+}
+
+NO_SANITIZE("cfi") napi_value GetDeviceConfig(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    size_t argc = 1;
+    napi_value argv[1];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+
+    int networkId = -1;
+    napi_get_value_int32(env, argv[0], &networkId);
+
+    WifiDeviceConfig config;
+    ErrCode ret = wifiDevicePtr->GetDeviceConfig(networkId, config);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("GetDeviceConfig fail: %{public}d", ret);
+    }
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+
+    return DeviceConfigToJs(env, config);
 }
 
 NO_SANITIZE("cfi") napi_value GetCandidateConfigs(napi_env env, napi_callback_info info)
@@ -1821,7 +1853,13 @@ NO_SANITIZE("cfi") napi_value GetDeviceMacAddress(napi_env env, napi_callback_in
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     napi_value addr;
     napi_create_string_utf8(env, macAddr.c_str(), NAPI_AUTO_LENGTH, &addr);
-    return addr;
+    napi_value result = nullptr;
+    napi_create_array_with_length(env, 1, &result);
+    napi_status status = napi_set_element(env, result, 0, addr);
+    if (status != napi_ok) {
+        WIFI_LOGE("GetDeviceMacAddress napi set element error: %{public}d", status);
+    }
+    return result;
 }
 
 NO_SANITIZE("cfi") napi_value IsBandTypeSupported(napi_env env, napi_callback_info info)

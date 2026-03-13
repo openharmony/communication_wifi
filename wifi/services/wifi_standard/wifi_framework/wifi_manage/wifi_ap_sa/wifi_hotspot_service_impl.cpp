@@ -165,6 +165,49 @@ int32_t WifiHotspotServiceImpl::GetHotspotConfig(HotspotConfigParcel &parcelconf
     return WIFI_OPT_SUCCESS;
 }
 
+bool WifiHotspotServiceImpl::CheckHotspot160MParam(BandType band, int bandwidth, int channel)
+{
+    if ((band != BandType::BAND_5GHZ && bandwidth == AP_BANDWIDTH_160) ||
+        (bandwidth != AP_BANDWIDTH_160 && bandwidth != AP_BANDWIDTH_DEFAULT) ||
+        (band == BandType::BAND_5GHZ && bandwidth == AP_BANDWIDTH_160 &&
+        ((channel < AP_CHANNEL_5G_160M_SET_BEGIN) || (channel > AP_CHANNEL_5G_160M_SET_END)))) {
+        return false;
+    } else {
+        return true;
+    }
+}
+
+bool WifiHotspotServiceImpl::CheckHostspot160MCountryCode()
+{
+    std::string countryCode;
+    WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
+    transform(countryCode.begin(), countryCode.end(), countryCode.begin(), ::toupper);
+    if (countryCode == "CN" || countryCode == "TW" || countryCode == "SG" || countryCode == "KR") {
+        WIFI_LOGD("CheckHostspot160MCountryCode countryCode %{public}s", countryCode.c_str());
+        return true;
+    } else {
+        WIFI_LOGE("CheckHostspot160MCountryCode Error countryCode %{public}s", countryCode.c_str());
+        return false;
+    }
+}
+
+ErrCode WifiHotspotServiceImpl::HostspotBandwidthConfig(HotspotConfig &config)
+{
+    int dataRead = config.GetChannel();
+    unsigned int unsignedDataRead = static_cast<unsigned int>(dataRead);
+    int channel = unsignedDataRead & 0x000000FF;
+    int bandwidth = (unsignedDataRead & 0x00FF0000) >> 16;
+    config.SetBandWidth(bandwidth);
+    config.SetChannel(channel);
+    if (config.GetSsid().empty() || config.GetPreSharedKey().empty() ||
+        !CheckHotspot160MParam(config.GetBand(), config.GetBandWidth(), config.GetChannel())) {
+        return WIFI_OPT_INVALID_PARAM;
+    } else if ((!CheckHostspot160MCountryCode()) && config.GetBandWidth() == AP_BANDWIDTH_160) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parcelconfig)
 {
     HotspotConfig config = parcelconfig.ToHotspotConfig();
@@ -184,6 +227,11 @@ int32_t WifiHotspotServiceImpl::SetHotspotConfig(const HotspotConfigParcel &parc
     if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("SetHotspotConfig:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
         return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
+    }
+    ErrCode ret = HostspotBandwidthConfig(config);
+    if (ret != ErrCode::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SetHotspotConfig:HostspotBandwidthConfig failed!");
+        return HandleHotspotIdlRet(ret);
     }
     ErrCode validRetval = VerifyConfigValidity(config);
     if (validRetval != ErrCode::WIFI_OPT_SUCCESS) {
@@ -1202,7 +1250,6 @@ ErrCode WifiHotspotServiceImpl::OnBackup(MessageParcel& data, MessageParcel& rep
     UniqueFd fd(-1);
     std::string replyCode = WifiSettings::GetInstance().SetBackupReplyCode(0);
     std::string backupInfo = data.ReadString();
-    WIFI_LOGE("OnBackup %{public}s", backupInfo.c_str());
     int ret = WifiSettings::GetInstance().OnHotspotBackup(fd, backupInfo);
     std::fill(backupInfo.begin(), backupInfo.end(), 0);
     if (ret < 0) {

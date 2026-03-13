@@ -19,6 +19,7 @@
 #include "wifichid2d_fuzzer.h"
 #include "c_adapter/inc/wifi_c_utils.h"
 #include "kits/c/wifi_hid2d.h"
+#include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
 namespace Wifi {
@@ -35,7 +36,6 @@ namespace Wifi {
         Hid2dReleaseIPAddrTest(data, size);
         Hid2dGetRecommendChannelTest(data, size);
         Hid2dGetSelfWifiCfgInfoTest(data, size);
-        Hid2dSetPeerWifiCfgInfoTest(data, size);
         Hid2dSetUpperSceneTest(data, size);
         return true;
     }
@@ -44,18 +44,19 @@ namespace Wifi {
 
 void Hid2dRequestGcIpTest(const uint8_t* data, size_t size)
 {
-    unsigned char gcMac[MACLEN] = {0};
-    unsigned int ipAddr[IPLEN] = {0};
-    if (size >= MACLEN) {
-        if (memcpy_s(gcMac, MACLEN, data, MACLEN) != EOK) {
-            return;
-        }
+    FuzzedDataProvider FDP(data, size);
 
-        for (int i = 0; i < IPLEN; i++) {
-            ipAddr[i] = static_cast<int>(data[i]);
-        }
+    std::vector<uint8_t> gcMac = FDP.ConsumeBytes<uint8_t>(MACLEN);
+    if (gcMac.size() != MACLEN) {
+        return;
     }
-    (void)Hid2dRequestGcIp(gcMac, ipAddr);
+    
+    std::vector<uint32_t> ipAddr;
+    for (size_t i = 0; i < IPLEN; i++) {
+        ipAddr.push_back(FDP.ConsumeIntegral<uint32_t>());
+    }
+    
+    (void)Hid2dRequestGcIp(gcMac.data(), ipAddr.data());
 }
 
 void Hid2dSharedlinkIncreaseTest(void)
@@ -75,10 +76,11 @@ void Hid2dIsWideBandwidthSupportedTest(void)
 
 void Hid2dCreateGroupTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     int frequency = 0;
     FreqType type = FREQUENCY_DEFAULT;
     if (size > 0) {
-        frequency = static_cast<int>(data[0]);
+        frequency = FDP.ConsumeIntegral<int>();
     }
     (void)Hid2dCreateGroup(frequency, type);
 }
@@ -96,6 +98,7 @@ void Hid2dRemoveGcGroupTest(const uint8_t* data, size_t size)
 
 void Hid2dConnectTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     Hid2dConnectConfig cppConfig;
     if (size >= sizeof(Hid2dConnectConfig)) {
         if (memcpy_s(cppConfig.ssid, MAX_SSID_LEN, data, MAX_SSID_LEN - 1) != EOK) {
@@ -109,13 +112,14 @@ void Hid2dConnectTest(const uint8_t* data, size_t size)
         if (memcpy_s(cppConfig.preSharedKey, MAX_KEY_LEN, data, MAX_KEY_LEN - 1) != EOK) {
             return;
         }
-        cppConfig.frequency = static_cast<int>(data[0]);
+        cppConfig.frequency = FDP.ConsumeIntegral<int>();
     }
     (void)Hid2dConnect(&cppConfig);
 }
 
 void Hid2dConfigIPAddrTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     char ifName[IF_NAME_LEN] = {0};
     IpAddrInfo ipAddrInfo;
     if (size >= IF_NAME_LEN) {
@@ -125,11 +129,10 @@ void Hid2dConfigIPAddrTest(const uint8_t* data, size_t size)
     }
 
     if (size >= sizeof(IpAddrInfo)) {
-        int index = 0;
         for (int i = 0; i < IPV4_ARRAY_LEN; i++) {
-            ipAddrInfo.ip[i] = static_cast<int>(data[index++]);
-            ipAddrInfo.gateway[i] = static_cast<int>(data[index++]);
-            ipAddrInfo.netmask[i] = static_cast<int>(data[index++]);
+            ipAddrInfo.ip[i] = FDP.ConsumeIntegral<int>();
+            ipAddrInfo.gateway[i] = FDP.ConsumeIntegral<int>();
+            ipAddrInfo.netmask[i] = FDP.ConsumeIntegral<int>();
         }
     }
     (void)Hid2dConfigIPAddr(ifName, &ipAddrInfo);
@@ -148,14 +151,15 @@ void Hid2dReleaseIPAddrTest(const uint8_t* data, size_t size)
 
 void Hid2dGetRecommendChannelTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     RecommendChannelRequest request;
     RecommendChannelResponse response;
     int index = 0;
 
     if (size >= sizeof(RecommendChannelRequest)) {
-        request.remoteIfMode = static_cast<int>(data[index++]);
-        request.localIfMode = static_cast<int>(data[index++]);
-        request.prefBand = static_cast<int>(data[index++]);
+        request.remoteIfMode = FDP.ConsumeIntegral<int>();
+        request.localIfMode = FDP.ConsumeIntegral<int>();
+        request.prefBand = FDP.ConsumeIntegral<int>();
 
         if (memcpy_s(request.remoteIfName, IF_NAME_LEN, data, IF_NAME_LEN - 1) != EOK) {
             return;
@@ -167,22 +171,23 @@ void Hid2dGetRecommendChannelTest(const uint8_t* data, size_t size)
     }
     index = 0;
     if (size >= sizeof(RecommendChannelResponse)) {
-        response.index = static_cast<int>(data[index++]);
-        response.centerFreq = static_cast<int>(data[index++]);
-        response.centerFreq1 = static_cast<int>(data[index++]);
-        response.centerFreq2 = static_cast<int>(data[index++]);
-        response.bandwidth = static_cast<int>(data[index++]);
+        response.index = FDP.ConsumeIntegral<int>();
+        response.centerFreq = FDP.ConsumeIntegral<int>();
+        response.centerFreq1 = FDP.ConsumeIntegral<int>();
+        response.centerFreq2 = FDP.ConsumeIntegral<int>();
+        response.bandwidth = FDP.ConsumeIntegral<int>();
     }
     (void)Hid2dGetRecommendChannel(&request, &response);
 }
 
 void Hid2dGetSelfWifiCfgInfoTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     int getDatValidLen = 0;
     char cfgData[DATA_MAX_BYTES] = {0};
     SelfCfgType cfgType = TYPE_OF_GET_SELF_CONFIG;
     if (size >= DATA_MAX_BYTES) {
-        getDatValidLen = static_cast<int>(data[0]);
+        getDatValidLen = FDP.ConsumeIntegral<int>();
         if (memcpy_s(cfgData, DATA_MAX_BYTES, data, DATA_MAX_BYTES - 1) != EOK) {
             return;
         }
@@ -192,7 +197,8 @@ void Hid2dGetSelfWifiCfgInfoTest(const uint8_t* data, size_t size)
 
 void Hid2dSetPeerWifiCfgInfoTest(const uint8_t* data, size_t size)
 {
-    int setDataValidLen = static_cast<int>(data[0]);
+    FuzzedDataProvider FDP(data, size);
+    int setDataValidLen = FDP.ConsumeIntegral<int>();
     char cfgData[DATA_MAX_BYTES] = {0};
     PeerCfgType cfgType = TYPE_OF_SET_PEER_CONFIG;
     if (size >= DATA_MAX_BYTES) {
@@ -205,6 +211,7 @@ void Hid2dSetPeerWifiCfgInfoTest(const uint8_t* data, size_t size)
 
 void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     char ifName[IF_NAME_LEN] = {0};
     Hid2dUpperScene scene;
 
@@ -218,10 +225,9 @@ void Hid2dSetUpperSceneTest(const uint8_t* data, size_t size)
         if (memcpy_s(scene.mac, MAC_LEN, data, MAC_LEN) != EOK) {
             return;
         }
-        int index = 0;
-        scene.scene = static_cast<unsigned int>(data[index++]);
-        scene.fps = static_cast<int>(data[index++]);
-        scene.bw = static_cast<unsigned int>(data[index++]);
+        scene.scene = FDP.ConsumeIntegral<unsigned int>();
+        scene.fps = FDP.ConsumeIntegral<int>();
+        scene.bw = FDP.ConsumeIntegral<unsigned int>();
     }
     (void)Hid2dSetUpperScene(ifName, &scene);
 }

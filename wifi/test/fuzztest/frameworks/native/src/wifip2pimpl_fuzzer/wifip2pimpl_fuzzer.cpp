@@ -96,10 +96,11 @@ namespace Wifi {
 
     void GetP2pDiscoverStatusTest(const uint8_t* data, size_t size)
     {
+        FuzzedDataProvider FDP(data, size);
         if (size == 0) {
             return;
         }
-        int status = static_cast<int>(data[0]);
+        int status = FDP.ConsumeIntegral<int>();
         WifiP2pPtr->GetP2pDiscoverStatus(status);
     }
 

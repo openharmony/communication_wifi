@@ -368,8 +368,8 @@ int WifiScanConfig::GetScanInfoList(std::vector<WifiScanInfo> &results)
             hilinkAbilityRecord.erase(iter->bssid);
             LOGI("ScanInfo remove ssid=%{public}s bssid=%{public}s.\n",
                 SsidAnonymize(iter->ssid).c_str(), MacAnonymize(iter->bssid).c_str());
-            iter = mWifiScanInfoList.erase(iter);
             mWifiCategoryRecord.erase(iter->bssid);
+            iter = mWifiScanInfoList.erase(iter);
             continue;
         }
         if (iter->timestamp > currentTime - WIFI_GET_SCAN_INFO_VALID_TIMESTAMP) {

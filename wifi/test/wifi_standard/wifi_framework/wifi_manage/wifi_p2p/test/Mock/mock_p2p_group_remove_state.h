@@ -21,7 +21,8 @@ namespace OHOS {
 namespace Wifi {
 class MockP2pGroupRemoveState : public P2pGroupRemoveState {
 public:
-    MockP2pGroupRemoveState()
+    MockP2pGroupRemoveState(P2pStateMachine &stateMachine)
+        : P2pGroupRemoveState(stateMachine)
     {}
     ~MockP2pGroupRemoveState() = default;
     MOCK_METHOD0(GoInState, void());

@@ -21,6 +21,7 @@
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
 #include "wifi_common_event_helper.h"
+#include "scan_chr.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -230,6 +231,7 @@ bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
         case DISCONNECTED_SCAN_TIMER:
         case RESTART_PNO_SCAN_TIMER:
         case RESTART_SYSTEM_SCAN_TIMER:
+        case RESTART_COMMON_SCAN_TIMER:
         case SYSTEM_SINGLE_SCAN_TIMER:
             pScanStateMachine->ReportScanInnerEvent((ScanInnerEventType)msg->GetMessageName());
             return true;
@@ -937,6 +939,7 @@ bool ScanStateMachine::StartSingleCommonScan(WifiHalScanParam &scanParam)
     }
 
     WIFI_LOGI("Begin call Scan.\n");
+    WifiConfigCenter::GetInstance().SetScanStyle(scanParam.scanStyle);
     WifiCommonEventHelper::PublishScanStartEvent(COMMON_SCAN_START, "");
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().Scan(
         WifiConfigCenter::GetInstance().GetStaIfaceName(), scanParam);
@@ -1101,8 +1104,11 @@ void ScanStateMachine::CommonScanInfoProcess()
         ReportCommonScanFailedAndClear(true);
         return;
     }
+    
     FilterScanResult(scanStatusReport.scanInfoList);
     GetRunningIndexList(scanStatusReport.requestIndexList);
+    /* Scan Chr */
+    WifiScanChr::GetInstance().RecordScanChrCountInfo(runningScanSettings, scanStatusReport);
 
     scanStatusReport.status = COMMON_SCAN_SUCCESS;
     if (scanStatusReportHandler) {
@@ -1411,6 +1417,7 @@ bool ScanStateMachine::StartPnoScanHardware()
     pnoScanParam.scanFreqs.assign(runningPnoScanConfig.freqs.begin(), runningPnoScanConfig.freqs.end());
     WIFI_LOGI("pnoScanParam.scanInterval is %{public}d.\n", pnoScanParam.scanInterval);
     WifiCommonEventHelper::PublishScanStartEvent(PNO_SCAN_START, "");
+    WifiConfigCenter::GetInstance().SetScanStyle(SCAN_DEFAULT_TYPE);
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().StartPnoScan(
         WifiConfigCenter::GetInstance().GetStaIfaceName(), pnoScanParam);
     if ((ret != WIFI_HAL_OPT_OK) && (ret != WIFI_HAL_OPT_SCAN_BUSY)) {

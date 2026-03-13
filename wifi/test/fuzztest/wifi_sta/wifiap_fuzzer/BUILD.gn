@@ -40,6 +40,10 @@ ohos_fuzztest("WifiApFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_native/client/idl_client/idl_interface",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_self_cure",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_scan",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_sub_manage",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_pro",
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func",
@@ -90,6 +94,7 @@ ohos_fuzztest("WifiApFuzzTest") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/mac_address.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/net_helper/network_interface.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/utils/wifi_global_func.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_manage/wifi_sta_sa/mock/mock_wifi_service_manager.cpp",
     "$WIFI_ROOT_DIR/test/fuzztest/fuzz_common_func/mock_wifi_ap_service.cpp",
     "wifiap_fuzzer.cpp",
   ]
@@ -105,6 +110,7 @@ ohos_fuzztest("WifiApFuzzTest") {
   external_deps = [
     "ability_base:base",
     "ability_base:want",
+    "ability_runtime:app_manager",
     "c_utils:utils",
     "cJSON:cjson",
     "common_event_service:cesfwk_core",
@@ -114,6 +120,7 @@ ohos_fuzztest("WifiApFuzzTest") {
     "libxml2:libxml2",
     "netmanager_base:net_conn_manager_if",
     "samgr:samgr_proxy",
+    "window_manager:libdm_lite",
   ]
 
   part_name = "wifi"

@@ -206,7 +206,7 @@ public:
         WifiDeviceConfig &config);
 
     int GetCandidateConfig(const int uid, const std::string &ssid, const std::string &keymgmt,
-        WifiDeviceConfig &config);
+        WifiDeviceConfig &config, int instId);
 
     int GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config);
 

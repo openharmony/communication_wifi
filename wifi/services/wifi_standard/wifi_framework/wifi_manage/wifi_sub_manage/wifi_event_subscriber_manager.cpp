@@ -52,6 +52,7 @@
 #include "cellular_data_client.h"
 #include "telephony_observer_client.h"
 #endif
+#include <regex>
 
 DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 
@@ -64,6 +65,8 @@ constexpr uint32_t PROP_FALSE_LEN = 5;
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
 constexpr uint32_t TEL_STATE_REGISTRY_DELAY_TIME = 5 * 1000;
 #endif
+constexpr int PROVIDED_DEVICE_FEATURES_LEN = 10;
+constexpr int PROVIDED_DEVICE_FEATURES_CMP_LEN = 5;
 const std::string PROP_TRUE = "true";
 const std::string PROP_FALSE = "false";
 const std::string MDM_WIFI_PROP = "persist.edm.wifi_enable";
@@ -71,6 +74,8 @@ const std::string WIFI_STANDBY_NAP = "napped";
 const std::string WIFI_STANDBY_SLEEPING = "sleeping";
 const std::string ENTER_SETTINGS = "usual.event.wlan.ENTER_SETTINGS_WLAN_PAGE";
 const std::string WLAN_PAGE_ENTER = "enterWlanPage";
+const std::string GAME_INFO_NOTIFY = "usual.event.gameservice.GAME_INFO_NOTIFY";
+constexpr const char* PRODUCT_PROVIDED_DEVICE_FEATURES = "const.product.providedDeviceFeatures";
 
 bool WifiEventSubscriberManager::mIsMdmForbidden = false;
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
@@ -98,7 +103,8 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_ENTER_FORCE_SLEEP, &
     CesEventSubscriber::OnReceiveForceSleepEvent},
     {OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_EXIT_FORCE_SLEEP, &
-    CesEventSubscriber::OnReceiveForceSleepEvent}
+    CesEventSubscriber::OnReceiveForceSleepEvent},
+    {GAME_INFO_NOTIFY, &CesEventSubscriber::OnReceiveGameInfoNotifyEvent}
 };
 
 WifiEventSubscriberManager::WifiEventSubscriberManager()
@@ -395,6 +401,17 @@ void WifiEventSubscriberManager::GetWifiAllowSemiActiveByDatashare()
 
 bool WifiEventSubscriberManager::GetLocationModeByDatashare()
 {
+    if (GetDeviceType() == ProductDeviceType::WEARABLE) {
+        char preValue[PROVIDED_DEVICE_FEATURES_LEN] = {0};
+        int errCode = GetParamValue(PRODUCT_PROVIDED_DEVICE_FEATURES, 0, preValue, PROVIDED_DEVICE_FEATURES_LEN);
+        if (errCode > 0) {
+            if (strncmp(preValue, "child", PROVIDED_DEVICE_FEATURES_CMP_LEN) == 0) {
+                WIFI_LOGI("GetLocationModeByDatashare, locationMode is enabled by default.");
+                return true;
+            }
+        }
+    }
+
     std::string locationMode;
     Uri uri(WifiDataShareHelperUtils::GetInstance().GetLoactionDataShareUri());
     int ret = WifiDataShareHelperUtils::GetInstance().Query(uri, SETTINGS_DATASHARE_KEY_LOCATION_MODE, locationMode);
@@ -838,6 +855,21 @@ void CesEventSubscriber::OnReceiveForceSleepEvent(const OHOS::EventFwk::CommonEv
 #endif
 }
 
+void CesEventSubscriber::OnReceiveGameInfoNotifyEvent(const OHOS::EventFwk::CommonEventData &eventData)
+{
+    auto value = eventData.GetWant().GetStringParam("value");
+    if (value.find("netLatency") != std::string::npos) {
+        std::regex pattern(R"(\"netLatency\":\"total:(\d+)\")");
+        std::smatch matches;
+
+        if (std::regex_search(value, matches, pattern)) {
+            std::string totalStr = matches[1].str();
+            int total = CheckDataLegal(totalStr);
+            AppNetworkSpeedLimitService::GetInstance().UpdateGameRttData(total);
+        }
+    }
+}
+
 void WifiEventSubscriberManager::RegisterNotificationEvent()
 {
     std::unique_lock<std::mutex> lock(notificationEventMutex);
@@ -849,6 +881,7 @@ void WifiEventSubscriberManager::RegisterNotificationEvent()
     }
     OHOS::EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(WIFI_EVENT_TAP_NOTIFICATION);
+    matchingSkills.AddEvent(WIFI_EVENT_TAP_DONT_SHOW_AGAIN);
     matchingSkills.AddEvent(WIFI_EVENT_DIALOG_ACCEPT);
     matchingSkills.AddEvent(WIFI_EVENT_DIALOG_REJECT);
     matchingSkills.AddEvent(EVENT_SETTINGS_WLAN_KEEP_CONNECTED);
@@ -918,6 +951,10 @@ void NotificationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEve
         int notificationId = eventData.GetWant().GetIntParam("notificationId", 0);
         WIFI_LOGI("notificationId[%{public}d]", notificationId);
         OnReceiveNotificationEvent(notificationId);
+    } else if (action == WIFI_EVENT_TAP_DONT_SHOW_AGAIN) {
+        int notificationId = eventData.GetWant().GetIntParam("notificationId", 0);
+        WIFI_LOGI("notificationId[%{public}d]", notificationId);
+        OnReceiveDontShowEvent(notificationId);
     } else if (action == WIFI_EVENT_DIALOG_ACCEPT) {
         int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
         WIFI_LOGI("dialogType[%{public}d]", dialogType);
@@ -944,10 +981,21 @@ void NotificationEventSubscriber::OnReceiveNotificationEvent(int notificationId)
                 pService->StartPortalCertification();
             }
         }
-    } else if (notificationId == static_cast<int>(WifiNotificationId::WIFI_5G_CONN_NOTIFICATION_ID)) {
+    } else if (notificationId == static_cast<int>(WifiNotificationId::WIFI_5G_CONN_NOTIFICATION_ID) ||
+                notificationId == static_cast<int>(WifiNotificationId::WIFI_TRIBAND_CONN_NOTIFICATION_ID)) {
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
         if (pEnhanceService != nullptr) {
-            pEnhanceService->OnNotificationReceive();
+            pEnhanceService->OnNotificationReceive(notificationId);
+        }
+    }
+}
+
+void NotificationEventSubscriber::OnReceiveDontShowEvent(int notificationId)
+{
+    if (notificationId == static_cast<int>(WifiNotificationId::WIFI_TRIBAND_CONN_NOTIFICATION_ID)) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnDontShowReceive(notificationId);
         }
     }
 }
@@ -1118,6 +1166,7 @@ void WifiEventSubscriberManager::RegisterNetmgrEvent()
     }
     OHOS::EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(WIFI_EVENT_BG_CONTINUOUS_TASK_STATE);
+    matchingSkills.AddEvent(WIFI_EVENT_ACC_TASK_STATE);
     WIFI_LOGI("RegisterNetmgrEvent start");
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
@@ -1163,6 +1212,17 @@ NetmgrEventSubscriber::~NetmgrEventSubscriber()
 
 void NetmgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData)
 {
+    std::string action = eventData.GetWant().GetAction();
+    if (action == WIFI_EVENT_ACC_TASK_STATE) {
+        int32_t accTaskState = eventData.GetCode();
+        WIFI_LOGI("NetmgrEventSubscriber OnReceiveEvent by AccTask %{public}d", accTaskState);
+        WifiNetworkControlInfo networkControlInfo;
+        networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_LOW_LATENCY;
+        networkControlInfo.state = accTaskState;
+        AppNetworkSpeedLimitService::GetInstance().ReceiveNetworkControlInfo(networkControlInfo);
+        return;
+    }
+
     uint32_t bgContinuousTaskState = eventData.GetCode();
     WIFI_LOGI("NetmgrEventSubscriber OnReceiveEvent by BgTaskAware %{public}d", bgContinuousTaskState);
     IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst();
@@ -1266,6 +1326,21 @@ void CesEventSubscriber::OnReceiveConnectivityChangedEvent(const OHOS::EventFwk:
     WIFI_LOGI("%{public}s net: %{public}d code: %{public}d", __FUNCTION__, bearType, code);
     WifiSensorScene::GetInstance().OnConnectivityChanged(bearType, code);
     AppNetworkSpeedLimitService::GetInstance().HandleNetworkConnectivityChange(bearType, code);
+    if (firstFoldState_.load() && IsSignalSmoothingEnable() &&
+        bearType == NetManagerStandard::NetBearType::BEARER_WIFI) {
+        auto foldStatus = Rosen::DisplayManagerLite::GetInstance().GetFoldStatus();
+        for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
+            if (pService != nullptr) {
+                pService->OnFoldStateChanged(static_cast<int>(foldStatus));
+            }
+        }
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnFoldStateChanged(static_cast<int>(foldStatus));
+        }
+        firstFoldState_.store(false);
+    }
 }
 
 void WifiEventSubscriberManager::RegisterNetworkStateChangeEvent()

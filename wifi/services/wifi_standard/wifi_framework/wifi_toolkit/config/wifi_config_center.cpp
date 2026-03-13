@@ -1178,6 +1178,16 @@ int WifiConfigCenter::GetFreezeModeState() const
     return mFreezeModeState.load();
 }
 
+void WifiConfigCenter::SetScanStyle(int scanStyle)
+{
+    scanStyle_ = scanStyle;
+}
+ 
+int WifiConfigCenter::GetScanStyle() const
+{
+    return scanStyle_.load();
+}
+ 
 void WifiConfigCenter::SetNoChargerPlugModeState(int state)
 {
     mNoChargerPlugModeState = state;
@@ -1600,16 +1610,6 @@ void WifiConfigCenter::SetBrowserState(bool browser)
 bool WifiConfigCenter::GetBrowserState()
 {
     return browserOn_;
-}
-
-void WifiConfigCenter::SetLpScanAbility(bool isSupportLpScan)
-{
-    isSupportLpScan_ = isSupportLpScan;
-}
- 
-bool WifiConfigCenter::GetLpScanAbility()
-{
-    return isSupportLpScan_;
 }
 
 bool WifiConfigCenter::IsSameKeyMgmt(std::string scanKeyMgmt, std::string keyMgmt)

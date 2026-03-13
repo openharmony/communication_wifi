@@ -56,10 +56,16 @@ bool WifiMultiVapManager::CheckCanUseSoftAp()
         if (!enhanceVapAvailable) {
             if (CheckP2pConnected() && !CheckEnhanceWifiConnected()) {
                 EnhanceWrite3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::STA_P2P_SOFTAP_CONFLICT_CNT));
+                WriteSoftApOpenAndCloseFailedEvent(
+                    static_cast<int>(SoftApperateType::STA_P2P_SOFTAP_CONFLICT), "STA_P2P_SOFTAP_CONFLICT");
             } else if (!CheckP2pConnected() && CheckEnhanceWifiConnected()) {
                 EnhanceWrite3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::STA_HML_SOFTAP_CONFLICT_CNT));
+                WriteSoftApOpenAndCloseFailedEvent(
+                    static_cast<int>(SoftApperateType::STA_HML_SOFTAP_CONFLICT), "STA_HML_SOFTAP_CONFLICT");
             } else if (CheckP2pConnected() && CheckEnhanceWifiConnected()) {
                 EnhanceWrite3VapConflictHisysevent(static_cast<int>(Wifi3VapConflictType::P2P_HML_SOFTAP_CONFLICT_CNT));
+                WriteSoftApOpenAndCloseFailedEvent(
+                    static_cast<int>(SoftApperateType::P2P_HML_SOFTAP_CONFLICT), "P2P_HML_SOFTAP_CONFLICT");
             }
         }
         return enhanceVapAvailable;

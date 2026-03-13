@@ -99,6 +99,25 @@ ErrCode WifiControllerMachine::InitWifiStates()
     return WIFI_OPT_SUCCESS;
 }
 
+bool WifiControllerMachine::IsEnableScanOnlyOnHotspot()
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("get pEnhance service failed!");
+        return false;
+    }
+    bool isCoexSupport = WifiConfigCenter::GetInstance().GetCoexSupport();
+    bool isEnableScanOnlyOnHotspot = pEnhanceService->GetDeviceFeatures().isEnableScanOnlyOnHotspot;
+    return (!isCoexSupport && isEnableScanOnlyOnHotspot);
+}
+ 
+bool WifiControllerMachine::IsWifiConnected()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    return (linkedInfo.connState == ConnState::CONNECTED);
+}
+
 WifiControllerMachine::DisableState::DisableState(WifiControllerMachine *wifiControllerMachine)
     : State("DisableState"), pWifiControllerMachine(wifiControllerMachine)
 {}
@@ -146,6 +165,7 @@ bool WifiControllerMachine::DisableState::ExecuteStateMsg(InternalMessagePtr msg
                 pWifiControllerMachine->SwitchState(pWifiControllerMachine->pEnableState);
             } else if (msg->GetParam2() == INSTID_WLAN0) {
                 ConcreteManagerRole roleStaWifi1 = pWifiControllerMachine->GetWifiRole();
+                WIFI_LOGI("%{public}s, role %{public}d", __func__, static_cast<int32_t>(roleStaWifi1));
                 if (roleStaWifi1 == ConcreteManagerRole::ROLE_UNKNOW) {
                     WIFI_LOGE("Get unknow wifi role, break");
                     break;
@@ -358,6 +378,7 @@ void WifiControllerMachine::HandleAirplaneClose()
 #endif
 #endif
     ConcreteManagerRole role = GetWifiRole();
+    WIFI_LOGI("%{public}s, role %{public}d", __func__, static_cast<int32_t>(role));
     if (role == ConcreteManagerRole::ROLE_UNKNOW) {
         WIFI_LOGE("Get unknow wifi role in HandleAirplaneClose.");
         return;
@@ -670,12 +691,21 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
         pWifiControllerMachine->concreteManagers.StopAllManagers();
         return;
     }
+#ifdef FEATURE_AP_SUPPORT
+    if (pWifiControllerMachine->IsEnableScanOnlyOnHotspot() &&
+        WifiConfigCenter::GetInstance().GetSoftapToggledState() &&
+        !pWifiControllerMachine->IsWifiConnected()) {
+        WIFI_LOGI("%{public}s, WiFi turning on while hotspot active, close hotspot first", __func__);
+        WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, id);
+    }
+#endif
     ConcreteManagerRole presentRole;
     if (pWifiControllerMachine->concreteManagers.IdExist(id)) {
         if (WifiConfigCenter::GetInstance().GetWifiStopState()) {
             return;
         }
         presentRole = pWifiControllerMachine->GetWifiRole();
+        WIFI_LOGI("%{public}s, role %{public}d", __func__, static_cast<int32_t>(presentRole));
         if (presentRole == ConcreteManagerRole::ROLE_UNKNOW) {
             WIFI_LOGE("Get unknow wifi role in enablestate.");
             return;
@@ -697,6 +727,7 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
 #endif
 #endif
     presentRole = pWifiControllerMachine->GetWifiRole();
+    WIFI_LOGI("%{public}s, role %{public}d", __func__, static_cast<int32_t>(presentRole));
     if (presentRole == ConcreteManagerRole::ROLE_UNKNOW) {
         WIFI_LOGE("Get unknow wifi role  in EnableState.");
         return;
@@ -749,6 +780,15 @@ void WifiControllerMachine::EnableState::HandleSoftapOpen(int id)
             return;
         }
 #endif
+    // If WiFi is not connected, disable WiFi before starting hotspot
+    if (pWifiControllerMachine->IsEnableScanOnlyOnHotspot() &&
+        pWifiControllerMachine->GetWifiRole() != ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY) {
+        pWifiControllerMachine->wifiStateBeforeHotspot_ = IsWifiEnable(INSTID_WLAN0);
+        if (!pWifiControllerMachine->IsWifiConnected()) {
+            WIFI_LOGI("%{public}s, WiFi is not connected, switch scan only", __func__);
+            pWifiControllerMachine->SwitchRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
+        }
+    }
     pWifiControllerMachine->MakeHotspotManager(id);
 }
 
@@ -761,6 +801,7 @@ void WifiControllerMachine::EnableState::HandleSoftapClose(int id)
         pWifiControllerMachine->concreteManagers.HasAnyManager() &&
         !WifiManager::GetInstance().GetWifiTogglerManager()->IsSatelliteStateStart()) {
         ConcreteManagerRole role = pWifiControllerMachine->GetWifiRole();
+        WIFI_LOGI("%{public}s, role %{public}d", __func__, static_cast<int32_t>(role));
         if (role != ConcreteManagerRole::ROLE_UNKNOW) {
             pWifiControllerMachine->SwitchRole(role);
         }
@@ -782,7 +823,11 @@ void WifiControllerMachine::EnableState::HandleSoftapClose(int id)
     if (pWifiControllerMachine->softApManagers.IdExist(id)) {
         pWifiControllerMachine->softApManagers.StopManager(id);
         pWifiControllerMachine->StartTimer(CMD_AP_STOP_TIME, SOFT_AP_TIME_OUT);
-        return;
+    }
+    // Recover WiFi if needed
+    if (pWifiControllerMachine->wifiStateBeforeHotspot_ && pWifiControllerMachine->IsEnableScanOnlyOnHotspot()) {
+        WIFI_LOGI("%{public}s, recover WiFi after hotspot closed", __func__);
+        pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, 1, INSTID_WLAN0);
     }
 }
 #endif
@@ -926,6 +971,7 @@ void WifiControllerMachine::HandleConcreteStop(int id)
         if (!WifiManager::GetInstance().GetWifiTogglerManager()->HasAnyApRuning()) {
             if (ShouldEnableWifi(id)) {
                 ConcreteManagerRole presentRole = GetWifiRole();
+                WIFI_LOGI("%{public}s, role %{public}d", __func__, static_cast<int32_t>(presentRole));
                 MakeConcreteManager(presentRole, 0);
                 return;
             }
@@ -940,6 +986,7 @@ void WifiControllerMachine::HandleConcreteStop(int id)
         }
         if (ShouldEnableWifi(id)) {
             ConcreteManagerRole presentRole = GetWifiRole();
+            WIFI_LOGI("%{public}s, role %{public}d", __func__, static_cast<int32_t>(presentRole));
             MakeConcreteManager(presentRole, 0);
             return;
         }
@@ -980,6 +1027,7 @@ void WifiControllerMachine::HandleHotspotStop(int id, HotspotMode THotspotMode, 
     }
     if (ShouldEnableWifi(INSTID_WLAN0) && !WifiConfigCenter::GetInstance().GetWifiStopState()) {
         ConcreteManagerRole role = GetWifiRole();
+        WIFI_LOGI("%{public}s, role %{public}d", __func__, static_cast<int32_t>(role));
         if (role == ConcreteManagerRole::ROLE_UNKNOW) {
             WIFI_LOGE("Get unknow wifi role in HandleSoftapStop.");
             return;

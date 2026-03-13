@@ -61,5 +61,11 @@ HWTEST_F(DualBandRepostitoryTest, QueryRelationApInfosTest1, TestSize.Level1)
     std::vector<RelationAp> relationAp = dualBandRepostitory_->QueryRelationApInfos(bssidSet);
     EXPECT_EQ(relationAp.size(), 0);
 }
+HWTEST_F(DualBandRepostitoryTest, QueryRelationApInfosTest2, TestSize.Level1)
+{
+    std::unordered_set<std::string> bssidSet({"ff:ff:ff:ff:ff:FF"});
+    std::vector<RelationAp> relationAp = dualBandRepostitory_->QueryRelationApInfos(bssidSet);
+    EXPECT_EQ(relationAp.size(), 0);
+}
 }
 }

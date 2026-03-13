@@ -54,6 +54,7 @@ namespace Wifi {
 constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
 constexpr int WIFI_BROKER_NETWORK_ID = -2;
 constexpr int RSS_UID = 1096;
+constexpr int RESOURCE_MANAGER_UID = 7680;
 
 bool g_hiLinkActive = false;
 constexpr int HILINK_CMD_MAX_LEN = 1024;
@@ -2803,6 +2804,35 @@ void WifiDeviceServiceImpl::ReportWifiConfigStatus(WifiConfigReportType reportTy
     WriteWifiConfigStatusHiSysEvent(packageName, reportType);
 #else
     return;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::SetBtCoexistState(CoexistState state, CoexistReason reason)
+{
+    if (!WifiAuthCenter::IsNativeProcess()) {
+        WIFI_LOGE("SetBtCoexistState: NOT NATIVE PROCESS, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("%{public}s PERMISSION_DENIED!", __FUNCTION__);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+#ifndef OHOS_ARCH_LITE
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s pEnhanceService is nullptr!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    int callingUid = GetCallingUid();
+    if (callingUid != RESOURCE_MANAGER_UID) {
+        WIFI_LOGE("%{public}s This interface is only for bt resoure manager, and uid: %{public}d can't be called!",
+            __FUNCTION__, callingUid);
+        return WIFI_OPT_FAILED;
+    }
+    pEnhanceService->SetBtCoexistState(state, reason);
+    return WIFI_OPT_SUCCESS;
+#else
+    return WIFI_OPT_FAILED;
 #endif
 }
 }  // namespace Wifi

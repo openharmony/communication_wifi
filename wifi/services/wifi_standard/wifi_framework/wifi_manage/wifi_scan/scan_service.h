@@ -39,6 +39,7 @@ namespace Wifi {
 inline const int DISCONNECTED_SCAN_INTERVAL = 20 * 60 * 1000;
 inline const int RESTART_PNO_SCAN_TIME = 5 * 1000;
 inline const int RESTART_SYSTEM_SCAN_TIME = 2 * 1000;
+inline const int RESTART_COMMON_SCAN_TIME = 0;
 inline const int FREQS_24G_MAX_VALUE = 2500;
 inline const int FREQS_5G_MIN_VALUE = 5000;
 inline const int SECOND_TO_MICRO_SECOND = 1000000;
@@ -155,6 +156,13 @@ public:
      * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual ErrCode ScanWithParam(const WifiScanParams &params, ScanType scanType);
+    /**
+     * @Description Convert scanned hotspots to GBK.
+     *
+     * @param ssid - ssid of saved networks[in]
+     * @param hiddenNetworkSsidList it is hiddenNetworkSsidList[out]
+     */
+    virtual void AddSsidToHiddenNetworkList(const std::string ssid, std::vector<std::string>& hiddenNetworkSsidList);
     /**
      * @Description Disable/Restore the scanning operation.
      *
@@ -551,6 +559,21 @@ private:
      */
     void HandleCommonScanFailed(std::vector<int> &requestIndexList);
     /**
+     * @Description System scanning failure processing, restart after a delay.
+     *
+     */
+    void HandleSystemScanFailed();
+    /**
+     * @Description LP scanning failure processing, restart common scan after a delay.
+     *
+     */
+    void HandleLpScanFailed();
+    /**
+     * @Description Determine whether to allow common scan when LP scan fails.
+     *
+     */
+    bool AllowCommonScanOnLpScanFailure();
+    /**
      * @Description Callback function for obtaining the PNO scanning result
      *
      * @param scanInfoList - Scan Info List[in]
@@ -568,6 +591,10 @@ private:
      * @param scanStyle - Type of scan to trigger the WiFi chip[in]
      */
     ErrCode ScanControlInner(ScanType scanType, int &scanStyle);
+    /**
+     * @Description Lp scan failed, Restart common scan after a delay.
+     */
+    void RestartCommonScanAfterLpScanFailed();
     /**
      * @Description System scanning failed, Restart after a delay.
      */
@@ -1002,14 +1029,6 @@ private:
      * @param count adjust count[in]
      */
     void SystemScanDisconnectedPolicy(int &interval, int &count);
-
-    /**
-     * @Description record scan limit info
-     *
-     * @param WifiScanDeviceInfo wifiScanDeviceInfo[in]
-     * @param ScanLimitType scanLimitType[in]
-     */
-    void RecordScanLimitInfo(const WifiScanDeviceInfo &wifiScanDeviceInfo, const ScanLimitType &scanLimitType);
 
 #ifndef OHOS_ARCH_LITE
     class WifiCountryCodeChangeObserver : public IWifiCountryCodeChangeListener {

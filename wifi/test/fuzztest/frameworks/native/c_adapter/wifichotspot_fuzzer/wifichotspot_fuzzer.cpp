@@ -23,6 +23,7 @@
 
 static void SetHotspotConfigTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     HotspotConfig config;
 
     if (size >= sizeof(HotspotConfig)) {
@@ -33,16 +34,16 @@ static void SetHotspotConfigTest(const uint8_t* data, size_t size)
         if (memcpy_s(config.preSharedKey, WIFI_MAX_KEY_LEN, data, WIFI_MAX_KEY_LEN - 1) != EOK) {
             return;
         }
-        int index = 0;
-        config.securityType = static_cast<int>(data[index++]);
-        config.band = static_cast<int>(data[index++]);
-        config.channelNum = static_cast<int>(data[index++]);
+        config.securityType = FDP.ConsumeIntegral<int>();
+        config.band = FDP.ConsumeIntegral<int>();
+        config.channelNum = FDP.ConsumeIntegral<int>();
     }
     (void)SetHotspotConfig(&config);
 }
 
 static void GetHotspotConfigTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     HotspotConfig result;
 
     if (size >= sizeof(HotspotConfig)) {
@@ -53,16 +54,16 @@ static void GetHotspotConfigTest(const uint8_t* data, size_t size)
         if (memcpy_s(result.preSharedKey, WIFI_MAX_KEY_LEN, data, WIFI_MAX_KEY_LEN - 1) != EOK) {
             return;
         }
-        int index = 0;
-        result.securityType = static_cast<int>(data[index++]);
-        result.band = static_cast<int>(data[index++]);
-        result.channelNum = static_cast<int>(data[index++]);
+        result.securityType = FDP.ConsumeIntegral<int>();
+        result.band = FDP.ConsumeIntegral<int>();
+        result.channelNum = FDP.ConsumeIntegral<int>();
     }
     (void)GetHotspotConfig(&result);
 }
 
 static void GetStationListTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     StationInfo result;
     unsigned int mSize = 0;
 
@@ -70,22 +71,22 @@ static void GetStationListTest(const uint8_t* data, size_t size)
         if (memcpy_s(result.macAddress, WIFI_MAC_LEN, data, WIFI_MAC_LEN) != EOK) {
             return;
         }
-        int index = 0;
         result.ipAddress = OHOS::Wifi::U32_AT(data);
-        result.disconnectedReason = static_cast<unsigned short>(data[index++]);
-        mSize = static_cast<unsigned int>(data[index++]);
+        result.disconnectedReason = FDP.ConsumeIntegral<unsigned short>();
+        mSize = FDP.ConsumeIntegral<unsigned int>();
     }
     (void)GetStationList(&result, &mSize);
 }
 
 static void DisassociateStaTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     unsigned char mac = 0;
     int macLen = 0;
     if (size >= TWO) {
         int index = 0;
         mac = data[index++];
-        macLen = static_cast<unsigned int>(data[index++]);
+        macLen = FDP.ConsumeIntegral<unsigned int>();
     }
     (void)DisassociateSta(&mac, macLen);
 }
@@ -101,6 +102,7 @@ static void GetHotspotModeTest(const uint8_t* data, size_t size)
  
 static void GetLocalOnlyHotspotConfigTest(const uint8_t* data, size_t size)
 {
+    FuzzedDataProvider FDP(data, size);
     HotspotConfig localOnlyResult;
  
     if (size >= sizeof(HotspotConfig)) {
@@ -111,10 +113,9 @@ static void GetLocalOnlyHotspotConfigTest(const uint8_t* data, size_t size)
         if (memcpy_s(localOnlyResult.preSharedKey, WIFI_MAX_KEY_LEN, data, WIFI_MAX_KEY_LEN - 1) != EOK) {
             return;
         }
-        int index = 0;
-        localOnlyResult.securityType = static_cast<int>(data[index++]);
-        localOnlyResult.band = static_cast<int>(data[index++]);
-        localOnlyResult.channelNum = static_cast<int>(data[index++]);
+        localOnlyResult.securityType = FDP.ConsumeIntegral<int>();
+        localOnlyResult.band = FDP.ConsumeIntegral<int>();
+        localOnlyResult.channelNum = FDP.ConsumeIntegral<int>();
     }
     (void)GetLocalOnlyHotspotConfig(&localOnlyResult);
 }

@@ -151,6 +151,7 @@ if (defined(ohos_lite)) {
     sources = [
       "app_network_speed_limit/app_network_speed_limit_service.cpp",
       "app_network_speed_limit/speed_limit_configs_writer.cpp",
+      "app_network_speed_limit/app_network_speed_limit_chr.cpp",
       "block_connect_service.cpp",
       "network_black_list/network_black_list_manager.cpp",
       "network_status_history/network_status_history_manager.cpp",

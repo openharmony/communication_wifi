@@ -52,6 +52,7 @@ inline const std::string COMMON_EVENT_GET_WIFI_INFO_PERMISSION = "ohos.permissio
 inline const std::string COMMON_EVENT_MANAGE_WIFI_CONNECTION_PERMISSION = "ohos.permission.MANAGE_WIFI_CONNECTION";
 inline const std::string COMMON_EVENT_NOT_AVAILABLE_DIALOG = "event.settings.wlan.close_not_available_dialog";
 inline const std::string COMMON_EVENT_WIFI_NET_CHECK_RESULT_CHANGE = "usual.event.wifi.net_check_result_change";
+inline const std::string COMMON_EVENT_HIDE_DROPDOWN_WINDOW = "sceneboard.event.HIDE_DROPDOWN_WINDOW";
 inline const int CANCEL_DIAG = 0;
 inline const int COMMON_SCAN_START = 0;
 inline const int PNO_SCAN_START = 1;
@@ -94,6 +95,7 @@ public:
     static bool PublishNotAvailableDialog();
     static bool PublishInternetAccessChangedEvent(const int &code, const std::string &data);
     static bool PublishNetCheckResultChange(const int &code, const std::string &data);
+    static void PublishHideDropDownWindowEvent();
 };
 }  // namespace Wifi
 }  // namespace OHOS

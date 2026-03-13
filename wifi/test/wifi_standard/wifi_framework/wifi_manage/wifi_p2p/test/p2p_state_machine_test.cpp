@@ -40,6 +40,7 @@
 #include "mock_wifi_settings.h"
 #include "wifi_logger.h"
 #include "mock_p2p_group_remove_state.h"
+#include "mock_wifi_config_center.h"
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -439,6 +440,10 @@ public:
     {
         pP2pStateMachine->CancelWpsPbc();
     }
+    bool GetAllFreqsByBand(GroupOwnerBand band, std::vector<int>& freqList) const
+    {
+        return pP2pStateMachine->GetAllFreqsByBand(band, freqList);
+    }
 };
 
 HWTEST_F(P2pStateMachineTest, HandlerDiscoverPeers, TestSize.Level1)
@@ -816,7 +821,11 @@ HWTEST_F(P2pStateMachineTest, GetAvailableFreqByBand3, TestSize.Level1)
     std::vector<int> freqList;
     freqList.push_back(2412);
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _, _))
-        .WillOnce(DoAll(SetArgReferee<2>(freqList), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
+        .WillRepeatedly(DoAll(SetArgReferee<2>(freqList), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
+    WifiLinkedInfo info;
+    info.connState = ConnState::CONNECTED;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(info), Return(0)));
     WarpGetAvailableFreqByBand(band);
 }
 
@@ -1001,6 +1010,42 @@ HWTEST_F(P2pStateMachineTest, CancelWpsPbcTest, TestSize.Level1)
 {
     WarpCancelWpsPbc();
     EXPECT_FALSE(g_errLog.find("P2pStateMachine") != std::string::npos);
+}
+
+HWTEST_F(P2pStateMachineTest, GetAllFreqsByBand1, TestSize.Level1)
+{
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pIfaceName()).WillOnce(Return("p2p"));
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _, _))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+
+    std::vector<int> freqList;
+    EXPECT_FALSE(GetAllFreqsByBand(GroupOwnerBand::GO_BAND_AUTO, freqList));
+}
+
+HWTEST_F(P2pStateMachineTest, GetAllFreqsByBand2, TestSize.Level1)
+{
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pIfaceName()).WillOnce(Return("p2p"));
+    std::vector<int> retFreqList;
+    retFreqList.push_back(2412);
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(retFreqList), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
+
+    std::vector<int> freqList;
+    EXPECT_TRUE(GetAllFreqsByBand(GroupOwnerBand::GO_BAND_2GHZ, freqList));
+    EXPECT_TRUE(std::find(freqList.begin(), freqList.end(), 2412) != freqList.end());
+}
+
+HWTEST_F(P2pStateMachineTest, GetAllFreqsByBand3, TestSize.Level1)
+{
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pIfaceName()).WillOnce(Return("p2p"));
+    std::vector<int> retFreqList;
+    retFreqList.push_back(5745);
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), P2pGetSupportFrequenciesByBand(_, _, _))
+        .WillOnce(DoAll(SetArgReferee<2>(retFreqList), Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
+
+    std::vector<int> freqList;
+    EXPECT_TRUE(GetAllFreqsByBand(GroupOwnerBand::GO_BAND_5GHZ, freqList));
+    EXPECT_TRUE(std::find(freqList.begin(), freqList.end(), 5745) != freqList.end());
 }
 }  // namespace Wifi
 }  // namespace OHOS

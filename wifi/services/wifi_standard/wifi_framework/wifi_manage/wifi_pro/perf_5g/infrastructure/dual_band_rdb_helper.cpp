@@ -125,6 +125,16 @@ bool DualBandRdbHelper::QueryRelationInfo(std::string &bssid, std::vector<Relati
     WIFI_LOGE("QueryRelationInfo, relationInfos size(%{public}zu)", relationInfos.size());
     return true;
 }
+
+bool DualBandRdbHelper::RemoveDuplicateDatas()
+{
+    std::shared_ptr<WifiRdbManager> pRdbManager = WifiRdbManager::GetRdbManger(RdbType::WIFI_PRO);
+    if (pRdbManager == nullptr) {
+        WIFI_LOGE("DeleteAll Failed,WIFI_PRO rdbManager is nullptr");
+        return false;
+    }
+    return pRdbManager->RemoveDuplicateDatas();
+}
 bool DualBandRdbHelper::DeleteAll(std::unordered_set<std::string> &bssids)
 {
     std::shared_ptr<WifiRdbManager> pRdbManager = WifiRdbManager::GetRdbManger(RdbType::WIFI_PRO);

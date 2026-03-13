@@ -200,7 +200,6 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->RegisterCommonBuilder(tagType, tagName, commonBuilder);
     pStaInterface->DeregisterCommonBuilder(tagType, tagName);
     pStaInterface->DeliverAudioState(networkId);
-    pStaInterface->InitStaServiceLocked();
     pStaInterface->OnFoldStateChanged(networkId);
     VoWifiSignalInfo signalInfo;
     pStaInterface->FetchWifiSignalInfoForVoWiFi(signalInfo);
@@ -326,6 +325,48 @@ void StaAutoServerFuzzTest(const uint8_t* data, size_t size)
     pStaAutoConnectService->SetAutoConnectStateCallback(callbacks);
     pStaAutoConnectService->OverrideCandidateWithUserSelectChoice(candidate);
     pStaAutoConnectService->IsAutoConnectFailByP2PEnhanceFilter(scanInfo);
+}
+
+void StaAutoServerFuzzTest01(const uint8_t* data, size_t size)
+{
+    FuzzedDataProvider FDP(data, size);
+    InterScanInfo scanInfoList;
+    scanInfoList.channelWidth = static_cast<WifiChannelWidth>(FDP.ConsumeIntegral<int>() % U32_AT_SIZE_ZERO);
+    scanInfoList.wifiMode = FDP.ConsumeIntegral<int>();
+    scanInfoList.timestamp = FDP.ConsumeIntegral<int64_t>();
+    scanInfoList.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    scanInfoList.rssi = FDP.ConsumeIntegral<int>();
+    scanInfoList.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+    scanInfoList.capabilities = FDP.ConsumeBytesAsString(NUM_BYTES);
+    scanInfoList.frequency = FDP.ConsumeIntegral<int>();
+    scanInfoList.features = FDP.ConsumeIntegral<int64_t>();
+    WifiDeviceConfig config;
+    config.bssid = scanInfoList.bssid;
+    config.ssid = scanInfoList.ssid;
+    config.preSharedKey = FDP.ConsumeBytesAsString(NUM_BYTES);
+    config.keyMgmt = FDP.ConsumeBytesAsString(NUM_BYTES);
+    std::vector<InterScanInfo> scanInfos;
+    WifiLinkedInfo info;
+    if (size >= sizeof(WifiLinkedInfo)) {
+        info.networkId = FDP.ConsumeIntegral<int>();
+        info.rssi = FDP.ConsumeIntegral<int>();
+        info.band = FDP.ConsumeIntegral<int>();
+        info.linkSpeed = FDP.ConsumeIntegral<int>();
+        info.frequency = FDP.ConsumeIntegral<int>();
+        info.macType = FDP.ConsumeIntegral<int>();
+        info.ssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        info.bssid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        info.macAddress = FDP.ConsumeBytesAsString(NUM_BYTES);
+        info.detailedState = static_cast<DetailedState>(FDP.ConsumeIntegral<int>() % STATE);
+    }
+    std::vector<std::string> blockedBssids;
+    pStaAutoConnectService->AutoSelectDevice(config, scanInfos, blockedBssids, info);
+}
+
+void StaAutoServerFuzzTest02(const uint8_t* data, size_t size)
+{
+    NetworkSelectionResult candidate;
+    pStaAutoConnectService->IsCandidateWithUserSelectChoiceHidden(candidate);
 }
 
 void RegisterDeviceAppraisalTest(FuzzedDataProvider& FDP)
@@ -498,7 +539,6 @@ void StaServiceFuzzTest(FuzzedDataProvider& FDP)
     std::string conditionName = FDP.ConsumeBytesAsString(NUM_BYTES);
     std::string ditionName = FDP.ConsumeBytesAsString(NUM_BYTES);
     AppExecFwk::AppStateData appData;
-    pStaService->EnableStaService();
     pStaService->DisableStaService();
     pStaService->RegisterAutoJoinCondition(conditionName, []() {return true;});
     pStaService->DeregisterAutoJoinCondition(ditionName);
@@ -664,6 +704,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::AllowAutoSelectDeviceTest(data, size);
     OHOS::Wifi::GetImsiFuzzTest(data, size);
     OHOS::Wifi::SecurityDetectFuzzTest(data, size);
+    OHOS::Wifi::StaAutoServerFuzzTest01(data, size);
+    OHOS::Wifi::StaAutoServerFuzzTest02(data, size);
     OHOS::Wifi::RegisterDeviceAppraisalTest(FDP);
     OHOS::Wifi::StaAutoConnectServiceFuzzTest(FDP);
     OHOS::Wifi::StaInterfaceFuzzTest(FDP);

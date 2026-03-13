@@ -1390,6 +1390,21 @@ int ConvertMacArr2String(const unsigned char *srcMac, int srcMacSize, char *dest
     return 0;
 }
 
+static void HandleMemcpyFail(ScanInfoElem *infoElemsTemp, int ieIndex)
+{
+    LOGE("memcpy content fail");
+ 
+    for (int i = 0; i < ieIndex; i++) {
+        if (infoElemsTemp[i].content != NULL) {
+            free(infoElemsTemp[i].content);
+            infoElemsTemp[i].content = NULL;
+        }
+    }
+ 
+    free(infoElemsTemp);
+    infoElemsTemp = NULL;
+}
+
 void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
 {
     if (scanInfo == NULL || start == NULL) {
@@ -1430,11 +1445,7 @@ void GetScanResultInfoElem(ScanInfo *scanInfo, const uint8_t *start, size_t len)
             break;
         }
         if (memcpy_s(infoElemsTemp[ieIndex].content, elen+1, elem->data, elen) != EOK) {
-            LOGE("memcpy content fail");
-            free(infoElemsTemp[ieIndex].content);
-            infoElemsTemp[ieIndex].content = NULL;
-            free(infoElemsTemp);
-            infoElemsTemp = NULL;
+            HandleMemcpyFail(infoElemsTemp, ieIndex);
             return;
         }
         ieIndex++;

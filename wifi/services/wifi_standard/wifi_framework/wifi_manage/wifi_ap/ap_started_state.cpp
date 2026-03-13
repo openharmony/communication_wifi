@@ -341,6 +341,8 @@ void ApStartedState::ProcessCmdEnableApTimeout(InternalMessagePtr msg) const
         WIFI_LOGI("Current state is AP_STATE_STARTED, no need deal CMD_START_HOTSPOT_TIMEOUT.");
         return;
     }
+    WriteSoftApOpenAndCloseFailedEvent(
+        static_cast<int>(SoftApperateType::SOFTAP_TIMEOUT), "SOFTAP_TIMEOUT");
     WIFI_LOGI("Ap enable timeout, set softap toggled false.");
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     m_ApStateMachine.SwitchState(&m_ApStateMachine.m_ApIdleState);

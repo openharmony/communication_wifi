@@ -16,21 +16,25 @@
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { i18n, resourceManager  } from '@kit.LocalizationKit';
-import { common, OpenLinkOptions } from '@kit.AbilityKit';
+import { common, OpenLinkOptions, abilityAccessCtrl } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { SymbolGlyphModifier } from '@kit.ArkUI';
+import { SymbolGlyphModifier, window } from '@kit.ArkUI';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
-  validateURL, getIsInOOBE
+  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl,
+  modifyCode
 } from '../common/utils';
 import {
-  updateFinalUrl,updateOnHttpErrorReceive,updateOnErrorReceive,updateOnSslErrorEvent,updateAboutToDisappear
+  updateFinalUrl, updateOnHttpErrorReceive, updateOnErrorReceive, updateOnSslErrorEvent, updateAboutToDisappear,
+  safeAnonymize
 } from '../common/chr';
 import { connection } from '@kit.NetworkKit';
 import { emitter } from '@kit.BasicServicesKit';
 
 const DOMAIN = 0x01560;
 const TAG = 'Pages';
+const RETRY_CODE = 999;
+const MAX_RETRY = 3;
 
 @Styles function pressedStyles() {
   .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
@@ -83,6 +87,7 @@ struct Index {
   private webviewController: webview.WebviewController = new webview.WebviewController();
   private context = getContext(this) as common.UIAbilityContext;
   @State private webUrl: string = getUrl();
+  private defaultUrl: string = getDefaultUrl();
   private harmonyUA: string = UserAgentSet.harmonyUA;
   private mobileUA: string = UserAgentSet.mobileUA;
   private desktopUA:string = UserAgentSet.desktopUA;
@@ -95,13 +100,14 @@ struct Index {
   private contextMenuWidth = 224;
   private netConnect: connection.NetConnection = connection.createNetConnection();
   private isInOOBE: boolean = getIsInOOBE();
-  @State mode: WebDarkMode = WebDarkMode.Auto;
-  @State access: boolean = true;
   @StorageProp('topRectHeight') topRectHeight: number = 0;
   private isLoaded: boolean = false;
   private isNetBind: boolean = false;
   @State timerCount: number = 10;
   private timerId: number = -1;
+  private isPhone: boolean = false;
+  @State retryCount: number = 0;
+  @State isActionBarVisible: boolean = true;
 
   @Builder
   ContextMenu() {
@@ -311,8 +317,13 @@ struct Index {
             showClose: true,
             title: { title: $r('app.string.site_setting_single_website_title', extractDomain(this.webUrl)) },
             onDisappear: () => {
-              this.webviewController.setCustomUserAgent(this.selectedUA);
-              this.webviewController.refresh();
+              try {
+                this.webviewController.setCustomUserAgent(this.selectedUA);
+                this.webviewController.refresh();
+              } catch (error) {
+                hilog.error(DOMAIN, TAG, '%{public}s',
+                  `Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
+              }
             }
           })
       }
@@ -321,6 +332,8 @@ struct Index {
         minHeight: '56vp'
       })
       .backgroundColor($r('sys.color.ohos_id_color_background'))
+      .visibility(this.isActionBarVisible ? Visibility.Visible :
+        Visibility.None)
 
       Web({ src: '', controller: this.webviewController })
         .javaScriptAccess(true)
@@ -328,6 +341,15 @@ struct Index {
         .geolocationAccess(false)
         .domStorageAccess(true)
         .overviewModeAccess(false)
+        .onPermissionRequest((event) => {
+          if (event) {
+            const permissions: string[] = event.request.getAccessibleResource();
+            if (permissions.includes('TYPE_VIDEO_CAPTURE')) {
+              this.requestCamera();
+              event.request.grant(event.request.getAccessibleResource());
+            }
+          }
+        })
         .onOverrideUrlLoading((request) => {
           this.webUrl = request.getRequestUrl();
           if (validateURL(this.webUrl) && !this.webUrl.startsWith('http') && !this.webUrl.startsWith('https')) {
@@ -347,16 +369,34 @@ struct Index {
         .onControllerAttached(() => {
           try {
             this.harmonyUA = this.webviewController.getUserAgent();
-            const isPhone = /Phone/i.test(this.harmonyUA);
+            this.isPhone = /Phone/i.test(this.harmonyUA);
             this.selectedUA = this.harmonyUA;
-            hilog.info(DOMAIN, TAG, '%{public}s', 'UA isPhone: '  + isPhone);
+            hilog.info(DOMAIN, TAG, '%{public}s', 'UA isPhone:'  + this.isPhone);
           } catch (error) {
-            hilog.error(DOMAIN, TAG, '%{public}s', `Failed to set UA. Code:${error.code}, message:${error.message}`);
+            hilog.error(DOMAIN, TAG, '%{public}s', `Failed to get UA. Code:${error.code}, message:${error.message}`);
           }
         })
+        .javaScriptOnDocumentStart([{ script: modifyCode, scriptRules: ["*"] }])
         .onPageBegin(() => {
           updateFinalUrl(this.webUrl);
           this.loadProgress = 0;
+          if (this.isPhone && this.selectedUA === this.harmonyUA) {
+            this.setUA();
+            this.selectedUA = this.harmonyUA;
+            try {
+              this.webviewController.setCustomUserAgent(this.selectedUA);
+            } catch (error) {
+              hilog.error(DOMAIN, TAG, '%{public}s',
+                `onPageBegin Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
+            }
+          }
+          try {
+            this.webviewController.runJavaScript(modifyCode);
+            hilog.info(DOMAIN, TAG, '%{public}s', 'runJavaScript enter.');
+          } catch (error) {
+            hilog.error(DOMAIN, TAG, '%{public}s',
+              `onPageBegin Failed runJavaScript. Code:${error.code}, message:${error.message}`);
+          }
         })
         .onProgressChange((event) => {
           this.loadProgress = event.newProgress;
@@ -365,7 +405,7 @@ struct Index {
           this.loadProgress = 100;
           if (event) {
             this.webUrl = event.url;
-            hilog.info(DOMAIN, TAG, '%{public}s', 'Url:' + extractDomain(this.webUrl));
+            hilog.info(DOMAIN, TAG, '%{public}s', 'Url:' + safeAnonymize(this.webUrl));
             if (event.url == 'about:blank') {
               hilog.info(DOMAIN, TAG, '%{public}s', 'about:blank exit.');
               exitApp(this.context);
@@ -379,8 +419,10 @@ struct Index {
         })
         .onHttpErrorReceive((event) => {
           if (event) {
-            updateOnHttpErrorReceive(event.response.getResponseCode());
-            hilog.info(DOMAIN, TAG, 'getResponseCode:' + event.response.getResponseCode());
+            let errorCode = event.response.getResponseCode();
+            let failedUrl = event.request.getRequestUrl();
+            hilog.info(DOMAIN, TAG, 'getResponseCode:' + errorCode);
+            this.handleHttpError(errorCode, failedUrl);
           }
         })
         .onErrorReceive((event) => {
@@ -399,6 +441,7 @@ struct Index {
             primaryButton: {
               value: $r('app.string.confirm_dialog_cancel'),
               action: () => {
+                hilog.info(DOMAIN, TAG, 'primaryButton handleCancel');
                 event.handler.handleCancel();
               }
             },
@@ -406,22 +449,98 @@ struct Index {
               value: $r('app.string.ssl_error_dialog_continue_btn'),
               fontColor: $r('sys.color.warning'),
               action: () => {
+                hilog.info(DOMAIN, TAG, 'secondaryButton handleConfirm');
                 event.handler.handleConfirm();
               }
             },
             cancel: () => {
-              event.handler.handleCancel();
+              hilog.info(DOMAIN, TAG, 'cancel handleConfirm');
+              event.handler.handleConfirm();
             }
           })
         })
-        .darkMode(this.mode)
-        .forceDarkAccess(this.access)
-        .backgroundColor($r('sys.color.ohos_id_color_background'))
+        .onFullScreenEnter((event) => {
+          hilog.info(DOMAIN, TAG, '%{public}s', 'onFullScreenEnter.');
+          this.isActionBarVisible = false;
+          this.handleFullScreenChange();
+        })
+        .onFullScreenExit(() => {
+          hilog.info(DOMAIN, TAG, '%{public}s', 'onFullScreenExit.');
+          this.isActionBarVisible = true;
+          this.handleFullScreenChange();
+        })
+        .darkMode(WebDarkMode.Off)
+        .backgroundColor(Color.White)
         .width('100%')
     }
     .padding({ top: px2vp(this.topRectHeight) })
   }
-  
+
+  private requestCamera() {
+    let atManager = abilityAccessCtrl.createAtManager();
+    atManager.requestPermissionsFromUser(this.getUIContext().getHostContext(), ['ohos.permission.CAMERA'])
+      .then((data) => {
+        hilog.info(DOMAIN, TAG, '%{public}s', 'requestPermissions:' + JSON.stringify(data));
+      }).catch((error: BusinessError) => {
+        hilog.error(DOMAIN, TAG, '%{public}s',
+          `Failed to request permissions from user. Code is ${error.code}, message is ${error.message}`);
+    })
+  }
+
+  private async handleFullScreenChange() {
+    let orientation = window.Orientation.UNSPECIFIED;
+    if (!this.isActionBarVisible){
+      orientation = window.Orientation.AUTO_ROTATION;
+    }
+    try {
+      const windowClass = await window.getLastWindow(this.context);
+      await windowClass.setPreferredOrientation(orientation);
+      hilog.info(DOMAIN, TAG, '%{public}s', 'Orientation' + orientation);
+    } catch (error) {
+      let err: BusinessError = error as BusinessError;
+      hilog.error(DOMAIN, TAG, '%{public}s',
+        `Orientation failed.Code:${err.code},message:${err.message}.` + orientation);
+    }
+  }
+
+  private setUA():void {
+    hilog.info(DOMAIN, TAG, '%{public}s', 'setUA enter.');
+    this.harmonyUA = HarmonyUserAgentSet.harmonyUACompatible;
+    let pattern:RegExp|undefined = getHmosUAComplexRegex();
+    if (pattern) {
+      if (pattern.test(extractDomain(this.webUrl))){
+        this.harmonyUA = HarmonyUserAgentSet.harmonyUAHmos;
+        hilog.info(DOMAIN, TAG, '%{public}s', 'setUA harmonyUAHmos.');
+      }
+    }
+  }
+
+  private handleHttpError(code:number, url:string) {
+    const retryList:StringNumberPair[] = getRetryList();
+    let retryFlag = false;
+    for (let i = 0;i < retryList.length;i++) {
+      if (retryList[i][0] === extractDomain(url) && retryList[i][1] === code) {
+        retryFlag = true;
+        break;
+      }
+    }
+    if (retryFlag) {
+      updateOnHttpErrorReceive(RETRY_CODE);
+      if (this.retryCount < MAX_RETRY) {
+        this.retryCount++;
+        try {
+          this.webviewController.loadUrl(this.defaultUrl);
+          hilog.info(DOMAIN, 'TAG', '%{public}s', 'handleHttpError retryCount:' + this.retryCount);
+        } catch (error) {
+          let err: BusinessError = error as BusinessError;
+          hilog.error(DOMAIN, 'TAG', '%{public}s', `retry Failed to load url.Code:${err.code},message:${err.message}`);
+        }
+      }
+    } else {
+      updateOnHttpErrorReceive(code);
+    }
+  }
+
   private startCountdown() {
     this.timerId = setInterval(() => {
       hilog.info(DOMAIN, TAG, '%{public}s', 'Timer count is:' + this.timerCount);
@@ -431,8 +550,25 @@ struct Index {
           hilog.info(DOMAIN, TAG, '%{public}s', 'startCountdown LoadUrl');
           this.webUrl = getUrl();
           try {
+            webview.ProxyController.removeProxyOverride(() => {
+              hilog.info(DOMAIN, TAG, '%{public}s', 'removeProxyOverride proxy changed');
+            });
+          } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            hilog.error(DOMAIN, TAG, '%{public}s', `removeProxyOverride Code:${err.code}, message:${err.message}`);
+          }
+          let proxyConfig:webview.ProxyConfig = new webview.ProxyConfig();
+          try {
+            webview.ProxyController.applyProxyOverride(proxyConfig, () => {
+              hilog.info(DOMAIN, TAG, '%{public}s', 'applyProxyOverride proxy changed');
+            });
+          } catch (error) {
+            let err: BusinessError = error as BusinessError;
+            hilog.error(DOMAIN, TAG, '%{public}s', `applyProxyOverride Code:${err.code}, message:${err.message}`);
+          }
+          try {
             this.webviewController.loadUrl(this.webUrl);
-            hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + extractDomain(this.webUrl));
+            hilog.info(DOMAIN, TAG, '%{public}s', 'Load url:' + safeAnonymize(this.webUrl));
           } catch (error) {
             let err: BusinessError = error as BusinessError;
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed to load url. Code:${err.code}, message:${err.message}`);
@@ -469,6 +605,13 @@ struct Index {
     }
     emitter.on('WANT_UPDATE', () => {
       hilog.info(DOMAIN, TAG, '%{public}s', 'on new want.');
+      try {
+        this.webviewController.clearSslCache();
+        hilog.info(DOMAIN, TAG, '%{public}s', 'clearSslCache');
+      } catch (error) {
+        let err: BusinessError = error as BusinessError;
+        hilog.error(DOMAIN, TAG, '%{public}s', `Failed to clearSslCache. Code:${err.code}, message:${err.message}`);
+      }
       this.isNetBind = false;
       this.timerCount = 10;
       this.isLoaded = false;

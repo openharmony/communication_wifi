@@ -41,12 +41,19 @@ public:
     void RemovePerf5gBlocklist(const std::string &bssid);
     void CleanPerf5gBlocklist();
     bool IsOverTwiceInPerf5gBlocklist(const std::string &bssid);
+    void AddEnhanceSwitchBlocklist(const std::string &bssid);
+    bool IsInEnhanceSwitchBlocklist(const std::string &bssid);
+    void RemoveEnhanceSwitchBlocklist(const std::string &bssid);
+    void CleanEnhanceSwitchBlocklist();
+    bool IsSameGateway(const std::string &bssid1, const std::string &bssid2);
+    void UpdateGatewayRelation(std::string &bssid1, std::string &bssid2, bool isSameGateway);
 private:
     std::mutex mutex_;
     std::set<std::string> wifiBlockSet_;
     std::set<std::string> abnormalWifiBlockSet_;
     std::map<std::string, uint32_t> tempWifiBlockMap_;
     std::unordered_map<std::string, std::pair<uint32_t, bool>> perf5gBlockMap_;
+    std::set<std::string> enhanceSwitchBlockSet_;
 };
 
 } // namespace Wifi

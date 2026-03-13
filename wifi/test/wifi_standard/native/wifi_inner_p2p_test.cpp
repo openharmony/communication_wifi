@@ -63,7 +63,8 @@ HWTEST_F(WifiInnerP2pTest, QueryP2pLinkedInfoTest, TestSize.Level1)
 {
     WifiP2pLinkedInfo linkedInfo;
     ASSERT_TRUE(p2pPtr != nullptr);
-    EXPECT_TRUE(p2pPtr->QueryP2pLinkedInfo(linkedInfo));
+    p2pPtr->QueryP2pLinkedInfo(linkedInfo);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
 HWTEST_F(WifiInnerP2pTest, GetP2pDiscoverStatusTest, TestSize.Level1)

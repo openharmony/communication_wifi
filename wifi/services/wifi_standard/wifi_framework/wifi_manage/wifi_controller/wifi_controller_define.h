@@ -119,6 +119,10 @@ enum class ConcreteManagerRole {
 enum class SoftApperateType {
     OPEN_SOFT_AP_FAILED = 0,
     CLOSE_SOFT_AP_FAILED = 1,
+    SOFTAP_TIMEOUT = 2,
+    STA_P2P_SOFTAP_CONFLICT,
+    STA_HML_SOFTAP_CONFLICT,
+    P2P_HML_SOFTAP_CONFLICT,
 };
 
 enum class SoftApChrEventType {

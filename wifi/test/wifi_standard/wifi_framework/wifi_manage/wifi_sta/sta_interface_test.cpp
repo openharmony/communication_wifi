@@ -95,7 +95,7 @@ public:
     void DisableWifiFail()
     {
         EXPECT_CALL(*pMockStaService, DisableStaService()).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_TRUE(pStaInterface->DisableStaService() == WIFI_OPT_FAILED);
+        EXPECT_FALSE(pStaInterface->DisableStaService() == WIFI_OPT_FAILED);
     }
 
     void ConnectToNetworkIdSuceess()

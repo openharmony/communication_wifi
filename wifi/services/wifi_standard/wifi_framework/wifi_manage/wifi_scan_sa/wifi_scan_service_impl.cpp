@@ -218,7 +218,7 @@ int32_t WifiScanServiceImpl::AdvanceScan(const WifiScanParamsParcel &paramsParce
     const std::string &bundleName)
 {
     WIFI_LOGD("AdvanceScan (Parcel) called: bundleName=%{public}s, SSID=%{public}s",
-        bundleName.c_str(), paramsParcel.ssid.c_str());
+        bundleName.c_str(), SsidAnonymize(paramsParcel.ssid.c_str()).c_str());
     WifiScanParams params = paramsParcel.ToWifiScanParams();
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetAppPackageName(bundleName);
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanInitiatorUid(GetCallingUid());
@@ -298,6 +298,7 @@ bool WifiScanServiceImpl::IsWifiScanAllowed(int &scanStyle, bool externFlag)
         scanInfo.isSystemApp = WifiAuthCenter::IsSystemAccess();
         bool allowScan = pEnhanceService->IsScanAllowed(scanInfo);
         scanStyle = scanInfo.scanStyle;
+        scanInfo.scanStyle = SCAN_DEFAULT_TYPE;
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->SaveScanDeviceInfo(scanInfo);
         return allowScan;
     }

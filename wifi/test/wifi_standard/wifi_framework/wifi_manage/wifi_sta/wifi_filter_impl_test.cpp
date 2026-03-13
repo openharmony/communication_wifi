@@ -77,7 +77,6 @@ HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterOpenNotStale, TestSize.Leve
     time_t now = time(nullptr);
     if (now == (time_t)(-1)) {
         GTEST_SKIP() << "time() returned invalid value, skipping test.";
-        return;
     }
     networkCandidate.wifiDeviceConfig.lastDisconnectTime = now - 1 * 24 * 60 * 60; //1天前断开
     networkCandidate.wifiDeviceConfig.networkId = 1;
@@ -98,7 +97,6 @@ HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterNonOpen, TestSize.Level1)
     if (now == (time_t)(-1)) {
         // time()返回非法值，跳过测试或标记为失败
         GTEST_SKIP() << "time() returned invalid value, skipping test.";
-        return;
     }
     networkCandidate.wifiDeviceConfig.lastDisconnectTime = now - 20 * 24 * 60 * 60;
     networkCandidate.wifiDeviceConfig.networkId = 1;
@@ -119,7 +117,6 @@ HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterOpenStale, TestSize.Level1)
     if (now == (time_t)(-1)) {
         // time()返回非法值，跳过测试或标记为失败
         GTEST_SKIP() << "time() returned invalid value, skipping test.";
-        return;
     }
     networkCandidate.wifiDeviceConfig.lastDisconnectTime = now - (15 * 24 * 60 * 60 + 1000); //超过阈值
     networkCandidate.wifiDeviceConfig.networkId = 1;
@@ -128,7 +125,7 @@ HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterOpenStale, TestSize.Level1)
     EXPECT_FALSE(longUnusedOpenWifiFilter->DoFilter(networkCandidate));
 }
 
-HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterNeverConnected, TestSize.Level1)
+HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterIgnoreCase, TestSize.Level1)
 {
     InterScanInfo scanInfo;
     scanInfo.bssid = "00:11:22:33:44:55";
@@ -136,11 +133,11 @@ HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterNeverConnected, TestSize.Le
     scanInfo.securityType = WifiSecurity::OPEN;
     scanInfo.riskType = WifiRiskType::OPEN;
     NetworkSelection::NetworkCandidate networkCandidate(scanInfo);
-    networkCandidate.wifiDeviceConfig.lastDisconnectTime = -1;
+    networkCandidate.wifiDeviceConfig.lastDisconnectTime = -1; // 不符合本场景特征，不做拦截
     networkCandidate.wifiDeviceConfig.networkId = 1;
     
     auto longUnusedOpenWifiFilter = std::make_shared<NetworkSelection::LongUnusedOpenWifiFilter>();
-    EXPECT_FALSE(longUnusedOpenWifiFilter->DoFilter(networkCandidate));
+    EXPECT_TRUE(longUnusedOpenWifiFilter->DoFilter(networkCandidate));
 }
 
 HWTEST_F(WifiFilterImplTest, LongUnusedOpenWifiFilterInWhiteList, TestSize.Level1)
@@ -793,6 +790,59 @@ HWTEST_F(WifiFilterImplTest, HigherCategoryFilterTest_CandidateIsLower_ShouldFil
         .WillRepeatedly(Return(WifiCategory::WIFI7));
     EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetWifiCategoryRecord(candidateScanInfo.bssid))
         .WillRepeatedly(Return(WifiCategory::WIFI6));
+
+    // Act & Assert
+    EXPECT_FALSE(filter->DoFilter(candidate));
+}
+
+HWTEST_F(WifiFilterImplTest, HigherCategoryFilterTest_2GCandidate_ShouldFilter, TestSize.Level1)
+{
+    auto filter = std::make_shared<NetworkSelection::HigherCategoryFilter>();
+    WifiLinkedInfo currentLinkInfo;
+    currentLinkInfo.bssid = "11:22:33:44:55:66";
+    currentLinkInfo.networkId = 1;
+    currentLinkInfo.ssid = "Current5GWiFi7";
+    currentLinkInfo.band = static_cast<int>(BandType::BAND_5GHZ);
+    InterScanInfo candidateScanInfo;
+    candidateScanInfo.bssid = "AA:BB:CC:DD:EE:FF";
+    candidateScanInfo.ssid = "Candidate24GWiFi7";
+    candidateScanInfo.band = static_cast<int>(BandType::BAND_2GHZ);
+    NetworkSelection::NetworkCandidate candidate(candidateScanInfo);
+
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(Invoke([&](WifiLinkedInfo& info, int32_t) {
+            info = currentLinkInfo;
+            return 0;
+        }));
+    EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetWifiCategoryRecord(currentLinkInfo.bssid))
+        .WillRepeatedly(Return(WifiCategory::WIFI7));
+    EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetWifiCategoryRecord(candidateScanInfo.bssid))
+        .WillRepeatedly(Return(WifiCategory::WIFI7));
+
+    // Act & Assert: 2.4G WiFi7 不应通过过滤
+    EXPECT_FALSE(filter->DoFilter(candidate));
+}
+
+HWTEST_F(WifiFilterImplTest, HigherCategoryFilterTest_CandidateIsSame_ShouldFilter, TestSize.Level1)
+{
+    auto filter = std::make_shared<NetworkSelection::HigherCategoryFilter>();
+    WifiLinkedInfo currentLinkInfo;
+    currentLinkInfo.bssid = "11:22:33:44:55:66";
+    currentLinkInfo.networkId = 1;
+    InterScanInfo candidateScanInfo;
+    candidateScanInfo.bssid = "AA:BB:CC:DD:EE:FF";
+    NetworkSelection::NetworkCandidate candidate(candidateScanInfo);
+
+    // Arrange: Mock the behavior of WifiConfigCenter
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(Invoke([&](WifiLinkedInfo& info, int32_t) {
+            info = currentLinkInfo;
+            return 0;
+        }));
+    EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetWifiCategoryRecord(currentLinkInfo.bssid))
+        .WillRepeatedly(Return(WifiCategory::WIFI7));
+    EXPECT_CALL(*WifiConfigCenter::GetInstance().GetWifiScanConfig(), GetWifiCategoryRecord(candidateScanInfo.bssid))
+        .WillRepeatedly(Return(WifiCategory::WIFI7));
 
     // Act & Assert
     EXPECT_FALSE(filter->DoFilter(candidate));

@@ -71,6 +71,7 @@ ohos_unittest("wifi_p2p_test") {
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/wifi_p2p_upnp_service_info.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/wifi_p2p_upnp_service_request.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_p2p/wifi_p2p_upnp_service_response.cpp",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock/mock_wifi_config_center.cpp",
     "./Mock/mock_wifi_p2p_hal_interface.cpp",
     "authorizing_negotiation_request_state_test.cpp",
     "global_test.cpp",
@@ -87,6 +88,7 @@ ohos_unittest("wifi_p2p_test") {
     "p2p_group_formation_state_test.cpp",
     "p2p_group_join_state_test.cpp",
     "p2p_group_operating_state_test.cpp",
+    "p2p_group_remove_test.cpp",
     "p2p_idle_state_test.cpp",
     "p2p_inviting_state_test.cpp",
     "p2p_monitor_test.cpp",
@@ -134,6 +136,7 @@ ohos_unittest("wifi_p2p_test") {
     "$WIFI_ROOT_DIR/utils/inc",
     "$WIFI_ROOT_DIR/services/wifi_standard/include",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/wifi_country_code",
+    "$WIFI_ROOT_DIR/test/wifi_standard/wifi_framework/wifi_toolkit/unittest/Mock",
   ]
   ldflags = [
     "-fPIC",

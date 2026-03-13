@@ -149,7 +149,7 @@ bool PeriodicScanStrategy::TryToScan(int rssi, bool needScanInMonitor, int conne
         wifiScanParams.scanStyle = scanStyle;
         scanResult = pScanService->ScanWithParam(wifiScanParams, true, ScanType::SCAN_TYPE_5G_AP);
     } else {
-        scanResult = pScanService->Scan(true, ScanType::SCAN_TYPE_5G_AP);
+        scanResult = pScanService->Scan(true, ScanType::SCAN_TYPE_5G_AP, scanStyle);
     }
     if (scanResult == WIFI_OPT_SUCCESS) {
         lastScanTimePoint_ = steady_clock::now();

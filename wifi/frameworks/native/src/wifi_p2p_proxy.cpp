@@ -1427,11 +1427,10 @@ ErrCode WifiP2pProxy::Hid2dConfigIPAddr(const std::string& ifName, const IpAddrI
         return WIFI_OPT_INVALID_PARAM;
     }
  
-    if (ipInfo.ip.length() > MAX_IPNAMSIZ ||
- 	    ipInfo.gateway.length() > MAX_IPNAMSIZ ||
- 	    ipInfo.netmask.length() > MAX_IPNAMSIZ) {
+    if (ipInfo.ip.length() > MAX_IPNAMSIZ || ipInfo.gateway.length() > MAX_IPNAMSIZ ||
+    ipInfo.netmask.length() > MAX_IPNAMSIZ) {
  	    WIFI_LOGE("Invalid IP address length");
- 	    return WIFI_OPT_INVALID_PARAM;
+        return WIFI_OPT_INVALID_PARAM;
  	}
 
     if (mRemoteDied) {

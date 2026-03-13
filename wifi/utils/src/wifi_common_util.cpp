@@ -318,6 +318,24 @@ std::vector<std::string> StrSplit(const std::string& str, const std::string& del
     return { first, last };
 }
 
+std::string GetCurrentTimeStr()
+{
+    constexpr int WALL_TIME_BUF_SIZE = 20;
+    time_t now = time(nullptr);
+    if (now == static_cast<time_t>(-1)) {
+        return "";
+    }
+    struct tm tmInfo;
+    if (localtime_r(&now, &tmInfo) == nullptr) {
+        return "";
+    }
+    char buf[WALL_TIME_BUF_SIZE];
+    if (strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tmInfo) == 0) {
+        return "";
+    }
+    return std::string(buf);
+}
+
 int64_t GetCurrentTimeSeconds()
 {
     auto now = std::chrono::system_clock::now();

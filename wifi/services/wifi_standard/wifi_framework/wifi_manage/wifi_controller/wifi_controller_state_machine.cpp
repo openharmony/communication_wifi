@@ -99,6 +99,25 @@ ErrCode WifiControllerMachine::InitWifiStates()
     return WIFI_OPT_SUCCESS;
 }
 
+bool WifiControllerMachine::IsEnableScanOnlyOnHotspot()
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("get pEnhance service failed!");
+        return false;
+    }
+    bool isCoexSupport = WifiConfigCenter::GetInstance().GetCoexSupport();
+    bool isEnableScanOnlyOnHotspot = pEnhanceService->GetDeviceFeatures().isEnableScanOnlyOnHotspot;
+    return (!isCoexSupport && isEnableScanOnlyOnHotspot);
+}
+ 
+bool WifiControllerMachine::IsWifiConnected()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    return (linkedInfo.connState == ConnState::CONNECTED);
+}
+
 WifiControllerMachine::DisableState::DisableState(WifiControllerMachine *wifiControllerMachine)
     : State("DisableState"), pWifiControllerMachine(wifiControllerMachine)
 {}
@@ -672,6 +691,14 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
         pWifiControllerMachine->concreteManagers.StopAllManagers();
         return;
     }
+#ifdef FEATURE_AP_SUPPORT
+    if (pWifiControllerMachine->IsEnableScanOnlyOnHotspot() &&
+        WifiConfigCenter::GetInstance().GetSoftapToggledState() &&
+        !pWifiControllerMachine->IsWifiConnected()) {
+        WIFI_LOGI("%{public}s, WiFi turning on while hotspot active, close hotspot first", __func__);
+        WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, id);
+    }
+#endif
     ConcreteManagerRole presentRole;
     if (pWifiControllerMachine->concreteManagers.IdExist(id)) {
         if (WifiConfigCenter::GetInstance().GetWifiStopState()) {
@@ -753,6 +780,15 @@ void WifiControllerMachine::EnableState::HandleSoftapOpen(int id)
             return;
         }
 #endif
+    // If WiFi is not connected, disable WiFi before starting hotspot
+    if (pWifiControllerMachine->IsEnableScanOnlyOnHotspot() &&
+        pWifiControllerMachine->GetWifiRole() != ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY) {
+        pWifiControllerMachine->wifiStateBeforeHotspot_ = IsWifiEnable(INSTID_WLAN0);
+        if (!pWifiControllerMachine->IsWifiConnected()) {
+            WIFI_LOGI("%{public}s, WiFi is not connected, switch scan only", __func__);
+            pWifiControllerMachine->SwitchRole(ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY);
+        }
+    }
     pWifiControllerMachine->MakeHotspotManager(id);
 }
 
@@ -786,7 +822,11 @@ void WifiControllerMachine::EnableState::HandleSoftapClose(int id)
     if (pWifiControllerMachine->softApManagers.IdExist(id)) {
         pWifiControllerMachine->softApManagers.StopManager(id);
         pWifiControllerMachine->StartTimer(CMD_AP_STOP_TIME, SOFT_AP_TIME_OUT);
-        return;
+    }
+    // Recover WiFi if needed
+    if (pWifiControllerMachine->wifiStateBeforeHotspot_ && pWifiControllerMachine->IsEnableScanOnlyOnHotspot()) {
+        WIFI_LOGI("%{public}s, recover WiFi after hotspot closed", __func__);
+        pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, 1, INSTID_WLAN0);
     }
 }
 #endif

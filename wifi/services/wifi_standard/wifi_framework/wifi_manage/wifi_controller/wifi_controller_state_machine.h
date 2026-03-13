@@ -163,6 +163,8 @@ private:
     static bool IsWifiEnable(int id = 0);
     static bool IsSemiWifiEnable();
     static bool IsScanOnlyEnable();
+    bool IsEnableScanOnlyOnHotspot();
+    bool IsWifiConnected();
 
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
     std::atomic<int> mApidStopWifi;
@@ -178,6 +180,7 @@ private:
 #endif
     ManagerControl<SoftApManager> softApManagers{SOFTAP_CMD_STOP};
     HotspotMode hotspotMode {HotspotMode::NONE};
+    std::atomic<bool> wifiStateBeforeHotspot_ {false};
 #endif
     ManagerControl<MultiStaManager> multiStaManagers{MULTI_STA_CMD_STOP};
     bool isLocalOnlyHotspot_ = false;

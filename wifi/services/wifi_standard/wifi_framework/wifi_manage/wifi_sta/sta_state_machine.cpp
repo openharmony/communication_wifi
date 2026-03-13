@@ -71,6 +71,7 @@ namespace Wifi {
 namespace {
 constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
 constexpr int MAX_CHLOAD = 800;
+constexpr int PRE_ROAM_SCAN_WAIT_TIME_MS = 100;
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define ANY_BSSID "any"
@@ -129,6 +130,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 
 constexpr int32_t MAX_NO_INTERNET_CNT = 3;
 constexpr uint32_t PKT_DIR_RPT_CNT = 3;
+constexpr int64_t ROAM_SCAN_MAX_AGE_US = 20 * 1000 * 1000;  // 20s
 
 const std::map<int, int> wpa3FailreasonMap {
     {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
@@ -5620,9 +5622,46 @@ void StaStateMachine::StartConnectToBssid(const int32_t networkId, std::string b
         WIFI_LOGI("notify enhance service quit dual_wlan mode");
     }
 #endif
+    PreRoamScanIfExpired(bssid);
     msg->SetMessageName(WIFI_SVR_COM_STA_START_ROAM);
     msg->AddStringMessageBody(bssid);
     SendMessage(msg);
+}
+
+bool StaStateMachine::IsScanResultExpired(const std::string &bssid, int &freq)
+{
+    int64_t currentTime = GetElapsedMicrosecondsSinceBoot();
+    std::vector<WifiScanInfo> scanInfoList;
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoListInner(scanInfoList);
+    for (const auto& scanInfo : scanInfoList) {
+        if (scanInfo.bssid == bssid) {
+            freq = scanInfo.frequency;
+            int64_t scanTime = scanInfo.timestamp;
+            if (currentTime - scanTime >= ROAM_SCAN_MAX_AGE_US) {
+                WIFI_LOGD("BSSID %{private}s scan result expired, duration=%{private}ld us",
+                    bssid.c_str(), static_cast<long>(currentTime - scanTime));
+                return true;
+            }
+            return false;
+        }
+    }
+    WIFI_LOGW("BSSID %{public}s not found in scan results", bssid.c_str());
+    return false;
+}
+
+void StaStateMachine::PreRoamScanIfExpired(const std::string &bssid)
+{
+    int freq = 0;
+    if (!IsScanResultExpired(bssid, freq)) {
+        return;
+    }
+    WifiScanParams params;
+    params.freqs.push_back(freq);
+    IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(m_instId);
+    if (pScanService != nullptr &&
+        pScanService->ScanWithParam(params, true, ScanType::SCAN_TYPE_WIFIPRO) == WIFI_OPT_SUCCESS) {
+        usleep(PRE_ROAM_SCAN_WAIT_TIME_MS); // wait for 100ms
+    }
 }
 
 #ifndef OHOS_ARCH_LITE

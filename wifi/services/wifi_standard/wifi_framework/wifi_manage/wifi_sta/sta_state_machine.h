@@ -496,6 +496,21 @@ public:
      */
     void StartConnectToBssid(const int32_t networkId, std::string bssid, int32_t type = NETWORK_SELECTED_BY_USER);
     /**
+     * @Description  Check whether the scan result of the specified bssid has expired.
+     *
+     * @param bssid - the target BSSID to query(in)
+     * @param freq - the scanning frequency corresponding to the BSSID
+     * @Return true if the scan result has expired and a rescan is required, false otherwise
+     */
+    bool IsScanResultExpired(const std::string &bssid, int &freq);
+
+    /**
+     * @Description  Check whether the scan result has expired before roaming, and trigger scan if expired.
+     *
+     * @param bssid - the target BSSID for roaming
+     */
+    void PreRoamScanIfExpired(const std::string &bssid);
+    /**
      * @Description Register sta callback function
      *
      * @param callback - Callback function pointer storage structure

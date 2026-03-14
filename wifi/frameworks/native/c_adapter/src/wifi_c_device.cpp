@@ -580,6 +580,15 @@ NO_SANITIZE("cfi") WifiErrorCode SetBtCoexistState(CoexistState state, CoexistRe
     return GetCErrorCode(wifiDevicePtr->SetBtCoexistState(tempState, tempReason));
 }
 
+NO_SANITIZE("cfi") WifiErrorCode SetWifiCapability(int capability, bool enable)
+{
+    return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
+}
+
+NO_SANITIZE("cfi") WifiErrorCode GetWifiCapability(int capability, bool &enabled)
+{
+    return GetCErrorCode(OHOS::Wifi::WIFI_OPT_NOT_SUPPORTED);
+}
 #ifndef OHOS_ARCH_LITE
 NO_SANITIZE("cfi") WifiErrorCode GetWifiProtect(OHOS::Wifi::WifiProtectMode mode)
 {

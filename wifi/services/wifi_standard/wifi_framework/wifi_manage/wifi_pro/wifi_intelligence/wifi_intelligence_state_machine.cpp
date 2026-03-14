@@ -122,6 +122,7 @@ ErrCode WifiIntelligenceStateMachine::Initialize()
     BuildStateTree();
     SetFirstState(pInitialState_);
     StartStateMachine();
+    WritePositionAutoOpenWlanHiSysEvent("OPEN_CNT");
     return WIFI_OPT_SUCCESS;
 }
 
@@ -497,19 +498,20 @@ void WifiIntelligenceStateMachine::DisabledState::HandleWifiOpen(InternalMessage
     auto staState = WifiConfigCenter::GetInstance().GetWifiDetailState();
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     WifiOprMidState apState = WifiConfigCenter::GetInstance().GetApMidState();
+    auto scanOnlyState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState();
     if (WifiManager::GetInstance().GetWifiTogglerManager()->IsSatelliteStateStart()) {
         WIFI_LOGE("HandleWifiOpen, open wifi fail, satellite state start.");
         return;
-    } else if (staState == WifiDetailState::STATE_SEMI_ACTIVE && !WifiConfigCenter::GetInstance().IsScreenLandscape() &&
-        screenState == MODE_STATE_OPEN &&
+    } else if ((staState == WifiDetailState::STATE_SEMI_ACTIVE || scanOnlyState == WifiOprMidState::RUNNING) &&
+        !WifiConfigCenter::GetInstance().IsScreenLandscape() && screenState == MODE_STATE_OPEN &&
         (apState != WifiOprMidState::OPENING && apState != WifiOprMidState::RUNNING)) {
         WIFI_LOGI("HandleWifiOpen, open wifi.");
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED);
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
-        WritePositionAutoOpenWlanHiSysEvent("OPEN_CNT");
         pWifiIntelligenceStateMachine_->StartTimer(EVENT_WIFI_HANLE_OPEN_WAIT_SUC, AUTO_OPEN_WIFI_TIMEOUT);
         return;
-    } else if (staState == WifiDetailState::STATE_SEMI_ACTIVATING &&
+    } else if ((staState == WifiDetailState::STATE_SEMI_ACTIVATING ||
+        staState == WifiDetailState::STATE_DEACTIVATING || scanOnlyState == WifiOprMidState::OPENING) &&
         !WifiConfigCenter::GetInstance().IsScreenLandscape() && screenState == MODE_STATE_OPEN &&
         (apState != WifiOprMidState::OPENING && apState != WifiOprMidState::RUNNING)) {
         WIFI_LOGI("HandleWifiOpen, open wifi wait.");

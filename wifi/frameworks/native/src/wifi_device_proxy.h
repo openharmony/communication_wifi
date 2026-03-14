@@ -688,7 +688,6 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode SetBtCoexistState(CoexistState state, CoexistReason reason) override;
-
         
     /**
      * @Description Set wifi capability enable status

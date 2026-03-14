@@ -1428,10 +1428,10 @@ ErrCode WifiP2pProxy::Hid2dConfigIPAddr(const std::string& ifName, const IpAddrI
     }
  
     if (ipInfo.ip.length() > MAX_IPNAMSIZ || ipInfo.gateway.length() > MAX_IPNAMSIZ ||
-    ipInfo.netmask.length() > MAX_IPNAMSIZ) {
- 	    WIFI_LOGE("Invalid IP address length");
-        return WIFI_OPT_INVALID_PARAM;
- 	}
+        ipInfo.netmask.length() > MAX_IPNAMSIZ) {
+ 	        WIFI_LOGE("Invalid IP address length");
+            return WIFI_OPT_INVALID_PARAM;
+ 	    }
 
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);

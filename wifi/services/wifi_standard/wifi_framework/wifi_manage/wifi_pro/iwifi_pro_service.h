@@ -52,6 +52,10 @@ public:
     virtual void DealQoeReport(const NetworkLagType &networkLagType, const NetworkLagInfo &networkLagInfo) = 0;
 
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+
+    virtual ErrCode UninitWifiIntelligence() = 0;
+    virtual ErrCode InitWifiIntelligence() = 0;
+    
     /**
      * @Description receive screen state change event
      *

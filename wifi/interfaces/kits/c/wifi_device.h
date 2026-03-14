@@ -407,7 +407,7 @@ WifiErrorCode SetWifiCapability(int capability, bool enable);
  * @param enabled - output enable status
  * @return ErrCode - operation result
  */
-WifiErrorCode GetWifiCapability(int capability, bool &enabled);
+WifiErrorCode GetWifiCapability(int capability, bool *enabled);
 
 #ifdef __cplusplus
 }

@@ -56,6 +56,9 @@ public:
     void DealQoeReport(const NetworkLagType &networkLagType, const NetworkLagInfo &networkLagInfo) override;
 
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+
+    ErrCode UninitWifiIntelligence() override;
+    ErrCode InitWifiIntelligence() override;
     /**
      * @Description receive screen state change event
      *

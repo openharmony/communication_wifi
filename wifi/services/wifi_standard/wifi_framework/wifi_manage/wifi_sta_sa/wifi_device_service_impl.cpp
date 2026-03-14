@@ -2835,5 +2835,54 @@ ErrCode WifiDeviceServiceImpl::SetBtCoexistState(CoexistState state, CoexistReas
     return WIFI_OPT_FAILED;
 #endif
 }
+
+
+ErrCode WifiDeviceServiceImpl::SetWifiCapability(int capability, bool enable)
+{
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("SetOpenWiFiOnSpecLoc:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetOpenWiFiOnSpecLoc:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    WifiSettings::GetInstance().SetWifiCapability(capability, enable, m_instId);
+    WIFI_LOGI("SetWifiCapability success, capability=%{public}d, enable=%{public}d", capability, enable);
+    switch (capability) {
+        case static_cast<int>(WifiCapability::WIFI_AUTO_ENABLE): {
+            IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(m_instId);
+            if (pWifiProService != nullptr) {
+                if (enable) {
+                    return pWifiProService->InitWifiIntelligence();
+                } else {
+                    return pWifiProService->UninitWifiIntelligence();
+                }
+            }
+        }
+        default:
+            return WIFI_OPT_NOT_SUPPORTED;
+    }
+#else
+    return WIFI_OPT_NOT_SUPPORTED;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::GetWifiCapability(int capability, bool &enabled)
+{
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetWifiCapability:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+
+    enabled = WifiSettings::GetInstance().GetWifiCapability(capability);
+    return WIFI_OPT_SUCCESS;
+#else
+    return WIFI_OPT_NOT_SUPPORTED;
+#endif
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

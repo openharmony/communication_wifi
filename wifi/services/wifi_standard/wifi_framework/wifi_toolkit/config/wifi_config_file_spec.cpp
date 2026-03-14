@@ -1127,7 +1127,7 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.scanOnlySwitch = true;
     item.realMacAddress = "";
     item.staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
-    OtherParamDefault(item)
+    OtherParamDefault(item);
     return;
 }
 

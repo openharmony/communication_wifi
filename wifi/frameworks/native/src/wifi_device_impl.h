@@ -703,6 +703,24 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode SetBtCoexistState(CoexistState state, CoexistReason reason) override;
+
+    /**
+     * @Description Set wifi capability enable status
+     *
+     * @param capability - capability id
+     * @param enable - enable or disable
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetWifiCapability(int capability, bool enable) override;
+
+    /**
+     * @Description Get wifi capability enable status
+     *
+     * @param capability - capability id
+     * @param enabled - output enable status
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetWifiCapability(int capability, bool &enabled) override;
 private:
     bool GetWifiDeviceProxy();
     std::atomic<int> systemAbilityId_;

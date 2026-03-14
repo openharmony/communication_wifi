@@ -164,7 +164,7 @@ void WifiProService::HandleScanResult(const std::vector<InterScanInfo> &scanInfo
         WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
         if (WifiProUtils::IsSupplicantConnectingProcess(linkedInfo.supplicantState)) {
             WIFI_LOGI("Delay the switch while connecting.");
-            pWifiProStateMachine_->SendMessage(EVENT_HANDLE_SCAN_RESULT, WIFI_SWITCH_DELAY_TIME);
+            pWifiProStateMachine_->MessageExecutedLater(EVENT_HANDLE_SCAN_RESULT, scanInfos, WIFI_SWITCH_DELAY_TIME);
         } else {
             pWifiProStateMachine_->SendMessage(EVENT_HANDLE_SCAN_RESULT, scanInfos);
         }

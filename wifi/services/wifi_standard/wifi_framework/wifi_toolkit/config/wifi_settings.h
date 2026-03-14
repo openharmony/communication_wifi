@@ -319,6 +319,10 @@ public:
 
     bool IsRandomMacDisabled(int instId = 0);
 
+    int SetWifiCapability(int capability, bool enabled, int instId = 0);
+
+    bool GetWifiCapability(int capability, int instId = 0);
+
     int GetStaLastRunState(int instId = 0);
 
     int SetStaLastRunState(int bRun, int instId = 0);

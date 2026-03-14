@@ -1127,9 +1127,14 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.scanOnlySwitch = true;
     item.realMacAddress = "";
     item.staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
+    OtherParamDefault(item)
+    return;
+}
+
+static void OtherParamDefault(WifiConfig &item)
+{
     item.isRandomMacDisabled = false;
     item.wifiAutoEnable = true;
-    return;
 }
 
 using Func = std::function<void(WifiConfig &item, const std::string &value)>;

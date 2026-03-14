@@ -510,8 +510,7 @@ void WifiIntelligenceStateMachine::DisabledState::HandleWifiOpen(InternalMessage
         WifiManager::GetInstance().GetWifiTogglerManager()->WifiToggled(1, 0);
         pWifiIntelligenceStateMachine_->StartTimer(EVENT_WIFI_HANLE_OPEN_WAIT_SUC, AUTO_OPEN_WIFI_TIMEOUT);
         return;
-    } else if ((staState == WifiDetailState::STATE_SEMI_ACTIVATING ||
-        staState == WifiDetailState::STATE_DEACTIVATING || scanOnlyState == WifiOprMidState::OPENING) &&
+    } else if ((staState == WifiDetailState::STATE_SEMI_ACTIVATING || scanOnlyState == WifiOprMidState::OPENING) &&
         !WifiConfigCenter::GetInstance().IsScreenLandscape() && screenState == MODE_STATE_OPEN &&
         (apState != WifiOprMidState::OPENING && apState != WifiOprMidState::RUNNING)) {
         WIFI_LOGI("HandleWifiOpen, open wifi wait.");

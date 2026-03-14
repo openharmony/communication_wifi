@@ -483,6 +483,8 @@
         "OHOS::Wifi::WifiSettings::IsRandomMacDisabled(int)";
         "OHOS::Wifi::WifiSettings::SetRandomMacDisabled(bool, int)";
         "OHOS::Wifi::WifiCommonEventHelper::PublishHideDropDownWindowEvent()";
+        "OHOS::Wifi::WifiSettings::SetWifiCapability(int, bool, int)";
+        "OHOS::Wifi::WifiSettings::GetWifiCapability(int, int)";
     };
     local:
         *;

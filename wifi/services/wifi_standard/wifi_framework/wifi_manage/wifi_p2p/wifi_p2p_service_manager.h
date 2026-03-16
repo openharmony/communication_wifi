@@ -238,7 +238,7 @@ private:
     std::map<std::string, WifiP2pServiceResponseList> serviceRespons;
     /* Locally registered services. Theoretically, all services are provided. */
     std::vector<WifiP2pServiceInfo> localServicesInfo;
-    std::mutex serviceMutex;
+    mutable std::mutex serviceMutex;
 };
 } // namespace Wifi
 } // namespace OHOS

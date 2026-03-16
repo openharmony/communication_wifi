@@ -550,6 +550,7 @@ void P2pStateMachine::BroadcastP2pGcLeaveGroup(WifiP2pDevice &device) const
             curGcInfo = gcInfo;
         }
     }
+    std::unique_lock<std::mutex> lock(cbMapMutex);
     for (const auto &callBackItem : p2pServiceCallbacks) {
         if (callBackItem.second.OnP2pGcLeaveGroupEvent) {
             callBackItem.second.OnP2pGcLeaveGroupEvent(curGcInfo);

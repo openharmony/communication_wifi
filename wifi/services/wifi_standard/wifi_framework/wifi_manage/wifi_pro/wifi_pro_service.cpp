@@ -253,6 +253,8 @@ ErrCode WifiProService::InitWifiIntelligence()
             return WIFI_OPT_FAILED;
         }
         if (pWifiIntelligenceStateMachine_->Initialize() != WIFI_OPT_SUCCESS) {
+            delete pWifiIntelligenceStateMachine_;
+            pWifiIntelligenceStateMachine_ = nullptr;
             WIFI_LOGE("Init WifiIntelligenceStateMachine failed.");
             return WIFI_OPT_FAILED;
         }

@@ -1396,8 +1396,13 @@ void ScanService::HandleAutoConnectStateChanged(bool success)
     WIFI_LOGI("Enter HandleAutoConnectStateChanged\n");
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     bool isOutdoorScene = WifiSensorScene::GetInstance().IsOutdoorScene();
+    int scanCount = 0;
+    {
+        std::unique_lock<std::mutex> lock(scanControlInfoMutex);
+        scanCount = systemScanIntervalMode.scanIntervalMode.count;
+    }
     if (staStatus == static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) && screenState != MODE_STATE_CLOSE &&
-        !success && systemScanIntervalMode.scanIntervalMode.count <= 1 && !isOutdoorScene) {
+        !success && scanCount <= 1 && !isOutdoorScene) {
         if (Scan(ScanType::SCAN_TYPE_SYSTEMTIMER) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Scan failed.");
         }
@@ -2341,7 +2346,12 @@ void ScanService::CheckNeedFastScan(std::vector<int> &scanFreqs)
     /* If scan freqs is empty, the freq for the first periodic scanning is selected based on
      * the historical connection freq.
     */
-    if (systemScanIntervalMode.scanIntervalMode.count == 1 && scanFreqs.empty() == 0 &&
+    int scanCount = 0;
+    {
+        std::unique_lock<std::mutex> lock(scanControlInfoMutex);
+        scanCount = systemScanIntervalMode.scanIntervalMode.count;
+    }
+    if (scanCount == 1 && scanFreqs.empty() == 0 &&
         WifiConfigCenter::GetInstance().IsNeedFastScan()) {
         WifiConfigCenter::GetInstance().SetFastScan(false);
         GetSavedNetworkFreq(scanFreqs);

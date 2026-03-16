@@ -129,7 +129,7 @@ public:
     virtual bool IsRandomMacDisabled(int instId = 0) = 0;
     virtual int SetRandomMacDisabled(bool isRandomMacDisabled, int instId = 0) = 0;
     virtual int GetPackageInfoByName(std::string name, std::vector<PackageInfo> &packageInfo) = 0;
-    virtual void GetWifiCapability(int capability, bool &enabled, int instId = 0) = 0;
+    virtual void GetWifiCapability(int capability, int instId = 0) = 0;
     virtual void SetWifiCapability(int capability, bool enable, int instId = 0) = 0;
 };
 

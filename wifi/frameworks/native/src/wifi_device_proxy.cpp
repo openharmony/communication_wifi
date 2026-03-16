@@ -30,6 +30,8 @@ constexpr int EDM_UID = 3057;
 constexpr int MAX_SIZE = 256;
 constexpr int MAX_MDM_RESTRICTED_SIZE = 200;
 int g_bigDataRecvLen = 0;
+constexpr int HUNDRED = 100;
+constexpr int MAX_PERIOD = 60000;
 
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
     sptr<WifiDeviceCallBackStub>::MakeSptr();
@@ -1352,6 +1354,10 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
 void WifiDeviceProxy::ReadWifiSignalPollInfo(MessageParcel &reply, std::vector<WifiSignalPollInfo> &wifiSignalPollInfos)
 {
     int arrayLength = reply.ReadInt32();
+    if (arrayLength < 0) {
+        WIFI_LOGE("Invalid array length");
+        return;
+    }
     for (int index = 0; index < arrayLength; index++) {
         WifiSignalPollInfo signInfo;
         signInfo.signal = reply.ReadInt32();
@@ -1479,6 +1485,10 @@ ErrCode WifiDeviceProxy::GetLinkedInfo(WifiLinkedInfo &info)
 
 ErrCode WifiDeviceProxy::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiSignalPollInfos, int length)
 {
+    if (length < 0 || length > HUNDRED) {
+        WIFI_LOGE("Invalid length: %{public}d", length);
+        return WIFI_OPT_INVALID_PARAM;
+    }
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
@@ -2845,6 +2855,10 @@ ErrCode WifiDeviceProxy::GetVoWifiDetectMode(WifiDetectConfInfo &info)
  
 ErrCode WifiDeviceProxy::SetVoWifiDetectPeriod(int period)
 {
+    if (period < HUNDRED || period > MAX_PERIOD) {
+        WIFI_LOGE("Invalid VoWiFi detect period: %{public}d", period);
+        return WIFI_OPT_INVALID_PARAM;
+    }
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;

@@ -101,7 +101,7 @@ typedef enum {
     /** WiFi 7 EMLSR */
     WIFI_LINK_WIFI7_EMLSR = 3,
     /** WiFi 7 STR */
-   WIFI_LINK_WIFI7_STR = 4,
+    WIFI_LINK_WIFI7_STR = 4,
     /** WiFi 7 not MLO */
     WIFI_LINK_WIFI7_LEGACY = 5
 } OHWifiLinkType;

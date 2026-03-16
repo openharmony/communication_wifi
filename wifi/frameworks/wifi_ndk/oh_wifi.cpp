@@ -104,29 +104,24 @@ Wifi_ResultCode OH_Wifi_GetLinkedInfo(OHWifiLinkedInfo *info)
     if (strncpy_s(info->macAddress, WIFI_MAC_LEN, linkedInfo.macAddress.c_str(), linkedInfo.macAddress.length()) != 0) {
         return WIFI_OPERATION_FAILED;
     }
-    info->networkId = linkedInfo.networkId;
     info->rssi = linkedInfo.rssi;
     info->band = linkedInfo.band;
     info->linkSpeed = linkedInfo.linkSpeed;
     info->frequency = linkedInfo.frequency;
+    info->macType = linkedInfo.macType;
+    info->connState = static_cast<OHWifiConnState>(linkedInfo.connState);
     info->ifHiddenSSID = linkedInfo.ifHiddenSSID;
     info->isDataRestricted = linkedInfo.isDataRestricted;
-    info->chload = linkedInfo.chload;
-    info->snr = linkedInfo.snr;
-    info->macType = linkedInfo.macType;
-    info->ipAddress = linkedInfo.ipAddress;
-    info->supplicantState = static_cast<int>(linkedInfo.supplicantState);
-    info->connState = static_cast<int>(linkedInfo.connState);
+    info->supplicantState = static_cast<OHWifiSupplicantState>(linkedInfo.supplicantState);
+    info->detailedState = static_cast<OHWifiDetailedState>(linkedInfo.detailedState);
+    info->wifiLinkType = static_cast<OHWifiLinkType>(linkedInfo.wifiLinkType);
     info->wifiStandard = linkedInfo.wifiStandard;
     info->maxSupportedRxLinkSpeed = linkedInfo.maxSupportedRxLinkSpeed;
     info->maxSupportedTxLinkSpeed = linkedInfo.maxSupportedTxLinkSpeed;
     info->rxLinkSpeed = linkedInfo.rxLinkSpeed;
-    info->txLinkSpeed = linkedInfo.txLinkSpeed;
-    info->channelWidth = static_cast<int>(linkedInfo.channelWidth);
-    info->supportedWifiCategory = static_cast<int>(linkedInfo.supportedWifiCategory);
+    info->channelWidth = static_cast<OHWifiChannelWidth>(linkedInfo.channelWidth);
+    info->supportedWifiCategory = static_cast<OHWifiCategory>(linkedInfo.supportedWifiCategory);
     info->isHiLinkNetwork = linkedInfo.isHiLinkNetwork;
-    info->isHiLinkProNetwork = linkedInfo.isHiLinkProNetwork;
-    info->wifiLinkType = static_cast<int>(linkedInfo.wifiLinkType);
-    info->riskType = static_cast<int>(linkedInfo.riskType);
+    info->ipAddress = linkedInfo.ipAddress;
     return WIFI_SUCCESS;
 }

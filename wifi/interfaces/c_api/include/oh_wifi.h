@@ -91,19 +91,19 @@ typedef enum Wifi_ResultCode {
  */
 typedef enum {
     /** Not disconnert */
-    DISCONNECT = -1, 
+    WIFI_LINK_DISCONNECT = -1, 
     /** Default link */
-    DEFAULT_LINK = 0,
+    WIFI_LINK_DEFAULT_LINK = 0,
     /** WiFi 7 single link */
-    WIFI7_SINGLE_LINK = 1,
+    WIFI_LINK_WIFI7_SINGLE_LINK = 1,
     /** WiFi 7 MLSR */
-    WIFI7_MLSR = 2,
+    WIFI_LINK_WIFI7_MLSR = 2,
     /** WiFi 7 EMLSR */
-    WIFI7_EMLSR = 3,
+    WIFI_LINK_WIFI7_EMLSR = 3,
     /** WiFi 7 STR */
-    WIFI7_STR = 4,
+   WIFI_LINK_WIFI7_STR = 4,
     /** WiFi 7 not MLO */
-    WIFI7_LEGACY = 5
+    WIFI_LINK_WIFI7_LEGACY = 5
 } OHWifiLinkType;
  
 /**

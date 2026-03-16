@@ -220,7 +220,7 @@ public:
     virtual int SetAcceptUnvalidated(int networkId, bool state) = 0;
     virtual bool IsRandomMacDisabled(int instId = 0) = 0;
     virtual int SetRandomMacDisabled(bool isRandomMacDisabled, int instId = 0) = 0;
-    virtual void GetWifiCapability(int capability, int instId = 0) = 0;
+    virtual bool GetWifiCapability(int capability, int instId = 0) = 0;
     virtual void SetWifiCapability(int capability, bool enable, int instId = 0) = 0;
 };
 class WifiSettings : public MockWifiSettings {
@@ -411,7 +411,7 @@ public:
     MOCK_METHOD1(IsRandomMacDisabled, bool(int instId));
     MOCK_METHOD2(SetRandomMacDisabled, int(bool isRandomMacDisabled, int instId));
     MOCK_METHOD3(SetWifiCapability, void(int capability, bool enable, int instId));
-    MOCK_METHOD2(GetWifiCapability, void(int capability, int instId));
+    MOCK_METHOD2(GetWifiCapability, bool(int capability, int instId));
 };
 }  // namespace Wifi
 }  // namespace OHOS

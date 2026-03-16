@@ -59,7 +59,6 @@ DEFINE_WIFILOG_LABEL("WifiEventSubscriberManager");
 namespace OHOS {
 namespace Wifi {
 constexpr uint32_t TIMEOUT_EVENT_SUBSCRIBER = 3000;
-constexpr uint32_t PROP_LEN = 26;
 constexpr uint32_t PROP_TRUE_LEN = 4;
 constexpr uint32_t PROP_FALSE_LEN = 5;
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
@@ -70,6 +69,8 @@ constexpr int PROVIDED_DEVICE_FEATURES_CMP_LEN = 5;
 const std::string PROP_TRUE = "true";
 const std::string PROP_FALSE = "false";
 const std::string MDM_WIFI_PROP = "persist.edm.wifi_enable";
+const std::string MDM_WIFI_HOTSPOT_PROP = "persist.edm.tethering_disallowed";
+const std::string MDM_WIFI_P2P_PROP = "persist.edm.p2p_disallowed";
 const std::string WIFI_STANDBY_NAP = "napped";
 const std::string WIFI_STANDBY_SLEEPING = "sleeping";
 const std::string ENTER_SETTINGS = "usual.event.wlan.ENTER_SETTINGS_WLAN_PAGE";
@@ -77,7 +78,9 @@ const std::string WLAN_PAGE_ENTER = "enterWlanPage";
 const std::string GAME_INFO_NOTIFY = "usual.event.gameservice.GAME_INFO_NOTIFY";
 constexpr const char* PRODUCT_PROVIDED_DEVICE_FEATURES = "const.product.providedDeviceFeatures";
 
-bool WifiEventSubscriberManager::mIsMdmForbidden = false;
+std::atomic<bool> WifiEventSubscriberManager::isMdmForbidden_{false};
+std::atomic<bool> WifiEventSubscriberManager::isMdmHotspotForbidden_{false};
+std::atomic<bool> WifiEventSubscriberManager::isMdmP2pForbidden_{false};
 static sptr<WifiLocationModeObserver> locationModeObserver_ = nullptr;
 
 using CesFuncType = void (CesEventSubscriber::*)(const OHOS::EventFwk::CommonEventData &eventData);
@@ -471,9 +474,16 @@ void WifiEventSubscriberManager::CheckAndStartStaByDatashare()
     }
 }
 
-bool WifiEventSubscriberManager::IsMdmForbidden()
+bool WifiEventSubscriberManager::IsMdmForbidden(MdmForbiddenType type)
 {
-    return mIsMdmForbidden;
+    switch (type) {
+        case MdmForbiddenType::HOTSPOT:
+            return isMdmHotspotForbidden_;
+        case MdmForbiddenType::P2P:
+            return isMdmP2pForbidden_;
+        default:
+            return isMdmForbidden_;
+    }
 }
 
 void WifiEventSubscriberManager::AccessDataShare()
@@ -555,38 +565,44 @@ void WifiEventSubscriberManager::UnRegisterLocationEvent()
 
 void WifiEventSubscriberManager::GetMdmProp()
 {
-    char preValue[PROP_FALSE_LEN + 1] = {0};
-    mIsMdmForbidden = false;
-    int errorCode = GetParamValue(MDM_WIFI_PROP.c_str(), 0, preValue, PROP_FALSE_LEN + 1);
-    if (errorCode > 0) {
-        if (strncmp(preValue, PROP_TRUE.c_str(), PROP_TRUE_LEN) == 0) {
-            mIsMdmForbidden = true;
-        }
-    }
+    auto readProp = [](const std::string &key) -> bool {
+        char preValue[PROP_FALSE_LEN + 1] = {0};
+        int errorCode = GetParamValue(key.c_str(), 0, preValue, PROP_FALSE_LEN + 1);
+        return errorCode > 0 && strncmp(preValue, PROP_TRUE.c_str(), PROP_TRUE_LEN) == 0;
+    };
+    isMdmForbidden_ = readProp(MDM_WIFI_PROP);
+    isMdmHotspotForbidden_ = readProp(MDM_WIFI_HOTSPOT_PROP);
+    isMdmP2pForbidden_ = readProp(MDM_WIFI_P2P_PROP);
 }
 
 void WifiEventSubscriberManager::RegisterMdmPropListener()
 {
-    int ret = WatchParamValue(MDM_WIFI_PROP.c_str(), MdmPropChangeEvt, nullptr);
-    if (ret != 0) {
-        WIFI_LOGI("RegisterMdmPropListener failed");
+    for (const std::string &prop : {MDM_WIFI_PROP, MDM_WIFI_HOTSPOT_PROP, MDM_WIFI_P2P_PROP}) {
+        int ret = WatchParamValue(prop.c_str(), MdmPropChangeEvt, nullptr);
+        if (ret != 0) {
+            WIFI_LOGI("RegisterMdmPropListener failed, prop:%{public}s", prop.c_str());
+        }
     }
 }
 
 void WifiEventSubscriberManager::MdmPropChangeEvt(const char *key, const char *value, void *context)
 {
-    if (strncmp(key, MDM_WIFI_PROP.c_str(), PROP_LEN) != 0) {
+    if (key == nullptr || value == nullptr) {
+        return;
+    }
+    std::string keyStr(key);
+    bool isForbidden = strncmp(value, PROP_TRUE.c_str(), PROP_TRUE_LEN) == 0;
+    if (keyStr == MDM_WIFI_PROP) {
+        isMdmForbidden_ = isForbidden;
+    } else if (keyStr == MDM_WIFI_HOTSPOT_PROP) {
+        isMdmHotspotForbidden_ = isForbidden;
+    } else if (keyStr == MDM_WIFI_P2P_PROP) {
+        isMdmP2pForbidden_ = isForbidden;
+    } else {
         WIFI_LOGI("not mdm prop change");
         return;
     }
-    WIFI_LOGI("mdm prop change");
-    if (strncmp(value, PROP_TRUE.c_str(), PROP_TRUE_LEN) == 0) {
-        mIsMdmForbidden = true;
-        return;
-    }
-    if (strncmp(value, PROP_FALSE.c_str(), PROP_FALSE_LEN) == 0) {
-        mIsMdmForbidden = false;
-    }
+    WIFI_LOGI("mdm prop change, key:%{public}s", key);
 }
 
 void WifiEventSubscriberManager::OnEnhanceServiceReady()

@@ -798,7 +798,8 @@ void WifiControllerMachine::EnableState::HandleSoftapClose(int id)
     if (!WifiConfigCenter::GetInstance().GetCoexSupport() &&
         pWifiControllerMachine->ShouldEnableWifi(INSTID_WLAN0) &&
         !WifiConfigCenter::GetInstance().GetWifiStopState() &&
-        pWifiControllerMachine->concreteManagers.HasAnyManager()) {
+        pWifiControllerMachine->concreteManagers.HasAnyManager() &&
+        !WifiManager::GetInstance().GetWifiTogglerManager()->IsSatelliteStateStart()) {
         ConcreteManagerRole role = pWifiControllerMachine->GetWifiRole();
         WIFI_LOGI("%{public}s, role %{public}d", __func__, static_cast<int32_t>(role));
         if (role != ConcreteManagerRole::ROLE_UNKNOW) {

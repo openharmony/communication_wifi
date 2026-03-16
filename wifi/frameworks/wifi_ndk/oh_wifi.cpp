@@ -88,7 +88,7 @@ Wifi_ResultCode OH_Wifi_GetLinkedInfo(OHWifiLinkedInfo *info)
     }
 
     if (g_WifiDevicePtr == nullptr) {
-        return WIFI_OPERATION_FAILED1;
+        return WIFI_OPERATION_FAILED;
     }
     OHOS::Wifi::WifiLinkedInfo linkedInfo;
     OHOS::Wifi::ErrCode ret = g_WifiDevicePtr->GetLinkedInfo(linkedInfo);
@@ -96,13 +96,13 @@ Wifi_ResultCode OH_Wifi_GetLinkedInfo(OHWifiLinkedInfo *info)
         return WifiErrCodeToResultCode(ret);
     }
     if (strncpy_s(info->ssid, sizeof(info->ssid), linkedInfo.ssid.c_str(), linkedInfo.ssid.length()) != 0) {
-        return WIFI_OPERATION_FAILED3;
+        return WIFI_OPERATION_FAILED;
     }
     if (strncpy_s(info->bssid, WIFI_MAC_LEN, linkedInfo.bssid.c_str(), linkedInfo.bssid.length()) != 0) {
-        return WIFI_OPERATION_FAILED4;
+        return WIFI_OPERATION_FAILED;
     }
     if (strncpy_s(info->macAddress, WIFI_MAC_LEN, linkedInfo.macAddress.c_str(), linkedInfo.macAddress.length()) != 0) {
-        return WIFI_OPERATION_FAILED5;
+        return WIFI_OPERATION_FAILED;
     }
     info->networkId = linkedInfo.networkId;
     info->rssi = linkedInfo.rssi;

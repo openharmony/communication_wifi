@@ -1078,6 +1078,12 @@ std::string OutTClassString<StationInfo>(StationInfo &item)
     return ss.str();
 }
 
+static void OtherParamDefault(WifiConfig &item)
+{
+    item.isRandomMacDisabled = false;
+    item.wifiAutoEnable = true;
+}
+
 template<>
 void ClearTClass<WifiConfig>(WifiConfig &item)
 {
@@ -1129,12 +1135,6 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
     OtherParamDefault(item);
     return;
-}
-
-static void OtherParamDefault(WifiConfig &item)
-{
-    item.isRandomMacDisabled = false;
-    item.wifiAutoEnable = true;
 }
 
 using Func = std::function<void(WifiConfig &item, const std::string &value)>;

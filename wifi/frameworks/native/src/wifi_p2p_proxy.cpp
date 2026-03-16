@@ -23,6 +23,8 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pProxy");
 
+constexpr int MAX_IPNAMSIZ = 16;
+
 static sptr<WifiP2pCallbackStub> g_wifiP2pCallbackStub =
     sptr<WifiP2pCallbackStub>(new (std::nothrow) WifiP2pCallbackStub());
 
@@ -1420,6 +1422,18 @@ ErrCode WifiP2pProxy::Hid2dConnect(const Hid2dConnectConfig& config)
 
 ErrCode WifiP2pProxy::Hid2dConfigIPAddr(const std::string& ifName, const IpAddrInfo& ipInfo)
 {
+    if (ifName.empty() || ifName.length() > MAX_IPNAMSIZ) {
+        WIFI_LOGE("Invalid interface name length");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+ 
+    if (ipInfo.ip.length() > MAX_IPNAMSIZ ||
+        ipInfo.gateway.length() > MAX_IPNAMSIZ ||
+        ipInfo.netmask.length() > MAX_IPNAMSIZ) {
+        WIFI_LOGE("Invalid IP address length");
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
@@ -1692,6 +1706,10 @@ ErrCode WifiP2pProxy::Hid2dSetUpperScene(const std::string& ifName, const Hid2dU
 
 ErrCode WifiP2pProxy::DiscoverPeers(int32_t channelid)
 {
+    if (channelid < 0) {
+        WIFI_LOGE("Invalid channelid: %{public}d", channelid);
+        return WIFI_OPT_INVALID_PARAM;
+    }
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;

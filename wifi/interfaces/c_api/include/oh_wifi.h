@@ -24,7 +24,7 @@
  * @file oh_wifi.h
  * @kit ConnectivityKit
  * @brief Define interfaces for querying wifi switch status.
- * @library libwifi_ndk.so
+ * @library libwifi.so
  * @syscap SystemCapability.Communication.WiFi.STA
  * @since 13
  */
@@ -91,7 +91,7 @@ typedef enum Wifi_ResultCode {
  */
 typedef enum {
     /** Not disconnert */
-    WIFI_LINK_DISCONNECT = -1, 
+    WIFI_LINK_DISCONNECT = -1,
     /** Default link */
     WIFI_LINK_DEFAULT_LINK = 0,
     /** WiFi 7 single link */

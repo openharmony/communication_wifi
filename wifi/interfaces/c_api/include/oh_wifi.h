@@ -32,6 +32,8 @@
 #ifndef OH_WIFI_H
 #define OH_WIFI_H
 
+#include <cstdint>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -342,7 +344,7 @@ typedef struct {
     /**
      * @brief Service set identifier (SSID).
      *
-     * For the maximum length, see {@link WIFI_MAX_SSID_LEN}.
+     * For the length, see {@link WIFI_MAX_SSID_LEN}.
      * @since 24
      */
     char ssid[WIFI_MAX_SSID_LEN];
@@ -351,7 +353,8 @@ typedef struct {
      * @brief Basic service set identifier (BSSID).
      * If the application has requested the ohos.permission.GET_WIFI_PEERS_MAC permission, the bssid .\n
      * in the returned result will be the real BSSID address; otherwise, it will be a randomized device address.
-     * For the maximum length, see {@link WIFI_MAC_LEN}.
+     * format: "AA:BB:CC:DD:EE:FF"
+     * For the length, see {@link WIFI_MAC_LEN}.
      * @since 24
      */
     char bssid[WIFI_MAC_LEN];
@@ -360,65 +363,67 @@ typedef struct {
      * @brief Received signal strength indicator (RSSI).
      * @since 24
      */
-    int rssi;
+    int32_t rssi;
 
     /**
      * @brief Wi-Fi band information of the hotspot.
      * @since 24
      */
-    int band;
+    int32_t band;
 
     /**
      * @brief Wi-Fi link speed, in Mbps.
      * @since 24
      */
-    int linkSpeed;
+    int32_t linkSpeed;
 
     /**
      * @brief Downlink speed, in Mbps.
      * @since 24
      */
-    int rxLinkSpeed;
+    int32_t rxLinkSpeed;
 
     /**
      * @brief Maximum supported TX link speed, in Mbps.
      * @since 24
      */
-    int maxSupportedTxLinkSpeed;
+    int32_t maxSupportedTxLinkSpeed;
 
     /**
      * @brief Maximum supported RX link speed, in Mbps.
      * @since 24
      */
-    int maxSupportedRxLinkSpeed;
+    int32_t maxSupportedRxLinkSpeed;
 
     /**
      * @brief Wi-Fi frequency of the hotspot, in MHz.
      * @since 24
      */
-    int frequency;
+    int32_t frequency;
 
     /**
      * @brief Indicates whether the SSID is hidden.
      * @since 24
      */
-    int isHidden;
+    bool isHidden;
 
     /**
      * @brief Indicates whether data access is restricted.
      * @since 24
      */
-    int isRestricted;
+    bool isRestricted;
 
     /**
      * @brief MAC address type.
+     * 0 indicates random MAC address; 1 indicates device MAC address
      * @since 24
      */
-    int macType;
+    int32_t macType;
 
     /**
      * @brief MAC address of the device.
      * @permission ohos.permission.GET_WIFI_LOCAL_MAC
+     * format: "AA:BB:CC:DD:EE:FF"
      * For the maximum length, see {@link WIFI_MAC_LEN}.
      * @since 24
      */
@@ -428,7 +433,7 @@ typedef struct {
      * @brief IP address of the connected network.
      * @since 24
      */
-    unsigned int ipAddress;
+    uint32_t ipAddress;
 
     /**
      * @brief Wi-Fi connection state.
@@ -462,7 +467,7 @@ typedef struct {
      * @brief Indicates whether the network is a HiLink network.
      * @since 24
      */
-    int isHiLinkNetwork;
+    bool isHiLinkNetwork;
 
     /**
      * @brief Wi-Fi link type.
@@ -507,7 +512,7 @@ Wifi_ResultCode OH_Wifi_IsWifiEnabled(bool *enabled);
 Wifi_ResultCode OH_Wifi_GetDeviceMacAddress(char *macAddr, unsigned int *macAddrLen);
 
 /**
- * @brief Get wifi linked info.When macType is 1 (device MAC address), obtaining macAddress also requires the\n
+ * @brief Get wifi linked info. When macType is 1 (device MAC address), obtaining macAddress also requires the\n
  * ohos.permission.GET_WIFI_LOCAL_MAC permission. This permission is available only to system apps in\n
  * API versions 8–15. Starting from API 16, it is available to regular apps on PC/2-in-1 devices, while on other\n
  * devices it remains restricted to system apps. If the permission is not granted, macAddress will be returned\n

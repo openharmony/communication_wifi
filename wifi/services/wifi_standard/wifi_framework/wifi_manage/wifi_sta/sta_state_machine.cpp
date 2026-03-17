@@ -1018,8 +1018,9 @@ bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string 
         return false;
     }
     WifiDeviceConfig wifiDeviceConfig = pStaStateMachine->getCurrentWifiDeviceConfig();
-    time_t connectStateChangeTime = std::max(wifiDeviceConfig.lastConnectTime, wifiDeviceConfig.lastDisconnectTime);
-    int32_t disconnectInterval = static_cast<int32_t>(time(nullptr) - connectStateChangeTime);
+    time_t now = time(nullptr);
+    int32_t disconnectInterval = static_cast<int32_t>(now- std::max(wifiDeviceConfig.lastConnectTime,
+        pStaStateMachine->lastFastReconnectTime_));
     int32_t fastConnectInterval = pStaStateMachine->enableSignalPoll ?
         config.minTimeIntervalSec : config.maxTimeIntervalSec;
     if (disconnectInterval <= fastConnectInterval) {
@@ -1032,6 +1033,7 @@ bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string 
     if (pScanService != nullptr &&
         pScanService->ScanWithParam(params, true, ScanType::SCAN_TYPE_FAST_RECONNECT) == WIFI_OPT_SUCCESS) {
         usleep(config.scanWaitTimeMs); // wait 100ms for single channel scan callback
+        pStaStateMachine->lastFastReconnectTime_ = now;
         if (pStaStateMachine->StartConnectToNetwork(pStaStateMachine->linkedInfo.networkId, bssid,
             NETWORK_SELECTED_BY_FAST_RECONNECT) == WIFI_OPT_SUCCESS) {
             WIFI_LOGI("%{public}s try to fast reconnect, networkId:%{public}d, bssid:%{public}s",
@@ -1360,6 +1362,7 @@ void StaStateMachine::SeparatedState::GoInState()
     pStaStateMachine->InitWifiLinkedInfo();
     pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
     pStaStateMachine->linkSwitchDetectingFlag_ = false;
+    pStaStateMachine->lastFastReconnectTime_ = -1;
 #ifdef FEATURE_SELF_CURE_SUPPORT
     if ((pStaStateMachine->selfCureService_ != nullptr &&
         !pStaStateMachine->selfCureService_->IsSelfCureL2Connecting())) {

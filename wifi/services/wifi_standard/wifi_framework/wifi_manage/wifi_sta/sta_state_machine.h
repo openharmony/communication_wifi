@@ -1167,6 +1167,7 @@ private:
     std::condition_variable httpDetectionCond_;
     std::atomic<bool> isHttpReachable_{false};
     int reconnType_ = RECONNECT_TYPE_UNKNOWN;
+    time_t lastFastReconnectTime_ = -1;
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
     WifiDataReportService *wifiDataReportService_ = nullptr;

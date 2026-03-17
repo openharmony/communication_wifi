@@ -49,26 +49,6 @@ extern "C" {
  * @brief Indicates the maximum length of a Wi-Fi MAC address or a Wi-Fi BSSID.
  * @since 24
  */
-#define WIFI_MAC_LEN 18#ifndef OH_WIFI_H
-#define OH_WIFI_H
-
-#include <cstdint>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/**
- * @brief Indicates the maximum length of a Wi-Fi SSID.
- * @since 24
- * The maximum length is 32, and the last bit is reserved and set to <b>\0</b>. \n
- */
-#define WIFI_MAX_SSID_LEN 33 // 32 + \0
-
-/**
- * @brief Indicates the maximum length of a Wi-Fi MAC address or a Wi-Fi BSSID.
- * @since 24
- */
 #define WIFI_MAC_LEN 18
 
 /**

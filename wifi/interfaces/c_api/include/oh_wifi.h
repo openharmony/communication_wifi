@@ -32,7 +32,7 @@
 #ifndef OH_WIFI_H
 #define OH_WIFI_H
 
-#include <cstdint>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -367,6 +367,7 @@ typedef struct {
 
     /**
      * @brief Wi-Fi band information of the hotspot.
+     * 1 indicates 2.4GHZ; 2 indicates 5GHZ
      * @since 24
      */
     int32_t band;
@@ -422,8 +423,8 @@ typedef struct {
 
     /**
      * @brief MAC address of the device.
-     * @permission ohos.permission.GET_WIFI_LOCAL_MAC (When macType is 1)
-     * format: "AA:BB:CC:DD:EE:FF"
+     * When macType is 1 require ohos.permission.GET_WIFI_LOCAL_MAC permission
+     * Format: "AA:BB:CC:DD:EE:FF"
      * For the maximum length, see {@link WIFI_MAC_LEN}.
      * @since 24
      */

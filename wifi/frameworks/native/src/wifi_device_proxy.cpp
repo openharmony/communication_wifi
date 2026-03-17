@@ -17,7 +17,6 @@
 #include "define.h"
 #include "wifi_manager_service_ipc_interface_code.h"
 #include "wifi_common_util.h"
-#include "wifi_device_callback_stub.h"
 #include "wifi_hisysevent.h"
 #include "wifi_logger.h"
 
@@ -30,9 +29,6 @@ constexpr int EDM_UID = 3057;
 constexpr int MAX_SIZE = 256;
 constexpr int MAX_MDM_RESTRICTED_SIZE = 200;
 int g_bigDataRecvLen = 0;
-
-static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub =
-    sptr<WifiDeviceCallBackStub>::MakeSptr();
 
 WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy<IWifiDevice>(impl),
     remote_(nullptr), mRemoteDied(false), deathRecipient_(nullptr)
@@ -53,6 +49,7 @@ WifiDeviceProxy::WifiDeviceProxy(const sptr<IRemoteObject> &impl) : IRemoteProxy
         }
         remote_ = impl;
         WIFI_LOGD("AddDeathRecipient success! ");
+        deviceCallBackStub_ = sptr<WifiDeviceCallBackStub>::MakeSptr();
         InitWifiState();
     }
 }
@@ -1220,8 +1217,8 @@ ErrCode WifiDeviceProxy::IsWifiActive(bool &bActive)
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
     }
-    if (g_deviceCallBackStub->GetWifiState() != DEFAULT_VALUES) {
-        bActive = g_deviceCallBackStub->GetWifiState();
+    if (deviceCallBackStub_ != nullptr && deviceCallBackStub_->GetWifiState() != DEFAULT_VALUES) {
+        bActive = deviceCallBackStub_->GetWifiState();
         WIFI_LOGI("%{public}s bActive=%{public}d", __func__, bActive);
         return WIFI_OPT_SUCCESS;
     }
@@ -1671,11 +1668,11 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
     }
     data.WriteInt32(0);
 
-    if (g_deviceCallBackStub == nullptr) {
-        WIFI_LOGE("g_deviceCallBackStub is nullptr");
+    if (deviceCallBackStub_ == nullptr) {
+        WIFI_LOGE("deviceCallBackStub_ is nullptr");
         return WIFI_OPT_FAILED;
     }
-    g_deviceCallBackStub->RegisterUserCallBack(callback);
+    deviceCallBackStub_->RegisterUserCallBack(callback);
 
     std::vector<std::string> trace;
     std::copy(event.begin(), event.end(), std::back_inserter(trace));
@@ -1684,7 +1681,7 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const sptr<IWifiDeviceCallBack> &callb
         trace.push_back(EVENT_STA_POWER_STATE_CHANGE);
     }
 
-    if (!data.WriteRemoteObject(g_deviceCallBackStub->AsObject())) {
+    if (!data.WriteRemoteObject(deviceCallBackStub_->AsObject())) {
         WIFI_LOGE("WifiDeviceProxy::RegisterCallBack WriteRemoteObject failed!");
         return WIFI_OPT_FAILED;
     }
@@ -1889,13 +1886,13 @@ void WifiDeviceProxy::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
     WIFI_LOGW("Remote service is died! remoteObject: %{private}p", &remoteObject);
     mRemoteDied = true;
     RemoveDeathRecipient();
-    if (g_deviceCallBackStub == nullptr) {
-        WIFI_LOGE("g_deviceCallBackStub is nullptr");
+    if (deviceCallBackStub_ == nullptr) {
+        WIFI_LOGE("deviceCallBackStub_ is nullptr");
         return;
     }
-    if (g_deviceCallBackStub != nullptr) {
-        g_deviceCallBackStub->SetRemoteDied(true);
-        g_deviceCallBackStub->SetWifiState(DEFAULT_VALUES);
+    if (deviceCallBackStub_ != nullptr) {
+        deviceCallBackStub_->SetRemoteDied(true);
+        deviceCallBackStub_->SetWifiState(DEFAULT_VALUES);
     }
 }
 
@@ -2938,10 +2935,14 @@ ErrCode WifiDeviceProxy::GetMultiLinkedInfo(std::vector<WifiLinkedInfo> &multiLi
 void WifiDeviceProxy::OnWifiStateChanged(int state)
 {
     WIFI_LOGI("WifiDeviceProxy::OnWifiStateChanged, state %{public}d", state);
+    if (deviceCallBackStub_ == nullptr) {
+        WIFI_LOGE("OnWifiStateChanged deviceCallBackStub_ is nullptr");
+        return;
+    }
     if (state == static_cast<int>(WifiState::ENABLED)) {
-        g_deviceCallBackStub->SetWifiState(true);
+        deviceCallBackStub_->SetWifiState(true);
     } else {
-        g_deviceCallBackStub->SetWifiState(false);
+        deviceCallBackStub_->SetWifiState(false);
     }
 }
 

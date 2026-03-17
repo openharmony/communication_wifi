@@ -151,8 +151,11 @@ ErrCode WifiP2pServiceImpl::DisableP2p(void)
 {
     WIFI_LOGI("DisableP2p");
     if (WifiPermissionUtils::VerifySameProcessPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("DisableP2p:VerifySameProcessPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        int callingUid = GetCallingUid();
+        if (callingUid != EDM_SERVICE_UID) {
+            WIFI_LOGE("DisableP2p:VerifySameProcessPermission PERMISSION_DENIED! uid = %{public}d", callingUid);
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
     }
 
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetP2pMidState();
@@ -393,6 +396,13 @@ ErrCode WifiP2pServiceImpl::StopP2pListen()
 
 ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
 {
+#ifndef OHOS_ARCH_LITE
+    if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden(
+        MdmForbiddenType::P2P)) {
+        WIFI_LOGE("CreateGroup: Mdm p2p forbidden PERMISSION_DENIED!");
+        return WIFI_OPT_ENTERPRISE_DENIED;
+    }
+#endif
     int callingUid = GetCallingUid();
     WIFI_LOGI("Uid %{public}d createGroup, network name is [%{public}s]", callingUid, config.GetGroupName().c_str());
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
@@ -511,6 +521,13 @@ ErrCode WifiP2pServiceImpl::DeleteGroup(const WifiP2pGroupInfo &group)
 
 ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
 {
+#ifndef OHOS_ARCH_LITE
+    if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden(
+        MdmForbiddenType::P2P)) {
+        WIFI_LOGE("P2pConnect: Mdm p2p forbidden PERMISSION_DENIED!");
+        return WIFI_OPT_ENTERPRISE_DENIED;
+    }
+#endif
     WIFI_LOGI("P2pConnect device address [%{private}s], addressType: %{public}d], "
         "pid:%{public}d, uid:%{public}d ,BundleName:%{public}s",
         config.GetDeviceAddress().c_str(), config.GetDeviceAddressType(),
@@ -1155,6 +1172,13 @@ ErrCode WifiP2pServiceImpl::Hid2dSharedlinkDecrease()
 
 ErrCode WifiP2pServiceImpl::Hid2dCreateGroup(const int frequency, FreqType type)
 {
+#ifndef OHOS_ARCH_LITE
+    if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden(
+        MdmForbiddenType::P2P)) {
+        WIFI_LOGE("Hid2dCreateGroup: Mdm p2p forbidden PERMISSION_DENIED!");
+        return WIFI_OPT_ENTERPRISE_DENIED;
+    }
+#endif
     int callingUid = GetCallingUid();
     WIFI_LOGI("Uid %{public}d Hid2dCreateGroup", callingUid);
     if (callingUid != SOFT_BUS_SERVICE_UID) {
@@ -1199,6 +1223,13 @@ ErrCode WifiP2pServiceImpl::Hid2dRemoveGcGroup(const std::string& gcIfName)
 
 ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
 {
+#ifndef OHOS_ARCH_LITE
+    if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden(
+        MdmForbiddenType::P2P)) {
+        WIFI_LOGE("Hid2dConnect: Mdm p2p forbidden PERMISSION_DENIED!");
+        return WIFI_OPT_ENTERPRISE_DENIED;
+    }
+#endif
     int callingUid = GetCallingUid();
     WIFI_LOGI("Uid %{public}d Hid2dConnect", callingUid);
     if (callingUid != SOFT_BUS_SERVICE_UID) {

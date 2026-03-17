@@ -44,6 +44,11 @@ const int MOUSE_CROSS_SERVICE_ID = 65569;
 constexpr int32_t MOVEMENT_TYPE_STILL = 4;
 constexpr int32_t MOVEMENT_TYPE_STAY = 14;
 constexpr int32_t MOVEMENT_VALUE_ENTER = 1;
+enum class MdmForbiddenType {
+    WIFI = 0,
+    HOTSPOT,
+    P2P,
+};
 #ifdef SUPPORT_ClOUD_WIFI_ASSET
 inline const std::string COMMON_EVENT_ASSETCLOUD_MANAGER_STATE_CHANGED = "usual.event.ASSET_SYNC_DATA_CHANGED_SA";
 const int ASSETID = 6226;
@@ -184,7 +189,7 @@ public:
     std::string GetScanMacInfoWhiteListByDatashare();
     void DealLocationModeChangeEvent();
     void CheckAndStartStaByDatashare();
-    bool IsMdmForbidden(void);
+    bool IsMdmForbidden(MdmForbiddenType type = MdmForbiddenType::WIFI);
     void AccessDataShare();
     void RegisterLocationEvent();
     void OnEnhanceServiceReady();
@@ -272,7 +277,9 @@ private:
     std::shared_ptr<SettingsEnterSubscriber> settingsEnterSubscriber_ = nullptr;
     std::shared_ptr<DataShareReadySubscriber> dataShareReadySubscriber_ = nullptr;
     std::unique_ptr<WifiEventHandler> movementChangeEventHandler_ = nullptr;
-    static bool mIsMdmForbidden;
+    static std::atomic<bool> isMdmForbidden_;
+    static std::atomic<bool> isMdmHotspotForbidden_;
+    static std::atomic<bool> isMdmP2pForbidden_;
     bool islocationModeObservered = false;
     std::mutex locationEventMutex;
     std::unique_ptr<WifiEventHandler> mWifiEventSubsThread_ = nullptr;

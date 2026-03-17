@@ -508,6 +508,13 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
         WIFI_LOGE("EnableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+#ifndef OHOS_ARCH_LITE
+    if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden(
+        MdmForbiddenType::HOTSPOT)) {
+        WIFI_LOGE("EnableHotspot: Mdm hotspot forbidden PERMISSION_DENIED!");
+        return WIFI_OPT_ENTERPRISE_DENIED;
+    }
+#endif
 
     if (WifiConfigCenter::GetInstance().GetPowerSavingModeState() == 1) {
         WIFI_LOGI("current power saving mode and can not use ap, open failed!");

@@ -337,7 +337,7 @@
         "OHOS::Wifi::WifiEventSubscriberManager::GetScanMacInfoWhiteListByDatashare()";
         "OHOS::Wifi::WifiEventSubscriberManager::DealLocationModeChangeEvent()";
         "OHOS::Wifi::WifiEventSubscriberManager::CheckAndStartStaByDatashare()";
-        "OHOS::Wifi::WifiEventSubscriberManager::IsMdmForbidden()";
+        "OHOS::Wifi::WifiEventSubscriberManager::IsMdmForbidden(OHOS::Wifi::MdmForbiddenType)";
         "OHOS::Wifi::WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, bool add) override";
         "OHOS::Wifi::WifiLocationModeObserver::OnChange() override";
         "OHOS::Wifi::AppNetworkSpeedLimitService::GetInstance()";

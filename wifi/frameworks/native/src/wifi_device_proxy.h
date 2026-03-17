@@ -22,6 +22,7 @@
 #include "iremote_proxy.h"
 #endif
 #include "i_wifi_device.h"
+#include "wifi_device_callback_stub.h"
 #include "wifi_errcode.h"
 #include "wifi_msg.h"
 
@@ -734,6 +735,7 @@ private:
 private:
     void InitWifiState();
     void OnWifiStateChanged(int state);
+    sptr<WifiDeviceCallBackStub> deviceCallBackStub_ = nullptr;
 };
 class WifiInternalCallback : public IWifiDeviceCallBack {
 public:

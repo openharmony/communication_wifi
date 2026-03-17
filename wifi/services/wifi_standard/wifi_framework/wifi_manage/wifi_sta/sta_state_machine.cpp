@@ -1018,7 +1018,7 @@ bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string 
         return false;
     }
     WifiDeviceConfig wifiDeviceConfig = pStaStateMachine->getCurrentWifiDeviceConfig();
-    time_t now = time(nullptr);
+    time_t now = std::time(nullptr);
     int32_t disconnectInterval = static_cast<int32_t>(now- std::max(wifiDeviceConfig.lastConnectTime,
         pStaStateMachine->lastFastReconnectTime_));
     int32_t fastConnectInterval = pStaStateMachine->enableSignalPoll ?

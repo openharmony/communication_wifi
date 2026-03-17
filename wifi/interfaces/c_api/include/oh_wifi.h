@@ -42,6 +42,7 @@ extern "C" {
  * The maximum length is 32, and the last bit is reserved and set to <b>\0</b>. \n
  */
 #define WIFI_MAX_SSID_LEN 33 // 32 + \0
+
 /**
  * @brief Indicates the maximum length of a Wi-Fi MAC address or a Wi-Fi BSSID.
  * @since 24
@@ -85,225 +86,391 @@ typedef enum Wifi_ResultCode {
 } Wifi_ResultCode;
 
 /**
- * @brief Enumerates Wi-Fi connection states.
+ * @brief Enumerates Wi-Fi link types.
  *
  * @since 24
  */
-typedef enum {
-    /** Not disconnert */
-    WIFI_LINK_DISCONNECT = -1,
-    /** Default link */
-    WIFI_LINK_DEFAULT_LINK = 0,
-    /** WiFi 7 single link */
-    WIFI_LINK_WIFI7_SINGLE_LINK = 1,
-    /** WiFi 7 MLSR */
-    WIFI_LINK_WIFI7_MLSR = 2,
-    /** WiFi 7 EMLSR */
-    WIFI_LINK_WIFI7_EMLSR = 3,
-    /** WiFi 7 STR */
-    WIFI_LINK_WIFI7_STR = 4,
-    /** WiFi 7 not MLO */
-    WIFI_LINK_WIFI7_LEGACY = 5
-} OHWifiLinkType;
- 
+typedef enum OH_WifiLinkType {
+    /**
+     * @brief Not connected.
+     * @since 24
+     */
+    OH_WIFI_LINK_DISCONNECT = -1,
+
+    /**
+     * @brief Default link.
+     * @since 24
+     */
+    OH_WIFI_LINK_DEFAULT_LINK = 0,
+
+    /**
+     * @brief Wi-Fi 7 single link.
+     * @since 24
+     */
+    OH_WIFI_LINK_WIFI7_SINGLE_LINK = 1,
+
+    /**
+     * @brief Wi-Fi 7 MLSR.
+     * @since 24
+     */
+    OH_WIFI_LINK_WIFI7_MLSR = 2,
+
+    /**
+     * @brief Wi-Fi 7 EMLSR.
+     * @since 24
+     */
+    OH_WIFI_LINK_WIFI7_EMLSR = 3,
+
+    /**
+     * @brief Wi-Fi 7 STR.
+     * @since 24
+     */
+    OH_WIFI_LINK_WIFI7_STR = 4,
+
+    /**
+     * @brief Wi-Fi 7 legacy mode without MLO.
+     * @since 24
+     */
+    OH_WIFI_LINK_WIFI7_LEGACY = 5
+} OH_WifiLinkType;
+
 /**
  * @brief Enumerates Wi-Fi connection states.
  *
  * @since 24
  */
-typedef enum {
-    /** The device is searching for an available AP. */
-    WIFI_CONN_SCANNING,
-    /** The Wi-Fi connection is being set up. */
-    WIFI_CONN_CONNECTING,
-    /** The Wi-Fi connection is being authenticated. */
-    WIFI_CONN_AUTHENTICATING,
-    /** The IP address of the Wi-Fi connection is being obtained. */
-    WIFI_CONN_OBTAINING_IPADDR,
-    /** The Wi-Fi connection has been set up. */
-    WIFI_CONN_CONNECTED,
-    /** The Wi-Fi connection is being torn down. */
-    WIFI_CONN_DISCONNECTING,
-    /** The Wi-Fi connection has been torn down. */
-    WIFI_CONN_DISCONNECTED,
-    /** The Wi-Fi special connection. */
-    WIFI_CONN_SPECIAL_CONNECT,
-    /** Failed to set up the Wi-Fi connection. */
-    WIFI_CONN_UNKNOWN
-} OHWifiConnState;
- 
-/**
- * @brief Enumerates Wi-Fi supplicant state.
- *
- * @since 24
- */
-typedef enum {
-    /** The Wi-Fi disconnected. */
-    WIFI_SUPP_DISCONNECTED = 0,
-    /** The Wi-Fi interface disabled. */
-    WIFI_SUPP_INTERFACE_DISABLED = 1,
-    /** The Wi-Fi inactive. */
-    WIFI_SUPP_INACTIVE = 2,
-    /** The Wi-Fi scanning. */
-    WIFI_SUPP_SCANNING = 3,
-    /** The Wi-Fi authenticating. */
-    WIFI_SUPP_AUTHENTICATING = 4,
-    /** The Wi-Fi associating. */
-    WIFI_SUPP_ASSOCIATING = 5,
-    /** The Wi-Fi associated. */
-    WIFI_SUPP_ASSOCIATED = 6,
-    /** The Wi-Fi four way handshake. */
-    WIFI_SUPP_FOUR_WAY_HANDSHAKE = 7,
-    /** The Wi-Fi group handshake. */
-    WIFI_SUPP_GROUP_HANDSHAKE = 8,
-    /** The Wi-Fi completed. */
-    WIFI_SUPP_COMPLETED = 9,
-    /** The Wi-Fi unknow. */
-    WIFI_SUPP_UNKNOWN = 10,
-    /** The Wi-Fi invalid. */
-    WIFI_SUPP_INVALID = 0xFF,
-} OHWifiSupplicantState;
- 
-/**
- * @brief Enumerates detailed Wi-Fi connection states.
- *
- * @since 24
- */
-typedef enum {
-    /** Authentication is in progress. */
-    WIFI_DETAIL_AUTHENTICATING = 0,
-    /** Connection is blocked by policy or temporary restrictions. */
-    WIFI_DETAIL_BLOCKED = 1,
-    /** Captive portal detection/check is in progress. */
-    WIFI_DETAIL_CAPTIVE_PORTAL_CHECK = 2,
-    /** Link is connected. */
-    WIFI_DETAIL_CONNECTED = 3,
-    /** Connection setup is in progress. */
-    WIFI_DETAIL_CONNECTING = 4,
-    /** Link is disconnected. */
-    WIFI_DETAIL_DISCONNECTED = 5,
-    /** Disconnection is in progress. */
-    WIFI_DETAIL_DISCONNECTING = 6,
-    /** Connection failed (generic failure state). */
-    WIFI_DETAIL_FAILED = 7,
-    /** Wi-Fi is idle (no active connection attempt). */
-    WIFI_DETAIL_IDLE = 8,
-    /** IP address acquisition is in progress (typically DHCP). */
-    WIFI_DETAIL_OBTAINING_IPADDR = 9,
-    /** Network is working and reachable. */
-    WIFI_DETAIL_WORKING = 10,
-    /** Network is not working/reachable. */
-    WIFI_DETAIL_NOTWORKING = 11,
-    /** Wi-Fi scan is in progress. */
-    WIFI_DETAIL_SCANNING = 12,
-    /** Connection is suspended. */
-    WIFI_DETAIL_SUSPENDED = 13,
-    /** Poor link verification is in progress. */
-    WIFI_DETAIL_VERIFYING_POOR_LINK = 14,
-    /** Password is incorrect. */
-    WIFI_DETAIL_PASSWORD_ERROR = 15,
-    /** Connection request is rejected by the AP. */
-    WIFI_DETAIL_CONNECTION_REJECT = 16,
-    /** AP cannot accept more clients (connection full). */
-    WIFI_DETAIL_CONNECTION_FULL = 17,
-    /** Connection attempt timed out. */
-    WIFI_DETAIL_CONNECTION_TIMEOUT = 18,
-    /** Failed to obtain an IP address. */
-    WIFI_DETAIL_OBTAINING_IPADDR_FAIL = 19,
-    /** Invalid or unknown state. */
-    WIFI_DETAIL_INVALID = 0xFF,
-} OHWifiDetailedState;
- 
+typedef enum OH_WifiConnState {
+    /**
+     * @brief The device is searching for an available AP.
+     * @since 24
+     */
+    OH_WIFI_CONN_SCANNING,
+
+    /**
+     * @brief The Wi-Fi connection is being set up.
+     * @since 24
+     */
+    OH_WIFI_CONN_CONNECTING,
+
+    /**
+     * @brief The Wi-Fi connection is being authenticated.
+     * @since 24
+     */
+    OH_WIFI_CONN_AUTHENTICATING,
+
+    /**
+     * @brief The IP address of the Wi-Fi connection is being obtained.
+     * @since 24
+     */
+    OH_WIFI_CONN_OBTAINING_IPADDR,
+
+    /**
+     * @brief The Wi-Fi connection has been set up.
+     * @since 24
+     */
+    OH_WIFI_CONN_CONNECTED,
+
+    /**
+     * @brief The Wi-Fi connection is being torn down.
+     * @since 24
+     */
+    OH_WIFI_CONN_DISCONNECTING,
+
+    /**
+     * @brief The Wi-Fi connection has been torn down.
+     * @since 24
+     */
+    OH_WIFI_CONN_DISCONNECTED,
+
+    /**
+     * @brief The Wi-Fi connection is in a special state.
+     * @since 24
+     */
+    OH_WIFI_CONN_SPECIAL_CONNECT,
+
+    /**
+     * @brief Failed to set up the Wi-Fi connection.
+     * @since 24
+     */
+    OH_WIFI_CONN_UNKNOWN
+} OH_WifiConnState;
+
 /**
  * @brief Enumerates Wi-Fi channel widths.
  *
  * @since 24
  */
-typedef enum {
-    /** 20 MHz channel width. */
-    WIDTH_20MHZ = 0,
-    /** 40 MHz channel width. */
-    WIDTH_40MHZ = 1,
-    /** 80 MHz channel width. */
-    WIDTH_80MHZ = 2,
-    /** 160 MHz channel width. */
-    WIDTH_160MHZ = 3,
-    /** 80+80 MHz channel width (non-contiguous). */
-    WIDTH_80MHZ_PLUS = 4,
-    /** Invalid channel width. */
-    WIDTH_INVALID
-} OHWifiChannelWidth;
+typedef enum OH_WifiChannelWidth {
+    /**
+     * @brief 20 MHz channel width.
+     * @since 24
+     */
+    OH_WIFI_WIDTH_20MHZ = 0,
+
+    /**
+     * @brief 40 MHz channel width.
+     * @since 24
+     */
+    OH_WIFI_WIDTH_40MHZ = 1,
+
+    /**
+     * @brief 80 MHz channel width.
+     * @since 24
+     */
+    OH_WIFI_WIDTH_80MHZ = 2,
+
+    /**
+     * @brief 160 MHz channel width.
+     * @since 24
+     */
+    OH_WIFI_WIDTH_160MHZ = 3,
+
+    /**
+     * @brief 80 + 80 MHz channel width.
+     * @since 24
+     */
+    OH_WIFI_WIDTH_80MHZ_PLUS = 4,
+
+    /**
+     * @brief Invalid channel width.
+     * @since 24
+     */
+    OH_WIFI_WIDTH_INVALID
+} OH_WifiChannelWidth;
+
 /**
- * @brief Enumerates Wi-Fi categories.
+ * @brief Wi-Fi categories.
  *
  * @since 24
  */
-typedef enum {
-    /** Default category. */
-    CATEGORY_DEFAULT = 1,
-    /** Wi-Fi 6 category. */
-    CATEGORY_WIFI6 = 2,
-    /** Wi-Fi 6 enhanced category. */
-    CATEGORY_WIFI6_PLUS = 3,
-    /** Wi-Fi 7 category. */
-    CATEGORY_WIFI7 = 4,
-    /** Wi-Fi 7 enhanced category. */
-    CATEGORY_WIFI7_PLUS = 5
-} OHWifiCategory;
+typedef enum OH_WifiCategory {
+    /**
+     * @brief Default category.
+     * @since 24
+     */
+    OH_WIFI_CATEGORY_DEFAULT = 1,
+
+    /**
+     * @brief Wi-Fi 6 category.
+     * @since 24
+     */
+    OH_WIFI_CATEGORY_WIFI6 = 2,
+
+    /**
+     * @brief Wi-Fi 6 plus category.
+     * @since 24
+     */
+    OH_WIFI_CATEGORY_WIFI6_PLUS = 3,
+
+    /**
+     * @brief Wi-Fi 7 category.
+     * @since 24
+     */
+    OH_WIFI_CATEGORY_WIFI7 = 4,
+
+    /**
+     * @brief Wi-Fi 7 plus category.
+     * @since 24
+     */
+    OH_WIFI_CATEGORY_WIFI7_PLUS = 5
+} OH_WifiCategory;
+
+/**
+ * @brief Enumerates Wi-Fi standards.
+ *
+ * @since 24
+ */
+typedef enum OH_WifiStandard {
+    /**
+     * @brief Invalid Wi-Fi standard.
+     * @since 24
+     */
+    OH_WIFI_STANDARD_UNDEFINED = 0,
+
+    /**
+     * @brief 802.11a Wi-Fi standard.
+     * @since 24
+     */
+    OH_WIFI_STANDARD_11A = 1,
+
+    /**
+     * @brief 802.11b Wi-Fi standard.
+     * @since 24
+     */
+    OH_WIFI_STANDARD_11B = 2,
+
+    /**
+     * @brief 802.11g Wi-Fi standard.
+     * @since 24
+     */
+    OH_WIFI_STANDARD_11G = 3,
+
+    /**
+     * @brief 802.11n Wi-Fi standard.
+     * @since 24
+     */
+    OH_WIFI_STANDARD_11N = 4,
+
+    /**
+     * @brief 802.11ac Wi-Fi standard.
+     * @since 24
+     */
+    OH_WIFI_STANDARD_11AC = 5,
+
+    /**
+     * @brief 802.11ax Wi-Fi standard.
+     * @since 24
+     */
+    OH_WIFI_STANDARD_11AX = 6,
+
+    /**
+     * @brief 802.11ad Wi-Fi standard.
+     * @since 24
+     */
+    OH_WIFI_STANDARD_11AD = 7
+} OH_WifiStandard;
+
 /**
  * @brief Represents the Wi-Fi connection information.
  *
- * This refers to the information about the hotspot connected to this station. The information is obtained using
- * {@link GetLinkedInfo}.
+ * This structure describes the hotspot information of the current station connection.
+ * The information can be obtained by calling {@link OH_Wifi_GetLinkedInfo}.
  *
  * @since 24
  */
 typedef struct {
-    /** Service set ID (SSID). For its length, see {@link WIFI_MAX_SSID_LEN}. */
+    /**
+     * @brief Service set identifier (SSID).
+     *
+     * For the maximum length, see {@link WIFI_MAX_SSID_LEN}.
+     * @since 24
+     */
     char ssid[WIFI_MAX_SSID_LEN];
-    /** Basic service set ID (BSSID). For its length, see {@link WIFI_MAC_LEN}. */
+
+    /**
+     * @brief Basic service set identifier (BSSID).
+     * If the application has requested the ohos.permission.GET_WIFI_PEERS_MAC permission, the bssid .\n
+     * in the returned result will be the real BSSID address; otherwise, it will be a randomized device address.
+     * For the maximum length, see {@link WIFI_MAC_LEN}.
+     * @since 24
+     */
     char bssid[WIFI_MAC_LEN];
-    /** MAC address of the connected hotspot */
-    char macAddress[WIFI_MAC_LEN];
-    /** Received signal strength indicator (RSSI) */
+
+    /**
+     * @brief Received signal strength indicator (RSSI).
+     * @since 24
+     */
     int rssi;
-    /** Wi-Fi band information of hotspot */
+
+    /**
+     * @brief Wi-Fi band information of the hotspot.
+     * @since 24
+     */
     int band;
-    /** Wi-Fi link speed (units: Mbps) */
+
+    /**
+     * @brief Wi-Fi link speed, in Mbps.
+     * @since 24
+     */
     int linkSpeed;
-    /** Wi-Fi frequency information of hotspot */
-    int frequency;
-    /** MAC address type */
-    int macType;
-    /** Wi-Fi connection state, which is defined in {@link OHWiFiConnState} */
-    OHWifiConnState connState;
-    /** Whether the SSID is hidden */
-    int ifHiddenSSID;
-    /** Whether data is restricted */
-    int isDataRestricted;
-    /** Supplicant state, defined in {@link OHWiFiSupplicantState} */
-    OHWifiSupplicantState supplicantState;
-    /** Detailed connection state, defined in {@link OHWiFiDetailedState} */
-    OHWifiDetailedState detailedState;
-    /** Wi-Fi link type, defined in {@link OHWiFiLinkType} */
-    OHWifiLinkType wifiLinkType;
-    /** Wi-Fi standard */
-    int wifiStandard;
-    /** Maximum supported RX link speed */
-    int maxSupportedRxLinkSpeed;
-    /** Maximum supported TX link speed */
-    int maxSupportedTxLinkSpeed;
-    /** Downstream network speed */
+
+    /**
+     * @brief Downlink speed, in Mbps.
+     * @since 24
+     */
     int rxLinkSpeed;
-    /** Current AP channel width */
-    OHWifiChannelWidth channelWidth;
-    /** Supported Wi-Fi category, defined in {@link WifiCategory} */
-    OHWifiCategory supportedWifiCategory;
-    /** Whether is HiLink network */
-    int isHiLinkNetwork;
-    /** IP address of the connected network */
+
+    /**
+     * @brief Maximum supported TX link speed, in Mbps.
+     * @since 24
+     */
+    int maxSupportedTxLinkSpeed;
+
+    /**
+     * @brief Maximum supported RX link speed, in Mbps.
+     * @since 24
+     */
+    int maxSupportedRxLinkSpeed;
+
+    /**
+     * @brief Wi-Fi frequency of the hotspot, in MHz.
+     * @since 24
+     */
+    int frequency;
+
+    /**
+     * @brief Indicates whether the SSID is hidden.
+     * @since 24
+     */
+    int isHidden;
+
+    /**
+     * @brief Indicates whether data access is restricted.
+     * @since 24
+     */
+    int isRestricted;
+
+    /**
+     * @brief MAC address type.
+     * @since 24
+     */
+    int macType;
+
+    /**
+     * @brief MAC address of the device.
+     * @permission ohos.permission.GET_WIFI_LOCAL_MAC
+     * For the maximum length, see {@link WIFI_MAC_LEN}.
+     * @since 24
+     */
+    char macAddress[WIFI_MAC_LEN];
+
+    /**
+     * @brief IP address of the connected network.
+     * @since 24
+     */
     unsigned int ipAddress;
-} OHWifiLinkedInfo;
+
+    /**
+     * @brief Wi-Fi connection state.
+     * For details, see {@link OH_WifiConnState}.
+     * @since 24
+     */
+    OH_WifiConnState connState;
+
+    /**
+     * @brief Current AP channel width.
+     * For details, see {@link OH_WifiChannelWidth}.
+     * @since 24
+     */
+    OH_WifiChannelWidth channelWidth;
+
+    /**
+     * @brief Wi-Fi standard.
+     * For details, see {@link OH_WifiStandard}.
+     * @since 24
+     */
+    OH_WifiStandard wifiStandard;
+
+    /**
+     * @brief Supported Wi-Fi category.
+     * For details, see {@link OH_WifiCategory}.
+     * @since 24
+     */
+    OH_WifiCategory supportedWifiCategory;
+
+    /**
+     * @brief Indicates whether the network is a HiLink network.
+     * @since 24
+     */
+    int isHiLinkNetwork;
+
+    /**
+     * @brief Wi-Fi link type.
+     * For details, see {@link OH_WifiLinkType}.
+     * @since 24
+     */
+    OH_WifiLinkType wifiLinkType;
+} OH_WifiLinkedInfo;
 
 /**
  * @brief Check whether the wifi switch is enabled.
@@ -340,9 +507,14 @@ Wifi_ResultCode OH_Wifi_IsWifiEnabled(bool *enabled);
 Wifi_ResultCode OH_Wifi_GetDeviceMacAddress(char *macAddr, unsigned int *macAddrLen);
 
 /**
- * @brief Get wifi linked info.
+ * @brief Get wifi linked info.When macType is 1 (device MAC address), obtaining macAddress also requires the\n
+ * ohos.permission.GET_WIFI_LOCAL_MAC permission. This permission is available only to system apps in\n
+ * API versions 8–15. Starting from API 16, it is available to regular apps on PC/2-in-1 devices, while on other\n
+ * devices it remains restricted to system apps. If the permission is not granted, macAddress will be returned\n
+ * as empty. If the application has requested the ohos.permission.GET_WIFI_PEERS_MAC permission, the bssid\n
+ * in the returned result will be the real BSSID address; otherwise, it will be a randomized device address.\n
  *
- * @param info - the data structure and macro of the Wi-Fi connection information.
+ * @param info - the data structure of the Wi-Fi connection information.
  * @permission ohos.permission.GET_WIFI_INFO.
  * @return wifi functions result code.
  *     For a detailed definition, please refer to {@link Wifi_ResultCode}.
@@ -353,7 +525,7 @@ Wifi_ResultCode OH_Wifi_GetDeviceMacAddress(char *macAddr, unsigned int *macAddr
  *     {@link WIFI_OPERATION_FAILED} Internal execution failed.
  * @since 24
  */
-Wifi_ResultCode OH_Wifi_GetLinkedInfo(OHWifiLinkedInfo *info);
+Wifi_ResultCode OH_Wifi_GetLinkedInfo(OH_WifiLinkedInfo *info);
 #ifdef __cplusplus
 }
 #endif

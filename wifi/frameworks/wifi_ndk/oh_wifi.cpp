@@ -81,7 +81,7 @@ Wifi_ResultCode OH_Wifi_GetDeviceMacAddress(char *macAddr, unsigned int *macAddr
     return WIFI_SUCCESS;
 }
 
-Wifi_ResultCode OH_Wifi_GetLinkedInfo(OHWifiLinkedInfo *info)
+Wifi_ResultCode OH_Wifi_GetLinkedInfo(OH_WifiLinkedInfo *info)
 {
     if (info == nullptr) {
         return WIFI_INVALID_PARAM;
@@ -98,30 +98,28 @@ Wifi_ResultCode OH_Wifi_GetLinkedInfo(OHWifiLinkedInfo *info)
     if (strncpy_s(info->ssid, sizeof(info->ssid), linkedInfo.ssid.c_str(), linkedInfo.ssid.length()) != 0) {
         return WIFI_OPERATION_FAILED;
     }
-    if (strncpy_s(info->bssid, WIFI_MAC_LEN, linkedInfo.bssid.c_str(), linkedInfo.bssid.length()) != 0) {
-        return WIFI_OPERATION_FAILED;
-    }
-    if (strncpy_s(info->macAddress, WIFI_MAC_LEN, linkedInfo.macAddress.c_str(), linkedInfo.macAddress.length()) != 0) {
+    if (strncpy_s(info->bssid, sizeof(info->bssid), linkedInfo.bssid.c_str(), linkedInfo.bssid.length()) != 0) {
         return WIFI_OPERATION_FAILED;
     }
     info->rssi = linkedInfo.rssi;
     info->band = linkedInfo.band;
     info->linkSpeed = linkedInfo.linkSpeed;
-    info->frequency = linkedInfo.frequency;
-    info->macType = linkedInfo.macType;
-    info->connState = static_cast<OHWifiConnState>(linkedInfo.connState);
-    info->ifHiddenSSID = linkedInfo.ifHiddenSSID;
-    info->isDataRestricted = linkedInfo.isDataRestricted;
-    info->supplicantState = static_cast<OHWifiSupplicantState>(linkedInfo.supplicantState);
-    info->detailedState = static_cast<OHWifiDetailedState>(linkedInfo.detailedState);
-    info->wifiLinkType = static_cast<OHWifiLinkType>(linkedInfo.wifiLinkType);
-    info->wifiStandard = linkedInfo.wifiStandard;
-    info->maxSupportedRxLinkSpeed = linkedInfo.maxSupportedRxLinkSpeed;
-    info->maxSupportedTxLinkSpeed = linkedInfo.maxSupportedTxLinkSpeed;
     info->rxLinkSpeed = linkedInfo.rxLinkSpeed;
-    info->channelWidth = static_cast<OHWifiChannelWidth>(linkedInfo.channelWidth);
-    info->supportedWifiCategory = static_cast<OHWifiCategory>(linkedInfo.supportedWifiCategory);
-    info->isHiLinkNetwork = linkedInfo.isHiLinkNetwork;
+    info->maxSupportedTxLinkSpeed = linkedInfo.maxSupportedTxLinkSpeed;
+    info->maxSupportedRxLinkSpeed = linkedInfo.maxSupportedRxLinkSpeed;
+    info->frequency = linkedInfo.frequency;
+    info->isHidden = linkedInfo.ifHiddenSSID;
+    info->isRestricted = linkedInfo.isDataRestricted;
+    info->macType = linkedInfo.macType;
+    if (strncpy_s(info->macAddress, sizeof(info->macAddress), linkedInfo.macAddress.c_str(), linkedInfo.macAddress.length()) != 0) {
+        return WIFI_OPERATION_FAILED;
+    }
     info->ipAddress = linkedInfo.ipAddress;
+    info->connState = static_cast<OH_WifiConnState>(linkedInfo.connState);
+    info->channelWidth = static_cast<OH_WifiChannelWidth>(linkedInfo.channelWidth);
+    info->wifiStandard = static_cast<OH_WifiStandard>(linkedInfo.wifiStandard);
+    info->supportedWifiCategory = static_cast<OH_WifiCategory>(linkedInfo.supportedWifiCategory);
+    info->isHiLinkNetwork = linkedInfo.isHiLinkNetwork;
+    info->wifiLinkType = static_cast<OH_WifiLinkType>(linkedInfo.wifiLinkType);
     return WIFI_SUCCESS;
 }

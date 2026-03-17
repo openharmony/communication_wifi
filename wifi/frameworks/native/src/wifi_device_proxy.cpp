@@ -1890,10 +1890,8 @@ void WifiDeviceProxy::OnRemoteDied(const wptr<IRemoteObject> &remoteObject)
         WIFI_LOGE("deviceCallBackStub_ is nullptr");
         return;
     }
-    if (deviceCallBackStub_ != nullptr) {
-        deviceCallBackStub_->SetRemoteDied(true);
-        deviceCallBackStub_->SetWifiState(DEFAULT_VALUES);
-    }
+    deviceCallBackStub_->SetRemoteDied(true);
+    deviceCallBackStub_->SetWifiState(DEFAULT_VALUES);
 }
 
 bool WifiDeviceProxy::IsRemoteDied(void)

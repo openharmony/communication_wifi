@@ -247,6 +247,7 @@ int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, Message
         info.detailedState = DetailedState::INVALID;
     }
     info.isAncoConnected = data.ReadBool();
+    info.isMloConnected = data.ReadBool();
     OnWifiConnectionChanged(state, info);
     return 0;
 }

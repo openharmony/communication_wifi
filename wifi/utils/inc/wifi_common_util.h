@@ -238,6 +238,13 @@ std::string Number2Ip(unsigned int intIp);
 std::vector<std::string> StrSplit(const std::string& str, const std::string& delim);
 
 /**
+ * @brief Gets the formatted string of the current clock time ("YYYY-MM-DD HH:MM:SS").
+ *
+ * @return std::string - The formatted time string, or an empty string on failure.
+ */
+std::string GetCurrentTimeStr();
+
+/**
   * @brief Returns the time, in seconds, since 1970-01-01 00:00:00 GMT
   *
   * @return Returns the time, in seconds

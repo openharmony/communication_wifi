@@ -36,6 +36,8 @@ const int64_t TIME_START_TO_CONNECT_LEVEL2_CNT = 1500;
 const int64_t TIME_CONNECT_TO_SUCC_LEVEL1_CNT = 2000;
 const int64_t TIME_CONNECT_TO_SUCC_LEVEL2_CNT = 3500;
 const int64_t USE_1000 = 1000;
+constexpr int RTT_DIFF_THRESHOLDS[] = { -50, 0, 50, 100 };
+constexpr size_t RTT_DIFF_THRESHOLD_COUNT = sizeof(RTT_DIFF_THRESHOLDS) / sizeof(RTT_DIFF_THRESHOLDS[0]);
 
 template<typename... Types>
 static void WriteEvent(const std::string& eventType, Types... args)
@@ -84,6 +86,20 @@ void WifiProChr::ResetChrRecord()
     selectNetResultCnt_.clear();
     wifiProResultCnt_.clear();
     wifiProSwitchTimeCnt_.clear();
+    switchEnhanceTotalCnt_ = 0;
+    switchEnhanceSuccCnt_ = 0;
+    switchEnhanceFailCnt_ = 0;
+    switchEnhanceConnTimeoutCnt_ = 0;
+    switchEnhanceArpFailCnt_ = 0;
+    switchEnhanceHttpFailCnt_ = 0;
+    switchEnhanceTotalSwitchTimeMs_ = 0;
+    switchEnhanceConnTimeoutList_.clear();
+    switchEnhanceArpFailTimeList_.clear();
+    switchEnhanceHttpFailTimeList_.clear();
+    lastRtt_ = 0;
+    lastRttTimeUs_ = 0;
+    isSwitchEnhanceSucc_ = false;
+    rttDiffBucketCnt_.clear();
 }
 
 void WifiProChr::RecordScanChrCnt(std::string eventName)
@@ -330,6 +346,90 @@ void WifiProChr::RecordGatewayInfoAfterSwitch()
     }
 }
 
+void WifiProChr::RecordSwitchEnhanceStart()
+{
+    WIFI_LOGI("RecordSwitchEnhanceStart");
+    switchEnhanceTotalCnt_++;
+}
+
+void WifiProChr::RecordSwitchEnhanceSuccess()
+{
+    WIFI_LOGI("RecordSwitchEnhanceSuccess");
+    switchEnhanceSuccCnt_++;
+    int64_t switchTime = GetElapsedMicrosecondsSinceBoot() / USE_1000 - wifiProStartTime_;
+    if (switchTime > 0) {
+        switchEnhanceTotalSwitchTimeMs_ += static_cast<uint64_t>(switchTime);
+    }
+    isSwitchEnhanceSucc_ = true;
+}
+
+void WifiProChr::RecordSwitchEnhanceConnTimeout()
+{
+    WIFI_LOGI("RecordSwitchEnhanceConnTimeout");
+    switchEnhanceFailCnt_++;
+    switchEnhanceConnTimeoutCnt_++;
+    if (switchEnhanceConnTimeoutList_.size() < SWITCH_ENHANCE_TIME_LIST_MAX_SIZE) {
+        std::string timeStr = GetCurrentTimeStr();
+        if (!timeStr.empty()) {
+            switchEnhanceConnTimeoutList_.emplace_back(timeStr);
+        }
+    }
+}
+
+void WifiProChr::RecordSwitchEnhanceArpFail()
+{
+    WIFI_LOGI("RecordSwitchEnhanceArpFail");
+    switchEnhanceFailCnt_++;
+    switchEnhanceArpFailCnt_++;
+    if (switchEnhanceArpFailTimeList_.size() < SWITCH_ENHANCE_TIME_LIST_MAX_SIZE) {
+        std::string timeStr = GetCurrentTimeStr();
+        if (!timeStr.empty()) {
+            switchEnhanceArpFailTimeList_.emplace_back(timeStr);
+        }
+    }
+}
+
+void WifiProChr::RecordSwitchEnhanceHttpFail()
+{
+    WIFI_LOGI("RecordSwitchEnhanceHttpFail");
+    switchEnhanceFailCnt_++;
+    switchEnhanceHttpFailCnt_++;
+    if (switchEnhanceHttpFailTimeList_.size() < SWITCH_ENHANCE_TIME_LIST_MAX_SIZE) {
+        std::string timeStr = GetCurrentTimeStr();
+        if (!timeStr.empty()) {
+            switchEnhanceHttpFailTimeList_.emplace_back(timeStr);
+        }
+    }
+}
+
+static RttDiffBucket ClassifyRttDiff(int diff)
+{
+    for (size_t i = 0; i < RTT_DIFF_THRESHOLD_COUNT; ++i) {
+        if (diff < RTT_DIFF_THRESHOLDS[i]) {
+            return static_cast<RttDiffBucket>(i);
+        }
+    }
+    return static_cast<RttDiffBucket>(RTT_DIFF_THRESHOLD_COUNT);
+}
+
+void WifiProChr::NotifyGameRtt(int rtt)
+{
+    int64_t nowUs = GetElapsedMicrosecondsSinceBoot();
+    if (isSwitchEnhanceSucc_) {
+        int diff = 0;
+        if (lastRttTimeUs_ > 0 && (nowUs - lastRttTimeUs_) <= RTT_DIFF_TIMEOUT_US) {
+            diff = rtt - lastRtt_;
+        }
+        RttDiffBucket bucket = ClassifyRttDiff(diff);
+        rttDiffBucketCnt_[bucket]++;
+        WIFI_LOGI("RecordRttDiff switch succ, rtt:%{public}d lastRtt:%{public}d diff:%{public}d bucket:%{public}d",
+            rtt, lastRtt_, diff, static_cast<int>(bucket));
+        isSwitchEnhanceSucc_ = false;
+    }
+    lastRtt_ = rtt;
+    lastRttTimeUs_ = nowUs;
+}
+
 void WifiProChr::RecordCountWiFiPro(bool isValid)
 {
     WIFI_LOGD("RecordCountWiFiPro, isValid : %{public}d, switchReason_ : %{public}d",
@@ -469,6 +569,67 @@ void WifiProChr::FillWifiProStatisticsJsons(cJSON *root)
     cJSON_AddNumberToObject(root, "GATEWAYMAC_DIFF_CNT", gatewayMacDiffCnt_);
     cJSON_AddNumberToObject(root, "GATEWAYMAC_UNKNOWN_CNT", gatewayMacUnknownCnt_);
     cJSON_AddNumberToObject(root, "GATEWAY_BSSID_SIMILAR_CNT", gatewayBssidSimilarCnt_);
+    FillSwitchEnhanceStatisticsJson(root);
+}
+
+void WifiProChr::AddStringListField(cJSON *root, const char *key,
+                                    const std::vector<std::string> &list)
+{
+    cJSON *arr = cJSON_CreateArray();
+    if (arr == nullptr) {
+        return;
+    }
+    for (const auto &item : list) {
+        cJSON *strItem = cJSON_CreateString(item.c_str());
+        if (strItem == nullptr) {
+            continue;
+        }
+        cJSON_AddItemToArray(arr, strItem);
+    }
+    char *arrStr = cJSON_PrintUnformatted(arr);
+    if (arrStr != nullptr) {
+        cJSON_AddStringToObject(root, key, arrStr);
+        cJSON_free(arrStr);
+    }
+    cJSON_Delete(arr);
+}
+
+static uint32_t GetAvgSwitchTimeMs(uint32_t succCnt, uint64_t totalTimeMs)
+{
+    if (succCnt == 0) {
+        return 0;
+    }
+    return static_cast<uint32_t>(totalTimeMs / succCnt);
+}
+
+static std::string BuildRttDiffBucketStr(const std::map<RttDiffBucket, uint32_t> &bucketCnt)
+{
+    std::string result = "[";
+    for (int i = 0; i < RTT_DIFF_BUCKET_COUNT; ++i) {
+        if (i > 0) {
+            result += ",";
+        }
+        auto it = bucketCnt.find(static_cast<RttDiffBucket>(i));
+        result += std::to_string(it != bucketCnt.end() ? it->second : 0);
+    }
+    result += "]";
+    return result;
+}
+
+void WifiProChr::FillSwitchEnhanceStatisticsJson(cJSON *root)
+{
+    cJSON_AddNumberToObject(root, "SWITCH_ENHANCE_SWITCH_TOTAL_CNT", switchEnhanceTotalCnt_);
+    cJSON_AddNumberToObject(root, "SWITCH_ENHANCE_SWITCH_SUCC_CNT", switchEnhanceSuccCnt_);
+    cJSON_AddNumberToObject(root, "SWITCH_ENHANCE_SWITCH_FAIL_CNT", switchEnhanceFailCnt_);
+    cJSON_AddNumberToObject(root, "SWITCH_ENHANCE_CONN_TIMEOUT_CNT", switchEnhanceConnTimeoutCnt_);
+    cJSON_AddNumberToObject(root, "SWITCH_ENHANCE_ARPFAIL_CNT", switchEnhanceArpFailCnt_);
+    cJSON_AddNumberToObject(root, "SWITCH_ENHANCE_HTTPFAIL_CNT", switchEnhanceHttpFailCnt_);
+    cJSON_AddNumberToObject(root, "SWITCH_ENHANCE_AVG_SWITCH_TIME",
+                            GetAvgSwitchTimeMs(switchEnhanceSuccCnt_, switchEnhanceTotalSwitchTimeMs_));
+    AddStringListField(root, "SWITCH_ENHANCE_CONN_TIMEOUTLIST", switchEnhanceConnTimeoutList_);
+    AddStringListField(root, "SWITCH_ENHANCE_ARPFAIL_TIMELIST", switchEnhanceArpFailTimeList_);
+    AddStringListField(root, "SWITCH_ENHANCE_HTTPFAIL_TIMELIST", switchEnhanceHttpFailTimeList_);
+    cJSON_AddStringToObject(root, "SWITCH_ENHANCE_RTT_DIFF", BuildRttDiffBucketStr(rttDiffBucketCnt_).c_str());
 }
 }  // namespace Wifi
 }  // namespace OHOS

@@ -18,6 +18,7 @@
 #include <string>
 #include <iostream>
 #include <map>
+#include <vector>
 #include "cJSON.h"
 #include "wifi_logger.h"
 #include "wifi_pro_common.h"
@@ -65,6 +66,14 @@ enum ReasonNotSwitch {
     WIFIPRO_USER_SELECT,
 };
 
+enum RttDiffBucket {
+    RTT_DIFF_VERY_LOW = 0,           // diff < -50
+    RTT_DIFF_LOW,                    // -50 <= diff < 0
+    RTT_DIFF_NORMAL,                 // 0 <= diff < 50
+    RTT_DIFF_HIGH,                   // 50 <= diff < 100
+    RTT_DIFF_VERY_HIGH,              // diff >= 100
+    RTT_DIFF_BUCKET_COUNT
+};
 class WifiProChr {
     WifiProChr();
     ~WifiProChr();
@@ -84,15 +93,25 @@ public:
     void WriteWifiProSysEvent();
     cJSON *FillWifiProStatisticsJson();
     void FillWifiProStatisticsJsons(cJSON *root);
+    void FillSwitchEnhanceStatisticsJson(cJSON *root);
     void RecordGatewayInfoBeforeSwitch();
     void RecordGatewayInfoAfterSwitch();
-    
+    void RecordSwitchEnhanceStart();
+    void RecordSwitchEnhanceSuccess();
+    void RecordSwitchEnhanceConnTimeout();
+    void RecordSwitchEnhanceArpFail();
+    void RecordSwitchEnhanceHttpFail();
+    void NotifyGameRtt(int rtt);
 private:
+    static constexpr uint32_t SWITCH_ENHANCE_TIME_LIST_MAX_SIZE = 100;
     static constexpr int ARP_CHECK_TIME_MS = 300;
     static constexpr int SIMILAR_BSSID_PREFIX_LEN = 14;
+    static constexpr int64_t RTT_DIFF_TIMEOUT_US = 5 * 1000 * 1000; // 5s
     static constexpr const char *macAddrAllZero = "00:00:00:00:00:00";
     void DoOneArp(IpInfo &ipInfo, std::string &gatewayIp, std::string &ifaceName);
     bool IsSimilarBssid(std::string &bssid1, std::string &bssid2);
+    static void AddStringListField(cJSON *root, const char *key,
+                                   const std::vector<std::string> &list);
 
     int64_t wifiProStartTime_ = 0;
     int64_t wifiProSumTime_ = 0;
@@ -117,6 +136,20 @@ private:
     std::map<WifiProEventResult, uint32_t> selectNetResultCnt_ = {};
     std::map<WifiProEventResult, uint32_t> wifiProResultCnt_ = {};
     std::map<WifiProSwitchTimeCnt, uint32_t> wifiProSwitchTimeCnt_ = {};
+    uint32_t switchEnhanceTotalCnt_ = 0;
+    uint32_t switchEnhanceSuccCnt_ = 0;
+    uint32_t switchEnhanceFailCnt_ = 0;
+    uint32_t switchEnhanceConnTimeoutCnt_ = 0;
+    uint32_t switchEnhanceArpFailCnt_ = 0;
+    uint32_t switchEnhanceHttpFailCnt_ = 0;
+    uint64_t switchEnhanceTotalSwitchTimeMs_ = 0;
+    std::vector<std::string> switchEnhanceConnTimeoutList_;
+    std::vector<std::string> switchEnhanceArpFailTimeList_;
+    std::vector<std::string> switchEnhanceHttpFailTimeList_;
+    int lastRtt_ = 0;
+    int64_t lastRttTimeUs_ = 0;
+    bool isSwitchEnhanceSucc_ = false;
+    std::map<RttDiffBucket, uint32_t> rttDiffBucketCnt_ = {};
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -45,6 +45,7 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_sensor_scene.h"
 #include "app_network_speed_limit_service.h"
+#include "wifi_pro_chr.h"
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
 #include "telephony_observer_client.h"
 #include "telephony_types.h"
@@ -882,6 +883,9 @@ void CesEventSubscriber::OnReceiveGameInfoNotifyEvent(const OHOS::EventFwk::Comm
             std::string totalStr = matches[1].str();
             int total = CheckDataLegal(totalStr);
             AppNetworkSpeedLimitService::GetInstance().UpdateGameRttData(total);
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+            WifiProChr::GetInstance().NotifyGameRtt(total);
+#endif
         }
     }
 }

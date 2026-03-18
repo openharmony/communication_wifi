@@ -31,6 +31,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_config_center.h"
 #include "wifi_chr_adapter.h"
+#include "wifi_pro_chr.h"
 #include "block_connect_service.h"
 #include "wifi_randommac_helper.h"
 #include "define.h"
@@ -2658,6 +2659,9 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         HandleNetCheckResultIsWorking(netState, updatePortalAuthTime);
 #ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
         WifiProEnhance::GetInstance().SetEnhanceSwitchEnable(true);
+        if (linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_WIFIPRO_ENHANCE) {
+            WifiProChr::GetInstance().RecordSwitchEnhanceSuccess();
+        }
 #endif
     } else if (netState == SystemNetWorkState::NETWORK_IS_PORTAL) {
         HandleNetCheckResultIsPortal(netState, updatePortalAuthTime);
@@ -2665,6 +2669,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
 #ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
         if (linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_WIFIPRO_ENHANCE) {
             WifiProEnhance::GetInstance().SetEnhanceSwitchEnable(false);
+            WifiProChr::GetInstance().RecordSwitchEnhanceHttpFail();
         }
 #endif
         HandleNetCheckResultIsNotWorking(netState);
@@ -3559,6 +3564,7 @@ void StaStateMachine::ApReconnectState::HandleNetworkConnectionEvent(InternalMes
         } else {
 #ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
             WifiProEnhance::GetInstance().SetEnhanceSwitchEnable(false);
+            WifiProChr::GetInstance().RecordSwitchEnhanceArpFail();
 #endif
             NetworkBlockListManager::GetInstance().AddEnhanceSwitchBlocklist(bssid);
             WIFI_LOGI("add %{public}s to enhance switch blocklist", MacAnonymize(bssid).c_str());
@@ -3589,6 +3595,11 @@ bool StaStateMachine::ApReconnectState::ExecuteStateMsg(InternalMessagePtr msg)
             if (pStaStateMachine->enhanceService_ != nullptr) {
                 pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::NOTIFY_DELAY_DISCONNECTED,
                     pStaStateMachine->m_instId);
+            }
+#endif
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+            if (pStaStateMachine->reconnType_ == RECONNECT_TYPE_EHANCE_SWITCH) {
+                WifiProChr::GetInstance().RecordSwitchEnhanceConnTimeout();
             }
 #endif
             pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);

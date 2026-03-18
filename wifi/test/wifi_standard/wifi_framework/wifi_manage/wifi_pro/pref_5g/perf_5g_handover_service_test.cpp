@@ -104,6 +104,15 @@ HWTEST_F(Perf5gHandoverServiceTest, PrintRelationApsTest1, TestSize.Level1)
     perf5gHandoverService_->PrintRelationAps();
     EXPECT_EQ(perf5gHandoverService_->connectedAp_ == nullptr, false);
 }
+HWTEST_F(Perf5gHandoverServiceTest, PrintRelationApsTest2, TestSize.Level1)
+{
+    RelationAp relationAps1;
+    relationAps1.apInfo_.ssid = "ASUS_5G";
+    relationAps1.apInfo_.keyMgmt = "WPA-PSK";
+    relationAps1.apInfo_.bssid = "82:4a:**:**:**:06";
+    perf5gHandoverService_->relationAps_.push_back(relationAps1);
+    EXPECT_EQ(perf5gHandoverService_->connectedAp_ == nullptr, false);
+}
 HWTEST_F(Perf5gHandoverServiceTest, isNotAllowedPerfTest1, TestSize.Level1)
 {
     WifiLinkedInfo wifiLinkedInfo;

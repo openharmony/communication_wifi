@@ -20,6 +20,7 @@
 #include "serializer.h"
 #else
 #include "iremote_proxy.h"
+#include "wifi_device_callback_stub.h"
 #endif
 #include "i_wifi_device.h"
 #include "wifi_errcode.h"
@@ -741,6 +742,7 @@ private:
     std::atomic<bool> mRemoteDied;
     std::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;
+    sptr<WifiDeviceCallBackStub> deviceCallBackStub_ = nullptr;
 #endif
 private:
     void InitWifiState();

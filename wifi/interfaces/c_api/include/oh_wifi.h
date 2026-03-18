@@ -424,7 +424,7 @@ typedef struct {
     /**
      * @brief MAC address of the device.
      * When macType is 1 require ohos.permission.GET_WIFI_LOCAL_MAC permission
-     * Format: "AA:BB:CC:DD:EE:FF"
+     * format: "AA:BB:CC:DD:EE:FF"
      * For the maximum length, see {@link WIFI_MAC_LEN}.
      * @since 24
      */

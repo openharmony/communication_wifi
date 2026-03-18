@@ -111,7 +111,8 @@ Wifi_ResultCode OH_Wifi_GetLinkedInfo(OH_WifiLinkedInfo *info)
     info->isHidden = linkedInfo.ifHiddenSSID;
     info->isRestricted = linkedInfo.isDataRestricted;
     info->macType = linkedInfo.macType;
-    if (strncpy_s(info->macAddress, sizeof(info->macAddress), linkedInfo.macAddress.c_str(), linkedInfo.macAddress.length()) != 0) {
+    if (strncpy_s(info->macAddress, sizeof(info->macAddress), linkedInfo.macAddress.c_str(),
+        linkedInfo.macAddress.length()) != 0) {
         return WIFI_OPERATION_FAILED;
     }
     info->ipAddress = linkedInfo.ipAddress;

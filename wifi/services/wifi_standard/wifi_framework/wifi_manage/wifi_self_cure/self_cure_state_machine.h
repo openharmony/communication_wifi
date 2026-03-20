@@ -417,7 +417,7 @@ private:
     void RemoveAutoJoinBlockTime(const std::string& conditionName);
     void SetDeviceConfigForUpdateById(int networkId);
     void UpdateLastNetworkId(int uid, const std::string& ssid, const std::string& keyMgmt);
-    void HandleWifi7WithoutMldBackOff(const std::string &bssid);
+    void HandleWifi7WithoutMldBackoff(const std::string &bssid);
     void HandleWifi7MldBackoff(const std::string &bssid);
 
 private:

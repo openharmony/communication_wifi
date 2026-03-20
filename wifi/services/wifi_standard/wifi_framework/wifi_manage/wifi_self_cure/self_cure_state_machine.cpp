@@ -1924,9 +1924,8 @@ void SelfCureStateMachine::Wifi7SelfCureState::HandleWifi7ArpFailMsg()
     if (pSelfCureStateMachine_->lastSignalLevel_ >= SigLevel::SIG_LEVEL_3 &&
         !pSelfCureStateMachine_->CanArpReachable()) {
         ExecuteWifi7ArpFailSelfCure();
-    } 
-    pSelfCureStateMachine_->SwitchState(pSelfCureStateMachine_->pConnectedMonitorState_)
-
+    }
+    pSelfCureStateMachine_->SwitchState(pSelfCureStateMachine_->pConnectedMonitorState_);
 }
 
 void SelfCureStateMachine::Wifi7SelfCureState::ExecuteWifi7ArpFailSelfCure()
@@ -1937,8 +1936,8 @@ void SelfCureStateMachine::Wifi7SelfCureState::ExecuteWifi7ArpFailSelfCure()
     auto iter = wifi7BlackListCache.find(currentBssid);
     if (iter == wifi7BlackListCache.end()) {
         WIFI_LOGI("ExecuteWifi7ArpFailSelfCure start wifi7 mld back off");
-       pSelfCureStateMachine_->HandleWifi7MldBackoff(currentBssid);
-       IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+        pSelfCureStateMachine_->HandleWifi7MldBackoff(currentBssid);
+        IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
         if (pStaService == nullptr) {
             WIFI_LOGE("ExecuteWifi7ArpFailSelfCure Get pStaService failed!");
             return;
@@ -3237,7 +3236,7 @@ void SelfCureStateMachine::UpdateLastNetworkId(int uid, const std::string& ssid,
     WIFI_LOGI("%{public}s, update last networkId: %{public}d -> %{public}d", __func__, lastNetworkId, config.networkId);
 }
 
-void SelfCureStateMachine::HandleWifi7WithoutMldBackOff(const std::string &bssid)
+void SelfCureStateMachine::HandleWifi7WithoutMldBackoff(const std::string &bssid)
 {
     if (bssid.empty()) {
         WIFI_LOGE("%{public}s: lastconnect bssid is empty.", __FUNCTION__);

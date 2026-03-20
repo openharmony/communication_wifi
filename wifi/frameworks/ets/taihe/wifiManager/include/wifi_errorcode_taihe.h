@@ -51,7 +51,6 @@ public:
 private:
     static std::map<int32_t, int32_t> errCodeMap_;
     static std::map<int32_t, std::string> errMsgMap_;
-    static std::map<int32_t, std::string> errMsgMapV2_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -3428,5 +3428,14 @@ HWTEST_F(StaStateMachineTest, ReconnTypeInitialValueTest, TestSize.Level1)
 {
     EXPECT_EQ(pStaStateMachine->reconnType_, RECONNECT_TYPE_UNKNOWN);
 }
+
+HWTEST_F(StaStateMachineTest, DealMloStateChangeTest, TestSize.Level1)
+{
+    MloStateParam mloParam = {0};
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageObj(mloParam);
+    pStaStateMachine->pLinkState->DealMloStateChange(msg);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
 } // namespace Wifi
 } // namespace OHOS

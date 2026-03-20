@@ -1198,11 +1198,11 @@ void StaStateMachine::LinkState::DealMloStateChange(InternalMessagePtr msg)
     uint8_t feature = param.feature;
     uint8_t state = param.state;
     uint16_t reasonCode = param.reasonCode;
-    pStaStateMachine->DealSignalPollResult();
     if (feature == CoFeatureType::COFEATURE_TYPE_MLO) {
         if (pStaStateMachine->linkedInfo.wifiLinkType == WifiLinkType::WIFI7_EMLSR &&
             static_cast<int32_t>(state) != WifiLinkType::WIFI7_EMLSR) {
             pStaStateMachine->linkedInfo.wifiLinkType = static_cast<WifiLinkType>(state);
+            pStaStateMachine->DealSignalPollResult();
             pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_EMLSR_END, pStaStateMachine->linkedInfo);
             EnhanceWriteEmlsrExitReasonHiSysEvent(pStaStateMachine->linkedInfo.ssid, static_cast<int>(reasonCode));
         }

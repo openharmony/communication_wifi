@@ -59,6 +59,30 @@ std::map<int32_t, std::string> WifiIdlErrorCode::errMsgMap_ {
     { WifiTaiheErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING, "Operation failed because the service is being opened." },
 };
 
+std::map<int32_t, std::string> WifiIdlErrorCode::errMsgMapV2_ {
+    { ErrCode::WIFI_OPT_FAILED, "Operation failed." },
+    { ErrCode::WIFI_OPT_NOT_SUPPORTED, "Capability not supported." },
+    { ErrCode::WIFI_OPT_INVALID_PARAM, "Parameter error." },
+    { ErrCode::WIFI_OPT_FORBID_AIRPLANE, "Flight mode is enabled." },
+    { ErrCode::WIFI_OPT_FORBID_POWSAVING, "Power saving mode is enabled." },
+    { ErrCode::WIFI_OPT_PERMISSION_DENIED, "Permission denied." },
+    { ErrCode::WIFI_OPT_NON_SYSTEMAPP, "non-system application." },
+    { ErrCode::WIFI_OPT_OPEN_FAIL_WHEN_CLOSING, "Operation failed because the service is being closed." },
+    { ErrCode::WIFI_OPT_OPEN_SUCC_WHEN_OPENED, "Operation failed because the service is being opened." },
+    { ErrCode::WIFI_OPT_CLOSE_FAIL_WHEN_OPENING, "Operation failed because the service is being opened." },
+    { ErrCode::WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED, "Operation failed because the service is being closed." },
+    { ErrCode::WIFI_OPT_STA_NOT_OPENED, "Wi-Fi STA disabled." },
+    { ErrCode::WIFI_OPT_SCAN_NOT_OPENED, "Scanning service is not enabled." },
+    { ErrCode::WIFI_OPT_AP_NOT_OPENED, "Ap service is not enabled." },
+    { ErrCode::WIFI_OPT_INVALID_CONFIG, "Configuration is invalid." },
+    { ErrCode::WIFI_OPT_P2P_NOT_OPENED, "Wi-Fi P2P disabled." },
+    { ErrCode::WIFI_OPT_P2P_MAC_NOT_FOUND, "P2P MAC address not found." },
+    { ErrCode::WIFI_OPT_P2P_ERR_MAC_FORMAT, "P2P MAC address format error." },
+    { ErrCode::WIFI_OPT_P2P_ERR_INTENT, "P2P Internal service exception." },
+    { ErrCode::WIFI_OPT_P2P_ERR_SIZE_NW_NAME, "P2P wrong parameter size." },
+    { ErrCode::WIFI_OPT_MOVING_FREEZE_CTRL, "moving freeze scanning control" },
+};
+
 int32_t WifiIdlErrorCode::GetErrCode(const int32_t errCodeIn, const int32_t sysCap = 0)
 {
     auto iter = errCodeMap_.find(errCodeIn);
@@ -80,11 +104,10 @@ std::string WifiIdlErrorCode::GetErrMsg(const int32_t errCodeIn, int sysCap)
         return "";
     }
 
-    int32_t errCode = GetErrCode(errCodeIn, sysCap);
-    auto iter = errMsgMap_.find(errCode);
-    if (iter != errMsgMap_.end()) {
+    auto iter = errMsgMapV2_.find(errCodeIn);
+    if (iter != errMsgMapV2_.end()) {
         std::string errMessage = "BussinessError ";
-        errMessage.append(std::to_string(errCode)).append(": ").append(iter->second);
+        errMessage.append(std::to_string(errCodeIn)).append(": ").append(iter->second);
         return errMessage;
     }
     return "Inner error.";

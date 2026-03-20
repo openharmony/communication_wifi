@@ -276,8 +276,8 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
     WifiConfigCenter::GetInstance().SetLastNetworkId(linkedInfo.networkId);
     WifiConfigCenter::GetInstance().SetWifiSelfcureReset(false);
     pSelfCureStateMachine_->SetIsReassocWithFactoryMacAddress(0);
-    pSelfCureStateMachine_->lastSignalLevel_ = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band,
-        pSelfCureStateMachine_->instId_);
+    pSelfCureStateMachine_->lastSignalLevel_ = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi,
+        linkedInfo.band, pSelfCureStateMachine_->instId_);
     lastDnsFailedCnt_ = 0;
     SelfCureUtils::GetInstance().ClearDnsFailedCounter();
     if (!SetupSelfCureMonitor()) {
@@ -290,7 +290,7 @@ void SelfCureStateMachine::ConnectedMonitorState::GoInState()
         pSelfCureStateMachine_->fastArpDetectTime_ = WIFI7_FAST_ARP_DETECTED_MS;
     }
     pSelfCureStateMachine_->MessageExecutedLater(WIFI_CURE_CMD_PERIODIC_ARP_DETECTED,
-                                                pSelfCureStateMachine_->fastArpDetectTime_);
+        pSelfCureStateMachine_->fastArpDetectTime_);
     pSelfCureStateMachine_->MessageExecutedLater(CMD_INTERNET_STATUS_DETECT_INTERVAL,
                                                  INTERNET_STATUS_DETECT_INTERVAL_MS);
 }
@@ -1903,7 +1903,7 @@ void SelfCureStateMachine::Wifi7SelfCureState::GoOutState()
 
 bool SelfCureStateMachine::Wifi7SelfCureState::ExecuteStateMsg(InternalMessagePtr msg)
 {
-    if(msg == nullptr) {
+    if (msg == nullptr) {
         return false;
     }
     WIFI_LOGD("Wifi7SelfCureState-msgCode=%{public}d is received.\n", msg->GetMessageName());
@@ -3259,7 +3259,7 @@ void SelfCureStateMachine::HandleWifi7MldBackoff(const std::string &bssid)
         return;
     }
     WifiCategoryBlackListInfo wifi7BlackListInfo(ACTION_TYPE_MLD, GetCurrentTimeMilliSeconds());
-    WifiConfigCenter::GetInstance().InsertWifiCategoryBlackListCache(EVENT_BE_BLA_LIST,bssid, wifi7BlackListInfo);
+    WifiConfigCenter::GetInstance().InsertWifiCategoryBlackListCache(EVENT_BE_BLA_LIST, bssid, wifi7BlackListInfo);
     WIFI_LOGI("add %{public}s to wifi7 blalist.", MacAnonymize(bssid).c_str());
     SendBlaListToDriver(EVENT_BE_BLA_LIST);
 

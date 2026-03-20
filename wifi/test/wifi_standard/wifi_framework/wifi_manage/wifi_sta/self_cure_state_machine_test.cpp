@@ -307,21 +307,63 @@ public:
     void HandleWifi7WithoutMldBackoffTest()
     {
         LOGI("Enter HandleWifi7WithoutMldBackoffTest");
-        pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7WithoutMldBackoff(nullptr);
-        InternalMessagePtr msg;
-        WifiLinkedInfo info;
-        info.bssid = CURR_BSSID;
-        pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7WithoutMldBackoff(msg);
+        pSelfCureStateMachine_->HandleWifi7WithoutMldBackoff("");
+        pSelfCureStateMachine_->HandleWifi7WithoutMldBackoff(CURR_BSSID);
     }
 
     void HandleWifi7MldBackoffTest()
     {
         LOGI("Enter HandleWifi7MldBackoffTest");
-        pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7MldBackoff(nullptr);
-        InternalMessagePtr msg;
-        WifiLinkedInfo info;
-        info.bssid = CURR_BSSID;
-        pSelfCureStateMachine_->pDisconnectedMonitorState_->HandleWifi7MldBackoff(msg);
+        pSelfCureStateMachine_->HandleWifi7MldBackoff("");
+        pSelfCureStateMachine_->HandleWifi7MldBackoff(CURR_BSSID);
+    }
+
+    void NeedWifi7SelfCureTest001()
+    {
+        WifiLinkedInfo linkedInfo;
+        linkedInfo.rssi = -99;
+        linkedInfo.band = 1;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+        bool ret = pSelfCureStateMachine_->NeedWifi7SelfCure(CURR_BSSID);
+        EXPECT_FALSE(ret);
+    }
+
+    void NeedWifi7SelfCureTest002()
+    {
+        WifiLinkedInfo linkedInfo;
+        linkedInfo.rssi = -50;
+        linkedInfo.band = 1;
+        linkedInfo.supportedWifiCategory = WifiCategory::WIFI6;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+        bool ret = pSelfCureStateMachine_->NeedWifi7SelfCure(CURR_BSSID);
+        EXPECT_FALSE(ret);
+    }
+
+    void NeedWifi7SelfCureTest003()
+    {
+        WifiLinkedInfo linkedInfo;
+        linkedInfo.rssi = -50;
+        linkedInfo.band = 1;
+        linkedInfo.supportedWifiCategory = WifiCategory::WIFI7;
+        linkedInfo.isMloConnected = false;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+        bool ret = pSelfCureStateMachine_->NeedWifi7SelfCure(CURR_BSSID);
+        EXPECT_FALSE(ret);
+    }
+
+    void Wifi7SelfCureStateTest()
+    {
+        pSelfCureStateMachine_->pWifi7SelfCureState_->GoInState();
+        pSelfCureStateMachine_->pWifi7SelfCureState_->GoOutState();
+
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(WIFI_CURE_CMD_WIFI7_SELFCURE);
+        pSelfCureStateMachine_->pWifi7SelfCureState_->ExecuteStateMsg(msg);
+
+        pSelfCureStateMachine_->pWifi7SelfCureState_->ExecuteWifi7ArpFailSelfCure();
     }
 
     void HandleNetworkConnectFailCountTest()
@@ -1832,6 +1874,15 @@ HWTEST_F(SelfCureStateMachineTest, HandleWifi7BlacklistRecoverTest, TestSize.Lev
 HWTEST_F(SelfCureStateMachineTest, HandleWifi7WithoutMldBackoffTest, TestSize.Level1)
 {
     HandleWifi7WithoutMldBackoffTest();
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(SelfCureStateMachineTest, Wifi7MloSelfCureTest, TestSize.Level1)
+{
+    NeedWifi7SelfCureTest001();
+    NeedWifi7SelfCureTest002();
+    NeedWifi7SelfCureTest003();
+    Wifi7SelfCureStateTest();
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 

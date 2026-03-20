@@ -3236,6 +3236,7 @@ void SelfCureStateMachine::UpdateLastNetworkId(int uid, const std::string& ssid,
     WifiConfigCenter::GetInstance().SetLastNetworkId(config.networkId);
     WIFI_LOGI("%{public}s, update last networkId: %{public}d -> %{public}d", __func__, lastNetworkId, config.networkId);
 }
+
 void SelfCureStateMachine::HandleWifi7WithoutMldBackOff(const std::string &bssid)
 {
     if (bssid.empty()) {

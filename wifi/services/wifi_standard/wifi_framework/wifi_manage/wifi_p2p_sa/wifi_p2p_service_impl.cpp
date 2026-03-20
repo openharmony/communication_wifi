@@ -113,8 +113,11 @@ bool WifiP2pServiceImpl::Init()
 ErrCode WifiP2pServiceImpl::CheckCanEnableP2p(void)
 {
     if (WifiPermissionUtils::VerifySameProcessPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("EnableP2p:VerifySameProcessPermission PERMISSION_DENIED!");
-        return WIFI_OPT_PERMISSION_DENIED;
+        int callingUid = GetCallingUid();
+        if (callingUid != EDM_SERVICE_UID) {
+            WIFI_LOGE("EnableP2p:VerifySameProcessPermission PERMISSION_DENIED!");
+            return WIFI_OPT_PERMISSION_DENIED;
+        }
     }
     /**
      * when airplane mode opened, if the config "can_open_sta_when_airplanemode"

@@ -49,17 +49,6 @@ std::map<int32_t, int32_t> WifiIdlErrorCode::errCodeMap_ = {
 };
 
 std::map<int32_t, std::string> WifiIdlErrorCode::errMsgMap_ {
-    { WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED, "Operation failed." },
-    { WifiTaiheErrCode::WIFI_ERRCODE_WIFI_NOT_OPENED, "Wi-Fi STA disabled." },
-    { WifiTaiheErrCode::WIFI_ERRCODE_PERMISSION_DENIED, "Permission denied." },
-    { WifiTaiheErrCode::WIFI_ERRCODE_NON_SYSTEMAPP, "non-system application." },
-    { WifiTaiheErrCode::WIFI_ERRCODE_INVALID_PARAM, "Parameter error." },
-    { WifiTaiheErrCode::WIFI_ERRCODE_NOT_SUPPORTED, "Capability not supported." },
-    { WifiTaiheErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING, "Operation failed because the service is being closed." },
-    { WifiTaiheErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING, "Operation failed because the service is being opened." },
-};
-
-std::map<int32_t, std::string> WifiIdlErrorCode::errMsgMapV2_ {
     { ErrCode::WIFI_OPT_FAILED, "Operation failed." },
     { ErrCode::WIFI_OPT_NOT_SUPPORTED, "Capability not supported." },
     { ErrCode::WIFI_OPT_INVALID_PARAM, "Parameter error." },
@@ -104,8 +93,8 @@ std::string WifiIdlErrorCode::GetErrMsg(const int32_t errCodeIn, int sysCap)
         return "";
     }
 
-    auto iter = errMsgMapV2_.find(errCodeIn);
-    if (iter != errMsgMapV2_.end()) {
+    auto iter = errMsgMap_.find(errCodeIn);
+    if (iter != errMsgMap_.end()) {
         std::string errMessage = "BussinessError ";
         errMessage.append(std::to_string(errCodeIn)).append(": ").append(iter->second);
         return errMessage;

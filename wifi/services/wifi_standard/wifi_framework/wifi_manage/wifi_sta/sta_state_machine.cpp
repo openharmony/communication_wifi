@@ -1173,13 +1173,11 @@ void StaStateMachine::LinkState::DealWpaStateChange(InternalMessagePtr msg)
             pStaStateMachine->linkedInfo.ssid = ssid;
         }
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATING, pStaStateMachine->linkedInfo);
-        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
             static_cast<int>(WifiOperateState::STA_ASSOCIATING));
         WIFI_LOGI("DealWpaStateChange ASSOCIATING:ssid = %{public}s",
             SsidAnonymize(pStaStateMachine->linkedInfo.ssid).c_str());
     } else if (static_cast<SupplicantState>(status) == SupplicantState::ASSOCIATED) {
         pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_ASSOCIATED, pStaStateMachine->linkedInfo);
-        WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_ASSOC),
             static_cast<int>(WifiOperateState::STA_ASSOCIATED));
     }
     pStaStateMachine->linkedInfo.supplicantState = static_cast<SupplicantState>(status);

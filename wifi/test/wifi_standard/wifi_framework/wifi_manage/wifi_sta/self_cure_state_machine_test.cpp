@@ -321,7 +321,7 @@ public:
     void NeedWifi7SelfCureTest001()
     {
         WifiLinkedInfo linkedInfo;
-        linkedInfo.rssi = -99;
+        linkedInfo.rssi = RSSI_LEVEL_1_2G;
         linkedInfo.band = 1;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
@@ -332,7 +332,7 @@ public:
     void NeedWifi7SelfCureTest002()
     {
         WifiLinkedInfo linkedInfo;
-        linkedInfo.rssi = -50;
+        linkedInfo.rssi = RSSI_LEVEL_4_5G;
         linkedInfo.band = 1;
         linkedInfo.supportedWifiCategory = WifiCategory::WIFI6;
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
@@ -344,7 +344,7 @@ public:
     void NeedWifi7SelfCureTest003()
     {
         WifiLinkedInfo linkedInfo;
-        linkedInfo.rssi = -50;
+        linkedInfo.rssi = RSSI_LEVEL_4_5G;
         linkedInfo.band = 1;
         linkedInfo.supportedWifiCategory = WifiCategory::WIFI7;
         linkedInfo.isMloConnected = false;

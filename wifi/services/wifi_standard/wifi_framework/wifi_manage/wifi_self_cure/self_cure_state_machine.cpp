@@ -673,7 +673,6 @@ void SelfCureStateMachine::DisconnectedMonitorState::GoInState()
     pSelfCureStateMachine_->UpdateSelfcureState(WIFI_CURE_RESET_LEVEL_IDLE, false);
     pSelfCureStateMachine_->ClearDhcpOffer();
     pSelfCureStateMachine_->HandleWifiBlackListUpdateMsg();
-    pSelfCureStateMachine_->lastSignalLevel_ = -1;
 }
 
 void SelfCureStateMachine::DisconnectedMonitorState::GoOutState()

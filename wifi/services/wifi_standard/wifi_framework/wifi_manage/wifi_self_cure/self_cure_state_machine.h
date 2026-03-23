@@ -101,7 +101,6 @@ public:
 
     private:
         SelfCureStateMachine *pSelfCureStateMachine_;
-        int lastSignalLevel_ = -1;
         std::string lastConnectedBssid_;
         bool isMobileHotspot_ = false;
         bool isIpv4DnsEnabled_ = false;
@@ -148,8 +147,6 @@ public:
 
     private:
         void HandleWifi7BlacklistRecover(InternalMessagePtr msg);
-        void HandleWifi7WithoutMldBackoff(InternalMessagePtr msg);
-        void HandleWifi7MldBackoff(InternalMessagePtr msg);
         void HandleNetworkConnectFailCount(InternalMessagePtr msg);
         SelfCureStateMachine *pSelfCureStateMachine_;
         bool isSetStaticIpConfig_ = false;
@@ -273,6 +270,21 @@ public:
         void Wifi6ReassocSelfcure();
     };
 
+    class Wifi7SelfCureState : public State {
+    public:
+        explicit Wifi7SelfCureState(SelfCureStateMachine *selfCureStateMachine);
+        ~Wifi7SelfCureState() override;
+        void GoInState() override;
+        void GoOutState() override;
+        bool ExecuteStateMsg(InternalMessagePtr msg) override;
+    private:
+        void HandleWifi7ArpFailMsg();
+        void ExecuteWifi7ArpFailSelfCure();
+        
+    private:
+        SelfCureStateMachine *pSelfCureStateMachine_;
+    };
+
     /* *
      * @Description  Definition of NoInternetState class in SelfCureStateMachine.
      *
@@ -359,6 +371,7 @@ private:
     int GetCurrentRssi();
     std::string GetCurrentBssid();
     bool IsWifi6Network(std::string currConnectedBssid);
+    bool NeedWifi7SelfCure(const std::string &bssid);
     void PeriodicArpDetection();
     bool IsSuppOnCompletedState();
     bool IfPeriodicArpDetection();
@@ -404,6 +417,8 @@ private:
     void RemoveAutoJoinBlockTime(const std::string& conditionName);
     void SetDeviceConfigForUpdateById(int networkId);
     void UpdateLastNetworkId(int uid, const std::string& ssid, const std::string& keyMgmt);
+    void HandleWifi7WithoutMldBackoff(const std::string &bssid);
+    void HandleWifi7MldBackoff(const std::string &bssid);
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap_;
@@ -414,6 +429,7 @@ private:
     ConnectionSelfCureState *pConnectionSelfCureState_;
     InternetSelfCureState *pInternetSelfCureState_;
     Wifi6SelfCureState *pWifi6SelfCureState_;
+    Wifi7SelfCureState *pWifi7SelfCureState_;
     NoInternetState *pNoInternetState_;
 
     int instId_;
@@ -423,6 +439,7 @@ private:
     std::atomic<bool> isP2pConnected_ = false;
     std::atomic<bool> isNotAllowSelfcure_ = true;
     int arpDetectionFailedCnt_ = 0;
+    int fastArpDetectTime_ = FAST_ARP_DETECTED_MS;
     int selfCureReason_ = -1;
     int noTcpRxCounter_ = 0;
     uint32_t connectNetworkRetryCnt_ = 0;
@@ -434,6 +451,7 @@ private:
     bool isHasTestWifi6Reassoc_ = false;
     bool isReassocSelfCureWithRealMacAddress_ = false;
     int64_t connectedTime_ = 0;
+    int lastSignalLevel_ = -1;
     std::mutex dhcpFailedBssidLock_;
     std::vector<std::string> dhcpFailedBssids_;
     std::vector<std::string> dhcpFailedConfigKeys_;

@@ -304,17 +304,6 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         WifiConfigCenter::GetInstance().UpdateLinkedInfo(instId);
         WifiConfigCenter::GetInstance().SetLastConnStaFreq(info.frequency);
     }
-    #ifndef OHOS_ARCH_LITE
-    // 当网络检测成功时，取消断开任务
-    if (state == OperateResState::CONNECT_NETWORK_ENABLED && staManagerEventHandler_ != nullptr) {
-        bool hasTask = false;
-        staManagerEventHandler_->HasAsyncTask(TASK_NAME_WIFI_DISCONNECT, hasTask);
-        if (hasTask) {
-            WIFI_LOGI("Cancel TASK_NAME_WIFI_DISCONNECT due to network detection success");
-            staManagerEventHandler_->RemoveAsyncTask(TASK_NAME_WIFI_DISCONNECT);
-        }
-    }
-    #endif
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
     if (isReport) {
@@ -339,6 +328,15 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     }
 #endif
 #ifndef OHOS_ARCH_LITE
+    // 当网络检测成功时，取消断开任务
+    if (state == OperateResState::CONNECT_NETWORK_ENABLED && staManagerEventHandler_ != nullptr) {
+        bool hasTask = false;
+        staManagerEventHandler_->HasAsyncTask(TASK_NAME_WIFI_DISCONNECT, hasTask);
+        if (hasTask) {
+            WIFI_LOGI("Cancel TASK_NAME_WIFI_DISCONNECT due to network detection success");
+            staManagerEventHandler_->RemoveAsyncTask(TASK_NAME_WIFI_DISCONNECT);
+        }
+    }
     bool isConnected = (info.connState == CONNECTED) ? true : false;
     WifiProtectManager::GetInstance().UpdateWifiClientConnected(isConnected);
     if (state == OperateResState::DISCONNECT_DISCONNECTED) {

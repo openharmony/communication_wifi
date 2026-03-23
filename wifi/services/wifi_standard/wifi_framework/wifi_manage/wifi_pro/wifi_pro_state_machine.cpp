@@ -1431,7 +1431,7 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
         WIFI_LOGI("HandleScanResultInHasNet, Wifi2WifiSwitching.");
         return;
     }
-
+    pWifiProStateMachine_->perf5gHandoverService_.ScanResultUpdated(scanInfos);
     // Make sure the wifipro lag switch is done only once
     if (pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW && !qoeSwitch_) {
         WIFI_LOGI("HandleScanResultInHasNet, qoe has tried to switch.");
@@ -1502,8 +1502,6 @@ bool WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const s
 
 bool WifiProStateMachine::WifiHasNetState::Try5gHandover(const std::vector<InterScanInfo> &scanInfos)
 {
-    std::vector<InterScanInfo> mutableScanInfos = scanInfos;
-    pWifiProStateMachine_->perf5gHandoverService_.ScanResultUpdated(mutableScanInfos);
     pWifiProStateMachine_->targetBssid_ = pWifiProStateMachine_->perf5gHandoverService_.Switch5g();
     if (pWifiProStateMachine_->targetBssid_ != "") {
         WIFI_LOGI("Try5gHandover, perf 5g tried to switch.");

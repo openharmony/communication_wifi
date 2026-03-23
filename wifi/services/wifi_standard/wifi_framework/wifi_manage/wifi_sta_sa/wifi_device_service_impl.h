@@ -81,7 +81,7 @@ public:
 
     ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) override;
 
-    ErrCode ConnectToNetwork(int networkId, bool isCandidate) override;
+    ErrCode ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout) override;
 
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
 

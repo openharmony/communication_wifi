@@ -945,6 +945,22 @@ struct WifiDeviceConfig {
     }
 };
 
+/* Wi-Fi connection settings */
+struct ConnectSettings {
+    int networkId;
+    bool withUserAction;
+    int userActionTimeout;
+    bool addNetworkToSystem;
+
+    ConnectSettings()
+    {
+        networkId = -1;
+        withUserAction = false;
+        userActionTimeout = -1;
+        addNetworkToSystem = false;
+    }
+};
+
 enum class WifiState { DISABLING = 0, DISABLED = 1, ENABLING = 2, ENABLED = 3, UNKNOWN = 4 };
 
 enum class WifiDetailState {

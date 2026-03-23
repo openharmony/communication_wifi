@@ -1016,7 +1016,7 @@ ErrCode WifiDeviceServiceImpl::AllowAutoConnect(int32_t networkId, bool isAllowe
     return pService->AllowAutoConnect(networkId, isAllowed);
 }
 
-ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
+ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout)
 {
     if (IsOtherVapConnect()) {
         LOGI("ConnectToNetwork: p2p or hml connected, and hotspot is enable");
@@ -1081,7 +1081,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
             }
         }
         BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
-        return pService->ConnectToCandidateConfig(uid, networkId);
+        return pService->ConnectToCandidateConfig(uid, networkId, dialogTimeout);
     }
     return pService->ConnectToNetwork(networkId);
 }

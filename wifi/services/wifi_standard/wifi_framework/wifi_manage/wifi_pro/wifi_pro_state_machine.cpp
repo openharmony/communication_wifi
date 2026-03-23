@@ -1397,8 +1397,10 @@ ErrCode WifiProStateMachine::WifiHasNetState::ScanByPerf5gTable(const std::vecto
  
     if (allRelationAps.empty()) {
         WIFI_LOGE("relation Ap is empty! start select Net!");
-        HandleScanResultInHasNetInner(scanInfos);
-        return WIFI_OPT_SUCCESS;
+        if (HandleScanResultInHasNetInner(scanInfos)) {
+            return WIFI_OPT_SUCCESS;
+        }
+        return WIFI_OPT_FAILED;
     }
  
     WifiScanParams params;
@@ -1410,7 +1412,10 @@ ErrCode WifiProStateMachine::WifiHasNetState::ScanByPerf5gTable(const std::vecto
     if (pScanService == nullptr ||
         pScanService->ScanWithParam(params, false, ScanType::SCAN_TYPE_WIFIPRO) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("ScanByPerf5gTable failed!");
-        HandleScanResultInHasNetInner(scanInfos);
+        if (HandleScanResultInHasNetInner(scanInfos)) {
+            return WIFI_OPT_SUCCESS;
+        }
+        return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -1442,15 +1447,18 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
     qoeSwitch_ = false;
     if (isLpScanTriggered_) {
         isLpScanTriggered_ = false;
-        ScanByPerf5gTable(scanInfos);
+        if (ScanByPerf5gTable(scanInfos) != WIFI_OPT_SUCCESS) 
+        {
+            return;
+        }
     } else {
         if (HandleScanResultInHasNetInner(scanInfos)) {
             return;
         }
     }
     if (Try5gHandover(scanInfos)) {
-            WIFI_LOGI("HandleScanResultInHasNet: 5G handover successful.");
-            return;
+        WIFI_LOGI("HandleScanResultInHasNet: 5G handover successful.");
+        return;
     }
     if (TryHigherCategoryNetworkSelection(scanInfos)) {
         WIFI_LOGI("HandleScanResultInHasNet: Higher category selection successful.");

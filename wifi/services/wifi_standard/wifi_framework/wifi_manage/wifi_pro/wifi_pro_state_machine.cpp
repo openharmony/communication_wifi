@@ -1447,7 +1447,7 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
     qoeSwitch_ = false;
     if (isLpScanTriggered_) {
         isLpScanTriggered_ = false;
-        if (ScanByPerf5gTable(scanInfos) != WIFI_OPT_SUCCESS) 
+        if (ScanByPerf5gTable(scanInfos) == WIFI_OPT_SUCCESS) 
         {
             return;
         }

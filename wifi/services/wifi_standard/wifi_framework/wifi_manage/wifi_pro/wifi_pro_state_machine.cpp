@@ -1397,10 +1397,7 @@ ErrCode WifiProStateMachine::WifiHasNetState::ScanByPerf5gTable(const std::vecto
  
     if (allRelationAps.empty()) {
         WIFI_LOGE("relation Ap is empty! start select Net!");
-        if (HandleScanResultInHasNetInner(scanInfos)) {
-            return WIFI_OPT_SUCCESS;
-        }
-        return WIFI_OPT_FAILED;
+        return HandleScanResultInHasNetInner(scanInfos) ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
     }
  
     WifiScanParams params;
@@ -1412,10 +1409,7 @@ ErrCode WifiProStateMachine::WifiHasNetState::ScanByPerf5gTable(const std::vecto
     if (pScanService == nullptr ||
         pScanService->ScanWithParam(params, false, ScanType::SCAN_TYPE_WIFIPRO) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("ScanByPerf5gTable failed!");
-        if (HandleScanResultInHasNetInner(scanInfos)) {
-            return WIFI_OPT_SUCCESS;
-        }
-        return WIFI_OPT_FAILED;
+        return HandleScanResultInHasNetInner(scanInfos) ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
 }

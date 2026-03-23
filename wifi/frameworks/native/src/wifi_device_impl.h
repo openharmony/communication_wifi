@@ -169,9 +169,10 @@ public:
      *
      * @param networkId - network id
      * @param isCandidate - Whether is candidate
+     * @param dialogTimeout - Displays the dialog timeout for connecting to candidate networks.
      * @return ErrCode - operation result
      */
-    ErrCode ConnectToNetwork(int networkId, bool isCandidate) override;
+    ErrCode ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout = -1) override;
 
     /**
      * @Description Connect To a network base WifiDeviceConfig object

@@ -341,12 +341,11 @@ ErrCode WifiHotspotImpl::RegisterCallBack(const sptr<IWifiHotspotCallback> &call
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiHotspotProxy());
-    if (g_wifiHotspotCallbackStub == nullptr)
-    {
+    if (g_wifiHotspotCallbackStub == nullptr) {
         WIFI_LOGE("g_wifiHotspotCallbackStub is null! Cannot register callback.");
         return WIFI_OPT_FAILED;
     }
-    g_wifiHotspotCallbackStub->RegisterCallBack(callback);    
+    g_wifiHotspotCallbackStub->RegisterCallBack(callback);  
     sptr<IRemoteObject> remoteObj = g_wifiHotspotCallbackStub->AsObject();
     sptr<IRemoteObject> &cb = remoteObj;
     OHOS::ErrCode ret = client_->RegisterCallBack(cb, event);

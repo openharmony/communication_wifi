@@ -214,6 +214,7 @@ int WifiInternalEventDispatcher::SetSingleStaCallback(const sptr<IWifiDeviceCall
 
 sptr<IWifiDeviceCallBack> WifiInternalEventDispatcher::GetSingleStaCallback(int instId) const
 {
+    std::unique_lock<std::mutex> lock(mStaCallbackMutex);
     auto iter = mStaSingleCallback.find(instId);
     if (iter != mStaSingleCallback.end()) {
         return iter->second;
@@ -447,6 +448,7 @@ int WifiInternalEventDispatcher::SetSingleP2pCallback(const sptr<IWifiP2pCallbac
 
 sptr<IWifiP2pCallback> WifiInternalEventDispatcher::GetSingleP2pCallback() const
 {
+    std::unique_lock<std::mutex> lock(mP2pCallbackMutex);
     return mP2pSingleCallback;
 }
 

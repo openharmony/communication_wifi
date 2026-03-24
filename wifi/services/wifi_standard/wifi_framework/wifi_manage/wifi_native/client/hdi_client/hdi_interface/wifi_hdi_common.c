@@ -382,7 +382,8 @@ const uint8_t* HdiBssGetVendorBeacon(const uint8_t *ies, size_t len, size_t beac
 {
     const struct HdiElem *elem;
 
-    if (beaconIeLen == 0) {
+    if (ies == NULL || beaconIeLen == 0) {
+        LOGE("HdiBssGetVendorBeacon: invalid param");
         return NULL;
     }
 

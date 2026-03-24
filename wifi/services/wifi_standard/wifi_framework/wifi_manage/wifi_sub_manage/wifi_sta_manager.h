@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace Wifi {
 #ifndef OHOS_ARCH_LITE
-constexpr uint32_t BEACON_LOST_DELAY_TIME = 800;
+constexpr uint32_t BEACON_LOST_DELAY_TIME = 3000;
 constexpr uint32_t MAX_WIFI_DETECTION_TIME = 3;
 inline const std::string TASK_NAME_WIFI_NET_DETECTION = "WifiNetDetection";
 inline const std::string TASK_NAME_WIFI_DISCONNECT = "WifiDisconnect";

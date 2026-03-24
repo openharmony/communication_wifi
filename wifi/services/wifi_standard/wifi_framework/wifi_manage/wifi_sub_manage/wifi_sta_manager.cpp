@@ -255,7 +255,7 @@ void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_
         screenOffCnt_ = 0;
         return;
     }
-    WIFI_LOGI("Enter HandleBeaconLost, screenState:%{public}d", screenState);
+    WIFI_LOGI("Enter HandleBeaconLost,screenState:%{public}d,screenoff cnt:%{public}d", screenState, screenOffCnt_);
     if (screenState == MODE_STATE_CLOSE && screenOffCnt_ <= MAX_WIFI_DETECTION_TIME) {
         DealOffScreenAudioBeaconLost();
         screenOffCnt_ += 1;

@@ -345,7 +345,7 @@ ErrCode WifiHotspotImpl::RegisterCallBack(const sptr<IWifiHotspotCallback> &call
         WIFI_LOGE("g_wifiHotspotCallbackStub is null! Cannot register callback.");
         return WIFI_OPT_FAILED;
     }
-    g_wifiHotspotCallbackStub->RegisterCallBack(callback);  
+    g_wifiHotspotCallbackStub->RegisterCallBack(callback);
     sptr<IRemoteObject> remoteObj = g_wifiHotspotCallbackStub->AsObject();
     sptr<IRemoteObject> &cb = remoteObj;
     OHOS::ErrCode ret = client_->RegisterCallBack(cb, event);

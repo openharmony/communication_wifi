@@ -145,7 +145,7 @@ private:
     static void FreecfgInfo(CfgInfo* cfgInfo);
 private:
     std::unique_ptr<WifiEventHandler> mBroadcastThread = nullptr;
-    std::mutex mStaCallbackMutex;
+    mutable std::mutex mStaCallbackMutex;
     std::map<int, StaCallbackMapType> mStaCallbacks;
     std::map<int, StaCallbackInfo> mStaCallBackInfo;
     std::map<int, sptr<IWifiDeviceCallBack>> mStaSingleCallback;
@@ -157,7 +157,7 @@ private:
     std::map<int, HotspotCallbackMapType> mHotspotCallbacks;
     std::map<int, HotspotCallbackInfo> mHotspotCallbackInfo;
     std::map<int, sptr<IWifiHotspotCallback>> mHotspotSingleCallback;
-    std::mutex mP2pCallbackMutex;
+    mutable std::mutex mP2pCallbackMutex;
     P2pCallbackMapType mP2pCallbacks;
     P2pCallbackInfo mP2pCallbackInfo;
     sptr<IWifiP2pCallback> mP2pSingleCallback;

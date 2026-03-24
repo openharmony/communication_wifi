@@ -404,9 +404,11 @@ ErrCode WifiScanImpl::RegisterCallBack(const sptr<IWifiScanCallback> &callback, 
     RETURN_IF_FAIL(GetWifiScanProxy());
     int32_t pid = GetCallingPid();
     int32_t tokenId = GetCallingTokenId();
-    if (g_wifiScanCallbackStub != nullptr) {
-        g_wifiScanCallbackStub->RegisterCallBack(callback);
+    if (g_wifiScanCallbackStub == nullptr) {
+        WIFI_LOGE("g_wifiScanCallbackStub is null! Cannot register callback.");
+        return WIFI_OPT_FAILED;
     }
+    g_wifiScanCallbackStub->RegisterCallBack(callback);
     sptr<IRemoteObject> remoteObj = g_wifiScanCallbackStub->AsObject();
     sptr<IRemoteObject>& cb = remoteObj;
     OHOS::ErrCode ret = client_->RegisterCallBack(cb, pid, tokenId, event);

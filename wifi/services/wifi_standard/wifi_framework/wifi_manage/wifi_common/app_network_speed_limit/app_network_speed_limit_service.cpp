@@ -663,7 +663,7 @@ void AppNetworkSpeedLimitService::BackgroundAppChangedAction(const AsyncParamInf
     }
 }
 
-void AppNetworkSpeedLimitService::ForegroundAppStateChangedAction (const AsyncParamInfo &asyncParamInfo)
+void AppNetworkSpeedLimitService::ForegroundAppStateChangedAction(const AsyncParamInfo &asyncParamInfo)
 {
     if (m_bgUidSet.count(asyncParamInfo.uid) <= 0) {
         return;

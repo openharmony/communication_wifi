@@ -89,7 +89,7 @@ public:
 
     /**
      * Process state change callback
-     * 
+     *
      * @param processData Process data.
      */
     void OnProcessStateChanged(const AppExecFwk::ProcessData &processData) override;

@@ -99,7 +99,7 @@ private:
     void WifiConnectStateChanged();
     void ForegroundAppChangedAction(const std::string &bundleName);
     void BackgroundAppChangedAction(const AsyncParamInfo &asyncParamInfo);
-    void ForegroudAppStateChangedAction(const AsyncParamInfo &asyncParamInfo);
+    void ForegroundAppStateChangedAction (const AsyncParamInfo &asyncParamInfo);
     void HandleRequest(const AsyncParamInfo &asyncParamInfo);
     void SendLimitCmd2Drv(const int controlId, const int limitMode, const int enable,
         const int uid = -1);

@@ -389,7 +389,7 @@ void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParam
         BackgroundAppChangedAction(asyncParamInfo);
     } else if (asyncParamInfo.funcName == HANDLE_PROCESS_STATE_CHANGED_EVENT) {
         // when background limit speed app switch to foreground, need to update limit speed list
-        ForegroudAppStateChangedAction(asyncParamInfo);
+        ForegroundAppStateChangedAction (asyncParamInfo);
     } else if (asyncParamInfo.funcName == LIMIT_SPEED) {
         SendLimitCmd2Drv(asyncParamInfo.controlId, asyncParamInfo.limitMode, m_isHighPriorityTransmit);
     } else if (asyncParamInfo.funcName == RECEIVE_NETWORK_CONTROL) {
@@ -663,9 +663,9 @@ void AppNetworkSpeedLimitService::BackgroundAppChangedAction(const AsyncParamInf
     }
 }
 
-void AppNetworkSpeedLimitService::ForegroudAppStateChangedAction(const AsyncParamInfo &asyncParamInfo)
+void AppNetworkSpeedLimitService::ForegroundAppStateChangedAction (const AsyncParamInfo &asyncParamInfo)
 {
-    if (m_bgUidSet.count(asyncParamInfo.uid) < 0) {
+    if (m_bgUidSet.count(asyncParamInfo.uid) <= 0) {
         return;
     }
     if (!ShouldLimitSpeedInBackground(asyncParamInfo.bundleName)) {

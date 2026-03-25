@@ -255,7 +255,7 @@ void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_
         screenOffCnt_ = 0;
         return;
     }
-    WIFI_LOGI("Enter HandleBeaconLost, screenState:%{public}d", screenState);
+    WIFI_LOGI("Enter HandleBeaconLost,screenState:%{public}d,screenoff cnt:%{public}d", screenState, screenOffCnt_);
     if (screenState == MODE_STATE_CLOSE && screenOffCnt_ <= MAX_WIFI_DETECTION_TIME) {
         DealOffScreenAudioBeaconLost();
         screenOffCnt_ += 1;
@@ -304,7 +304,6 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         WifiConfigCenter::GetInstance().UpdateLinkedInfo(instId);
         WifiConfigCenter::GetInstance().SetLastConnStaFreq(info.frequency);
     }
-
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
     if (isReport) {
@@ -329,6 +328,15 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     }
 #endif
 #ifndef OHOS_ARCH_LITE
+    // 当网络检测成功时，取消断开任务
+    if (state == OperateResState::CONNECT_NETWORK_ENABLED && staManagerEventHandler_ != nullptr) {
+        bool hasTask = false;
+        staManagerEventHandler_->HasAsyncTask(TASK_NAME_WIFI_DISCONNECT, hasTask);
+        if (hasTask) {
+            WIFI_LOGI("Cancel TASK_NAME_WIFI_DISCONNECT due to network detection success");
+            staManagerEventHandler_->RemoveAsyncTask(TASK_NAME_WIFI_DISCONNECT);
+        }
+    }
     bool isConnected = (info.connState == CONNECTED) ? true : false;
     WifiProtectManager::GetInstance().UpdateWifiClientConnected(isConnected);
     if (state == OperateResState::DISCONNECT_DISCONNECTED) {
@@ -392,18 +400,6 @@ void WifiStaManager::DealInternetAccessChanged(int internetAccessStatus, int ins
     cbMsg.msgData = internetAccessStatus;
     cbMsg.id = instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-#ifndef OHOS_ARCH_LITE
-    if (staManagerEventHandler_ == nullptr) {
-        WIFI_LOGE("%{public}s staManagerEventHandler netWorkDetect is null", __func__);
-        return;
-    }
-    bool hasTask = false;
-    staManagerEventHandler_->HasAsyncTask(TASK_NAME_WIFI_DISCONNECT, hasTask);
-    if (hasTask && internetAccessStatus == SystemNetWorkState::NETWORK_IS_WORKING) {
-        WIFI_LOGI("Remove TASK_NAME_WIFI_DISCONNECT");
-        staManagerEventHandler_->RemoveAsyncTask(TASK_NAME_WIFI_DISCONNECT);
-    }
-#endif
 }
 
 #ifndef OHOS_ARCH_LITE

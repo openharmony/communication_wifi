@@ -1365,9 +1365,9 @@ ErrCode WifiProStateMachine::WifiHasNetState::ScanByPerf5gTable(const std::vecto
  
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
- 
     isConnected24G_ = WifiChannelHelper::GetInstance().IsValid24GHz(linkedInfo.frequency);
     isConnected5G_ = WifiChannelHelper::GetInstance().IsValid5GHz(linkedInfo.frequency);
+    pWifiProStateMachine_->perf5gHandoverService_.ScanResultUpdated(scanInfos);
  
     std::set<RelationAp> allRelationAps;
     const auto getRelationBssid = [this](RelationInfo& relationInfo) -> std::string& {

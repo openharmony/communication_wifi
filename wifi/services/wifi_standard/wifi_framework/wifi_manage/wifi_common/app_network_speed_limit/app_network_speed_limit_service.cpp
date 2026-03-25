@@ -213,8 +213,7 @@ ErrCode AppNetworkSpeedLimitService::GetAppList(std::vector<AppExecFwk::RunningP
     }
     if (getFgAppFlag) {
         for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
-            if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_FOREGROUND &&
-                iter->isFocused) {
+            if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) {
                 appList.push_back(*iter);
             }
         }

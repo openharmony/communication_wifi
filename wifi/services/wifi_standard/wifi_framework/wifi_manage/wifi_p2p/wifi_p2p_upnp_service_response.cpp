@@ -51,6 +51,10 @@ bool WifiP2pUpnpServiceResponse::ParseData()
     version = responseData.at(0) & 0xff;
     auto lastIt = responseData.begin() + 1;
     auto it = responseData.begin() + 1;
+    if (lastIt >= responseData.end()) {
+        return false;
+    }
+    uniqueServNames.clear();
     for (; it != responseData.end(); ) {
         if (*it == ',') {
             uniqueServNames.push_back(std::string(lastIt, it));
@@ -58,15 +62,23 @@ bool WifiP2pUpnpServiceResponse::ParseData()
         } else if (*it == ';') {
             uniqueServNames.push_back(std::string(lastIt, it));
             lastIt = it + 1;
+                if (lastIt >= responseData.end()) {
+                    return false;
+                }
             int svrNameLength = static_cast<int>(*lastIt);
             lastIt++;
+            if (lastIt >= responseData.end() || lastIt + svrNameLength > responseData.end()) {
+                return false;
+            }
             it = lastIt + svrNameLength;
             mSvrName = std::string(lastIt, it);
             return true;
         }
         ++it;
     }
-    uniqueServNames.push_back(std::string(lastIt, it));
+    if (lastIt < responseData.end()) {
+        uniqueServNames.push_back(std::string(lastIt, it));
+    }
     return true;
 }
 }  // namespace Wifi

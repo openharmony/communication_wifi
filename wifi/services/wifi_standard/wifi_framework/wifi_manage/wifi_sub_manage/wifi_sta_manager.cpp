@@ -400,18 +400,6 @@ void WifiStaManager::DealInternetAccessChanged(int internetAccessStatus, int ins
     cbMsg.msgData = internetAccessStatus;
     cbMsg.id = instId;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
-#ifndef OHOS_ARCH_LITE
-    if (staManagerEventHandler_ == nullptr) {
-        WIFI_LOGE("%{public}s staManagerEventHandler netWorkDetect is null", __func__);
-        return;
-    }
-    bool hasTask = false;
-    staManagerEventHandler_->HasAsyncTask(TASK_NAME_WIFI_DISCONNECT, hasTask);
-    if (hasTask && internetAccessStatus == SystemNetWorkState::NETWORK_IS_WORKING) {
-        WIFI_LOGI("Remove TASK_NAME_WIFI_DISCONNECT");
-        staManagerEventHandler_->RemoveAsyncTask(TASK_NAME_WIFI_DISCONNECT);
-    }
-#endif
 }
 
 #ifndef OHOS_ARCH_LITE

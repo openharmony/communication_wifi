@@ -234,11 +234,23 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, HandleProcessCreatedEventTest4, TestSi
     EXPECT_EQ(data.state, AppExecFwk::AppProcessState::APP_STATE_READY);
 }
 
+HWTEST_F(AppNetworkSpeedLimitServiceTest, HandleProcessStateChangedEventTest1, TestSize.Level1)
+{
+    AppExecFwk::ProcessData data;
+    data.bundleName = "xxx";
+    data.state = AppExecFwk::AppProcessState::APP_STATE_FOREGROUND;
+    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap = {{4, 3}};
+    AppNetworkSpeedLimitService::GetInstance().HandleProcessStateChangedEvent(data);
+    EXPECT_EQ(data.state, AppExecFwk::AppProcessState::APP_STATE_FOREGROUND);
+}
+
 HWTEST_F(AppNetworkSpeedLimitServiceTest, BackGroundAppChangedActionTest1, TestSize.Level1)
 {
     AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = false;
     AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap = {{4, 3}};
-    AppNetworkSpeedLimitService::GetInstance().BackgroundAppChangedAction("xxx");
+    AsyncParamInfo info;
+    info.bundleName = "xxx";
+    AppNetworkSpeedLimitService::GetInstance().BackgroundAppChangedAction(info);
     EXPECT_EQ(AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected, false);
 }
 
@@ -246,7 +258,9 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, BackGroundAppChangedActionTest2, TestS
 {
     AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
     AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap = {{3, 1}};
-    AppNetworkSpeedLimitService::GetInstance().BackgroundAppChangedAction("xxx");
+    AsyncParamInfo info;
+    info.bundleName = "xxx";
+    AppNetworkSpeedLimitService::GetInstance().BackgroundAppChangedAction(info);
     EXPECT_EQ(AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected, true);
 }
 

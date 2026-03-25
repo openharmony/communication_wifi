@@ -205,9 +205,7 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo, 
         default:
             break;
     }
-    if (dialogTimeout > 0) {
-        cJSON_AddNumberToObject(param, "dialogTimeout", dialogTimeout);
-    }
+    cJSON_AddNumberToObject(param, "dialogTimeout", dialogTimeout);
     char *cjsonStr = cJSON_PrintUnformatted(param);
     if (cjsonStr == nullptr) {
         WIFI_LOGE("Failed to print cJSON object");

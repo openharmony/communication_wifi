@@ -187,7 +187,7 @@ public:
      * @param dialogTimeout - Displays the dialog timeout for connecting to candidate networks.
      * @return ErrCode - operation result
      */
-    virtual ErrCode ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout = -1) = 0;
+    virtual ErrCode ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout = DEFAULT_DIALOG_TIMEOUT) = 0;
 
     /**
      * @Description Connect To a network base WifiDeviceConfig object

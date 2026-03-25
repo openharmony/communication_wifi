@@ -966,7 +966,13 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callba
     } else if (valueType == napi_object) {
         ConnectSettings connectSettings;
         GetJsObjToConnectSettings(env, argv[0], connectSettings);
-        WIFI_LOGI("ConnectToCandidateConfig userActionTimeout=%{public}d", connectSettings.userActionTimeout);
+        WIFI_LOGI("ConnectToCandidateConfig lllx networkId=%{public}d withUserAction=%{public}d "
+            "userActionTimeout=%{public}d addNetworkToSystem=%{public}d",
+            connectSettings.networkId, connectSettings.withUserAction, connectSettings.userActionTimeout,
+            connectSettings.addNetworkToSystem);
+        if (connectSettings.userActionTimeout <= 0 || connectSettings.userActionTimeout > MAX_DIALOG_TIMEOUT) {
+            WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+        }
         ret = wifiDevicePtr->ConnectToNetwork(connectSettings.networkId, true, connectSettings.userActionTimeout);
     } else {
         WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);

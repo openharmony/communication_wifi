@@ -27,6 +27,7 @@
 #include "wifi_service_manager.h"
 #include "ienhance_service.h"
 #include "app_network_speed_limit_chr.h"
+#include "wifi_cmd_client.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -47,6 +48,8 @@ namespace {
     const std::string RECEIVE_NETWORK_CONTROL = "ReceiveNetworkControlInfo";
     const std::string FEATURE_GAME_NO_SLEEP = "GameNoSleep";
     const std::string FEATURE_VPN_NO_LIMIT = "VpnNoLimit";
+    const std::string RX_LISTEN_ON = "Y";
+    const std::string RX_LISTEN_OFF = "N";
     const int GAME_BOOST_ENABLE = 1;
     const int GAME_BOOST_DISABLE = 0;
     const int BOOST_UDP_TYPE = 17;
@@ -818,6 +821,11 @@ void AppNetworkSpeedLimitService::UpdatePowerModeByScenes()
         return;
     }
 
+    const std::string &param = (targetMode == POWER_MODE_ON) ? RX_LISTEN_OFF : RX_LISTEN_ON;
+    int cmdRet = WifiCmdClient::GetInstance().SendCmdToDriver("wlan0", CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH, param);
+    if (cmdRet != 0) {
+        WIFI_LOGE("SendCmdToDriver RxListen failed, ret: %{public}d.", cmdRet);
+    }
     int frequency = POWER_MODE_FREQUENCY_DEFAULT;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode("wlan0", frequency, targetMode);
     if (ret != WIFI_HAL_OPT_OK) {
@@ -835,6 +843,11 @@ void AppNetworkSpeedLimitService::ResetPowerMode()
     activePowerScenes_.store(POWER_SCENE_NONE);
     if (cachedPowerMode_.load() == POWER_MODE_OFF) {
         return;
+    }
+    int cmdRet = WifiCmdClient::GetInstance().SendCmdToDriver(
+        "wlan0", CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH, RX_LISTEN_ON);
+    if (cmdRet != 0) {
+        WIFI_LOGE("SendCmdToDriver RxListen failed on reset, ret: %{public}d.", cmdRet);
     }
     int frequency = POWER_MODE_FREQUENCY_DEFAULT;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode("wlan0", frequency, POWER_MODE_OFF);

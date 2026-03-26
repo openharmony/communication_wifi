@@ -288,5 +288,10 @@ void AppStateObserver::OnProcessCreated(const AppExecFwk::ProcessData &processDa
 {
     AppNetworkSpeedLimitService::GetInstance().HandleProcessCreatedEvent(processData);
 }
+
+void AppStateObserver::OnProcessStateChanged(const AppExecFwk::ProcessData &processData)
+{
+    AppNetworkSpeedLimitService::GetInstance().HandleProcessStateChangedEvent(processData);
+}
 } // namespace Wifi
 } // namespace OHOS

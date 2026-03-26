@@ -783,7 +783,8 @@ void WifiDeviceStub::OnConnectTo(uint32_t code, MessageParcel &data, MessageParc
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     bool isCandidate = data.ReadBool();
     int networkId = data.ReadInt32();
-    ErrCode ret = ConnectToNetwork(networkId, isCandidate);
+    int dialogTimeout = data.ReadInt32();
+    ErrCode ret = ConnectToNetwork(networkId, isCandidate, dialogTimeout);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 

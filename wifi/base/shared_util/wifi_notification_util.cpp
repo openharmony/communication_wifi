@@ -175,7 +175,7 @@ static void AddP2pParam(WifiDialogType type, std::string comInfo, cJSON *param)
     }
 }
 
-void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
+void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo, int dialogTimeout)
 {
     WIFI_LOGI("ShowDialog, type=%{public}d", static_cast<int32_t>(type));
     AAFwk::Want want;
@@ -205,6 +205,7 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo)
         default:
             break;
     }
+    cJSON_AddNumberToObject(param, "dialogTimeout", dialogTimeout);
     char *cjsonStr = cJSON_PrintUnformatted(param);
     if (cjsonStr == nullptr) {
         WIFI_LOGE("Failed to print cJSON object");

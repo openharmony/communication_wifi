@@ -911,7 +911,7 @@ ErrCode WifiDeviceProxy::AllowAutoConnect(int32_t networkId, bool isAllowed)
     return ErrCode(reply.ReadInt32());
 }
 
-ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate)
+ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout)
 {
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
@@ -927,6 +927,7 @@ ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate)
     /* true-candidate config, false-normal config */
     data.WriteBool(isCandidate);
     data.WriteInt32(networkId);
+    data.WriteInt32(dialogTimeout);
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO), data, reply,
         option);
     if (error != ERR_NONE) {

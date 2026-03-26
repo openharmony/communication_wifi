@@ -68,7 +68,8 @@ constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 
 const int WIFI_DETECT_MODE_LOW = 1;
 const int WIFI_DETECT_MODE_HIGH = 2;
- 
+
+inline const int SECOND_TO_MILLI_SECOND = 1000;
 const std::string VOWIFI_DETECT_SET_PREFIX = "VOWIFI_DETECT SET ";
 
 StaService::StaService(int instId)
@@ -283,7 +284,7 @@ void StaService::NotifyCandidateApprovalStatus(CandidateApprovalStatus status) c
 #endif
 }
 
-ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId) const
+ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId, const int dialogTimeout) const
 {
     LOGI("Enter ConnectToCandidateConfig.\n");
     WifiDeviceConfig config;
@@ -309,7 +310,9 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId)
     }
     if (config.lastConnectTime <= 0) {
         WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(networkId);
-        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT, config.ssid);
+        int timeoutMs = dialogTimeout * SECOND_TO_MILLI_SECOND;
+        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT,
+            config.ssid, timeoutMs);
         return WIFI_OPT_SUCCESS;
     }
 #endif

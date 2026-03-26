@@ -74,7 +74,7 @@ public:
  
     int32_t StartAbility(OHOS::AAFwk::Want& want);
 
-    void ShowDialog(WifiDialogType type, std::string comInfo = "");
+    void ShowDialog(WifiDialogType type, std::string comInfo = "", int dialogTimeout = -1);
 
     void ShowSettingsDialog(WifiDialogType type, std::string settings);
 

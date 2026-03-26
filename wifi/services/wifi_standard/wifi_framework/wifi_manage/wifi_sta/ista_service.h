@@ -128,9 +128,11 @@ public:
      *
      * @param uid - call app uid
      * @param networkId - the candidate device network id
+     * @param dialogTimeout - Displays the dialog timeout for connecting to candidate networks.
      * @Return ErrCode - operation result
      */
-    virtual ErrCode ConnectToCandidateConfig(const int uid, const int networkId) = 0;
+    virtual ErrCode ConnectToCandidateConfig(const int uid, const int networkId,
+                                            int dialogTimeout = DEFAULT_DIALOG_TIMEOUT) = 0;
 
     /**
      * @Description Remove the wifi candidate device config equals to input network id

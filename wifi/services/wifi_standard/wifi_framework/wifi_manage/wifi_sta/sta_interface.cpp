@@ -182,12 +182,12 @@ ErrCode StaInterface::AddCandidateConfig(const int uid, const WifiDeviceConfig &
     return pStaService->AddCandidateConfig(uid, config, netWorkId);
 }
 
-ErrCode StaInterface::ConnectToCandidateConfig(const int uid, const int networkId)
+ErrCode StaInterface::ConnectToCandidateConfig(const int uid, const int networkId, int dialogTimeout)
 {
     LOGI("Enter ConnectToCandidateConfig.\n");
     std::lock_guard<std::mutex> lock(mutex);
     CHECK_NULL_AND_RETURN(pStaService, WIFI_OPT_FAILED);
-    return pStaService->ConnectToCandidateConfig(uid, networkId);
+    return pStaService->ConnectToCandidateConfig(uid, networkId, dialogTimeout);
 }
 
 ErrCode StaInterface::RemoveCandidateConfig(const int uid, const int networkId)

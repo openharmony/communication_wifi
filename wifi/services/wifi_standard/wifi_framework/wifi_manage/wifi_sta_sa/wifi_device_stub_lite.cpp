@@ -369,9 +369,11 @@ void WifiDeviceStub::OnConnectTo(uint32_t code, IpcIo *req, IpcIo *reply)
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     int networkId = 0;
     bool isCandidate = false;
+    int dialogTimeout = DEFAULT_DIALOG_TIMEOUT;
     (void)ReadBool(req, &isCandidate);
     (void)ReadInt32(req, &networkId);
-    ErrCode ret = ConnectToNetwork(networkId, isCandidate);
+    (void)ReadInt32(req, &dialogTimeout);
+    ErrCode ret = ConnectToNetwork(networkId, isCandidate, dialogTimeout);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
 }

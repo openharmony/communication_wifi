@@ -85,6 +85,8 @@ inline const int INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP = -1;
 inline const uint32_t ENABLE_AIDFS = 7;
 inline constexpr int DEFAULT_CONNECT_RSSI = -72;
 inline constexpr uint32_t MAX_LIFETIME_S = 0xFFFFFFFF;
+inline const int DEFAULT_DIALOG_TIMEOUT = 10;
+inline const int MAX_DIALOG_TIMEOUT = 30;
 enum class DisconnState {
     DEFAULTSTAT,
     DISCONNECTED,
@@ -942,6 +944,22 @@ struct WifiDeviceConfig {
         lastDetectTime = -1;
         lastDisconnectTime = -1;
         riskType = WifiRiskType::INVALID;
+    }
+};
+
+/* Wi-Fi connection settings */
+struct ConnectSettings {
+    int networkId;
+    bool withUserAction;
+    int userActionTimeout;
+    bool addNetworkToSystem;
+
+    ConnectSettings()
+    {
+        networkId = -1;
+        withUserAction = false;
+        userActionTimeout = DEFAULT_DIALOG_TIMEOUT;
+        addNetworkToSystem = false;
     }
 };
 

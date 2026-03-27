@@ -544,6 +544,17 @@ int WifiSettings::SetDeviceEphemeral(int networkId, bool isEphemeral)
     return 0;
 }
 
+int WifiSettings::SetDeviceUid(int networkId, int uid)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    auto iter = mWifiDeviceConfig.find(networkId);
+    if (iter == mWifiDeviceConfig.end()) {
+        return -1;
+    }
+    iter->second.uid = uid;
+    return 0;
+}
+
 int WifiSettings::SetDeviceAfterConnect(int networkId, int rssi)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);

@@ -49,6 +49,7 @@ struct AsyncParamInfo {
     WifiNetworkControlInfo networkControlInfo;
     std::string funcName;
     std::string bundleName;
+    int uid;
 
     AsyncParamInfo()
     {
@@ -56,6 +57,7 @@ struct AsyncParamInfo {
         limitMode = -1;
         funcName = "";
         bundleName = "";
+        uid = -1;
     }
 };
 
@@ -67,6 +69,7 @@ public:
     StaServiceCallback GetStaCallback() const;
     void HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData);
     void HandleProcessCreatedEvent(const AppExecFwk::ProcessData &processData);
+    void HandleProcessStateChangedEvent(const AppExecFwk::ProcessData &processData);
     void ReceiveNetworkControlInfo(const WifiNetworkControlInfo &networkControlInfo);
     void LimitSpeed(const int controlId, const int limitMode);
     void HandleNetworkConnectivityChange(int32_t bearType, int32_t code);
@@ -95,7 +98,8 @@ private:
     void AsyncLimitSpeed(const AsyncParamInfo &asyncParamInfo);
     void WifiConnectStateChanged();
     void ForegroundAppChangedAction(const std::string &bundleName);
-    void BackgroundAppChangedAction(const std::string &bundleName);
+    void BackgroundAppChangedAction(const AsyncParamInfo &asyncParamInfo);
+    void ForegroundAppStateChangedAction(const AsyncParamInfo &asyncParamInfo);
     void HandleRequest(const AsyncParamInfo &asyncParamInfo);
     void SendLimitCmd2Drv(const int controlId, const int limitMode, const int enable,
         const int uid = -1);

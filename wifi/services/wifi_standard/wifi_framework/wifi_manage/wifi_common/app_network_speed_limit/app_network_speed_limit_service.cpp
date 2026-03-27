@@ -27,6 +27,7 @@
 #include "wifi_service_manager.h"
 #include "ienhance_service.h"
 #include "app_network_speed_limit_chr.h"
+#include "wifi_cmd_client.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -42,10 +43,13 @@ namespace {
     const std::string HANDLE_WIFI_CONNECT_CHANGED = "HandleWifiConnectStateChanged";
     const std::string HANDLE_FOREGROUND_APP_CHANGED = "HandleForegroundAppChangedAction";
     const std::string HANDLE_PROCESS_CREATED_EVENT = "HandleProcessCreatedEvent";
+    const std::string HANDLE_PROCESS_STATE_CHANGED_EVENT = "HandleProcessStateChangedEvent";
     const std::string LIMIT_SPEED = "LimitSpeed";
     const std::string RECEIVE_NETWORK_CONTROL = "ReceiveNetworkControlInfo";
     const std::string FEATURE_GAME_NO_SLEEP = "GameNoSleep";
     const std::string FEATURE_VPN_NO_LIMIT = "VpnNoLimit";
+    const std::string RX_LISTEN_ON = "Y";
+    const std::string RX_LISTEN_OFF = "N";
     const int GAME_BOOST_ENABLE = 1;
     const int GAME_BOOST_DISABLE = 0;
     const int BOOST_UDP_TYPE = 17;
@@ -128,6 +132,7 @@ void AppNetworkSpeedLimitService::HandleForegroundAppChangedAction(const AppExec
         AsyncParamInfo asyncParamInfo;
         asyncParamInfo.funcName = __FUNCTION__;
         asyncParamInfo.bundleName = appStateData.bundleName;
+        asyncParamInfo.uid = appStateData.uid;
         AsyncLimitSpeed(asyncParamInfo);
     }
 }
@@ -137,15 +142,22 @@ void AppNetworkSpeedLimitService::HandleProcessCreatedEvent(const AppExecFwk::Pr
     if (processData.state == AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) {
         return;
     }
-    if (!ShouldLimitSpeedInBackground(processData.bundleName)) {
-        return;
-    }
-    if (m_bgUidSet.count(processData.uid) > 0) {
-        return;
-    }
     AsyncParamInfo asyncParamInfo;
     asyncParamInfo.funcName = HANDLE_PROCESS_CREATED_EVENT;
     asyncParamInfo.bundleName = processData.bundleName;
+    asyncParamInfo.uid = processData.uid;
+    AsyncLimitSpeed(asyncParamInfo);
+}
+
+void AppNetworkSpeedLimitService::HandleProcessStateChangedEvent(const AppExecFwk::ProcessData &processData)
+{
+    if (processData.state != AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) {
+        return;
+    }
+    AsyncParamInfo asyncParamInfo;
+    asyncParamInfo.funcName = HANDLE_PROCESS_STATE_CHANGED_EVENT;
+    asyncParamInfo.bundleName = processData.bundleName;
+    asyncParamInfo.uid = processData.uid;
     AsyncLimitSpeed(asyncParamInfo);
 }
 
@@ -204,8 +216,7 @@ ErrCode AppNetworkSpeedLimitService::GetAppList(std::vector<AppExecFwk::RunningP
     }
     if (getFgAppFlag) {
         for (auto iter = infos.begin(); iter != infos.end(); ++iter) {
-            if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_FOREGROUND &&
-                iter->isFocused) {
+            if (iter->state_ == AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) {
                 appList.push_back(*iter);
             }
         }
@@ -377,7 +388,11 @@ void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParam
     } else if (asyncParamInfo.funcName == HANDLE_FOREGROUND_APP_CHANGED) {
         ForegroundAppChangedAction(asyncParamInfo.bundleName);
     } else if (asyncParamInfo.funcName == HANDLE_PROCESS_CREATED_EVENT) {
-        BackgroundAppChangedAction(asyncParamInfo.bundleName);
+        // when background limit speed app create, need to update limit speed list
+        BackgroundAppChangedAction(asyncParamInfo);
+    } else if (asyncParamInfo.funcName == HANDLE_PROCESS_STATE_CHANGED_EVENT) {
+        // when background limit speed app switch to foreground, need to update limit speed list
+        ForegroundAppStateChangedAction (asyncParamInfo);
     } else if (asyncParamInfo.funcName == LIMIT_SPEED) {
         SendLimitCmd2Drv(asyncParamInfo.controlId, asyncParamInfo.limitMode, m_isHighPriorityTransmit);
     } else if (asyncParamInfo.funcName == RECEIVE_NETWORK_CONTROL) {
@@ -574,6 +589,14 @@ void AppNetworkSpeedLimitService::FilterLimitSpeedConfigs()
     for (const auto& audioPid : m_bgAudioPlaybackPidSet) {
         m_bgPidSet.erase(audioPid);
     }
+    std::unordered_set<int> filterBguidSet;
+    for (int uid : m_bgUidSet) {
+        if (m_fgUidSet.find(uid) == m_fgUidSet.end()) {
+            filterBguidSet.insert(uid);
+        }
+    }
+    // if speed-limiting app is runing both in foreground and background, need remove it from speed-liming list
+    m_bgUidSet = filterBguidSet;
 }
 
 void AppNetworkSpeedLimitService::WifiConnectStateChanged()
@@ -624,9 +647,34 @@ void AppNetworkSpeedLimitService::ForegroundAppChangedAction(const std::string &
     }
 }
 
-void AppNetworkSpeedLimitService::BackgroundAppChangedAction(const std::string &bundleName)
+void AppNetworkSpeedLimitService::BackgroundAppChangedAction(const AsyncParamInfo &asyncParamInfo)
 {
-    WIFI_LOGI("%{public}s accept background limit speed bundleName: %{public}s ", __FUNCTION__, bundleName.c_str());
+    if (m_bgUidSet.count(asyncParamInfo.uid) > 0) {
+        return;
+    }
+    if (!ShouldLimitSpeedInBackground(asyncParamInfo.bundleName)) {
+        return;
+    }
+    WIFI_LOGI("%{public}s accept bundleName: %{public}s ", __FUNCTION__, asyncParamInfo.bundleName.c_str());
+    if (m_isWifiConnected && m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] != BG_LIMIT_OFF) {
+        WIFI_LOGI("%{public}s high temp speed limit is running, update background app list", __FUNCTION__);
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_TEMP, m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP],
+            m_isHighPriorityTransmit);
+    }
+    if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+    }
+}
+
+void AppNetworkSpeedLimitService::ForegroundAppStateChangedAction(const AsyncParamInfo &asyncParamInfo)
+{
+    if (m_bgUidSet.count(asyncParamInfo.uid) <= 0) {
+        return;
+    }
+    if (!ShouldLimitSpeedInBackground(asyncParamInfo.bundleName)) {
+        return;
+    }
+    WIFI_LOGI("%{public}s accept bundleName: %{public}s ", __FUNCTION__, asyncParamInfo.bundleName.c_str());
     if (m_isWifiConnected && m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP] != BG_LIMIT_OFF) {
         WIFI_LOGI("%{public}s high temp speed limit is running, update background app list", __FUNCTION__);
         SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_TEMP, m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP],
@@ -773,6 +821,11 @@ void AppNetworkSpeedLimitService::UpdatePowerModeByScenes()
         return;
     }
 
+    const std::string &param = (targetMode == POWER_MODE_ON) ? RX_LISTEN_OFF : RX_LISTEN_ON;
+    int cmdRet = WifiCmdClient::GetInstance().SendCmdToDriver("wlan0", CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH, param);
+    if (cmdRet != 0) {
+        WIFI_LOGE("SendCmdToDriver RxListen failed, ret: %{public}d.", cmdRet);
+    }
     int frequency = POWER_MODE_FREQUENCY_DEFAULT;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode("wlan0", frequency, targetMode);
     if (ret != WIFI_HAL_OPT_OK) {
@@ -790,6 +843,11 @@ void AppNetworkSpeedLimitService::ResetPowerMode()
     activePowerScenes_.store(POWER_SCENE_NONE);
     if (cachedPowerMode_.load() == POWER_MODE_OFF) {
         return;
+    }
+    int cmdRet = WifiCmdClient::GetInstance().SendCmdToDriver(
+        "wlan0", CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH, RX_LISTEN_ON);
+    if (cmdRet != 0) {
+        WIFI_LOGE("SendCmdToDriver RxListen failed on reset, ret: %{public}d.", cmdRet);
     }
     int frequency = POWER_MODE_FREQUENCY_DEFAULT;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode("wlan0", frequency, POWER_MODE_OFF);

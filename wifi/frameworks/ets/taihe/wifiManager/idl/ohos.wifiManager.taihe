@@ -302,6 +302,7 @@ struct WifiLinkedInfo {
     isHiLinkNetwork: bool;
     isHiLinkProNetwork: Optional<bool>;
     wifiLinkType: Optional<WifiLinkType>;
+    wifiTxRxValid: bool;
 }
 
 struct IpInfo {

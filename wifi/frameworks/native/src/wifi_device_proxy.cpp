@@ -911,7 +911,7 @@ ErrCode WifiDeviceProxy::AllowAutoConnect(int32_t networkId, bool isAllowed)
     return ErrCode(reply.ReadInt32());
 }
 
-ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate)
+ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout)
 {
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
@@ -927,11 +927,42 @@ ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate)
     /* true-candidate config, false-normal config */
     data.WriteBool(isCandidate);
     data.WriteInt32(networkId);
+    data.WriteInt32(dialogTimeout);
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO), data, reply,
         option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
+ErrCode WifiDeviceProxy::ConnectToCandidateConfig(const ConnectSettings &connectSettings)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data, reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(connectSettings.networkId);
+    data.WriteBool(connectSettings.withUserAction);
+    data.WriteInt32(connectSettings.userActionTimeout);
+    data.WriteBool(connectSettings.addNetworkToSystem);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG), error);
         return WIFI_OPT_FAILED;
     }
     int exception = reply.ReadInt32();
@@ -1346,6 +1377,7 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
     info.riskType = static_cast<WifiRiskType>(reply.ReadInt32());
 #endif
+    info.wifiTxRxValid = reply.ReadBool();
 }
 
 void WifiDeviceProxy::ReadWifiSignalPollInfo(MessageParcel &reply, std::vector<WifiSignalPollInfo> &wifiSignalPollInfos)

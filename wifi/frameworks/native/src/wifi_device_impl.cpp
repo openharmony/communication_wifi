@@ -269,11 +269,18 @@ ErrCode WifiDeviceImpl::AllowAutoConnect(int32_t networkId, bool isAllowed)
     return client_->AllowAutoConnect(networkId, isAllowed);
 }
 
-ErrCode WifiDeviceImpl::ConnectToNetwork(int networkId, bool isCandidate)
+ErrCode WifiDeviceImpl::ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());
-    return client_->ConnectToNetwork(networkId, isCandidate);
+    return client_->ConnectToNetwork(networkId, isCandidate, dialogTimeout);
+}
+
+ErrCode WifiDeviceImpl::ConnectToCandidateConfig(const ConnectSettings &connectSettings)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->ConnectToCandidateConfig(connectSettings);
 }
 
 ErrCode WifiDeviceImpl::ConnectToDevice(const WifiDeviceConfig &config)

@@ -1016,7 +1016,7 @@ ErrCode WifiDeviceServiceImpl::AllowAutoConnect(int32_t networkId, bool isAllowe
     return pService->AllowAutoConnect(networkId, isAllowed);
 }
 
-ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
+ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout)
 {
     if (IsOtherVapConnect()) {
         LOGI("ConnectToNetwork: p2p or hml connected, and hotspot is enable");
@@ -1081,9 +1081,69 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate)
             }
         }
         BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
-        return pService->ConnectToCandidateConfig(uid, networkId);
+        return pService->ConnectToCandidateConfig(uid, networkId, dialogTimeout);
     }
     return pService->ConnectToNetwork(networkId);
+}
+
+ErrCode WifiDeviceServiceImpl::ConnectToCandidateConfig(const ConnectSettings &connectSettings)
+{
+    if (IsOtherVapConnect()) {
+        LOGI("ConnectToCandidateConfig: p2p or hml connected, and hotspot is enable");
+#ifndef OHOS_ARCH_LITE
+        WifiManager::GetInstance().GetWifiMultiVapManager()->VapConflictReport();
+#endif
+        WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
+    }
+#ifndef OHOS_ARCH_LITE
+    if (WifiManager::GetInstance().GetWifiMultiVapManager()->CheckEnhanceWifiConnected() &&
+        WifiManager::GetInstance().GetWifiMultiVapManager()->CheckP2pConnected()) {
+            IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+            if (pService == nullptr) {
+                WIFI_LOGE("Get P2P service failed");
+            } else {
+                ErrCode ret = pService->RemoveGroup();
+                WIFI_LOGI("P2P RemoveGroup ret is %{public}d", ret);
+            }
+        }
+#endif
+    int apiVersion = WifiPermissionUtils::GetApiVersion();
+    if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
+        WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("ConnectToCandidateConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_STA_REQUEST);
+
+    if (!IsStaServiceRunning()) {
+        WIFI_LOGE("ConnectToCandidateConfig: sta service is not running!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+
+    if (connectSettings.networkId < 0) {
+        WIFI_LOGE("ConnectToCandidateConfig: invalid networkId = %{public}d!", connectSettings.networkId);
+        return WIFI_OPT_INVALID_PARAM;
+    }
+
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("ConnectToCandidateConfig: pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    SetWifiConnectedMode();
+    int uid = 0;
+    if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
+        if (!IsWifiBrokerProcess(uid)) {
+            WIFI_LOGE("ConnectToCandidateConfig IsWifiBrokerProcess failed!");
+            return WIFI_OPT_INVALID_PARAM;
+        }
+    }
+    connectSettings.uid = uid;
+    BlockConnectService::GetInstance().EnableNetworkSelectStatus(connectSettings.networkId);
+    return pService->ConnectToCandidateConfig(connectSettings);
 }
 
 ErrCode WifiDeviceServiceImpl::ConnectToDevice(const WifiDeviceConfig &config)

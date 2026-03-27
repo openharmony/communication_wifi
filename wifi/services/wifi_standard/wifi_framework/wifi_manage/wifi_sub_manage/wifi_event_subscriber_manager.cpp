@@ -1025,6 +1025,7 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType,
 {
     if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
         NotifyCandidateApprovalStatus(CandidateApprovalStatus::USER_ACCEPT);
+        bool addNetworkToSystem = eventData.GetWant().GetBoolParam("addNetworkToSystem");
         int candidateNetworkId = WifiConfigCenter::GetInstance().GetSelectedCandidateNetworkId();
         if (candidateNetworkId == INVALID_NETWORK_ID) {
             WIFI_LOGI("OnReceiveNotificationEvent networkid is invalid");

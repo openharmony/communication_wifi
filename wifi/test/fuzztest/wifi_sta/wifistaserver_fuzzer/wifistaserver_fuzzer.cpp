@@ -468,6 +468,21 @@ void ConnectToCandidateConfigTest(FuzzedDataProvider& FDP)
     pStaService->ConnectToCandidateConfig(uid, networkId);
 }
 
+void ConnectToCandidateConfigWithSettingsTest(FuzzedDataProvider& FDP)
+{
+    ConnectSettings connectSettings;
+    connectSettings.networkId = FDP.ConsumeIntegral<int>();
+    connectSettings.withUserAction = FDP.ConsumeBool();
+    connectSettings.userActionTimeout = FDP.ConsumeIntegral<int>();
+    connectSettings.addNetworkToSystem = FDP.ConsumeBool();
+    WifiDeviceConfig config;
+    config.networkId = connectSettings.networkId;
+    config.uid = ID;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    pStaService->ConnectToCandidateConfig(connectSettings.networkId, connectSettings.networkId,
+        connectSettings.userActionTimeout);
+}
+
 void ConvertStringTest()
 {
     std::u16string wideText;
@@ -710,6 +725,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::StaAutoConnectServiceFuzzTest(FDP);
     OHOS::Wifi::StaInterfaceFuzzTest(FDP);
     OHOS::Wifi::ConnectToCandidateConfigTest(FDP);
+    OHOS::Wifi::ConnectToCandidateConfigWithSettingsTest(FDP);
     OHOS::Wifi::UpdateEapConfigTest(FDP);
     OHOS::Wifi::AddDeviceConfigTest(FDP);
     OHOS::Wifi::ConnectToNetworkTest(FDP);

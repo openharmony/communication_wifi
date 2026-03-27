@@ -325,6 +325,7 @@ void StaStateMachine::InitWifiLinkedInfo()
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
     linkedInfo.riskType = WifiRiskType::INVALID;
 #endif
+    linkedInfo.wifiTxRxValid = true;
     std::vector<WifiLinkedInfo> emptyMloLinkInfo;
     WifiConfigCenter::GetInstance().SaveMloLinkedInfo(emptyMloLinkInfo, m_instId);
 }
@@ -6357,6 +6358,8 @@ void StaStateMachine::HandleInternetAccessChanged(SystemNetWorkState internetAcc
         return;
     }
     lastInternetIconStatus_ = internetAccessStatus;
+    linkedInfo.wifiTxRxValid = lastInternetIconStatus_ == SystemNetWorkState::NETWORK_IS_WORKING ? true : false;
+    WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
     InvokeOnInternetAccessChanged(internetAccessStatus);
 }
 

@@ -209,6 +209,7 @@ static void ReadLinkedInfo(IpcIo *reply, WifiLinkedInfo &info)
     } else {
         info.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     }
+    (void)ReadBool(reply, &info.wifiTxRxValid);
 }
 
 static void ReadDhcpInfo(IpcIo *reply, IpInfo &info)
@@ -895,7 +896,7 @@ ErrCode WifiDeviceProxy::AllowAutoConnect(int32_t networkId, bool isAllowed)
     return ErrCode(owner.retCode);
 }
 
-ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate)
+ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout)
 {
     if (remoteDied_ || remote_ == nullptr) {
         WIFI_LOGE("failed to %{public}s, remoteDied_: %{public}d, remote_: %{public}d",
@@ -915,6 +916,7 @@ ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate)
     (void)WriteInt32(&req, 0);
     (void)WriteBool(&req, isCandidate);
     (void)WriteInt32(&req, networkId);
+    (void)WriteInt32(&req, dialogTimeout);
     owner.funcId = static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO);
     int error = remote_->Invoke(remote_, static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO), &req, &owner,
         IpcCallback);

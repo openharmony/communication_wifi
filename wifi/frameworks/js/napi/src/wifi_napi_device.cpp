@@ -912,6 +912,38 @@ NO_SANITIZE("cfi") napi_value RemoveCandidateConfig(napi_env env, napi_callback_
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
+static napi_value GetJsObjToConnectSettings(napi_env env, napi_value object, ConnectSettings &connectSettings)
+{
+    napi_valuetype valueType;
+    napi_value propValue;
+
+    napi_get_named_property(env, object, "networkId", &propValue);
+    napi_typeof(env, propValue, &valueType);
+    if (valueType == napi_number) {
+        napi_get_value_int32(env, propValue, &connectSettings.networkId);
+    }
+
+    napi_get_named_property(env, object, "withUserAction", &propValue);
+    napi_typeof(env, propValue, &valueType);
+    if (valueType == napi_boolean) {
+        napi_get_value_bool(env, propValue, &connectSettings.withUserAction);
+    }
+
+    napi_get_named_property(env, object, "userActionTimeout", &propValue);
+    napi_typeof(env, propValue, &valueType);
+    if (valueType == napi_number) {
+        napi_get_value_int32(env, propValue, &connectSettings.userActionTimeout);
+    }
+
+    napi_get_named_property(env, object, "addNetworkToSystem", &propValue);
+    napi_typeof(env, propValue, &valueType);
+    if (valueType == napi_boolean) {
+        napi_get_value_bool(env, propValue, &connectSettings.addNetworkToSystem);
+    }
+
+    return object;
+}
+
 NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
@@ -923,14 +955,29 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callba
 
     napi_valuetype valueType;
     napi_typeof(env, argv[0], &valueType);
-    WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
-
-    int networkId = -1;
-    napi_get_value_int32(env, argv[0], &networkId);
-    bool isCandidate = true;
 
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-    ErrCode ret = wifiDevicePtr->ConnectToNetwork(networkId, isCandidate);
+    ErrCode ret;
+
+    if (valueType == napi_number) {
+        int networkId = -1;
+        napi_get_value_int32(env, argv[0], &networkId);
+        ret = wifiDevicePtr->ConnectToNetwork(networkId, true);
+    } else if (valueType == napi_object) {
+        ConnectSettings connectSettings;
+        GetJsObjToConnectSettings(env, argv[0], connectSettings);
+        WIFI_LOGI("ConnectToCandidateConfig lllx networkId=%{public}d withUserAction=%{public}d "
+            "userActionTimeout=%{public}d addNetworkToSystem=%{public}d",
+            connectSettings.networkId, connectSettings.withUserAction, connectSettings.userActionTimeout,
+            connectSettings.addNetworkToSystem);
+        if (connectSettings.userActionTimeout <= 0 || connectSettings.userActionTimeout > MAX_DIALOG_TIMEOUT) {
+            WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+        }
+        ret = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
+    } else {
+        WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    }
+
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
@@ -1235,6 +1282,7 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
     SetValueInt32(env, "riskType", static_cast<int>(linkedInfo.riskType), result);
 #endif
+    SetValueBool(env, "wifiTxRxValid", linkedInfo.wifiTxRxValid, result);
 }
 
 /* This interface has not been fully implemented */

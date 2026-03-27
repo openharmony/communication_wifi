@@ -2512,6 +2512,8 @@ void StaStateMachine::StartDetectTimer(int detectType)
     } else if (detectType == DETECT_TYPE_DEFAULT) {
         StartTimer(static_cast<int>(CMD_START_NETCHECK), 0);
     } else if (detectType == DETECT_TYPE_CHECK_PORTAL_EXPERIED) {
+        WIFI_LOGI("Portal expired detect, count:%{public}d", portalExpiredDetectCount);
+        StopTimer(static_cast<int>(CMD_START_NETCHECK));
         StartTimer(static_cast<int>(CMD_START_NETCHECK), PORTAL_AUTH_EXPIRED_CHECK_TIME * PORTAL_MILLSECOND);
     }
 }
@@ -2523,7 +2525,9 @@ void StaStateMachine::PortalExpiredDetect()
             portalExpiredDetectCount++;
             StartDetectTimer(DETECT_TYPE_CHECK_PORTAL_EXPERIED);
         } else if (portalExpiredDetectCount == PORTAL_EXPERIED_DETECT_MAX_COUNT) {
+            WIFI_LOGI("Portal expired detect max, count:%{public}d", portalExpiredDetectCount);
             portalExpiredDetectCount = 0;
+            portalState = PortalState::UNAUTHED;
             auto config = getCurrentWifiDeviceConfig();
             EnhanceWritePortalAuthExpiredHisysevent(static_cast<int>(SystemNetWorkState::NETWORK_IS_PORTAL),
                 detectNum, config.lastConnectTime, config.portalAuthTime, false);

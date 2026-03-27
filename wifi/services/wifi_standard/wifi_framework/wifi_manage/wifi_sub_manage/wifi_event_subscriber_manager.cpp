@@ -1031,6 +1031,9 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType,
             WIFI_LOGI("OnReceiveNotificationEvent networkid is invalid");
             return;
         }
+        if (addNetworkToSystem) {
+            WifiSettings::GetInstance().SetDeviceUid(candidateNetworkId, -1);
+        }
         WifiSettings::GetInstance().SetDeviceEphemeral(candidateNetworkId, false);
         WifiSettings::GetInstance().SyncDeviceConfig();
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);

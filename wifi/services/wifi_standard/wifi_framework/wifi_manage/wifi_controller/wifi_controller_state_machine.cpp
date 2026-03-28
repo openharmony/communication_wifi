@@ -782,7 +782,7 @@ void WifiControllerMachine::EnableState::HandleSoftapOpen(int id)
 #endif
     // If WiFi is not connected, disable WiFi before starting hotspot
     if (pWifiControllerMachine->IsEnableScanOnlyOnHotspot() &&
-        pWifiControllerMachine->GetWifiRole() != ConcreteManagerRole::ROLE_CLIENT_SCAN_ONLY) {
+        pWifiControllerMachine->GetWifiRole() == ConcreteManagerRole::ROLE_CLIENT_STA) {
         pWifiControllerMachine->wifiStateBeforeHotspot_ = IsWifiEnable(INSTID_WLAN0);
         if (!pWifiControllerMachine->IsWifiConnected()) {
             WIFI_LOGI("%{public}s, WiFi is not connected, switch scan only", __func__);

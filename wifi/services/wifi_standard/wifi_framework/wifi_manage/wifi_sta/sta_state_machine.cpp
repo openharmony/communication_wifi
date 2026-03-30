@@ -1036,7 +1036,7 @@ bool StaStateMachine::LinkState::TryFastReconnect(int reason, const std::string 
     IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(pStaStateMachine->m_instId);
     if (pScanService != nullptr &&
         pScanService->ScanWithParam(params, true, ScanType::SCAN_TYPE_FAST_RECONNECT) == WIFI_OPT_SUCCESS) {
-        usleep(config.scanWaitTimeMs); // wait 100ms for single channel scan callback
+        usleep(config.scanWaitTimeMs * MSEC); // wait 100ms for single channel scan callback
         pStaStateMachine->lastFastReconnectTime_ = now;
         if (pStaStateMachine->StartConnectToNetwork(pStaStateMachine->linkedInfo.networkId, bssid,
             NETWORK_SELECTED_BY_FAST_RECONNECT) == WIFI_OPT_SUCCESS) {
@@ -5798,7 +5798,7 @@ void StaStateMachine::PreRoamScanIfExpired(const std::string &bssid)
     IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(m_instId);
     if (pScanService != nullptr &&
         pScanService->ScanWithParam(params, true, ScanType::SCAN_TYPE_WIFIPRO) == WIFI_OPT_SUCCESS) {
-        usleep(PRE_ROAM_SCAN_WAIT_TIME_MS); // wait for 100ms
+        usleep(PRE_ROAM_SCAN_WAIT_TIME_MS * MSEC); // wait for 100ms
     }
 }
 

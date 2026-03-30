@@ -127,11 +127,7 @@ public:
      * @param dialogTimeout - Displays the dialog timeout for connecting to candidate networks.
      * @Return ErrCode - operation result
      */
-    ErrCode ConnectToCandidateConfig(const int uid, const int networkId,
-                                    int dialogTimeout = DEFAULT_DIALOG_TIMEOUT) override;
-
-
-    ErrCode ConnectToCandidateConfig(const ConnectSettings &connectSettings) override;
+    ErrCode ConnectToCandidateConfig(ConnectSettings &connectSettings) override;
 
     /**
      * @Description Remove the wifi candidate device config equals to input network id

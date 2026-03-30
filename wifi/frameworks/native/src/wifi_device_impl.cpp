@@ -276,7 +276,7 @@ ErrCode WifiDeviceImpl::ConnectToNetwork(int networkId, bool isCandidate, int di
     return client_->ConnectToNetwork(networkId, isCandidate, dialogTimeout);
 }
 
-ErrCode WifiDeviceImpl::ConnectToCandidateConfig(const ConnectSettings &connectSettings)
+ErrCode WifiDeviceImpl::ConnectToCandidateConfig(ConnectSettings &connectSettings)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiDeviceProxy());

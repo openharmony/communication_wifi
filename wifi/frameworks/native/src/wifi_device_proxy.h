@@ -200,7 +200,7 @@ public:
      * @param connectSettings - ConnectSettings object containing network connection parameters
      * @return ErrCode - operation result
      */
-    ErrCode ConnectToCandidateConfig(const ConnectSettings &connectSettings) override;
+    ErrCode ConnectToCandidateConfig(ConnectSettings &connectSettings) override;
 
     /**
      * @Description Connect To a network base WifiDeviceConfig object

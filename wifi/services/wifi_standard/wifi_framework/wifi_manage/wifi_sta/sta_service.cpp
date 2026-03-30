@@ -284,16 +284,7 @@ void StaService::NotifyCandidateApprovalStatus(CandidateApprovalStatus status) c
 #endif
 }
 
-ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId, const int dialogTimeout) const
-{
-    ConnectSettings connectSettings;
-    connectSettings.uid = uid;
-    connectSettings.networkId = networkId;
-    connectSettings.userActionTimeout = dialogTimeout;
-    ConnectToCandidateConfig(connectSettings);
-}
-
-ErrCode StaService::ConnectToCandidateConfig(const ConnectSettings &connectSettings)
+ErrCode StaService::ConnectToCandidateConfig(ConnectSettings &connectSettings)
 {
     LOGI("Enter ConnectToCandidateConfig.\n");
     WifiDeviceConfig config;
@@ -319,10 +310,9 @@ ErrCode StaService::ConnectToCandidateConfig(const ConnectSettings &connectSetti
         return WIFI_OPT_NOT_SUPPORTED;
     }
     if (config.lastConnectTime <= 0) {
-        WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(networkId);
-        int timeoutMs = dialogTimeout * SECOND_TO_MILLI_SECOND;
-        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT,
-            comInfo, connectSettings.userActionTimeout, connectSettings.addNetworkToSystem);
+        WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(connectSettings.networkId);
+        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT, config.ssid,
+            connectSettings.userActionTimeout * SECOND_TO_MILLI_SECOND, connectSettings.addNetworkToSystem);
         return WIFI_OPT_SUCCESS;
     }
 #endif

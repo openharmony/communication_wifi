@@ -959,12 +959,12 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callba
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret;
 
+    ConnectSettings connectSettings;
     if (valueType == napi_number) {
         int networkId = -1;
         napi_get_value_int32(env, argv[0], &networkId);
-        ret = wifiDevicePtr->ConnectToNetwork(networkId, true);
+        connectSettings.networkId = networkId;
     } else if (valueType == napi_object) {
-        ConnectSettings connectSettings;
         GetJsObjToConnectSettings(env, argv[0], connectSettings);
         WIFI_LOGI("ConnectToCandidateConfig lllx networkId=%{public}d withUserAction=%{public}d "
             "userActionTimeout=%{public}d addNetworkToSystem=%{public}d",
@@ -973,10 +973,10 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callba
         if (connectSettings.userActionTimeout <= 0 || connectSettings.userActionTimeout > MAX_DIALOG_TIMEOUT) {
             WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
         }
-        ret = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
     } else {
         WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     }
+    ret = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
 
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
@@ -1065,7 +1065,10 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfigWithUserAction(napi_env en
     asyncContext->callbackFunc = CandidateConnectCallbackFunc;
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
-        context->errorCode = wifiDevicePtr->ConnectToNetwork(context->networkId, context->isCandidate);
+        ConnectSettings connectSettings;
+        connectSettings.networkId = context->networkId;
+        connectSettings.withUserAction = true;
+        context->errorCode = wifiDevicePtr->ConnectToNetwork(connectSettings);
     };
     asyncContext->completeFunc = CandidateConnectCompleteFunc;
 

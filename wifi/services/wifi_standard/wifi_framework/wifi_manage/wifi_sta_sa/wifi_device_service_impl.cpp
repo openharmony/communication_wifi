@@ -1042,17 +1042,10 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate,
         WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    if (isCandidate) {
-        if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("ConnectToCandidateConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
-            return WIFI_OPT_PERMISSION_DENIED;
-        }
-    } else {
-        if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED &&
-            WifiPermissionUtils::VerifyEnterpriseWifiConnectionPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("ConnectToNetwork:VerifyWifiConnectionPermission PERMISSION_DENIED!");
-            return WIFI_OPT_PERMISSION_DENIED;
-        }
+    if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED &&
+        WifiPermissionUtils::VerifyEnterpriseWifiConnectionPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("ConnectToNetwork:VerifyWifiConnectionPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
     }
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_STA_REQUEST);
 
@@ -1072,21 +1065,10 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate,
         return WIFI_OPT_STA_NOT_OPENED;
     }
     SetWifiConnectedMode();
-    if (isCandidate) {
-        int uid = 0;
-        if (CheckCallingUid(uid) != WIFI_OPT_SUCCESS) {
-            if (!IsWifiBrokerProcess(uid)) {
-                WIFI_LOGE("ConnectToNetwork IsWifiBrokerProcess failed!");
-                return WIFI_OPT_INVALID_PARAM;
-            }
-        }
-        BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
-        return pService->ConnectToCandidateConfig(uid, networkId, dialogTimeout);
-    }
     return pService->ConnectToNetwork(networkId);
 }
 
-ErrCode WifiDeviceServiceImpl::ConnectToCandidateConfig(const ConnectSettings &connectSettings)
+ErrCode WifiDeviceServiceImpl::ConnectToCandidateConfig(ConnectSettings &connectSettings)
 {
     if (IsOtherVapConnect()) {
         LOGI("ConnectToCandidateConfig: p2p or hml connected, and hotspot is enable");

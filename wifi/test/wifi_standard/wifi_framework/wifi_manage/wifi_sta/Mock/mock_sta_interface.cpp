@@ -94,11 +94,6 @@ ErrCode StaInterface::AddCandidateConfig(const int uid, const WifiDeviceConfig &
     LOGI("Enter AddCandidateConfig.\n");
         return WIFI_OPT_SUCCESS;
 }
-ErrCode StaInterface::ConnectToCandidateConfig(const int uid, const int networkId, int dialogTimeout)
-{
-    LOGI("Enter ConnectToCandidateConfig.\n");
-    return WIFI_OPT_SUCCESS;
-}
 
 ErrCode StaInterface::RemoveCandidateConfig(const int uid, const int networkId)
 {

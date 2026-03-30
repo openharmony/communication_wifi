@@ -942,7 +942,7 @@ ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate, int d
     return ErrCode(reply.ReadInt32());
 }
 
-ErrCode WifiDeviceProxy::ConnectToCandidateConfig(const ConnectSettings &connectSettings)
+ErrCode WifiDeviceProxy::ConnectToCandidateConfig(ConnectSettings &connectSettings)
 {
     if (mRemoteDied) {
         WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);

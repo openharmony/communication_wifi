@@ -170,7 +170,7 @@ public:
      * @param connectSettings - ConnectSettings object containing network connection parameters
      * @return ErrCode - operation result
      */
-    virtual ErrCode ConnectToCandidateConfig(const ConnectSettings &connectSettings) = 0;
+    virtual ErrCode ConnectToCandidateConfig(ConnectSettings &connectSettings) = 0;
 
     /**
      * @Description Connect To a network base WifiDeviceConfig object.

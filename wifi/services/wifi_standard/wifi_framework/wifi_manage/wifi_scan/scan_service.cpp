@@ -2903,7 +2903,12 @@ bool ScanService::AllowLpScan(ScanType scanType)
 bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
 {
     LOGD("Enter AllowScanByHid2dState.\n");
-    Hid2dUpperScene softbusScene, castScene, shareScene, mouseCrossScene, miracastScene, gameScene;
+    Hid2dUpperScene softbusScene;
+    Hid2dUpperScene castScene; 
+    Hid2dUpperScene shareScene; 
+    Hid2dUpperScene mouseCrossScene;
+    Hid2dUpperScene miracastScene;
+    Hid2dUpperScene gameScene;
     WifiP2pLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(SOFT_BUS_SERVICE_UID, softbusScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID, castScene);

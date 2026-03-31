@@ -293,6 +293,13 @@ void WifiEventSubscriberManager::HandleMouseCrossServiceChange(bool add)
     }
 }
 
+void WifiEventSubscriberManager::HandleGameServiceChange(bool add)
+{
+    if (!add) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(GAMESERVICE_SA_UID);
+    }
+}
+
 #ifdef FEATURE_P2P_SUPPORT
 void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bool add)
 {
@@ -346,6 +353,9 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             break;
         case MOUSE_CROSS_SERVICE_ID:
             HandleMouseCrossServiceChange(add);
+            break;
+        case GAMESERVICE_SA_ID:
+            HandleGameServiceChange(add);
             break;
         case COMM_ETHERNET_MANAGER_SYS_ABILITY_ID:
             HandleEthernetServiceChange(systemAbilityId, add);

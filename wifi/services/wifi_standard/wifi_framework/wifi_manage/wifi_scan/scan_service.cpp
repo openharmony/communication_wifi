@@ -2904,8 +2904,8 @@ bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
 {
     LOGD("Enter AllowScanByHid2dState.\n");
     Hid2dUpperScene softbusScene;
-    Hid2dUpperScene castScene; 
-    Hid2dUpperScene shareScene; 
+    Hid2dUpperScene castScene;
+    Hid2dUpperScene shareScene;
     Hid2dUpperScene mouseCrossScene;
     Hid2dUpperScene miracastScene;
     Hid2dUpperScene gameScene;

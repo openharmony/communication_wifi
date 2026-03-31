@@ -57,6 +57,8 @@ constexpr const char* DEFAULT_STARTUP_WIFI_ENABLE = "false";
 constexpr const char* STARTUP_WIFI_ENABLE = "true";
 constexpr int PROP_PRODUCT_DEVICE_TYPE_LEN = 30;
 constexpr int PRODUCT_DEVICE_TYPE_LEN = 5;
+constexpr int PROVIDED_DEVICE_FEATURES_LEN = 10;
+constexpr int PROVIDED_DEVICE_FEATURES_CMP_LEN = 5;
 constexpr const char* PRODUCT_DEVICE_TYPE = "const.product.devicetype";
 constexpr const char* DEFAULT_PRODUCT_DEVICE_TYPE = "default";
 constexpr const char* PHONE_PRODUCT_DEVICE_TYPE = "phone";
@@ -75,6 +77,8 @@ constexpr int FSS_ENABLE_LEN = 4;
 constexpr const char* PROP_FSS_ENABLE = "const.wifi.hw_fss_enable";
 constexpr const char* DEFAULT_FSS_ENABLE = "false";
 constexpr const char* FSS_ENABLE = "true";
+constexpr const char* KIDWATCH_MODE_DEFAULT = "0";
+constexpr const char* PRODUCT_PROVIDED_DEVICE_FEATURES = "const.product.providedDeviceFeatures";
 #ifndef INIT_LIB_ENABLE
 constexpr int EC_INVALID = -9;  // using sysparam_errno.h, invalid param value
 #endif
@@ -600,6 +604,21 @@ int GetDeviceType()
         }
     }
     return ProductDeviceType::DEFAULT;
+}
+
+bool IsKidWatchDevice()
+{
+    if (GetDeviceType() == ProductDeviceType::WEARABLE) {
+        char preValue[PROVIDED_DEVICE_FEATURES_LEN] = {0};
+        int errCode = GetParamValue(
+            PRODUCT_PROVIDED_DEVICE_FEATURES, KIDWATCH_MODE_DEFAULT, preValue, PROVIDED_DEVICE_FEATURES_LEN);
+        if (errCode > 0) {
+            if (strncmp(preValue, "child", PROVIDED_DEVICE_FEATURES_CMP_LEN) == 0) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 bool CheckDeviceTypeByVendorCountry()

@@ -247,13 +247,12 @@ ErrCode WifiProService::InitWifiIntelligence()
 {
     WIFI_LOGI("Enter InitWifiIntelligence.");
     if (instId_ == INSTID_WLAN0) {
-        pWifiIntelligenceStateMachine_ = new (std::nothrow) WifiIntelligenceStateMachine(instId_);
+        pWifiIntelligenceStateMachine_ = std::make_shared<WifiIntelligenceStateMachine>(instId_);
         if (pWifiIntelligenceStateMachine_ == nullptr) {
             WIFI_LOGE("Alloc WifiIntelligenceStateMachine failed.");
             return WIFI_OPT_FAILED;
         }
         if (pWifiIntelligenceStateMachine_->Initialize() != WIFI_OPT_SUCCESS) {
-            delete pWifiIntelligenceStateMachine_;
             pWifiIntelligenceStateMachine_ = nullptr;
             WIFI_LOGE("Init WifiIntelligenceStateMachine failed.");
             return WIFI_OPT_FAILED;
@@ -269,7 +268,6 @@ ErrCode WifiProService::UninitWifiIntelligence()
 {
     WIFI_LOGI("Enter UninitWifiIntelligence.");
     if (pWifiIntelligenceStateMachine_) {
-        delete pWifiIntelligenceStateMachine_;
         pWifiIntelligenceStateMachine_ = nullptr;
     }
     return WIFI_OPT_SUCCESS;

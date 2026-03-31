@@ -74,6 +74,7 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
+        WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine_ { nullptr };
     };
 
     /**
@@ -153,6 +154,7 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
+        WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine_ { nullptr };
     };
 
     /**
@@ -167,6 +169,7 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
+        WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine_ { nullptr };
     };
 
     ErrCode Initialize();
@@ -204,7 +207,7 @@ private:
 
 private:
     int32_t instId_ { 0 };
-
+    std::shared_ptr<ApInfoHelper> apInfoHelper_;
     DefaultState *pDefaultState_ { nullptr };
     InitialState *pInitialState_ { nullptr };
     EnabledState *pEnabledState_ { nullptr };

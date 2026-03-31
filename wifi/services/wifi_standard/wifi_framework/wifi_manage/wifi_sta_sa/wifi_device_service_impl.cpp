@@ -2837,6 +2837,7 @@ ErrCode WifiDeviceServiceImpl::SetBtCoexistState(CoexistState state, CoexistReas
 }
 
 
+ 
 ErrCode WifiDeviceServiceImpl::SetWifiCapability(int capability, bool enable)
 {
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
@@ -2859,6 +2860,8 @@ ErrCode WifiDeviceServiceImpl::SetWifiCapability(int capability, bool enable)
                 } else {
                     return pWifiProService->UninitWifiIntelligence();
                 }
+            } else {
+                return WIFI_OPT_NOT_SUPPORTED;
             }
         }
         default:
@@ -2868,7 +2871,7 @@ ErrCode WifiDeviceServiceImpl::SetWifiCapability(int capability, bool enable)
     return WIFI_OPT_NOT_SUPPORTED;
 #endif
 }
-
+ 
 ErrCode WifiDeviceServiceImpl::GetWifiCapability(int capability, bool &enabled)
 {
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
@@ -2876,7 +2879,7 @@ ErrCode WifiDeviceServiceImpl::GetWifiCapability(int capability, bool &enabled)
         WIFI_LOGE("GetWifiCapability:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
-
+ 
     enabled = WifiSettings::GetInstance().GetWifiCapability(capability);
     return WIFI_OPT_SUCCESS;
 #else

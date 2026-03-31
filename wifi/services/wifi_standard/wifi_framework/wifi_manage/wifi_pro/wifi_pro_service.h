@@ -49,7 +49,7 @@ public:
 #endif
 private:
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
-    WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine_ { nullptr };
+    std::shared_ptr<WifiIntelligenceStateMachine> pWifiIntelligenceStateMachine_ { nullptr };
 #endif
     std::shared_ptr<WifiProStateMachine> pWifiProStateMachine_ { nullptr };
     int32_t instId_ { 0 };

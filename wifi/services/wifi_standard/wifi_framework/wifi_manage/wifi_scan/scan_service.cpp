@@ -2903,13 +2903,14 @@ bool ScanService::AllowLpScan(ScanType scanType)
 bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
 {
     LOGD("Enter AllowScanByHid2dState.\n");
-    Hid2dUpperScene softbusScene, castScene, shareScene, mouseCrossScene, miracastScene;
+    Hid2dUpperScene softbusScene, castScene, shareScene, mouseCrossScene, miracastScene, gameScene;
     WifiP2pLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(SOFT_BUS_SERVICE_UID, softbusScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID, castScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(MIRACAST_SERVICE_UID, miracastScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(SHARE_SERVICE_UID, shareScene);
     WifiConfigCenter::GetInstance().GetHid2dUpperScene(MOUSE_CROSS_SERVICE_UID, mouseCrossScene);
+    WifiConfigCenter::GetInstance().GetHid2dUpperScene(GAMESERVICE_SA_UID, gameScene);
     WifiConfigCenter::GetInstance().GetP2pInfo(linkedInfo);
 
     if (IsAppInFilterList(scan_hid2d_list)) {
@@ -2932,7 +2933,10 @@ bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
     }
     // scene bit 0-2 is valid, 0x01: video, 0x02: audio, 0x04: file,
     // scene & 0x07 > 0 means one of them takes effect.
-    if ((softbusScene.scene & 0x07) > 0) {
+    if ((gameScene.scene & 0x07) > 0) {
+        WIFI_LOGI("Scan is not allowed in game hid2d.");
+        return false;
+    } else if ((softbusScene.scene & 0x07) > 0) {
         if ((softbusScene.scene & 0x07) <= 0x03 && AllowLpScan(scanType)) {
             scanStyle = SCAN_TYPE_LOW_PRIORITY;
             WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::LP_SCAN_UNCTRL_CNT);

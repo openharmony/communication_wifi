@@ -81,7 +81,6 @@ enum RatType { GSM_TYPE = 1, WCDMA_TYPE = 2, LTE_TYPE = 3, NR_TYPE = 4 };
 class ApInfoHelper {
 public:
     ~ApInfoHelper();
-    static ApInfoHelper &GetInstance();
     int32_t Init();
     bool IsCellIdExit(std::string cellId);
     bool IsCellIdExitByData(ApInfoData info, std::string cellId);
@@ -112,7 +111,6 @@ public:
     void DelAllApInfo();
     std::string GetCurrentCellIdInfo();
 private:
-    explicit ApInfoHelper();
     void GetLteCellInfo(sptr<Telephony::CellInformation> infoItem, LinkedCellInfo &currentCell);
     void GetNrCellInfo(sptr<Telephony::CellInformation> infoItem, LinkedCellInfo &currentCell);
     std::mutex mutex_;

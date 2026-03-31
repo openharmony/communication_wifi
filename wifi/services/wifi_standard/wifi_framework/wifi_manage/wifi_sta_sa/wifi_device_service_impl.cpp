@@ -2836,8 +2836,6 @@ ErrCode WifiDeviceServiceImpl::SetBtCoexistState(CoexistState state, CoexistReas
 #endif
 }
 
-
- 
 ErrCode WifiDeviceServiceImpl::SetWifiCapability(int capability, bool enable)
 {
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT

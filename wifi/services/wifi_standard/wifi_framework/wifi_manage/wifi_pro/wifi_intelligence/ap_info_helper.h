@@ -80,6 +80,7 @@ enum RatType { GSM_TYPE = 1, WCDMA_TYPE = 2, LTE_TYPE = 3, NR_TYPE = 4 };
 
 class ApInfoHelper {
 public:
+    ApInfoHelper();
     ~ApInfoHelper();
     int32_t Init();
     bool IsCellIdExit(std::string cellId);

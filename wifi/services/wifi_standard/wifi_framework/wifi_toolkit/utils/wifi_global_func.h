@@ -463,6 +463,14 @@ bool IsPskEncryption(const std::string &keyMgmt);
 bool IsFactoryMode();
 
 /**
+ * @Description is kidwatch device
+ *
+ * @return true - is kidwatch
+ * @return false - not is kidwatch
+ */
+bool IsKidWatchDevice();
+
+/**
  * @Description get device type
  *
  * @return int - DEFAULT -1, PHONE 0, TABLET 1, WEARABLE 2, TV 3, PC 4

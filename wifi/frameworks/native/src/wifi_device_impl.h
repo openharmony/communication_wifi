@@ -711,7 +711,7 @@ public:
      * @param enable - enable or disable
      * @return ErrCode - operation result
      */
-    virtual ErrCode SetWifiCapability(int capability, bool enable) override;
+    ErrCode SetWifiCapability(int capability, bool enable) override;
 
     /**
      * @Description Get wifi capability enable status
@@ -720,7 +720,7 @@ public:
      * @param enabled - output enable status
      * @return ErrCode - operation result
      */
-    virtual ErrCode GetWifiCapability(int capability, bool &enabled) override;
+    ErrCode GetWifiCapability(int capability, bool &enabled) override;
 private:
     bool GetWifiDeviceProxy();
     std::atomic<int> systemAbilityId_;

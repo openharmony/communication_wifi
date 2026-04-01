@@ -2836,6 +2836,22 @@ ErrCode WifiDeviceServiceImpl::SetBtCoexistState(CoexistState state, CoexistReas
 #endif
 }
 
+#ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+static ErrCode SetWifiAutoEnable(bool enable, int instId)
+{
+    IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(instId);
+    if (pWifiProService != nullptr) {
+        if (enable) {
+            return pWifiProService->InitWifiIntelligence();
+        } else {
+            return pWifiProService->UninitWifiIntelligence();
+        }
+    } else {
+        return WIFI_OPT_FAILED;
+    }
+}
+#endif
+
 ErrCode WifiDeviceServiceImpl::SetWifiCapability(int capability, bool enable)
 {
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
@@ -2850,18 +2866,9 @@ ErrCode WifiDeviceServiceImpl::SetWifiCapability(int capability, bool enable)
     WifiSettings::GetInstance().SetWifiCapability(capability, enable, m_instId);
     WIFI_LOGI("SetWifiCapability success, capability=%{public}d, enable=%{public}d", capability, enable);
     switch (capability) {
-        case static_cast<int>(WifiCapability::WIFI_AUTO_ENABLE): {
-            IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(m_instId);
-            if (pWifiProService != nullptr) {
-                if (enable) {
-                    return pWifiProService->InitWifiIntelligence();
-                } else {
-                    return pWifiProService->UninitWifiIntelligence();
-                }
-            } else {
-                return WIFI_OPT_NOT_SUPPORTED;
-            }
-        }
+        case static_cast<int>(WifiCapability::WIFI_AUTO_ENABLE):
+            return SetWifiAutoEnable(enable, m_instId);
+            break;
         default:
             return WIFI_OPT_NOT_SUPPORTED;
     }

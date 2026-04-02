@@ -724,7 +724,7 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
     }
 }
 
-void AppNetworkSpeedLimitService::AdjustSpeedLimitByRtt(int rtt)
+void AppNetworkSpeedLimitService::AdjustSpeedLimitByRtt(const int rtt)
 {
     WifiNetworkControlInfo &gameInfo = WifiConfigCenter::GetNetworkControlInfo();
     if (gameInfo.bundleName == "" || gameInfo.state != GameSceneId::MSG_GAME_STATE_FOREGROUND) {

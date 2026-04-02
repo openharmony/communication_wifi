@@ -894,6 +894,7 @@ void WifiConfigCenter::ClearLocalHid2dInfo(int uid)
         mHid2dUpperScenePair.insert_or_assign(MIRACAST_SERVICE_UID, scene);
         mHid2dUpperScenePair.insert_or_assign(SHARE_SERVICE_UID, scene);
         mHid2dUpperScenePair.insert_or_assign(MOUSE_CROSS_SERVICE_UID, scene);
+        mHid2dUpperScenePair.insert_or_assign(GAMESERVICE_SA_UID, scene);
         SetHid2dSceneLastSetTime(0);
     }
 }

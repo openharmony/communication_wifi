@@ -493,6 +493,7 @@ private:
 #ifndef OHOS_ARCH_LITE
     void GetStaControlInfo();
     bool IsAppInCandidateFilterList(int uid) const;
+    void IsEphemeralConfig(WifiDeviceConfig &config) const;
 #endif
 
 private:

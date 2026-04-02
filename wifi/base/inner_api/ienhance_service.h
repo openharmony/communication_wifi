@@ -438,7 +438,7 @@ public:
     /**
      * @Description get num by package name
      *
-     * @return : -1(not find) 0(settings) 1(sceneboard)
+     * @return : -1(not find) 0(settings) 1(sceneboard) 2(watchcore)
      */
     virtual int32_t GetPackageNum(std::string packageName) = 0;
 

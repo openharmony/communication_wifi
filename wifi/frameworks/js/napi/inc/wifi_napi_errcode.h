@@ -86,7 +86,6 @@ do { \
     return res; \
 } while (0)
 #endif
-
 #endif /* #endif ENABLE_NAPI_WIFI_MANAGER */
 
 #ifndef WIFI_NAPI_RETURN_NUM_CODE

@@ -18,7 +18,6 @@
 
 #include "wifi_napi_utils.h"
 #include <string>
-#include "wifi_napi_errcode.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -115,12 +114,22 @@ do { \
 
 #ifndef WIFI_NAPI_ASSERT_NUM_CODE
 #define WIFI_NAPI_ASSERT_NUM_CODE(env, cond, errCode, sysCap) \
-WIFI_NAPI_ASSERT(env, cond, errCode, sysCap)
+do { \
+    if (!(cond)) { \
+        napi_value res = nullptr; \
+        napi_get_boolean(env, cond, &res); \
+        return res; \
+    } \
+} while (0)
 #endif
 
 #ifndef WIFI_NAPI_RETURN_NUM_CODE
 #define WIFI_NAPI_RETURN_NUM_CODE(env, cond, errCode, sysCap) \
-WIFI_NAPI_RETURN(env, cond, errCode, sysCap)
+do { \
+    napi_value res = nullptr; \
+    napi_get_boolean(env, cond, &res); \
+    return res; \
+} while (0)
 #endif
 
 #endif /* #endif ENABLE_NAPI_WIFI_MANAGER */

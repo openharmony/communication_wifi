@@ -690,7 +690,6 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
     WIFI_LOGI("%{public}s enter game limit configs, game state is %{public}d, game rtt is %{public}d", __FUNCTION__,
         networkControlInfo.state, networkControlInfo.rtt);
     ReportGameSceneChange(networkControlInfo.state);
-    curGameInfoPtr_ = std::make_unique<WifiNetworkControlInfo>(networkControlInfo);
     switch (networkControlInfo.state) {
         case GameSceneId::MSG_GAME_STATE_START:
         case GameSceneId::MSG_GAME_STATE_FOREGROUND:
@@ -705,7 +704,7 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
             break;
         case GameSceneId::MSG_GAME_STATE_BACKGROUND:
         case GameSceneId::MSG_GAME_STATE_END:
-            curGameInfoPtr_ = nullptr;
+            WifiConfigCenter::GetInstance().SetNetworkControlInfo(WifiNetworkControlInfo()); // clear game info
             SetActivePowerScenes(POWER_SCENE_GAME, false);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_OFF, GAME_BOOST_DISABLE, networkControlInfo.uid);
             break;
@@ -724,23 +723,27 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
     }
 }
 
-void AppNetworkSpeedLimitService::AdjustSpeedLimitByRtt(const int rtt)
+void AppNetworkSpeedLimitService::AdjustSpeedLimitByRtt(int rtt)
 {
-    if (curGameInfoPtr_ == nullptr || curGameInfoPtr_->state != GameSceneId::MSG_GAME_STATE_FOREGROUND) {
+    WifiNetworkControlInfo &gameInfo = WifiConfigCenter::GetNetworkControlInfo();
+    if (gameInfo.bundleName == "" || gameInfo.state != GameSceneId::MSG_GAME_STATE_FOREGROUND) {
         return;
     }
-    if (AppParser::GetInstance().IsOverGameRtt(curGameInfoPtr_->bundleName, rtt) ==
-        AppParser::GetInstance().IsOverGameRtt(curGameInfoPtr_->bundleName, curGameInfoPtr_->rtt)) {
-        return;
+ 
+    if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] == BG_LIMIT_LEVEL_3) {
+        if (AppParser::GetInstance().IsOverGameHighRttThresh(gameInfo.bundleName, rtt)) {
+            SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
+                gameInfo.uid);
+        }
+    } else if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] == BG_LIMIT_LEVEL_7) {
+        if (AppParser::GetInstance().IsUnderGameLowRttThresh(gameInfo.bundleName, rtt)) {
+            SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_3, GAME_BOOST_DISABLE,
+                gameInfo.uid);
+        }
     }
-    if (AppParser::GetInstance().IsOverGameRtt(curGameInfoPtr_->bundleName, rtt)) {
-        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
-            curGameInfoPtr_->uid);
-    } else {
-        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_3, GAME_BOOST_DISABLE,
-            curGameInfoPtr_->uid);
-    }
-    curGameInfoPtr_->rtt = rtt;
+ 
+    gameInfo.rtt = rtt;
+    WifiConfigCenter::GetInstance().SetNetworkControlInfo(gameInfo);
 }
 
 void AppNetworkSpeedLimitService::LowLatencyNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)

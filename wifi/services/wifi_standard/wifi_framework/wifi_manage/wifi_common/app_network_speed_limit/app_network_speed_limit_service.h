@@ -129,7 +129,6 @@ private:
     std::unordered_set<int> m_fgUidSet;
     std::unordered_set<std::string> m_bgSpeedLimitAppBundleNameSet;
     std::unordered_set<std::string> m_fgAppBundleNameSet;
-    std::unique_ptr<WifiNetworkControlInfo> curGameInfoPtr_ = nullptr;
     int m_lastLimitSpeedMode{UNKNOWN_MODE};
     std::unordered_set<int> m_lastBgUidSet;
     std::unordered_set<int> m_lastBgPidSet;

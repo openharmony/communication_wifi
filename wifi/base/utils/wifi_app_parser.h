@@ -117,7 +117,8 @@ public:
     bool IsLiveStreamApp(const std::string &bundleName) const;
     bool IsGameBackgroundLimitApp(const std::string &bundleName) const;
     bool IsRssGameApp(const std::string &bundleName) const;
-    bool IsOverGameRtt(const std::string &bundleName, const int gameRtt) const;
+    bool IsOverGameHighRttThresh(const std::string &bundleName, const int gameRtt) const;
+    bool IsUnderGameLowRttThresh(const std::string &bundleName, const int gameRtt) const
 private:
     AppParser();
     ~AppParser();

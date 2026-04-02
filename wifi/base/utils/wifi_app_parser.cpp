@@ -60,6 +60,8 @@ const std::unordered_map<std::string, AppType> appTypeMap = {
     { XML_TAG_SECTION_KEY_GAME_RTT, AppType::GAME_RTT},
 };
 
+const int RTT_GAP = 60;
+
 AppParserInner::AppParserInner()
 {
     WIFI_LOGI("%{public}s enter", __FUNCTION__);
@@ -539,13 +541,22 @@ bool AppParser::IsRssGameApp(const std::string &bundleName) const
         [bundleName](const RssGameListAppInfo &app) { return app.packageName == bundleName; });
 }
 
-bool AppParser::IsOverGameRtt(const std::string &bundleName, const int gameRtt) const
+bool AppParser::IsOverGameHighRttThresh(const std::string &bundleName, const int gameRtt) const
 {
     std::shared_lock<std::shared_mutex> lock(appParserMutex_);
     if (result_.m_gameRtt.find(bundleName) == result_.m_gameRtt.end()) {
         return false;
     }
     return result_.m_gameRtt.at(bundleName) <= gameRtt;
+}
+
+bool AppParser::IsUnderGameLowRttThresh(const std::string &bundleName, const int gameRtt) const
+{
+    std::shared_lock<std::shared_mutex> lock(appParserMutex_);
+    if (result_.m_gameRtt.find(bundleName) == result_.m_gameRtt.end()) {
+        return false;
+    }
+    return result_.m_gameRtt.at(bundleName) - RTT_GAP >= gameRtt;
 }
 
 std::string AppParser::GetAsyncLimitSpeedDelayTime() const

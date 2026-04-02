@@ -687,7 +687,8 @@ void AppNetworkSpeedLimitService::ForegroundAppStateChangedAction(const AsyncPar
 
 void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)
 {
-    WIFI_LOGI("%{public}s enter game limit configs, game state is %{public}d", __FUNCTION__, networkControlInfo.state);
+    WIFI_LOGI("%{public}s enter game limit configs, game state is %{public}d, game rtt is %{public}d", __FUNCTION__,
+        networkControlInfo.state, networkControlInfo.rtt);
     ReportGameSceneChange(networkControlInfo.state);
     curGameInfoPtr_ = std::make_unique<WifiNetworkControlInfo>(networkControlInfo);
     switch (networkControlInfo.state) {

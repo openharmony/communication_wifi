@@ -66,6 +66,31 @@ do { \
 } while (0)
 #endif
 
+#ifndef WIFI_NAPI_ASSERT_NUM_CODE
+#define WIFI_NAPI_ASSERT_NUM_CODE(env, cond, errCode, sysCap) \
+do { \
+    if (!(cond)) { \
+        napi_value res = nullptr; \
+        HandleSyncErrCodeByNum(env, errCode, sysCap); \
+        napi_get_undefined(env, &res); \
+        return res; \
+    } \
+} while (0)
+#endif
+
+#ifndef WIFI_NAPI_RETURN_NUM_CODE
+#define WIFI_NAPI_RETURN_NUM_CODE(env, cond, errCode, sysCap) \
+do { \
+    napi_value res = nullptr; \
+    if (!(cond)) { \
+        HandleSyncErrCodeByNum(env, errCode, sysCap); \
+    } \
+    napi_get_undefined(env, &res); \
+    return res; \
+} while (0)
+#endif
+
+
 #else /* #else ENABLE_NAPI_WIFI_MANAGER */
 
 #ifndef WIFI_NAPI_ASSERT
@@ -87,6 +112,17 @@ do { \
     return res; \
 } while (0)
 #endif
+
+#ifndef WIFI_NAPI_ASSERT_NUM_CODE
+#define WIFI_NAPI_ASSERT_NUM_CODE(env, cond, errCode, sysCap) \
+WIFI_NAPI_ASSERT(env, cond, errCode, sysCap)
+#endif
+
+#ifndef WIFI_NAPI_RETURN_NUM_CODE
+#define WIFI_NAPI_RETURN_NUM_CODE(env, cond, errCode, sysCap) \
+WIFI_NAPI_RETURN(env, cond, errCode, sysCap)
+#endif
+
 #endif /* #endif ENABLE_NAPI_WIFI_MANAGER */
 
 /**
@@ -115,6 +151,15 @@ void HandlePromiseErrCode(const napi_env &env, const AsyncContext &info);
  * @param sysCap System capability code.
  */
 void HandleSyncErrCode(const napi_env &env, int32_t errCode, int32_t sysCap);
+
+/**
+ * @brief Thow number type error code for async function.
+ *
+ * @param env The env.
+ * @param errCode The error code.
+ * @param sysCap System capability code.
+ */
+void HandleSyncErrCodeByNum(const napi_env &env, int32_t errCode, int32_t sysCap);
 #endif
 }  // namespace Wifi
 }  // namespace OHOS

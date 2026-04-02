@@ -196,5 +196,18 @@ void HandleSyncErrCode(const napi_env &env, int32_t errCode, int32_t sysCap)
         napi_throw_error(env, std::to_string(errCodeInfo).c_str(), errMsg.c_str());
     }
 }
+
+void HandleSyncErrCodeByNum(const napi_env &env, int32_t errCode, int32_t sysCap)
+{
+    WIFI_LOGI("HandleSyncErrCodeByNum, errCode = %{public}d", static_cast<int>(errCode));
+    if (errCode == ErrCode::WIFI_OPT_SUCCESS) {
+        return;
+    }
+    std::string errMsg = GetNapiErrMsg(env, errCode, sysCap);
+    int32_t errCodeInfo = GetNapiErrCode(env, errCode, sysCap);
+    if (errMsg != "") {
+        napi_throw_business_error(env, errCodeInfo, errMsg.c_str());
+    }
+}
 }  // namespace Wifi
 }  // namespace OHOS

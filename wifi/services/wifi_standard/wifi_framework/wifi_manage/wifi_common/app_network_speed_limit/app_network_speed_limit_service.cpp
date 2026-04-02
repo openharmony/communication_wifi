@@ -725,7 +725,6 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
 
 void AppNetworkSpeedLimitService::AdjustSpeedLimitByRtt(const int rtt)
 {
-    WIFI_LOGI("YSH current rtt:%{public}d", rtt);
     if (curGameInfoPtr_ == nullptr || curGameInfoPtr_->state != GameSceneId::MSG_GAME_STATE_FOREGROUND) {
         return;
     }

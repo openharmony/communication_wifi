@@ -138,7 +138,7 @@ enum ProductDeviceType : int {
 };
 
 enum class WifiCapability {
-    WIFI_AUTO_ENABLE = 1,
+    WIFI_AUTO_ENABLE = 0,
 };
 
 struct WifiCallingInfo {

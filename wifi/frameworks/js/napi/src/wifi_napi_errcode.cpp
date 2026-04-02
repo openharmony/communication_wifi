@@ -199,7 +199,6 @@ void HandleSyncErrCode(const napi_env &env, int32_t errCode, int32_t sysCap)
 
 void HandleSyncErrCodeByNum(const napi_env &env, int32_t errCode, int32_t sysCap)
 {
-    WIFI_LOGI("HandleSyncErrCodeByNum, errCode = %{public}d", static_cast<int>(errCode));
     if (errCode == ErrCode::WIFI_OPT_SUCCESS) {
         return;
     }

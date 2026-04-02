@@ -967,7 +967,7 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callba
     } else if (valueType == napi_object) {
         ConnectSettings connectSettings;
         GetJsObjToConnectSettings(env, argv[0], connectSettings);
-        WIFI_LOGI("ConnectToCandidateConfig lllx networkId=%{public}d withUserAction=%{public}d "
+        WIFI_LOGI("ConnectToCandidateConfig networkId=%{public}d withUserAction=%{public}d "
             "userActionTimeout=%{public}d addNetworkToSystem=%{public}d",
             connectSettings.networkId, connectSettings.withUserAction, connectSettings.userActionTimeout,
             connectSettings.addNetworkToSystem);

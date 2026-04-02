@@ -65,31 +65,6 @@ do { \
 } while (0)
 #endif
 
-#ifndef WIFI_NAPI_ASSERT_NUM_CODE
-#define WIFI_NAPI_ASSERT_NUM_CODE(env, cond, errCode, sysCap) \
-do { \
-    if (!(cond)) { \
-        napi_value res = nullptr; \
-        HandleSyncErrCodeByNum(env, errCode, sysCap); \
-        napi_get_undefined(env, &res); \
-        return res; \
-    } \
-} while (0)
-#endif
-
-#ifndef WIFI_NAPI_RETURN_NUM_CODE
-#define WIFI_NAPI_RETURN_NUM_CODE(env, cond, errCode, sysCap) \
-do { \
-    napi_value res = nullptr; \
-    if (!(cond)) { \
-        HandleSyncErrCodeByNum(env, errCode, sysCap); \
-    } \
-    napi_get_undefined(env, &res); \
-    return res; \
-} while (0)
-#endif
-
-
 #else /* #else ENABLE_NAPI_WIFI_MANAGER */
 
 #ifndef WIFI_NAPI_ASSERT
@@ -112,27 +87,19 @@ do { \
 } while (0)
 #endif
 
-#ifndef WIFI_NAPI_ASSERT_NUM_CODE
-#define WIFI_NAPI_ASSERT_NUM_CODE(env, cond, errCode, sysCap) \
-do { \
-    if (!(cond)) { \
-        napi_value res = nullptr; \
-        napi_get_boolean(env, cond, &res); \
-        return res; \
-    } \
-} while (0)
-#endif
+#endif /* #endif ENABLE_NAPI_WIFI_MANAGER */
 
 #ifndef WIFI_NAPI_RETURN_NUM_CODE
 #define WIFI_NAPI_RETURN_NUM_CODE(env, cond, errCode, sysCap) \
 do { \
     napi_value res = nullptr; \
-    napi_get_boolean(env, cond, &res); \
+    if (!(cond)) { \
+        HandleSyncErrCodeByNum(env, errCode, sysCap); \
+    } \
+    napi_get_undefined(env, &res); \
     return res; \
 } while (0)
 #endif
-
-#endif /* #endif ENABLE_NAPI_WIFI_MANAGER */
 
 /**
  * @brief Thow error code for async-callback function.
@@ -160,6 +127,7 @@ void HandlePromiseErrCode(const napi_env &env, const AsyncContext &info);
  * @param sysCap System capability code.
  */
 void HandleSyncErrCode(const napi_env &env, int32_t errCode, int32_t sysCap);
+#endif
 
 /**
  * @brief Thow number type error code for async function.
@@ -169,7 +137,6 @@ void HandleSyncErrCode(const napi_env &env, int32_t errCode, int32_t sysCap);
  * @param sysCap System capability code.
  */
 void HandleSyncErrCodeByNum(const napi_env &env, int32_t errCode, int32_t sysCap);
-#endif
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

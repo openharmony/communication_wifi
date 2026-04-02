@@ -528,6 +528,7 @@ void WifiEventSubscriberManager::InitSubscribeListener()
     SubscribeSystemAbility(SHARE_SERVICE_ID);
     SubscribeSystemAbility(MOUSE_CROSS_SERVICE_ID);
     SubscribeSystemAbility(HICAR_SERVICE_SA_ID);
+    SubscribeSystemAbility(GAMESERVICE_SA_ID);
 }
 
 int WifiEventSubscriberManager::GetLastStaStateByDatashare()

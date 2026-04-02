@@ -877,5 +877,13 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateForegroundAppConfigsTest01, Test
     AppNetworkSpeedLimitService::GetInstance().UpdateBackgroundAppConfigs(enable);
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, AdjustSpeedLimitByRttTest01, TestSize.Level1)
+{
+    const int rtt = 100;
+    AppNetworkSpeedLimitService::GetInstance().curGameInfoPtr_ = nullptr;
+    AppNetworkSpeedLimitService::GetInstance().AdjustSpeedLimitByRtt(rtt);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
 } // namespace Wifi
 } // namespace OHOS

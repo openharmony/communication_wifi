@@ -126,7 +126,6 @@ enum class ScanLimitType {
     ACTION_LISTEN,
     HID2D_CLONE,
     GAME_SCENE,
-    GLASSES_SCENE,
     LP_SCANSTYLE,
 };
 }  // namespace Wifi

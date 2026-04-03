@@ -692,6 +692,12 @@ private:
      */
     bool IsScanTrustMode() const;
     /**
+     * @Description is product need disable pno scan
+     *
+     * @return true: need disable pno, false: not need disable pno
+     */
+    bool IsProductPnoScanDisabled();
+    /**
      * @Description Add the scene id to trust list.
      * Assume that the scene id of moving freeze is -1.
      *

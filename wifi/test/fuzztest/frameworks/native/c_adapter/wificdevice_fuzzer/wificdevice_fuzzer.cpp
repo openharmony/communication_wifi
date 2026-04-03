@@ -23,10 +23,6 @@
 static FuzzedDataProvider *FDP = nullptr;
 static const int32_t NUM_BYTES = 1;
 
-static void EnableWifiTest()
-{
-    EnableWifi();
-}
 static void EnableSemiWifiTest()
 {
     EnableSemiWifi();
@@ -228,7 +224,6 @@ namespace OHOS {
 namespace Wifi {
     bool WifiCDeviceFuzzerTest()
     {
-        EnableWifiTest();
         DisableWifiTest();
         EnableSemiWifiTest();
         ScanTest();

@@ -367,13 +367,19 @@ struct Index {
           if (event) {
             let url: string = event.data.getRequestUrl();
             // 判断链接是否为拨号链接
-            if (url.indexOf('tel://') === 0) {
+            if (url.startsWith('tel:')) {
+              let phoneNumber = url.replace(/^tel:\/\//, '').replace(/^tel:/, '');
+              phoneNumber = phoneNumber.split('?')[0].split('#')[0].trim();
+              if (phoneNumber.length === 0 || !/^\+?[0-9*#()-]+$/.test(phoneNumber)) {
+                hilog.error(DOMAIN, 'TAG', 'invalid tel url:' + url);
+                return true;
+              }
               // 跳转拨号界面
-              call.makeCall(url.substring(6), (err) => {
+              call.makeCall(phoneNumber, (err) => {
                 if (!err) {
-                  hilog.info(DOMAIN, TAG, 'make call success.');   
+                  console.info('make call succeeded.');
                 } else {
-                  hilog.error(DOMAIN, TAG, 'make call fail, err is:' + JSON.stringify(err));
+                  console.info('make call fail, err is:' + JSON.stringify(err));
                 }
               });
               return true;

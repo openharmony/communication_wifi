@@ -17,8 +17,10 @@ import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { i18n, resourceManager  } from '@kit.LocalizationKit';
 import { common, OpenLinkOptions, abilityAccessCtrl } from '@kit.AbilityKit';
-import { BusinessError } from '@kit.BasicServicesKit';
+import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import { SymbolGlyphModifier, window } from '@kit.ArkUI';
+import { connection } from '@kit.NetworkKit';
+import { call } from '@kit.TelephonyKit';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
   validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl,
@@ -28,8 +30,6 @@ import {
   updateFinalUrl, updateOnHttpErrorReceive, updateOnErrorReceive, updateOnSslErrorEvent, updateAboutToDisappear,
   safeAnonymize
 } from '../common/chr';
-import { connection } from '@kit.NetworkKit';
-import { emitter } from '@kit.BasicServicesKit';
 
 const DOMAIN = 0x01560;
 const TAG = 'Pages';
@@ -360,6 +360,24 @@ struct Index {
                 hilog.error(DOMAIN, TAG, `open link failed. Code is ${err.code}, message is ${err.message}`);
               })
             return true;
+          }
+          return false;
+        })
+        .onLoadIntercept((event) => {
+          if (event) {
+            let url: string = event.data.getRequestUrl();
+            // 判断链接是否为拨号链接
+            if (url.indexOf('tel://') === 0) {
+              // 跳转拨号界面
+              call.makeCall(url.substring(6), (err) => {
+                if (!err) {
+                  hilog.info(DOMAIN, TAG, 'make call success.');   
+                } else {
+                  hilog.error('make call fail, err is:' + JSON.stringify(err));
+                }
+              });
+              return true;
+            }
           }
           return false;
         })

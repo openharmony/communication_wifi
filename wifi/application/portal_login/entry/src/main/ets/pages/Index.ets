@@ -373,7 +373,7 @@ struct Index {
                 if (!err) {
                   hilog.info(DOMAIN, TAG, 'make call success.');   
                 } else {
-                  hilog.error('make call fail, err is:' + JSON.stringify(err));
+                  hilog.error(DOMAIN, TAG, 'make call fail, err is:' + JSON.stringify(err));
                 }
               });
               return true;

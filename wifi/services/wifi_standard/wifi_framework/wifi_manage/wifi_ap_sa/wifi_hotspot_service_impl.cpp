@@ -990,8 +990,8 @@ int32_t WifiHotspotServiceImpl::SetPowerModel(PowerModelParcel parcelModel)
 {
     WIFI_LOGI("SetPowerModel, m_id is %{public}d %{public}s", m_id, __func__);
     PowerModel model = FromParcel<PowerModel>(parcelModel);
-    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("SetPowerModel:VerifySetWifiInfoPermission() PERMISSION_DENIED!");
+    if (WifiPermissionUtils::VerifyManageWifiHotspotExtPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetPowerModel:VerifyManageWifiHotspotExtPermission() PERMISSION_DENIED!");
         return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
 

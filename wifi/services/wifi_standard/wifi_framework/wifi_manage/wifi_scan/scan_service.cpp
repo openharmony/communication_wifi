@@ -1885,8 +1885,8 @@ ErrCode ScanService::AllowPnoScan(ScanType scanType, int &scanStyle)
         WriteScanLimitHiSysEvent("PNO_SCAN", static_cast<int>(ScanLimitType::LP_SCANSTYLE));
         return WIFI_OPT_FAILED;
     }
-    if (GetDeviceType() == ProductDeviceType::GLASSES) {
-        WriteScanLimitHiSysEvent("PNO_SCAN", static_cast<int>(ScanLimitType::GLASSES_SCENE));
+    if (IsProductPnoScanDisabled()) {
+        WIFI_LOGI("product disable PNO scan, not allow PNO scan.");
         return WIFI_OPT_FAILED;
     }
     if (WifiConfigCenter::GetInstance().GetWifiState(m_instId) != static_cast<int>(WifiState::ENABLED)) {
@@ -1949,6 +1949,17 @@ ErrCode ScanService::AllowPnoScan(ScanType scanType, int &scanStyle)
 
     WIFI_LOGI("pno scan is allowed");
     return WIFI_OPT_SUCCESS;
+}
+
+bool ScanService::IsProductPnoScanDisabled()
+{
+    if (GetDeviceType() == ProductDeviceType::GLASSES) {
+        return true;
+    }
+    if (IsKidWatchDevice()) {
+        return true;
+    }
+    return false;
 }
 
 ErrCode ScanService::AllowWifiProScan(ScanType scanType, int &scanStyle)

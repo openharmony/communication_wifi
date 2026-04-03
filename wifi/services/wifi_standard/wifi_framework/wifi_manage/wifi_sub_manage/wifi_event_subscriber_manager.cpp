@@ -65,8 +65,6 @@ constexpr uint32_t PROP_FALSE_LEN = 5;
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
 constexpr uint32_t TEL_STATE_REGISTRY_DELAY_TIME = 5 * 1000;
 #endif
-constexpr int PROVIDED_DEVICE_FEATURES_LEN = 10;
-constexpr int PROVIDED_DEVICE_FEATURES_CMP_LEN = 5;
 const std::string PROP_TRUE = "true";
 const std::string PROP_FALSE = "false";
 const std::string MDM_WIFI_PROP = "persist.edm.wifi_enable";
@@ -77,7 +75,6 @@ const std::string WIFI_STANDBY_SLEEPING = "sleeping";
 const std::string ENTER_SETTINGS = "usual.event.wlan.ENTER_SETTINGS_WLAN_PAGE";
 const std::string WLAN_PAGE_ENTER = "enterWlanPage";
 const std::string GAME_INFO_NOTIFY = "usual.event.gameservice.GAME_INFO_NOTIFY";
-constexpr const char* PRODUCT_PROVIDED_DEVICE_FEATURES = "const.product.providedDeviceFeatures";
 
 std::atomic<bool> WifiEventSubscriberManager::isMdmForbidden_{false};
 std::atomic<bool> WifiEventSubscriberManager::isMdmHotspotForbidden_{false};
@@ -405,15 +402,9 @@ void WifiEventSubscriberManager::GetWifiAllowSemiActiveByDatashare()
 
 bool WifiEventSubscriberManager::GetLocationModeByDatashare()
 {
-    if (GetDeviceType() == ProductDeviceType::WEARABLE) {
-        char preValue[PROVIDED_DEVICE_FEATURES_LEN] = {0};
-        int errCode = GetParamValue(PRODUCT_PROVIDED_DEVICE_FEATURES, 0, preValue, PROVIDED_DEVICE_FEATURES_LEN);
-        if (errCode > 0) {
-            if (strncmp(preValue, "child", PROVIDED_DEVICE_FEATURES_CMP_LEN) == 0) {
-                WIFI_LOGI("GetLocationModeByDatashare, locationMode is enabled by default.");
-                return true;
-            }
-        }
+    if (IsKidWatchDevice()) {
+        WIFI_LOGI("GetLocationModeByDatashare, locationMode is enabled by default.");
+        return true;
     }
 
     std::string locationMode;

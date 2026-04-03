@@ -371,15 +371,15 @@ struct Index {
               let phoneNumber = url.replace(/^tel:\/\//, '').replace(/^tel:/, '');
               phoneNumber = phoneNumber.split('?')[0].split('#')[0].trim();
               if (phoneNumber.length === 0 || !/^\+?[0-9*#()-]+$/.test(phoneNumber)) {
-                hilog.error(DOMAIN, 'TAG', 'invalid tel url:' + url);
+                hilog.error(DOMAIN, TAG, 'invalid tel url:' + url);
                 return true;
               }
               // 跳转拨号界面
               call.makeCall(phoneNumber, (err) => {
                 if (!err) {
-                  console.info('make call succeeded.');
+                  hilog.info(DOMAIN, TAG, 'make call succeeded.');
                 } else {
-                  console.info('make call fail, err is:' + JSON.stringify(err));
+                  hilog.error(DOMAIN, TAG, 'make call fail, err is:' + JSON.stringify(err));
                 }
               });
               return true;

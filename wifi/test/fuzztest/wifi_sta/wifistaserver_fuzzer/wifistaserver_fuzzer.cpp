@@ -480,6 +480,7 @@ void ConnectToCandidateConfigTest(FuzzedDataProvider& FDP)
 void ConnectToCandidateConfigWithSettingsTest(FuzzedDataProvider& FDP)
 {
     ConnectSettings connectSettings;
+    connectSettings.uid = ID;
     connectSettings.networkId = FDP.ConsumeIntegral<int>();
     connectSettings.withUserAction = FDP.ConsumeBool();
     connectSettings.userActionTimeout = FDP.ConsumeIntegral<int>();

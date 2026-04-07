@@ -954,6 +954,7 @@ ErrCode WifiDeviceProxy::ConnectToCandidateConfig(ConnectSettings &connectSettin
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
     }
+    data.WriteInt32(0);
     data.WriteInt32(connectSettings.networkId);
     data.WriteBool(connectSettings.withUserAction);
     data.WriteInt32(connectSettings.userActionTimeout);

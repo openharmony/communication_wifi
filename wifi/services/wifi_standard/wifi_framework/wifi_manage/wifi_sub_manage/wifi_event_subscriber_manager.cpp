@@ -1025,19 +1025,30 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType,
 {
     if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
         NotifyCandidateApprovalStatus(CandidateApprovalStatus::USER_ACCEPT);
-        bool addNetworkToSystem = eventData.GetWant().GetBoolParam("addNetworkToSystem");
+        bool addNetworkToSystem = eventData.GetWant().GetBoolParam("addNetworkToSystem", false);
         int candidateNetworkId = WifiConfigCenter::GetInstance().GetSelectedCandidateNetworkId();
         if (candidateNetworkId == INVALID_NETWORK_ID) {
             WIFI_LOGI("OnReceiveNotificationEvent networkid is invalid");
             return;
         }
-        if (addNetworkToSystem) {
-            WifiSettings::GetInstance().SetDeviceUid(candidateNetworkId, -1);
-        }
-        WifiSettings::GetInstance().SetDeviceEphemeral(candidateNetworkId, false);
-        WifiSettings::GetInstance().SyncDeviceConfig();
         IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
-        if (pService != nullptr) {
+        if (pService == nullptr) {
+            WIFI_LOGE("OnReceiveNotificationEvent pService is null");
+            return;
+        }
+        if (addNetworkToSystem) {
+            WifiDeviceConfig config;
+            if (WifiSettings::GetInstance().GetCandidateConfigWithoutUid(candidateNetworkId, config) == -1) {
+                WIFI_LOGE("OnReceiveNotificationEvent get config fail");
+                return;
+            }
+            WifiSettings::GetInstance().RemoveDevice(candidateNetworkId);
+            config.uid = -1;
+            config.isEphemeral = false;
+            pService->ConnectToDevice(config);
+        } else {
+            WifiSettings::GetInstance().SetDeviceEphemeral(candidateNetworkId, false);
+            WifiSettings::GetInstance().SyncDeviceConfig();
             pService->ConnectToNetwork(candidateNetworkId);
         }
     } else if (dialogType == static_cast<int>(WifiDialogType::AUTO_IDENTIFY_CONN)) {

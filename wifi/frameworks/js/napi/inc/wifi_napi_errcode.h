@@ -18,7 +18,6 @@
 
 #include "wifi_napi_utils.h"
 #include <string>
-#include "wifi_napi_errcode.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -89,6 +88,18 @@ do { \
 #endif
 #endif /* #endif ENABLE_NAPI_WIFI_MANAGER */
 
+#ifndef WIFI_NAPI_RETURN_NUM_CODE
+#define WIFI_NAPI_RETURN_NUM_CODE(env, cond, errCode, sysCap) \
+do { \
+    napi_value res = nullptr; \
+    if (!(cond)) { \
+        HandleSyncErrCodeByNum(env, errCode, sysCap); \
+    } \
+    napi_get_undefined(env, &res); \
+    return res; \
+} while (0)
+#endif
+
 /**
  * @brief Thow error code for async-callback function.
  *
@@ -116,6 +127,15 @@ void HandlePromiseErrCode(const napi_env &env, const AsyncContext &info);
  */
 void HandleSyncErrCode(const napi_env &env, int32_t errCode, int32_t sysCap);
 #endif
+
+/**
+ * @brief Thow number type error code for async function.
+ *
+ * @param env The env.
+ * @param errCode The error code.
+ * @param sysCap System capability code.
+ */
+void HandleSyncErrCodeByNum(const napi_env &env, int32_t errCode, int32_t sysCap);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

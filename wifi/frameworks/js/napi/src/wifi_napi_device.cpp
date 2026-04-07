@@ -964,21 +964,22 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callba
         int networkId = -1;
         napi_get_value_int32(env, argv[0], &networkId);
         connectSettings.networkId = networkId;
+        ret = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
+        WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     } else if (valueType == napi_object) {
         GetJsObjToConnectSettings(env, argv[0], connectSettings);
-        WIFI_LOGI("ConnectToCandidateConfig lllx networkId=%{public}d withUserAction=%{public}d "
+        WIFI_LOGI("ConnectToCandidateConfig networkId=%{public}d withUserAction=%{public}d "
             "userActionTimeout=%{public}d addNetworkToSystem=%{public}d",
             connectSettings.networkId, connectSettings.withUserAction, connectSettings.userActionTimeout,
             connectSettings.addNetworkToSystem);
         if (connectSettings.userActionTimeout <= 0 || connectSettings.userActionTimeout > MAX_DIALOG_TIMEOUT) {
             WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
         }
+        ret = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
+        WIFI_NAPI_RETURN_NUM_CODE(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     } else {
         WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     }
-    ret = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
-
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
 static void CandidateConnectCallbackFunc(void *data)

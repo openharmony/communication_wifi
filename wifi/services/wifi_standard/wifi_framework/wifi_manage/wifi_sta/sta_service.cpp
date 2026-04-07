@@ -69,6 +69,8 @@ constexpr const int REMOVE_ALL_DEVICECONFIG = 0x7FFFFFFF;
 const int WIFI_DETECT_MODE_LOW = 1;
 const int WIFI_DETECT_MODE_HIGH = 2;
 
+const int WATCH_CORE = 2;
+
 inline const int SECOND_TO_MILLI_SECOND = 1000;
 const std::string VOWIFI_DETECT_SET_PREFIX = "VOWIFI_DETECT SET ";
 
@@ -481,6 +483,7 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
         LOGI("AddDeviceConfig EncryptionDeviceConfig failed");
     }
     tempDeviceConfig.lastUpdateTime = time(0);
+    IsEphemeralConfig(tempDeviceConfig);
     WifiSettings::GetInstance().AddDeviceConfig(tempDeviceConfig);
     WifiSettings::GetInstance().SyncDeviceConfig();
     /* update net link proxy info */
@@ -488,6 +491,21 @@ int StaService::AddDeviceConfig(const WifiDeviceConfig &config) const
     ConfigChange changeType = isUpdate ? ConfigChange::CONFIG_UPDATE : ConfigChange::CONFIG_ADD;
     NotifyDeviceConfigChange(changeType, tempDeviceConfig, false);
     return netWorkId;
+}
+
+void StaService::IsEphemeralConfig(WifiDeviceConfig &config) const
+{
+    std::string bundleName;
+    int32_t uid = GetCallingUid();
+    GetBundleNameByUid(uid, bundleName);
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGD("%{public}s: pEnhanceService is null", __FUNCTION__);
+        return;
+    }
+    if (pEnhanceService->GetPackageNum(bundleName) == WATCH_CORE) {
+        config.isEphemeral = true;
+    }
 }
 
 int StaService::UpdateDeviceConfig(const WifiDeviceConfig &config) const

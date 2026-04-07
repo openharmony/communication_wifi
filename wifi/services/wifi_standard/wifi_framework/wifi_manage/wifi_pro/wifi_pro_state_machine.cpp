@@ -1364,9 +1364,10 @@ ErrCode WifiProStateMachine::WifiHasNetState::ScanByPerf5gTable(const std::vecto
  
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
- 
     isConnected24G_ = WifiChannelHelper::GetInstance().IsValid24GHz(linkedInfo.frequency);
     isConnected5G_ = WifiChannelHelper::GetInstance().IsValid5GHz(linkedInfo.frequency);
+    std::vector<InterScanInfo> mutableScanInfos = scanInfos;
+    pWifiProStateMachine_->perf5gHandoverService_.ScanResultUpdated(mutableScanInfos);
  
     std::set<RelationAp> allRelationAps;
     const auto getRelationBssid = [this](RelationInfo& relationInfo) -> std::string& {
@@ -1396,8 +1397,7 @@ ErrCode WifiProStateMachine::WifiHasNetState::ScanByPerf5gTable(const std::vecto
  
     if (allRelationAps.empty()) {
         WIFI_LOGE("relation Ap is empty! start select Net!");
-        HandleScanResultInHasNetInner(scanInfos);
-        return WIFI_OPT_SUCCESS;
+        return HandleScanResultInHasNetInner(scanInfos) ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
     }
  
     WifiScanParams params;
@@ -1409,7 +1409,7 @@ ErrCode WifiProStateMachine::WifiHasNetState::ScanByPerf5gTable(const std::vecto
     if (pScanService == nullptr ||
         pScanService->ScanWithParam(params, false, ScanType::SCAN_TYPE_WIFIPRO) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("ScanByPerf5gTable failed!");
-        HandleScanResultInHasNetInner(scanInfos);
+        return HandleScanResultInHasNetInner(scanInfos) ? WIFI_OPT_SUCCESS : WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -1431,7 +1431,6 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
         WIFI_LOGI("HandleScanResultInHasNet, Wifi2WifiSwitching.");
         return;
     }
-
     // Make sure the wifipro lag switch is done only once
     if (pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW && !qoeSwitch_) {
         WIFI_LOGI("HandleScanResultInHasNet, qoe has tried to switch.");
@@ -1441,15 +1440,17 @@ void WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNet(const Intern
     qoeSwitch_ = false;
     if (isLpScanTriggered_) {
         isLpScanTriggered_ = false;
-        ScanByPerf5gTable(scanInfos);
+        if (ScanByPerf5gTable(scanInfos) == WIFI_OPT_SUCCESS) {
+            return;
+        }
     } else {
         if (HandleScanResultInHasNetInner(scanInfos)) {
             return;
         }
     }
     if (Try5gHandover(scanInfos)) {
-            WIFI_LOGI("HandleScanResultInHasNet: 5G handover successful.");
-            return;
+        WIFI_LOGI("HandleScanResultInHasNet: 5G handover successful.");
+        return;
     }
     if (TryHigherCategoryNetworkSelection(scanInfos)) {
         WIFI_LOGI("HandleScanResultInHasNet: Higher category selection successful.");

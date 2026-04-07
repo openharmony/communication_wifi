@@ -1040,5 +1040,11 @@ HWTEST_F(WifiProStateMachineTest, UpdateGatewayRelationDiffBssidTest01, TestSize
     NetworkBlockListManager::GetInstance().UpdateGatewayRelation(bssid1, bssid2, false);
     EXPECT_NE(pWifiProStateMachine_->wifiSwitchReason_, TEN);
 }
+
+HWTEST_F(WifiProStateMachineTest, HandleScanResultInHasNetTest01, TestSize.Level1)
+{
+    wifiHasNetState_->HandleScanResultInHasNet(nullptr);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
 } // namespace Wifi
 } // namespace OHOS

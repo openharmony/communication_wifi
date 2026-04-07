@@ -188,8 +188,6 @@ public:
 
     int SetDeviceEphemeral(int networkId, bool isEphemeral);
 
-    int SetDeviceUid(int networkId, int uid);
-
     int SetDeviceAfterConnect(int networkId, int rssi = INVALID_SIGNAL_LEVEL);
 
     int SetDeviceAfterDisconnect(int networkId);
@@ -211,6 +209,8 @@ public:
         WifiDeviceConfig &config, int instId);
 
     int GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config);
+
+    int GetCandidateConfigWithoutUid(const int &networkId, WifiDeviceConfig &config);
 
     int GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs);
 

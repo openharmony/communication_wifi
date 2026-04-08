@@ -694,12 +694,12 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
         case GameSceneId::MSG_GAME_STATE_START:
         case GameSceneId::MSG_GAME_STATE_FOREGROUND:
             SetActivePowerScenes(POWER_SCENE_GAME, false);
-            if (AppParser::GetInstance().IsUnderGameLowRttThresh(networkControlInfo.bundleName,
+            if (AppParser::GetInstance().IsOverGameLowRttThresh(networkControlInfo.bundleName,
                 networkControlInfo.rtt)) {
-                SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_3, GAME_BOOST_DISABLE,
+                SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
                     networkControlInfo.uid);
             } else {
-                SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
+                SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_3, GAME_BOOST_DISABLE,
                     networkControlInfo.uid);
             }
             break;
@@ -726,6 +726,7 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
 
 void AppNetworkSpeedLimitService::AdjustSpeedLimitByRtt(const int rtt)
 {
+    std::unique_lock<std::mutex> lock(rttMutex_);
     WifiNetworkControlInfo gameInfo = WifiConfigCenter::GetInstance().GetNetworkControlInfo();
     if (gameInfo.bundleName == "" || gameInfo.state != GameSceneId::MSG_GAME_STATE_FOREGROUND) {
         return;
@@ -734,11 +735,6 @@ void AppNetworkSpeedLimitService::AdjustSpeedLimitByRtt(const int rtt)
     if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] == BG_LIMIT_LEVEL_3) {
         if (AppParser::GetInstance().IsOverGameHighRttThresh(gameInfo.bundleName, rtt)) {
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
-                gameInfo.uid);
-        }
-    } else if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] == BG_LIMIT_LEVEL_7) {
-        if (AppParser::GetInstance().IsUnderGameLowRttThresh(gameInfo.bundleName, rtt)) {
-            SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_3, GAME_BOOST_DISABLE,
                 gameInfo.uid);
         }
     }

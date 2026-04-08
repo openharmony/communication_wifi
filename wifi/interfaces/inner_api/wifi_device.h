@@ -170,7 +170,10 @@ public:
      * @param connectSettings - ConnectSettings object containing network connection parameters
      * @return ErrCode - operation result
      */
-    virtual ErrCode ConnectToCandidateConfig(ConnectSettings &connectSettings) = 0;
+    virtual ErrCode ConnectToCandidateConfig(ConnectSettings &connectSettings)
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
 
     /**
      * @Description Connect To a network base WifiDeviceConfig object.

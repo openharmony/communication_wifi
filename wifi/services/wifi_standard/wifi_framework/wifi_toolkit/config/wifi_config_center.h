@@ -427,6 +427,7 @@ private:
 private:
     // STA
     std::mutex mStaMutex;
+    mutable std::mutex mutex;
     std::atomic<bool> mWifiSelfcureReset {false};
     std::atomic<bool> mWifiSelfcureResetEntered {false};
     std::atomic<int> mLastNetworkId {INVALID_NETWORK_ID};

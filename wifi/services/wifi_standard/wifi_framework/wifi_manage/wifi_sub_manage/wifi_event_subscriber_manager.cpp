@@ -1015,7 +1015,8 @@ void NotificationEventSubscriber::HandleCandidateConnect(const OHOS::EventFwk::C
 {
     NotifyCandidateApprovalStatus(CandidateApprovalStatus::USER_ACCEPT);
     bool addNetworkToSystem = eventData.GetWant().GetBoolParam("addNetworkToSystem", false);
-    int candidateNetworkId = WifiConfigCenter::GetInstance().GetSelectedCandidateNetworkId();
+    ConnectSettings connectSettings = WifiConfigCenter::GetInstance().GetCandidateConnectSettings();
+    int candidateNetworkId = connectSettings.networkId;
     if (candidateNetworkId == INVALID_NETWORK_ID) {
         WIFI_LOGI("OnReceiveNotificationEvent networkid is invalid");
         return;
@@ -1090,7 +1091,8 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType, boo
             pEnhanceService->OnSettingsDialogClick(false, SETTINGS_5G_AUTO_IDENTIFY_CONN);
         }
     } else if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
-        WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(INVALID_NETWORK_ID);
+        ConnectSettings connectSettings;
+        WifiConfigCenter::GetInstance().SetCandidateConnectSettings(connectSettings);
         if (noAction) {
             NotifyCandidateApprovalStatus(CandidateApprovalStatus::USER_NO_RESPOND);
         } else {

@@ -312,7 +312,7 @@ ErrCode StaService::ConnectToCandidateConfig(ConnectSettings &connectSettings)
         return WIFI_OPT_NOT_SUPPORTED;
     }
     if (config.lastConnectTime <= 0) {
-        WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(connectSettings.networkId);
+        WifiConfigCenter::GetInstance().SetCandidateConnectSettings(connectSettings);
         WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT, config.ssid,
             connectSettings.userActionTimeout * SECOND_TO_MILLI_SECOND, connectSettings.addNetworkToSystem);
         return WIFI_OPT_SUCCESS;

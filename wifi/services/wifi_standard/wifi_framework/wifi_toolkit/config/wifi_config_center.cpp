@@ -126,14 +126,16 @@ int WifiConfigCenter::GetLastNetworkId() const
     return mLastNetworkId.load();
 }
 
-void WifiConfigCenter::SetSelectedCandidateNetworkId(const int networkId)
+void WifiConfigCenter::SetCandidateConnectSettings(const ConnectSettings &connectSettings)
 {
-    mSelectedCandidateNetworkId = networkId;
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    mCandidateConnectSettings = connectSettings;
 }
 
-int WifiConfigCenter::GetSelectedCandidateNetworkId() const
+ConnectSettings WifiConfigCenter::GetCandidateConnectSettings() const
 {
-    return mSelectedCandidateNetworkId.load();
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    return mCandidateConnectSettings;
 }
 
 void WifiConfigCenter::SetWifiAllowSemiActive(bool isAllowed)

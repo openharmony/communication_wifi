@@ -944,6 +944,57 @@ static napi_value GetJsObjToConnectSettings(napi_env env, napi_value object, Con
     return object;
 }
 
+static void CandidateConnectCallbackFunc(void *data)
+{
+    if (data == nullptr) {
+        WIFI_LOGE("Async data parameter is null");
+        return;
+    }
+    DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
+    EraseAsyncContext(NapiAsyncType::CANDIDATE_CONNECT);
+    std::function<void(void)> func = [context] () {
+        if (context->errorCode == WIFI_OPT_INVALID_PARAM) {
+            context->errorCode = WIFI_OPT_INVALID_PARAM_NEW;
+        }
+        napi_get_boolean(context->env, (context->errorCode == WIFI_OPT_SUCCESS), &context->result);
+        HandlePromiseErrCode(context->env, *context);
+        if (context->completeTriggered) {
+            WifiTimer::GetInstance()->UnRegister(context->timerId);
+            delete context;
+        } else {
+            context->callbackTriggered = true;
+        }
+    };
+    if (napi_send_event(context->env, func, napi_eprio_immediate) != napi_status::napi_ok) {
+        WIFI_LOGE("CandidateConnectCallbackFunc: Failed to SendEvent");
+    }
+    WIFI_LOGI("Push connect candidate network result to client");
+}
+
+static void CandidateConnectCompleteFunc(void *data)
+{
+    if (data == nullptr) {
+        WIFI_LOGE("Async data parameter is null");
+        return;
+    }
+    DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
+    if (context->errorCode != WIFI_OPT_SUCCESS) {
+        context->callbackFunc(context);
+    }
+    auto timeoutCallback = [context] () {
+        context->errorCode = WIFI_OPT_USER_DOES_NOT_RESPOND;
+        context->callbackFunc(context);
+    };
+    WifiTimer::GetInstance()->Register(timeoutCallback, context->timerId, CANDIDATE_CALLBACK_TIMEOUT);
+
+    if (context->callbackTriggered) {
+        WifiTimer::GetInstance()->UnRegister(context->timerId);
+        delete context;
+    } else {
+        context->completeTriggered = true;
+    }
+}
+
 static napi_value ConnectToCandidateWithUserActionAsync(napi_env env, int networkId,
     size_t argc, const napi_value* argv)
 {
@@ -1014,57 +1065,6 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callba
         WIFI_NAPI_RETURN_NUM_CODE(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     } else {
         WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
-    }
-}
-
-static void CandidateConnectCallbackFunc(void *data)
-{
-    if (data == nullptr) {
-        WIFI_LOGE("Async data parameter is null");
-        return;
-    }
-    DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
-    EraseAsyncContext(NapiAsyncType::CANDIDATE_CONNECT);
-    std::function<void(void)> func = [context] () {
-        if (context->errorCode == WIFI_OPT_INVALID_PARAM) {
-            context->errorCode = WIFI_OPT_INVALID_PARAM_NEW;
-        }
-        napi_get_boolean(context->env, (context->errorCode == WIFI_OPT_SUCCESS), &context->result);
-        HandlePromiseErrCode(context->env, *context);
-        if (context->completeTriggered) {
-            WifiTimer::GetInstance()->UnRegister(context->timerId);
-            delete context;
-        } else {
-            context->callbackTriggered = true;
-        }
-    };
-    if (napi_send_event(context->env, func, napi_eprio_immediate) != napi_status::napi_ok) {
-        WIFI_LOGE("CandidateConnectCallbackFunc: Failed to SendEvent");
-    }
-    WIFI_LOGI("Push connect candidate network result to client");
-}
-
-static void CandidateConnectCompleteFunc(void *data)
-{
-    if (data == nullptr) {
-        WIFI_LOGE("Async data parameter is null");
-        return;
-    }
-    DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
-    if (context->errorCode != WIFI_OPT_SUCCESS) {
-        context->callbackFunc(context);
-    }
-    auto timeoutCallback = [context] () {
-        context->errorCode = WIFI_OPT_USER_DOES_NOT_RESPOND;
-        context->callbackFunc(context);
-    };
-    WifiTimer::GetInstance()->Register(timeoutCallback, context->timerId, CANDIDATE_CALLBACK_TIMEOUT);
-
-    if (context->callbackTriggered) {
-        WifiTimer::GetInstance()->UnRegister(context->timerId);
-        delete context;
-    } else {
-        context->completeTriggered = true;
     }
 }
 

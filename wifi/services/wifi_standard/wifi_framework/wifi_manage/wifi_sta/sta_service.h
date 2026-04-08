@@ -128,9 +128,7 @@ public:
     /**
      * @Description Connect to a candidate specified network.
      *
-     * @param uid - call app uid
-     * @param networkId - the candidate device network id
-     * @param dialogTimeout - Displays the dialog timeout for connecting to candidate networks.
+     * @param connectSettings - connectSettings
      * @Return ErrCode - operation result
      */
     virtual ErrCode ConnectToCandidateConfig(ConnectSettings &connectSettings);

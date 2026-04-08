@@ -1014,7 +1014,6 @@ void NotificationEventSubscriber::OnReceiveDontShowEvent(int notificationId)
 void NotificationEventSubscriber::HandleCandidateConnect(const OHOS::EventFwk::CommonEventData &eventData)
 {
     NotifyCandidateApprovalStatus(CandidateApprovalStatus::USER_ACCEPT);
-    bool addNetworkToSystem = eventData.GetWant().GetBoolParam("addNetworkToSystem", false);
     ConnectSettings connectSettings = WifiConfigCenter::GetInstance().GetCandidateConnectSettings();
     if (connectSettings.networkId == INVALID_NETWORK_ID) {
         WIFI_LOGI("OnReceiveNotificationEvent networkid is invalid");

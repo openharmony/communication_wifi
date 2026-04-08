@@ -195,8 +195,8 @@ void WifiDeviceStub::InitHandleMap()
         MessageParcel &data, MessageParcel &reply) { OnAllowAutoConnect(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnConnectTo(code, data, reply); };
-    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG)] = [this](uint32_t code,
-        MessageParcel &data, MessageParcel &reply) { OnConnectToCandidateConfig(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG)] = [this](
+        uint32_t code, MessageParcel &data, MessageParcel &reply) { OnConnectToCandidateConfig(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnConnect2To(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RECONNECT)] = [this](uint32_t code,

@@ -949,7 +949,8 @@ ErrCode WifiDeviceProxy::ConnectToCandidateConfig(ConnectSettings &connectSettin
         return WIFI_OPT_FAILED;
     }
     MessageOption option;
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         WIFI_LOGE("Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
@@ -962,7 +963,7 @@ ErrCode WifiDeviceProxy::ConnectToCandidateConfig(ConnectSettings &connectSettin
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG),
         data, reply, option);
     if (error != ERR_NONE) {
-        WIFI_LOGE("Set Attr(%{public}d) failed,error code is %{public}d",
+        WIFI_LOGE("SConnectToCandidateConfig et Attr(%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG), error);
         return WIFI_OPT_FAILED;
     }

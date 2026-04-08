@@ -975,6 +975,9 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callba
         if (connectSettings.userActionTimeout <= 0 || connectSettings.userActionTimeout > MAX_DIALOG_TIMEOUT) {
             WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
         }
+        if (connectSettings.withUserAction) {
+            return ConnectToCandidateWithUserActionAsync(env, connectSettings.networkId, argc, argv);
+        }
         ret = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
         WIFI_NAPI_RETURN_NUM_CODE(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     } else {
@@ -1033,6 +1036,38 @@ static void CandidateConnectCompleteFunc(void *data)
     }
 }
 
+static napi_value ConnectToCandidateWithUserActionAsync(napi_env env, int networkId,
+    size_t argc, const napi_value* argv)
+{
+    DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    if (!TryPushAsyncContext(NapiAsyncType::CANDIDATE_CONNECT, asyncContext)) {
+        delete asyncContext;
+        WIFI_NAPI_ASSERT(env, false, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    }
+    napi_create_string_latin1(env, "ConnectToCandidateConfigWithUserAction", NAPI_AUTO_LENGTH,
+        &asyncContext->resourceName);
+
+    std::vector<std::string> stdEvent = { EVENT_STA_CANDIDATE_CONNECT_CHANGE };
+    EventRegister::GetInstance().RegisterDeviceEvents(stdEvent);
+
+    asyncContext->networkId = networkId;
+    asyncContext->isCandidate = true;
+    asyncContext->waitCallback = true;
+    asyncContext->callbackFunc = CandidateConnectCallbackFunc;
+    asyncContext->executeFunc = [&](void* data) -> void {
+        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
+        ConnectSettings connectSettings;
+        connectSettings.networkId = context->networkId;
+        connectSettings.withUserAction = true;
+        context->errorCode = wifiDevicePtr->ConnectToNetwork(connectSettings);
+    };
+    asyncContext->completeFunc = CandidateConnectCompleteFunc;
+
+    asyncContext->sysCap = SYSCAP_WIFI_STA;
+    return DoAsyncWork(env, asyncContext, argc, argv, 1);
+}
+
 NO_SANITIZE("cfi") napi_value ConnectToCandidateConfigWithUserAction(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
@@ -1048,34 +1083,9 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfigWithUserAction(napi_env en
     napi_typeof(env, argv[0], &valueType);
     WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
-    DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-    if (!TryPushAsyncContext(NapiAsyncType::CANDIDATE_CONNECT, asyncContext)) {
-        delete asyncContext;
-        WIFI_NAPI_ASSERT(env, false, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-    }
-    napi_create_string_latin1(env, "ConnectToCandidateConfigWithUserAction", NAPI_AUTO_LENGTH,
-        &asyncContext->resourceName);
-
-    std::vector<std::string> stdEvent = { EVENT_STA_CANDIDATE_CONNECT_CHANGE };
-    EventRegister::GetInstance().RegisterDeviceEvents(stdEvent);
-
-    napi_get_value_int32(env, argv[0], &asyncContext->networkId);
-    asyncContext->isCandidate = true;
-    asyncContext->waitCallback = true;
-    asyncContext->callbackFunc = CandidateConnectCallbackFunc;
-    asyncContext->executeFunc = [&](void* data) -> void {
-        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
-        ConnectSettings connectSettings;
-        connectSettings.networkId = context->networkId;
-        connectSettings.withUserAction = true;
-        context->errorCode = wifiDevicePtr->ConnectToNetwork(connectSettings);
-    };
-    asyncContext->completeFunc = CandidateConnectCompleteFunc;
-
-    size_t nonCallbackArgNum = 1;
-    asyncContext->sysCap = SYSCAP_WIFI_STA;
-    return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
+    int networkId = -1;
+    napi_get_value_int32(env, argv[0], &networkId);
+    return ConnectToCandidateWithUserActionAsync(env, networkId, argc, argv);
 }
 
 NO_SANITIZE("cfi") napi_value ConnectToNetwork(napi_env env, napi_callback_info info)

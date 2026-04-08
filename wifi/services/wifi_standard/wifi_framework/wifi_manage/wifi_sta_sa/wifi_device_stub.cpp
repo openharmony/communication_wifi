@@ -804,7 +804,6 @@ void WifiDeviceStub::OnConnectToCandidateConfig(uint32_t code, MessageParcel &da
     ErrCode ret = ConnectToCandidateConfig(connectSettings);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
-
     return;
 }
 

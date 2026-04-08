@@ -696,6 +696,5 @@ void StaInterface::GetDetectNetState(OperateResState &state)
 {
     pStaService->GetDetectNetState(state);
 }
-
 } // namespace Wifi
 }  // namespace OHOS

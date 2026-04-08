@@ -39,6 +39,7 @@ constexpr auto XML_TAG_SECTION_HEADER_APP_GAME_BACKGROUND_LIMIT_LIST = "GameBack
 constexpr auto XML_TAG_SECTION_HEADER_RSS_GAME_LIST = "RssGameList";
 constexpr auto XML_TAG_SECTION_HEADER_ASYNC_DELAY_TIME = "AsyncDelayTime";
 constexpr auto XML_TAG_SECTION_KEY_GAME_RTT = "mGameRtt";
+constexpr auto XML_TAG_SECTION_KEY_GAME_RTT_GAP = "mGameRttGap";
 constexpr auto XML_TAG_SECTION_KEY_GAME_NAME = "gameName";
 constexpr auto XML_TAG_SECTION_KEY_PACKAGE_NAME = "packageName";
 constexpr auto XML_TAG_SECTION_KEY_DELAY_TIME = "delayTime";
@@ -59,8 +60,6 @@ const std::unordered_map<std::string, AppType> appTypeMap = {
     { XML_TAG_SECTION_HEADER_RSS_GAME_LIST, AppType::RSS_GAME_LIST_APP},
     { XML_TAG_SECTION_KEY_GAME_RTT, AppType::GAME_RTT},
 };
-
-const int RTT_GAP = 60;
 
 AppParserInner::AppParserInner()
 {
@@ -247,8 +246,18 @@ LowLatencyAppInfo AppParserInner::ParseLowLatencyAppInfo(const xmlNodePtr &innod
                 break;
             }
             std::string rtt = std::string(reinterpret_cast<char *>(rttValue));
-            result_.m_gameRtt[gameName] = CheckDataLegal(rtt);
+            result_.m_gameInfo[gameName].rtt = CheckDataLegal(rtt);
             xmlFree(rttValue);
+        }
+        if (GetNodeValue(node) == XML_TAG_SECTION_KEY_GAME_RTT_GAP) {
+            xmlChar *rttGapValue = xmlNodeGetContent(node);
+            if (rttGapValue == NULL) {
+                WIFI_LOGE("%{public}s xml parser game rtt gap info error.", __FUNCTION__);
+                break;
+            }
+            std::string rttGap = std::string(reinterpret_cast<char *>(rttGapValue));
+            result_.m_gameInfo[gameName].rttGap = CheckDataLegal(rttGap);
+            xmlFree(rttGapValue);
         }
     }
     return appInfo;
@@ -541,7 +550,7 @@ bool AppParser::IsRssGameApp(const std::string &bundleName) const
         [bundleName](const RssGameListAppInfo &app) { return app.packageName == bundleName; });
 }
 
-bool AppParser::IsOverGameHighRttThresh(const std::string &bundleName, const int gameRtt) const
+bool AppParser::IsOverGameRtt(const std::string &bundleName, const int gameRtt) const
 {
     std::shared_lock<std::shared_mutex> lock(appParserMutex_);
     if (result_.m_gameRtt.find(bundleName) == result_.m_gameRtt.end()) {
@@ -550,13 +559,13 @@ bool AppParser::IsOverGameHighRttThresh(const std::string &bundleName, const int
     return result_.m_gameRtt.at(bundleName) <= gameRtt;
 }
 
-bool AppParser::IsUnderGameLowRttThresh(const std::string &bundleName, const int gameRtt) const
+bool AppParser::IsOverGameLowRttThresh(const std::string &bundleName, const int gameRtt) const
 {
     std::shared_lock<std::shared_mutex> lock(appParserMutex_);
     if (result_.m_gameRtt.find(bundleName) == result_.m_gameRtt.end()) {
         return false;
     }
-    return result_.m_gameRtt.at(bundleName) - RTT_GAP >= gameRtt;
+    return result_.m_gameRtt.at(bundleName).rtt - result_.m_gameRtt.at(bundleName).rttGap <= gameRtt;
 }
 
 std::string AppParser::GetAsyncLimitSpeedDelayTime() const

@@ -159,6 +159,10 @@ void WifiDeviceStub::InitHandleMapEx2()
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnIsRandomMacDisabled(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_BT_COEXIST_STATE)] = [this]
         (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnSetBtCoexistState(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_WIFI_CAPABILITY)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnSetWifiCapability(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_CAPABILITY)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetWifiCapability(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -1693,6 +1697,33 @@ void WifiDeviceStub::OnSetBtCoexistState(uint32_t code, MessageParcel &data, Mes
     ErrCode ret = SetBtCoexistState(state, reason);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnSetWifiCapability(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int capability = data.ReadInt32();
+    bool enable = data.ReadBool();
+    int ret = SetWifiCapability(capability, enable);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
+void WifiDeviceStub::OnGetWifiCapability(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int capability = data.ReadInt32();
+    bool enabled = false;
+    int ret = GetWifiCapability(capability, enabled);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteBool(enabled);
+    }
+
     return;
 }
 }  // namespace Wifi

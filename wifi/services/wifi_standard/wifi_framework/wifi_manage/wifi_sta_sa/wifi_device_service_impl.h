@@ -224,6 +224,10 @@ public:
     ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
 
     ErrCode SetBtCoexistState(CoexistState state, CoexistReason reason) override;
+
+    ErrCode SetWifiCapability(int capability, bool enable) override;
+
+    ErrCode GetWifiCapability(int capability, bool &enabled) override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

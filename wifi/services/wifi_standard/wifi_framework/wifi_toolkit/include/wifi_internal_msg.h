@@ -137,6 +137,10 @@ enum ProductDeviceType : int {
     GLASSES = 5
 };
 
+enum class WifiCapability {
+    WIFI_AUTO_ENABLE = 0,
+};
+
 struct WifiCallingInfo {
     int callingUid;
     int callingPid;
@@ -277,6 +281,7 @@ struct WifiConfig {
     std::string realMacAddress;
     int staApExclusionType;
     bool isRandomMacDisabled;
+    bool wifiAutoEnable;
 
     WifiConfig()
     {
@@ -324,6 +329,7 @@ struct WifiConfig {
         realMacAddress = "";
         staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
         isRandomMacDisabled = false;
+        wifiAutoEnable = true;
     }
 };
 

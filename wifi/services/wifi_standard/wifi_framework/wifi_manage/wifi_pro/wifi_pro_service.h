@@ -39,6 +39,8 @@ public:
     void HandleWifiHalSignalInfoChange(const WifiSignalPollInfo &wifiSignalPollInfo);
     void HandleQoeReport(const NetworkLagType &networkLagType, const NetworkLagInfo &networkLagInfo);
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    ErrCode UninitWifiIntelligence();
+    ErrCode InitWifiIntelligence();
     void OnScreenStateChanged(int32_t screenState);
     void OnCellInfoUpdated();
     void OnWifiStateOpen(int32_t state);

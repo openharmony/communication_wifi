@@ -364,32 +364,50 @@ WifiErrorCode GetWifiDetailState(WifiDetailState *state);
  */
 WifiErrorCode GetMultiLinkedInfo(WifiLinkedInfo *result, unsigned int *size);
 
-    /**
-     * @Description Get Random Mac Disabled.
-     * @param isRandomMacDisabled: True for disabled   False for enabled
-     * @return Returns {@link WIFI_SUCCESS} get randommacdisabled successfully; returns an error code defined in
+/**
+ * @Description Get Random Mac Disabled.
+ * @param isRandomMacDisabled: True for disabled   False for enabled
+ * @return Returns {@link WIFI_SUCCESS} get randommacdisabled successfully; returns an error code defined in
  * {@link WifiErrorCode} otherwise.
-     */
+ */
 WifiErrorCode IsRandomMacDisabled(bool *isRandomMacDisabled);
 
-    /**
-     * @Description Set Random Mac Disabled.
-     *
-     * @param isRandomMacDisabled: True for disabled   False for enabled
-     * @return Returns {@link WIFI_SUCCESS} set randommacdisabled successfully; returns an error code defined in
+/**
+ * @Description Set Random Mac Disabled.
+ *
+ * @param isRandomMacDisabled: True for disabled   False for enabled
+ * @return Returns {@link WIFI_SUCCESS} set randommacdisabled successfully; returns an error code defined in
  * {@link WifiErrorCode} otherwise.
-     */
+ */
 WifiErrorCode SetRandomMacDisabled(bool isRandomMacDisabled);
 
 /**
-     * @Description Set bt co-exist state when service conflict
-     *
-     * @param state - bt co-exist state
-     * @param reason - conflict reason
-     * @return Returns {@link WIFI_SUCCESS} set randommacdisabled successfully; returns an error code defined in
+ * @Description Set bt co-exist state when service conflict
+ *
+ * @param state - bt co-exist state
+ * @param reason - conflict reason
+ * @return Returns {@link WIFI_SUCCESS} set randommacdisabled successfully; returns an error code defined in
  * {@link WifiErrorCode} otherwise.
-     */
+ */
 WifiErrorCode SetBtCoexistState(CoexistState state, CoexistReason reason);
+
+/**
+ * @Description Set wifi capability enable status
+ *
+ * @param capability - capability id
+ * @param enable - enable or disable
+ * @return ErrCode - operation result
+ */
+WifiErrorCode SetWifiCapability(int capability, bool enable);
+
+/**
+ * @Description Get wifi capability enable status
+ *
+ * @param capability - capability id
+ * @param enabled - output enable status
+ * @return ErrCode - operation result
+ */
+WifiErrorCode GetWifiCapability(int capability, bool *enabled);
 
 #ifdef __cplusplus
 }

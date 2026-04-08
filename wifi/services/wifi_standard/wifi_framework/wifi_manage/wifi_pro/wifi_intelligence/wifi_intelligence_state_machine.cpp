@@ -49,6 +49,7 @@ WifiIntelligenceStateMachine::WifiIntelligenceStateMachine(int32_t instId)
     : StateMachine(WIFI_INTELLIGENCE_STATE_MACHINE),
     instId_(instId)
 {
+    apInfoHelper_ = std::make_shared<ApInfoHelper>();
     WIFI_LOGI("Enter WifiIntelligenceStateMachine");
 }
 
@@ -118,7 +119,7 @@ ErrCode WifiIntelligenceStateMachine::Initialize()
     if (InitWifiIntelligenceStates() == WIFI_OPT_FAILED) {
         return WIFI_OPT_FAILED;
     }
-    ApInfoHelper::GetInstance().Init();
+    apInfoHelper_->Init();
     BuildStateTree();
     SetFirstState(pInitialState_);
     StartStateMachine();
@@ -227,14 +228,14 @@ void WifiIntelligenceStateMachine::DefaultState::HandleWifiConfigurationChange(I
         return;
     }
     if (state == static_cast<int32_t>(ConfigChange::CONFIG_REMOVE) && isRemoveAll) {
-        ApInfoHelper::GetInstance().DelAllApInfo();
+        pWifiIntelligenceStateMachine_->apInfoHelper_->DelAllApInfo();
         return;
     }
     if (state == static_cast<int32_t>(ConfigChange::CONFIG_REMOVE)) {
         if (!config.ssid.empty()) {
-            ApInfoHelper::GetInstance().DelApInfoBySsid(config.ssid, config.keyMgmt);
+            pWifiIntelligenceStateMachine_->apInfoHelper_->DelApInfoBySsid(config.ssid, config.keyMgmt);
         } else {
-            ApInfoHelper::GetInstance().DelApInfoByBssid(config.bssid);
+            pWifiIntelligenceStateMachine_->apInfoHelper_->DelApInfoByBssid(config.bssid);
         }
     }
 }
@@ -275,7 +276,8 @@ bool WifiIntelligenceStateMachine::InitialState::ExecuteStateMsg(InternalMessage
 
 /* --------------------------- state machine enabled state ------------------------------ */
 WifiIntelligenceStateMachine::EnabledState::EnabledState(WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine)
-    : State("EnabledState")
+    : State("EnabledState"),
+      pWifiIntelligenceStateMachine_(pWifiIntelligenceStateMachine)
 {
     WIFI_LOGD("EnabledState construct success.");
 }
@@ -285,7 +287,7 @@ WifiIntelligenceStateMachine::EnabledState::~EnabledState() {}
 void WifiIntelligenceStateMachine::EnabledState::GoInState()
 {
     WIFI_LOGI("Enter EnabledState GoInState function.");
-    ApInfoHelper::GetInstance().ResetAllBalcklist();
+    pWifiIntelligenceStateMachine_->apInfoHelper_->ResetAllBalcklist();
 }
 
 void WifiIntelligenceStateMachine::EnabledState::GoOutState()
@@ -393,14 +395,14 @@ bool WifiIntelligenceStateMachine::DisabledState::ExecuteStateMsg(InternalMessag
 void WifiIntelligenceStateMachine::DisabledState::HandleMsgStateChange(InternalMessagePtr msg)
 {
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
-    std::string cellId = ApInfoHelper::GetInstance().GetCurrentCellIdInfo();
+    std::string cellId = pWifiIntelligenceStateMachine_->apInfoHelper_->GetCurrentCellIdInfo();
     WIFI_LOGI("HandleMsgStateChange, cur cellId = %{private}s", cellId.c_str());
     if (cellId.empty()) {
         WIFI_LOGE("HandleMsgStateChange, current cell id is null.");
         return;
     }
 
-    if (!ApInfoHelper::GetInstance().IsCellIdExit(cellId)) {
+    if (!pWifiIntelligenceStateMachine_->apInfoHelper_->IsCellIdExit(cellId)) {
         std::vector<WifiScanInfo> scanInfoList;
         WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
         WIFI_LOGI("mIsAutoOpenSearch_:%{public}d, mTargetApInfoDatas_.size:%{public}zu, scanInfoList.size:%{public}zu",
@@ -410,7 +412,7 @@ void WifiIntelligenceStateMachine::DisabledState::HandleMsgStateChange(InternalM
             pWifiIntelligenceStateMachine_->mTargetApInfoDatas_.size() > 0 && scanInfoList.size() > 0 &&
             pWifiIntelligenceStateMachine_->IsHasTargetAp(scanInfoList)) {
             pWifiIntelligenceStateMachine_->ProcessScanResult(scanInfoList,
-                ApInfoHelper::GetInstance().GetCurrentCellIdInfo());
+                pWifiIntelligenceStateMachine_->apInfoHelper_->GetCurrentCellIdInfo());
             pWifiIntelligenceStateMachine_->UpdateScanResult(msg);
             return;
         }
@@ -419,7 +421,7 @@ void WifiIntelligenceStateMachine::DisabledState::HandleMsgStateChange(InternalM
         return;
     }
 
-    std::vector<ApInfoData> datas = ApInfoHelper::GetInstance().GetMonitorDatas(cellId);
+    std::vector<ApInfoData> datas = pWifiIntelligenceStateMachine_->apInfoHelper_->GetMonitorDatas(cellId);
     pWifiIntelligenceStateMachine_->mTargetApInfoDatas_ = FilterFromBlackList(datas);
     WIFI_LOGI("mTargetApInfoDatas_.size:%{public}zu", pWifiIntelligenceStateMachine_->mTargetApInfoDatas_.size());
     if (pWifiIntelligenceStateMachine_->mTargetApInfoDatas_.size() > 0 && screenState == MODE_STATE_OPEN &&
@@ -448,13 +450,13 @@ bool WifiIntelligenceStateMachine::ProcessScanResult(std::vector<WifiScanInfo> s
     }
     for (auto &scanResult : scanInfoList) {
         ApInfoData data;
-        int index = ApInfoHelper::GetInstance().GetApInfoByBssid(scanResult.bssid, data);
+        int index = apInfoHelper_->GetApInfoByBssid(scanResult.bssid, data);
         if (index != -1) {
-            if (!ApInfoHelper::GetInstance().IsCellIdExit(cellId)) {
-                ApInfoHelper::GetInstance().AddCellInfo(data.bssid, cellId);
+            if (!apInfoHelper_->IsCellIdExit(cellId)) {
+                apInfoHelper_->AddCellInfo(data.bssid, cellId);
                 checkResult = true;
                 std::vector<CellInfoData> cellInfos;
-                ApInfoHelper::GetInstance().QueryCellIdInfoByParam({{CellIdInfoTable::BSSID, data.bssid}},
+                apInfoHelper_->QueryCellIdInfoByParam({{CellIdInfoTable::BSSID, data.bssid}},
                     cellInfos);
                 data.cellInfos = cellInfos;
             }
@@ -478,7 +480,7 @@ bool WifiIntelligenceStateMachine::IsHasTargetAp(std::vector<WifiScanInfo> &scan
 bool WifiIntelligenceStateMachine::IsInBlacklist(std::string bssid)
 {
     ApInfoData data;
-    int index = ApInfoHelper::GetInstance().GetApInfoByBssid(bssid, data);
+    int index = apInfoHelper_->GetApInfoByBssid(bssid, data);
     if (index == -1) {
         return false;
     }
@@ -644,12 +646,12 @@ void WifiIntelligenceStateMachine::StopState::GoInState()
         WIFI_LOGE("get scan result is null.");
     }
     if (!pWifiIntelligenceStateMachine_->mTargetSsid_.empty()) {
-        ApInfoHelper::GetInstance().SetBlackListBySsid(pWifiIntelligenceStateMachine_->mTargetSsid_,
+        pWifiIntelligenceStateMachine_->apInfoHelper_->SetBlackListBySsid(pWifiIntelligenceStateMachine_->mTargetSsid_,
             pWifiIntelligenceStateMachine_->mTargetAuthType_, 1);
     }
     pWifiIntelligenceStateMachine_->mTargetSsid_ = "";
     pWifiIntelligenceStateMachine_->mTargetAuthType_ = "";
-    ApInfoHelper::GetInstance().ResetBlacklist(scanInfoList, 1);
+    pWifiIntelligenceStateMachine_->apInfoHelper_->ResetBlacklist(scanInfoList, 1);
     pWifiIntelligenceStateMachine_->InitPunishParameter();
 }
 
@@ -800,13 +802,13 @@ void WifiIntelligenceStateMachine::ConnectedState::HandleWifiInternetChangeRes(c
         pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pNoInternetState_);
         return;
     } else if (state == static_cast<int32_t>(OperateResState::CONNECT_CHECK_PORTAL)) {
-        ApInfoHelper::GetInstance().DelApInfoBySsid(config.ssid, config.keyMgmt);
+        pWifiIntelligenceStateMachine_->apInfoHelper_->DelApInfoBySsid(config.ssid, config.keyMgmt);
         pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pNoInternetState_);
         return;
     } else if (state == static_cast<int32_t>(OperateResState::CONNECT_NETWORK_ENABLED)) {
         if (config.isPortal) {
             WIFI_LOGI("current network has network but is portal, no need to record it.");
-            ApInfoHelper::GetInstance().DelApInfoBySsid(config.ssid, config.keyMgmt);
+            pWifiIntelligenceStateMachine_->apInfoHelper_->DelApInfoBySsid(config.ssid, config.keyMgmt);
             pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pNoInternetState_);
             return;
         }
@@ -818,7 +820,8 @@ void WifiIntelligenceStateMachine::ConnectedState::HandleWifiInternetChangeRes(c
 /* --------------------------- state machine internet ready state ------------------------------ */
 WifiIntelligenceStateMachine::InternetReadyState::InternetReadyState(
     WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine)
-    : State("InternetReadyState")
+    : State("InternetReadyState"),
+      pWifiIntelligenceStateMachine_(pWifiIntelligenceStateMachine)
 {
     WIFI_LOGD("InternetReadyState construct success.");
 }
@@ -833,8 +836,8 @@ void WifiIntelligenceStateMachine::InternetReadyState::GoInState()
     bool isMobileAp = linkedInfo.isDataRestricted;
     if (!linkedInfo.bssid.empty() && !isMobileAp) {
         /* to do get cellId info and add cur ap info to apinfoManager*/
-        std::string cellId = ApInfoHelper::GetInstance().GetCurrentCellIdInfo();
-        ApInfoHelper::GetInstance().AddApInfo(cellId, linkedInfo.networkId);
+        std::string cellId = pWifiIntelligenceStateMachine_->apInfoHelper_->GetCurrentCellIdInfo();
+        pWifiIntelligenceStateMachine_->apInfoHelper_->AddApInfo(cellId, linkedInfo.networkId);
     } else if (isMobileAp) {
         WIFI_LOGI("mobileAp, no need to add current ap.");
     }
@@ -861,9 +864,9 @@ bool WifiIntelligenceStateMachine::InternetReadyState::ExecuteStateMsg(InternalM
             WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
             bool isMobileAp = linkedInfo.isDataRestricted;
             if (!isMobileAp) {
-                std::string cellId = ApInfoHelper::GetInstance().GetCurrentCellIdInfo();
+                std::string cellId = pWifiIntelligenceStateMachine_->apInfoHelper_->GetCurrentCellIdInfo();
                 if (!cellId.empty()) {
-                    ApInfoHelper::GetInstance().AddApInfo(cellId, linkedInfo.networkId);
+                    pWifiIntelligenceStateMachine_->apInfoHelper_->AddApInfo(cellId, linkedInfo.networkId);
                 }
             }
             break;
@@ -890,7 +893,8 @@ bool WifiIntelligenceStateMachine::InternetReadyState::ExecuteStateMsg(InternalM
 /* --------------------------- state machine noInternet state ------------------------------ */
 WifiIntelligenceStateMachine::NoInternetState::NoInternetState(
     WifiIntelligenceStateMachine *pWifiIntelligenceStateMachine)
-    : State("NoInternetState")
+    : State("NoInternetState"),
+      pWifiIntelligenceStateMachine_(pWifiIntelligenceStateMachine)
 {
     WIFI_LOGD("NoInternetState construct success.");
 }
@@ -903,7 +907,7 @@ void WifiIntelligenceStateMachine::NoInternetState::GoInState()
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     if (!linkedInfo.bssid.empty()) {
-        ApInfoHelper::GetInstance().DelApInfoByBssid(linkedInfo.bssid);
+        pWifiIntelligenceStateMachine_->apInfoHelper_->DelApInfoByBssid(linkedInfo.bssid);
     }
 }
 
@@ -950,11 +954,11 @@ bool WifiIntelligenceStateMachine::HandleScanResult(std::vector<WifiScanInfo> sc
     }
     bool hasApInBlacklist = false;
     bool hasTargetAp = false;
-    std::string cellId = ApInfoHelper::GetInstance().GetCurrentCellIdInfo();
+    std::string cellId = apInfoHelper_->GetCurrentCellIdInfo();
 
     for (auto &scanInfo : scanInfoList) {
         ApInfoData data;
-        int index = ApInfoHelper::GetInstance().GetApInfoByBssid(scanInfo.bssid, data);
+        int index = apInfoHelper_->GetApInfoByBssid(scanInfo.bssid, data);
         if (index == -1) {
             continue;
         }
@@ -984,7 +988,7 @@ bool WifiIntelligenceStateMachine::HandleScanResult(std::vector<WifiScanInfo> sc
 
     if (hasApInBlacklist) {
         WIFI_LOGI("Has tartget in black list, update record.");
-        ApInfoHelper::GetInstance().ResetBlacklist(scanInfoList, 1);
+        apInfoHelper_->ResetBlacklist(scanInfoList, 1);
         WritePositionAutoOpenWlanHiSysEvent("FORBIDDEN_CONTROL_CNT");
         return true;
     } else {
@@ -1012,10 +1016,10 @@ bool WifiIntelligenceStateMachine::IsInTargetAp(std::string bssid, std::string s
 
 void WifiIntelligenceStateMachine::InlineUpdateCellInfo(ApInfoData data, std::string cellId)
 {
-    if (!ApInfoHelper::GetInstance().IsCellIdExit(cellId)) {
-        ApInfoHelper::GetInstance().AddCellInfo(data.bssid, cellId);
+    if (!apInfoHelper_->IsCellIdExit(cellId)) {
+        apInfoHelper_->AddCellInfo(data.bssid, cellId);
         std::vector<CellInfoData> cellInfos;
-        ApInfoHelper::GetInstance().QueryCellIdInfoByParam({{CellIdInfoTable::BSSID, data.bssid}}, cellInfos);
+        apInfoHelper_->QueryCellIdInfoByParam({{CellIdInfoTable::BSSID, data.bssid}}, cellInfos);
         if (cellInfos.size() != 0) {
             data.cellInfos = cellInfos;
         }

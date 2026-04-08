@@ -85,6 +85,8 @@ napi_value ConfigStaticIp(const napi_env &env, const napi_value &object, WifiDev
 napi_value ConfigStaticIpv4(const napi_env &env, const napi_value &object, WifiDeviceConfig &cppConfig);
 napi_value ConfigStaticIpv6(const napi_env &env, const napi_value &object, WifiDeviceConfig &cppConfig);
 napi_value IsRandomMacDisabled(napi_env env, napi_callback_info info);
+napi_value SetWifiCapability(napi_env env, napi_callback_info info);
+napi_value GetWifiCapability(napi_env env, napi_callback_info info);
 class ScanInfoAsyncContext : public AsyncContext {
 public:
     std::vector<WifiScanInfo> vecScanInfos;

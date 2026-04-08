@@ -30,12 +30,6 @@ constexpr int32_t QUERY_FAILED = 0;
 constexpr int32_t QUERY_NO_RECORD = 1;
 constexpr int32_t QUERY_HAS_RECORD = 2;
 
-ApInfoHelper &ApInfoHelper::GetInstance()
-{
-    static ApInfoHelper gApInfoHelper;
-    return gApInfoHelper;
-}
-
 ApInfoHelper::ApInfoHelper()
 {
     WIFI_LOGI("Enter ApInfoHelper");

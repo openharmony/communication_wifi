@@ -2134,5 +2134,59 @@ NO_SANITIZE("cfi") napi_value IsRandomMacDisabled(napi_env env, napi_callback_in
     return result;
 }
 
+NO_SANITIZE("cfi") napi_value SetWifiCapability(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    const int PARAMS_COUNT = 2;
+    napi_value argv[PARAMS_COUNT];
+    size_t argc = 2;
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    WIFI_NAPI_ASSERT(env, argc == PARAMS_COUNT, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
+ 
+    napi_valuetype capabilityType;
+    napi_valuetype enableType;
+    napi_typeof(env, argv[0], &capabilityType);
+    napi_typeof(env, argv[1], &enableType);
+    WIFI_NAPI_ASSERT(env, capabilityType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
+    WIFI_NAPI_ASSERT(env, enableType == napi_boolean, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+ 
+    int capability = -1;
+    bool enable = false;
+    napi_get_value_int32(env, argv[0], &capability);
+    napi_get_value_bool(env, argv[1], &enable);
+    ErrCode ret = wifiDevicePtr->SetWifiCapability(capability, enable);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
+}
+ 
+NO_SANITIZE("cfi") napi_value GetWifiCapability(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+ 
+    size_t argc = 1;
+    napi_value argv[1];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
+ 
+    napi_valuetype capabilityType;
+    napi_typeof(env, argv[0], &capabilityType);
+    WIFI_NAPI_ASSERT(env, capabilityType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
+ 
+    int capability = -1;
+    napi_get_value_int32(env, argv[0], &capability);
+    bool enabled = false;
+    ErrCode ret = wifiDevicePtr->GetWifiCapability(capability, enabled);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get wifi capability fail: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
+    }
+ 
+    napi_value result;
+    napi_get_boolean(env, enabled, &result);
+    return result;
+}
 }  // namespace Wifi
 }  // namespace OHOS

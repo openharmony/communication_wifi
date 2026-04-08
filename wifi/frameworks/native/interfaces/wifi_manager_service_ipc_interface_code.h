@@ -103,6 +103,10 @@ enum class  DevInterfaceCode {
     /* BT WiFi co-exist */
     WIFI_SVR_CMD_SET_BT_COEXIST_STATE = 0x1055, /* Set BT Co-exist State */
 
+    /* WiFi Capability */
+    WIFI_SVR_CMD_SET_WIFI_CAPABILITY = 0x1056, /* Set WiFi Capability */
+    WIFI_SVR_CMD_GET_WIFI_CAPABILITY = 0x1057, /* Get WiFi Capability */
+    
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */
     WIFI_CBK_CMD_CONNECTION_CHANGE = 0x3001,    /* STA connection state change event */

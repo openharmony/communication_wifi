@@ -1016,7 +1016,7 @@ ErrCode WifiDeviceServiceImpl::AllowAutoConnect(int32_t networkId, bool isAllowe
     return pService->AllowAutoConnect(networkId, isAllowed);
 }
 
-ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout)
+void WifiDeviceServiceImpl::CheckAndHandleVapConflict()
 {
     if (IsOtherVapConnect()) {
         LOGI("ConnectToNetwork: p2p or hml connected, and hotspot is enable");
@@ -1037,6 +1037,11 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate,
             }
         }
 #endif
+}
+
+ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout)
+{
+    CheckAndHandleVapConflict();
     int apiVersion = WifiPermissionUtils::GetApiVersion();
     if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
         WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
@@ -1070,25 +1075,7 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate,
 
 ErrCode WifiDeviceServiceImpl::ConnectToCandidateConfig(ConnectSettings &connectSettings)
 {
-    if (IsOtherVapConnect()) {
-        LOGI("ConnectToCandidateConfig: p2p or hml connected, and hotspot is enable");
-#ifndef OHOS_ARCH_LITE
-        WifiManager::GetInstance().GetWifiMultiVapManager()->VapConflictReport();
-#endif
-        WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, 0);
-    }
-#ifndef OHOS_ARCH_LITE
-    if (WifiManager::GetInstance().GetWifiMultiVapManager()->CheckEnhanceWifiConnected() &&
-        WifiManager::GetInstance().GetWifiMultiVapManager()->CheckP2pConnected()) {
-            IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
-            if (pService == nullptr) {
-                WIFI_LOGE("Get P2P service failed");
-            } else {
-                ErrCode ret = pService->RemoveGroup();
-                WIFI_LOGI("P2P RemoveGroup ret is %{public}d", ret);
-            }
-        }
-#endif
+    CheckAndHandleVapConflict();
     int apiVersion = WifiPermissionUtils::GetApiVersion();
     if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
         WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);

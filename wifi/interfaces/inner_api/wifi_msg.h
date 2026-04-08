@@ -959,8 +959,8 @@ struct ConnectSettings {
 
     ConnectSettings()
     {
-        uid = -1;
-        networkId = -1;
+        uid = WIFI_INVALID_UID;
+        networkId = INVALID_NETWORK_ID;
         withUserAction = false;
         userActionTimeout = DEFAULT_DIALOG_TIMEOUT;
         addNetworkToSystem = false;

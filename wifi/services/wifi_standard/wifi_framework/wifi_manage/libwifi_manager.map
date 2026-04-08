@@ -20,8 +20,8 @@
         "OHOS::Wifi::WifiConfigCenter::GetWifiSelfcureResetEntered() const";
         "OHOS::Wifi::WifiConfigCenter::SetLastNetworkId(int)";
         "OHOS::Wifi::WifiConfigCenter::GetLastNetworkId() const";
-        "OHOS::Wifi::WifiConfigCenter::SetSelectedCandidateNetworkId(int)";
-        "OHOS::Wifi::WifiConfigCenter::GetSelectedCandidateNetworkId() const";
+        "OHOS::Wifi::WifiConfigCenter::SetCandidateConnectSettings(ConnectSettings const&)";
+        "OHOS::Wifi::WifiConfigCenter::GetCandidateConnectSettings() const";
         "OHOS::Wifi::WifiConfigCenter::SetWifiAllowSemiActive(bool)";
         "OHOS::Wifi::WifiConfigCenter::GetWifiScanConfig()";
         "OHOS::Wifi::WifiConfigCenter::GetWifiAllowSemiActive() const";

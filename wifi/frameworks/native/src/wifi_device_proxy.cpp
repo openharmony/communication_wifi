@@ -3050,7 +3050,7 @@ ErrCode WifiDeviceProxy::Update5gAutoIdentifyConnFeatures(Wifi5gOperateType opTy
     data.WriteBool(value);
     data.WriteBool(result);
     int error = Remote()->SendRequest(
-        static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_5G_AUTO_IDENTIFY_CONN_FEATURE),data, reply, option);
+        static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_5G_AUTO_IDENTIFY_CONN_FEATURE), data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Update5gAutoIdentifyConnFeatures (%{public}d) failed,error code is %{public}d",
             static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_5G_AUTO_IDENTIFY_CONN_FEATURE), error);

@@ -517,6 +517,7 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, IpcIo *req, IpcIo *reply)
         (void)WriteInt32(reply, (int)wifiInfo.maxSupportedRxLinkSpeed);
         (void)WriteInt32(reply, (int)wifiInfo.maxSupportedTxLinkSpeed);
         (void)WriteInt32(reply, (int)wifiInfo.channelWidth);
+        (void)WriteBool(reply, wifiInfo.wifiTxRxValid);
     }
 }
 

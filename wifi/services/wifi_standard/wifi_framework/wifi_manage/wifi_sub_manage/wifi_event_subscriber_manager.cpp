@@ -1016,8 +1016,7 @@ void NotificationEventSubscriber::HandleCandidateConnect(const OHOS::EventFwk::C
     NotifyCandidateApprovalStatus(CandidateApprovalStatus::USER_ACCEPT);
     bool addNetworkToSystem = eventData.GetWant().GetBoolParam("addNetworkToSystem", false);
     ConnectSettings connectSettings = WifiConfigCenter::GetInstance().GetCandidateConnectSettings();
-    int candidateNetworkId = connectSettings.networkId;
-    if (candidateNetworkId == INVALID_NETWORK_ID) {
+    if (connectSettings.networkId == INVALID_NETWORK_ID) {
         WIFI_LOGI("OnReceiveNotificationEvent networkid is invalid");
         return;
     }
@@ -1026,20 +1025,20 @@ void NotificationEventSubscriber::HandleCandidateConnect(const OHOS::EventFwk::C
         WIFI_LOGE("OnReceiveNotificationEvent pService is null");
         return;
     }
-    if (addNetworkToSystem) {
+    if (connectSettings.addNetworkToSystem) {
         WifiDeviceConfig config;
-        if (WifiSettings::GetInstance().GetCandidateConfigWithoutUid(candidateNetworkId, config) == -1) {
+        if (WifiSettings::GetInstance().GetCandidateConfigWithoutUid(connectSettings.networkId, config) == -1) {
             WIFI_LOGE("OnReceiveNotificationEvent get config fail");
             return;
         }
-        WifiSettings::GetInstance().RemoveDevice(candidateNetworkId);
+        WifiSettings::GetInstance().RemoveDevice(connectSettings.networkId);
         config.uid = -1;
         config.isEphemeral = false;
         pService->ConnectToDevice(config);
     } else {
-        WifiSettings::GetInstance().SetDeviceEphemeral(candidateNetworkId, false);
+        WifiSettings::GetInstance().SetDeviceEphemeral(connectSettings.networkId, false);
         WifiSettings::GetInstance().SyncDeviceConfig();
-        pService->ConnectToNetwork(candidateNetworkId);
+        pService->ConnectToNetwork(connectSettings.networkId);
     }
 }
 

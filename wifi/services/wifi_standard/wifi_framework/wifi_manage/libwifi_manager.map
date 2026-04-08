@@ -485,6 +485,7 @@
         "OHOS::Wifi::WifiCommonEventHelper::PublishHideDropDownWindowEvent()";
         "OHOS::Wifi::WifiSettings::SetWifiCapability(int, bool, int)";
         "OHOS::Wifi::WifiSettings::GetWifiCapability(int, int)";
+        "OHOS::Wifi::WifiSettings::Update5gAutoIdentifyConnFeatures(OHOS::Wifi::Wifi5gOperateType, OHOS::Wifi::Wifi5gFeatureType, bool, bool&, int)";
     };
     local:
         *;

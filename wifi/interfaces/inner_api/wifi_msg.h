@@ -222,6 +222,17 @@ enum WifiLinkType:int32_t {
     WIFI7_LEGACY = 5 //非MLO接入
 };
 
+enum Wifi5gFeatureType {
+    WIFI_5G_CONN_FEATURE = 0,        // 方案1.0特性开关
+    SETTINGS_5G_CONN_FEATURE = 1,    // 方案2.0特性开关
+    SETTINGS_5G_SAVE_FEATURE = 2,    // 方案3.0特性开关
+};
+ 
+enum Wifi5gOperateType {
+    SET_5G_FEATURE = 0,    // 设置特性
+    GET_5G_FEATURE = 1,    // 读取特性
+};
+
 enum class DisconnectedReason {
     /* Default reason */
     DISC_REASON_DEFAULT = 0,

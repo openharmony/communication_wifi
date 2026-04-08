@@ -1030,12 +1030,12 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType,
     } else if (dialogType == static_cast<int>(WifiDialogType::AUTO_IDENTIFY_CONN)) {
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
         if (pEnhanceService != nullptr) {
-            pEnhanceService->OnDialogClick(true);
+            pEnhanceService->OnSettingsDialogClick(true, SETTINGS_5G_CONN_FEATURE);
         }
-    } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_CONN)) {
+    } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_SAVE)) {
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
         if (pEnhanceService != nullptr) {
-            pEnhanceService->OnSettingsDialogClick(true, SETTINGS_5G_AUTO_IDENTIFY_CONN);
+            pEnhanceService->OnSettingsDialogClick(true, SETTINGS_5G_SAVE_FEATURE);
         }
     }
 #ifdef FEATURE_P2P_SUPPORT
@@ -1066,8 +1066,13 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType, boo
         }
     } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_CONN)) {
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        f (pEnhanceService != nullptr) {
+            pEnhanceService->OnSettingsDialogClick(false, SETTINGS_5G_CONN_FEATURE);
+        }
+    } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_SAVE)) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
         if (pEnhanceService != nullptr) {
-            pEnhanceService->OnSettingsDialogClick(false, SETTINGS_5G_AUTO_IDENTIFY_CONN);
+            pEnhanceService->OnSettingsDialogClick(false, SETTINGS_5G_SAVE_FEATURE);
         }
     } else if (dialogType == static_cast<int>(WifiDialogType::CANDIDATE_CONNECT)) {
         WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(INVALID_NETWORK_ID);

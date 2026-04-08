@@ -282,6 +282,9 @@ struct WifiConfig {
     int staApExclusionType;
     bool isRandomMacDisabled;
     bool wifiAutoEnable;
+    bool is5gConnFeature;
+    bool isSettings5gConnFeature;
+    bool isSettings5gSaveFeature;
 
     WifiConfig()
     {
@@ -330,6 +333,9 @@ struct WifiConfig {
         staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
         isRandomMacDisabled = false;
         wifiAutoEnable = true;
+        is5gConnFeature = true;
+        isSettings5gConnFeature = true;
+        isSettings5gSaveFeature = true;
     }
 };
 

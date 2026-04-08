@@ -2793,6 +2793,16 @@ ErrCode WifiDeviceServiceImpl::SetRandomMacDisabled(bool isRandomMacDisabled)
 #endif
 }
 
+ErrCode WifiDeviceServiceImpl::Update5gAutoIdentifyConnFeatures(Wifi5gOperateType opType,
+    Wifi5gFeatureType featureType, bool value, bool& result)
+{
+    if (WifiPermissionUtils::VerifySetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("Update5gAutoIdentifyConnFeatures:VerifySetWifiConfigPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+    return WifiSettings::GetInstance().Update5gAutoIdentifyConnFeatures(opType, featureType, value, result);
+}
+
 void WifiDeviceServiceImpl::ReportWifiConfigStatus(WifiConfigReportType reportType)
 {
 #ifndef OHOS_ARCH_LITE

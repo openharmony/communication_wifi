@@ -23,7 +23,8 @@
 namespace OHOS {
 namespace Wifi {
 enum SettingsDialogClickType {
-    SETTINGS_5G_AUTO_IDENTIFY_CONN = 0
+    SETTINGS_5G_AUTO_IDENTIFY_CONN = 0,
+    SETTINGS_5G_AUTO_IDENTIFY_SAVE = 1
 };
 
 typedef enum {
@@ -297,7 +298,7 @@ public:
      * @param click - user click accept or reject
      * @param type - settings dialog click type
      */
-    virtual void OnSettingsDialogClick(bool click, int type) = 0;
+    virtual void OnSettingsDialogClick(bool click, Wifi5gFeatureType type) = 0;
 
     /**
      * @Description on notification receive

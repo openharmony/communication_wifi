@@ -172,7 +172,7 @@ void AppXmlParserTest(const uint8_t* data, size_t size)
         return;
     }
     std::string conditionName(reinterpret_cast<const char*>(data), size);
-    m_appXmlParser->IsOverGameHighRttThresh(conditionName, gameRtt);
+    m_appXmlParser->IsOverGameRtt(conditionName, gameRtt);
     m_appXmlParser->GetAsyncLimitSpeedDelayTime();
     m_appXmlParser->appParserInner_->ParseInternal(root_node);
     m_appXmlParser->appParserInner_->ParseAppList(root_node);

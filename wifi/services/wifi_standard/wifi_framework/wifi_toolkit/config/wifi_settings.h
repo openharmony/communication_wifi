@@ -323,6 +323,13 @@ public:
 
     bool GetWifiCapability(int capability, int instId = 0);
 
+    ErrCode Update5gAutoIdentifyConnFeatures(Wifi5gOperateType opType,
+        Wifi5gFeatureType featureType, bool value, bool &result, int instId = 0);
+ 
+    ErrCode Get5gAutoIdentifyFeature(int featureType, bool &result, int instId = 0);
+ 
+    ErrCode Set5gAutoIdentifyFeature(int featureType, bool value, int instId = 0);
+
     int GetStaLastRunState(int instId = 0);
 
     int SetStaLastRunState(int bRun, int instId = 0);

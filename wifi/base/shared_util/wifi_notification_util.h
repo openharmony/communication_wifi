@@ -59,7 +59,8 @@ enum WifiDialogType {
     P2P_WSC_PBC_DIALOG = 4,
     SETTINGS_AUTO_IDENTIFY_CONN = 5,
     P2P_WSC_DISPLAY_DIALOG = 6,
-    P2P_WSC_KEYPAD_DIALOG = 7
+    P2P_WSC_KEYPAD_DIALOG = 7,
+    SETTINGS_AUTO_IDENTIFY_SAVE = 8
 };
 
 class WifiNotificationUtil {

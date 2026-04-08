@@ -3030,6 +3030,47 @@ ErrCode WifiDeviceProxy::SetRandomMacDisabled(bool isRandomMacDisabled)
     return ErrCode(reply.ReadInt32());
 }
 
+ErrCode WifiDeviceProxy::Update5gAutoIdentifyConnFeatures(Wifi5gOperateType opType,
+    Wifi5gFeatureType featureType, bool value, bool& result)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(opType);
+    data.WriteInt32(featureType);
+    data.WriteBool(value);
+    data.WriteBool(result);
+    int error = Remote()->SendRequest(
+        static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_5G_AUTO_IDENTIFY_CONN_FEATURE),data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Update5gAutoIdentifyConnFeatures (%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_5G_AUTO_IDENTIFY_CONN_FEATURE), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    switch (opType) {
+        case Wifi5gOperateType::SET_5G_FEATURE:
+            return ErrCode(reply.ReadInt32());
+        case Wifi5gOperateType::GET_5G_FEATURE:
+            result = reply.ReadBool();
+            return WIFI_OPT_SUCCESS;
+        default:
+            return WIFI_OPT_INVALID_PARAM;
+    }
+}
+
 ErrCode WifiDeviceProxy::SetBtCoexistState(CoexistState state, CoexistReason reason)
 {
     if (mRemoteDied) {

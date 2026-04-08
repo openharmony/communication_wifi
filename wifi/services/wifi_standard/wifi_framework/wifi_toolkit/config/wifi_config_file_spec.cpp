@@ -1134,6 +1134,9 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.realMacAddress = "";
     item.staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
     OtherParamDefault(item);
+    item.is5gConnFeature = true;
+    item.isSettings5gConnFeature = true;
+    item.isSettings5gSaveFeature = true;
     return;
 }
 
@@ -1319,6 +1322,18 @@ std::map<std::string, Func> g_wifiConfigSetValueMap = {
         std::string tmpValue = value;
         item.wifiAutoEnable = (CheckDataLegal(tmpValue) != 0);
     }},
+    {"is5gConnFeature", [](WifiConfig &item, const std::string &value) -> void {
+        std::string tmpValue = value;
+        item.is5gConnFeature = (CheckDataLegal(tmpValue) != 0);
+    }},
+    {"isSettings5gConnFeature", [](WifiConfig &item, const std::string &value) -> void {
+        std::string tmpValue = value;
+        item.isSettings5gConnFeature = (CheckDataLegal(tmpValue) != 0);
+    }},
+    {"isSettings5gSaveFeature", [](WifiConfig &item, const std::string &value) -> void {
+        std::string tmpValue = value;
+        item.isSettings5gSaveFeature = (CheckDataLegal(tmpValue) != 0);
+    }},
     {"version", [](WifiConfig &item, const std::string &value) -> void {
         //@deprecated
     }}
@@ -1400,6 +1415,9 @@ std::string OutTClassString<WifiConfig>(WifiConfig &item)
     ss << "    " <<"staApExclusionType=" << item.staApExclusionType << std::endl;
     ss << "    " <<"isRandomMacDisabled=" << item.isRandomMacDisabled << std::endl;
     ss << "    " <<"wifiAutoEnable =" << item.wifiAutoEnable << std::endl;
+    ss << "    " <<"is5gConnFeature=" << item.is5gConnFeature << std::endl;
+    ss << "    " <<"isSettings5gConnFeature=" << item.isSettings5gConnFeature << std::endl;
+    ss << "    " <<"isSettings5gSaveFeature=" << item.isSettings5gSaveFeature << std::endl;
     ss << "    " <<"</WifiConfig>" << std::endl;
     return ss.str();
 }

@@ -164,8 +164,8 @@ void WifiDeviceStub::InitHandleMapEx2()
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_CAPABILITY)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnGetWifiCapability(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_5G_AUTO_IDENTIFY_CONN_FEATURE)] = [this]
-        (uint32_t code, MessageParcel &data, MessageParcel &reply)
-        { OnUpdate5gAutoIdentifyConnFeatures(code, data, reply); };
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) {
+            OnUpdate5gAutoIdentifyConnFeatures(code, data, reply); };
 }
 
 void WifiDeviceStub::InitHandleMap()

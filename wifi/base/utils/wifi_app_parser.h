@@ -45,7 +45,7 @@ struct CommonAppInfo {
 };
 
 struct CommonGameInfo {
-    int rtt;
+    int rtt = 200;
     int rttGap = 0;
 };
 

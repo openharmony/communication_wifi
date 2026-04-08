@@ -128,13 +128,13 @@ int WifiConfigCenter::GetLastNetworkId() const
 
 void WifiConfigCenter::SetCandidateConnectSettings(const ConnectSettings &connectSettings)
 {
-    std::unique_lock<std::mutex> lock(mStaMutex);
+    std::unique_lock<std::mutex> lock(mutex);
     mCandidateConnectSettings = connectSettings;
 }
 
 ConnectSettings WifiConfigCenter::GetCandidateConnectSettings() const
 {
-    std::unique_lock<std::mutex> lock(mStaMutex);
+    std::unique_lock<std::mutex> lock(mutex);
     return mCandidateConnectSettings;
 }
 

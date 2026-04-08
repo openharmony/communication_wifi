@@ -104,7 +104,7 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_SET_BT_COEXIST_STATE = 0x1055, /* Set BT Co-exist State */
 
     /* Connect to candidate config with ConnectSettings */
-    WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG = 0x1056, /* connect to a network with ConnectSettings */
+    WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG = 0x1057, /* connect to a network with ConnectSettings */
 
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */

@@ -733,7 +733,7 @@ void AppNetworkSpeedLimitService::AdjustSpeedLimitByRtt(const int rtt)
     }
  
     if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] == BG_LIMIT_LEVEL_3) {
-        if (AppParser::GetInstance().IsOverGameHighRttThresh(gameInfo.bundleName, rtt)) {
+        if (AppParser::GetInstance().IsOverGameRtt(gameInfo.bundleName, rtt)) {
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
                 gameInfo.uid);
         }

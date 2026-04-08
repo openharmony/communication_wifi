@@ -304,20 +304,32 @@ HWTEST_F(WifiSettingsTest, GetCandidateConfigWithoutUidByNetworkIdTest, TestSize
     EXPECT_EQ(config2.ssid, "test_networkId");
 }
 
-HWTEST_F(WifiSettingsTest, RemoveCandidateConfigWithoutUidTest, TestSize.Level1)
+HWTEST_F(WifiSettingsTest, GetCandidateConfigWithoutUidByNetworkIdNotFoundTest, TestSize.Level1)
 {
-    WIFI_LOGI("RemoveCandidateConfigWithoutUidTest enter!");
+    WIFI_LOGI("GetCandidateConfigWithoutUidByNetworkIdNotFoundTest enter!");
     WifiDeviceConfig config1;
-    config1.ssid = "test_remove";
+    config1.ssid = "test_not_found";
     config1.keyMgmt = "WPA2-PSK";
     config1.uid = 1;
     config1.isShared = false;
-    int networkId = WifiSettings::GetInstance().AddDeviceConfig(config1);
-    EXPECT_GE(networkId, 0);
+    WifiSettings::GetInstance().AddDeviceConfig(config1);
 
-    int result = WifiSettings::GetInstance().RemoveCandidateConfigWithoutUid(networkId);
-    WIFI_LOGI("RemoveCandidateConfigWithoutUidTest result(%{public}d)", result);
-    EXPECT_EQ(result, 0);
+    WifiDeviceConfig config2;
+    int invalidNetworkId = 99999;
+    int result = WifiSettings::GetInstance().GetCandidateConfigWithoutUid(invalidNetworkId, config2);
+    WIFI_LOGI("GetCandidateConfigWithoutUidByNetworkIdNotFoundTest result(%{public}d)", result);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiSettingsTest, GetCandidateConfigWithoutUidByNetworkIdEmptyTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetCandidateConfigWithoutUidByNetworkIdEmptyTest enter!");
+    WifiSettings::GetInstance().ClearDeviceConfig();
+
+    WifiDeviceConfig config;
+    int result = WifiSettings::GetInstance().GetCandidateConfigWithoutUid(0, config);
+    WIFI_LOGI("GetCandidateConfigWithoutUidByNetworkIdEmptyTest result(%{public}d)", result);
+    EXPECT_EQ(result, -1);
 }
 
 HWTEST_F(WifiSettingsTest, SetDeviceConnFailedCountTest, TestSize.Level1)

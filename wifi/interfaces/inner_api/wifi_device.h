@@ -685,6 +685,30 @@ public:
     {
         return WIFI_OPT_NOT_SUPPORTED;
     }
+    
+    /**
+     * @Description Set wifi capability enable status
+     *
+     * @param capability - capability id
+     * @param enable - enable or disable
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetWifiCapability(int capability, bool enable)
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+
+    /**
+     * @Description Get wifi capability enable status
+     *
+     * @param capability - capability id
+     * @param enabled - output enable status
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetWifiCapability(int capability, bool &enabled)
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
 };
 }  // namespace Wifi
 }  // namespace OHOS

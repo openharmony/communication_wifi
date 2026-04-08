@@ -54,16 +54,8 @@ ErrCode WifiProService::InitWifiProService()
         return WIFI_OPT_FAILED;
     }
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
-    if (instId_ == INSTID_WLAN0) {
-        pWifiIntelligenceStateMachine_ = std::make_shared<WifiIntelligenceStateMachine>(instId_);
-        if (pWifiIntelligenceStateMachine_ == nullptr) {
-            WIFI_LOGE("Alloc WifiIntelligenceStateMachine failed.");
-            return WIFI_OPT_FAILED;
-        }
-        if (pWifiIntelligenceStateMachine_->Initialize() != WIFI_OPT_SUCCESS) {
-            WIFI_LOGE("Init WifiIntelligenceStateMachine failed.");
-            return WIFI_OPT_FAILED;
-        }
+    if (WifiSettings::GetInstance().GetWifiCapability(static_cast<int>(WifiCapability::WIFI_AUTO_ENABLE))) {
+        InitWifiIntelligence();
     }
 #endif
     return WIFI_OPT_SUCCESS;
@@ -249,6 +241,36 @@ void WifiProService::OnWifiDeviceConfigChange(int32_t status, const WifiDeviceCo
     if (pWifiIntelligenceStateMachine_ != nullptr) {
         pWifiIntelligenceStateMachine_->SendMessage(EVENT_CONFIGURATION_CHANGED, status, isRemoveAll, config);
     }
+}
+
+ErrCode WifiProService::InitWifiIntelligence()
+{
+    WIFI_LOGI("Enter InitWifiIntelligence.");
+    if (instId_ == INSTID_WLAN0) {
+        pWifiIntelligenceStateMachine_ = std::make_shared<WifiIntelligenceStateMachine>(instId_);
+        if (pWifiIntelligenceStateMachine_ == nullptr) {
+            WIFI_LOGE("Alloc WifiIntelligenceStateMachine failed.");
+            return WIFI_OPT_FAILED;
+        }
+        if (pWifiIntelligenceStateMachine_->Initialize() != WIFI_OPT_SUCCESS) {
+            pWifiIntelligenceStateMachine_ = nullptr;
+            WIFI_LOGE("Init WifiIntelligenceStateMachine failed.");
+            return WIFI_OPT_FAILED;
+        }
+        return WIFI_OPT_SUCCESS;
+    } else {
+        WIFI_LOGE("instId_ is not waln0.");
+        return WIFI_OPT_FAILED;
+    }
+}
+
+ErrCode WifiProService::UninitWifiIntelligence()
+{
+    WIFI_LOGI("Enter UninitWifiIntelligence.");
+    if (pWifiIntelligenceStateMachine_) {
+        pWifiIntelligenceStateMachine_ = nullptr;
+    }
+    return WIFI_OPT_SUCCESS;
 }
 #endif
 }  // namespace Wifi

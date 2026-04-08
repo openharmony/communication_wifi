@@ -86,6 +86,8 @@
         GetMultiLinkedInfo;
         IsRandomMacDisabled;
         SetRandomMacDisabled;
+        SetWifiCapability;
+        GetWifiCapability;
         "*CompositeWifiFilter*";
         EnableLocalOnlyHotspot;
         DisableLocalOnlyHotspot;

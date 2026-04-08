@@ -442,6 +442,8 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("startWifiDetection", StartWifiDetection),
         DECLARE_NAPI_FUNCTION("enableHiLinkHandshake", EnableHiLinkHandshake),
         DECLARE_NAPI_FUNCTION("isRandomMacDisabled", IsRandomMacDisabled),
+        DECLARE_NAPI_FUNCTION("setWifiCapability", SetWifiCapability),
+        DECLARE_NAPI_FUNCTION("getWifiCapability", GetWifiCapability),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));

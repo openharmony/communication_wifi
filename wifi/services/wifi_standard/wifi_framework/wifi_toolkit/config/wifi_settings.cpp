@@ -17,6 +17,7 @@
 #include "define.h"
 #include "wifi_cert_utils.h"
 #include "wifi_global_func.h"
+#include "wifi_internal_msg.h"
 #include "wifi_log.h"
 #include "wifi_config_country_freqs.h"
 #include "mac_address.h"
@@ -1615,6 +1616,35 @@ bool WifiSettings::IsRandomMacDisabled(int instId)
         return iter->second.isRandomMacDisabled;
     }
     return false;
+}
+
+int WifiSettings::SetWifiCapability(int capability, bool enable, int instId)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    switch (capability) {
+        case static_cast<int>(WifiCapability::WIFI_AUTO_ENABLE):
+            mWifiConfig[instId].wifiAutoEnable = enable;
+            break;
+        default:
+            break;
+    }
+    SyncWifiConfig();
+    return 0;
+}
+
+bool WifiSettings::GetWifiCapability(int capability, int instId)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    auto iter = mWifiConfig.find(instId);
+    if (iter == mWifiConfig.end()) {
+        return false;
+    }
+    switch (capability) {
+        case static_cast<int>(WifiCapability::WIFI_AUTO_ENABLE):
+            return iter->second.wifiAutoEnable;
+        default:
+            return false;
+    }
 }
 
 bool WifiSettings::GetWifiDisabledByAirplane(int instId)

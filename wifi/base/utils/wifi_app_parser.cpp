@@ -553,19 +553,19 @@ bool AppParser::IsRssGameApp(const std::string &bundleName) const
 bool AppParser::IsOverGameRtt(const std::string &bundleName, const int gameRtt) const
 {
     std::shared_lock<std::shared_mutex> lock(appParserMutex_);
-    if (result_.m_gameRtt.find(bundleName) == result_.m_gameRtt.end()) {
+    if (result_.m_gameInfo.find(bundleName) == result_.m_gameInfo.end()) {
         return false;
     }
-    return result_.m_gameRtt.at(bundleName).rtt <= gameRtt;
+    return result_.m_gameInfo.at(bundleName).rtt <= gameRtt;
 }
 
 bool AppParser::IsOverGameLowRttThresh(const std::string &bundleName, const int gameRtt) const
 {
     std::shared_lock<std::shared_mutex> lock(appParserMutex_);
-    if (result_.m_gameRtt.find(bundleName) == result_.m_gameRtt.end()) {
+    if (result_.m_gameInfo.find(bundleName) == result_.m_gameInfo.end()) {
         return false;
     }
-    return result_.m_gameRtt.at(bundleName).rtt - result_.m_gameRtt.at(bundleName).rttGap <= gameRtt;
+    return result_.m_gameInfo.at(bundleName).rtt - result_.m_gameInfo.at(bundleName).rttGap <= gameRtt;
 }
 
 std::string AppParser::GetAsyncLimitSpeedDelayTime() const

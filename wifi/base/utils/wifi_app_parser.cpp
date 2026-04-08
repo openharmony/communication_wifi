@@ -556,7 +556,7 @@ bool AppParser::IsOverGameRtt(const std::string &bundleName, const int gameRtt) 
     if (result_.m_gameRtt.find(bundleName) == result_.m_gameRtt.end()) {
         return false;
     }
-    return result_.m_gameRtt.at(bundleName) <= gameRtt;
+    return result_.m_gameRtt.at(bundleName).rtt <= gameRtt;
 }
 
 bool AppParser::IsOverGameLowRttThresh(const std::string &bundleName, const int gameRtt) const

@@ -740,5 +740,19 @@ ErrCode WifiDeviceImpl::SetBtCoexistState(CoexistState state, CoexistReason reas
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->SetBtCoexistState(state, reason);
 }
+
+ErrCode WifiDeviceImpl::SetWifiCapability(int capability, bool enable)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->SetWifiCapability(capability, enable);
+}
+
+ErrCode WifiDeviceImpl::GetWifiCapability(int capability, bool &enabled)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetWifiCapability(capability, enabled);
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -121,6 +121,28 @@ void WifiProInterface::HandleSignalInfoChange(const WifiSignalPollInfo &wifiSign
 }
 
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+ErrCode WifiProInterface::InitWifiIntelligence()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
+        WIFI_LOGI("pWifiProService is null");
+        return WIFI_OPT_FAILED;
+    }
+    pWifiProService_->InitWifiIntelligence();
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiProInterface::UninitWifiIntelligence()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (pWifiProService_ == nullptr) {
+        WIFI_LOGI("pWifiProService is null");
+        return WIFI_OPT_FAILED;
+    }
+    pWifiProService_->UninitWifiIntelligence();
+    return WIFI_OPT_SUCCESS;
+}
+
 void WifiProInterface::OnScreenStateChanged(int32_t screenState)
 {
     std::lock_guard<std::mutex> lock(mutex_);

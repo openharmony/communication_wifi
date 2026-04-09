@@ -81,6 +81,26 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_title",
+            "value":"Harmful content ahead"
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_content",
+            "value":"The site ahead may contain inappropriate or prohibited content. Proceed with caution."
+        },
+        {
+            "name":"permission_reason_camera",
+            "value":"This is used for taking photos and videos."
+        },
+        {
+            "name":"camera_permission_message",
+            "value":"Allow %s to use the camera?"
+        },
+        {
+            "name":"website_permission_never_allowed",
+            "value":"Deny"
         }
     ]
 }

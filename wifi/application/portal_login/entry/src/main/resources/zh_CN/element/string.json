@@ -69,6 +69,26 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_title",
+            "value":"此网页疑似含有风险内容"
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_content",
+            "value":"您访问的网页疑似含有不良/违规内容，请谨慎访问。"
+        },
+        {
+            "name":"permission_reason_camera",
+            "value":"用于提供拍照和录像功能。"
+        },
+        {
+            "name":"camera_permission_message",
+            "value":"允许“%s”访问你的相机？"
+        },
+        {
+            "name":"website_permission_never_allowed",
+            "value":"不允许"
         }
     ]
 }

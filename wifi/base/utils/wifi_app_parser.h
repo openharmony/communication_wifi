@@ -44,6 +44,11 @@ struct CommonAppInfo {
     std::string packageName;
 };
 
+struct CommonGameInfo {
+    int rtt = 200;
+    int rttGap = 0;
+};
+
 struct LowLatencyAppInfo : CommonAppInfo {};
 struct WhiteListAppInfo : CommonAppInfo {};
 struct BlackListAppInfo : CommonAppInfo {};
@@ -68,7 +73,7 @@ struct AppParserResult {
     std::vector<LiveStreamAppInfo> m_liveStreamAppVec {};
     std::vector<GameBackgroundLimitListAppInfo> m_gameBackgroundLimitListAppVec {};
     std::vector<RssGameListAppInfo> m_rssGameListAppVec {};
-    std::unordered_map<std::string, int> m_gameRtt {};
+    std::unordered_map<std::string, CommonGameInfo> m_gameInfo {};
     std::string m_delayTime = "";
 };
 
@@ -118,6 +123,7 @@ public:
     bool IsGameBackgroundLimitApp(const std::string &bundleName) const;
     bool IsRssGameApp(const std::string &bundleName) const;
     bool IsOverGameRtt(const std::string &bundleName, const int gameRtt) const;
+    bool IsOverGameLowRttThresh(const std::string &bundleName, const int gameRtt) const;
 private:
     AppParser();
     ~AppParser();

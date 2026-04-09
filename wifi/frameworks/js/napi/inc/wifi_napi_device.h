@@ -103,14 +103,18 @@ public:
     WifiDeviceConfig *config;
     int networkId;
     bool isCandidate;
+    bool withUserAction;
     int userActionTimeout;
+    bool addNetworkToSystem;
 
     DeviceConfigContext(napi_env env, napi_async_work work = nullptr, napi_deferred deferred = nullptr) :
         AsyncContext(env, work, deferred) {
             config = nullptr;
             networkId = -1;
             isCandidate = false;
+            withUserAction = false;
             userActionTimeout = DEFAULT_DIALOG_TIMEOUT;
+            addNetworkToSystem = false;
         }
 
     DeviceConfigContext() = delete;

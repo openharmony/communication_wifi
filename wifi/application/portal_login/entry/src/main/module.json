@@ -39,7 +39,7 @@
       },
       {
         "name": "ohos.permission.CAMERA",
-        "reason": "$string:continue_visit",
+        "reason": "$string:permission_reason_camera",
         "usedScene": {
           "when": "inuse"
         }

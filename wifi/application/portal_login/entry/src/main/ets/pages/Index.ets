@@ -16,7 +16,7 @@
 import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { i18n, resourceManager  } from '@kit.LocalizationKit';
-import { common, OpenLinkOptions, abilityAccessCtrl } from '@kit.AbilityKit';
+import { common, OpenLinkOptions, abilityAccessCtrl, Permissions } from '@kit.AbilityKit';
 import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import { SymbolGlyphModifier, window } from '@kit.ArkUI';
 import { connection } from '@kit.NetworkKit';
@@ -24,7 +24,7 @@ import { call } from '@kit.TelephonyKit';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
   validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl,
-  modifyCode
+  modifyCode, convertToPermissions, reqPermissionsFromUser
 } from '../common/utils';
 import {
   updateFinalUrl, updateOnHttpErrorReceive, updateOnErrorReceive, updateOnSslErrorEvent, updateAboutToDisappear,
@@ -67,18 +67,6 @@ const MAX_RETRY = 3;
   .fontColor($r('sys.color.font_primary'))
   .fontSize($r('sys.float.Subtitle_M'))
   .fontWeight(FontWeight.Medium)
-}
-
-enum ThreatType {
-  UNKNOWN = -1,
-  THREAT_ILLEGAL = 0,
-  THREAT_FRAUD = 1,
-  THREAT_RISK = 2,
-  THREAT_WARNING = 3,
-}
-
-class OnSafeBrowsingCheckResultCallback {
-  threatType: ThreatType = ThreatType.UNKNOWN;
 }
 
 @Entry
@@ -343,10 +331,38 @@ struct Index {
         .overviewModeAccess(false)
         .onPermissionRequest((event) => {
           if (event) {
-            const permissions: string[] = event.request.getAccessibleResource();
-            if (permissions.includes('TYPE_VIDEO_CAPTURE')) {
-              this.requestCamera();
-              event.request.grant(event.request.getAccessibleResource());
+            const permissionString: string[] = event.request.getAccessibleResource();
+            hilog.info(DOMAIN, TAG, 'req permission ' + permissionString);
+            const permissions: Permissions[] = convertToPermissions(permissionString)
+            const context: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
+            try {
+              reqPermissionsFromUser(permissions, context);
+                this.getUIContext().showAlertDialog({
+                  title: $r('app.string.camera_permission_message', extractDomain(this.webUrl)),
+                  message:  $r('app.string.permission_reason_camera'),
+                  primaryButton: {
+                    value: $r('app.string.website_permission_never_allowed'),
+                    action: () => {
+                      hilog.info(DOMAIN, TAG, 'req permission deny');
+                      event.request.deny();
+                    }
+                  },
+                  secondaryButton: {
+                    value: $r('app.string.ssl_error_dialog_continue_btn'),
+                    fontColor: $r('sys.color.warning'),
+                    action: () => {
+                      hilog.info(DOMAIN, TAG, 'req permission grant');
+                      event.request.grant(permissionString);
+                    }
+                  },
+                  cancel: () => {
+                    hilog.info(DOMAIN, TAG, 'req permission defalut deny');
+                    event.request.deny();
+                  }
+                })
+            } catch (error) {
+              let err = error as BusinessError;
+              hilog.error(DOMAIN, TAG, `oponPermissionRequest. Code is ${err.code}, message is ${err.message}`);
             }
           }
         })
@@ -355,7 +371,7 @@ struct Index {
           if (validateURL(this.webUrl) && !this.webUrl.startsWith('http') && !this.webUrl.startsWith('https')) {
             (this.getUIContext().getHostContext() as common.UIAbilityContext).openLink(this.webUrl)
               .then(() => {
-                hilog.info(DOMAIN, TAG, 'open link success.');               
+                hilog.info(DOMAIN, TAG, 'open link success.');
               }).catch((err: BusinessError) => {
                 hilog.error(DOMAIN, TAG, `open link failed. Code is ${err.code}, message is ${err.message}`);
               })
@@ -436,10 +452,40 @@ struct Index {
             }
           }
         })
-        .onSafeBrowsingCheckResult((callback) => { // 恶意网址检测
-          let jsonData = JSON.stringify(callback);
-          let json: OnSafeBrowsingCheckResultCallback = JSON.parse(jsonData);
-          hilog.info(DOMAIN, TAG, '%{public}s', 'onSafeBrowsingCheckResult: [threatType]= ' + json.threatType);
+        .onSafeBrowsingCheckFinish((callback) => { // 恶意网址检测
+          const jsonData = JSON.stringify(callback);
+          hilog.info(DOMAIN, TAG, 'onSafeBrowsingCheckFinish %{public}s', jsonData);
+          try {
+            const parsed = JSON.parse(jsonData)  as object;
+            const threatType1: number = parsed?.['threatType'];
+            if (threatType1 <= 3) {
+              AlertDialog.show({
+                title: $r('app.string.web_risk_warning_level3_Phone_title'),
+                message: $r('app.string.web_risk_warning_level3_Phone_content'),
+                primaryButton: {
+                  value: $r('app.string.confirm_dialog_cancel'),
+                  action: () => {
+                    hilog.info(DOMAIN, TAG, 'safe browsing primaryButton handleCancel');
+                    this.context.terminateSelf();
+                  }
+                },
+                secondaryButton: {
+                  value: $r('app.string.ssl_error_dialog_continue_btn'),
+                  fontColor: $r('sys.color.warning'),
+                  action: () => {
+                    hilog.info(DOMAIN, TAG, 'safe browsing secondaryButton handleProceed');
+                  }
+                },
+                cancel: () => {
+                  hilog.info(DOMAIN, TAG, 'safe browsing cancel handleCancel');
+                }
+              })
+            }
+          }
+          catch (error) {
+            let err: BusinessError = error as BusinessError;
+            hilog.error(DOMAIN, TAG, '%{public}s', `Failed . Code:${err.code}, message:${err.message}`);
+          }
         })
         .onHttpErrorReceive((event) => {
           if (event) {
@@ -479,7 +525,7 @@ struct Index {
             },
             cancel: () => {
               hilog.info(DOMAIN, TAG, 'cancel handleConfirm');
-              event.handler.handleConfirm();
+              event.handler.handleCancel();
             }
           })
         })

@@ -548,7 +548,8 @@ HotspotConfig ConvertHotspotConfig(const ::ohos::wifiManager::HotspotConfig &con
         wifiStandard, supportedWifiCategory, isHiLinkNetwork,
         ::taihe::optional<bool>(std::in_place_t{}, linkedInfo.isHiLinkProNetwork),
         ::taihe::optional<::ohos::wifiManager::WifiLinkType>(std::in_place_t{},
-            static_cast<::ohos::wifiManager::WifiLinkType::key_t>(linkedInfo.wifiLinkType))
+            static_cast<::ohos::wifiManager::WifiLinkType::key_t>(linkedInfo.wifiLinkType)),
+        ::taihe::optional<bool>(std::in_place_t{}, linkedInfo.wifiTxRxValid),
     };
 }
 

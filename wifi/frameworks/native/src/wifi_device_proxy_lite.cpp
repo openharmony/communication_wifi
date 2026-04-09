@@ -209,6 +209,7 @@ static void ReadLinkedInfo(IpcIo *reply, WifiLinkedInfo &info)
     } else {
         info.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     }
+    (void)ReadBool(reply, &info.wifiTxRxValid);
 }
 
 static void ReadDhcpInfo(IpcIo *reply, IpInfo &info)

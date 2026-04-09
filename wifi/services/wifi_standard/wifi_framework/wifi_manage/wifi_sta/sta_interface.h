@@ -122,13 +122,11 @@ public:
     /**
      * @Description Connecting to a candidate specified network.
      *
-     * @param uid - call app uid
-     * @param networkId - the candidate device network id
-     * @param dialogTimeout - Displays the dialog timeout for connecting to candidate networks.
+     * @param connectSettings - connectSettings
      * @Return ErrCode - operation result
      */
-    ErrCode ConnectToCandidateConfig(const int uid, const int networkId,
-                                    int dialogTimeout = DEFAULT_DIALOG_TIMEOUT) override;
+    ErrCode ConnectToCandidateConfig(ConnectSettings &connectSettings) override;
+
     /**
      * @Description Remove the wifi candidate device config equals to input network id
      *

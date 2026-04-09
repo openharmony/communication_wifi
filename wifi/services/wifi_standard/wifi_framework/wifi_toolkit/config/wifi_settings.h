@@ -210,6 +210,8 @@ public:
 
     int GetCandidateConfig(const int uid, const int &networkId, WifiDeviceConfig &config);
 
+    int GetCandidateConfigWithoutUid(const int &networkId, WifiDeviceConfig &config);
+
     int GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs);
 
     int IncreaseDeviceConnFailedCount(const std::string &index, const int &indexType, int count);

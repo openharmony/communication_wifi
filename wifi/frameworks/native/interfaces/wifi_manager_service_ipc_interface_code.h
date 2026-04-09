@@ -106,6 +106,8 @@ enum class  DevInterfaceCode {
     /* WiFi Capability */
     WIFI_SVR_CMD_SET_WIFI_CAPABILITY = 0x1056, /* Set WiFi Capability */
     WIFI_SVR_CMD_GET_WIFI_CAPABILITY = 0x1057, /* Get WiFi Capability */
+
+    WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG = 0x1059,
     
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */

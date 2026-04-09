@@ -482,10 +482,10 @@
         "OHOS::Wifi::ApConfigUse::UpdateApChannelConfig(OHOS::Wifi::HotspotConfig&) const";
         "OHOS::Wifi::WifiSettings::IsRandomMacDisabled(int)";
         "OHOS::Wifi::WifiSettings::SetRandomMacDisabled(bool, int)";
+        "OHOS::Wifi::WifiSettings::Update5gAutoIdentifyConnFeatures(OHOS::Wifi::Wifi5gOperateType, OHOS::Wifi::Wifi5gFeatureType, bool, bool&, int)";
         "OHOS::Wifi::WifiCommonEventHelper::PublishHideDropDownWindowEvent()";
         "OHOS::Wifi::WifiSettings::SetWifiCapability(int, bool, int)";
         "OHOS::Wifi::WifiSettings::GetWifiCapability(int, int)";
-        "OHOS::Wifi::WifiSettings::Update5gAutoIdentifyConnFeatures(OHOS::Wifi::Wifi5gOperateType, OHOS::Wifi::Wifi5gFeatureType, bool, bool&, int)";
     };
     local:
         *;

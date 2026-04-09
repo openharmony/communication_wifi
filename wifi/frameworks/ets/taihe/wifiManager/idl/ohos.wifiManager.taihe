@@ -302,7 +302,7 @@ struct WifiLinkedInfo {
     isHiLinkNetwork: bool;
     isHiLinkProNetwork: Optional<bool>;
     wifiLinkType: Optional<WifiLinkType>;
-    wifiTxRxValid: bool;
+    wifiTxRxValid: Optional<bool>;
 }
 
 struct IpInfo {
@@ -380,6 +380,13 @@ struct WifiP2pGroupInfo {
     goIpAddress: String;
 }
 
+struct ConnectSettings {
+    networkId: i32;
+    withUserAction: bool;
+    userActionTimeout: i32;
+    addNetworkToSystem: bool;
+}
+
 
 // function
 function IsConnected(): bool;
@@ -407,6 +414,7 @@ function P2pConnect(config: WifiP2PConfig): void;
 function GetCandidateConfigs(): Array<WifiDeviceConfig>;
 function P2pCancelConnect(): void;
 function ConnectToCandidateConfig(networkId: i32): void;
+function ConnectToCandidateConfigWithConnectSettings(connectSettings: ConnectSettings): void;
 function Reconnect(): void;
 function Reassociate(): void;
 function ConnectToDevice(config: WifiDeviceConfig): void;

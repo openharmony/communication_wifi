@@ -652,7 +652,7 @@ void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc0()
     EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), IsAllowPopUp()).WillRepeatedly(Return(true));
-    EXPECT_FALSE(pStaService->ConnectToCandidateConfig(connectSettings) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->ConnectToCandidateConfig(connectSettings) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc1()
@@ -671,7 +671,7 @@ void StaServiceTest::StaServiceConnectToCandidateConfigTestSucc1()
     connectSettings.networkId = netWorkId;
     EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
         .WillOnce(DoAll(SetArgReferee<TWO>(config), Return(0)));
-    EXPECT_FALSE(pStaService->ConnectToCandidateConfig(connectSettings) == WIFI_OPT_SUCCESS);
+    EXPECT_TRUE(pStaService->ConnectToCandidateConfig(connectSettings) == WIFI_OPT_SUCCESS);
 }
 
 void StaServiceTest::StaServiceConnectToCandidateConfigTestFail()

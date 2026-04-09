@@ -1082,6 +1082,9 @@ static void OtherParamDefault(WifiConfig &item)
 {
     item.isRandomMacDisabled = false;
     item.wifiAutoEnable = true;
+    item.is5gConnFeature = true;
+    item.isSettings5gConnFeature = true;
+    item.isSettings5gSaveFeature = true;
 }
 
 template<>
@@ -1134,9 +1137,6 @@ void ClearTClass<WifiConfig>(WifiConfig &item)
     item.realMacAddress = "";
     item.staApExclusionType = static_cast<int>(StaApExclusionType::INITIAL_TYPE);
     OtherParamDefault(item);
-    item.is5gConnFeature = true;
-    item.isSettings5gConnFeature = true;
-    item.isSettings5gSaveFeature = true;
     return;
 }
 

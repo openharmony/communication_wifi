@@ -164,7 +164,10 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaInterface->ReAssociate();
     pStaInterface->Disconnect();
     pStaInterface->AddCandidateConfig(uid, config, networkId);
-    pStaInterface->ConnectToCandidateConfig(uid, networkId);
+    ConnectSettings connectSettings1;
+    connectSettings1.uid = uid;
+    connectSettings1.networkId = networkId;
+    pStaInterface->ConnectToCandidateConfig(connectSettings1);
     pStaInterface->RemoveCandidateConfig(uid, networkId);
     pStaInterface->RemoveAllCandidateConfig(uid);
     pStaInterface->AddDeviceConfig(config);
@@ -237,7 +240,10 @@ void StaServerFuzzTest(const uint8_t* data, size_t size)
     pStaService->NotifyDeviceConfigChange(value, config, isRemoveAll);
     pStaService->AddCandidateConfig(uid, config, networkId);
     pStaService->RemoveAllCandidateConfig(uid);
-    pStaService->ConnectToCandidateConfig(uid, networkId);
+    ConnectSettings connectSettings2;
+    connectSettings2.uid = uid;
+    connectSettings2.networkId = networkId;
+    pStaService->ConnectToCandidateConfig(connectSettings2);
     pStaService->UpdateDeviceConfig(config);
     pStaService->RemoveDevice(networkId);
     pStaService->RemoveAllDevice();
@@ -465,7 +471,25 @@ void ConnectToCandidateConfigTest(FuzzedDataProvider& FDP)
     config.uid = ID;
     config.networkId = WORK_ID;
     WifiSettings::GetInstance().AddDeviceConfig(config);
-    pStaService->ConnectToCandidateConfig(uid, networkId);
+    ConnectSettings connectSettings3;
+    connectSettings3.uid = uid;
+    connectSettings3.networkId = networkId;
+    pStaService->ConnectToCandidateConfig(connectSettings3);
+}
+
+void ConnectToCandidateConfigWithSettingsTest(FuzzedDataProvider& FDP)
+{
+    ConnectSettings connectSettings;
+    connectSettings.uid = ID;
+    connectSettings.networkId = FDP.ConsumeIntegral<int>();
+    connectSettings.withUserAction = FDP.ConsumeBool();
+    connectSettings.userActionTimeout = FDP.ConsumeIntegral<int>();
+    connectSettings.addNetworkToSystem = FDP.ConsumeBool();
+    WifiDeviceConfig config;
+    config.networkId = connectSettings.networkId;
+    config.uid = ID;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    pStaService->ConnectToCandidateConfig(connectSettings);
 }
 
 void ConvertStringTest()
@@ -710,6 +734,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::StaAutoConnectServiceFuzzTest(FDP);
     OHOS::Wifi::StaInterfaceFuzzTest(FDP);
     OHOS::Wifi::ConnectToCandidateConfigTest(FDP);
+    OHOS::Wifi::ConnectToCandidateConfigWithSettingsTest(FDP);
     OHOS::Wifi::UpdateEapConfigTest(FDP);
     OHOS::Wifi::AddDeviceConfigTest(FDP);
     OHOS::Wifi::ConnectToNetworkTest(FDP);

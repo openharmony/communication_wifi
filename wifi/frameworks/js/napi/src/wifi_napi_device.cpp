@@ -37,7 +37,7 @@ static const std::string EAP_METHOD[] = { "NONE", "PEAP", "TLS", "TTLS", "PWD", 
 
 std::shared_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::shared_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
-constexpr uint32_t CANDIDATE_CALLBACK_TIMEOUT = 12 * 1000; // 12s
+constexpr uint32_t CANDIDATE_CALLBACK_TIMEOUT = 2 * 1000; // 2s
 
 void Ipv4ConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& result);
 void Ipv6ConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& result);
@@ -944,43 +944,6 @@ static napi_value GetJsObjToConnectSettings(napi_env env, napi_value object, Con
     return object;
 }
 
-NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callback_info info)
-{
-    TRACE_FUNC_CALL;
-    size_t argc = 1;
-    napi_value argv[1];
-    napi_value thisVar;
-    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
-
-    napi_valuetype valueType;
-    napi_typeof(env, argv[0], &valueType);
-
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-    ErrCode ret;
-
-    if (valueType == napi_number) {
-        int networkId = -1;
-        napi_get_value_int32(env, argv[0], &networkId);
-        ret = wifiDevicePtr->ConnectToNetwork(networkId, true);
-        WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
-    } else if (valueType == napi_object) {
-        ConnectSettings connectSettings;
-        GetJsObjToConnectSettings(env, argv[0], connectSettings);
-        WIFI_LOGI("ConnectToCandidateConfig networkId=%{public}d withUserAction=%{public}d "
-            "userActionTimeout=%{public}d addNetworkToSystem=%{public}d",
-            connectSettings.networkId, connectSettings.withUserAction, connectSettings.userActionTimeout,
-            connectSettings.addNetworkToSystem);
-        if (connectSettings.userActionTimeout <= 0 || connectSettings.userActionTimeout > MAX_DIALOG_TIMEOUT) {
-            WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
-        }
-        ret = wifiDevicePtr->ConnectToNetwork(connectSettings.networkId, true, connectSettings.userActionTimeout);
-        WIFI_NAPI_RETURN_NUM_CODE(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
-    } else {
-        WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
-    }
-}
-
 static void CandidateConnectCallbackFunc(void *data)
 {
     if (data == nullptr) {
@@ -1022,13 +985,92 @@ static void CandidateConnectCompleteFunc(void *data)
         context->errorCode = WIFI_OPT_USER_DOES_NOT_RESPOND;
         context->callbackFunc(context);
     };
-    WifiTimer::GetInstance()->Register(timeoutCallback, context->timerId, CANDIDATE_CALLBACK_TIMEOUT);
+    WifiTimer::GetInstance()->Register(timeoutCallback, context->timerId,
+        context->userActionTimeout + CANDIDATE_CALLBACK_TIMEOUT);
 
     if (context->callbackTriggered) {
         WifiTimer::GetInstance()->UnRegister(context->timerId);
         delete context;
     } else {
         context->completeTriggered = true;
+    }
+}
+
+static napi_value ConnectToCandidateWithUserActionAsync(napi_env env, const ConnectSettings &connectSettings,
+    size_t argc, const napi_value* argv)
+{
+    DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
+    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    if (!TryPushAsyncContext(NapiAsyncType::CANDIDATE_CONNECT, asyncContext)) {
+        delete asyncContext;
+        WIFI_NAPI_ASSERT(env, false, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    }
+    napi_create_string_latin1(env, "ConnectToCandidateConfigWithUserAction", NAPI_AUTO_LENGTH,
+        &asyncContext->resourceName);
+
+    std::vector<std::string> stdEvent = { EVENT_STA_CANDIDATE_CONNECT_CHANGE };
+    EventRegister::GetInstance().RegisterDeviceEvents(stdEvent);
+
+    asyncContext->networkId = connectSettings.networkId;
+    asyncContext->userActionTimeout = connectSettings.userActionTimeout;
+    asyncContext->isCandidate = true;
+    asyncContext->withUserAction = connectSettings.withUserAction;
+    asyncContext->addNetworkToSystem = connectSettings.addNetworkToSystem;
+    asyncContext->waitCallback = true;
+    asyncContext->callbackFunc = CandidateConnectCallbackFunc;
+    asyncContext->executeFunc = [&](void* data) -> void {
+        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
+        ConnectSettings connectSettings;
+        connectSettings.networkId = context->networkId;
+        connectSettings.withUserAction = context->withUserAction;
+        connectSettings.userActionTimeout = context->userActionTimeout;
+        connectSettings.addNetworkToSystem = context->addNetworkToSystem;
+        context->errorCode = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
+    };
+    asyncContext->completeFunc = CandidateConnectCompleteFunc;
+
+    asyncContext->sysCap = SYSCAP_WIFI_STA;
+    return DoAsyncWork(env, asyncContext, argc, argv, 1);
+}
+
+NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callback_info info)
+{
+    TRACE_FUNC_CALL;
+    size_t argc = 1;
+    napi_value argv[1];
+    napi_value thisVar;
+    NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+
+    napi_valuetype valueType;
+    napi_typeof(env, argv[0], &valueType);
+
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    ErrCode ret;
+
+    ConnectSettings connectSettings;
+    if (valueType == napi_number) {
+        int networkId = -1;
+        napi_get_value_int32(env, argv[0], &networkId);
+        connectSettings.networkId = networkId;
+        ret = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
+        WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    } else if (valueType == napi_object) {
+        GetJsObjToConnectSettings(env, argv[0], connectSettings);
+        WIFI_LOGI("ConnectToCandidateConfig networkId=%{public}d withUserAction=%{public}d "
+            "userActionTimeout=%{public}d addNetworkToSystem=%{public}d",
+            connectSettings.networkId, connectSettings.withUserAction, connectSettings.userActionTimeout,
+            connectSettings.addNetworkToSystem);
+        if (connectSettings.userActionTimeout <= 0 || connectSettings.userActionTimeout > MAX_DIALOG_TIMEOUT) {
+            WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+        }
+        if (connectSettings.withUserAction) {
+            return ConnectToCandidateWithUserActionAsync(env, connectSettings, argc, argv);
+        }
+        ret = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
+        WIFI_NAPI_RETURN_NUM_CODE(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    } else {
+        WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     }
 }
 
@@ -1047,31 +1089,11 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfigWithUserAction(napi_env en
     napi_typeof(env, argv[0], &valueType);
     WIFI_NAPI_ASSERT(env, valueType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
 
-    DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
-    WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-    if (!TryPushAsyncContext(NapiAsyncType::CANDIDATE_CONNECT, asyncContext)) {
-        delete asyncContext;
-        WIFI_NAPI_ASSERT(env, false, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-    }
-    napi_create_string_latin1(env, "ConnectToCandidateConfigWithUserAction", NAPI_AUTO_LENGTH,
-        &asyncContext->resourceName);
-
-    std::vector<std::string> stdEvent = { EVENT_STA_CANDIDATE_CONNECT_CHANGE };
-    EventRegister::GetInstance().RegisterDeviceEvents(stdEvent);
-
-    napi_get_value_int32(env, argv[0], &asyncContext->networkId);
-    asyncContext->isCandidate = true;
-    asyncContext->waitCallback = true;
-    asyncContext->callbackFunc = CandidateConnectCallbackFunc;
-    asyncContext->executeFunc = [&](void* data) -> void {
-        DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
-        context->errorCode = wifiDevicePtr->ConnectToNetwork(context->networkId, context->isCandidate);
-    };
-    asyncContext->completeFunc = CandidateConnectCompleteFunc;
-
-    size_t nonCallbackArgNum = 1;
-    asyncContext->sysCap = SYSCAP_WIFI_STA;
-    return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
+    int networkId = -1;
+    napi_get_value_int32(env, argv[0], &networkId);
+    ConnectSettings connectSettings;
+    connectSettings.networkId = networkId;
+    return ConnectToCandidateWithUserActionAsync(env, connectSettings, argc, argv);
 }
 
 NO_SANITIZE("cfi") napi_value ConnectToNetwork(napi_env env, napi_callback_info info)
@@ -1282,6 +1304,7 @@ static void LinkedInfoToJs(const napi_env& env, WifiLinkedInfo& linkedInfo, napi
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
     SetValueInt32(env, "riskType", static_cast<int>(linkedInfo.riskType), result);
 #endif
+    SetValueBool(env, "wifiTxRxValid", linkedInfo.wifiTxRxValid, result);
 }
 
 /* This interface has not been fully implemented */

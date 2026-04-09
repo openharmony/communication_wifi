@@ -175,7 +175,7 @@ static void AddP2pParam(WifiDialogType type, std::string comInfo, cJSON *param)
     }
 }
 
-void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo, int dialogTimeout)
+void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo, int dialogTimeout, bool extFlag)
 {
     WIFI_LOGI("ShowDialog, type=%{public}d", static_cast<int32_t>(type));
     AAFwk::Want want;
@@ -201,6 +201,7 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo, 
             break;
         case CANDIDATE_CONNECT:
             cJSON_AddStringToObject(param, "targetSsid", comInfo.c_str());
+            cJSON_AddBoolToObject(param, "addNetworkToSystem", extFlag);
             break;
         default:
             break;

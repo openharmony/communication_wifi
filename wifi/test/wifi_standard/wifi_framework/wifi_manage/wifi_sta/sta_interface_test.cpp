@@ -262,18 +262,20 @@ public:
 
     void ConnectToCandidateConfigFail()
     {
-        int uid = 1;
-        int networkId = 0;
-        EXPECT_CALL(*pMockStaService, ConnectToCandidateConfig(_, _, _)).WillRepeatedly(Return(WIFI_OPT_FAILED));
-        EXPECT_TRUE(pStaInterface->ConnectToCandidateConfig(uid, networkId) == WIFI_OPT_FAILED);
+        ConnectSettings connectSettings;
+        connectSettings.uid = 1;
+        connectSettings.networkId = 0;
+        EXPECT_CALL(*pMockStaService, ConnectToCandidateConfig(_)).WillRepeatedly(Return(WIFI_OPT_FAILED));
+        EXPECT_TRUE(pStaInterface->ConnectToCandidateConfig(connectSettings) == WIFI_OPT_FAILED);
     }
 
     void ConnectToCandidateConfigSuccess()
     {
-        int uid = 1;
-        int networkId = 0;
-        EXPECT_CALL(*pMockStaService, ConnectToCandidateConfig(_, _, _)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
-        EXPECT_TRUE(pStaInterface->ConnectToCandidateConfig(uid, networkId) == WIFI_OPT_SUCCESS);
+        ConnectSettings connectSettings;
+        connectSettings.uid = 1;
+        connectSettings.networkId = 0;
+        EXPECT_CALL(*pMockStaService, ConnectToCandidateConfig(_)).WillRepeatedly(Return(WIFI_OPT_SUCCESS));
+        EXPECT_TRUE(pStaInterface->ConnectToCandidateConfig(connectSettings) == WIFI_OPT_SUCCESS);
     }
     void RemoveCandidateConfigSuccess()
     {

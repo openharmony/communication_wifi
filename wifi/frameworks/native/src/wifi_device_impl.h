@@ -175,6 +175,14 @@ public:
     ErrCode ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout = DEFAULT_DIALOG_TIMEOUT) override;
 
     /**
+     * @Description Connect To a network using ConnectSettings.
+     *
+     * @param connectSettings - ConnectSettings object containing network connection parameters
+     * @return ErrCode - operation result
+     */
+    ErrCode ConnectToCandidateConfig(ConnectSettings &connectSettings) override;
+
+    /**
      * @Description Connect To a network base WifiDeviceConfig object
      *
      * @param config - WifiDeviceConfig object

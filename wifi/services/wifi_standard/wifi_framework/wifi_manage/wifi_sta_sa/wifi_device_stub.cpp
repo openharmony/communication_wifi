@@ -203,6 +203,8 @@ void WifiDeviceStub::InitHandleMap()
         MessageParcel &data, MessageParcel &reply) { OnAllowAutoConnect(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnConnectTo(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG)] = [this](
+        uint32_t code, MessageParcel &data, MessageParcel &reply) { OnConnectToCandidateConfig(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnConnect2To(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RECONNECT)] = [this](uint32_t code,
@@ -799,6 +801,20 @@ void WifiDeviceStub::OnConnectTo(uint32_t code, MessageParcel &data, MessageParc
     return;
 }
 
+void WifiDeviceStub::OnConnectToCandidateConfig(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    ConnectSettings connectSettings;
+    connectSettings.networkId = data.ReadInt32();
+    connectSettings.withUserAction = data.ReadBool();
+    connectSettings.userActionTimeout = data.ReadInt32();
+    connectSettings.addNetworkToSystem = data.ReadBool();
+    ErrCode ret = ConnectToCandidateConfig(connectSettings);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    return;
+}
+
 void WifiDeviceStub::OnConnect2To(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
@@ -988,6 +1004,7 @@ void WifiDeviceStub::WriteWifiLinkedInfo(MessageParcel &reply, const WifiLinkedI
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
     reply.WriteInt32(static_cast<int>(wifiInfo.riskType));
 #endif
+reply.WriteBool(wifiInfo.wifiTxRxValid);
 }
 
 void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, MessageParcel &data, MessageParcel &reply)

@@ -105,6 +105,7 @@ private:
         const int uid = -1);
     void HighPriorityTransmit(int uid, int protocol, int enable);
     void GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
+    void AdjustSpeedLimitByRtt(const int rtt);
     void LowLatencyNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
     void VideoCallNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo);
     void LogSpeedLimitConfigs();
@@ -143,6 +144,7 @@ private:
     std::atomic<int> cachedPowerMode_ = UNKNOWN_MODE;
     std::atomic<uint32_t> activePowerScenes_{POWER_SCENE_NONE};
     std::atomic<bool> isFirstRtt_{false};
+    std::mutex rttMutex_;
 };
 } // namespace Wifi
 } // namespace OHOS

@@ -69,9 +69,9 @@ public:
 
     int GetLastNetworkId() const;
 
-    void SetSelectedCandidateNetworkId(const int networkId);
+    void SetCandidateConnectSettings(const ConnectSettings &connectSettings);
 
-    int GetSelectedCandidateNetworkId() const;
+    ConnectSettings GetCandidateConnectSettings() const;
 
     void SetWifiAllowSemiActive(bool isAllowed);
 
@@ -427,11 +427,12 @@ private:
 private:
     // STA
     std::mutex mStaMutex;
+    mutable std::mutex mutex;
     std::atomic<bool> mWifiSelfcureReset {false};
     std::atomic<bool> mWifiSelfcureResetEntered {false};
     std::atomic<int> mLastNetworkId {INVALID_NETWORK_ID};
     std::atomic<int> lastConnStaFreq_ {INVALID_NETWORK_ID};
-    std::atomic<int> mSelectedCandidateNetworkId {INVALID_NETWORK_ID};
+    ConnectSettings mCandidateConnectSettings;
     std::atomic<bool> mWifiAllowSemiActive {false};
     std::atomic<bool> mWifiStoping {false};
     std::vector<std::string> mStaIfaceName = {"wlan0", "wlan1"};

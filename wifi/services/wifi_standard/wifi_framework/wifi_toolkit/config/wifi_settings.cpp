@@ -679,6 +679,22 @@ int WifiSettings::GetCandidateConfig(const int uid, const int &networkId, WifiDe
     return -1;
 }
 
+int WifiSettings::GetCandidateConfigWithoutUid(const int &networkId, WifiDeviceConfig &config)
+{
+    std::vector<WifiDeviceConfig> configs;
+    if (GetAllCandidateConfigWithoutUid(configs) != 0) {
+        return -1;
+    }
+
+    for (const auto &it : configs) {
+        if (it.networkId == networkId) {
+            config = it;
+            return it.networkId;
+        }
+    }
+    return -1;
+}
+
 int WifiSettings::GetAllCandidateConfigWithoutUid(std::vector<WifiDeviceConfig> &configs)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {

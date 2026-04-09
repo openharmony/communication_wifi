@@ -286,6 +286,50 @@ HWTEST_F(WifiSettingsTest, GetAllCandidateConfigWithoutUidTest, TestSize.Level1)
     EXPECT_NE(result, WIFI_OPT_RETURN);
 }
 
+HWTEST_F(WifiSettingsTest, GetCandidateConfigWithoutUidByNetworkIdTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetCandidateConfigWithoutUidByNetworkIdTest enter!");
+    WifiDeviceConfig config1;
+    config1.ssid = "test_networkId";
+    config1.keyMgmt = "SAE";
+    config1.uid = 1;
+    config1.isShared = false;
+    int networkId = WifiSettings::GetInstance().AddDeviceConfig(config1);
+
+    WifiDeviceConfig config2;
+    int result = WifiSettings::GetInstance().GetCandidateConfigWithoutUid(networkId, config2);
+    WIFI_LOGI("GetCandidateConfigWithoutUidByNetworkIdTest result(%{public}d)", result);
+    EXPECT_EQ(result, networkId);
+}
+
+HWTEST_F(WifiSettingsTest, GetCandidateConfigWithoutUidByNetworkIdNotFoundTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetCandidateConfigWithoutUidByNetworkIdNotFoundTest enter!");
+    WifiDeviceConfig config1;
+    config1.ssid = "test_not_found";
+    config1.keyMgmt = "WPA2-PSK";
+    config1.uid = 1;
+    config1.isShared = false;
+    WifiSettings::GetInstance().AddDeviceConfig(config1);
+
+    WifiDeviceConfig config2;
+    int invalidNetworkId = 99999;
+    int result = WifiSettings::GetInstance().GetCandidateConfigWithoutUid(invalidNetworkId, config2);
+    WIFI_LOGI("GetCandidateConfigWithoutUidByNetworkIdNotFoundTest result(%{public}d)", result);
+    EXPECT_EQ(result, -1);
+}
+
+HWTEST_F(WifiSettingsTest, GetCandidateConfigWithoutUidByNetworkIdEmptyTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetCandidateConfigWithoutUidByNetworkIdEmptyTest enter!");
+    WifiSettings::GetInstance().ClearDeviceConfig();
+
+    WifiDeviceConfig config;
+    int result = WifiSettings::GetInstance().GetCandidateConfigWithoutUid(0, config);
+    WIFI_LOGI("GetCandidateConfigWithoutUidByNetworkIdEmptyTest result(%{public}d)", result);
+    EXPECT_EQ(result, -1);
+}
+
 HWTEST_F(WifiSettingsTest, SetDeviceConnFailedCountTest, TestSize.Level1)
 {
     WIFI_LOGE("SetDeviceConnFailedCountTest enter!");

@@ -108,7 +108,7 @@ enum class  DevInterfaceCode {
     WIFI_SVR_CMD_GET_WIFI_CAPABILITY = 0x1057, /* Get WiFi Capability */
 
     /* 5g Auto Identify Conn Feature */
-    WIFI_SVR_CMD_5G_AUTO_IDENTIFY_CONN_FEATURE = 0x1056,
+    WIFI_SVR_CMD_5G_AUTO_IDENTIFY_CONN_FEATURE = 0x1058,
 
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */

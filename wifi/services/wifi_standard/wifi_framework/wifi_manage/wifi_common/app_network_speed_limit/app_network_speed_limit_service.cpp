@@ -684,13 +684,15 @@ void AppNetworkSpeedLimitService::ForegroundAppStateChangedAction(const AsyncPar
 
 void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)
 {
-    WIFI_LOGI("%{public}s enter game limit configs, game state is %{public}d", __FUNCTION__, networkControlInfo.state);
+    WIFI_LOGI("%{public}s enter game limit configs, game state is %{public}d, game rtt is %{public}d", __FUNCTION__,
+        networkControlInfo.state, networkControlInfo.rtt);
     ReportGameSceneChange(networkControlInfo.state);
     switch (networkControlInfo.state) {
         case GameSceneId::MSG_GAME_STATE_START:
         case GameSceneId::MSG_GAME_STATE_FOREGROUND:
             SetActivePowerScenes(POWER_SCENE_GAME, false);
-            if (AppParser::GetInstance().IsOverGameRtt(networkControlInfo.bundleName, networkControlInfo.rtt)) {
+            if (AppParser::GetInstance().IsOverGameLowRttThresh(networkControlInfo.bundleName,
+                networkControlInfo.rtt)) {
                 SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
                     networkControlInfo.uid);
             } else {
@@ -700,6 +702,7 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
             break;
         case GameSceneId::MSG_GAME_STATE_BACKGROUND:
         case GameSceneId::MSG_GAME_STATE_END:
+            WifiConfigCenter::GetInstance().SetNetworkControlInfo(WifiNetworkControlInfo()); // clear game info
             SetActivePowerScenes(POWER_SCENE_GAME, false);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_OFF, GAME_BOOST_DISABLE, networkControlInfo.uid);
             break;
@@ -715,6 +718,22 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
         default:
             WIFI_LOGE("%{public}s there is no such state.", __FUNCTION__);
             break;
+    }
+}
+
+void AppNetworkSpeedLimitService::AdjustSpeedLimitByRtt(const int rtt)
+{
+    std::unique_lock<std::mutex> lock(rttMutex_);
+    WifiNetworkControlInfo gameInfo = WifiConfigCenter::GetInstance().GetNetworkControlInfo();
+    if (gameInfo.bundleName == "" || gameInfo.state != GameSceneId::MSG_GAME_STATE_FOREGROUND) {
+        return;
+    }
+ 
+    if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] == BG_LIMIT_LEVEL_3) {
+        if (AppParser::GetInstance().IsOverGameRtt(gameInfo.bundleName, rtt)) {
+            SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
+                gameInfo.uid);
+        }
     }
 }
 
@@ -865,6 +884,7 @@ void AppNetworkSpeedLimitService::CheckAndResetGamePowerMode(const std::string &
 
 void AppNetworkSpeedLimitService::UpdateGameRttData(int rtt)
 {
+    AdjustSpeedLimitByRtt(rtt);
     if (!isFirstRtt_.exchange(false)) {
         WIFI_LOGD("%{public}s not waiting for first rtt, ignore", __FUNCTION__);
         return;

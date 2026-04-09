@@ -219,14 +219,14 @@ public:
 
     ErrCode IsRandomMacDisabled(bool &isRandomMacDisabled) override;
 
+    ErrCode Update5gAutoIdentifyConnFeatures(Wifi5gOperateType opType,
+        Wifi5gFeatureType featureType, bool value, bool& result) override;
+
     ErrCode SetBtCoexistState(CoexistState state, CoexistReason reason) override;
 
     ErrCode SetWifiCapability(int capability, bool enable) override;
 
     ErrCode GetWifiCapability(int capability, bool &enabled) override;
-
-    ErrCode Update5gAutoIdentifyConnFeatures(Wifi5gOperateType opType,
-        Wifi5gFeatureType featureType, bool value, bool& result) override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

@@ -355,7 +355,7 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, VideoCallNetworkSpeedLimitConfigs, Tes
     EXPECT_EQ(level, BG_LIMIT_OFF);
 }
 
-HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateNoSpeedLimitConfigs, TestSize.Level1)
+HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateNoSpeedLimitConfigs001, TestSize.Level1)
 {
     WIFI_LOGI("UpdateNoSpeedLimitConfigs enter");
     WifiNetworkControlInfo networkControlInfo;
@@ -365,14 +365,28 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateNoSpeedLimitConfigs, TestSize.Le
     AppNetworkSpeedLimitService::GetInstance().UpdateNoSpeedLimitConfigs(networkControlInfo);
     networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_WINDOW_VISIBLE;
     AppNetworkSpeedLimitService::GetInstance().UpdateNoSpeedLimitConfigs(networkControlInfo);
+    int windowUidSize = AppNetworkSpeedLimitService::GetInstance().m_additionalWindowUidSet.size();
+    EXPECT_EQ(windowUidSize, 1);
+}
 
+HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateNoSpeedLimitConfigs002, TestSize.Level1)
+{
+    WifiNetworkControlInfo networkControlInfo;
     networkControlInfo.state = 0;
     networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_AUDIO_PLAYBACK;
     AppNetworkSpeedLimitService::GetInstance().UpdateNoSpeedLimitConfigs(networkControlInfo);
+    int windowUidSize = AppNetworkSpeedLimitService::GetInstance().m_additionalWindowUidSet.size();
+    EXPECT_EQ(windowUidSize, 1);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateNoSpeedLimitConfigs003, TestSize.Level1)
+{
+    WifiNetworkControlInfo networkControlInfo;
+    networkControlInfo.state = 0;
     networkControlInfo.sceneId = BG_LIMIT_CONTROL_ID_WINDOW_VISIBLE;
     AppNetworkSpeedLimitService::GetInstance().UpdateNoSpeedLimitConfigs(networkControlInfo);
     int windowUidSize = AppNetworkSpeedLimitService::GetInstance().m_additionalWindowUidSet.size();
-    EXPECT_EQ(windowUidSize, 0);
+    EXPECT_EQ(windowUidSize, 1);
 }
 
 HWTEST_F(AppNetworkSpeedLimitServiceTest, ForegroundAppChangedAction_Test, TestSize.Level1)

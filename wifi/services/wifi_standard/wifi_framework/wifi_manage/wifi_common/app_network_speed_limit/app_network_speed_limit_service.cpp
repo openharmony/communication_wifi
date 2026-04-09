@@ -27,7 +27,6 @@
 #include "wifi_service_manager.h"
 #include "ienhance_service.h"
 #include "app_network_speed_limit_chr.h"
-#include "wifi_cmd_client.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -48,8 +47,6 @@ namespace {
     const std::string RECEIVE_NETWORK_CONTROL = "ReceiveNetworkControlInfo";
     const std::string FEATURE_GAME_NO_SLEEP = "GameNoSleep";
     const std::string FEATURE_VPN_NO_LIMIT = "VpnNoLimit";
-    const std::string RX_LISTEN_ON = "Y";
-    const std::string RX_LISTEN_OFF = "N";
     const int GAME_BOOST_ENABLE = 1;
     const int GAME_BOOST_DISABLE = 0;
     const int BOOST_UDP_TYPE = 17;
@@ -687,13 +684,15 @@ void AppNetworkSpeedLimitService::ForegroundAppStateChangedAction(const AsyncPar
 
 void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetworkControlInfo &networkControlInfo)
 {
-    WIFI_LOGI("%{public}s enter game limit configs, game state is %{public}d", __FUNCTION__, networkControlInfo.state);
+    WIFI_LOGI("%{public}s enter game limit configs, game state is %{public}d, game rtt is %{public}d", __FUNCTION__,
+        networkControlInfo.state, networkControlInfo.rtt);
     ReportGameSceneChange(networkControlInfo.state);
     switch (networkControlInfo.state) {
         case GameSceneId::MSG_GAME_STATE_START:
         case GameSceneId::MSG_GAME_STATE_FOREGROUND:
             SetActivePowerScenes(POWER_SCENE_GAME, false);
-            if (AppParser::GetInstance().IsOverGameRtt(networkControlInfo.bundleName, networkControlInfo.rtt)) {
+            if (AppParser::GetInstance().IsOverGameLowRttThresh(networkControlInfo.bundleName,
+                networkControlInfo.rtt)) {
                 SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
                     networkControlInfo.uid);
             } else {
@@ -703,6 +702,7 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
             break;
         case GameSceneId::MSG_GAME_STATE_BACKGROUND:
         case GameSceneId::MSG_GAME_STATE_END:
+            WifiConfigCenter::GetInstance().SetNetworkControlInfo(WifiNetworkControlInfo()); // clear game info
             SetActivePowerScenes(POWER_SCENE_GAME, false);
             SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_OFF, GAME_BOOST_DISABLE, networkControlInfo.uid);
             break;
@@ -718,6 +718,22 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
         default:
             WIFI_LOGE("%{public}s there is no such state.", __FUNCTION__);
             break;
+    }
+}
+
+void AppNetworkSpeedLimitService::AdjustSpeedLimitByRtt(const int rtt)
+{
+    std::unique_lock<std::mutex> lock(rttMutex_);
+    WifiNetworkControlInfo gameInfo = WifiConfigCenter::GetInstance().GetNetworkControlInfo();
+    if (gameInfo.bundleName == "" || gameInfo.state != GameSceneId::MSG_GAME_STATE_FOREGROUND) {
+        return;
+    }
+ 
+    if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME] == BG_LIMIT_LEVEL_3) {
+        if (AppParser::GetInstance().IsOverGameRtt(gameInfo.bundleName, rtt)) {
+            SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_GAME, BG_LIMIT_LEVEL_7, GAME_BOOST_ENABLE,
+                gameInfo.uid);
+        }
     }
 }
 
@@ -821,11 +837,6 @@ void AppNetworkSpeedLimitService::UpdatePowerModeByScenes()
         return;
     }
 
-    const std::string &param = (targetMode == POWER_MODE_ON) ? RX_LISTEN_OFF : RX_LISTEN_ON;
-    int cmdRet = WifiCmdClient::GetInstance().SendCmdToDriver("wlan0", CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH, param);
-    if (cmdRet != 0) {
-        WIFI_LOGE("SendCmdToDriver RxListen failed, ret: %{public}d.", cmdRet);
-    }
     int frequency = POWER_MODE_FREQUENCY_DEFAULT;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode("wlan0", frequency, targetMode);
     if (ret != WIFI_HAL_OPT_OK) {
@@ -843,11 +854,6 @@ void AppNetworkSpeedLimitService::ResetPowerMode()
     activePowerScenes_.store(POWER_SCENE_NONE);
     if (cachedPowerMode_.load() == POWER_MODE_OFF) {
         return;
-    }
-    int cmdRet = WifiCmdClient::GetInstance().SendCmdToDriver(
-        "wlan0", CMD_SET_RX_LISTEN_POWER_SAVING_SWITCH, RX_LISTEN_ON);
-    if (cmdRet != 0) {
-        WIFI_LOGE("SendCmdToDriver RxListen failed on reset, ret: %{public}d.", cmdRet);
     }
     int frequency = POWER_MODE_FREQUENCY_DEFAULT;
     WifiErrorNo ret = WifiStaHalInterface::GetInstance().SetPmMode("wlan0", frequency, POWER_MODE_OFF);
@@ -878,6 +884,7 @@ void AppNetworkSpeedLimitService::CheckAndResetGamePowerMode(const std::string &
 
 void AppNetworkSpeedLimitService::UpdateGameRttData(int rtt)
 {
+    AdjustSpeedLimitByRtt(rtt);
     if (!isFirstRtt_.exchange(false)) {
         WIFI_LOGD("%{public}s not waiting for first rtt, ignore", __FUNCTION__);
         return;

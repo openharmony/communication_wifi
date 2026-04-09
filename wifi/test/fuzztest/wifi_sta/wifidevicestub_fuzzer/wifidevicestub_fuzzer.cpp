@@ -336,6 +336,24 @@ void OnConnect2ToFuzzTest()
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO), datas);
 }
 
+void OnConnectToCandidateConfigFuzzTest()
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    int32_t networkId = FDP->ConsumeIntegral<int32_t>();
+    bool withUserAction = FDP->ConsumeBool();
+    int32_t userActionTimeout = FDP->ConsumeIntegral<int32_t>();
+    bool addNetworkToSystem = FDP->ConsumeBool();
+    datas.WriteInt32(networkId);
+    datas.WriteBool(withUserAction);
+    datas.WriteInt32(userActionTimeout);
+    datas.WriteBool(addNetworkToSystem);
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG), datas);
+}
+
 void OnReConnectFuzzTest()
 {
     MessageParcel datas;
@@ -1449,6 +1467,7 @@ void WifiDeviceFuzzTest()
     OHOS::Wifi::OnDisableDeviceConfigFuzzTest();
     OHOS::Wifi::OnAllowAutoConnectFuzzTest();
     OHOS::Wifi::OnConnectToFuzzTest();
+    OHOS::Wifi::OnConnectToCandidateConfigFuzzTest();
     OHOS::Wifi::OnConnect2ToFuzzTest();
     OHOS::Wifi::OnReConnectFuzzTest();
     OHOS::Wifi::OnReAssociateFuzzTest();

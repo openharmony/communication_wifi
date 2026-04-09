@@ -378,6 +378,19 @@ void WifiDeviceStub::OnConnectTo(uint32_t code, IpcIo *req, IpcIo *reply)
     (void)WriteInt32(reply, ret);
 }
 
+void WifiDeviceStub::OnConnectToCandidateConfig(uint32_t code, IpcIo *req, IpcIo *reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
+    ConnectSettings connectSettings;
+    (void)ReadInt32(req, &connectSettings.networkId);
+    (void)ReadBool(req, &connectSettings.withUserAction);
+    (void)ReadInt32(req, &connectSettings.userActionTimeout);
+    (void)ReadBool(req, &connectSettings.addNetworkToSystem);
+    ErrCode ret = ConnectToCandidateConfig(connectSettings);
+    (void)WriteInt32(reply, 0);
+    (void)WriteInt32(reply, ret);
+}
+
 void WifiDeviceStub::OnConnect2To(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
@@ -504,6 +517,7 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, IpcIo *req, IpcIo *reply)
         (void)WriteInt32(reply, (int)wifiInfo.maxSupportedRxLinkSpeed);
         (void)WriteInt32(reply, (int)wifiInfo.maxSupportedTxLinkSpeed);
         (void)WriteInt32(reply, (int)wifiInfo.channelWidth);
+        (void)WriteBool(reply, wifiInfo.wifiTxRxValid);
     }
 }
 
@@ -728,6 +742,8 @@ void WifiDeviceStub::InitHandleMap()
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ALLOW_AUTO_CONNECT)] =
         &WifiDeviceStub::OnAllowAutoConnect;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO)] = &WifiDeviceStub::OnConnectTo;
+    handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG)] =
+        &WifiDeviceStub::OnConnectToCandidateConfig;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT2_TO)] = &WifiDeviceStub::OnConnect2To;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_RECONNECT)] = &WifiDeviceStub::OnReConnect;
     handleFuncMap_[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_REASSOCIATE)] = &WifiDeviceStub::OnReAssociate;

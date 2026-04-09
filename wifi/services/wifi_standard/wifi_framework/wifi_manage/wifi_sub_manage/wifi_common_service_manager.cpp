@@ -123,7 +123,10 @@ bool WifiCommonServiceManager::OnRequestNetwork(const int uid, const int network
         WIFI_LOGE("OnRequestNetwork: pService is nullptr!");
         return false;
     }
-    if (pService->ConnectToCandidateConfig(uid, networkId) != WIFI_OPT_SUCCESS) {
+    ConnectSettings connectSettings;
+    connectSettings.uid = uid;
+    connectSettings.networkId = networkId;
+    if (pService->ConnectToCandidateConfig(connectSettings) != WIFI_OPT_SUCCESS) {
         return false;
     }
     return true;

@@ -81,7 +81,11 @@ public:
 
     ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) override;
 
+    void CheckAndHandleVapConflict();
+
     ErrCode ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout = DEFAULT_DIALOG_TIMEOUT) override;
+
+    ErrCode ConnectToCandidateConfig(ConnectSettings &connectSettings) override;
 
     ErrCode ConnectToDevice(const WifiDeviceConfig &config) override;
 

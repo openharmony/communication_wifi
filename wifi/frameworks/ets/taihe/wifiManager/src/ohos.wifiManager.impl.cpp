@@ -395,6 +395,24 @@ void ConnectToCandidateConfig(int32_t networkId)
     }
 }
 
+void ConnectToCandidateConfigWithConnectSettings(const ::ohos::wifiManager::ConnectSettings &connectSettings)
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ConnectSettings settings;
+    settings.networkId = connectSettings.networkId;
+    settings.withUserAction = connectSettings.withUserAction;
+    settings.userActionTimeout = connectSettings.userActionTimeout;
+    settings.addNetworkToSystem = connectSettings.addNetworkToSystem;
+    ErrCode ret = g_wifiDevicePtr->ConnectToCandidateConfig(settings);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+}
+
 void Reconnect()
 {
     if (g_wifiDevicePtr == nullptr) {
@@ -1735,6 +1753,7 @@ TH_EXPORT_CPP_API_P2pConnect(P2pConnect);
 TH_EXPORT_CPP_API_GetCandidateConfigs(GetCandidateConfigs);
 TH_EXPORT_CPP_API_P2pCancelConnect(P2pCancelConnect);
 TH_EXPORT_CPP_API_ConnectToCandidateConfig(ConnectToCandidateConfig);
+TH_EXPORT_CPP_API_ConnectToCandidateConfigWithConnectSettings(ConnectToCandidateConfigWithConnectSettings);
 TH_EXPORT_CPP_API_Reconnect(Reconnect);
 TH_EXPORT_CPP_API_Reassociate(Reassociate);
 TH_EXPORT_CPP_API_ConnectToDevice(ConnectToDevice);

@@ -353,6 +353,7 @@ struct WifiLinkedInfo {
     int connTriggerMode; /* Connection Trigger Module */
     DisconnState disconnTriggerMode;  /* Disconnection Trigger Module */
     WifiRiskType riskType;
+    bool wifiTxRxValid;
     WifiLinkedInfo()
     {
         networkId = INVALID_NETWORK_ID;
@@ -393,6 +394,7 @@ struct WifiLinkedInfo {
         connTriggerMode = -1;
         disconnTriggerMode = DisconnState::DEFAULTSTAT;
         riskType = WifiRiskType::INVALID;
+        wifiTxRxValid = true;
     }
 };
 
@@ -960,6 +962,7 @@ struct WifiDeviceConfig {
 
 /* Wi-Fi connection settings */
 struct ConnectSettings {
+    int uid;
     int networkId;
     bool withUserAction;
     int userActionTimeout;
@@ -967,7 +970,8 @@ struct ConnectSettings {
 
     ConnectSettings()
     {
-        networkId = -1;
+        uid = WIFI_INVALID_UID;
+        networkId = INVALID_NETWORK_ID;
         withUserAction = false;
         userActionTimeout = DEFAULT_DIALOG_TIMEOUT;
         addNetworkToSystem = false;

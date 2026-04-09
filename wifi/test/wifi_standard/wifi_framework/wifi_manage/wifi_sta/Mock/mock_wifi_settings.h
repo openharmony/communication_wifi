@@ -39,6 +39,7 @@ public:
         const std::string &index, const int &indexType, WifiDeviceConfig &config, int instId = 0) = 0;
     virtual int GetCandidateConfigWithoutUid(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config) = 0;
+    virtual int GetCandidateConfigWithoutUid(const int &networkId, WifiDeviceConfig &config) = 0;
     virtual int SyncDeviceConfig() = 0;
     virtual bool InKeyMgmtBitset(const WifiDeviceConfig &config, const std::string &keyMgmt) = 0;
     virtual void SetKeyMgmtBitset(WifiDeviceConfig &config) = 0;
@@ -158,6 +159,7 @@ public:
     MOCK_METHOD4(GetDeviceConfig, int(const std::string &index, const int &indexType, WifiDeviceConfig &config, int));
     MOCK_METHOD3(GetCandidateConfigWithoutUid, int(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config));
+    MOCK_METHOD2(GetCandidateConfigWithoutUid, int(const int &networkId, WifiDeviceConfig &config));
     MOCK_METHOD0(SyncDeviceConfig, int());
     MOCK_METHOD2(InKeyMgmtBitset, bool(const WifiDeviceConfig &config, const std::string &keyMgmt));
     MOCK_METHOD1(SetKeyMgmtBitset, void(WifiDeviceConfig &config));

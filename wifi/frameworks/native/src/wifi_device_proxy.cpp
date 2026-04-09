@@ -942,6 +942,38 @@ ErrCode WifiDeviceProxy::ConnectToNetwork(int networkId, bool isCandidate, int d
     return ErrCode(reply.ReadInt32());
 }
 
+ErrCode WifiDeviceProxy::ConnectToCandidateConfig(ConnectSettings &connectSettings)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+    data.WriteInt32(connectSettings.networkId);
+    data.WriteBool(connectSettings.withUserAction);
+    data.WriteInt32(connectSettings.userActionTimeout);
+    data.WriteBool(connectSettings.addNetworkToSystem);
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("SConnectToCandidateConfig et Attr(%{public}d) failed,error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG), error);
+        return WIFI_OPT_FAILED;
+    }
+    int exception = reply.ReadInt32();
+    if (exception) {
+        return WIFI_OPT_FAILED;
+    }
+    return ErrCode(reply.ReadInt32());
+}
+
 ErrCode WifiDeviceProxy::ConnectToDevice(const WifiDeviceConfig &config)
 {
     if (mRemoteDied) {
@@ -1347,6 +1379,7 @@ void WifiDeviceProxy::ReadLinkedInfo(MessageParcel &reply, WifiLinkedInfo &info)
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
     info.riskType = static_cast<WifiRiskType>(reply.ReadInt32());
 #endif
+    info.wifiTxRxValid = reply.ReadBool();
 }
 
 void WifiDeviceProxy::ReadWifiSignalPollInfo(MessageParcel &reply, std::vector<WifiSignalPollInfo> &wifiSignalPollInfos)

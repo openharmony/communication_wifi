@@ -286,11 +286,12 @@ void StaService::NotifyCandidateApprovalStatus(CandidateApprovalStatus status) c
 #endif
 }
 
-ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId, const int dialogTimeout) const
+ErrCode StaService::ConnectToCandidateConfig(ConnectSettings &connectSettings)
 {
     LOGI("Enter ConnectToCandidateConfig.\n");
     WifiDeviceConfig config;
-    if (WifiSettings::GetInstance().GetCandidateConfig(uid, networkId, config) == INVALID_NETWORK_ID) {
+    if (WifiSettings::GetInstance().GetCandidateConfig(connectSettings.uid, connectSettings.networkId, config)
+        == INVALID_NETWORK_ID) {
         LOGE("ConnectToCandidateConfig:GetCandidateConfig is null!");
         return WIFI_OPT_FAILED;
     }
@@ -311,10 +312,9 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId,
         return WIFI_OPT_NOT_SUPPORTED;
     }
     if (config.lastConnectTime <= 0) {
-        WifiConfigCenter::GetInstance().SetSelectedCandidateNetworkId(networkId);
-        int timeoutMs = dialogTimeout * SECOND_TO_MILLI_SECOND;
-        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT,
-            config.ssid, timeoutMs);
+        WifiConfigCenter::GetInstance().SetCandidateConnectSettings(connectSettings);
+        WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::CANDIDATE_CONNECT, config.ssid,
+            connectSettings.userActionTimeout * SECOND_TO_MILLI_SECOND, connectSettings.addNetworkToSystem);
         return WIFI_OPT_SUCCESS;
     }
 #endif
@@ -322,10 +322,10 @@ ErrCode StaService::ConnectToCandidateConfig(const int uid, const int networkId,
     pStaAutoConnectService->EnableOrDisableBssid(config.bssid, true, 0);
     pStaStateMachine->SetPortalBrowserFlag(false);
     NotifyCandidateApprovalStatus(CandidateApprovalStatus::USER_ACCEPT);
-    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, networkId, NETWORK_SELECTED_BY_USER);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK, connectSettings.networkId,
+        NETWORK_SELECTED_BY_USER);
     return WIFI_OPT_SUCCESS;
 }
-
 
 std::string StaService::GetMcc(const std::string &imsi) const
 {

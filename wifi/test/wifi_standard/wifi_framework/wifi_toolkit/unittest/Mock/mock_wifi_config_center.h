@@ -149,8 +149,8 @@ public:
     virtual int GetWifiToggledEnable(int id = 0) = 0;
     virtual bool GetSoftapToggledState() const = 0;
     virtual bool CheckScanOnlyAvailable(int instId) = 0;
-    virtual int GetSelectedCandidateNetworkId() const = 0;
-    virtual void SetSelectedCandidateNetworkId(const int networkId) = 0;
+    virtual ConnectSettings GetCandidateConnectSettings() const = 0;
+    virtual void SetCandidateConnectSettings(const ConnectSettings &connectSettings) = 0;
     virtual void SetP2pIfaceName(const std::string &ifaceName) = 0;
     virtual int SetP2pState(int state) = 0;
     virtual int GetPowerSavingModeState() const = 0;
@@ -337,8 +337,8 @@ public:
     MOCK_METHOD1(GetWifiToggledEnable, int(int));
     MOCK_CONST_METHOD0(GetSoftapToggledState, bool());
     MOCK_METHOD1(CheckScanOnlyAvailable, bool(int instId));
-    MOCK_CONST_METHOD0(GetSelectedCandidateNetworkId, int());
-    MOCK_METHOD1(SetSelectedCandidateNetworkId, void(const int networkId));
+    MOCK_CONST_METHOD0(GetCandidateConnectSettings, ConnectSettings());
+    MOCK_METHOD1(SetCandidateConnectSettings, void(const ConnectSettings &connectSettings));
     MOCK_METHOD1(SetP2pIfaceName, void(const std::string &ifaceName));
     MOCK_METHOD1(SetP2pState, int(int state));
     MOCK_CONST_METHOD0(GetPowerSavingModeState, int());

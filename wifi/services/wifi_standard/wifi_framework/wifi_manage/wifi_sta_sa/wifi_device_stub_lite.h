@@ -50,6 +50,7 @@ private:
     void OnDisableDeviceConfig(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnAllowAutoConnect(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnConnectTo(uint32_t code, IpcIo *req, IpcIo *reply);
+    void OnConnectToCandidateConfig(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnConnect2To(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnReConnect(uint32_t code, IpcIo *req, IpcIo *reply);
     void OnReAssociate(uint32_t code, IpcIo *req, IpcIo *reply);

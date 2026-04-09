@@ -1014,13 +1014,17 @@ static napi_value ConnectToCandidateWithUserActionAsync(napi_env env, const Conn
     asyncContext->networkId = connectSettings.networkId;
     asyncContext->userActionTimeout = connectSettings.userActionTimeout;
     asyncContext->isCandidate = true;
+    asyncContext->withUserAction = connectSettings.withUserAction;
+    asyncContext->addNetworkToSystem = connectSettings.addNetworkToSystem;
     asyncContext->waitCallback = true;
     asyncContext->callbackFunc = CandidateConnectCallbackFunc;
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         ConnectSettings connectSettings;
         connectSettings.networkId = context->networkId;
-        connectSettings.withUserAction = true;
+        connectSettings.withUserAction = context->withUserAction;
+        connectSettings.userActionTimeout = context->userActionTimeout;
+        connectSettings.addNetworkToSystem = context->addNetworkToSystem;
         context->errorCode = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
     };
     asyncContext->completeFunc = CandidateConnectCompleteFunc;

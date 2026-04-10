@@ -82,8 +82,8 @@ bool WifiChrUtils::IsBeaconLost(const std::string &bssid, const int32_t signalLe
                 BeaconLostType::SIGNAL_LEVEL_LOW_OFF_SCREEN : BeaconLostType::SIGNAL_LEVEL_HIGH_OFF_SCREEN;
         }
         const int64_t checkTime = wifiCheckInfo.timeStamp;
-        if (checkTime - intBeaconLstTime_ > BEACON_ABNORMAL_TWO_HOUR) {
-            intBeaconLstTime_ = checkTime;
+        if (checkTime - intBeaconLostTime_ > BEACON_ABNORMAL_TWO_HOUR) {
+            intBeaconLostTime_ = checkTime;
             WriteWifiBeaconLostHiSysEvent(lostType);
         }
     }

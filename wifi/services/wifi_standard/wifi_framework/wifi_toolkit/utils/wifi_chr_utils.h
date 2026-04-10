@@ -41,7 +41,7 @@ private:
     std::mutex signalInfoMutex;
     WifiSignalPollInfo signalPollInfoItem_;
     int64_t intBeaconAbTime_ = 0;
-    int64_t intBeaconLstTime_ = 0;
+    int64_t intBeaconLostTime_ = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

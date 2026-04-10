@@ -72,21 +72,27 @@ bool WifiChrUtils::IsBeaconLost(const std::string &bssid, const int32_t signalLe
     }
     bool beaconLost = OHOS::Wifi::IsBeaconLost(bssid, wifiCheckInfo, screenState);
     if (beaconLost) {
+        BeaconLostType lostType;
         LOGW("Beacon Lost, signalLevel: %{public}d", signalLevel);
         if (screenState == MODE_STATE_OPEN) {
-            WriteWifiBeaconLostHiSysEvent((signalLevel <= SIGNAL_LEVEL_TWO) ?
-                BeaconLostType::SIGNAL_LEVEL_LOW : BeaconLostType::SIGNAL_LEVEL_HIGH);
+            lostType = (signalLevel <= SIGNAL_LEVEL_TWO) ?
+                BeaconLostType::SIGNAL_LEVEL_LOW : BeaconLostType::SIGNAL_LEVEL_HIGH;
         } else {
-            WriteWifiBeaconLostHiSysEvent((signalLevel <= SIGNAL_LEVEL_TWO) ?
-                BeaconLostType::SIGNAL_LEVEL_LOW_OFF_SCREEN : BeaconLostType::SIGNAL_LEVEL_HIGH_OFF_SCREEN);
+            lostType = (signalLevel <= SIGNAL_LEVEL_TWO) ?
+                BeaconLostType::SIGNAL_LEVEL_LOW_OFF_SCREEN : BeaconLostType::SIGNAL_LEVEL_HIGH_OFF_SCREEN;
+        }
+        const int64_t checkTime = wifiCheckInfo.timeStamp;
+        if (checkTime - intBeaconLstTime_ > BEACON_ABNORMAL_TWO_HOUR) {
+            intBeaconLstTime_ = checkTime;
+            WriteWifiBeaconLostHiSysEvent(lostType);
         }
     }
     bool beaconAbnormal = OHOS::Wifi::IsBeaconAbnormal(bssid, wifiCheckInfo);
     if (beaconAbnormal) {
         LOGW("Beacon Abnormal, signalLevel: %{public}d", signalLevel);
         const int64_t checkTime = wifiCheckInfo.timeStamp;
-        if (checkTime - intTime_ > BEACON_ABNORMAL_TWO_HOUR) {
-            intTime_ = checkTime;
+        if (checkTime - intBeaconAbTime_ > BEACON_ABNORMAL_TWO_HOUR) {
+            intBeaconAbTime_ = checkTime;
             WriteWifiBeaconLostHiSysEvent(BeaconLostType::BEACON_ABNORMAL);
         }
     }

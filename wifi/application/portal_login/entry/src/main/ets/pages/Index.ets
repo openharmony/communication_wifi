@@ -466,7 +466,7 @@ struct Index {
                   value: $r('app.string.confirm_dialog_cancel'),
                   action: () => {
                     hilog.info(DOMAIN, TAG, 'safe browsing primaryButton handleCancel');
-                    this.context.terminateSelf();
+                    this.webviewController.loadUrl(this.defaultUrl);
                   }
                 },
                 secondaryButton: {
@@ -478,6 +478,7 @@ struct Index {
                 },
                 cancel: () => {
                   hilog.info(DOMAIN, TAG, 'safe browsing cancel handleCancel');
+                  this.webviewController.loadUrl(this.defaultUrl);
                 }
               })
             }

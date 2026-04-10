@@ -1663,6 +1663,70 @@ bool WifiSettings::GetWifiCapability(int capability, int instId)
     }
 }
 
+ErrCode WifiSettings::Update5gAutoIdentifyConnFeatures(Wifi5gOperateType opType,
+    Wifi5gFeatureType featureType, bool value, bool &result, int instId)
+{
+    std::unique_lock<std::mutex> lock(mWifiConfigMutex);
+    switch (opType) {
+        case Wifi5gOperateType::SET_5G_FEATURE:
+            return Set5gAutoIdentifyFeature(featureType, value);
+        case Wifi5gOperateType::GET_5G_FEATURE:
+            return Get5gAutoIdentifyFeature(featureType, result);
+        default:
+            return WIFI_OPT_INVALID_PARAM;
+    }
+}
+ 
+ErrCode WifiSettings::Get5gAutoIdentifyFeature(int featureType, bool &result, int instId)
+{
+    auto iter = mWifiConfig.find(instId);
+    switch (featureType) {
+        case Wifi5gFeatureType::WIFI_5G_CONN_FEATURE:
+            if (iter != mWifiConfig.end()) {
+                result = iter->second.is5gConnFeature;
+            } else {
+                result = mWifiConfig[0].is5gConnFeature;
+            }
+            return WIFI_OPT_SUCCESS;
+        case Wifi5gFeatureType::SETTINGS_5G_CONN_FEATURE:
+            if (iter != mWifiConfig.end()) {
+                result = iter->second.isSettings5gConnFeature;
+            } else {
+                result = mWifiConfig[0].isSettings5gConnFeature;
+            }
+            return WIFI_OPT_SUCCESS;
+        case Wifi5gFeatureType::SETTINGS_5G_SAVE_FEATURE:
+            if (iter != mWifiConfig.end()) {
+                result = iter->second.isSettings5gSaveFeature;
+            } else {
+                result = mWifiConfig[0].isSettings5gSaveFeature;
+            }
+            return WIFI_OPT_SUCCESS;
+        default:
+            return WIFI_OPT_INVALID_PARAM;
+    }
+}
+ 
+ErrCode WifiSettings::Set5gAutoIdentifyFeature(int featureType, bool value, int instId)
+{
+    switch (featureType) {
+        case Wifi5gFeatureType::WIFI_5G_CONN_FEATURE:
+            mWifiConfig[instId].is5gConnFeature = value;
+            SyncWifiConfig();
+            return WIFI_OPT_SUCCESS;
+        case Wifi5gFeatureType::SETTINGS_5G_CONN_FEATURE:
+            mWifiConfig[instId].isSettings5gConnFeature = value;
+            SyncWifiConfig();
+            return WIFI_OPT_SUCCESS;
+        case Wifi5gFeatureType::SETTINGS_5G_SAVE_FEATURE:
+            mWifiConfig[instId].isSettings5gSaveFeature = value;
+            SyncWifiConfig();
+            return WIFI_OPT_SUCCESS;
+        default:
+            return WIFI_OPT_INVALID_PARAM;
+    }
+}
+
 bool WifiSettings::GetWifiDisabledByAirplane(int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);

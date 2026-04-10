@@ -686,6 +686,21 @@ public:
     }
 
     /**
+     * @Description Set or get 5G identify feature.
+     *
+     * @param opType: 0 for set feature   1 for get feature
+     * @param featureType: 0 for notification   1 for conn dialog  2 for save dialog
+     * @param value: value to be set
+     * @param result: the result of read
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode Update5gAutoIdentifyConnFeatures(Wifi5gOperateType opType,
+        Wifi5gFeatureType featureType, bool value, bool& result)
+    {
+        return WIFI_OPT_NOT_SUPPORTED;
+    }
+
+    /**
      * @Description Set bt co-exist state when service conflict
      *
      * @param state - bt co-exist state

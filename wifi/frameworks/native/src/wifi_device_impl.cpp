@@ -733,6 +733,14 @@ ErrCode WifiDeviceImpl::SetRandomMacDisabled(bool isRandomMacDisabled)
     return client_->SetRandomMacDisabled(isRandomMacDisabled);
 }
 
+ErrCode WifiDeviceImpl::Update5gAutoIdentifyConnFeatures(Wifi5gOperateType opType,
+    Wifi5gFeatureType featureType, bool value, bool& result)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->Update5gAutoIdentifyConnFeatures(opType, featureType, value, result);
+}
+
 ErrCode WifiDeviceImpl::SetBtCoexistState(CoexistState state, CoexistReason reason)
 {
     std::lock_guard<std::mutex> lock(mutex_);

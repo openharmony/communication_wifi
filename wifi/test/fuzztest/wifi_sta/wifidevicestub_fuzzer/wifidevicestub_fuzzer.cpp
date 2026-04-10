@@ -1437,6 +1437,20 @@ void OnSetBtCoexistStateTest()
     OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_BT_COEXIST_STATE), datas);
 }
 
+void OnUpdate5gAutoIdentifyConnFeaturesTest()
+{
+    MessageParcel datas;
+    if (!datas.WriteInterfaceToken(FORMMGR_INTERFACE_TOKEN)) {
+        LOGE("WriteInterfaceToken failed!");
+        return;
+    }
+    int32_t tmpInt = FDP->ConsumeIntegral<int32_t>();
+    std::string tmpBuffer = FDP->ConsumeBytesAsString(NUM_BYTES);
+    datas.WriteInt32(tmpInt);
+    datas.WriteBuffer(tmpBuffer.c_str(), tmpBuffer.size());
+    OnRemoteRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_5G_AUTO_IDENTIFY_CONN_FEATURE), datas);
+}
+
 void WifiDeviceFuzzTest()
 {
     OHOS::Wifi::OnInitWifiProtectFuzzTest();
@@ -1531,6 +1545,7 @@ void WifiDeviceFuzzTestPart2()
     OHOS::Wifi::OnGetSignalPollInfoArrayTest();
     OHOS::Wifi::OnIsRandomMacDisabledTest();
     OHOS::Wifi::OnSetRandomMacDisabledTest();
+    OHOS::Wifi::OnUpdate5gAutoIdentifyConnFeaturesTest();
 }
 
 /* Fuzzer entry point */

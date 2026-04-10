@@ -2395,8 +2395,8 @@ bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetwo
     WIFI_LOGI("Enter GetHiddenNetworkSsidList.\n");
 
     std::vector<WifiDeviceConfig> deviceConfigs;
-    if (WifiSettings::GetInstance().GetDeviceConfig(deviceConfigs) != 0) {
-        WIFI_LOGE("WifiSettings::GetInstance().GetDeviceConfig failed");
+    if (WifiSettings::GetInstance().GetDeviceConfigByInstId(deviceConfigs) != 0) {
+        WIFI_LOGE("WifiSettings::GetInstance().GetDeviceConfigByInstId failed");
         return false;
     }
     for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end();) {
@@ -2409,6 +2409,8 @@ bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetwo
             continue;
         }
         // Add the user-selected SSID to the scan list with priority.
+        WIFI_LOGI("HiddenNetworkSsidList add user-selected ssid:%{public}s, uid:%{public}d",
+            SsidAnonymize(iter->ssid).c_str(), iter->uid);
         hiddenNetworkSsid.push_back(iter->ssid);
         AddSsidToHiddenNetworkList(iter->ssid, hiddenNetworkSsid);
         iter = deviceConfigs.erase(iter);
@@ -2419,6 +2421,8 @@ bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetwo
         return aTime > bTime;
     });
     for (auto iter = deviceConfigs.begin(); iter != deviceConfigs.end(); ++iter) {
+        WIFI_LOGI("HiddenNetworkSsidList add ssid:%{public}s, uid:%{public}d",
+            SsidAnonymize(iter->ssid).c_str(), iter->uid);
         hiddenNetworkSsid.push_back(iter->ssid);
         // for gbk hiddenNetworkSsID
         AddSsidToHiddenNetworkList(iter->ssid, hiddenNetworkSsid);

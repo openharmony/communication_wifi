@@ -457,8 +457,8 @@ struct Index {
           hilog.info(DOMAIN, TAG, 'onSafeBrowsingCheckFinish %{public}s', jsonData);
           try {
             const parsed = JSON.parse(jsonData)  as object;
-            const threatType1: number = parsed?.['threatType'];
-            if (threatType1 <= 3) {
+            const threatType: number = parsed?.['threatType'];
+            if (threatType <= 3) {
               AlertDialog.show({
                 title: $r('app.string.web_risk_warning_level3_Phone_title'),
                 message: $r('app.string.web_risk_warning_level3_Phone_content'),

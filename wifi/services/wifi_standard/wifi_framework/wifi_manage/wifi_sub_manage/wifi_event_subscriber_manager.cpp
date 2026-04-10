@@ -1085,7 +1085,7 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType, boo
         }
     } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_CONN)) {
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-        f (pEnhanceService != nullptr) {
+        if (pEnhanceService != nullptr) {
             pEnhanceService->OnSettingsDialogClick(false, SETTINGS_5G_CONN_FEATURE);
         }
     } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_SAVE)) {

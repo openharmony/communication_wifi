@@ -80,10 +80,8 @@ export function validateURL(urlString: string): boolean {
 }
 
 function isAcceptURL(urlString: string): boolean {
-  if (urlString.toLowerCase().startsWith('http://') && urlString.toLowerCase().startsWith('https://')) {
-    return true;
-  }
-  return false;
+  const lower = urlString.toLowerCase();
+  return lower.startsWith('http://') || lower.startsWith('https://');
 }
 
 export function setUrl(want: Want): void {

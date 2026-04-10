@@ -112,6 +112,7 @@ private:
     void OnGetVoWifiDetectPeriod(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnIsRandomMacDisabled(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetRandomMacDisabled(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnUpdate5gAutoIdentifyConnFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetBtCoexistState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetWifiCapability(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetWifiCapability(uint32_t code, MessageParcel &data, MessageParcel &reply);

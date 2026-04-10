@@ -163,6 +163,10 @@ void WifiDeviceStub::InitHandleMapEx2()
         MessageParcel &data, MessageParcel &reply) { OnSetWifiCapability(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_CAPABILITY)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnGetWifiCapability(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_5G_AUTO_IDENTIFY_CONN_FEATURE)] = [this]
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) {
+            OnUpdate5gAutoIdentifyConnFeatures(code, data, reply);
+        };
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -1724,6 +1728,30 @@ void WifiDeviceStub::OnGetWifiCapability(uint32_t code, MessageParcel &data, Mes
         reply.WriteBool(enabled);
     }
 
+    return;
+}
+
+void WifiDeviceStub::OnUpdate5gAutoIdentifyConnFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    Wifi5gOperateType opType = static_cast<Wifi5gOperateType>(data.ReadInt32());
+    Wifi5gFeatureType featureType = static_cast<Wifi5gFeatureType>(data.ReadInt32());
+    bool value = data.ReadBool();
+    bool result = data.ReadBool();
+    ErrCode ret = Update5gAutoIdentifyConnFeatures(opType, featureType, value, result);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    switch (opType) {
+        case Wifi5gOperateType::SET_5G_FEATURE:
+            break;
+        case Wifi5gOperateType::GET_5G_FEATURE:
+            if (ret == WIFI_OPT_SUCCESS) {
+                reply.WriteBool(result);
+            }
+            break;
+        default:
+            break;
+    }
     return;
 }
 }  // namespace Wifi

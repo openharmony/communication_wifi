@@ -332,6 +332,21 @@ void WifiSettings::ClearDeviceConfig(void)
     return;
 }
 
+int WifiSettings::GetDeviceConfigByInstId(std::vector<WifiDeviceConfig> &results, int instId)
+{
+    if (!deviceConfigLoadFlag.test_and_set()) {
+        LOGD("Reload wifi config");
+        ReloadDeviceConfig();
+    }
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+        if (iter->second.instanceId == instId) {
+            results.push_back(iter->second);
+        }
+    }
+    return 0;
+}
+
 int WifiSettings::GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {

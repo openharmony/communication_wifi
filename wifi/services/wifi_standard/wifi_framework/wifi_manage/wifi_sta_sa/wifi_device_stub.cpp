@@ -1773,7 +1773,7 @@ void WifiDeviceStub::OnIsWlanSupported(uint32_t code, MessageParcel &data, Messa
     reply.WriteInt32(ret);
 
     if (ret == WIFI_OPT_SUCCESS) {
-        reply.WriteBool(enabled);
+        reply.WriteBool(isSupported);
     }
     return;
 }

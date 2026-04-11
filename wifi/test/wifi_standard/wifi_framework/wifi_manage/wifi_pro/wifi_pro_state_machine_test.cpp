@@ -684,6 +684,14 @@ HWTEST_F(WifiProStateMachineTest, wifiNoNetStateTrySelfCureTest02, TestSize.Leve
     EXPECT_EQ(wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_, false);
 }
 
+HWTEST_F(WifiProStateMachineTest, wifiNoNetStateTrySelfCureTest03, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
+    wifiNoNetState_->pWifiProStateMachine_->TrySelfCure(false);
+    EXPECT_EQ(wifiNoNetState_->pWifiProStateMachine_->isWifi2WifiSwitching_, false);
+}
+
 HWTEST_F(WifiProStateMachineTest, wifiNoNetHandleReuqestSelfCureTest01, TestSize.Level1)
 {
     pWifiProStateMachine_->pWifiNoNetState_->HandleReuqestSelfCure();

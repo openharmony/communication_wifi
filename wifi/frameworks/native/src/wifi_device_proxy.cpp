@@ -3216,7 +3216,7 @@ ErrCode WifiDeviceProxy::IsWlanSupported(bool &isSupported)
     }
     data.WriteInt32(0);
 
-    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS WLAN_SUPPORTED),
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WLAN_SUPPORTED),
         data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Check wlan supported status (%{public}d) failed, error code is %{public}d",

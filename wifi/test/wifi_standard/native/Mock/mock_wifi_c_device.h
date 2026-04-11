@@ -25,12 +25,14 @@ class MockWifiCDevice {
 public:
     virtual ~MockWifiCDevice() = default;
     virtual ErrCode GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate) = 0;
+    virtual ErrCode IsWlanSupported(bool &isSupported) = 0;
 };
 
 class WifiCDevice : public MockWifiCDevice {
 public:
     static WifiCDevice &GetInstance(void);
     MOCK_METHOD2(GetDeviceConfigs, ErrCode(std::vector<WifiDeviceConfig> &result, bool isCandidate));
+    MOCK_METHOD1(IsWlanSupported, ErrCode(bool &isSupported));
 };
 }  // namespace OHOS
 }  // namespace Wifi

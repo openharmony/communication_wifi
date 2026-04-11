@@ -445,6 +445,14 @@ public:
     bool SetP2pHighPerf(const std::string &ifaceName, bool isEnable);
 
     void RegisterChipHdiDeathCallback(OnChipServiceDied cb);
+
+    /**
+     * @Description Check whether Wifi hardware module is present and supported
+     *
+     * @param isSupported - [out] whether WiFi hardware is supported
+     * @return bool
+     */
+    bool IsWlanSupported(bool &isSupported)
 private:
     bool CheckReloadChipHdiService();
     bool CheckChipHdiStarted();

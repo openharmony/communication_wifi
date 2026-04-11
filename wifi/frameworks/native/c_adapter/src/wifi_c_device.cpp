@@ -661,4 +661,15 @@ NO_SANITIZE("cfi") WifiErrorCode SetLowTxPower(const WifiLowPowerParam wifiLowPo
     tempParam.powerParamLen = wifiLowPowerParam.powerParamLen;
     return GetCErrorCode(wifiDevicePtr->SetLowTxPower(tempParam));
 }
+
+NO_SANITIZE("cfi") WifiErrorCode IsWlanSupported(bool *isSupported)
+{
+    CHECK_PTR_RETURN(wifiDevicePtr, ERROR_WIFI_NOT_AVAILABLE);
+    CHECK_PTR_RETURN(isSupported, ERROR_WIFI_INVALID_ARGS);
+    
+    bool supported = false;
+    OHOS::Wifi::ErrCode ret = wifiDevicePtr->IsWlanSupported(supported);
+    *isSupported = supported;
+    return GetCErrorCode(ret);
+}
 #endif

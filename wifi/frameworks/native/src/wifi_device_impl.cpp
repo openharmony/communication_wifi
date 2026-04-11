@@ -761,5 +761,12 @@ ErrCode WifiDeviceImpl::GetWifiCapability(int capability, bool &enabled)
     RETURN_IF_FAIL(GetWifiDeviceProxy());
     return client_->GetWifiCapability(capability, enabled);
 }
+
+ErrCode WifiDeviceImpl::IsWlanSupported(bool &isSupported)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->IsWlanSupported(isSupported);
+}
 }  // namespace Wifi
 }  // namespace OHOS

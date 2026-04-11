@@ -304,6 +304,24 @@ public:
     {
         EXPECT_TRUE(StartPortalCertification() != WIFI_SUCCESS);
     }
+
+    void IsWlanSupportedTrueTest()
+    {
+        bool isSupported = false;
+        EXPECT_CALL(WifiCDevice::GetInstance(), IsWlanSupported(_))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(true), Return(WIFI_SUCCESS)));
+        EXPECT_EQ(IsWlanSupported(&isSupported), WIFI_SUCCESS);
+        EXPECT_TRUE(isSupported);
+    }
+
+    void IsWlanSupportedFalseTest()
+    {
+        bool isSupported = true;
+        EXPECT_CALL(WifiCDevice::GetInstance(), IsWlanSupported(_))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(false), Return(WIFI_SUCCESS)));
+        EXPECT_EQ(IsWlanSupported(&isSupported), WIFI_SUCCESS);
+        EXPECT_TRUE(isSupported);
+    }
 };
 
 HWTEST_F(WifiCDeviceTest, EnableWifiSuccess, TestSize.Level1)
@@ -450,6 +468,16 @@ HWTEST_F(WifiCDeviceTest, SetLowLatencyModeTest, TestSize.Level1)
 HWTEST_F(WifiCDeviceTest, IsBandTypeSupportedTest, TestSize.Level1)
 {
     IsBandTypeSupportedTest();
+}
+
+HWTEST_F(WifiCDeviceTest, IsWlanSupportedTrueTest, TestSize.Level1)
+{
+    IsWlanSupportedTrueTest();
+}
+
+HWTEST_F(WifiCDeviceTest, IsWlanSupportedFalseTest, TestSize.Level1)
+{
+    IsWlanSupportedFalseTest();
 }
 } // namespace Wifi
 } // namespace OHOS

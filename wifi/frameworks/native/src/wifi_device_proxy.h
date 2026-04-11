@@ -728,6 +728,14 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode GetWifiCapability(int capability, bool &enabled) override;
+
+    /**
+     * @Description Check whether WiFi hardware module is present and supported
+     *
+     * @param isSupported - [out] whether WiFi hardware is supported
+     * @return ErrCode - operation result
+     */
+    ErrCode IsWlanSupported(bool &isSupported) override;
 #ifdef OHOS_ARCH_LITE
     /**
     * @Description Handle remote object died event.

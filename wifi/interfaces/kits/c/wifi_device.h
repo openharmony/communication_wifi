@@ -409,6 +409,16 @@ WifiErrorCode SetWifiCapability(int capability, bool enable);
  */
 WifiErrorCode GetWifiCapability(int capability, bool *enabled);
 
+/**
+ * @Description Check whether Wifi hardware module is present and supported
+ *
+ * @param isSupported - [out] whether WiFi hardware is supported
+ * @return Returns {@link WIFI_SUCCESS} if the check is successful; returns an eror code defined in
+ * {@link WiFiErrorCode} otherwise.
+ * @since 17
+ */
+WifiErrorCode IsWlanSupported(bool *isSupported);
+
 #ifdef __cplusplus
 }
 #endif

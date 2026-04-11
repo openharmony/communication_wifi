@@ -112,6 +112,9 @@ enum class  DevInterfaceCode {
 
     WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG = 0x1059,
 
+    /* WiFi hardware detection */
+    WIFI_SVR_CMD_IS_WLAN_SUPPORTED = 0X1060,
+
     /* 以下CALL BACK类code，不需要进行权限校验 */
     WIFI_CBK_CMD_STATE_CHANGE = 0x3000,         /* STA state change event */
     WIFI_CBK_CMD_CONNECTION_CHANGE = 0x3001,    /* STA connection state change event */

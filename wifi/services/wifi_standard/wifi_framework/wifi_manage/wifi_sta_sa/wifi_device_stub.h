@@ -39,6 +39,7 @@ private:
     void InitHandleMap();
     void InitHandleMapEx(void);
     void InitHandleMapEx2();
+    void InitHandleMapEx3();
     void OnEnableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnDisableWifi(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnInitWifiProtect(uint32_t code, MessageParcel &data, MessageParcel &reply);
@@ -116,6 +117,7 @@ private:
     void OnSetBtCoexistState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetWifiCapability(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetWifiCapability(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnIsWlanSupported(uint32_t code, MessageParcel &data, MessageParcel &reply);
     
 private:
     void ReadEapConfig(MessageParcel &data, WifiEapConfig &wifiEapConfig);

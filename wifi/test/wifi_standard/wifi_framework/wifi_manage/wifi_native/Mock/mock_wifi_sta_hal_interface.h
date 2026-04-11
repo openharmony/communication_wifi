@@ -92,7 +92,7 @@ public:
     const std::function<void(int)> &GetDeathCallbackInst(void) const;
     WifiErrorNo RegisterNativeProcessCallback(const std::function<void(int)> &callback);
     WifiErrorNo GetConnectionMloLinkedInfo(const std::string &ifName, std::vector<WifiLinkedInfo> &mloLinkInfo);
-    WifiErrorNo GetConnectionMloSignalInfo(const std::string &ifName, std::vector<WifiMloSignalInfo> &mloSignalInfo);
+    WifiErrorNo GetConnectionMloSignalInfo(const std::string &ifName, std::vector<WifiSignalPollInfo> &mloSignalInfo);
 public:
     WifiSignalPollInfo mInfo;
 private:

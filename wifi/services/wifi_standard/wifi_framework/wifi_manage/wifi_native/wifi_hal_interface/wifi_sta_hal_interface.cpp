@@ -700,7 +700,7 @@ WifiErrorNo WifiStaHalInterface::GetConnectionMloLinkedInfo(const std::string &i
     return WIFI_HAL_OPT_FAILED;
 }
 WifiErrorNo WifiStaHalInterface::GetConnectionMloSignalInfo(const std::string &ifName,
-    std::vector<WifiMloSignalInfo> &mloSignalInfo)
+    std::vector<WifiSignalPollInfo> &mloSignalInfo)
 {
     if (ifName.length() <= 0) {
         return WIFI_HAL_OPT_INVALID_PARAM;

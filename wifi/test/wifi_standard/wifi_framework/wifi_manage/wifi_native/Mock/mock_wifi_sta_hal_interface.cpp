@@ -355,7 +355,7 @@ WifiErrorNo WifiStaHalInterface::GetConnectionMloLinkedInfo(const std::string &i
 }
 
 WifiErrorNo WifiStaHalInterface::GetConnectionMloSignalInfo(const std::string &ifName,
-    std::vector<WifiMloSignalInfo> &mloSignalInfo)
+    std::vector<WifiSignalPollInfo> &mloSignalInfo)
 {
     return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;

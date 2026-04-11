@@ -72,6 +72,20 @@ NO_SANITIZE("cfi") napi_value IsWifiActive(napi_env env, napi_callback_info info
     return result;
 }
 
+NO_SANITIZE("cfi") napi_value IsWlanSupported(napi_env env, napi_callback_info info)
+{
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    bool isSupported = false;
+    ErrCode ret = wifiDevicePtr->IsWlanSupported(isSupported);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("Get wlan supported status fail: %{public}d", ret);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+    }
+    napi_value result;
+    napi_get_boolean(env, isSupported, &result);
+    return result;
+}
+
 NO_SANITIZE("cfi") napi_value Scan(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;

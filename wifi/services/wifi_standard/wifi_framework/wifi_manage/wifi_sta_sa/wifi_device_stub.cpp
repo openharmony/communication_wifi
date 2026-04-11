@@ -167,6 +167,9 @@ void WifiDeviceStub::InitHandleMapEx2()
         (uint32_t code, MessageParcel &data, MessageParcel &reply) {
             OnUpdate5gAutoIdentifyConnFeatures(code, data, reply);
         };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WLAN_SUPPORTED)] = [this]
+        (uint32_t code, MessageParcel &data, MessageParcel &reply) { OnIsWlanSupported(code, data, reply); };
+
 }
 
 void WifiDeviceStub::InitHandleMap()
@@ -1751,6 +1754,20 @@ void WifiDeviceStub::OnUpdate5gAutoIdentifyConnFeatures(uint32_t code, MessagePa
             break;
         default:
             break;
+    }
+    return;
+}
+
+void WifiDeviceStub::OnIsWlanSupported(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    bool isSupported = false;
+    ErrCode ret = IsWlanSupported(isSupported);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteBool(enabled);
     }
     return;
 }

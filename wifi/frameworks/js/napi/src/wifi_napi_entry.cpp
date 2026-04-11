@@ -349,6 +349,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("enableWifi", EnableWifi),
         DECLARE_NAPI_FUNCTION("disableWifi", DisableWifi),
         DECLARE_NAPI_FUNCTION("enableSemiWifi", EnableSemiWifi),
+        DECLARE_NAPI_FUNCTION("isWlanSupported", IsWlanSupported),
         DECLARE_NAPI_FUNCTION("isWifiActive", IsWifiActive),
         DECLARE_NAPI_FUNCTION("scan", Scan),
         DECLARE_NAPI_FUNCTION("startScan", StartScan),

@@ -1634,6 +1634,29 @@ int32_t ChipIfaceCallback::OnWifiNetlinkMessage(uint32_t type, const std::vector
     return 0;
 }
 
+bool HalDeviceManager::IsWlanSupported(bool &isSupported)
+{
+    LOGI("IsWlanSupported start");
+    isSupported = false;
+
+    std::vector<uint32_t> chipIds;
+    CHECK_NULL_AND_RETURN(g_IWifi, false);
+
+    int32_t ret = g_IWifi->GetAvailableChips(chipIds);
+    if (ret != HDF_SUCCESS) {
+        LOGE("IsWlanSupported, call GetAvailableChips failed! ret:%{public}d", ret);
+        return false;
+    }
+
+    if (!chipIds.empty()) {
+        isSupported = true;
+        LOGI("IsWlanSupported, WiFi hardware is supported, chip count:%{public}zu", chipIds.size());
+    } else {
+        LOGI("IsWlanSupported, WiFi hardware is not supported");
+    }
+    return true;
+}
+
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

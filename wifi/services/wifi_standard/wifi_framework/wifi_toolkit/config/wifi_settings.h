@@ -144,6 +144,8 @@ public:
 
     void ClearDeviceConfig(void);
 
+    int GetDeviceConfigByInstId(std::vector<WifiDeviceConfig> &results, int instId = 0);
+
     int GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId = 0);
 
     int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config, int instId = 0);

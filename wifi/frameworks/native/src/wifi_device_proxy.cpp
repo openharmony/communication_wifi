@@ -3220,7 +3220,7 @@ ErrCode WifiDeviceProxy::IsWlanSupported(bool &isSupported)
         data, reply, option);
     if (error != ERR_NONE) {
         WIFI_LOGE("Check wlan supported status (%{public}d) failed, error code is %{public}d",
-            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_CAPABILITY), error);
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WLAN_SUPPORTED), error);
         return WIFI_OPT_FAILED;
     }
 

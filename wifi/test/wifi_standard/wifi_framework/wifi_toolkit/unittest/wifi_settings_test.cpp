@@ -695,6 +695,31 @@ HWTEST_F(WifiSettingsTest, ClearHotspotConfigTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 
+HWTEST_F(WifiSettingsTest, GetDeviceConfigByInstIdTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetDeviceConfigByInstIdTest enter");
+    WifiSettings::GetInstance().ClearDeviceConfig();
+    WifiDeviceConfig config1;
+    WifiDeviceConfig config2;
+    config1.uid = 3;
+    config1.ssid = "0123//45";
+    config1.keyMgmt = "WPA";
+    config1.ancoCallProcessName = "wifitest1";
+    config1.wifiEapConfig.clientCert = "//twifitest1";
+    config2.uid = -1;
+    config2.ssid = "4567//89";
+    config2.keyMgmt = "WPA";
+    config2.ancoCallProcessName = "wifitest2";
+    config2.wifiEapConfig.clientCert = "//twifitest2";
+    WifiSettings::GetInstance().mWifiDeviceConfig.emplace(1, config1);
+    WifiSettings::GetInstance().mWifiDeviceConfig.emplace(2, config2);
+
+    std::vector<WifiDeviceConfig> deviceConfigs;
+    WifiSettings::GetInstance().GetDeviceConfigByInstId(deviceConfigs, 0);
+    EXPECT_EQ(deviceConfigs.size(), 2);
+    WifiSettings::GetInstance().ClearDeviceConfig();
+}
+
 HWTEST_F(WifiSettingsTest, GetDeviceConfigTest, TestSize.Level1)
 {
     WIFI_LOGI("GetDeviceConfigTest enter");

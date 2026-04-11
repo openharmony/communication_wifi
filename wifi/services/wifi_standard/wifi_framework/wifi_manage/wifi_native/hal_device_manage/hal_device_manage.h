@@ -452,7 +452,7 @@ public:
      * @param isSupported - [out] whether WiFi hardware is supported
      * @return bool
      */
-    bool IsWlanSupported(bool &isSupported)
+    bool IsWlanSupported(bool &isSupported);
 private:
     bool CheckReloadChipHdiService();
     bool CheckChipHdiStarted();

@@ -52,6 +52,9 @@ OnChipServiceDied HalDeviceManager::g_chipHdiServiceDiedCb = nullptr;
 constexpr int32_t CMD_SET_MAX_CONNECT = 102;
 constexpr int32_t MAX_CONNECT_DEFAULT = 8;
 constexpr int32_t CMD_SET_P2P_HIGH_PERF = 103;
+static bool g_isWlanSupportedCached = false;
+static bool g_isWlanSupportedResult = false;
+static std::mutex g_isWlanSupportedMutex;
 
 HalDeviceManager::HalDeviceManager()
 {
@@ -878,6 +881,9 @@ void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)
     mIWifiStaIfaces.clear();
     mIWifiApIfaces.clear();
     mIWifiP2pIfaces.clear();
+    std::lock_guard<std::mutex> lock(g_isWlanSupportedMutex);
+    g_isWlanSupportedCached = false;
+    g_isWlanSupportedResult = false;
     if (g_chipHdiServiceDiedCb && isRemoteDied) {
         g_chipHdiServiceDiedCb();
     }
@@ -1637,14 +1643,22 @@ int32_t ChipIfaceCallback::OnWifiNetlinkMessage(uint32_t type, const std::vector
 bool HalDeviceManager::IsWlanSupported(bool &isSupported)
 {
     LOGI("IsWlanSupported start");
-    isSupported = false;
-
+    std::lock_guard<std::mutex> lock(g_isWlanSupportedMutex);
+    if (g_isWlanSupportedCached) {
+        isSupported = g_isWlanSupportedResult;
+        LOGI("IsWlanSupported return cached result: %{public}d", isSupported);
+        return true;
+    }
     std::vector<uint32_t> chipIds;
     CHECK_NULL_AND_RETURN(g_IWifi, false);
 
     int32_t ret = g_IWifi->GetAvailableChips(chipIds);
     if (ret != HDF_SUCCESS) {
+        isSupported = false;
         LOGE("IsWlanSupported, call GetAvailableChips failed! ret:%{public}d", ret);
+        std::lock_guard<std::mutex> lock(g_isWlanSupportedMutex);
+        g_isWlanSupportedResult = false;
+        g_isWlanSupportedCached = true
         return false;
     }
 
@@ -1652,8 +1666,12 @@ bool HalDeviceManager::IsWlanSupported(bool &isSupported)
         isSupported = true;
         LOGI("IsWlanSupported, WiFi hardware is supported, chip count:%{public}zu", chipIds.size());
     } else {
+        isSupported = false;
         LOGI("IsWlanSupported, WiFi hardware is not supported");
     }
+    std::lock_guard<std::mutex> lock(g_isWlanSupportedMutex);
+    g_isWlanSupportedResult = isSupported;
+    g_isWlanSupportedCached = true;
     return true;
 }
 

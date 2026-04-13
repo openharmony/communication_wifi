@@ -367,23 +367,6 @@ bool BlockConnectService::IsFrequentDisconnect(std::string bssid, int wpaReason,
     return false;
 }
 
-// Check if the given targetNetworkId is blocked due to wrong password
-bool BlockConnectService::IsWrongPassword(int targetNetworkId)
-{
-    // Implement the logic to check if the given targetNetworkId is blocked due to wrong password
-    // Return true if blocked due to wrong password, false otherwise
-    WifiDeviceConfig targetNetwork;
-    if (WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, targetNetwork)) {
-        WIFI_LOGE("Failed to get device config %{public}d", targetNetworkId);
-        return false;
-    }
-
-    if (targetNetwork.numAssociation == 0) {
-        return true;
-    }
-    return false;
-}
-
 void BlockConnectService::EnableAllNetworksByEnteringSettings(std::vector<DisabledReason> enableReasons)
 {
     WIFI_LOGI("ENTER EnableAllNetworksByEnteringSettings");

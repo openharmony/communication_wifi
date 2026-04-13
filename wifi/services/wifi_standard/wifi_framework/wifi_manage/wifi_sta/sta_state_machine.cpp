@@ -1538,25 +1538,14 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent(InternalMe
     }
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_WRONG_PWD);
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::PASSWORD_ERROR);
-    if (BlockConnectService::GetInstance().IsWrongPassword(pStaStateMachine->targetNetworkId_)) {
-        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
-            DisabledReason::DISABLED_BY_WRONG_PASSWORD);
+    BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
+        DisabledReason::DISABLED_BY_WRONG_PASSWORD);
 #ifndef OHOS_ARCH_LITE
 #ifdef WIFI_DATA_REPORT_ENABLE
-        pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_WRONG_PASSWORD,
-            pStaStateMachine->targetNetworkId_);
+    pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_WRONG_PASSWORD,
+        pStaStateMachine->targetNetworkId_);
 #endif
 #endif
-    } else {
-        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
-            DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
-#ifndef OHOS_ARCH_LITE
-#ifdef WIFI_DATA_REPORT_ENABLE
-        pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_AUTHENTICATION_FAILURE,
-            pStaStateMachine->targetNetworkId_);
-#endif
-#endif
-    }
 #ifndef OHOS_ARCH_LITE
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
         pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_AUTHENTICATION_FAILURE);

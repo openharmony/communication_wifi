@@ -43,6 +43,7 @@ static const auto CMD_SET_AX_CLOSE_HTC = "SET_AX_CLOSE_HTC";
 static const auto CMD_SET_BE_BLA_LIST = "SET_BE_BLACKLIST";
 static const auto CMD_SET_EMLSR_MODE = "SET_EMLSR_SWITCH";
 static const auto CMD_SET_MLSR_LINK_SWITCH = "SET_MLSR_LINK_SWITCH ";
+static const auto CMD_UPDATE_UNFOLD_STATE = "UPDATE_UNFOLD_STATE ";
 
 #define MSS_SOFTAP_MAX_IFNAMESIZE 5
 #define MSS_SOFTAP_CMDSIZE 30
@@ -73,6 +74,8 @@ int WifiCmdClient::SendCmdToDriver(const std::string &ifName, int commandId, con
         ret = SetEmlsrMode(ifName, param);
     } else if (commandId == CMD_MLD_LINK_SWITCH) {
         ret = StartMldLinkSwitch(ifName, param);
+    } else if (commandId == CMD_SET_FOLD_STATUS) {
+        ret = SetFoldStatus(ifName, param);
     } else {
         WIFI_LOGD("%{public}s not supported command", __FUNCTION__);
     }
@@ -247,5 +250,18 @@ int WifiCmdClient::StartMldLinkSwitch(const std::string &ifName, const std::stri
     cmdParm.append(param);
     return SendCommandToDriverByInterfaceName(ifName, cmdParm);
 }
+
+int WifiCmdClient::SetFoldStatus(const std::string &ifName, const std::string &param) const
+{
+    WIFI_LOGD("%{public}s enter", __FUNCTION__);
+    if (param.size() + strlen(CMD_UPDATE_UNFOLD_STATE) > TINY_BUFF_SIZE) {
+        WIFI_LOGE("%{public}s invalid input param", __FUNCTION__);
+        return -1;
+    }
+    std::string cmdParm = CMD_UPDATE_UNFOLD_STATE;
+    cmdParm.append(param);
+    return SendCommandToDriverByInterfaceName(ifName, cmdParm);
+}
+
 } // namespace Wifi
 } // namespace OHOS

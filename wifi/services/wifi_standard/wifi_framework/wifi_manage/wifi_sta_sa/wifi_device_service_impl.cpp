@@ -2937,7 +2937,6 @@ ErrCode WifiDeviceServiceImpl::GetWifiCapability(int capability, bool &enabled)
 ErrCode WifiDeviceServiceImpl::IsWlanSupported(bool &isSupported)
 {
     WIFI_LOGI("Enter IsWlanSupported.");
-
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!HalDeviceManager::GetInstance().IsWlanSupported(isSupported)) {
         WIFI_LOGE("IsWlanSupported: Check hardware support failed!");

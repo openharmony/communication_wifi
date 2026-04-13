@@ -800,7 +800,7 @@ bool IsSameEncryptType(const std::string& scanInfoKeymgmt, const std::string& de
         return false;
     }
 }
-
+#endif
 int GetFoldAction()
 {
     char preValue[MAX_FOLD_ACTION_LEN] = {0};
@@ -812,6 +812,5 @@ int GetFoldAction()
     std::string valueStr(preValue);
     return CheckDataLegal(valueStr);
 }
-#endif
 }  // namespace Wifi
 }  // namespace OHOS

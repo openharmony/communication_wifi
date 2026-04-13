@@ -67,9 +67,6 @@ public:
     // false - Not frequent disconnect true - Frequent disconnect
     bool IsFrequentDisconnect(std::string bssid, int wpaReason, int locallyGenerated);
 
-    // Check if the given targetNetworkId is blocked due to wrong password
-    bool IsWrongPassword(int targetNetworkId);
-
     // Enable all networks by entering settings
     void OnReceiveSettingsEnterEvent(bool isEnter);
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT

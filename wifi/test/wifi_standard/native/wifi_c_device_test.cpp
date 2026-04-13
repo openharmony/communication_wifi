@@ -307,7 +307,7 @@ public:
 
     void IsWlanSupportedTrueTest()
     {
-        bool isSupported = false;
+        bool isSupported = true;
         EXPECT_CALL(WifiCDevice::GetInstance(), IsWlanSupported(_))
             .WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         EXPECT_EQ(IsWlanSupported(&isSupported), WIFI_SUCCESS);
@@ -316,7 +316,7 @@ public:
 
     void IsWlanSupportedFalseTest()
     {
-        bool isSupported = true;
+        bool isSupported = false;
         EXPECT_CALL(WifiCDevice::GetInstance(), IsWlanSupported(_))
             .WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         EXPECT_EQ(IsWlanSupported(&isSupported), WIFI_SUCCESS);

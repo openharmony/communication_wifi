@@ -881,7 +881,6 @@ void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)
     mIWifiStaIfaces.clear();
     mIWifiApIfaces.clear();
     mIWifiP2pIfaces.clear();
-    std::lock_guard<std::mutex> lock(g_isWlanSupportedMutex);
     g_isWlanSupportedCached = false;
     g_isWlanSupportedResult = false;
     if (g_chipHdiServiceDiedCb && isRemoteDied) {
@@ -1656,9 +1655,6 @@ bool HalDeviceManager::IsWlanSupported(bool &isSupported)
     if (ret != HDF_SUCCESS) {
         isSupported = false;
         LOGE("IsWlanSupported, call GetAvailableChips failed! ret:%{public}d", ret);
-        std::lock_guard<std::mutex> lock(g_isWlanSupportedMutex);
-        g_isWlanSupportedResult = false;
-        g_isWlanSupportedCached = true
         return false;
     }
 
@@ -1669,7 +1665,6 @@ bool HalDeviceManager::IsWlanSupported(bool &isSupported)
         isSupported = false;
         LOGI("IsWlanSupported, WiFi hardware is not supported");
     }
-    std::lock_guard<std::mutex> lock(g_isWlanSupportedMutex);
     g_isWlanSupportedResult = isSupported;
     g_isWlanSupportedCached = true;
     return true;

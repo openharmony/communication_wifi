@@ -294,30 +294,29 @@ bool SelfCureService::NotifyIpv6FailureDetected(bool isIpv4Good)
         WIFI_LOGI("Device has wlan1 interface, connected to dual-band router");
     }
 
-    if (SelfCureUtils::GetInstance().HasIpv6Disabled(0) && !hasWlan1) {
-        WIFI_LOGI("IPv6 already disabled, ignore IPv6 failure");
-        SelfCureUtils::GetInstance().ReportIpv6ChrEvent();
-        return false;
-    }
-
-    if (SelfCureUtils::GetInstance().HasIpv6Disabled(0) &&
-        SelfCureUtils::GetInstance().HasIpv6Disabled(1) && hasWlan1) {
-        WIFI_LOGI("IPv6 already disabled on both interfaces, ignore IPv6 failure");
-        SelfCureUtils::GetInstance().ReportIpv6ChrEvent();
-        return false;
-    }
-
     bool ret = false;
-    if (!SelfCureUtils::GetInstance().HasIpv6Disabled(0)) {
-        // Disable IPv6 to avoid potential connection issues
-        bool result = SelfCureUtils::GetInstance().DisableIpv6(0);
-        ret = ret || result;
+    bool wlan0Disabled = SelfCureUtils::GetInstance().HasIpv6Disabled(0);
+    if (hasWlan1) {
+        bool wlan1Disabled = SelfCureUtils::GetInstance().HasIpv6Disabled(1);
+        if (wlan0Disabled && wlan1Disabled) {
+            WIFI_LOGI("IPv6 already disabled on both interfaces, ignore IPv6 failure");
+            SelfCureUtils::GetInstance().ReportIpv6ChrEvent();
+            return false;
+        }
+        if (!wlan1Disabled) {
+            // Disable IPv6 on wlan1 as well
+            ret = SelfCureUtils::GetInstance().DisableIpv6(1) || ret;
+        }
+    } else {
+        if (wlan0Disabled) {
+            WIFI_LOGI("IPv6 already disabled, ignore IPv6 failure");
+            SelfCureUtils::GetInstance().ReportIpv6ChrEvent();
+            return false;
+        }
     }
-
-    if (hasWlan1 && !SelfCureUtils::GetInstance().HasIpv6Disabled(1)) {
-        // Disable IPv6 on wlan1 as well
-        bool result = SelfCureUtils::GetInstance().DisableIpv6(1);
-        ret = ret || result;
+    if (!wlan0Disabled) {
+        // Disable IPv6 to avoid potential connection issues
+        ret = SelfCureUtils::GetInstance().DisableIpv6(0) || ret;
     }
     return ret;
 }

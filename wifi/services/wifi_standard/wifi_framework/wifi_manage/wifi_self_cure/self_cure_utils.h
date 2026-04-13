@@ -56,7 +56,6 @@ public:
     bool IsIpv6SelfCureSupported() const;
     bool DisableIpv6(int instId = 0);
     bool HasIpv6Disabled(int instId = 0) const;
-    void SetIpv6Disabled(bool disabled, int instId = 0);
     void ReportIpv6ChrEvent();
 private:
     class SelfCureDnsResultCallback : public NetManagerStandard::NetsysDnsReportCallback {
@@ -73,7 +72,6 @@ private:
 
 private:
     std::atomic<int64_t> lastReportIpv6Time_ = 0;
-    std::atomic<bool> ipv6Disabled_[2] = {false, false};
     sptr<SelfCureDnsResultCallback> dnsResultCallback_{nullptr};
 };
 } // namespace Wifi

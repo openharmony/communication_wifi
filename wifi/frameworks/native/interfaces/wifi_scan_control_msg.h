@@ -29,6 +29,7 @@ struct Hid2dInfo {
     Hid2dUpperScene shareScene;
     Hid2dUpperScene mouseCrossScene;
     Hid2dUpperScene miraCastScene;
+    Hid2dUpperScene gameScene;
     P2pConnectedState p2pConnectState;
     int p2pEnhanceState;
     int64_t hid2dSceneLastSetTime;
@@ -128,6 +129,7 @@ enum class ScanLimitType {
     GAME_SCENE,
     GLASSES_SCENE,
     LP_SCANSTYLE,
+    HID2D_GAME,
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -2938,10 +2938,7 @@ bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
     }
     // scene bit 0-2 is valid, 0x01: video, 0x02: audio, 0x04: file,
     // scene & 0x07 > 0 means one of them takes effect.
-    if ((gameScene.scene & 0x07) > 0) {
-        WIFI_LOGI("Scan is not allowed in game hid2d.");
-        return false;
-    } else if ((softbusScene.scene & 0x07) > 0) {
+    if ((softbusScene.scene & 0x07) > 0) {
         if ((softbusScene.scene & 0x07) <= 0x03 && AllowLpScan(scanType)) {
             scanStyle = SCAN_TYPE_LOW_PRIORITY;
             WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::LP_SCAN_UNCTRL_CNT);
@@ -2988,6 +2985,12 @@ bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
         WifiScanChr::GetInstance().RecordScanChrLimitInfo(
             WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
             ScanLimitType::HID2D_CROSS);
+        return false;
+    } else if ((gameScene.scene & 0x07) > 0) {
+        WIFI_LOGW("Scan is not allowed in game hid2d.");
+        WifiScanChr::GetInstance().RecordScanChrLimitInfo(
+            WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
+            ScanLimitType::HID2D_GAME);
         return false;
     } else {
         WIFI_LOGD("allow hid2d scan");

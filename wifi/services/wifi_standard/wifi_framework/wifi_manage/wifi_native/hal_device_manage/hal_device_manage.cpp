@@ -54,7 +54,6 @@ constexpr int32_t MAX_CONNECT_DEFAULT = 8;
 constexpr int32_t CMD_SET_P2P_HIGH_PERF = 103;
 static bool g_isWlanSupportedCached = false;
 static bool g_isWlanSupportedResult = false;
-static std::mutex g_isWlanSupportedMutex;
 
 HalDeviceManager::HalDeviceManager()
 {
@@ -1642,7 +1641,7 @@ int32_t ChipIfaceCallback::OnWifiNetlinkMessage(uint32_t type, const std::vector
 bool HalDeviceManager::IsWlanSupported(bool &isSupported)
 {
     LOGI("IsWlanSupported start");
-    std::lock_guard<std::mutex> lock(g_isWlanSupportedMutex);
+    std::lock_guard<std::mutex> lock(mMutex);
     if (g_isWlanSupportedCached) {
         isSupported = g_isWlanSupportedResult;
         LOGI("IsWlanSupported return cached result: %{public}d", isSupported);

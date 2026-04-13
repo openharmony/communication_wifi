@@ -1732,11 +1732,11 @@ void OffP2pDiscoveryChange(::taihe::optional_view<::taihe::callback<void(int)>> 
 bool IsWlanSupported()
 {
     bool isSupported = false;
-    if (g_wifiHotspotPtr == nullptr) {
+    if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
         return isSupported;
     }
-    ErrCode ret = g_wifiHotspotPtr->IsWlanSupported(isSupported);
+    ErrCode ret = g_wifiDevicePtr->IsWlanSupported(isSupported);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
     }

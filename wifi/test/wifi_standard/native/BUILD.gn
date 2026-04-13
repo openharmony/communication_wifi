@@ -27,6 +27,8 @@ ohos_unittest("native_unittest") {
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_hotspot_callback_stub.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_callback_stub.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_scan_callback_stub.cpp",
+    "$WIFI_ROOT_DIR/frameworks/native/c_adapter/src/wifi_c_device.cpp",
+    "$WIFI_ROOT_DIR/frameworks/native/c_adapter/src/wifi_c_utils.cpp",
     "Mock/mock_wifi_c_device.cpp",
     "wifi_c_device_test.cpp",
     "wifi_c_event_test.cpp",

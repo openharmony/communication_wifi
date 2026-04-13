@@ -147,9 +147,11 @@ public:
 
 class WifiFoldStateListener : public Rosen::DisplayManagerLite::IFoldStatusListener {
 public:
-    WifiFoldStateListener();
+    explicit WifiFoldStateListener(int foldAction);
     ~WifiFoldStateListener() = default;
     void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
+private:
+    int foldAction_ { 0 };
 };
 
 class WifiDisplayStateListener : public Rosen::DisplayManagerLite::IDisplayListener {
@@ -246,6 +248,7 @@ private:
     void UnRegisterSettingsEnterEvent();
     void RegisterDataShareReadyEvent();
     void UnRegisterDataShareReadyEvent();
+    void SyncFoldStatus();
     void RegisterFoldStatusListener();
     void UnRegisterFoldStatusListener();
     void RegisterDisplayListener();
@@ -304,6 +307,7 @@ private:
     std::mutex cellularObserverLock_;
 #endif
     std::atomic<bool> enhanceServiceReady_{false};
+    int foldAction_ { 0 };
 };
 
 }  // namespace Wifi

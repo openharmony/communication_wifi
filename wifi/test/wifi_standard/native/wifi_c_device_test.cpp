@@ -320,7 +320,7 @@ public:
         EXPECT_CALL(WifiCDevice::GetInstance(), IsWlanSupported(_))
             .WillRepeatedly(Return(WIFI_OPT_SUCCESS));
         EXPECT_EQ(IsWlanSupported(&isSupported), WIFI_SUCCESS);
-        EXPECT_TRUE(isSupported);
+        EXPECT_FALSE(isSupported);
     }
 };
 

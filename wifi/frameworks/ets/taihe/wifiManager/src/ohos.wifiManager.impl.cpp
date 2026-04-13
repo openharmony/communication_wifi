@@ -1728,6 +1728,20 @@ void OffP2pDiscoveryChange(::taihe::optional_view<::taihe::callback<void(int)>> 
         g_wifiP2pDiscoveryChangeVec.clear();
     }
 }
+
+bool IsWlanSupported()
+{
+    bool isSupported = false;
+    if (g_wifiHotspotPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+        return isSupported;
+    }
+    ErrCode ret = g_wifiHotspotPtr->IsWlanSupported(isSupported);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+    }
+    return isSupported;
+}
 }
 
 TH_EXPORT_CPP_API_IsConnected(IsConnected);
@@ -1831,3 +1845,4 @@ TH_EXPORT_CPP_API_OnP2pPersistentGroupChange(OnP2pPersistentGroupChange);
 TH_EXPORT_CPP_API_OffP2pPersistentGroupChange(OffP2pPersistentGroupChange);
 TH_EXPORT_CPP_API_OnP2pDiscoveryChange(OnP2pDiscoveryChange);
 TH_EXPORT_CPP_API_OffP2pDiscoveryChange(OffP2pDiscoveryChange);
+TH_EXPORT_CPP_API_IsWlanSupported(IsWlanSupported);

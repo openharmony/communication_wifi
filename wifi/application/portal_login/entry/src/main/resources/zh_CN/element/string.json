@@ -89,6 +89,10 @@
         {
             "name":"website_permission_never_allowed",
             "value":"不允许"
+        },
+        {
+            "name":"website_permission_allowed",
+            "value":"允许"
         }
     ]
 }

@@ -593,12 +593,20 @@ bool SelfCureUtils::IsIpv6SelfCureSupported() const
 
 bool SelfCureUtils::HasIpv6Disabled(int instId) const
 {
-    return ipv6Disabled_[instId];
-}
-
-void SelfCureUtils::SetIpv6Disabled(bool disabled, int instId)
-{
-    ipv6Disabled_[instId] = disabled;
+    std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName(instId);
+    if (ifName.empty()) {
+        WIFI_LOGW("HasIpv6Disabled: iface is empty, instId=%{public}d", instId);
+        return false;
+    }
+    std::string disablePath = "/proc/sys/net/ipv6/conf/" + ifName + "/disable_ipv6";
+    std::ifstream inf(disablePath, std::ios::in);
+    if (!inf) {
+        WIFI_LOGW("HasIpv6Disabled: open %{public}s failed", disablePath.c_str());
+        return false;
+    }
+    std::string value;
+    inf >> value;
+    return value == "1";
 }
 
 bool SelfCureUtils::DisableIpv6(int instId)
@@ -615,11 +623,9 @@ bool SelfCureUtils::DisableIpv6(int instId)
     int result = NetManagerStandard::NetsysController::GetInstance().SetEnableIpv6(ifName, 0);
     if (result == 0) {
         WIFI_LOGI("IPv6 disabled successfully on interface %{public}s", ifName.c_str());
-        SetIpv6Disabled(true, instId);
         return true;
     } else {
         WIFI_LOGE("Failed to disable IPv6 on interface %{public}s, result: %{public}d", ifName.c_str(), result);
-        SetIpv6Disabled(false, instId);
         return false;
     }
 }

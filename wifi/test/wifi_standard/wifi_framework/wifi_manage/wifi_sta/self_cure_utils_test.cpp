@@ -120,22 +120,17 @@ HWTEST_F(SelfCureUtilsTest, DisableIpv6Test, TestSize.Level1)
 
 HWTEST_F(SelfCureUtilsTest, HasIpv6DisabledTest001, TestSize.Level1)
 {
-    SelfCureUtils::GetInstance().SetIpv6Disabled(false);
+    // Empty iface name → returns false
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName(_)).WillRepeatedly(Return(""));
     EXPECT_FALSE(SelfCureUtils::GetInstance().HasIpv6Disabled());
 }
 
 HWTEST_F(SelfCureUtilsTest, HasIpv6DisabledTest002, TestSize.Level1)
 {
-    SelfCureUtils::GetInstance().SetIpv6Disabled(true);
-    EXPECT_TRUE(SelfCureUtils::GetInstance().HasIpv6Disabled());
-}
-
-HWTEST_F(SelfCureUtilsTest, SetIpv6DisabledTest001, TestSize.Level1)
-{
-    SelfCureUtils::GetInstance().SetIpv6Disabled(false);
+    // Non-existent iface (proc path open fails) → returns false
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetStaIfaceName(_))
+        .WillRepeatedly(Return("nonexistent_iface_xyz_12345"));
     EXPECT_FALSE(SelfCureUtils::GetInstance().HasIpv6Disabled());
-    SelfCureUtils::GetInstance().SetIpv6Disabled(true);
-    EXPECT_TRUE(SelfCureUtils::GetInstance().HasIpv6Disabled());
 }
 
 HWTEST_F(SelfCureUtilsTest, IsIpv6SelfCureSupportedTest001, TestSize.Level1)

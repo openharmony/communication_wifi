@@ -317,9 +317,7 @@ void StaMonitor::OnWpaAuthTimeOutCallBack()
         return;
     }
     /* Notification state machine wpa auth timeout event. */
-    InternalMessagePtr msg = pStaStateMachine->CreateMessage();
-    msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_AUTH_TIMEOUT_EVENT);
-    pStaStateMachine->SendMessage(msg);
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_AUTH_TIMEOUT_EVENT);
 }
 
 /* SIM authentication data format: [GSM-AUTH][:][Rand1][:][Rand2] or [GSM-AUTH][:][Rand1][:][Rand2][:][Rand3]

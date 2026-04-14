@@ -348,7 +348,7 @@ struct Index {
                     }
                   },
                   secondaryButton: {
-                    value: $r('app.string.ssl_error_dialog_continue_btn'),
+                    value: $r('app.string.website_permission_allowed'),
                     fontColor: $r('sys.color.warning'),
                     action: () => {
                       hilog.info(DOMAIN, TAG, 'req permission grant');

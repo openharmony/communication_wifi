@@ -38,6 +38,7 @@
 #include "wifi_service_manager.h"
 #endif
 #include "wifi_chr_utils.h"
+#include "wifi_supplicant_hal_interface.h"
 
 DEFINE_WIFILOG_LABEL("WifiStaManager");
 
@@ -327,7 +328,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
     }
 #endif
-    if (state == OperateResState::CONNECT_AP_CONNECTED && m_instId == INSTID_WLAN0) {
+    if (state == OperateResState::CONNECT_AP_CONNECTED && instId == INSTID_WLAN0) {
         int screenState = WifiConfigCenter::GetInstance().GetScreenState();
         WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
     }

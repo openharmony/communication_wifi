@@ -317,8 +317,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     }
     NotifyScanForStaConnChanged(state, info.networkId, instId);
     PublishWifiOperateStateHiSysEvent(state);
-    if (info.connState == ConnState::AUTHENTICATING)
-    {
+    if (info.connState == ConnState::AUTHENTICATING) {
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_AUTH),
             static_cast<int>(WifiOperateState::STA_AUTHING));
     }
@@ -330,6 +329,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
 #endif
     SetSuspendMode(state, instId);
 #ifndef OHOS_ARCH_LITE
+// 当网络检测成功时，取消断开任务
     if (state == OperateResState::CONNECT_NETWORK_ENABLED && staManagerEventHandler_ != nullptr) {
         bool hasTask = false;
         staManagerEventHandler_->HasAsyncTask(TASK_NAME_WIFI_DISCONNECT, hasTask);

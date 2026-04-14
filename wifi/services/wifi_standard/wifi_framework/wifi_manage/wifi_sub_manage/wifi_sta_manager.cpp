@@ -328,10 +328,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
     }
 #endif
-    if (state == OperateResState::CONNECT_AP_CONNECTED && instId == INSTID_WLAN0) {
-        int screenState = WifiConfigCenter::GetInstance().GetScreenState();
-        WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
-    }
+    SetSuspendMode(state, instId);
 #ifndef OHOS_ARCH_LITE
     // 当网络检测成功时，取消断开任务
     if (state == OperateResState::CONNECT_NETWORK_ENABLED && staManagerEventHandler_ != nullptr) {
@@ -434,5 +431,13 @@ void WifiStaManager::StartSatelliteTimer(void)
     return;
 }
 #endif
+
+void WifiStaManager::SetSuspendMode(OperateResState state, int instId)
+{
+    if (state == OperateResState::CONNECT_AP_CONNECTED && instId == INSTID_WLAN0) {
+        int screenState = WifiConfigCenter::GetInstance().GetScreenState();
+        WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
+    }
+}
 }  // namespace Wifi
 }  // namespace OHOS

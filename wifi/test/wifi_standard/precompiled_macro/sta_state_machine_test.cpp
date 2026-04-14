@@ -988,6 +988,15 @@ HWTEST_F(StaStateMachineTest, ApLinkingStateDealWpaLinkFailEventTest03, TestSize
     EXPECT_NE(pStaStateMachine->currentTpType, TEN);
 }
 
+HWTEST_F(StaStateMachineTest, ApLinkingStateDealWpaLinkFailEventTest04, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    pStaStateMachine->pApLinkingState->pStaStateMachine->targetNetworkId_ = INVALID_NETWORK_ID;
+    msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_AUTH_TIMEOUT_EVENT);
+    pStaStateMachine->pApLinkingState->DealWpaLinkFailEvent(msg);
+    EXPECT_NE(pStaStateMachine->currentTpType, TEN);
+}
+
 HWTEST_F(StaStateMachineTest, ApLinkedStateGoInStateTest01, TestSize.Level1)
 {
 #ifdef OHOS_ARCH_LITE

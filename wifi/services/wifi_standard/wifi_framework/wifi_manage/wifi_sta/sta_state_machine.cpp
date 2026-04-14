@@ -1605,6 +1605,21 @@ void StaStateMachine::ApLinkingState::DealWpaLinkAssocRejectFailEvent(InternalMe
     return;
 }
 
+void StaStateMachine::ApLinkingState::DealWpaLinkAuthTimeoutFailEvent(InternalMessagePtr msg)
+{
+    pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_DEFAULT);
+    pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::CONNECTION_TIMEOUT);
+    BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
+        DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
+#ifndef OHOS_ARCH_LITE
+    BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
+        pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
+#endif
+    pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTING_TIMEOUT,
+        pStaStateMachine->linkedInfo);
+    return;
+}
+
 void StaStateMachine::ApLinkingState::DealWpaLinkFailEvent(InternalMessagePtr msg)
 {
     WIFI_LOGW("enter DealWpaLinkFailEvent.\n");
@@ -1628,6 +1643,9 @@ void StaStateMachine::ApLinkingState::DealWpaLinkFailEvent(InternalMessagePtr ms
         case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT:
             DealWpaLinkAssocRejectFailEvent(msg);
             break;
+        case WIFI_SVR_CMD_STA_WPA_AUTH_TIMEOUT_EVENT:
+            DealWpaLinkAuthTimeoutFailEvent(msg);
+            break;    
         default:
             WIFI_LOGW("DealWpaLinkFailEvent unhandled %{public}d", eventName);
             return;

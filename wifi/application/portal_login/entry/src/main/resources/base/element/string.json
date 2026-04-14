@@ -101,6 +101,10 @@
         {
             "name":"website_permission_never_allowed",
             "value":"Deny"
+        },
+        {
+            "name":"website_permission_allowed",
+            "value":"allow"
         }
     ]
 }

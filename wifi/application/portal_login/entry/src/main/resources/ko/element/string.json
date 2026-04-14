@@ -2,7 +2,7 @@
     "string":[
         {
             "name":"compatibility_mode_of_the_PC_version",
-            "value":"데스크탑 사이트",
+            "value":"데스크톱 사이트",
             "attr":{
                 "priority":"translate"
             }

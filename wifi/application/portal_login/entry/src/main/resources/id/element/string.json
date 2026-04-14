@@ -30,7 +30,7 @@
         },
         {
             "name":"compatibility_mode_of_the_mobile_version",
-            "value":"Situs perangkat seluler",
+            "value":"Situs seluler",
             "attr":{
                 "priority":"LT"
             }

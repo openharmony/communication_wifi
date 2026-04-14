@@ -2,7 +2,7 @@
     "string":[
         {
             "name":"compatibility_mode_of_the_PC_version",
-            "value":"ເວັບ​ໄຊ​ທ໌ເທິງເດັສທັອບ",
+            "value":"ເວັບໄຊທ໌ເດັສທັອບ",
             "attr":{
                 "priority":"LT"
             }
@@ -30,7 +30,7 @@
         },
         {
             "name":"compatibility_mode_of_the_mobile_version",
-            "value":"ເວັບ​ໄຊ​ທ໌​ມື​ຖື",
+            "value":"ເວັບໄຊທ໌ມືຖື",
             "attr":{
                 "priority":"LT"
             }

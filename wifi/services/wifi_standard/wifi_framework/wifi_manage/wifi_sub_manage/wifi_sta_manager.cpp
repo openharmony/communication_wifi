@@ -327,7 +327,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
     }
 #endif
-    if (m_instId == INSTID_WLAN0) {
+    if (state == OperateResState::CONNECT_AP_CONNECTED && m_instId == INSTID_WLAN0) {
         int screenState = WifiConfigCenter::GetInstance().GetScreenState();
         WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
     }

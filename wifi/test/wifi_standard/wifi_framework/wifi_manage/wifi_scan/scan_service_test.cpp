@@ -28,6 +28,7 @@ using ::testing::SetArgReferee;
 using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
+#define GAMESERVICE_SA_UID 7011
 
 namespace OHOS {
 namespace Wifi {

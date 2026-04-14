@@ -1645,7 +1645,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkFailEvent(InternalMessagePtr ms
             break;
         case WIFI_SVR_CMD_STA_WPA_AUTH_TIMEOUT_EVENT:
             DealWpaLinkAuthTimeoutFailEvent(msg);
-            break;    
+            break;
         default:
             WIFI_LOGW("DealWpaLinkFailEvent unhandled %{public}d", eventName);
             return;

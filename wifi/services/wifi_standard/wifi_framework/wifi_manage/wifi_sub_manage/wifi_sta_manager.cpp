@@ -327,6 +327,10 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
     }
 #endif
+    if (m_instId == INSTID_WLAN0) {
+        int screenState = WifiConfigCenter::GetInstance().GetScreenState();
+        WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
+    }
 #ifndef OHOS_ARCH_LITE
     // 当网络检测成功时，取消断开任务
     if (state == OperateResState::CONNECT_NETWORK_ENABLED && staManagerEventHandler_ != nullptr) {

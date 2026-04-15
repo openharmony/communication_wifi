@@ -599,6 +599,10 @@ bool SelfCureUtils::HasIpv6Disabled(int instId) const
         return false;
     }
     std::string disablePath = "/proc/sys/net/ipv6/conf/" + ifName + "/disable_ipv6";
+    if (!IsValidPath(disablePath)) {
+        WIFI_LOGW("HasIpv6Disabled: invalid path: %{public}s", disablePath.c_str());
+        return false;
+    }
     std::ifstream inf(disablePath, std::ios::in);
     if (!inf) {
         WIFI_LOGW("HasIpv6Disabled: open %{public}s failed", disablePath.c_str());

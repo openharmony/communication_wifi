@@ -1548,7 +1548,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent(InternalMe
 #endif
 #ifndef OHOS_ARCH_LITE
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
-        pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
+        pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_BY_WRONG_PASSWORD);
 #endif
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG,
         pStaStateMachine->linkedInfo);

@@ -447,6 +447,7 @@ void BlockConnectService::NotifyWifiConnFailedInfo(int targetNetworkId, std::str
     }
 
     if (disableReason == DisabledReason::DISABLED_ASSOCIATION_REJECTION
+        || disableReason == DisabledReason::DISABLED_AUTHENTICATION_FAILURE
         || disableReason == DisabledReason::DISABLED_BY_WRONG_PASSWORD) {
         std::lock_guard<std::mutex> lock(bssidMutex_);
         if (targetNetwork.ssid != curUnusableSsid_ ||

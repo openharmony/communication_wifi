@@ -22,7 +22,6 @@ namespace Wifi {
     std::shared_ptr<WifiDevice> devicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
     bool DisableWifiFuzzerTest(FuzzedDataProvider& FDP)
     {
-        bool isconnected = FDP.ConsumeBool();
         if (devicePtr == nullptr) {
             return false;
         }

@@ -43,7 +43,7 @@ static const auto CMD_SET_AX_CLOSE_HTC = "SET_AX_CLOSE_HTC";
 static const auto CMD_SET_BE_BLA_LIST = "SET_BE_BLACKLIST";
 static const auto CMD_SET_EMLSR_MODE = "SET_EMLSR_SWITCH";
 static const auto CMD_SET_MLSR_LINK_SWITCH = "SET_MLSR_LINK_SWITCH ";
-static const auto CMD_UPDATE_UNFOLD_STATE = "UPDATE_UNFOLD_STATE ";
+static const auto CMD_UPDATE_UNFOLD_STATE = "UPDATE_UNFOLD_STATE "; // The trailing space is a pre-defined format
 
 #define MSS_SOFTAP_MAX_IFNAMESIZE 5
 #define MSS_SOFTAP_CMDSIZE 30

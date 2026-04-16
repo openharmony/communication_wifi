@@ -231,6 +231,8 @@ public:
     ErrCode SetWifiCapability(int capability, bool enable) override;
 
     ErrCode GetWifiCapability(int capability, bool &enabled) override;
+
+    ErrCode IsWlanSupported(bool &isSupported) override;
 private:
     bool Init();
     ErrCode CheckCanEnableWifi(void);

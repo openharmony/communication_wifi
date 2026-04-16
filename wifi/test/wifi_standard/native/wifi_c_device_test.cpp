@@ -304,6 +304,12 @@ public:
     {
         EXPECT_TRUE(StartPortalCertification() != WIFI_SUCCESS);
     }
+
+    void IsWlanSupportedTest()
+    {
+        bool isSupported = true;
+        EXPECT_FALSE(IsWlanSupported(&isSupported) != WIFI_SUCCESS);
+    }
 };
 
 HWTEST_F(WifiCDeviceTest, EnableWifiSuccess, TestSize.Level1)
@@ -450,6 +456,11 @@ HWTEST_F(WifiCDeviceTest, SetLowLatencyModeTest, TestSize.Level1)
 HWTEST_F(WifiCDeviceTest, IsBandTypeSupportedTest, TestSize.Level1)
 {
     IsBandTypeSupportedTest();
+}
+
+HWTEST_F(WifiCDeviceTest, IsWlanSupportedTest, TestSize.Level1)
+{
+    IsWlanSupportedTest();
 }
 } // namespace Wifi
 } // namespace OHOS

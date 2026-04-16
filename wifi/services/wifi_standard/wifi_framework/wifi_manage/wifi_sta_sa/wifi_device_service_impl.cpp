@@ -46,6 +46,9 @@
 #include "wifi_sta_hal_interface.h"
 #include "block_connect_service.h"
 #include "wifi_hisysevent.h"
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+#include "hal_device_manage.h"
+#endif
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -2928,6 +2931,22 @@ ErrCode WifiDeviceServiceImpl::GetWifiCapability(int capability, bool &enabled)
     return WIFI_OPT_SUCCESS;
 #else
     return WIFI_OPT_NOT_SUPPORTED;
+#endif
+}
+
+ErrCode WifiDeviceServiceImpl::IsWlanSupported(bool &isSupported)
+{
+    WIFI_LOGI("Enter IsWlanSupported.");
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!HalDeviceManager::GetInstance().IsWlanSupported(isSupported)) {
+        WIFI_LOGE("IsWlanSupported: Check hardware support failed!");
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+#else
+    isSupported = false;
+    WIFI_LOGI("IsWlanSupported: HDI_CHIP_INTERFACE_SUPPORT not defined, return false");
+    return WIFI_OPT_SUCCESS;
 #endif
 }
 

@@ -76,7 +76,7 @@ const std::string WIFI_STANDBY_SLEEPING = "sleeping";
 const std::string ENTER_SETTINGS = "usual.event.wlan.ENTER_SETTINGS_WLAN_PAGE";
 const std::string WLAN_PAGE_ENTER = "enterWlanPage";
 const std::string GAME_INFO_NOTIFY = "usual.event.gameservice.GAME_INFO_NOTIFY";
-constexpr int HW_FOLD_ACTION_RF_DIFF_POWER = 1;
+constexpr int FOLD_ACTION_NOTIFY_DRV = 1;
 
 std::atomic<bool> WifiEventSubscriberManager::isMdmForbidden_{false};
 std::atomic<bool> WifiEventSubscriberManager::isMdmHotspotForbidden_{false};
@@ -128,7 +128,7 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
     RegisterNetworkStateChangeEvent();
     RegisterWifiScanChangeEvent();
     RegisterSettingsEnterEvent();
-    if (IsSignalSmoothingEnable() || foldAction_ > 0) {
+    if (IsSignalSmoothingEnable() || foldAction_ > FOLD_ACTION_NOTIFY_DRV) {
         SyncFoldStatus();
         RegisterFoldStatusListener();
     }
@@ -159,7 +159,7 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     UnRegisterWifiScanChangeEvent();
     UnRegisterSettingsEnterEvent();
     UnRegisterDataShareReadyEvent();
-    if (IsSignalSmoothingEnable() || foldAction_ > 0) {
+    if (IsSignalSmoothingEnable() || foldAction_ > FOLD_ACTION_NOTIFY_DRV) {
         UnRegisterFoldStatusListener();
     }
     UnregisterDisplayListener();
@@ -1675,7 +1675,7 @@ void WifiFoldStateListener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
         }
     }
 
-    if (foldAction_ != HW_FOLD_ACTION_RF_DIFF_POWER || (foldStatus != Rosen::FoldStatus::EXPAND &&
+    if (foldAction_ != FOLD_ACTION_NOTIFY_DRV || (foldStatus != Rosen::FoldStatus::EXPAND &&
         foldStatus != Rosen::FoldStatus::FOLDED)) {
         return;
     }
@@ -1725,7 +1725,7 @@ void WifiEventSubscriberManager::UnregisterDisplayListener()
 
 void WifiEventSubscriberManager::SyncFoldStatus()
 {
-    if (foldAction_ != HW_FOLD_ACTION_RF_DIFF_POWER) {
+    if (foldAction_ != FOLD_ACTION_NOTIFY_DRV) {
         return;
     }
  

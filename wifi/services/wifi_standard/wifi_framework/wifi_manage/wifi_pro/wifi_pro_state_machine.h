@@ -170,10 +170,11 @@ public:
         void GoInState() override;
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
+    public:
+        std::atomic<bool> isSelfCure_ { false };
     private:
         WifiProStateMachine *pWifiProStateMachine_ { nullptr };
         bool fullScan_ { false };
-        std::atomic<bool> isSelfCure_ { false };
         void HandleWifiNoInternet(const InternalMessagePtr msg);
         void HandleReuqestScanInNoNet(const InternalMessagePtr msg);
         void HandleNoNetChanged();

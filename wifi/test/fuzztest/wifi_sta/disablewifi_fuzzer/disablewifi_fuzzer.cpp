@@ -26,7 +26,6 @@ namespace Wifi {
         if (devicePtr == nullptr) {
             return false;
         }
-        devicePtr->IsConnected(isconnected);
         devicePtr->DisableWifi();
         return true;
     }

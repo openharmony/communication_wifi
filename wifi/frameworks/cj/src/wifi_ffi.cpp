@@ -678,6 +678,39 @@ int32_t FfiWifiGetLinkedInfo(CWifiLinkedInfo& info)
     return code;
 }
 
+int32_t FfiWifiGetLinkedInfoV2(CWifiLinkedInfoV2& info)
+{
+    if (cjWifiDevicePtr == nullptr) {
+        return WIFI_OPT_FAILED;
+    }
+    WifiLinkedInfo linkedInfo;
+    ErrCode code = cjWifiDevicePtr->GetLinkedInfo(linkedInfo);
+    if (code == WIFI_OPT_SUCCESS) {
+        info.ssid = MallocCString(linkedInfo.ssid);
+        info.bssid = MallocCString(linkedInfo.bssid);
+        info.rssi = linkedInfo.rssi;
+        info.band = linkedInfo.band;
+        info.linkSpeed = linkedInfo.linkSpeed;
+        info.frequency = linkedInfo.frequency;
+        info.isHidden = linkedInfo.ifHiddenSSID;
+        info.isRestricted = linkedInfo.isDataRestricted;
+        info.macAddress = MallocCString(linkedInfo.macAddress);
+        info.macType = linkedInfo.macType;
+        info.ipAddress = linkedInfo.ipAddress;
+        info.connState = static_cast<int32_t>(linkedInfo.connState);
+        info.wifiStandard = linkedInfo.wifiStandard;
+        info.maxSupportedRxLinkSpeed = linkedInfo.maxSupportedRxLinkSpeed;
+        info.maxSupportedTxLinkSpeed = linkedInfo.maxSupportedTxLinkSpeed;
+        info.rxLinkSpeed = linkedInfo.rxLinkSpeed;
+        info.channelWidth = static_cast<int32_t>(linkedInfo.channelWidth);
+        info.supportedWifiCategory = static_cast<int32_t>(linkedInfo.supportedWifiCategory);
+        info.isHiLinkNetwork = linkedInfo.isHiLinkNetwork;
+        info.wifiLinkType = linkedInfo.wifiLinkType;
+        info.wifiTxRxValid = linkedInfo.wifiTxRxValid;
+    }
+    return code;
+}
+
 int32_t FfiWifiAddCandidateConfig(CWifiDeviceConfig cfg, int32_t& ret)
 {
     if (cjWifiDevicePtr == nullptr) {

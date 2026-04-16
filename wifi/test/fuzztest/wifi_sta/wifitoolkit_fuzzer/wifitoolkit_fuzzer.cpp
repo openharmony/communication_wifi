@@ -342,12 +342,14 @@ void WifinetworkselectionmanagerTest()
     InterScanInfo interScanInfo;
     NetworkSelectionResult networkSelectionResult;
     std::string autoSelectBssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    bool isSavedNetEmpty = FDP->ConsumeIntegral<bool>();
     std::vector<NetworkSelection::NetworkCandidate> networkCandidates;
     std::vector<InterScanInfo> scanInfos;
     m_NetworkSelectionManager->SelectNetworkWithSsid(deviceConfig, autoSelectBssid);
     m_NetworkSelectionManager->GetAllDeviceConfigs(networkCandidates, scanInfos);
     m_NetworkSelectionManager->ConvertScanInfo(wifiScanInfo, interScanInfo);
     m_NetworkSelectionManager->GetFilteredReasonForChr(networkCandidates);
+    m_NetworkSelectionManager->GetSavedNetInfoForChr(networkCandidates, isSavedNetEmpty);
 }
 
 void WifinotificationutilTest()

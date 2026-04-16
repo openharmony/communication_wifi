@@ -3200,5 +3200,35 @@ ErrCode WifiDeviceProxy::GetWifiCapability(int capability, bool &enabled)
     enabled = reply.ReadBool();
     return WIFI_OPT_SUCCESS;
 }
+
+ErrCode WifiDeviceProxy::IsWlanSupported(bool &isSupported)
+{
+    if (mRemoteDied) {
+        WIFI_LOGE("failed to `%{public}s`,remote service is died!", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    MessageOption option;
+    MessageParcel data;
+    MessageParcel reply;
+    if (!data.WriteInterfaceToken(GetDescriptor())) {
+        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        return WIFI_OPT_FAILED;
+    }
+    data.WriteInt32(0);
+
+    int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WLAN_SUPPORTED),
+        data, reply, option);
+    if (error != ERR_NONE) {
+        WIFI_LOGE("Check wlan supported status (%{public}d) failed, error code is %{public}d",
+            static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WLAN_SUPPORTED), error);
+        return WIFI_OPT_FAILED;
+    }
+
+    ErrCode ret = ErrCode(reply.ReadInt32());
+    if (ret == WIFI_OPT_SUCCESS) {
+        isSupported = reply.ReadBool();
+    }
+    return ret;
+}
 }  // namespace Wifi
 }  // namespace OHOS

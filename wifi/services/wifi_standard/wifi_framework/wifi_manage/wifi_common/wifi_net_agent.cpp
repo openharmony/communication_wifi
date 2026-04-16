@@ -314,7 +314,7 @@ void WifiNetAgent::SetNetLinkIPInfo(sptr<NetManagerStandard::NetLinkInfo> &netLi
     netIpv6Addr->type_ = NetManagerStandard::INetAddr::IPV6;
     netIpv6Addr->family_ = NetManagerStandard::INetAddr::IPV6;
     netIpv6Addr->netMask_ = wifiIpV6Info.netmask;
-    netIpv6Addr->prefixlen_ = 0;
+    netIpv6Addr->prefixlen_ = static_cast<unsigned int>(IpTools::GetIPV6MaskLength(wifiIpV6Info.netmask));
 
     std::vector<std::pair<std::string, int>> ipv6Addr(wifiIpV6Info.IpAddrMap.begin(), wifiIpV6Info.IpAddrMap.end());
     std::sort(ipv6Addr.begin(), ipv6Addr.end(),

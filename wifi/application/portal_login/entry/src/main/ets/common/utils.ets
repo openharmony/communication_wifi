@@ -21,6 +21,7 @@ import { url, util, JSON } from '@kit.ArkTS'
 import { updateInitUrl, updateBindNetTime, updateBindNetSuccess,
   safeAnonymize } from './chr';
 import { fileIo as fs } from '@kit.CoreFileKit';
+import { abilityAccessCtrl, Permissions } from '@kit.AbilityKit';
 
 const DOMAIN = 0x01560
 const TAG = 'Utils';
@@ -34,6 +35,11 @@ let hmosComplexRegex_: RegExp | undefined;
 export type StringNumberPair = [string, number];
 let retryList_: StringNumberPair[] = [];
 let defaultUrl_: string = '';
+
+const permissionMap: Record<string, Permissions> = {
+  'TYPE_VIDEO_CAPTURE':'ohos.permission.CAMERA',
+  'TYPE_AUDIO_CAPTURE':'ohos.permission.MICROPHONE',
+};
 
 export function setShouldShowBrowseItem(want: Want): void {
   if (want.parameters) {
@@ -73,8 +79,14 @@ export function validateURL(urlString: string): boolean {
   return false;
 }
 
+function isAcceptURL(urlString: string): boolean {
+  const lower = urlString.toLowerCase();
+  return lower.startsWith('http://') || lower.startsWith('https://');
+}
+
 export function setUrl(want: Want): void {
-  if (want.parameters && want.parameters.url && validateURL(want.parameters.url as string)) {
+  if (want.parameters && want.parameters.url && validateURL(want.parameters.url as string) &&
+    isAcceptURL(want.parameters.url as string)) {
     url_ = want.parameters.url as string;
     updateInitUrl(url_);
     hilog.info(DOMAIN, TAG, '%{public}s', 'Succeeded set url:' + extractDomain(url_));
@@ -106,6 +118,29 @@ export function setNetId(want: Want): void {
   } else {
     hilog.error(DOMAIN, TAG, '%{public}s', 'Failed set net id:' + netId_);
   }
+}
+
+export function reqPermissionsFromUser(permissions: Array<Permissions>, context: common.UIAbilityContext): void {
+  let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
+  atManager.requestPermissionsFromUser(context, permissions).then((data) => {
+    let grantStatus: number[] = data.authResults;
+    let length: number = grantStatus.length;
+    for (let i = 0; i < length; i++) {
+      if (grantStatus[i] === 0) {
+        console.info(`${permissions[i]} is granted by user.`);
+      } else {
+        return;
+      }
+    }
+    }).catch((err: BusinessError) => {
+      console.error(`Failed to request permissions from user, code: ${err.code}, message: ${err.message}`);
+    })
+}
+
+export function convertToPermissions(permissionStrings: string[]): Permissions[] {
+  return permissionStrings
+    .map(str => permissionMap[str])
+    .filter(permission => permission != undefined);
 }
 
 export async function bindToNetById(context: common.UIAbilityContext) {

@@ -204,6 +204,7 @@ private:
     void HandleCastServiceChange(bool add);
     void HandleShareServiceChange(bool add);
     void HandleMouseCrossServiceChange(bool add);
+    void HandleGameServiceChange(bool add);
     int GetLastStaStateByDatashare();
     void RegisterCesEvent();
 #ifdef HAS_POWERMGR_PART

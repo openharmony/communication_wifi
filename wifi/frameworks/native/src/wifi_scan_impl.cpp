@@ -466,7 +466,10 @@ ErrCode WifiScanImpl::GetSupportedFeatures(long &features)
 bool WifiScanImpl::IsFeatureSupported(long feature)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    RETURN_IF_FAIL(GetWifiScanProxy());
+    if (!GetWifiScanProxy()) {
+        WIFI_LOGI("'%{public}s' failed.", "GetWifiScanProxy()");
+        return false;
+    }
 #ifdef OHOS_ARCH_LITE
     long tmpFeatures = 0;
 #else

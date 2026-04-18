@@ -419,6 +419,28 @@ private:
     void UpdateLastNetworkId(int uid, const std::string& ssid, const std::string& keyMgmt);
     void HandleWifi7WithoutMldBackoff(const std::string &bssid);
     void HandleWifi7MldBackoff(const std::string &bssid);
+    
+    /**
+     * @brief Preserve Reset self-cure success information before history reset
+     *
+     * When network recovers (HTTP detection succeeds) and self-cure history needs
+     * to be reset, this function preserves the Reset self-cure success related data
+     * to prevent loss of success records due to reset.
+     *
+     * @param historyInfo Input/output history string (format: field1|field2|...|fieldn)
+     * @param selfCureHistory Reference value to determine if preservation is needed
+     * @note If selfCureHistory == INIT_SELFCURE_HISTORY, reset is required.
+     *       In this case, only Reset self-cure success related fields are preserved:
+     *       - resetSelfCureSuccessCnt: Reset self-cure success count
+     *       - lastResetSelfCureSuccessTs: Last Reset self-cure success timestamp
+     *       Failure records of other self-cure types will be cleared to zero.
+     *       If not in initial state, historyInfo remains unchanged.
+     *
+     * @see INIT_SELFCURE_HISTORY
+     * @see SelfCureHistoryOrder::POS_RESET_SUCCESS_CNT
+     * @see SelfCureHistoryOrder::POS_RESET_SUCCESS_TS
+     */
+    void ReserveRestSelfCureSuccessInfo(std::string &historyInfo, const std::string &selfCureHistory);
 
 private:
     SelfCureSmHandleFuncMap selfCureSmHandleFuncMap_;

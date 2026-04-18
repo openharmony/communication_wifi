@@ -40,6 +40,7 @@
 #define HICAR_SERVICE_SA_ID 65872
 #define GAMESERVICE_SA_UID 7011
 #define GAMESERVICE_SA_ID 66006
+#define WATCH_SERVICE_UID 7500
 #define HILINK_PRO_NETWORK 4
 namespace OHOS {
 namespace Wifi {

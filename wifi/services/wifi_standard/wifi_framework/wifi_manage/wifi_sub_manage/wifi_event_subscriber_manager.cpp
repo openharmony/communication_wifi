@@ -297,6 +297,13 @@ void WifiEventSubscriberManager::HandleGameServiceChange(bool add)
     }
 }
 
+void WifiEventSubscriberManager::HandleWatchServiceChange(bool add)
+{
+    if (!add) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(WATCH_SERVICE_UID);
+    }
+}
+
 #ifdef FEATURE_P2P_SUPPORT
 void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bool add)
 {
@@ -312,6 +319,9 @@ void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bo
     }
     if (systemAbilityId == HICAR_SERVICE_SA_ID) {
         WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(HICAR_SERVICE_UID);
+    }
+    if (systemAbilityId == SUBSYS_WEARABLE_SYS_ABILITY_ID_BEGIN) {
+        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(WATCH_SERVICE_UID);
     }
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
@@ -353,6 +363,9 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             break;
         case GAMESERVICE_SA_ID:
             HandleGameServiceChange(add);
+            break;
+        case SUBSYS_WEARABLE_SYS_ABILITY_ID_BEGIN:
+            HandleWatchServiceChange(add);
             break;
         case COMM_ETHERNET_MANAGER_SYS_ABILITY_ID:
             HandleEthernetServiceChange(systemAbilityId, add);
@@ -520,6 +533,7 @@ void WifiEventSubscriberManager::InitSubscribeListener()
     SubscribeSystemAbility(MOUSE_CROSS_SERVICE_ID);
     SubscribeSystemAbility(HICAR_SERVICE_SA_ID);
     SubscribeSystemAbility(GAMESERVICE_SA_ID);
+    SubscribeSystemAbility(SUBSYS_WEARABLE_SYS_ABILITY_ID_BEGIN);
 }
 
 int WifiEventSubscriberManager::GetLastStaStateByDatashare()

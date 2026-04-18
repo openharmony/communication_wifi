@@ -29,6 +29,7 @@ using ::testing::StrEq;
 using ::testing::TypedEq;
 using ::testing::ext::TestSize;
 #define GAMESERVICE_SA_UID 7011
+#define WATCH_SERVICE_UID 7500
 
 namespace OHOS {
 namespace Wifi {
@@ -3262,6 +3263,16 @@ HWTEST_F(ScanServiceTest, AllowScanByHid2dGameSceneTest, TestSize.Level1)
     Hid2dUpperScene gameScene;
     gameScene.scene = 0x07;
     WifiConfigCenter::GetInstance().SetHid2dUpperScene(GAMESERVICE_SA_UID, gameScene);
+    bool result = pScanService->AllowScanByHid2dState(ScanType::SCAN_TYPE_EXTERN, scanStyle);
+    EXPECT_FALSE(result);
+}
+
+HWTEST_F(ScanServiceTest, AllowScanByHid2dWatchSceneTest, TestSize.Level1)
+{
+    int scanStyle = 0;
+    Hid2dUpperScene watchScene;
+    watchScene.scene = 0x07;
+    WifiConfigCenter::GetInstance().SetHid2dUpperScene(WATCH_SERVICE_UID, watchScene);
     bool result = pScanService->AllowScanByHid2dState(ScanType::SCAN_TYPE_EXTERN, scanStyle);
     EXPECT_FALSE(result);
 }

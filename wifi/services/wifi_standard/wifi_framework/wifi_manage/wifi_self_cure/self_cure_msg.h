@@ -63,6 +63,13 @@ struct WifiSelfCureHistoryInfo {
 
     /* record last reset connect failed milliseconds */
     int64_t lastResetSelfCureConnectFailedTs;
+
+    /* record reset success count */
+    int resetSelfCureSuccessCnt;
+ 
+    /* record last reset success milliseconds */
+    int64_t lastResetSelfCureSuccessTs;
+
     WifiSelfCureHistoryInfo()
     {
         staticIpSelfCureFailedCnt = 0;
@@ -79,6 +86,8 @@ struct WifiSelfCureHistoryInfo {
         lastRandMacSelfCureConnectFailedCntTs = 0;
         resetSelfCureConnectFailedCnt = 0;
         lastResetSelfCureConnectFailedTs = 0;
+        resetSelfCureSuccessCnt = 0;
+        lastResetSelfCureSuccessTs = 0;
     }
     std::string GetSelfCureHistory()
     {
@@ -96,7 +105,9 @@ struct WifiSelfCureHistoryInfo {
         internetSelfCureHistory.append(std::to_string(randMacSelfCureConnectFailedCnt) + "|");
         internetSelfCureHistory.append(std::to_string(lastRandMacSelfCureConnectFailedCntTs) + "|");
         internetSelfCureHistory.append(std::to_string(resetSelfCureConnectFailedCnt) + "|");
-        internetSelfCureHistory.append(std::to_string(lastResetSelfCureConnectFailedTs));
+        internetSelfCureHistory.append(std::to_string(lastResetSelfCureConnectFailedTs) + "|");
+        internetSelfCureHistory.append(std::to_string(resetSelfCureSuccessCnt) + "|");
+        internetSelfCureHistory.append(std::to_string(lastResetSelfCureSuccessTs));
         return internetSelfCureHistory;
     }
 };
@@ -116,6 +127,8 @@ enum SelfCureHistoryOrder {
     POS_RANDMAC_CONNECT_FAILED_TS,
     POS_RESET_CONNECT_FAILED_CNT,
     POS_RESET_CONNECT_FAILED_TS,
+    POS_RESET_SUCCESS_CNT,
+    POS_RESET_SUCCESS_TS,
 };
 
 enum class SelfCureType {

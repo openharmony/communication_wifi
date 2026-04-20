@@ -343,7 +343,7 @@ static bool DealRandMacReassoc(const WifiSelfCureHistoryInfo &historyInfo, int r
 static bool IsResetSelfCureFrequent(WifiSelfCureHistoryInfo &historyInfo, int64_t currentMs)
 {
     if ((historyInfo.resetSelfCureSuccessCnt >= 1) &&
-        ((currentMs - historyInfo.lastResetSelfCureSuccessTs) < DELAYED_TEN_MIU)) {
+        ((currentMs - historyInfo.lastResetSelfCureSuccessTs) < DELAYED_TEN_MIN)) {
             WIFI_LOGE("Reset SelfCure Frequent, Not Allow Reset SelfCure");
         return true;
     }

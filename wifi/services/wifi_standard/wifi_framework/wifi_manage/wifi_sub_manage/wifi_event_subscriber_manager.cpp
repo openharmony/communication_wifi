@@ -128,7 +128,7 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
     RegisterNetworkStateChangeEvent();
     RegisterWifiScanChangeEvent();
     RegisterSettingsEnterEvent();
-    if (IsSignalSmoothingEnable() || foldAction_ > FOLD_ACTION_NOTIFY_DRV) {
+    if (IsSignalSmoothingEnable() || foldAction_ == FOLD_ACTION_NOTIFY_DRV) {
         SyncFoldStatus();
         RegisterFoldStatusListener();
     }
@@ -159,7 +159,7 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     UnRegisterWifiScanChangeEvent();
     UnRegisterSettingsEnterEvent();
     UnRegisterDataShareReadyEvent();
-    if (IsSignalSmoothingEnable() || foldAction_ > FOLD_ACTION_NOTIFY_DRV) {
+    if (IsSignalSmoothingEnable() || foldAction_ == FOLD_ACTION_NOTIFY_DRV) {
         UnRegisterFoldStatusListener();
     }
     UnregisterDisplayListener();

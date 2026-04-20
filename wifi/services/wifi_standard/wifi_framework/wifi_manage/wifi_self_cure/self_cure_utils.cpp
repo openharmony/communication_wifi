@@ -359,7 +359,7 @@ static bool DealHighReset(WifiSelfCureHistoryInfo &historyInfo, int requestCureL
          (currentMs - historyInfo.lastResetSelfCureFailedTs > DELAYED_DAYS_MID)) ||
         (historyInfo.resetSelfCureFailedCnt >= SELF_CURE_FAILED_FOUR_CNT &&
          (currentMs - historyInfo.lastResetSelfCureFailedTs > DELAYED_DAYS_HIGH))) &&
-        AllowSelfCure(historyInfo, requestCureLevel) && !IsResetSelfCureFrequent(historyInfo)) {
+        AllowSelfCure(historyInfo, requestCureLevel) && !IsResetSelfCureFrequent(historyInfo, currentMs)) {
         return true;
     }
     return false;

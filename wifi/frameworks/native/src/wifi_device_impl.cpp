@@ -113,7 +113,7 @@ bool WifiDeviceImpl::GetWifiDeviceProxy()
 
     client_ = iface_cast<IWifiDevice>(service);
     if (client_ == nullptr) {
-        client_ = new (std::nothrow) WifiDeviceProxy(service);
+        client_ = new (std::nothrow) WifiDeviceProxy(service, instId_);
     }
     if (client_ == nullptr) {
         WIFI_LOGE("wifi device instId_ %{public}d init failed. %{public}d", instId_, systemAbilityId_.load());

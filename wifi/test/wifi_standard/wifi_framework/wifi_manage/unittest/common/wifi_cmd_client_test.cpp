@@ -219,3 +219,19 @@ HWTEST_F(WifiCmdClientTest, SetBeBlaListTest002, TestSize.Level1)
     int result = wifiCmdClient_->SetBeBlaList(ifName, param);
     EXPECT_EQ(result, -1);
 }
+
+HWTEST_F(WifiCmdClientTest, SetFoldStatusTest001, TestSize.Level1)
+{
+    std::string ifName = "wlan0";
+    std::string param = "0";
+    int result = wifiCmdClient_->SendCmdToDriver(ifName, CMD_SET_FOLD_STATUS, param);
+    EXPECT_EQ(result, 0);
+}
+ 
+HWTEST_F(WifiCmdClientTest, SetFoldStatusTest002, TestSize.Level1)
+{
+    std::string ifName = "wlan0";
+    std::string param = "1";
+    int result = wifiCmdClient_->SendCmdToDriver(ifName, CMD_SET_FOLD_STATUS, param);
+    EXPECT_EQ(result, 0);
+}

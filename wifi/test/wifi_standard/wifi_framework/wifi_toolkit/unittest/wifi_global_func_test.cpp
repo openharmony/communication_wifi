@@ -496,5 +496,12 @@ HWTEST_F(WifiGlobalFuncTest, GetBssidCounterTest, TestSize.Level1)
     config.keyMgmt = "WPA-EAP";
     EXPECT_EQ(0, GetBssidCounter(config, scanResults));
 }
+
+HWTEST_F(WifiGlobalFuncTest, GetFoldActionTest, TestSize.Level1)
+{
+    int action = GetFoldAction();
+    bool ret = (action == -1 || action == 0 || action == 1);
+    EXPECT_TRUE(ret);
+}
 }  // namespace Wifi
 }  // namespace OHOS

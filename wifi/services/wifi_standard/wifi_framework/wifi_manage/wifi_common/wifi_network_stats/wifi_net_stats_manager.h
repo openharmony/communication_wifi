@@ -22,7 +22,10 @@
 #include <vector>
 #include "singleton.h"
 #include "net_stats_info.h"
+#include "wifi_hisysevent.h"
+
 #include <mutex>
+#include <cstdint>
 
 namespace OHOS {
 namespace Wifi {
@@ -48,6 +51,20 @@ private:
     std::mutex lastStatsMapMutex_ {};
     bool m_hasLastStats {false};
     uint64_t m_netStatsTimerId {0};
+
+    std::string lastAppName_ {""};
+    int64_t maxRxSpeed_ {0};
+    int64_t maxTxSpeed_ {0};
+    int64_t lastLogTime_ {0};
+    int64_t totalRxBytes_ {0};
+    int64_t totalTxBytes_ {0};
+    int64_t highSpeedDuration_ {0};
+    int64_t avgRxSpeed_ {0};
+    int64_t avgTxSpeed_ {0};
+    int32_t speedSampleCount_ {0};
+    void CheckAndReportSpeedTest(const NetStats& netStats, int64_t currentTime);
+    void InitSpeedTestInfo();
+    void ReportSpeedTestChr();
 };
 } // namespace Wifi
 } // namespace OHOS

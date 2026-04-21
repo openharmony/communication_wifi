@@ -136,5 +136,64 @@ HWTEST_F(WifiHisyseventTest, WriteWifiRiskInfoHiSysEventTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 #endif
+
+HWTEST_F(WifiHisyseventTest, WriteSpeedTestHiSysEventTest, TestSize.Level1)
+{
+    WifiSpeedTestStatisticInfo speedTestInfo;
+    WriteSpeedTestHiSysEvent(speedTestInfo);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+ 
+HWTEST_F(WifiHisyseventTest, WriteSpeedTestHiSysEventTest_WithValidData, TestSize.Level1)
+{
+    WifiSpeedTestStatisticInfo speedTestInfo;
+    speedTestInfo.appName = "com.test.speedtest";
+    speedTestInfo.rxMaxSpeed = 100;
+    speedTestInfo.txMaxSpeed = 200;
+    speedTestInfo.rxAvgSpeed = 80;
+    speedTestInfo.txAvgSpeed = 150;
+    speedTestInfo.highSpeedDuration = 5000;
+    WriteSpeedTestHiSysEvent(speedTestInfo);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+ 
+HWTEST_F(WifiHisyseventTest, WriteSpeedTestHiSysEventTest_WithEmptyAppName, TestSize.Level1)
+{
+    WifiSpeedTestStatisticInfo speedTestInfo;
+    speedTestInfo.appName = "";
+    speedTestInfo.rxMaxSpeed = 0;
+    speedTestInfo.txMaxSpeed = 0;
+    speedTestInfo.rxAvgSpeed = 0;
+    speedTestInfo.txAvgSpeed = 0;
+    speedTestInfo.highSpeedDuration = 0;
+    WriteSpeedTestHiSysEvent(speedTestInfo);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+ 
+HWTEST_F(WifiHisyseventTest, WriteSpeedTestHiSysEventTest_WithBoundaryValues, TestSize.Level1)
+{
+    WifiSpeedTestStatisticInfo speedTestInfo;
+    speedTestInfo.appName = "boundary_test";
+    speedTestInfo.rxMaxSpeed = LLONG_MAX;
+    speedTestInfo.txMaxSpeed = LLONG_MAX;
+    speedTestInfo.rxAvgSpeed = LLONG_MAX;
+    speedTestInfo.txAvgSpeed = LLONG_MAX;
+    speedTestInfo.highSpeedDuration = LLONG_MAX;
+    WriteSpeedTestHiSysEvent(speedTestInfo);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+ 
+HWTEST_F(WifiHisyseventTest, WriteSpeedTestHiSysEventTest_WithNegativeValues, TestSize.Level1)
+{
+    WifiSpeedTestStatisticInfo speedTestInfo;
+    speedTestInfo.appName = "negative_test";
+    speedTestInfo.rxMaxSpeed = -100;
+    speedTestInfo.txMaxSpeed = -200;
+    speedTestInfo.rxAvgSpeed = -80;
+    speedTestInfo.txAvgSpeed = -150;
+    speedTestInfo.highSpeedDuration = -5000;
+    WriteSpeedTestHiSysEvent(speedTestInfo);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
 }  // namespace Wifi
 }  // namespace OHOS

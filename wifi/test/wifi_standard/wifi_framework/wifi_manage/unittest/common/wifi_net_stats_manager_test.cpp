@@ -292,7 +292,8 @@ HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_AppChanged_ReportsSpee
     EXPECT_EQ(WifiNetStatsManager::GetInstance().lastAppName_, "unknown:456");
 }
  
-HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_ExceedsDurationThreshold_IncrementsSampleCount, TestSize.Level1)
+HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_ExceedsDurationThreshold_IncrementsSampleCount,
+    TestSize.Level1)
 {
     WIFI_LOGI("CheckAndReportSpeedTest_ExceedsDurationThreshold_IncrementsSampleCount enter!");
     NetStats netStats;

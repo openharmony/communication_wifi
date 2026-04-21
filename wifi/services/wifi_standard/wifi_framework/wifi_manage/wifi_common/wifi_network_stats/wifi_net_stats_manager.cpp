@@ -248,9 +248,9 @@ void WifiNetStatsManager::InitSpeedTestInfo()
 void WifiNetStatsManager::ReportSpeedTestChr()
 {
     WIFI_LOGI("ReportSpeedTestChr %{public}s", lastAppName_.c_str());
-    avgRxSpeed_ = (highSpeedDuration_ > 0) ? 
+    avgRxSpeed_ = (highSpeedDuration_ > 0) ?
         (totalRxBytes_ * BYTE_TO_BITE * MS_TO_SECOND / highSpeedDuration_) / BYTE_TO_MBYTE : 0;
-    avgTxSpeed_ = (highSpeedDuration_ > 0) ? 
+    avgTxSpeed_ = (highSpeedDuration_ > 0) ?
         (totalTxBytes_ * BYTE_TO_BITE * MS_TO_SECOND / highSpeedDuration_) / BYTE_TO_MBYTE : 0;
     WifiSpeedTestStatisticInfo speedTestInfo;
     speedTestInfo.appName = lastAppName_;

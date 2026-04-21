@@ -24,7 +24,7 @@ import { call } from '@kit.TelephonyKit';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
   validateURL, getIsInOOBE, getHmosUAComplexRegex, StringNumberPair, getRetryList, getDefaultUrl, modifyCode,
-  convertToPermissions, reqPermissionsFromUser, modifyUserAgent, userAgentCompatibleInfo
+  convertToPermissions, reqPermissionsFromUser, modifyUserAgent, UserAgentCompatibleInfo
 } from '../common/utils';
 import {
   updateFinalUrl, updateOnHttpErrorReceive, updateOnErrorReceive, updateOnSslErrorEvent, updateAboutToDisappear,
@@ -598,8 +598,8 @@ struct Index {
     }
     // 根据设备类型自动选择合适的兼容信息
     const compatibleInfo = appendInfo || 
-      (this.deviceType === DeviceType.PHONE || this.deviceType === DeviceType.TABLET ? userAgentCompatibleInfo.Android :
-       this.deviceType === DeviceType.PC ? userAgentCompatibleInfo.Windows : '');
+      (this.deviceType === DeviceType.PHONE || this.deviceType === DeviceType.TABLET ? UserAgentCompatibleInfo.Android :
+       this.deviceType === DeviceType.PC ? UserAgentCompatibleInfo.Windows : '');
     
     return compatibleInfo ? modifyUserAgent(originalUA, compatibleInfo) : originalUA;
   }

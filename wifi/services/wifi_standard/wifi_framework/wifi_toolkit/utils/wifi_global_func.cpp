@@ -801,5 +801,16 @@ bool IsSameEncryptType(const std::string& scanInfoKeymgmt, const std::string& de
     }
 }
 #endif
+int GetFoldAction()
+{
+    char preValue[MAX_FOLD_ACTION_LEN] = {0};
+    int errorCode = GetParamValue(PROP_HW_FOLD_ACTION, "0", preValue, sizeof(preValue));
+    if (errorCode <= 0) {
+        LOGI("GetFoldAction: hw_fold_action not initialized");
+        return FOLD_ACTION_NONE;
+    }
+    std::string valueStr(preValue);
+    return CheckDataLegal(valueStr);
+}
 }  // namespace Wifi
 }  // namespace OHOS

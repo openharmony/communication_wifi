@@ -46,6 +46,7 @@
 #include "wifi_sensor_scene.h"
 #include "app_network_speed_limit_service.h"
 #include "wifi_pro_chr.h"
+#include "wifi_cmd_client.h"
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
 #include "telephony_observer_client.h"
 #include "telephony_types.h"
@@ -75,6 +76,7 @@ const std::string WIFI_STANDBY_SLEEPING = "sleeping";
 const std::string ENTER_SETTINGS = "usual.event.wlan.ENTER_SETTINGS_WLAN_PAGE";
 const std::string WLAN_PAGE_ENTER = "enterWlanPage";
 const std::string GAME_INFO_NOTIFY = "usual.event.gameservice.GAME_INFO_NOTIFY";
+constexpr int FOLD_ACTION_NOTIFY_DRV = 1;
 
 std::atomic<bool> WifiEventSubscriberManager::isMdmForbidden_{false};
 std::atomic<bool> WifiEventSubscriberManager::isMdmHotspotForbidden_{false};
@@ -111,6 +113,7 @@ const std::map<std::string, CesFuncType> CES_REQUEST_MAP = {
 WifiEventSubscriberManager::WifiEventSubscriberManager()
 {
     WIFI_LOGI("create WifiEventSubscriberManager");
+    foldAction_ = GetFoldAction();
     RegisterCesEvent();
     RegisterNotificationEvent();
 #ifdef HAS_POWERMGR_PART
@@ -125,7 +128,8 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
     RegisterNetworkStateChangeEvent();
     RegisterWifiScanChangeEvent();
     RegisterSettingsEnterEvent();
-    if (IsSignalSmoothingEnable()) {
+    if (IsSignalSmoothingEnable() || foldAction_ == FOLD_ACTION_NOTIFY_DRV) {
+        SyncFoldStatus();
         RegisterFoldStatusListener();
     }
     RegisterDisplayListener();
@@ -155,7 +159,7 @@ WifiEventSubscriberManager::~WifiEventSubscriberManager()
     UnRegisterWifiScanChangeEvent();
     UnRegisterSettingsEnterEvent();
     UnRegisterDataShareReadyEvent();
-    if (IsSignalSmoothingEnable()) {
+    if (IsSignalSmoothingEnable() || foldAction_ == FOLD_ACTION_NOTIFY_DRV) {
         UnRegisterFoldStatusListener();
     }
     UnregisterDisplayListener();
@@ -1677,9 +1681,10 @@ void WifiDisplayStateListener::OnChange(uint64_t displayId)
     WifiConfigCenter::GetInstance().SetScreenDispalyState(static_cast<int32_t>(orientation));
 }
 
-WifiFoldStateListener::WifiFoldStateListener()
+WifiFoldStateListener::WifiFoldStateListener(int foldAction)
 {
     WIFI_LOGI("WifiFoldStateListener Enter");
+    foldAction_ = foldAction;
 }
 
 void WifiFoldStateListener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
@@ -1694,6 +1699,16 @@ void WifiFoldStateListener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
             pEnhanceService->OnFoldStateChanged(static_cast<int>(foldStatus));
         }
     }
+
+    if (foldAction_ != FOLD_ACTION_NOTIFY_DRV || (foldStatus != Rosen::FoldStatus::EXPAND &&
+        foldStatus != Rosen::FoldStatus::FOLDED)) {
+        return;
+    }
+ 
+    std::string ifName = "wlan0";
+    std::string cmdParam = (foldStatus == Rosen::FoldStatus::EXPAND ? "1" : "0");
+    int ret = WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_FOLD_STATUS, cmdParam);
+    WIFI_LOGI("OnFoldStatusChanged, send cmd %{public}s ret %{public}d", cmdParam.c_str(), ret);
 }
 
 void WifiEventSubscriberManager::RegisterDisplayListener()
@@ -1733,13 +1748,31 @@ void WifiEventSubscriberManager::UnregisterDisplayListener()
     WIFI_LOGI("UnregisterDisplayListener finished");
 }
 
+void WifiEventSubscriberManager::SyncFoldStatus()
+{
+    if (foldAction_ != FOLD_ACTION_NOTIFY_DRV) {
+        return;
+    }
+ 
+    auto foldStatus = Rosen::DisplayManagerLite::GetInstance().GetFoldStatus();
+    WIFI_LOGI("SyncFoldStatus: current foldStatus %{public}d", static_cast<int>(foldStatus));
+    if (foldStatus != Rosen::FoldStatus::EXPAND && foldStatus != Rosen::FoldStatus::FOLDED) {
+        return;
+    }
+ 
+    std::string ifName = "wlan0";
+    std::string cmdParam = (foldStatus == Rosen::FoldStatus::EXPAND ? "1" : "0");
+    int ret = WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_FOLD_STATUS, cmdParam);
+    WIFI_LOGI("SyncFoldStatus, send cmd %{public}s ret %{public}d", cmdParam.c_str(), ret);
+}
+
 void WifiEventSubscriberManager::RegisterFoldStatusListener()
 {
     std::unique_lock<std::mutex> lock(foldStatusListenerMutex_);
     if (foldStatusListener_ != nullptr) {
         return;
     }
-    foldStatusListener_ = new(std::nothrow) WifiFoldStateListener();
+    foldStatusListener_ = new(std::nothrow) WifiFoldStateListener(foldAction_);
     if (foldStatusListener_ == nullptr) {
         WIFI_LOGE("RegisterFoldStatusListener fail");
         return;

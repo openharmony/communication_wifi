@@ -311,7 +311,6 @@ HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_ExceedsDurationThresho
     WifiNetStatsManager::GetInstance().CheckAndReportSpeedTest(netStats, currentTime);
  
     EXPECT_EQ(WifiNetStatsManager::GetInstance().speedSampleCount_, 0);
-
 }
  
 HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_LowSpeedAfterHighSpeed_ReportsCHR, TestSize.Level1)
@@ -351,7 +350,6 @@ HWTEST_F(WifiNetStatsManagerTest, ReportSpeedTestChr_CalculatesAverageSpeed_AndR
     WifiNetStatsManager::GetInstance().ReportSpeedTestChr();
  
     EXPECT_EQ(WifiNetStatsManager::GetInstance().avgRxSpeed_, 0);
-
     EXPECT_EQ(WifiNetStatsManager::GetInstance().avgTxSpeed_, 0);
     EXPECT_EQ(WifiNetStatsManager::GetInstance().maxRxSpeed_, 0);
     EXPECT_EQ(WifiNetStatsManager::GetInstance().maxTxSpeed_, 0);

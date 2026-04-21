@@ -209,7 +209,6 @@ void WifiNetStatsManager::CheckAndReportSpeedTest(const NetStats& netStats, int6
     int64_t rxSpeedMbps = (netStats[0].rxBytes_ * BYTE_TO_BITE * MS_TO_SECOND) / (timeInterval * BYTE_TO_MBYTE);
     int64_t txSpeedMbps = (netStats[0].txBytes_ * BYTE_TO_BITE * MS_TO_SECOND) / (timeInterval * BYTE_TO_MBYTE);
     std::string curAppName = GetBundleName(netStats[0].uid_);
- 
     if (lastAppName_ != curAppName && speedSampleCount_ > 0) {
         ReportSpeedTestChr();
         lastAppName_ = curAppName;
@@ -249,8 +248,10 @@ void WifiNetStatsManager::InitSpeedTestInfo()
 void WifiNetStatsManager::ReportSpeedTestChr()
 {
     WIFI_LOGI("ReportSpeedTestChr %{public}s", lastAppName_.c_str());
-    avgRxSpeed_ = (highSpeedDuration_ > 0) ? (totalRxBytes_ * BYTE_TO_BITE * MS_TO_SECOND / highSpeedDuration_) / BYTE_TO_MBYTE : 0;
-    avgTxSpeed_ = (highSpeedDuration_ > 0) ? (totalTxBytes_ * BYTE_TO_BITE * MS_TO_SECOND / highSpeedDuration_) / BYTE_TO_MBYTE : 0;
+    avgRxSpeed_ = (highSpeedDuration_ > 0) ? 
+        (totalRxBytes_ * BYTE_TO_BITE * MS_TO_SECOND / highSpeedDuration_) / BYTE_TO_MBYTE : 0;
+    avgTxSpeed_ = (highSpeedDuration_ > 0) ? 
+        (totalTxBytes_ * BYTE_TO_BITE * MS_TO_SECOND / highSpeedDuration_) / BYTE_TO_MBYTE : 0;
     WifiSpeedTestStatisticInfo speedTestInfo;
     speedTestInfo.appName = lastAppName_;
     speedTestInfo.rxMaxSpeed = maxRxSpeed_;

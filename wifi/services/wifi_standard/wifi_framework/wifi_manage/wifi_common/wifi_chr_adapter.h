@@ -101,6 +101,8 @@ void EnhanceWriteAutoSelectHiSysEvent(int selectType, const std::string &selecte
 void EnhanceWriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info);
  
 void EnhanceWriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo);
+
+void EnhanceWriteSpeedTestHiSysEvent(const WifiSpeedTestStatisticInfo &speedTestinfo);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

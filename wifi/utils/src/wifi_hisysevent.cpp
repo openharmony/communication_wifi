@@ -1026,6 +1026,30 @@ void WriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo)
     cJSON_Delete(root);
 }
 
+void WriteSpeedTestHiSysEvent(const WifiSpeedTestStatisticInfo &speedTestStatisticInfo)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    cJSON_AddStringToObject(root, "APP_NAME", speedTestStatisticInfo.appName.c_str());
+    cJSON_AddNumberToObject(root, "RX_MAX_THROUGHPUT", speedTestStatisticInfo.rxMaxSpeed);
+    cJSON_AddNumberToObject(root, "TX_MAX_THROUGHPUT", speedTestStatisticInfo.txMaxSpeed);
+    cJSON_AddNumberToObject(root, "RX_AVG_THROUGHPUT", speedTestStatisticInfo.rxAvgSpeed);
+    cJSON_AddNumberToObject(root, "TX_AVG_THROUGHPUT", speedTestStatisticInfo.txAvgSpeed);
+    cJSON_AddNumberToObject(root, "THROUGHPUT_TIME", speedTestStatisticInfo.highSpeedDuration);
+ 
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    if (jsonStr == nullptr) {
+        cJSON_Delete(root);
+        return;
+    }
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "WIFI_SPEEDTEST_EVENT", "EVENT_VALUE", std::string(jsonStr));
+    cJSON_free(jsonStr);
+    cJSON_Delete(root);
+}
+
 void WriteMdmHiSysEvent(const MdmRestrictedInfo &mdmRestrictedInfo)
 {
     cJSON *root = cJSON_CreateObject();

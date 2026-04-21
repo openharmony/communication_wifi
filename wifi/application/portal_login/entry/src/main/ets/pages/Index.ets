@@ -23,7 +23,7 @@ import { connection } from '@kit.NetworkKit';
 import { call } from '@kit.TelephonyKit';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
-  validateURL, getIsInOOBE, getHmosUAComplexRegex, StringNumberPair, getRetryList, getDefaultUrl, modifyCode
+  validateURL, getIsInOOBE, getHmosUAComplexRegex, StringNumberPair, getRetryList, getDefaultUrl, modifyCode,
   convertToPermissions, reqPermissionsFromUser, modifyUserAgent, userAgentCompatibleInfo
 } from '../common/utils';
 import {

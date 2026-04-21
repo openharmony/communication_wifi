@@ -229,9 +229,11 @@ export enum userAgentCompatibleInfo {
 
 export function modifyUserAgent(originalUA: string, appendInfo: string): string {
   const pattern = /OpenHarmony\s+\d+\.\d+/;
-  return originalUA.replace(pattern, (match) => {
-    return match + '; ' +appendInfo;
-  });
+  const newUA = originalUA.replace(pattern, (match) => {match + '; ' + appendInfo});
+  if (newUA === originalUA) {
+    hilog.warn(DOMAIN, TAG, 'UA pattern not found, appendInfo not added');
+  }
+  return newUA;
 }
 
 export const modifyCode = `Object.defineProperty(navigator, 'platform', { get: () => 'Linux aarch64' });`;

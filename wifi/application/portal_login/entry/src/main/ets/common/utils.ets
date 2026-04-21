@@ -222,7 +222,7 @@ export enum UserAgentSet {
     'Chrome/114.0.5735.196 Safari/537.36'
 }
 
-export enum userAgentCompatibleInfo {
+export enum UserAgentCompatibleInfo {
   Android = 'Android 10.0;',
   Windows = 'Windows NT 10.0;',
 }

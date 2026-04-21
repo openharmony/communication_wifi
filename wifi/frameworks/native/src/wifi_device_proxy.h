@@ -38,7 +38,8 @@ public:
 #else
 class WifiDeviceProxy : public IRemoteProxy<IWifiDevice> {
 public:
-    explicit WifiDeviceProxy(const sptr<IRemoteObject> &impl);
+    explicit WifiDeviceProxy(const sptr<IRemoteObject> &impl, int instId = 0);
+    static sptr<WifiDeviceCallBackStub> GetDeviceCallbackStub(int instId);
 #endif
     ~WifiDeviceProxy();
 
@@ -789,15 +790,15 @@ private:
     std::atomic<bool> mRemoteDied;
     std::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ = nullptr;
-    sptr<WifiDeviceCallBackStub> deviceCallBackStub_ = nullptr;
+    int instId_ { 0 };
 #endif
 private:
     void InitWifiState();
-    void OnWifiStateChanged(int state);
+    void OnWifiStateChanged(int state, int instId = 0);
 };
 class WifiInternalCallback : public IWifiDeviceCallBack {
 public:
-    WifiInternalCallback() {
+    explicit WifiInternalCallback(int instId = 0) : internalInstId_(instId) {
     }
     ~WifiInternalCallback() {
     }
@@ -806,7 +807,7 @@ public:
         if (wifiStateChangeCallback == nullptr) {
             return;
         }
-        wifiStateChangeCallback(state);
+        wifiStateChangeCallback(state, internalInstId_);
         return;
     }
     void OnWifiConnectionChanged(int state, const WifiLinkedInfo &info) override {}
@@ -820,7 +821,9 @@ public:
         return nullptr;
     }
 #endif
-    std::function<void(int state)> wifiStateChangeCallback;
+    std::function<void(int state, int instId)> wifiStateChangeCallback;
+private:
+    int internalInstId_ { 0 };
 };
 }  // namespace Wifi
 }  // namespace OHOS

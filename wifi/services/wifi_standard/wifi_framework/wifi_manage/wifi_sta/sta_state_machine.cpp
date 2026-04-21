@@ -1494,7 +1494,8 @@ bool StaStateMachine::ApLinkingState::ExecuteStateMsg(InternalMessagePtr msg)
         }
         case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT:
         case WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT:
-        case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT: {
+        case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT
+        case WIFI_SVR_CMD_STA_WPA_AUTH_TIMEOUT_EVENT: {
             ret = EXECUTED;
             DealWpaLinkFailEvent(msg);
             break;
@@ -1742,7 +1743,8 @@ bool StaStateMachine::ApLinkedState::HandleExtMsg(InternalMessagePtr msg)
             break;
         case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT:
         case WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT:
-        case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT: {
+        case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT
+        case WIFI_SVR_CMD_STA_WPA_AUTH_TIMEOUT_EVENT: {
             ret = EXECUTED;
             DealWpaLinkFailEventInApLinked(msg);
             break;
@@ -1916,6 +1918,11 @@ void StaStateMachine::ApLinkedState::DealWpaLinkFailEventInApLinked(InternalMess
                 break;
             }
             case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT: {
+                pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
+                    RoamingResultType::TYPE_ROAMING_ASSOC_REJECT);
+                break;
+            }
+            case WIFI_SVR_CMD_STA_WPA_AUTH_TIMEOUT_EVENT: {
                 pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
                     RoamingResultType::TYPE_ROAMING_ASSOC_REJECT);
                 break;

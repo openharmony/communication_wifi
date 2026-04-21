@@ -50,7 +50,8 @@ typedef enum {
     TYPE_ROAMING_TIMEOUT = 1,
     TYPE_ROAMING_PASSWD_WRONG,
     TYPE_ROAMING_FULL_CONNECT,
-    TYPE_ROAMING_ASSOC_REJECT
+    TYPE_ROAMING_ASSOC_REJECT,
+    TYPE_ROAMING_AUTH_TIMEOUT
 } RoamingResultType;
 
 using P2pEnhanceCallback = std::function<void(const std::string &, int32_t, int32_t)>;

@@ -229,7 +229,7 @@ export enum userAgentCompatibleInfo {
 
 export function modifyUserAgent(originalUA: string, appendInfo: string): string {
   const pattern = /OpenHarmony\s+\d+\.\d+/;
-  const newUA = originalUA.replace(pattern, (match) => {match + '; ' + appendInfo});
+  const newUA = originalUA.replace(pattern, (match) => match + '; ' + appendInfo);
   if (newUA === originalUA) {
     hilog.warn(DOMAIN, TAG, 'UA pattern not found, appendInfo not added');
   }

@@ -57,6 +57,7 @@ public:
     int32_t RegisterNetConnCallback(const sptr<INetConnCallback> callback);
 
     int32_t UnregisterNetConnCallback(const sptr<INetConnCallback> &callback);
+    int32_t CloseSocketsUid(int32_t netId, uint32_t uid);
 };
 } // namespace NetManagerStandard
 } // namespace OHOS

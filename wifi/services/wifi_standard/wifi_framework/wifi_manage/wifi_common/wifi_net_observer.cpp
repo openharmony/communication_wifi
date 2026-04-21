@@ -134,5 +134,16 @@ int32_t NetStateObserver::GetWifiNetId()
     }
     return 0;
 }
+
+void NetStateObserver::CloseSocketsUidByWifiNetId(int32_t uid)
+{
+    if (uid == WIFI_INVALID_UID) {
+        WIFI_LOGE("CloseSocketsUidByWifiNetId invalid uid");
+        return;
+    }
+    int32_t netId = GetWifiNetId();
+    int32_t ret = NetConnClient::GetInstance().CloseSocketsUid(netId, static_cast<uint32_t>(uid));
+    WIFI_LOGI("CloseSocketsUidByWifiNetId netId=%{public}d, uid=%{public}d, ret=%{public}d", netId, uid, ret);
+}
 }
 }

@@ -79,6 +79,13 @@ public:
     int32_t GetWifiNetId();
 
     /**
+     * @Description close sockets by foreground uid on Wi-Fi network
+     *
+     * @param uid - foreground app uid
+     */
+    void CloseSocketsUidByWifiNetId(int32_t uid);
+
+    /**
      * @Description start wifi detection
      *
      * @return 0 is success, 1 is fail

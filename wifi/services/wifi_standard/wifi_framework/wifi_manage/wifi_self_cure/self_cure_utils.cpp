@@ -500,20 +500,13 @@ int SelfCureUtils::SetSelfCureFailInfo(WifiSelfCureHistoryInfo &info,
 int SelfCureUtils::SetResetSelfCureSuccInfo(WifiSelfCureHistoryInfo &info,
                                             std::vector<std::string>& histories, int cnt)
 {
-    if (histories.empty() || histories.size() != SELFCURE_HISTORY_LENGTH || cnt != SELFCURE_FAIL_HISTORY_LENGTH) {
+    if (hhistories.size() != SELFCURE_HISTORY_LENGTH || cnt != SELFCURE_FAIL_HISTORY_LENGTH) {
         WIFI_LOGE("SetSelfCureSuccInfo return");
         return -1;
     }
     // 14 to 16 is history subscript, which record the selfcure failed info, covert array to calss member
-    for (int i = SELFCURE_FAIL_HISTORY_LENGTH; i < SELFCURE_HISTORY_LENGTH; i++) {
-        if (i == SelfCureHistoryOrder::POS_RESET_SUCCESS_CNT) {
-            info.resetSelfCureSuccessCnt = CheckDataLegal(histories[i]);
-        } else if (i == SelfCureHistoryOrder::POS_RESET_SUCCESS_TS) {
-            info.lastResetSelfCureSuccessTs = CheckDataTolonglong(histories[i]);
-        } else {
-            WIFI_LOGE("SetResetSelfCureSuccInfo, exception happen.");
-        }
-    }
+    info.resetSelfCureSuccessCnt = CheckDataLegal(histories[SELFCURE_FAIL_HISTORY_LENGTH]);
+    info.lastResetSelfCureSuccessTs = CheckDataTolonglong(histories[SELFCURE_HISTORY_LENGTH -1]);
     return 0;
 }
 

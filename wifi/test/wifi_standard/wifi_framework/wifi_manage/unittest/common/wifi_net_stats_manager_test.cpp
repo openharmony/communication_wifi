@@ -230,7 +230,7 @@ HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_HighSpeed_AccumulatesS
     NetStats netStats;
     NetStatsInfo netStatsInfo;
     netStatsInfo.uid_ = 123;
-    netStatsInfo.rxBytes_ = 10 * 1024 * 1024;
+    netStatsInfo.rxBytes_ = 100 * 1024 * 1024;
     netStatsInfo.txBytes_ = 5 * 1024 * 1024;
     netStats.push_back(netStatsInfo);
  
@@ -299,8 +299,8 @@ HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_ExceedsDurationThresho
     NetStats netStats;
     NetStatsInfo netStatsInfo;
     netStatsInfo.uid_ = 123;
-    netStatsInfo.rxBytes_ = 200 * 1024 * 1024;
-    netStatsInfo.txBytes_ = 200 * 1024 * 1024;
+    netStatsInfo.rxBytes_ = 100 * 1024 * 1024;
+    netStatsInfo.txBytes_ = 100 * 1024 * 1024;
     netStats.push_back(netStatsInfo);
  
     WifiNetStatsManager::GetInstance().lastLogTime_ = 0;

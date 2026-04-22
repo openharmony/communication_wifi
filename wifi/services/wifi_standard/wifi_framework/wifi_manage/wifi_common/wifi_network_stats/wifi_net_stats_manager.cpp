@@ -200,7 +200,6 @@ void WifiNetStatsManager::LogNetStatsTraffic(NetStats netStats)
         return;
     }
     int64_t currentTime = timeServiceClient->GetBootTimeMs();
-    std::lock_guard<std::mutex> lock(lastStatsMapMutex_);
     CheckAndReportSpeedTest(netStats, currentTime);
 }
 

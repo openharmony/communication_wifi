@@ -194,7 +194,13 @@ void WifiNetStatsManager::LogNetStatsTraffic(NetStats netStats)
         }
     }
     WIFI_LOGI("%{public}s", allTrafficLog.c_str());
-    int64_t currentTime = MiscServices::TimeServiceClient::GetInstance()->GetBootTimeMs();
+    auto timeServiceClient = MiscServices::TimeServiceClient::GetInstance();
+    if (timeServiceClient == nullptr) {
+        WIFI_LOGE("Get TimeServiceClient instance is null");
+        return;
+    }
+    int64_t currentTime = timeServiceClient->GetBootTimeMs();
+    std::lock_guard<std::mutex> lock(lastStatsMapMutex_);
     CheckAndReportSpeedTest(netStats, currentTime);
 }
 
@@ -227,7 +233,7 @@ void WifiNetStatsManager::CheckAndReportSpeedTest(const NetStats& netStats, int6
     } else if (speedSampleCount_ > 0) {
         ReportSpeedTestChr();
         lastAppName_ = curAppName;
-    } else {
+    } else if (highSpeedDuration_ > 0) {
         InitSpeedTestInfo();
     }
     lastLogTime_ = currentTime;

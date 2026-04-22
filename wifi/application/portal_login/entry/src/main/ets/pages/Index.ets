@@ -520,9 +520,9 @@ struct Index {
             hilog.info(DOMAIN, TAG, 'getErrorCode:' + event.error.getErrorCode());
           }
         })
-        .onSslErrorEventReceive((event) => {
+        .onSslErrorEvent((event) => {
           updateOnSslErrorEvent(event.error);
-          hilog.info(DOMAIN, TAG, 'Ssl Error:' + event.error);
+          hilog.info(DOMAIN, TAG, 'SSL Error:' + event.error);
           AlertDialog.show({
             title: $r('app.string.continue_visit'),
             message: $r('app.string.ssl_normal_error_msg'),

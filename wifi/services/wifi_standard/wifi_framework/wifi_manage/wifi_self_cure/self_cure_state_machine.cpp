@@ -2580,13 +2580,12 @@ void SelfCureStateMachine::ReserveRestSelfCureSuccessInfo(std::string &historyIn
         WifiSelfCureHistoryInfo info;
         std::vector<std::string> histories =
             SelfCureUtils::GetInstance().TransStrToVec(historyInfo, '|');
-        for (int i = SELFCURE_FAIL_HISTORY_LENGTH; i < SELFCURE_HISTORY_LENGTH; i++) {
-            if (i == SelfCureHistoryOrder::POS_RESET_SUCCESS_CNT) {
-                info.resetSelfCureSuccessCnt = CheckDataLegal(histories[i]);
-            } else if (i == SelfCureHistoryOrder::POS_RESET_SUCCESS_TS) {
-                info.lastResetSelfCureSuccessTs = CheckDataTolonglong(histories[i]);
-            }
+        if (histories.size() != SELFCURE_HISTORY_LENGTH) {
+            historyInfo = selfCureHistory;
+            return;
         }
+        info.resetSelfCureSuccessCnt = CheckDataLegal(histories[SELFCURE_FAIL_HISTORY_LENGTH]);
+        info.lastResetSelfCureSuccessTs = CheckDataTolonglong(histories[SELFCURE_HISTORY_LENGTH - 1]);
         historyInfo = info.GetSelfCureHistory();
     } else {
         historyInfo = selfCureHistory;

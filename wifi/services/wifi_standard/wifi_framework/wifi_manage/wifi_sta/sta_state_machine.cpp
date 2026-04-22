@@ -1615,6 +1615,10 @@ void StaStateMachine::ApLinkingState::DealWpaLinkAuthTimeoutFailEvent(InternalMe
 #ifndef OHOS_ARCH_LITE
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
         pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
+#ifdef WIFI_DATA_REPORT_ENABLE
+    pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_AUTHENTICATION_FAILURE,
+        pStaStateMachine->targetNetworkId_);
+#endif
 #endif
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTING_TIMEOUT,
         pStaStateMachine->linkedInfo);

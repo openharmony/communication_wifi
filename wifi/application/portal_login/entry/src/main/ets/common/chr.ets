@@ -26,7 +26,7 @@ let initUrl_ = '';
 let finalUrl_ = '';
 let httpErrorCode_ = 0;
 let errorCode_ = 0;
-let sslErrorCode_ = 0;
+let sslErrorCode_ = -1;
 let isUpload_ = false;
 let isPortalSuccess_ = 0;
 

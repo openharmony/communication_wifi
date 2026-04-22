@@ -23,8 +23,8 @@ import { connection } from '@kit.NetworkKit';
 import { call } from '@kit.TelephonyKit';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
-  validateURL, getIsInOOBE, getHmosUAComplexRegex, HarmonyUserAgentSet, StringNumberPair, getRetryList, getDefaultUrl,
-  modifyCode, convertToPermissions, reqPermissionsFromUser
+  validateURL, getIsInOOBE, getHmosUAComplexRegex, StringNumberPair, getRetryList, getDefaultUrl, modifyCode,
+  convertToPermissions, reqPermissionsFromUser, modifyUserAgent, UserAgentCompatibleInfo
 } from '../common/utils';
 import {
   updateFinalUrl, updateOnHttpErrorReceive, updateOnErrorReceive, updateOnSslErrorEvent, updateAboutToDisappear,
@@ -35,6 +35,13 @@ const DOMAIN = 0x01560;
 const TAG = 'Pages';
 const RETRY_CODE = 999;
 const MAX_RETRY = 3;
+
+enum DeviceType {
+  PHONE = 'Phone',
+  TABLET = 'Tablet',
+  PC = 'PC',
+  UNKNOWN = 'Unknown'
+}
 
 @Styles function pressedStyles() {
   .backgroundColor($r('sys.color.ohos_id_color_click_effect'))
@@ -76,6 +83,7 @@ struct Index {
   private context = getContext(this) as common.UIAbilityContext;
   @State private webUrl: string = getUrl();
   private defaultUrl: string = getDefaultUrl();
+  private harmonyUARaw: string = '';
   private harmonyUA: string = UserAgentSet.harmonyUA;
   private mobileUA: string = UserAgentSet.mobileUA;
   private desktopUA:string = UserAgentSet.desktopUA;
@@ -93,7 +101,7 @@ struct Index {
   private isNetBind: boolean = false;
   @State timerCount: number = 10;
   private timerId: number = -1;
-  private isPhone: boolean = false;
+  private deviceType: DeviceType = DeviceType.UNKNOWN;
   @State retryCount: number = 0;
   @State isActionBarVisible: boolean = true;
 
@@ -408,10 +416,18 @@ struct Index {
         })
         .onControllerAttached(() => {
           try {
-            this.harmonyUA = this.webviewController.getUserAgent();
-            this.isPhone = /Phone/i.test(this.harmonyUA);
+            this.harmonyUARaw = this.webviewController.getUserAgent();
+            const match = this.harmonyUARaw.match(/(Phone|Tablet|PC)/i);
+            if (match) {
+              const deviceTypeStr = match[1];
+              this.deviceType = deviceTypeStr === 'Phone' ? DeviceType.PHONE :
+                               deviceTypeStr === 'Tablet' ? DeviceType.TABLET :
+                               deviceTypeStr === 'PC' ? DeviceType.PC : DeviceType.UNKNOWN;
+            }
+            hilog.info(DOMAIN, TAG, 'deviceType:%{public}s', this.deviceType);
+            this.harmonyUA = this.setUA(this.harmonyUARaw);
             this.selectedUA = this.harmonyUA;
-            hilog.info(DOMAIN, TAG, '%{public}s', 'UA isPhone:'  + this.isPhone);
+            this.webviewController.setCustomUserAgent(this.selectedUA);
           } catch (error) {
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed to get UA. Code:${error.code}, message:${error.message}`);
           }
@@ -420,11 +436,12 @@ struct Index {
         .onPageBegin(() => {
           updateFinalUrl(this.webUrl);
           this.loadProgress = 0;
-          if (this.isPhone && this.selectedUA === this.harmonyUA) {
-            this.setUA();
+          if (this.selectedUA === this.harmonyUA) {
+            this.harmonyUA = this.setUA(this.harmonyUARaw);
             this.selectedUA = this.harmonyUA;
             try {
               this.webviewController.setCustomUserAgent(this.selectedUA);
+              hilog.info(DOMAIN, TAG, '%{public}s', 'setCustomUserAgent enter.');
             } catch (error) {
               hilog.error(DOMAIN, TAG, '%{public}s',
                 `onPageBegin Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
@@ -574,16 +591,17 @@ struct Index {
     }
   }
 
-  private setUA():void {
-    hilog.info(DOMAIN, TAG, '%{public}s', 'setUA enter.');
-    this.harmonyUA = HarmonyUserAgentSet.harmonyUACompatible;
-    let pattern:RegExp|undefined = getHmosUAComplexRegex();
-    if (pattern) {
-      if (pattern.test(extractDomain(this.webUrl))){
-        this.harmonyUA = HarmonyUserAgentSet.harmonyUAHmos;
-        hilog.info(DOMAIN, TAG, '%{public}s', 'setUA harmonyUAHmos.');
-      }
+  private setUA(originalUA: string, appendInfo?: string): string {
+    const pattern = getHmosUAComplexRegex();
+    if (pattern && pattern.test(extractDomain(this.webUrl))) {
+      return originalUA;
     }
+    // 根据设备类型自动选择合适的兼容信息
+    const compatibleInfo = appendInfo || 
+      (this.deviceType === DeviceType.PHONE || this.deviceType === DeviceType.TABLET ? UserAgentCompatibleInfo.Android :
+       this.deviceType === DeviceType.PC ? UserAgentCompatibleInfo.Windows : '');
+    
+    return compatibleInfo ? modifyUserAgent(originalUA, compatibleInfo) : originalUA;
   }
 
   private handleHttpError(code:number, url:string) {

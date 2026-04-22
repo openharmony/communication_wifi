@@ -221,12 +221,19 @@ export enum UserAgentSet {
   desktopUA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' +
     'Chrome/114.0.5735.196 Safari/537.36'
 }
- 
-export enum HarmonyUserAgentSet {
-  harmonyUAHmos = 'Mozilla/5.0 (Phone; OpenHarmony 6.0;) AppleWebKit/537.36 (KHTML, like Gecko) ' +
-    'Chrome/132.0.0.0 Safari/537.36 ArkWeb/6.0.0.120 Mobile HuaweiBrowser/5.1.11.312',
-  harmonyUACompatible = 'Mozilla/5.0 (Phone; OpenHarmony 6.0; Android 10.0;) AppleWebKit/537.36 (KHTML, like Gecko) ' +
-    'Chrome/132.0.0.0 Safari/537.36 ArkWeb/6.0.0.120 Mobile HuaweiBrowser/5.1.11.312',
+
+export enum UserAgentCompatibleInfo {
+  Android = 'Android 10.0;',
+  Windows = 'Windows NT 10.0;',
+}
+
+export function modifyUserAgent(originalUA: string, appendInfo: string): string {
+  const pattern = /OpenHarmony\s+\d+\.\d+/;
+  const newUA = originalUA.replace(pattern, (match) => match + '; ' + appendInfo);
+  if (newUA === originalUA) {
+    hilog.warn(DOMAIN, TAG, 'UA pattern not found, appendInfo not added');
+  }
+  return newUA;
 }
 
 export const modifyCode = `Object.defineProperty(navigator, 'platform', { get: () => 'Linux aarch64' });`;

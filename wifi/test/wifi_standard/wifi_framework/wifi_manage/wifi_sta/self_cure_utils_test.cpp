@@ -166,7 +166,7 @@ HWTEST_F(SelfCureUtilsTest, IsResetSelfCureFrequentTest001, TestSize.Level1)
     auto now = std::chrono::system_clock::now();
     int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     historyInfo.lastResetSelfCureSuccessTs = currentMs - DELAYED_TEN_MIN * 2;
-    bool result = SelfCureUtils::IsResetSelfCureFrequent(historyInfo, currentMs);
+    bool result = SelfCureUtils::GetInstance().IsResetSelfCureFrequent(historyInfo, currentMs);
     EXPECT_FALSE(result);
 }
 
@@ -177,15 +177,16 @@ HWTEST_F(SelfCureUtilsTest, IsResetSelfCureFrequentTest002, TestSize.Level1)
     auto now = std::chrono::system_clock::now();
     int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     historyInfo.lastResetSelfCureSuccessTs = currentMs - 100;
-    bool result = SelfCureUtils::IsResetSelfCureFrequent(historyInfo, currentMs);
+    bool result = SelfCureUtils::GetInstance().IsResetSelfCureFrequent(historyInfo, currentMs);
     EXPECT_TRUE(result);
 }
 
 HWTEST_F(SelfCureUtilsTest, IsResetSelfCureFrequentTest003, TestSize.Level1)
 {
     WifiSelfCureHistoryInfo historyInfo;
+    auto now = std::chrono::system_clock::now();
     int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-    bool result = SelfCureUtils::IsResetSelfCureFrequent(historyInfo, currentMs);
+    bool result = SelfCureUtils::GetInstance().IsResetSelfCureFrequent(historyInfo, currentMs);
     EXPECT_FALSE(result);
 }
 }

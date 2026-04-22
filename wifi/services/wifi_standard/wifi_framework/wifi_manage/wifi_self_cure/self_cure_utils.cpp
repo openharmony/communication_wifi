@@ -500,7 +500,7 @@ int SelfCureUtils::SetSelfCureFailInfo(WifiSelfCureHistoryInfo &info,
 int SelfCureUtils::SetResetSelfCureSuccInfo(WifiSelfCureHistoryInfo &info,
                                             std::vector<std::string>& histories, int cnt)
 {
-    if (hhistories.size() != SELFCURE_HISTORY_LENGTH || cnt != SELFCURE_FAIL_HISTORY_LENGTH) {
+    if (histories.size() != SELFCURE_HISTORY_LENGTH || cnt != SELFCURE_FAIL_HISTORY_LENGTH) {
         WIFI_LOGE("SetSelfCureSuccInfo return");
         return -1;
     }

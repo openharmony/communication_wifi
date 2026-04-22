@@ -518,7 +518,7 @@ int SelfCureUtils::SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info,
         return -1;
     }
     // 8 to 13 is history subscript, which record the selfcure connect failed info, covert array to calss member
-    for (int i = cnt; i < SELFCURE_HISTORY_LENGTH; i++) {
+    for (int i = cnt; i < SELFCURE_FAIL_HISTORY_LENGTH ; i++) {
         if (i == POS_REASSOC_CONNECT_FAILED_CNT) {
             info.reassocSelfCureConnectFailedCnt = CheckDataLegal(histories[i]);
         } else if (i == POS_REASSOC_CONNECT_FAILED_TS) {

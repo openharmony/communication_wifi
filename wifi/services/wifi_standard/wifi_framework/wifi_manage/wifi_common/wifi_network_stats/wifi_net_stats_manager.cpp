@@ -214,7 +214,7 @@ void WifiNetStatsManager::CheckAndReportSpeedTest(const NetStats& netStats, int6
     int64_t rxSpeedMbps = (netStats[0].rxBytes_ * BYTE_TO_BITE * MS_TO_SECOND) / (timeInterval * BYTE_TO_MBYTE);
     int64_t txSpeedMbps = (netStats[0].txBytes_ * BYTE_TO_BITE * MS_TO_SECOND) / (timeInterval * BYTE_TO_MBYTE);
     std::string curAppName = GetBundleName(netStats[0].uid_);
-    if (lastAppName_ != curAppName && speedSampleCount_ > 0) {
+    if (lastAppName_ != curAppName && speedSampleCount_ > 1) {
         ReportSpeedTestChr();
         lastAppName_ = curAppName;
     }
@@ -229,7 +229,7 @@ void WifiNetStatsManager::CheckAndReportSpeedTest(const NetStats& netStats, int6
         if (highSpeedDuration_ >= HIGH_SPEED_DURATION_THRESHOLD) {
             speedSampleCount_++;
         }
-    } else if (speedSampleCount_ > 0) {
+    } else if (speedSampleCount_ > 1) {
         ReportSpeedTestChr();
         lastAppName_ = curAppName;
     } else if (highSpeedDuration_ > 0) {

@@ -714,7 +714,7 @@ void EnhanceWriteSpeedTestHiSysEvent(const WifiSpeedTestStatisticInfo &speedTest
         WIFI_LOGE("WIFI_SPEEDTEST_EVENT report failed");
         WriteSpeedTestHiSysEvent(speedTestinfo);
     }
-    free(jsonStr);
+    cJSON_free(jsonStr);
     cJSON_Delete(root);
 }
 }  // namespace Wifi

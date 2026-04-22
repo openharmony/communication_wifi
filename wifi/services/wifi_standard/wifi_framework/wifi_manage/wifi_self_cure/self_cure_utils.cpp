@@ -340,7 +340,7 @@ static bool DealRandMacReassoc(const WifiSelfCureHistoryInfo &historyInfo, int r
     return false;
 }
 
-static bool IsResetSelfCureFrequent(WifiSelfCureHistoryInfo &historyInfo, int64_t currentMs)
+bool SelfCureUtils::IsResetSelfCureFrequent(WifiSelfCureHistoryInfo &historyInfo, int64_t currentMs)
 {
     if ((historyInfo.resetSelfCureSuccessCnt >= 1) &&
         ((currentMs - historyInfo.lastResetSelfCureSuccessTs) < DELAYED_TEN_MIN)) {

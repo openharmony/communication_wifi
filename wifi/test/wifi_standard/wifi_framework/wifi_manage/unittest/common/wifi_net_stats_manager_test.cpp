@@ -192,9 +192,9 @@ HWTEST_F(WifiNetStatsManagerTest, InitSpeedTestInfo_ResetsAllSpeedTestVariables,
     WifiNetStatsManager::GetInstance().avgRxSpeed_ = 50;
     WifiNetStatsManager::GetInstance().avgTxSpeed_ = 60;
     WifiNetStatsManager::GetInstance().speedSampleCount_ = 5;
- 
+
     WifiNetStatsManager::GetInstance().InitSpeedTestInfo();
- 
+
     EXPECT_EQ(WifiNetStatsManager::GetInstance().maxRxSpeed_, 0);
     EXPECT_EQ(WifiNetStatsManager::GetInstance().maxTxSpeed_, 0);
     EXPECT_EQ(WifiNetStatsManager::GetInstance().totalRxBytes_, 0);
@@ -204,7 +204,7 @@ HWTEST_F(WifiNetStatsManagerTest, InitSpeedTestInfo_ResetsAllSpeedTestVariables,
     EXPECT_EQ(WifiNetStatsManager::GetInstance().avgTxSpeed_, 0);
     EXPECT_EQ(WifiNetStatsManager::GetInstance().speedSampleCount_, 0);
 }
- 
+
 HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_NegativeTimeInterval_UpdatesTimeOnly, TestSize.Level1)
 {
     WIFI_LOGI("CheckAndReportSpeedTest_NegativeTimeInterval_UpdatesTimeOnly enter!");
@@ -214,14 +214,14 @@ HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_NegativeTimeInterval_U
     netStatsInfo.rxBytes_ = 100;
     netStatsInfo.txBytes_ = 200;
     netStats.push_back(netStatsInfo);
- 
+
     WifiNetStatsManager::GetInstance().lastLogTime_ = 1000;
- 
+
     WifiNetStatsManager::GetInstance().CheckAndReportSpeedTest(netStats);
- 
+
     EXPECT_EQ(WifiNetStatsManager::GetInstance().highSpeedDuration_, 0);
 }
- 
+
 HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_HighSpeed_AccumulatesStats, TestSize.Level1)
 {
     WIFI_LOGI("CheckAndReportSpeedTest_HighSpeed_AccumulatesStats enter!");
@@ -231,20 +231,19 @@ HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_HighSpeed_AccumulatesS
     netStatsInfo.rxBytes_ = 100 * 1024 * 1024;
     netStatsInfo.txBytes_ = 5 * 1024 * 1024;
     netStats.push_back(netStatsInfo);
- 
+
     WifiNetStatsManager::GetInstance().lastLogTime_ = 0;
     WifiNetStatsManager::GetInstance().lastAppName_ = "app1";
     WifiNetStatsManager::GetInstance().maxRxSpeed_ = 0;
     WifiNetStatsManager::GetInstance().maxTxSpeed_ = 0;
     WifiNetStatsManager::GetInstance().highSpeedDuration_ = 0;
- 
 
     WifiNetStatsManager::GetInstance().CheckAndReportSpeedTest(netStats);
- 
+
     EXPECT_EQ(WifiNetStatsManager::GetInstance().lastAppName_, "app1");
     EXPECT_EQ(WifiNetStatsManager::GetInstance().highSpeedDuration_, 0);
 }
- 
+
 HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_LowSpeed_BelowThreshold, TestSize.Level1)
 {
     WIFI_LOGI("CheckAndReportSpeedTest_LowSpeed_BelowThreshold enter!");
@@ -254,18 +253,17 @@ HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_LowSpeed_BelowThreshol
     netStatsInfo.rxBytes_ = 100;
     netStatsInfo.txBytes_ = 100;
     netStats.push_back(netStatsInfo);
- 
+
     WifiNetStatsManager::GetInstance().lastLogTime_ = 0;
     WifiNetStatsManager::GetInstance().lastAppName_ = "testApp";
     WifiNetStatsManager::GetInstance().speedSampleCount_ = 0;
- 
 
     WifiNetStatsManager::GetInstance().CheckAndReportSpeedTest(netStats);
- 
+
     EXPECT_EQ(WifiNetStatsManager::GetInstance().speedSampleCount_, 0);
     EXPECT_EQ(WifiNetStatsManager::GetInstance().highSpeedDuration_, 0);
 }
- 
+
 HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_AppChanged_ReportsSpeedTest, TestSize.Level1)
 {
     WIFI_LOGI("CheckAndReportSpeedTest_AppChanged_ReportsSpeedTest enter!");
@@ -284,7 +282,7 @@ HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_AppChanged_ReportsSpee
  
     EXPECT_EQ(WifiNetStatsManager::GetInstance().lastAppName_, "oldApp");
 }
- 
+
 HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_ExceedsDurationThreshold_IncrementsSampleCount,
     TestSize.Level1)
 {
@@ -295,16 +293,16 @@ HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_ExceedsDurationThresho
     netStatsInfo.rxBytes_ = 100 * 1024 * 1024;
     netStatsInfo.txBytes_ = 100 * 1024 * 1024;
     netStats.push_back(netStatsInfo);
- 
+
     WifiNetStatsManager::GetInstance().lastLogTime_ = 0;
     WifiNetStatsManager::GetInstance().highSpeedDuration_ = 5000;
     WifiNetStatsManager::GetInstance().speedSampleCount_ = 0;
- 
+
     WifiNetStatsManager::GetInstance().CheckAndReportSpeedTest(netStats);
- 
+
     EXPECT_EQ(WifiNetStatsManager::GetInstance().speedSampleCount_, 0);
 }
- 
+
 HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_LowSpeedAfterHighSpeed_ReportsCHR, TestSize.Level1)
 {
     WIFI_LOGI("CheckAndReportSpeedTest_LowSpeedAfterHighSpeed_ReportsCHR enter!");
@@ -314,18 +312,17 @@ HWTEST_F(WifiNetStatsManagerTest, CheckAndReportSpeedTest_LowSpeedAfterHighSpeed
     netStatsInfo.rxBytes_ = 100;
     netStatsInfo.txBytes_ = 100;
     netStats.push_back(netStatsInfo);
- 
+
     WifiNetStatsManager::GetInstance().lastLogTime_ = 0;
     WifiNetStatsManager::GetInstance().speedSampleCount_ = 5;
     WifiNetStatsManager::GetInstance().maxRxSpeed_ = 50;
     WifiNetStatsManager::GetInstance().maxTxSpeed_ = 60;
- 
 
     WifiNetStatsManager::GetInstance().CheckAndReportSpeedTest(netStats);
- 
+
     EXPECT_EQ(WifiNetStatsManager::GetInstance().speedSampleCount_, 5);
 }
- 
+
 HWTEST_F(WifiNetStatsManagerTest, ReportSpeedTestChr_CalculatesAverageSpeed_AndReportsEvent, TestSize.Level1)
 {
     WIFI_LOGI("ReportSpeedTestChr_CalculatesAverageSpeed_AndReportsEvent enter!");
@@ -337,16 +334,16 @@ HWTEST_F(WifiNetStatsManagerTest, ReportSpeedTestChr_CalculatesAverageSpeed_AndR
     WifiNetStatsManager::GetInstance().highSpeedDuration_ = 5000;
     WifiNetStatsManager::GetInstance().avgRxSpeed_ = 0;
     WifiNetStatsManager::GetInstance().avgTxSpeed_ = 0;
- 
+
     WifiNetStatsManager::GetInstance().ReportSpeedTestChr();
- 
+
     EXPECT_EQ(WifiNetStatsManager::GetInstance().avgRxSpeed_, 0);
     EXPECT_EQ(WifiNetStatsManager::GetInstance().avgTxSpeed_, 0);
     EXPECT_EQ(WifiNetStatsManager::GetInstance().maxRxSpeed_, 0);
     EXPECT_EQ(WifiNetStatsManager::GetInstance().maxTxSpeed_, 0);
     EXPECT_EQ(WifiNetStatsManager::GetInstance().highSpeedDuration_, 0);
 }
- 
+
 HWTEST_F(WifiNetStatsManagerTest, ReportSpeedTestChr_ZeroDuration_HandlesDivisionByZero, TestSize.Level1)
 {
     WIFI_LOGI("ReportSpeedTestChr_ZeroDuration_HandlesDivisionByZero enter!");
@@ -356,13 +353,13 @@ HWTEST_F(WifiNetStatsManagerTest, ReportSpeedTestChr_ZeroDuration_HandlesDivisio
     WifiNetStatsManager::GetInstance().totalRxBytes_ = 1000;
     WifiNetStatsManager::GetInstance().totalTxBytes_ = 2000;
     WifiNetStatsManager::GetInstance().highSpeedDuration_ = 0;
- 
+
     WifiNetStatsManager::GetInstance().ReportSpeedTestChr();
- 
+
     EXPECT_EQ(WifiNetStatsManager::GetInstance().avgRxSpeed_, 0);
     EXPECT_EQ(WifiNetStatsManager::GetInstance().avgTxSpeed_, 0);
 }
- 
+
 HWTEST_F(WifiNetStatsManagerTest, LogNetStatsTraffic_WithSpeedTest_CallsCheckAndReport, TestSize.Level1)
 {
     WIFI_LOGI("LogNetStatsTraffic_WithSpeedTest_CallsCheckAndReport enter!");
@@ -374,12 +371,12 @@ HWTEST_F(WifiNetStatsManagerTest, LogNetStatsTraffic_WithSpeedTest_CallsCheckAnd
     netStatsInfo.rxPackets_ = 1;
     netStatsInfo.txPackets_ = 2;
     netStats.push_back(netStatsInfo);
- 
+
     WifiNetStatsManager::GetInstance().m_lastStatsMap = {};
     WifiNetStatsManager::GetInstance().lastLogTime_ = 0;
- 
+
     WifiNetStatsManager::GetInstance().LogNetStatsTraffic(netStats);
- 
+
     EXPECT_EQ(WifiNetStatsManager::GetInstance().lastLogTime_, 0);
 }
 }  // namespace Wifi

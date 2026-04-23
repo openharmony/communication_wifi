@@ -5069,6 +5069,18 @@ void StaStateMachine::DealMloLinkSignalPollResult()
         WIFI_LOGE("%{public}s get mlo linkInfo fail", __FUNCTION__);
         return;
     }
+    UpdateMloLinkedInfoWithSignal(mloLinkedInfo, mloSignalInfo);
+    WifiConfigCenter::GetInstance().SaveMloLinkedInfo(mloLinkedInfo, m_instId);
+#ifndef OHOS_ARCH_LITE
+    if (enhanceService_ != nullptr) {
+        enhanceService_->NotifyMloSignalPollInfo(mloSignalInfo);
+    }
+#endif
+}
+
+void StaStateMachine::UpdateMloLinkedInfoWithSignal(
+    std::vector<WifiLinkedInfo>& mloLinkedInfo, const std::vector<WifiSignalPollInfo>& mloSignalInfo)
+{
     for (auto &linkInfo : mloLinkedInfo) {
         bool isLinkedMatch = false;
         for (auto signalInfo : mloSignalInfo) {
@@ -5079,7 +5091,8 @@ void StaStateMachine::DealMloLinkSignalPollResult()
             int rssi = UpdateLinkInfoRssi(signalInfo.signal);
             WIFI_LOGI("MloSignalPollResult ssid:%{public}s, bssid:%{public}s, linkId:%{public}d, rssi: %{public}d,"
                 "fre: %{public}d, txSpeed: %{public}d, rxSpeed: %{public}d, deltaTxPackets: %{public}d, deltaRxPackets:"
-                "%{public}d, noise: %{public}d, snr: %{public}d, chload: %{public}d, ulDelay: %{public}d, chloadSelf: %{public}d",
+                "%{public}d, noise: %{public}d, snr: %{public}d, chload: %{public}d, ulDelay: %{public}d,"
+                "chloadSelf: %{public}d",
                 SsidAnonymize(linkedInfo.ssid).c_str(), MacAnonymize(linkInfo.bssid).c_str(),
                 linkInfo.linkId, rssi, signalInfo.frequency, signalInfo.txrate, signalInfo.rxrate,
                 signalInfo.txPackets - linkInfo.lastTxPackets, signalInfo.rxPackets - linkInfo.lastRxPackets,
@@ -5100,12 +5113,6 @@ void StaStateMachine::DealMloLinkSignalPollResult()
             return;
         }
     }
-    WifiConfigCenter::GetInstance().SaveMloLinkedInfo(mloLinkedInfo, m_instId);
-#ifndef OHOS_ARCH_LITE
-    if (enhanceService_ != nullptr) {
-        enhanceService_->NotifyMloSignalPollInfo(mloSignalInfo);
-    }
-#endif
 }
 
 void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)

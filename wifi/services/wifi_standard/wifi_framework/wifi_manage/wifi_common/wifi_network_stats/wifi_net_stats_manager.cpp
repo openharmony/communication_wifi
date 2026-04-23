@@ -195,7 +195,7 @@ void WifiNetStatsManager::LogNetStatsTraffic(NetStats netStats)
     }
     WIFI_LOGI("%{public}s", allTrafficLog.c_str());
 
-    CheckAndReportSpeedTest(netStats, currentTime);
+    CheckAndReportSpeedTest(netStats);
 }
 
 void WifiNetStatsManager::CheckAndReportSpeedTest(const NetStats& netStats)
@@ -224,7 +224,7 @@ void WifiNetStatsManager::CheckAndReportSpeedTest(const NetStats& netStats)
         ReportSpeedTestChr();
         lastAppName_ = curAppName;
     }
- 
+
     if (rxSpeedMbps > SPEED_THRESHOLD_MBPS || txSpeedMbps > SPEED_THRESHOLD_MBPS) {
         lastAppName_ = curAppName;
         maxRxSpeed_ = (rxSpeedMbps > maxRxSpeed_) ? rxSpeedMbps : maxRxSpeed_;
@@ -261,6 +261,7 @@ void WifiNetStatsManager::ReportSpeedTestChr()
     WIFI_LOGI("ReportSpeedTestChr %{public}s", lastAppName_.c_str());
     avgRxSpeed_ = (highSpeedDuration_ > 0) ? (totalRxBytes_ / highSpeedDuration_ / BYTE_TO_MBYTE) * BYTE_TO_BIT : 0;
     avgTxSpeed_ = (highSpeedDuration_ > 0) ? (totalTxBytes_ / highSpeedDuration_ / BYTE_TO_MBYTE) * BYTE_TO_BIT : 0;
+
     WifiSpeedTestStatisticInfo speedTestInfo;
     speedTestInfo.appName = lastAppName_;
     speedTestInfo.rxMaxSpeed = maxRxSpeed_;

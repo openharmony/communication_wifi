@@ -69,6 +69,48 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"website_permission_never_allowed",
+            "value":"Denegar",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_content",
+            "value":"El sitio al que estás a punto de acceder puede contener contenido inapropiado o prohibido. Procede con precaución.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_title",
+            "value":"Contenido nocivo a continuación",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"camera_permission_message",
+            "value":"¿Permitir que %s use la cámara?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"permission_reason_camera",
+            "value":"Se utiliza para hacer fotos y vídeos.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"website_permission_allowed",
+            "value":"Permitir",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

@@ -69,6 +69,48 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"website_permission_never_allowed",
+            "value":"ငြင်းပယ်ရန်",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_content",
+            "value":"ဝင်ရောက်မည့် ဝက်ဘ်ဆိုက်တွင် မသင့်လျော်သော သို့မဟုတ် တားမြစ်ထားသော အကြောင်းအရာ ပါဝင်နိုင်ပါသည်။ သတိဖြင့် ဆောင်ရွက်ပါ။",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_title",
+            "value":"အန္တရာယ်ဖြစ်စေနိုင်သော အကြောင်းအရာ ရှိနေသည်",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"camera_permission_message",
+            "value":"%s ကို ကင်မရာ သုံးစွဲခွင့်ပြုမည်လား။",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"permission_reason_camera",
+            "value":"ဓာတ်ပုံများနှင့် ဗီဒီယိုများ ရိုက်ယူရန်အတွက် ဤသည်ကို သုံးပါသည်။",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"website_permission_allowed",
+            "value":"ခွင့်ပြုရန်",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

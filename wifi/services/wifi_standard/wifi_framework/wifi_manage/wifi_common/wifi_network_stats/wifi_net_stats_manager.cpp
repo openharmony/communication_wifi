@@ -34,10 +34,10 @@ const int32_t MAX_LOG_TRAFFIC = 10;
 const int64_t NET_STATS_POLL_INTERVAL = 5 * 1000;
 const int64_t NET_STATS_DELAY_TIME = 2 * 1000;
 const int64_t BYTE_TO_MBYTE = 1024 * 1024;
-const int64_t BYTE_TO_BITE = 8;
+const int64_t BYTE_TO_BIT = 8;
 const int64_t MS_TO_SECOND = 1000;
-const int64_t SPEED_THRESHOLD = 160;
-const int64_t HIGH_SPEED_DURATION_THRESHOLD = 10 * 1000;
+const int64_t SPEED_THRESHOLD_MBPS = 160;
+const int64_t HIGH_SPEED_DURATION_THRESHOLD = 10;
 const std::string WIFI_SPEEDTEST_EVENT = "WIFI_SPEEDTEST_EVENT";
 
 void WifiNetStatsManager::StartNetStats()
@@ -194,42 +194,48 @@ void WifiNetStatsManager::LogNetStatsTraffic(NetStats netStats)
         }
     }
     WIFI_LOGI("%{public}s", allTrafficLog.c_str());
+
+    CheckAndReportSpeedTest(netStats, currentTime);
+}
+
+void WifiNetStatsManager::CheckAndReportSpeedTest(const NetStats& netStats)
+{
+    if (netStats.size() == 0 || lastLogTime_ == 0) {
+        WIFI_LOGE("netStats is null");
+        return;
+    }
     auto timeServiceClient = MiscServices::TimeServiceClient::GetInstance();
     if (timeServiceClient == nullptr) {
         WIFI_LOGE("Get TimeServiceClient instance is null");
         return;
     }
     int64_t currentTime = timeServiceClient->GetBootTimeMs();
-    CheckAndReportSpeedTest(netStats, currentTime);
-}
-
-void WifiNetStatsManager::CheckAndReportSpeedTest(const NetStats& netStats, int64_t currentTime)
-{
-    int64_t timeInterval = currentTime - lastLogTime_;
+    int64_t timeInterval = (currentTime - lastLogTime_) / MS_TO_SECOND;
     if (timeInterval <= 0) {
         lastLogTime_ = currentTime;
         lastAppName_ = GetBundleName(netStats[0].uid_);
         return;
     }
-    int64_t rxSpeedMbps = (netStats[0].rxBytes_ * BYTE_TO_BITE * MS_TO_SECOND) / (timeInterval * BYTE_TO_MBYTE);
-    int64_t txSpeedMbps = (netStats[0].txBytes_ * BYTE_TO_BITE * MS_TO_SECOND) / (timeInterval * BYTE_TO_MBYTE);
+
+    int64_t rxSpeedMbps = (netStats[0].rxBytes_ / timeInterval / BYTE_TO_MBYTE) * BYTE_TO_BIT;
+    int64_t txSpeedMbps = (netStats[0].txBytes_ / timeInterval / BYTE_TO_MBYTE) * BYTE_TO_BIT;
     std::string curAppName = GetBundleName(netStats[0].uid_);
-    if (lastAppName_ != curAppName && speedSampleCount_ > 1) {
+    if (lastAppName_ != curAppName && speedSampleCount_ > 0) {
         ReportSpeedTestChr();
         lastAppName_ = curAppName;
     }
  
-    if (rxSpeedMbps > SPEED_THRESHOLD || txSpeedMbps > SPEED_THRESHOLD) {
+    if (rxSpeedMbps > SPEED_THRESHOLD_MBPS || txSpeedMbps > SPEED_THRESHOLD_MBPS) {
         lastAppName_ = curAppName;
         maxRxSpeed_ = (rxSpeedMbps > maxRxSpeed_) ? rxSpeedMbps : maxRxSpeed_;
         maxTxSpeed_ = (txSpeedMbps > maxTxSpeed_) ? txSpeedMbps : maxTxSpeed_;
         totalRxBytes_ += netStats[0].rxBytes_;
         totalTxBytes_ += netStats[0].txBytes_;
-        highSpeedDuration_ += currentTime - lastLogTime_;
+        highSpeedDuration_ += (currentTime - lastLogTime_) / MS_TO_SECOND;
         if (highSpeedDuration_ >= HIGH_SPEED_DURATION_THRESHOLD) {
             speedSampleCount_++;
         }
-    } else if (speedSampleCount_ > 1) {
+    } else if (speedSampleCount_ > 0) {
         ReportSpeedTestChr();
         lastAppName_ = curAppName;
     } else if (highSpeedDuration_ > 0) {
@@ -253,17 +259,15 @@ void WifiNetStatsManager::InitSpeedTestInfo()
 void WifiNetStatsManager::ReportSpeedTestChr()
 {
     WIFI_LOGI("ReportSpeedTestChr %{public}s", lastAppName_.c_str());
-    avgRxSpeed_ = (highSpeedDuration_ > 0) ?
-        (totalRxBytes_ * BYTE_TO_BITE * MS_TO_SECOND / highSpeedDuration_) / BYTE_TO_MBYTE : 0;
-    avgTxSpeed_ = (highSpeedDuration_ > 0) ?
-        (totalTxBytes_ * BYTE_TO_BITE * MS_TO_SECOND / highSpeedDuration_) / BYTE_TO_MBYTE : 0;
+    avgRxSpeed_ = (highSpeedDuration_ > 0) ? (totalRxBytes_ / highSpeedDuration_ / BYTE_TO_MBYTE) * BYTE_TO_BIT : 0;
+    avgTxSpeed_ = (highSpeedDuration_ > 0) ? (totalTxBytes_ / highSpeedDuration_ / BYTE_TO_MBYTE) * BYTE_TO_BIT : 0;
     WifiSpeedTestStatisticInfo speedTestInfo;
     speedTestInfo.appName = lastAppName_;
     speedTestInfo.rxMaxSpeed = maxRxSpeed_;
     speedTestInfo.txMaxSpeed = maxTxSpeed_;
     speedTestInfo.rxAvgSpeed = avgRxSpeed_;
     speedTestInfo.txAvgSpeed = avgTxSpeed_;
-    speedTestInfo.highSpeedDuration = highSpeedDuration_ / MS_TO_SECOND;
+    speedTestInfo.highSpeedDuration = highSpeedDuration_;
     EnhanceWriteSpeedTestHiSysEvent(speedTestInfo);
     InitSpeedTestInfo();
 }

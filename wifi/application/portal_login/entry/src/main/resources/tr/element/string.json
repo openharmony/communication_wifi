@@ -69,6 +69,48 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"website_permission_never_allowed",
+            "value":"Reddet",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_content",
+            "value":"Açılacak olan site uygunsuz veya yasaklanmış içerikler barındırıyor olabilir. Dikkatli olun.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_title",
+            "value":"Devamında zararlı içerik var",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"camera_permission_message",
+            "value":"%s sitesinin kamerayı kullanmasına izin verilsin mi?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"permission_reason_camera",
+            "value":"Bu izin, fotoğraf ve video çekmek için kullanılır.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"website_permission_allowed",
+            "value":"İzin ver",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

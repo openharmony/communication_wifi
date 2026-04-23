@@ -69,6 +69,48 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"website_permission_never_allowed",
+            "value":"མི་ཆོག",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_content",
+            "value":"ཁྱེད་ཀྱིས་ལྟ་སྤྱོད་བྱ་རྒྱུའི་དྲ་ངོས་ལ་ནང་དོན་མི་ལེགས་པའམ་སྒྲིག་འགལ་ནང་དོན་ཡོད་པ་འདྲ། ལྟ་སྤྱོད་བྱེད་སྐབས་ཡིད་གཟབ་གནང་རོགས།",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_title",
+            "value":"དྲ་ངོས་འདིར་ཉེན་ཁའི་ནང་དོན་ཡོད་པ་འདྲ།",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"camera_permission_message",
+            "value":"༼%s༽ཡིས་ཁྱེད་ཀྱི་པར་ཆས་ལ་ལྟ་སྤྱོད་བྱ་ཆོག་པར་བྱེད་དམ།",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"permission_reason_camera",
+            "value":"པར་ལེན་དང་བརྙན་ཕབ་རྩོལ་ནུས་མཁོ་འདོན་བྱེད་པར་བཀོལ་བ།",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"website_permission_allowed",
+            "value":"ཆོག་པ།",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

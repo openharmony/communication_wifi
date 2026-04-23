@@ -69,6 +69,48 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"website_permission_never_allowed",
+            "value":"ปฏิเสธ",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_content",
+            "value":"ไซต์ข้างหน้าอาจมีเนื้อหาที่ไม่เหมาะสมหรือต้องห้าม ดำเนินการด้วยความระมัดระวัง",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_title",
+            "value":"มีเนื้อหาที่อาจเป็นอันตราย",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"camera_permission_message",
+            "value":"อนุญาตให้ %s ใช้กล้องถ่ายรูปหรือไม่",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"permission_reason_camera",
+            "value":"ใช้เพื่อทำการถ่ายภาพและวิดีโอ",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"website_permission_allowed",
+            "value":"อนุญาต",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

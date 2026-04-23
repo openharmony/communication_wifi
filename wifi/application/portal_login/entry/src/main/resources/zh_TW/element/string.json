@@ -69,6 +69,48 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"website_permission_never_allowed",
+            "value":"不允許",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_content",
+            "value":"您存取的網頁疑似含有不良/違規內容，請謹慎存取。",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_title",
+            "value":"此網頁疑似含有風險內容",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"camera_permission_message",
+            "value":"允許「%s」存取您的相機？",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"permission_reason_camera",
+            "value":"用於提供拍照和錄影功能。",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"website_permission_allowed",
+            "value":"允許",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

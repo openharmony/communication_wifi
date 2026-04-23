@@ -24,7 +24,6 @@
 #include "net_stats_info.h"
 #include "wifi_hisysevent.h"
 #include <mutex>
-#include <cstdint>
 
 namespace OHOS {
 namespace Wifi {
@@ -62,7 +61,7 @@ private:
     int64_t avgTxSpeed_ {0};
     int32_t speedSampleCount_ {0};
 
-    void CheckAndReportSpeedTest(const NetStats& netStats, int64_t currentTime);
+    void CheckAndReportSpeedTest(const NetStats& netStats);
     void InitSpeedTestInfo();
     void ReportSpeedTestChr();
 };

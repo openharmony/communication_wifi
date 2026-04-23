@@ -5047,7 +5047,7 @@ void StaStateMachine::DealMloLinkSignalPollResult()
         WIFI_LOGD("%{public}s current linkType is not EMLSR", __FUNCTION__);
         return;
     }
-    std::vector<WifiMloSignalInfo> mloSignalInfo;
+    std::vector<WifiSignalPollInfo> mloSignalInfo;
     std::string ifName = WifiConfigCenter::GetInstance().GetStaIfaceName(m_instId);
     if (WifiStaHalInterface::GetInstance().GetConnectionMloSignalInfo(ifName, mloSignalInfo) != WIFI_HAL_OPT_OK ||
         mloSignalInfo.size() != WIFI_MAX_MLO_LINK_NUM) {
@@ -5058,6 +5058,18 @@ void StaStateMachine::DealMloLinkSignalPollResult()
         WIFI_LOGE("%{public}s get mlo linkInfo fail", __FUNCTION__);
         return;
     }
+    UpdateMloLinkedInfoWithSignal(mloLinkedInfo, mloSignalInfo);
+    WifiConfigCenter::GetInstance().SaveMloLinkedInfo(mloLinkedInfo, m_instId);
+#ifndef OHOS_ARCH_LITE
+    if (enhanceService_ != nullptr) {
+        enhanceService_->NotifyMloSignalPollInfo(mloSignalInfo);
+    }
+#endif
+}
+
+void StaStateMachine::UpdateMloLinkedInfoWithSignal(
+    std::vector<WifiLinkedInfo>& mloLinkedInfo, const std::vector<WifiSignalPollInfo>& mloSignalInfo)
+{
     for (auto &linkInfo : mloLinkedInfo) {
         bool isLinkedMatch = false;
         for (auto signalInfo : mloSignalInfo) {
@@ -5065,27 +5077,31 @@ void StaStateMachine::DealMloLinkSignalPollResult()
                 continue;
             }
             isLinkedMatch = true;
-            int rssi = UpdateLinkInfoRssi(signalInfo.rssi);
+            int rssi = UpdateLinkInfoRssi(signalInfo.signal);
             WIFI_LOGI("MloSignalPollResult ssid:%{public}s, bssid:%{public}s, linkId:%{public}d, rssi: %{public}d,"
                 "fre: %{public}d, txSpeed: %{public}d, rxSpeed: %{public}d, deltaTxPackets: %{public}d, deltaRxPackets:"
-                "%{public}d", SsidAnonymize(linkedInfo.ssid).c_str(), MacAnonymize(linkInfo.bssid).c_str(),
-                linkInfo.linkId, rssi, signalInfo.frequency, signalInfo.txLinkSpeed, signalInfo.rxLinkSpeed,
-                signalInfo.txPackets - linkInfo.lastTxPackets, signalInfo.rxPackets - linkInfo.lastRxPackets);
+                "%{public}d, noise: %{public}d, snr: %{public}d, chload: %{public}d, ulDelay: %{public}d,"
+                "chloadSelf: %{public}d",
+                SsidAnonymize(linkedInfo.ssid).c_str(), MacAnonymize(linkInfo.bssid).c_str(),
+                linkInfo.linkId, rssi, signalInfo.frequency, signalInfo.txrate, signalInfo.rxrate,
+                signalInfo.txPackets - linkInfo.lastTxPackets, signalInfo.rxPackets - linkInfo.lastRxPackets,
+                signalInfo.noise, signalInfo.snr, signalInfo.chload, signalInfo.ulDelay, signalInfo.chloadSelf);
 
             linkInfo.rssi = rssi;
             linkInfo.frequency = signalInfo.frequency;
-            linkInfo.linkSpeed = signalInfo.txLinkSpeed;
-            linkInfo.txLinkSpeed = signalInfo.txLinkSpeed;
-            linkInfo.rxLinkSpeed = signalInfo.rxLinkSpeed;
+            linkInfo.linkSpeed = signalInfo.txrate;
+            linkInfo.txLinkSpeed = signalInfo.txrate;
+            linkInfo.rxLinkSpeed = signalInfo.rxrate;
             linkInfo.lastTxPackets = signalInfo.txPackets;
             linkInfo.lastRxPackets = signalInfo.rxPackets;
+            linkInfo.snr = signalInfo.snr;
+            linkInfo.chload = signalInfo.chload;
         }
         if (!isLinkedMatch) {
             WIFI_LOGE("%{public}s linkId:%{public}d not match", __FUNCTION__, linkInfo.linkId);
             return;
         }
     }
-    WifiConfigCenter::GetInstance().SaveMloLinkedInfo(mloLinkedInfo, m_instId);
 }
 
 void StaStateMachine::JudgeEnableSignalPoll(WifiSignalPollInfo &signalInfo)

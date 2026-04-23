@@ -868,7 +868,7 @@ public:
      */
     WifiErrorNo GetMloLinkedInfo(const std::string &ifName, std::vector<WifiLinkedInfo> &mloLinkInfo);
 
-    WifiErrorNo GetMloSignalPollInfo(const std::string &ifName, std::vector<WifiMloSignalInfo> &mloSignalInfo);
+    WifiErrorNo GetMloSignalPollInfo(const std::string &ifName, std::vector<WifiSignalPollInfo> &mloSignalInfo);
 
     WifiErrorNo P2pReject(const std::string &mac);
 
@@ -893,7 +893,7 @@ private:
     bool WriteConfigToFile(const std::string &fileContext);
     WifiErrorNo HandleMloLinkData(char *staData, uint32_t staDataLen, std::vector<WifiLinkedInfo> &mloLinkInfo);
     WifiErrorNo HandleMloSignalPollData(char *staData, uint32_t staDataLen,
-        std::vector<WifiMloSignalInfo> &mloSignalInfo);
+        std::vector<WifiSignalPollInfo> &mloSignalInfo);
 };
 }  // namespace Wifi
 }  // namespace OHOS

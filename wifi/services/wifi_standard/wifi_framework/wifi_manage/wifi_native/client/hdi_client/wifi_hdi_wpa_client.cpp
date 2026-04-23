@@ -1568,7 +1568,7 @@ WifiErrorNo WifiHdiWpaClient::GetMloLinkedInfo(const std::string &ifName,
 }
 
 WifiErrorNo WifiHdiWpaClient::GetMloSignalPollInfo(const std::string &ifName,
-    std::vector<WifiMloSignalInfo> &mloSignalInfo)
+    std::vector<WifiSignalPollInfo> &mloSignalInfo)
 {
     char ifNameBuf[MAX_IFACENAME_LEN];
     char staParam[] = "MLO_SIGNAL_POLL";
@@ -1591,7 +1591,7 @@ WifiErrorNo WifiHdiWpaClient::GetMloSignalPollInfo(const std::string &ifName,
 }
 
 WifiErrorNo WifiHdiWpaClient::HandleMloSignalPollData(char *staData, uint32_t staDataLen,
-    std::vector<WifiMloSignalInfo> &mloSignalInfo)
+    std::vector<WifiSignalPollInfo> &mloSignalInfo)
 {
     if (staData == NULL || staDataLen == 0) {
         LOGE("%{public}s: hdiInfo null or length err copy", __func__);
@@ -1600,7 +1600,7 @@ WifiErrorNo WifiHdiWpaClient::HandleMloSignalPollData(char *staData, uint32_t st
     char *savedPtr = NULL;
     std::string value = "";
     char *token = strtok_r(staData, "=", &savedPtr);
-    WifiMloSignalInfo signalInfo;
+    WifiSignalPollInfo signalInfo;
     while (token != NULL) {
         char* tmpValue = strtok_r(NULL, "\n", &savedPtr);
         if (!tmpValue) {
@@ -1611,13 +1611,13 @@ WifiErrorNo WifiHdiWpaClient::HandleMloSignalPollData(char *staData, uint32_t st
         if (strcmp(token, "LINK_ID") == 0) {
             signalInfo.linkId = CheckDataLegal(value);
         } else if (strcmp(token, "RSSI") == 0) {
-            signalInfo.rssi = CheckDataLegal(value);
+            signalInfo.signal = CheckDataLegal(value);
         } else if (strcmp(token, "FREQUENCY") == 0) {
             signalInfo.frequency = CheckDataLegal(value);
         } else if (strcmp(token, "TXLINKSPEED") == 0) {
-            signalInfo.txLinkSpeed = CheckDataLegal(value);
+            signalInfo.txrate = CheckDataLegal(value);
         } else if (strcmp(token, "RXLINKSPEED") == 0) {
-            signalInfo.rxLinkSpeed = CheckDataLegal(value);
+            signalInfo.rxrate = CheckDataLegal(value);
         } else if (strcmp(token, "TXPACKETS") == 0) {
             signalInfo.txPackets = CheckDataLegal(value);
         } else if (strcmp(token, "RXPACKETS") == 0) {

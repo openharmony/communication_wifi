@@ -2675,8 +2675,8 @@ HWTEST_F(SelfCureStateMachineTest, SetSelfCureFailInfoTest_InvalidCnt, TestSize.
 HWTEST_F(SelfCureStateMachineTest, SetSelfCureFailInfoTest, TestSize.Level1)
 {
     WifiSelfCureHistoryInfo info;
-    std::vector<std::string> histories = {"3", "4", "5", "6", "7",
-        "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18"};
+    std::vector<std::string> histories = {"5", "6", "7",
+        "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"};
     int cnt = SELFCURE_FAIL_LENGTH;
     EXPECT_EQ(SelfCureUtils::GetInstance().SetSelfCureFailInfo(info, histories, cnt), 0);
     EXPECT_EQ(info.staticIpSelfCureFailedCnt, 5);

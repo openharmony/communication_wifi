@@ -344,6 +344,14 @@ public:
     virtual void SetEnhanceSignalPollInfo(WifiSignalPollInfo &info) = 0;
 
     /**
+     * @Description notify MLO signal poll info updated
+     *
+     * @param mloSignalInfo - MLO signal poll info
+     * @return void
+     */
+    virtual void NotifyMloSignalPollInfo(std::vector<WifiSignalPollInfo> &mloSignalInfo) = 0;
+
+    /**
      * @Description Crowdsourced Data Report Interface
      *
      * @param wifiCrowdsourcedInfo - wifi crowdsourced info

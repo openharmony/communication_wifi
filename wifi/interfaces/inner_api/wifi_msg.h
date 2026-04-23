@@ -297,18 +297,6 @@ enum class DisconnectDetailReason {
     DISASSOC_LOW_ACK = 34
 };
 
-struct WifiMloSignalInfo {
-    int32_t linkId {INVALID_LINK_ID};
-    int32_t frequency {0};
-    int32_t rssi {0};
-    int32_t linkSpeed {0};
-    int32_t rxLinkSpeed {0};
-    int32_t txLinkSpeed {0};
-    int32_t rxPackets {0};
-    int32_t txPackets {0};
-    WifiChannelWidth channelWidth {WifiChannelWidth::WIDTH_INVALID};
-};
-
 struct WifiLinkedInfo {
     int networkId;
     std::string ssid;
@@ -1240,10 +1228,12 @@ struct WifiSignalPollInfo {
     std::vector<uint8_t> ext;
     int extLen;
     int64_t timeStamp;
+    int linkId;
 
     WifiSignalPollInfo() : signal(0), txrate(0), rxrate(0), noise(0), frequency(0),
         txPackets(0), rxPackets(0), snr(0), chload(0), ulDelay(0), txBytes(0), rxBytes(0),
-        txFailed(0), chloadSelf(0), c0Rssi(0), c1Rssi(0), ext(), extLen(0), timeStamp(0)
+        txFailed(0), chloadSelf(0), c0Rssi(0), c1Rssi(0), ext(), extLen(0), timeStamp(0),
+        linkId(0)
     {}
 
     ~WifiSignalPollInfo()

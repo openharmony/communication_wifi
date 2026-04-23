@@ -766,6 +766,9 @@ private:
 
     void DealMloLinkSignalPollResult();
 
+    void UpdateMloLinkedInfoWithSignal(
+        std::vector<WifiLinkedInfo>& mloLinkedInfo, const std::vector<WifiSignalPollInfo>& mloSignalInfo);
+
     /**
      * @Description : Update RSSI to LinkedInfo and public rssi changed broadcast.
      *

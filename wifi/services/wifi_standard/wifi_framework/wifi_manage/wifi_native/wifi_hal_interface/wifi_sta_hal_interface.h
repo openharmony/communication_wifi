@@ -433,7 +433,7 @@ public:
      * @param mloLinkInfo - MLO signal poll info
      * @return WifiErrorNo
      */
-    WifiErrorNo GetConnectionMloSignalInfo(const std::string &ifName, std::vector<WifiMloSignalInfo> &mloSignalInfo);
+    WifiErrorNo GetConnectionMloSignalInfo(const std::string &ifName, std::vector<WifiSignalPollInfo> &mloSignalInfo);
 
 private:
     WifiEventCallback mStaCallback[2];

@@ -348,7 +348,7 @@ public:
      * @param mloSignalInfo - MLO signal poll info
      * @return void
      */
-    virtual void NotifyMloSignalPollInfo(const std::vector<WifiSignalPollInfo> &mloSignalInfo) = 0;
+    virtual void NotifyMloSignalPollInfo(std::vector<WifiSignalPollInfo> &mloSignalInfo) = 0;
 
     /**
      * @Description Crowdsourced Data Report Interface

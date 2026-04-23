@@ -296,6 +296,7 @@ public:
         void DealWpaLinkPasswdWrongFailEvent(InternalMessagePtr msg);
         void DealWpaLinkFullConnectFailEvent(InternalMessagePtr msg);
         void DealWpaLinkAssocRejectFailEvent(InternalMessagePtr msg);
+        void DealWpaLinkAuthTimeoutFailEvent(InternalMessagePtr msg);
         void DealWpaLinkFailEvent(InternalMessagePtr msg);
     private:
         StaStateMachine *pStaStateMachine;

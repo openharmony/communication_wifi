@@ -312,6 +312,12 @@ void StaMonitor::OnWpsTimeOutCallBack(int status)
 void StaMonitor::OnWpaAuthTimeOutCallBack()
 {
     WIFI_LOGI("OnWpaAuthTimeOutCallBack");
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("The statemachine pointer is null.");
+        return;
+    }
+    /* Notification state machine wpa auth timeout event. */
+    pStaStateMachine->SendMessage(WIFI_SVR_CMD_STA_WPA_AUTH_TIMEOUT_EVENT);
 }
 
 /* SIM authentication data format: [GSM-AUTH][:][Rand1][:][Rand2] or [GSM-AUTH][:][Rand1][:][Rand2][:][Rand3]

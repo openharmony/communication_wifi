@@ -68,6 +68,7 @@ private:
     ErrCode StartDependentService(int instId);
     ErrCode InitStaServiceExtral(IStaService *pService, int instId);
     void HandleGetStaFailed(int instId);
+    void HandleWifiOpenFailedReport(WifiOprMidState staState);
 #ifdef FEATURE_WIFI_PRO_SUPPORT
     ErrCode StartWifiProService(int instId);
 #endif

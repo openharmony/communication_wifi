@@ -876,6 +876,11 @@ void WifiControllerMachine::ClearWifiStartFailCount()
     mWifiStartFailCount = 0;
 }
 
+int WifiControllerMachine::GetWifiStartFailCount() const
+{
+    return mWifiStartFailCount;
+}
+
 void WifiControllerMachine::HandleStaStartSuccess(int id)
 {
     mWifiStartFailCount = 0;

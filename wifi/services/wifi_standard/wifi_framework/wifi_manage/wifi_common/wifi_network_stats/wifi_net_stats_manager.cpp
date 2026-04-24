@@ -19,6 +19,7 @@
 #include "net_stats_client.h"
 #include "wifi_system_timer.h"
 #include "wifi_logger.h"
+#include "wifi_chr_adapter.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -30,8 +31,14 @@ const char* SEP_STR = "/";
 const char* END_STR = ",";
 const int32_t UID_ALL = -1;
 const int32_t MAX_LOG_TRAFFIC = 10;
-const int64_t NET_STATS_POLL_INTERVAL = 10 * 1000;
+const int64_t NET_STATS_POLL_INTERVAL = 5 * 1000;
 const int64_t NET_STATS_DELAY_TIME = 2 * 1000;
+const int64_t BYTE_TO_MBYTE = 1024 * 1024;
+const int64_t BYTE_TO_BIT = 8;
+const int64_t MS_TO_SECOND = 1000;
+const int64_t SPEED_THRESHOLD_MBPS = 160;
+const int64_t HIGH_SPEED_DURATION_THRESHOLD = 10;
+const std::string WIFI_SPEEDTEST_EVENT = "WIFI_SPEEDTEST_EVENT";
 
 void WifiNetStatsManager::StartNetStats()
 {
@@ -187,6 +194,84 @@ void WifiNetStatsManager::LogNetStatsTraffic(NetStats netStats)
         }
     }
     WIFI_LOGI("%{public}s", allTrafficLog.c_str());
+
+    CheckAndReportSpeedTest(netStats);
+}
+
+void WifiNetStatsManager::CheckAndReportSpeedTest(const NetStats& netStats)
+{
+    auto timeServiceClient = MiscServices::TimeServiceClient::GetInstance();
+    if (timeServiceClient == nullptr) {
+        WIFI_LOGE("Get TimeServiceClient instance is null");
+        return;
+    }
+    int64_t currentTime = timeServiceClient->GetBootTimeMs();
+    if (netStats.size() == 0 || lastLogTime_ == 0) {
+        WIFI_LOGE("netStats is null");
+        lastLogTime_ = currentTime;
+        return;
+    }
+    int64_t timeInterval = (currentTime - lastLogTime_) / MS_TO_SECOND;
+    if (timeInterval <= 0) {
+        lastLogTime_ = currentTime;
+        lastAppName_ = GetBundleName(netStats[0].uid_);
+        return;
+    }
+
+    int64_t rxSpeedMbps = (netStats[0].rxBytes_ / timeInterval / BYTE_TO_MBYTE) * BYTE_TO_BIT;
+    int64_t txSpeedMbps = (netStats[0].txBytes_ / timeInterval / BYTE_TO_MBYTE) * BYTE_TO_BIT;
+    std::string curAppName = GetBundleName(netStats[0].uid_);
+    if (lastAppName_ != curAppName && speedSampleCount_ > 0) {
+        ReportSpeedTestChr();
+        lastAppName_ = curAppName;
+    }
+
+    if (rxSpeedMbps > SPEED_THRESHOLD_MBPS || txSpeedMbps > SPEED_THRESHOLD_MBPS) {
+        lastAppName_ = curAppName;
+        maxRxSpeed_ = (rxSpeedMbps > maxRxSpeed_) ? rxSpeedMbps : maxRxSpeed_;
+        maxTxSpeed_ = (txSpeedMbps > maxTxSpeed_) ? txSpeedMbps : maxTxSpeed_;
+        totalRxBytes_ += netStats[0].rxBytes_;
+        totalTxBytes_ += netStats[0].txBytes_;
+        highSpeedDuration_ += (currentTime - lastLogTime_) / MS_TO_SECOND;
+        if (highSpeedDuration_ >= HIGH_SPEED_DURATION_THRESHOLD) {
+            speedSampleCount_++;
+        }
+    } else if (speedSampleCount_ > 0) {
+        ReportSpeedTestChr();
+        lastAppName_ = curAppName;
+    } else if (highSpeedDuration_ > 0) {
+        InitSpeedTestInfo();
+    }
+    lastLogTime_ = currentTime;
+}
+
+void WifiNetStatsManager::InitSpeedTestInfo()
+{
+    maxRxSpeed_ = 0;
+    maxTxSpeed_ = 0;
+    avgRxSpeed_ = 0;
+    avgTxSpeed_ = 0;
+    totalTxBytes_ = 0;
+    totalRxBytes_ = 0;
+    speedSampleCount_ = 0;
+    highSpeedDuration_ = 0;
+}
+
+void WifiNetStatsManager::ReportSpeedTestChr()
+{
+    WIFI_LOGI("ReportSpeedTestChr %{public}s", lastAppName_.c_str());
+    avgRxSpeed_ = (highSpeedDuration_ > 0) ? (totalRxBytes_ / highSpeedDuration_ / BYTE_TO_MBYTE) * BYTE_TO_BIT : 0;
+    avgTxSpeed_ = (highSpeedDuration_ > 0) ? (totalTxBytes_ / highSpeedDuration_ / BYTE_TO_MBYTE) * BYTE_TO_BIT : 0;
+
+    WifiSpeedTestStatisticInfo speedTestInfo;
+    speedTestInfo.appName = lastAppName_;
+    speedTestInfo.rxMaxSpeed = maxRxSpeed_;
+    speedTestInfo.txMaxSpeed = maxTxSpeed_;
+    speedTestInfo.rxAvgSpeed = avgRxSpeed_;
+    speedTestInfo.txAvgSpeed = avgTxSpeed_;
+    speedTestInfo.highSpeedDuration = highSpeedDuration_;
+    EnhanceWriteSpeedTestHiSysEvent(speedTestInfo);
+    InitSpeedTestInfo();
 }
 } // namespace Wifi
 } // namespace OHOS

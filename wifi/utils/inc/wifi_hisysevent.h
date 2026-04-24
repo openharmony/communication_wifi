@@ -100,6 +100,15 @@ enum class WifiCloudRiskType {
     UNSAFE = 1
 };
 
+struct WifiSpeedTestStatisticInfo {
+    std::string appName = "";
+    int64_t rxMaxSpeed = 0;
+    int64_t txMaxSpeed = 0;
+    int64_t rxAvgSpeed = 0;
+    int64_t txAvgSpeed = 0;
+    int64_t highSpeedDuration = 0;
+};
+
 struct Pref5gStatisticsInfo {
     std::string bssid;
     std::string ssid;
@@ -319,6 +328,9 @@ void WritePositionAutoOpenWlanHiSysEvent(const std::string updateType);
 void WriteWifiScanInfoHiSysEvent(const ScanStatisticInfo &scanStatisticInfo);
 
 void WriteWifiAppNetWorkSpeedLimitCommonInfoHiSysEvent(const AppNetworkSpeedLimitStatisticInfo &info);
+
+void WriteSpeedTestHiSysEvent(const WifiSpeedTestStatisticInfo &speedTestStatisticInfo);
+
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
 void WriteWifiRiskInfoHiSysEvent(const WifiRiskInfo &wifiRiskInfo);
 #endif

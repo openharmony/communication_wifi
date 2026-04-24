@@ -106,6 +106,7 @@ public:
     void HandleStaSemiActive(int id);
     void HandleConcreteStop(int id);
     void ClearWifiStartFailCount();
+    int GetWifiStartFailCount() const;
     void HandleStopConcretRetry();
     bool IsOpenSoftApAllowed(int id);
 #ifdef FEATURE_AP_SUPPORT

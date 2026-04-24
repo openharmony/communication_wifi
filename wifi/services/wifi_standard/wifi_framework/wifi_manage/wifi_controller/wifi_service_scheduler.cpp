@@ -744,6 +744,25 @@ void WifiServiceScheduler::OnNetlinkReportCallback(int type, const std::vector<u
 }
 #endif
 
+void WifiServiceScheduler::HandleWifiOpenFailedReport(WifiOprMidState staState)
+{
+    int deviceType = WifiConfigCenter::GetInstance().GetDeviceType();
+    bool needReport = true;
+    if (deviceType == ProductDeviceType::WEARABLE) {
+        auto &controllerMachine = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+        if (controllerMachine != nullptr &&
+            controllerMachine->GetWifiStartFailCount() >= WIFI_OPEN_RETRY_MAX_COUNT - 1) {
+            needReport = true;
+        } else {
+            needReport = false;
+        }
+    }
+    if (needReport) {
+        EnhanceWriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED),
+            "HAL_FAIL", static_cast<int>(staState));
+    }
+}
+
 void WifiServiceScheduler::DispatchWifiOpenRes(OperateResState state, int instId)
 {
     WIFI_LOGI("DispatchWifiOpenRes, state:%{public}d", static_cast<int>(state));
@@ -776,8 +795,7 @@ void WifiServiceScheduler::DispatchWifiOpenRes(OperateResState state, int instId
     }
     if (state == OperateResState::OPEN_WIFI_FAILED) {
         WifiOprMidState staState = WifiConfigCenter::GetInstance().GetWifiMidState(instId);
-        EnhanceWriteWifiOpenAndCloseFailedHiSysEvent(static_cast<int>(OperateResState::OPEN_WIFI_FAILED),
-            "HAL_FAIL", static_cast<int>(staState));
+        HandleWifiOpenFailedReport(staState);
         WifiConfigCenter::GetInstance().SetWifiState(static_cast<int>(WifiState::DISABLED), instId);
         WifiConfigCenter::GetInstance().SetWifiDetailState(WifiDetailState::STATE_INACTIVE, instId);
         WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);

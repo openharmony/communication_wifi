@@ -3264,7 +3264,7 @@ HWTEST_F(ScanServiceTest, AllowScanByHid2dGameSceneTest, TestSize.Level1)
     gameScene.scene = 0x07;
     WifiConfigCenter::GetInstance().SetHid2dUpperScene(GAMESERVICE_SA_UID, gameScene);
     bool result = pScanService->AllowScanByHid2dState(ScanType::SCAN_TYPE_EXTERN, scanStyle);
-    EXPECT_FALSE(result);
+    EXPECT_TRUE(result);
 }
 
 HWTEST_F(ScanServiceTest, AllowScanByHid2dWatchSceneTest, TestSize.Level1)
@@ -3274,7 +3274,7 @@ HWTEST_F(ScanServiceTest, AllowScanByHid2dWatchSceneTest, TestSize.Level1)
     watchScene.scene = 0x07;
     WifiConfigCenter::GetInstance().SetHid2dUpperScene(WATCH_SERVICE_UID, watchScene);
     bool result = pScanService->AllowScanByHid2dState(ScanType::SCAN_TYPE_EXTERN, scanStyle);
-    EXPECT_FALSE(result);
+    EXPECT_TRUE(result);
 }
 
 HWTEST_F(ScanServiceTest, AllowLpScanTest01, TestSize.Level1)

@@ -50,7 +50,9 @@ public:
     int String2InternetSelfCureHistoryInfo(const std::string selfCureHistory, WifiSelfCureHistoryInfo &info);
     int SetSelfCureFailInfo(OHOS::Wifi::WifiSelfCureHistoryInfo &info, std::vector<std::string>& histories, int cnt);
     int SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info, std::vector<std::string>& histories, int cnt);
+    int SetResetSelfCureSuccInfo(WifiSelfCureHistoryInfo &info, std::vector<std::string>& histories, int cnt);
     bool IsIpConflictDetect();
+    bool IsResetSelfCureFrequent(WifiSelfCureHistoryInfo &historyInfo, int64_t currentMs);
     std::string GetSelfCureHistory();
     void ReportNoInternetChrEvent();
     bool IsIpv6SelfCureSupported() const;

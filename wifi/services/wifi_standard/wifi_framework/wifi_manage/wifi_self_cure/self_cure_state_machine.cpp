@@ -1515,6 +1515,9 @@ void SelfCureStateMachine::InternetSelfCureState::HandleHttpReachableAfterSelfCu
 {
     WIFI_LOGI("HandleHttpReachableAfterSelfCure, currentCureLevel = %{public}d", currentCureLevel);
     SelfCureUtils::GetInstance().UpdateSelfCureHistoryInfo(selfCureHistoryInfo_, currentCureLevel, true);
+    pSelfCureStateMachine_->SetSelfCureHistoryInfo(selfCureHistoryInfo_.GetSelfCureHistory());
+    WIFI_LOGI("HTTP reachable, self cure success for %{public}d, selfCureHistoryInfo_ = %{public}s", currentCureLevel,
+              pSelfCureStateMachine_->GetSelfCureHistoryInfo().c_str());
     pSelfCureStateMachine_->UpdateSelfcureState(currentSelfCureLevel_, false);
     if (!isSetStaticIp4InvalidIp_ && currentCureLevel == WIFI_CURE_RESET_LEVEL_LOW_3_STATIC_IP) {
         currentAbnormalType_ = WIFI_CURE_INTERNET_FAILED_TYPE_GATEWAY;
@@ -2563,10 +2566,30 @@ int SelfCureStateMachine::SetSelfCureHistoryInfo(const std::string selfCureHisto
         WIFI_LOGE("SetSelfCureHistoryInfo failed!");
         return -1;
     }
-    config.internetSelfCureHistory = selfCureHistory;
+    ReserveRestSelfCureSuccessInfo(config.internetSelfCureHistory, selfCureHistory);
     WifiSettings::GetInstance().AddDeviceConfig(config);
     WifiSettings::GetInstance().SyncDeviceConfig();
     return 0;
+}
+
+void SelfCureStateMachine::ReserveRestSelfCureSuccessInfo(std::string &historyInfo,
+    const std::string &selfCureHistory)
+{
+    // Check if reset is required（reserve success related info）
+    if (selfCureHistory == INIT_SELFCURE_HISTORY) {
+        WifiSelfCureHistoryInfo info;
+        std::vector<std::string> histories =
+            SelfCureUtils::GetInstance().TransStrToVec(historyInfo, '|');
+        if (histories.size() != SELFCURE_HISTORY_LENGTH) {
+            historyInfo = selfCureHistory;
+            return;
+        }
+        info.resetSelfCureSuccessCnt = CheckDataLegal(histories[SELFCURE_FAIL_HISTORY_LENGTH]);
+        info.lastResetSelfCureSuccessTs = CheckDataTolonglong(histories[SELFCURE_HISTORY_LENGTH - 1]);
+        historyInfo = info.GetSelfCureHistory();
+    } else {
+        historyInfo = selfCureHistory;
+    }
 }
 
 int SelfCureStateMachine::GetIsReassocWithFactoryMacAddress()

@@ -69,6 +69,48 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"website_permission_never_allowed",
+            "value":"Запретить",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_content",
+            "value":"Этот сайт может содержать неприемлемый или запрещенный контент. Выполняйте это действие с осторожностью.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_title",
+            "value":"Возможен вредоносный контент",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"camera_permission_message",
+            "value":"Разрешить веб-сайту %s использовать камеру?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"permission_reason_camera",
+            "value":"Это необходимо для съемки фото и видео.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"website_permission_allowed",
+            "value":"Разрешить",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

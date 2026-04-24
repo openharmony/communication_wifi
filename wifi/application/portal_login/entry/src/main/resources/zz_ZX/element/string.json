@@ -51,6 +51,30 @@
         {
             "name":"module_desc",
             "value":"[TS_1079370]_module description"
+        },
+        {
+            "name":"website_permission_never_allowed",
+            "value":"[TS_1200070]_Deny"
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_content",
+            "value":"[TS_1200073]_The site ahead may contain inappropriate or prohibited content. Proceed with caution."
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_title",
+            "value":"[TS_1200072]_Harmful content ahead"
+        },
+        {
+            "name":"camera_permission_message",
+            "value":"[TS_1200071]_Allow %s to use the camera?"
+        },
+        {
+            "name":"permission_reason_camera",
+            "value":"[TS_1200074]_This is used for taking photos and videos."
+        },
+        {
+            "name":"website_permission_allowed",
+            "value":"[TS_1200075]_Allow"
         }
     ]
 }

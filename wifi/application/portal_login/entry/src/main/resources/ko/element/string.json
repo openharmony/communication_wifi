@@ -69,6 +69,48 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"website_permission_never_allowed",
+            "value":"거부",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_content",
+            "value":"위 사이트에는 부적절하거나 금지된 콘텐츠가 포함되어 있을 수 있습니다. 주의하여 진행하시기 바랍니다.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_title",
+            "value":"유해 콘텐츠 예고",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"camera_permission_message",
+            "value":"%s의 카메라 사용을 허용하시겠습니까?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"permission_reason_camera",
+            "value":"사진 및 비디오를 촬영하는 데 사용됩니다.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"website_permission_allowed",
+            "value":"허용",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

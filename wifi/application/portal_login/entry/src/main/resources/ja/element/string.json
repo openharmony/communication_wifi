@@ -69,6 +69,48 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"website_permission_never_allowed",
+            "value":"拒否",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_content",
+            "value":"このサイトには、不適切または禁止されているコンテンツが含まれている可能性があります。注意して進んでください。",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_title",
+            "value":"有害なコンテンツを表示しようとしています",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"camera_permission_message",
+            "value":"%sにカメラの使用を許可しますか？",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"permission_reason_camera",
+            "value":"写真撮影とビデオ録画に使用されます。",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"website_permission_allowed",
+            "value":"許可",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

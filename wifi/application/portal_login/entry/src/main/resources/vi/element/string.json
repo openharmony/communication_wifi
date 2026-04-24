@@ -69,6 +69,48 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"website_permission_never_allowed",
+            "value":"Từ chối",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_content",
+            "value":"Trang web sắp truy cập có thể chứa nội dung không phù hợp hoặc bị cấm. Hãy thận trọng.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"web_risk_warning_level3_Phone_title",
+            "value":"Trang web chứa nội dung có hại",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"camera_permission_message",
+            "value":"Cho phép %s sử dụng máy ảnh?",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"permission_reason_camera",
+            "value":"Quyền này được sử dụng để chụp ảnh và quay video.",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"website_permission_allowed",
+            "value":"Cho phép",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

@@ -316,6 +316,7 @@ void AppNetworkSpeedLimitService::UpdateBackgroundAppConfigs(const int enable)
             }
         }
     }
+    m_bgUidSet.insert(m_SaUidList.begin(), m_SaUidList.end());
 }
 
 void AppNetworkSpeedLimitService::UpdateForegroundAppConfigs()

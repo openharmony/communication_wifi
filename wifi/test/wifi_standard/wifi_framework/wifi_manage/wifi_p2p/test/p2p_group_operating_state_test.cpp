@@ -269,7 +269,7 @@ HWTEST_F(P2pGroupOperatingStateTest, ProcessCmdCreateRptGroup, TestSize.Level1)
 
     WifiLinkedInfo info;
     info.connState = ConnState::CONNECTED;
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(3)
         .WillOnce(DoAll(SetArgReferee<0>(info), Return(0)));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), SetExplicitGroup(_)).WillOnce(Return());
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GroupAdd(_, _, _))

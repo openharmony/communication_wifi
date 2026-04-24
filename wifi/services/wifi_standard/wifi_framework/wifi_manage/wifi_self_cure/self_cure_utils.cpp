@@ -240,6 +240,8 @@ void SelfCureUtils::UpdateSelfCureHistoryInfo(WifiSelfCureHistoryInfo &historyIn
         if (success) {
             historyInfo.resetSelfCureFailedCnt = 0;
             historyInfo.lastResetSelfCureFailedTs = 0;
+            historyInfo.resetSelfCureSuccessCnt += 1;
+            historyInfo.lastResetSelfCureSuccessTs = currentMs;
         } else {
             historyInfo.resetSelfCureFailedCnt += 1;
             historyInfo.lastResetSelfCureFailedTs = currentMs;
@@ -338,6 +340,16 @@ static bool DealRandMacReassoc(const WifiSelfCureHistoryInfo &historyInfo, int r
     return false;
 }
 
+bool SelfCureUtils::IsResetSelfCureFrequent(WifiSelfCureHistoryInfo &historyInfo, int64_t currentMs)
+{
+    if ((historyInfo.resetSelfCureSuccessCnt >= 1) &&
+        ((currentMs - historyInfo.lastResetSelfCureSuccessTs) < DELAYED_TEN_MIN)) {
+            WIFI_LOGE("Reset SelfCure Frequent, Not Allow Reset SelfCure");
+        return true;
+    }
+    return false;
+}
+
 static bool DealHighReset(WifiSelfCureHistoryInfo &historyInfo, int requestCureLevel, int64_t currentMs)
 {
     if ((historyInfo.resetSelfCureFailedCnt <= SELF_CURE_FAILED_ONE_CNT ||
@@ -347,7 +359,8 @@ static bool DealHighReset(WifiSelfCureHistoryInfo &historyInfo, int requestCureL
          (currentMs - historyInfo.lastResetSelfCureFailedTs > DELAYED_DAYS_MID)) ||
         (historyInfo.resetSelfCureFailedCnt >= SELF_CURE_FAILED_FOUR_CNT &&
          (currentMs - historyInfo.lastResetSelfCureFailedTs > DELAYED_DAYS_HIGH))) &&
-        AllowSelfCure(historyInfo, requestCureLevel)) {
+        AllowSelfCure(historyInfo, requestCureLevel) &&
+        !SelfCureUtils::GetInstance().IsResetSelfCureFrequent(historyInfo, currentMs)) {
         return true;
     }
     return false;
@@ -446,6 +459,9 @@ int SelfCureUtils::String2InternetSelfCureHistoryInfo(const std::string selfCure
     if (SetSelfCureConnectFailInfo(selfCureHistoryInfo, histories, SELFCURE_FAIL_LENGTH) != 0) {
         WIFI_LOGE("set self cure connect history information failed!");
     }
+    if (SetResetSelfCureSuccInfo(selfCureHistoryInfo, histories, SELFCURE_FAIL_HISTORY_LENGTH) != 0) {
+        WIFI_LOGE("set self cure success history information failed!");
+    }
     info = selfCureHistoryInfo;
     return 0;
 }
@@ -457,7 +473,7 @@ int SelfCureUtils::SetSelfCureFailInfo(WifiSelfCureHistoryInfo &info,
         WIFI_LOGE("SetSelfCureFailInfo return");
         return -1;
     }
-    // 0 to 12 is history subscript, which record the selfcure failed info, covert array to calss member
+    // 0 to 7 is history subscript, which record the selfcure failed info, covert array to calss member
     for (int i = 0; i < cnt; i++) {
         if (i == SelfCureHistoryOrder::POS_STATIC_IP_FAILED_CNT) {
             info.staticIpSelfCureFailedCnt = CheckDataLegal(histories[i]);
@@ -482,6 +498,19 @@ int SelfCureUtils::SetSelfCureFailInfo(WifiSelfCureHistoryInfo &info,
     return 0;
 }
 
+int SelfCureUtils::SetResetSelfCureSuccInfo(WifiSelfCureHistoryInfo &info,
+                                            std::vector<std::string>& histories, int cnt)
+{
+    if (histories.size() != SELFCURE_HISTORY_LENGTH || cnt != SELFCURE_FAIL_HISTORY_LENGTH) {
+        WIFI_LOGE("SetSelfCureSuccInfo return");
+        return -1;
+    }
+    // 14 to 16 is history subscript, which record the selfcure failed info, covert array to calss member
+    info.resetSelfCureSuccessCnt = CheckDataLegal(histories[SELFCURE_FAIL_HISTORY_LENGTH]);
+    info.lastResetSelfCureSuccessTs = CheckDataTolonglong(histories[SELFCURE_HISTORY_LENGTH -1]);
+    return 0;
+}
+
 int SelfCureUtils::SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info,
                                               std::vector<std::string>& histories, int cnt)
 {
@@ -489,8 +518,8 @@ int SelfCureUtils::SetSelfCureConnectFailInfo(WifiSelfCureHistoryInfo &info,
         WIFI_LOGE("SetSelfCureFailInfo return");
         return -1;
     }
-    // 12 to 17 is history subscript, which record the selfcure connect failed info, covert array to calss member
-    for (int i = cnt; i < SELFCURE_HISTORY_LENGTH; i++) {
+    // 8 to 13 is history subscript, which record the selfcure connect failed info, covert array to calss member
+    for (int i = cnt; i < SELFCURE_FAIL_HISTORY_LENGTH ; i++) {
         if (i == POS_REASSOC_CONNECT_FAILED_CNT) {
             info.reassocSelfCureConnectFailedCnt = CheckDataLegal(histories[i]);
         } else if (i == POS_REASSOC_CONNECT_FAILED_TS) {

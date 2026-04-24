@@ -200,16 +200,17 @@ void WifiNetStatsManager::LogNetStatsTraffic(NetStats netStats)
 
 void WifiNetStatsManager::CheckAndReportSpeedTest(const NetStats& netStats)
 {
-    if (netStats.size() == 0 || lastLogTime_ == 0) {
-        WIFI_LOGE("netStats is null");
-        return;
-    }
     auto timeServiceClient = MiscServices::TimeServiceClient::GetInstance();
     if (timeServiceClient == nullptr) {
         WIFI_LOGE("Get TimeServiceClient instance is null");
         return;
     }
     int64_t currentTime = timeServiceClient->GetBootTimeMs();
+    if (netStats.size() == 0 || lastLogTime_ == 0) {
+        WIFI_LOGE("netStats is null");
+        lastLogTime_ = currentTime;
+        return;
+    }
     int64_t timeInterval = (currentTime - lastLogTime_) / MS_TO_SECOND;
     if (timeInterval <= 0) {
         lastLogTime_ = currentTime;

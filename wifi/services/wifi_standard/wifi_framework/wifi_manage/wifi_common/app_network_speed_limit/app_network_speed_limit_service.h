@@ -138,7 +138,6 @@ private:
     std::unordered_set<int> m_additionalWindowUidSet;
     std::unordered_set<int> m_additionalWindowPidSet;
     std::unordered_map<int, WifiNetworkControlInfo> m_AncoAppInfos;
-    std::unordered_set<uint32_t> m_SaUidList = {5206};
     std::unique_ptr<WifiEventHandler> m_asyncSendLimit = nullptr;
     int64_t m_delayTime;
     std::atomic<bool> isVpnConnected_ = false;

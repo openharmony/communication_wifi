@@ -33,6 +33,7 @@ namespace Wifi {
 
 DEFINE_WIFILOG_LABEL("AppNetworkSpeedLimitService");
 const std::string APP_NETWORK_SPEED_LIMIT_CLASS_NAME = "AppNetworkSpeedLimitService";
+const std::unordered_set<uint32_t> m_SaUidList = {5206}; // 5206: 云备份
 
 namespace {
     const int ON = 1;

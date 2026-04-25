@@ -1090,6 +1090,11 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType,
         if (pEnhanceService != nullptr) {
             pEnhanceService->OnSettingsDialogClick(true, SETTINGS_5G_SAVE_FEATURE);
         }
+    } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_SAVE_SINGLE)) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnSettingsDialogClick(true, SETTINGS_5G_SAVE_FEATURE);
+        }
     }
 #ifdef FEATURE_P2P_SUPPORT
     if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_PBC_DIALOG) ||
@@ -1123,6 +1128,11 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType, boo
             pEnhanceService->OnSettingsDialogClick(false, SETTINGS_5G_CONN_FEATURE);
         }
     } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_SAVE)) {
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnSettingsDialogClick(false, SETTINGS_5G_SAVE_FEATURE);
+        }
+    } else if (dialogType == static_cast<int>(WifiDialogType::SETTINGS_AUTO_IDENTIFY_SAVE_SINGLE)) {
         IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
         if (pEnhanceService != nullptr) {
             pEnhanceService->OnSettingsDialogClick(false, SETTINGS_5G_SAVE_FEATURE);

@@ -193,6 +193,7 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo, 
         case AUTO_IDENTIFY_CONN:
         case SETTINGS_AUTO_IDENTIFY_CONN:
         case SETTINGS_AUTO_IDENTIFY_SAVE:
+        case SETTINGS_AUTO_IDENTIFY_SAVE_SINGLE:
             cJSON_AddStringToObject(param, "wifi5gSsid", comInfo.c_str());
             break;
         case P2P_WSC_PBC_DIALOG:

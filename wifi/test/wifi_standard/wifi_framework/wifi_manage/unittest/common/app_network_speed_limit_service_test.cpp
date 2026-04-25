@@ -879,13 +879,13 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateAncoAppInfosTest03, TestSize.Lev
     EXPECT_EQ(ancoAppList.size(), 0);
 }
 
-HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateBackgroundAppConfigsTest01, TestSize.Level1)
+HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateForegroundAppConfigsTest01, TestSize.Level1)
 {
     AppNetworkSpeedLimitService::GetInstance().UpdateForegroundAppConfigs();
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
-HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateForegroundAppConfigsTest01, TestSize.Level1)
+HWTEST_F(AppNetworkSpeedLimitServiceTest, UpdateBackgroundAppConfigsTest01, TestSize.Level1)
 {
     const int enable = 1;
     AppNetworkSpeedLimitService::GetInstance().UpdateBackgroundAppConfigs(enable);

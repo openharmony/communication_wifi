@@ -304,6 +304,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         WifiConfigCenter::GetInstance().UpdateLinkedInfo(instId);
         WifiConfigCenter::GetInstance().SetLastConnStaFreq(info.frequency);
+        SetAndInstallSuspendMode(state, instId);
     }
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
@@ -321,15 +322,8 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_AUTH),
             static_cast<int>(WifiOperateState::STA_AUTHING));
     }
-#ifdef FEATURE_HPF_SUPPORT
-    if (state == OperateResState::CONNECT_AP_CONNECTED) {
-        int screenState = WifiConfigCenter::GetInstance().GetScreenState();
-        WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
-    }
-#endif
-    SetSuspendMode(state, instId);
 #ifndef OHOS_ARCH_LITE
-// 当网络检测成功时，取消断开任务
+    // 当网络检测成功时，取消断开任务
     if (state == OperateResState::CONNECT_NETWORK_ENABLED && staManagerEventHandler_ != nullptr) {
         bool hasTask = false;
         staManagerEventHandler_->HasAsyncTask(TASK_NAME_WIFI_DISCONNECT, hasTask);
@@ -431,10 +425,14 @@ void WifiStaManager::StartSatelliteTimer(void)
 }
 #endif
 
-void WifiStaManager::SetSuspendMode(OperateResState state, int instId)
+void WifiStaManager::SetAndInstallSuspendMode(OperateResState state, int instId)
 {
-    if (state == OperateResState::CONNECT_AP_CONNECTED && instId == INSTID_WLAN0) {
-        int screenState = WifiConfigCenter::GetInstance().GetScreenState();
+
+    int screenState = WifiConfigCenter::GetInstance().GetScreenState();
+    #ifdef FEATURE_HPF_SUPPORT
+        WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
+    #endif
+    if (instId == INSTID_WLAN0) {
         WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
     }
 }

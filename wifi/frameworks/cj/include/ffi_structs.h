@@ -162,6 +162,30 @@ struct CWifiLinkedInfo {
     bool isHiLinkNetwork;
 };
 
+struct CWifiLinkedInfoV2 {
+    char* ssid;
+    char* bssid;
+    int32_t rssi;
+    int32_t band;
+    int32_t linkSpeed;
+    int32_t rxLinkSpeed;
+    int32_t maxSupportedTxLinkSpeed;
+    int32_t maxSupportedRxLinkSpeed;
+    int32_t frequency;
+    bool isHidden;
+    bool isRestricted;
+    int32_t macType;
+    char* macAddress;
+    uint32_t ipAddress;
+    int32_t connState;
+    int32_t channelWidth;
+    int32_t wifiStandard;
+    int32_t supportedWifiCategory;
+    bool isHiLinkNetwork;
+    int32_t wifiLinkType;
+    bool wifiTxRxValid;
+};
+
 struct CWifiDeviceConfig {
     int32_t securityType;
     int32_t bssidType;

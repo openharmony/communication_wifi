@@ -43,6 +43,7 @@ FFI_EXPORT WifiP2pDeviceArr FfiWifiGetP2pPeerDevices(int32_t& ret);
 FFI_EXPORT int32_t FfiWifiGetP2pLocalDevice(CWifiP2pDevice& info);
 FFI_EXPORT int32_t FfiWifiCreateGroup(CWifiP2PConfig& cfg);
 FFI_EXPORT int32_t FfiWifiGetLinkedInfo(CWifiLinkedInfo& info);
+FFI_EXPORT int32_t FfiWifiGetLinkedInfoV2(CWifiLinkedInfoV2& info);
 FFI_EXPORT int32_t FfiWifiAddCandidateConfig(CWifiDeviceConfig cfg, int32_t& ret);
 FFI_EXPORT WifiDeviceConfigArr FfiWifiGetCandidateConfigs(int32_t& code);
 FFI_EXPORT int32_t FfiWifiWifiOn(char* type, void (*callback)());

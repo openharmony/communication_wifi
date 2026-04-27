@@ -196,6 +196,19 @@ WifiErrorNo WifiStaHalInterface::SetTxPower(int power)
     return WIFI_HAL_OPT_FAILED;
 }
 
+WifiErrorNo WifiStaHalInterface::IsWlanSupported(bool &isSupported)
+{
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    if (!HalDeviceManager::GetInstance().IsWlanSupported(isSupported)) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+    return WIFI_HAL_OPT_OK;
+#endif
+    LOGI("%{public}s fadiled no define HDI_CHIP_INTERFACE_SUPPORT", __FUNCTION__);
+    isSupported = false;
+    return WIFI_HAL_OPT_FAILED;
+}
+
 WifiErrorNo WifiStaHalInterface::Scan(const std::string &ifaceName, const WifiHalScanParam &scanParam)
 {
 #ifdef HDI_CHIP_INTERFACE_SUPPORT

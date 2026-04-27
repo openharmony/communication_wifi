@@ -12,6 +12,7 @@
         "OHOS::Wifi::WifiStaHalInterface::GetInstance()";
         "OHOS::Wifi::WifiStaHalInterface::SetTxPower(int)";
         "OHOS::Wifi::WifiStaHalInterface::SetDpiMarkRule(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int, int, int)";
+        "OHOS::Wifi::WifiStaHalInterface::IsWlanSupported(bool&)";
         "OHOS::Wifi::WifiConfigCenter::GetInstance()";
         "OHOS::Wifi::WifiConfigCenter::Init()";
         "OHOS::Wifi::WifiConfigCenter::SetWifiSelfcureReset(bool)";

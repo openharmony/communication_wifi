@@ -75,6 +75,13 @@ HWTEST_F(WifiNotificationUtilTest, ShowDialogTest001, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("WifiNotificationUtilTest")!=std::string::npos);
 }
 
+HWTEST_F(WifiNotificationUtilTest, ShowDialogTest002, TestSize.Level1)
+{
+    WifiNotificationUtil wifiNotificationUtil;
+    wifiNotificationUtil.ShowDialog(WifiDialogType::SETTINGS_AUTO_IDENTIFY_SAVE_SINGLE);
+    EXPECT_FALSE(g_errLog.find("WifiNotificationUtilTest")!=std::string::npos);
+}
+
 HWTEST_F(WifiNotificationUtilTest, ShowSettingsDialogTest001, TestSize.Level1)
 {
     WifiNotificationUtil wifiNotificationUtil;

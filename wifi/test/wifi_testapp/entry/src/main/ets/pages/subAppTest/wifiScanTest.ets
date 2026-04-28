@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
-import { AvailableWifi } from '../../component/availableWifi';
-import { TitleBar } from '../../component/titleBar';
-import { WifiModel } from '../../entryability/model/wifiModel';
-import ConfigData from '../../utils/ConfigData';
+import { AvailableWifi} from '../../Component/availableWifi';
+import { TitleBar} from '../../Component/titleBar';
+import { WifiModel} from '../../entryability/model/wifiModel';
+import ConfigData from '../../Utils/ConfigData';
 
 const TAG = 'wifiTestApp [wifiScan]'
 
@@ -61,14 +62,14 @@ struct WifiScan {
   }
 
   async scan() {
-    if (!this.isScanning) {
-      return; // 如果不需要扫描，则直接返回
+    if (!this.isScanning){
+      return;// 如果不需要扫描，则直接返回
     } else {
       try{
         let result = await wifiManager.getScanInfoList();
-        console.log(TAG, `scan info call back: ${ result.length }`)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `scan info call back: ${ result.length }`)
         result.forEach(item => {
-          if (item.ssid) {
+          if (item.ssid){
             this.wifiList.push({
               ssid: item.ssid,
               bssid: item.bssid,
@@ -89,12 +90,12 @@ struct WifiScan {
           }
         });
         this.wifiList = [...this.wifiList];
-        console.log(TAG, "wifiList:" + JSON.stringify(this.wifiList))
-      } catch (error) {
-        console.error(TAG, `Error scanning Wi-Fi: ${error}`);
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "wifiList:" + JSON.stringify(this.wifiList))
+      } catch (error){
+        hilog.error(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Error scanning Wi-Fi: ${error}`);
       }
 
-      if (this.isScanning) { // 再次检查是否还需要继续扫描
+      if (this.isScanning){// 再次检查是否还需要继续扫描
         setTimeout(() => {
           this.scan()
         }, 2000)
@@ -104,12 +105,12 @@ struct WifiScan {
 
   getLinkedInfo() {
     wifiManager.getLinkedInfo((err, linkedInfo) => {
-      if (err) {
-        console.log(TAG, `getLinkedInfo err: ${ JSON.stringify(err) }`)
+      if (err){
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `getLinkedInfo err: ${ JSON.stringify(err) }`)
         return;
       }
-      console.log(TAG, `linkedInfo: ${ JSON.stringify(linkedInfo) }`)
-      if (linkedInfo === null || linkedInfo.bssid === '') {
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `linkedInfo: ${ JSON.stringify(linkedInfo) }`)
+      if (linkedInfo === null || linkedInfo.bssid === ''){
         this.isLinked = false
         this.linkedInfo = {
           ssid: "",
@@ -122,28 +123,28 @@ struct WifiScan {
       }
       this.isLinked = true
       this.linkedInfo = linkedInfo as wifiManager.WifiLinkedInfo;
-      console.log("getLinkedInfo this.linkedInfo:" + this.linkedInfo);
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s', "getLinkedInfo this.linkedInfo:" + this.linkedInfo);
     })
   }
 
   addListener() {
     wifiManager.on('wifiConnectionChange', state => {
-      console.log(TAG, `wifiConnectionChange: ${ state }`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `wifiConnectionChange: ${ state }`)
       this.getLinkedInfo()
     })
     wifiManager.on('wifiStateChange', state => {
-      console.log(TAG, `wifiStateLisener state: ${ state }`)
-      if (state === 1) { //0: inactive, 1: active, 2: activating, 3: de - activating
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `wifiStateLisener state: ${ state }`)
+      if (state === 1){//0: inactive, 1: active, 2: activating, 3: de - activating
         this.scan();
       }
     })
   }
 
   aboutToAppear() {
-    if (wifiManager.isWifiActive()) {
-      console.log(TAG, 'wifi is active')
+    if (wifiManager.isWifiActive()){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'wifi is active')
       this.isSwitchOn = true
-      this.isScanning = true; // 在页面出现时开始扫描
+      this.isScanning = true;// 在页面出现时开始扫描
       // wifiManager.startScan()
       this.scan()
       this.getLinkedInfo()
@@ -155,22 +156,22 @@ struct WifiScan {
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TitleBar({ detail: "wlan" })
+      Stack({alignContent: Alignment.TopStart}){
+        TitleBar({detail: "wlan"})
       }
 
       Row() {
         Text($r('app.string.wlan'))
-          .fontSize(22)
+          .fontSize(ConfigData.VP_22)
           .fontWeight(FontWeight.Bold)
           .layoutWeight(1)
           .align(Alignment.TopStart)
         Column() {
-          Toggle({ type: ToggleType.Switch, isOn: this.isSwitchOn })
+          Toggle({type: ToggleType.Switch, isOn: this.isSwitchOn})
             .onChange(async (isOn: boolean) => {
-              console.log(TAG, `wifi swtich is: ${ isOn }`)
+              hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `wifi swtich is: ${ isOn }`)
               this.wifiList = []
-              if (isOn) {
+              if (isOn){
                 try {
                   this.isSwitchOn = true;
                   this.isScanning = true;
@@ -178,10 +179,10 @@ struct WifiScan {
                   // 延迟执行startScan，确保WiFi服务已经准备好
                   setTimeout(() => {
                     this.scan();
-                  }, 2000);
-                } catch (error) {
-                  console.error(TAG, `Failed to enable Wi-Fi: ${error}`);
-                }
+                }, 2000);
+              } catch (error){
+                  hilog.error(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to enable Wi-Fi: ${error}`);
+              }
               } else {
                 this.isSwitchOn = false;
                 this.isLinked = false;
@@ -189,9 +190,9 @@ struct WifiScan {
                 try {
                   await wifiManager.disconnect();
                   await wifiManager.disableWifi();
-                } catch (error) {
-                  console.error(TAG, `Failed to disable Wi-Fi: ${error}`);
-                }
+              } catch (error){
+                  hilog.error(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to disable Wi-Fi: ${error}`);
+              }
                 this.wifiList = [];
               }
             })
@@ -199,36 +200,36 @@ struct WifiScan {
       }
       .width(ConfigData.WH_95_100)
 
-      if (this.isSwitchOn) {
-        if (this.isLinked) {
+      if (this.isSwitchOn){
+        if (this.isLinked){
           Text($r('app.string.wlanIsConnected'))
-            .fontSize(22)
+            .fontSize(ConfigData.VP_22)
             .width(ConfigData.WH_95_100)
             .align(Alignment.TopStart)
           Row() {
             Text(this.linkedInfo.ssid)
-              .fontSize(20)
-              .fontColor(Color.Black)
+              .fontSize(ConfigData.VP_20)
+              .fontColor($r('app.color.black'))
               .layoutWeight(1)
             Text($r('app.string.wlanIsConnected'))
-              .fontSize(18)
-              .fontColor(Color.Black)
+              .fontSize(ConfigData.VP_18)
+              .fontColor($r('app.color.black'))
           }
           .width(ConfigData.WH_95_100)
-          .padding(10)
-          .margin(10)
-          .border({ radius: 15, color: Color.Gray, width: 1 })
-          .backgroundColor(Color.White)
+          .padding(ConfigData.VP_10)
+          .margin(ConfigData.VP_10)
+          .border({radius: $r('app.float.wh_value_15'), color: $r('app.color.color_999999_grey'), width: ConfigData.VP_1})
+          .backgroundColor($r('app.color.white'))
         }
-        AvailableWifi({ wifiList: $wifiList, linkedInfo: $linkedInfo })
+        AvailableWifi({wifiList: $wifiList, linkedInfo: $linkedInfo})
       }
     }
-    .size({ width: ConfigData.WH_100_100, height: ConfigData.WH_100_100 })
-    .backgroundColor('#F5F5F5')
+    .size({width: ConfigData.WH_100_100, height: ConfigData.WH_100_100})
+    .backgroundColor($r("app.color.ohcc_hex_f5f5f5"))
   }
 
   aboutToDisappear() {
-    this.isScanning = false; // 设置标志，告诉scan方法停止新的扫描
+    this.isScanning = false;// 设置标志，告诉scan方法停止新的扫描
     this.isSwitchOn = false
     wifiManager.off('wifiConnectionChange')
     wifiManager.off('wifiStateChange')

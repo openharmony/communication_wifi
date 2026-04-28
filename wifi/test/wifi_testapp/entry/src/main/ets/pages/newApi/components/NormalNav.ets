@@ -12,7 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
+import ConfigData from '../../../Utils/ConfigData';
 @Component
 export struct NormalNav {
   @Require @Prop title: Resource | string
@@ -20,8 +21,8 @@ export struct NormalNav {
   build() {
     Row() {
       Text(this.title)
-        .margin({ left: 20 })
+        .margin({left: ConfigData.VP_20})
     }
-    .height(50)
+    .height(ConfigData.VP_50)
   }
 }

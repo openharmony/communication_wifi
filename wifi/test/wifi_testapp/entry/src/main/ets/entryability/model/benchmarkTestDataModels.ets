@@ -998,3 +998,204 @@ const P2pBenchmarkTestCase: BenchmarkTest[] = [
 
 const P2pManagerBenchmarkTestCase: BenchmarkTest[] = [
   {
+    'name': '获取P2P连接信息Callback',
+    'detail': '获取P2P连接信息Callback',
+    'method': 'getP2pLinkedInfo',
+    'api': testGetP2pLinkedInfoManagerCallback,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '获取P2P当前组信息Callback',
+    'detail': '获取P2P当前组信息Callback',
+    'method': 'getCurrentGroup',
+    'api': testGetCurrentP2pGroupManagerCallback,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '获取P2P对端设备列表信息Callback',
+    'detail': '获取P2P对端设备列表信息Callback',
+    'method': 'getP2pPeerDevices',
+    'api': testGetP2pPeerDevicesManagerCallback,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '获取P2P对端设备列表信息Callback',
+    'detail': '获取P2P对端设备列表信息Callback',
+    'method': 'getP2pPeerDevices',
+    'api': testGetP2pLocalDeviceManagerCallback,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+
+  {
+    'name': '创建群组',
+    'detail': '创建群组',
+    'method': 'createGroup',
+    'api': testCreateP2pGroupManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '移除群组',
+    'detail': '移除群组',
+    'method': 'removeGroup',
+    'api': testRemoveP2pGroupManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '执行P2P连接',
+    'detail': '执行P2P连接',
+    'method': 'p2pConnect',
+    'api': testP2pConnectManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '取消P2P连接',
+    'detail': '取消P2P连接',
+    'method': 'p2pCancelConnect',
+    'api': testP2pCancelConnectManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '开始发现设备',
+    'detail': '开始发现设备',
+    'method': 'startDiscoverDevices',
+    'api': testStartDiscoverP2pDevicesManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '停止发现设备',
+    'detail': '停止发现设备',
+    'method': 'stopDiscoverDevices',
+    'api': testStopDiscoverP2pDevicesManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '删除永久组',
+    'detail': '删除永久组',
+    'method': 'deletePersistentP2pGroup',
+    'api': testDeletePersistentP2pGroupManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '获取创建的所有P2P群组信息Callback',
+    'detail': '获取创建的所有P2P群组信息Callback',
+    'method': 'getP2pGroupsManagerCallback',
+    'api': testGetP2pGroupsManagerCallback,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '设置设备名称',
+    'detail': '设置设备名称',
+    'method': 'setP2pDeviceNameManager',
+    'api': testSetP2pDeviceNameManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '注册P2P开关状态改变事件',
+    'detail': '注册P2P开关状态改变事件',
+    'method': 'On.P2pStateChange',
+    'api': testOnP2pStateChangeManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '注册P2P连接状态改变事件',
+    'detail': '注册P2P连接状态改变事件',
+    'method': 'On.P2pConnectionChange',
+    'api': testOnP2pConnectionChangeManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '注册P2P设备状态改变事件',
+    'detail': '注册P2P设备状态改变事件',
+    'method': 'On.p2pDeviceChange',
+    'api': testOnP2pDeviceChangeManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '注册P2P对端设备状态改变事件',
+    'detail': '注册P2P对端设备状态改变事件',
+    'method': 'On.p2pPeerDeviceChange',
+    'api': testOnP2pPeerDeviceChangeManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '注册P2P永久组状态改变事件',
+    'detail': '注册P2P永久组状态改变事件',
+    'method': 'On.p2pPersistentGroupChange',
+    'api': testOnP2pPersistentGroupChangeManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+  {
+    'name': '注册发现设备状态改变事件',
+    'detail': '注册发现设备状态改变事件',
+    'method': 'On.p2pDiscoveryChange',
+    'api': testOnP2pDiscoveryChangeManager,
+    'result': 'None',
+    'category': BenchmarkCategory.P2pManagerBenchmark
+},
+]
+
+export function initWifiBenchmarkData(): Array<TestBenchmark> {
+  let TestBenchmarkArray: Array<TestBenchmark> = []
+  WifiBenchmarkTestCase.forEach(item => {
+    TestBenchmarkArray.push(new TestBenchmark(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestBenchmarkArray;
+}
+
+export function initWifiManagerBenchmarkData(): Array<TestBenchmark> {
+  let TestBenchmarkArray: Array<TestBenchmark> = []
+  WifiManagerBenchmarkTestCase.forEach(item => {
+    TestBenchmarkArray.push(new TestBenchmark(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestBenchmarkArray;
+}
+
+export function initHotspotBenchmarkData(): Array<TestBenchmark> {
+  let TestBenchmarkArray: Array<TestBenchmark> = []
+  HotspotBenchmarkTestCase.forEach(item => {
+    TestBenchmarkArray.push(new TestBenchmark(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestBenchmarkArray;
+}
+
+export function initHotspotManagerBenchmarkData(): Array<TestBenchmark> {
+  let TestBenchmarkArray: Array<TestBenchmark> = []
+  HotspotManagerBenchmarkTestCase.forEach(item => {
+    TestBenchmarkArray.push(new TestBenchmark(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestBenchmarkArray;
+}
+
+export function initP2pBenchmarkData(): Array<TestBenchmark> {
+  let TestBenchmarkArray: Array<TestBenchmark> = []
+  P2pBenchmarkTestCase.forEach(item => {
+    TestBenchmarkArray.push(new TestBenchmark(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestBenchmarkArray;
+}
+
+export function initP2pManagerBenchmarkData(): Array<TestBenchmark> {
+  let TestBenchmarkArray: Array<TestBenchmark> = []
+  P2pManagerBenchmarkTestCase.forEach(item => {
+    TestBenchmarkArray.push(new TestBenchmark(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestBenchmarkArray;
+}

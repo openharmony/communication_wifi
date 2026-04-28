@@ -1,6 +1,6 @@
 {
   "devices": {
-    "general": ["default"]
+    "general": ["default", "tablet"]
   },
   "production": {
     "removedSysCaps": [

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import ConfigData from '../utils/ConfigData';
+import ConfigData from '../Utils/ConfigData';
 
 /**
  * TitleComponent of wifi test
@@ -22,7 +22,7 @@ import ConfigData from '../utils/ConfigData';
 @Component
 export struct TitleComponent {
   private title: string | Resource;
-  private fontSize: string = '30vp';
+  private fontSize: string = ConfigData.VP_30;
   private stateChangeFlag: boolean = false;
   private pinRequiredFlag: boolean = false;
   private bondStateChangeFlag: boolean = false;
@@ -34,37 +34,37 @@ export struct TitleComponent {
 
   build() {
     Column() {
-      Flex({ justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center }) {
-        Text(this.stateChangeFlag ? this.state : (this.pinRequiredFlag ? this.pin : (this.bondStateChangeFlag ? this.bondState : this.title)))
+      Flex({justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center}){
+        Text(this.stateChangeFlag ? this.state: (this.pinRequiredFlag ? this.pin: (this.bondStateChangeFlag ? this.bondState: this.title)))
           .textAlign(TextAlign.Center)
           .width(ConfigData.WH_100_100)
-          .height(70)
+          .height(ConfigData.VP_70)
           .fontSize(this.fontSize)
           .fontColor($r('app.color.font_color_182431'))
           .fontWeight(FontWeight.Medium)
       }
-      .height(80)
+      .height(ConfigData.VP_80)
       .width(ConfigData.WH_100_100)
       .backgroundColor(this.bgColor)
       .linearGradient(this.isTouched ? {
         angle: 90,
-        direction: GradientDirection.Right ,
+        direction: GradientDirection.Right,
         colors: [[$r("app.color.DCEAF9"), 0.0], [$r("app.color.FAFAFA"), 1.0]]
       }: {
         angle: 90,
-        direction: GradientDirection.Right ,
+        direction: GradientDirection.Right,
         colors: [[$r("sys.color.ohos_id_color_foreground_contrary"), 1], [$r("sys.color.ohos_id_color_foreground_contrary"), 1]]
       })
       .onTouch((event: TouchEvent) => {
-        if (event.type === TouchType.Down) {
+        if (event.type === TouchType.Down){
           this.isTouched = true;
-        } else if (event.type === TouchType.Up) {
+        } else if (event.type === TouchType.Up){
           this.isTouched = false;
         }
       })
     }
     .padding($r('app.float.distance_4'))
-    .height("100vp")
+    .height(ConfigData.VP_100)
     .borderRadius($r('app.float.radius_12'))
     .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"));
   }

@@ -18,13 +18,13 @@
  */
 
 export enum Category {
-  All ,
-  API ,
-  Scenario ,
-  AutoTest ,
-  BenchMark ,
-  Stress ,
-  App ,
+  All,
+  API,
+  Scenario,
+  AutoTest,
+  BenchMark,
+  Stress,
+  App,
   Stability,
   NewApi,
   Socket
@@ -40,7 +40,7 @@ export class TestData {
   image?: Resource
   category?: Category;
 
-  constructor(name: string, detail: string, url: string, image: Resource, category: Category) {
+  constructor(name: string, detail: string, url: string, image: Resource, category: Category){
     this.id = `${ NextId ++ }`;
     this.name = name;
     this.url = url;
@@ -52,11 +52,11 @@ export class TestData {
 
 
 export enum CaseCategory {
-  Wifi ,
-  WifiManager ,
-  Hotspot ,
-  HotspotManager ,
-  P2p ,
+  Wifi,
+  WifiManager,
+  Hotspot,
+  HotspotManager,
+  P2p,
   P2pManager,
   Socket,
   LinkEnhance
@@ -71,7 +71,7 @@ export class TestApi {
   result?: string;
   category?: CaseCategory;
 
-  constructor(name: string, detail: string, method: string, api: Function, result: string, category: CaseCategory) {
+  constructor(name: string, detail: string, method: string, api: Function, result: string, category: CaseCategory){
     this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
@@ -83,11 +83,11 @@ export class TestApi {
 }
 
 export enum AutoCategory {
-  WifiAuto ,
-  WifiManagerAuto ,
-  HotspotAuto ,
-  HotspotManagerAuto ,
-  P2pAuto ,
+  WifiAuto,
+  WifiManagerAuto,
+  HotspotAuto,
+  HotspotManagerAuto,
+  P2pAuto,
   P2pManagerAuto
 }
 
@@ -100,7 +100,7 @@ export class TestAuto {
   result: string;
   category: AutoCategory;
 
-  constructor(name: string, detail: string, method: string, api: Function, result: string, category: AutoCategory) {
+  constructor(name: string, detail: string, method: string, api: Function, result: string, category: AutoCategory){
     this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
@@ -112,12 +112,12 @@ export class TestAuto {
 }
 
 export enum ScenarioCategory {
-  WifiScanScenario ,
-  WifiManagerScanScenario ,
-  HotspotCreateScenario ,
-  HotspotManagerCreateScenario ,
-  P2pConnectScenario ,
-  P2pManagerConnectScenario ,
+  WifiScanScenario,
+  WifiManagerScanScenario,
+  HotspotCreateScenario,
+  HotspotManagerCreateScenario,
+  P2pConnectScenario,
+  P2pManagerConnectScenario,
 }
 
 export class TestScenario {
@@ -129,7 +129,7 @@ export class TestScenario {
   result: string;
   category: ScenarioCategory;
 
-  constructor(name: string, detail: string, method: string, api: Function, result: string, category: ScenarioCategory) {
+  constructor(name: string, detail: string, method: string, api: Function, result: string, category: ScenarioCategory){
     this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
@@ -141,12 +141,12 @@ export class TestScenario {
 }
 
 export enum BenchmarkCategory {
-  WifiBenchmark ,
-  WifiManagerBenchmark ,
-  HotspotBenchmark ,
-  HotspotManagerBenchmark ,
-  P2pBenchmark ,
-  P2pManagerBenchmark ,
+  WifiBenchmark,
+  WifiManagerBenchmark,
+  HotspotBenchmark,
+  HotspotManagerBenchmark,
+  P2pBenchmark,
+  P2pManagerBenchmark,
 }
 
 export class TestBenchmark {
@@ -158,7 +158,7 @@ export class TestBenchmark {
   result: string;
   category: BenchmarkCategory;
 
-  constructor(name: string, detail: string, method: string, api: Function, result: string, category: BenchmarkCategory) {
+  constructor(name: string, detail: string, method: string, api: Function, result: string, category: BenchmarkCategory){
     this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;
@@ -170,12 +170,12 @@ export class TestBenchmark {
 }
 
 export enum StressCategory {
-  WifiStress ,
-  WifiManagerStress ,
-  HotspotStress ,
-  HotspotManagerStress ,
-  P2pStress ,
-  P2pManagerStress ,
+  WifiStress,
+  WifiManagerStress,
+  HotspotStress,
+  HotspotManagerStress,
+  P2pStress,
+  P2pManagerStress,
 }
 
 export class TestStress {
@@ -187,7 +187,7 @@ export class TestStress {
   result: string;
   category: StressCategory;
 
-  constructor(name: string, detail: string, method: string, api: Function, result: string, category: StressCategory) {
+  constructor(name: string, detail: string, method: string, api: Function, result: string, category: StressCategory){
     this.id = `${ NextId ++ }`;
     this.name = name;
     this.detail = detail;

@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
-import { PageTitle } from '../../component/pageTitle';
-import { TestImageDisplay } from '../../component/testImageDisplay';
-import { ContentTable } from '../../component/contentTable';
+import hilog from '@ohos.hilog';
+import { PageTitle} from '../../Component/pageTitle';
+import { TestImageDisplay} from '../../Component/testImageDisplay';
+import { ContentTable} from '../../Component/contentTable';
 import router from '@ohos.router';
-import ConfigData from '../../utils/ConfigData';
-import { initP2pApiData } from '../../entryability/model/testDataModels';
-import { TestData } from '../../entryability/model/testData';
+import ConfigData from '../../Utils/ConfigData';
+import { initP2pApiData} from '../../entryability/model/testDataModels';
+import { TestData} from '../../entryability/model/testData';
 
 interface myParams extends Object {
   testItem: TestData
@@ -31,12 +32,12 @@ interface myParams extends Object {
 
 @Component
 struct p2pSetting {
-  @State deviceAddress: string = '6c:96:d7:3d:87:6f';
-  @State netId: number = - 2;
-  @State passphrase: string = "12345678";
-  @State groupName: string = "testGroup"
-  @State goBand: number = 0;
-  @State deviceName: string = "MyTestDevice"
+  @State deviceAddress: string = ConfigData.P2P_DEMO_ADDRESS;
+  @State netId: number = ConfigData.P2P_DEMO_NET_ID;
+  @State passphrase: string = ConfigData.P2P_DEMO_PASSPHRASE;
+  @State groupName: string = ConfigData.P2P_DEMO_GROUP_NAME;
+  @State goBand: number = ConfigData.P2P_DEMO_GO_BAND;
+  @State deviceName: string = ConfigData.P2P_DEMO_DEVICE_NAME;
 
   aboutToAppear() {
     AppStorage.setOrCreate("deviceAddress", this.deviceAddress)
@@ -50,121 +51,121 @@ struct p2pSetting {
   build() {
     Column() {
       Row() {
-        Text("deviceAddress:").fontSize(16).width(120)
-        TextInput({ text: this.deviceAddress, placeholder: "input peripheral deviceId." })
-          .fontSize("15vp")
+        Text($r('app.string.wifitest_text_d_1')).fontSize(ConfigData.VP_16).width(ConfigData.VP_120)
+        TextInput({text: this.deviceAddress, placeholder: $r('app.string.wifitest_text_ipd')})
+          .fontSize(ConfigData.VP_15)
           .onChange((strInput: string) => {
             this.deviceAddress = strInput;
             //判断合法性
-            if (strInput.length >= 1) {
+            if (strInput.length >= 1){
               AppStorage.setOrCreate('deviceAddress', this.deviceAddress);
             }
           })
           .width(ConfigData.WH_80_100)
-          .borderRadius(1)
+          .borderRadius($r('app.float.wh_value_1'))
       }
       .backgroundColor($r("app.color.moon"))
-      .padding(5)
+      .padding(ConfigData.VP_5)
       .justifyContent(FlexAlign.Start)
       .alignItems(VerticalAlign.Center)
 
       Column() {
-        Stack().height("0.25vp").backgroundColor("#000000");
+        Stack().height(ConfigData.VP_0_25).backgroundColor($r("app.color.black"));
         Column() {
           Row() {
-            Text("netId:").fontSize(15).width(60);
-            TextInput({ text: this.netId.toString(), placeholder: "-2" })
-              .fontSize("15vp")
+            Text($r('app.string.wifitest_text_n')).fontSize(ConfigData.VP_15).width(ConfigData.VP_60);
+            TextInput({text: this.netId.toString(), placeholder: $r('app.string.wifitest_text_2')})
+              .fontSize(ConfigData.VP_15)
               .onChange((strInput: string) => {
                 this.netId = parseInt(strInput);
                 //判断合法性
-                if (strInput.length >= 1) {
+                if (strInput.length >= 1){
                   AppStorage.setOrCreate('netId', this.netId);
                 }
               })
               .width(ConfigData.WH_80_100)
-              .borderRadius(1)
+              .borderRadius($r('app.float.wh_value_1'))
           }
-          .padding(5)
+          .padding(ConfigData.VP_5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
           .backgroundColor($r("app.color.spring"))
 
           Row() {
-            Text("passphrase:").fontSize(15).width(100);
-            TextInput({ text: this.passphrase, placeholder: "input passphrase" })
-              .fontSize("15vp")
+            Text($r('app.string.wifitest_text_p')).fontSize(ConfigData.VP_15).width(ConfigData.VP_100);
+            TextInput({text: this.passphrase, placeholder: $r('app.string.wifitest_text_ip_1')})
+              .fontSize(ConfigData.VP_15)
               .onChange((strInput: string) => {
                 this.passphrase = strInput;
-                if (strInput.length >= 1) {
+                if (strInput.length >= 1){
                   AppStorage.setOrCreate('passphrase', this.passphrase);
                 }
               })
               .width(ConfigData.WH_80_100)
-              .borderRadius(1)
+              .borderRadius($r('app.float.wh_value_1'))
           }
           .backgroundColor($r("app.color.spring"))
-          .padding(5)
+          .padding(ConfigData.VP_5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
 
           Row() {
-            Text("groupName:").fontSize(15).width(100);
-            TextInput({ text: this.groupName, placeholder: "testGroup" })
-              .fontSize("15vp")
+            Text($r('app.string.wifitest_text_g_1')).fontSize(ConfigData.VP_15).width(ConfigData.VP_100);
+            TextInput({text: this.groupName, placeholder: ConfigData.P2P_DEMO_GROUP_NAME})
+              .fontSize(ConfigData.VP_15)
               .onChange((strInput: string) => {
                 this.groupName = strInput;
-                if (strInput.length >= 1) {
+                if (strInput.length >= 1){
                   AppStorage.setOrCreate('groupName', this.groupName);
                 }
               })
               .width(ConfigData.WH_80_100)
-              .borderRadius(1)
+              .borderRadius($r('app.float.wh_value_1'))
           }
           .backgroundColor($r("app.color.spring"))
-          .padding(5)
+          .padding(ConfigData.VP_5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
 
           Row() {
-            Text("goBand:").fontSize(15).width(80);
-            TextInput({ text: this.goBand.toString(), placeholder: "0" })
-              .fontSize("15vp")
+            Text($r('app.string.wifitest_text_g')).fontSize(ConfigData.VP_15).width(ConfigData.VP_80);
+            TextInput({text: this.goBand.toString(), placeholder: ConfigData.QV_MOCK_DOMAIN_0})
+              .fontSize(ConfigData.VP_15)
               .onChange((strInput: string) => {
                 this.goBand = Number(strInput);
-                if (strInput.length >= 1) {
+                if (strInput.length >= 1){
                   AppStorage.setOrCreate('goBand', this.goBand);
                 }
               })
               .width(ConfigData.WH_80_100)
-              .borderRadius(1)
+              .borderRadius($r('app.float.wh_value_1'))
           }
           .backgroundColor($r("app.color.spring"))
-          .padding(5)
+          .padding(ConfigData.VP_5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
 
 
           Row() {
-            Text("deviceName:").fontSize(15).width(100);
-            TextInput({ text: this.deviceName, placeholder: "MyTestDevice" })
-              .fontSize("15vp")
+            Text($r('app.string.wifitest_text_d')).fontSize(ConfigData.VP_15).width(ConfigData.VP_100);
+            TextInput({text: this.deviceName, placeholder: ConfigData.P2P_DEMO_DEVICE_NAME})
+              .fontSize(ConfigData.VP_15)
               .onChange((strInput: string) => {
                 this.deviceName = strInput;
-                if (strInput.length >= 1) {
+                if (strInput.length >= 1){
                   AppStorage.setOrCreate('deviceName', strInput);
                 }
               })
               .width(ConfigData.WH_80_100)
-              .borderRadius(1)
+              .borderRadius($r('app.float.wh_value_1'))
           }
           .backgroundColor($r("app.color.spring"))
-          .padding(5)
+          .padding(ConfigData.VP_5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
         }
 
-        Stack().height("0.25vp").backgroundColor("#000000");
+        Stack().height(ConfigData.VP_0_25).backgroundColor($r("app.color.black"));
       }
     }
   }
@@ -177,16 +178,16 @@ struct P2pInterfaceTest {
   private testItem: TestData = (router.getParams() as myParams).testItem
   @State message: string = "";
   @State deviceId: string = '';
-  @State currentClick: number = - 1;
+  @State currentClick: number = ConfigData.ITEM_CLICK_NONE;
   @State pairPinCode: string = '';
   @State isStateChangeClick: boolean = false;
-  @State deviceAddress: string = '6c:96:d7:3d:87:6f';
-  @State netId: number = - 2;
-  @State passphrase: string = "12345678";
-  @State groupName: string = "testGroup"
-  @State goBand: number = 0;
-  @State deviceName: string = "MyTestDevice"
-  @State connectedIp: string = "192.168.1.107"
+  @State deviceAddress: string = ConfigData.P2P_DEMO_ADDRESS;
+  @State netId: number = ConfigData.P2P_DEMO_NET_ID;
+  @State passphrase: string = ConfigData.P2P_DEMO_PASSPHRASE;
+  @State groupName: string = ConfigData.P2P_DEMO_GROUP_NAME;
+  @State goBand: number = ConfigData.P2P_DEMO_GO_BAND;
+  @State deviceName: string = ConfigData.P2P_DEMO_DEVICE_NAME;
+  @State connectedIp: string = ConfigData.P2P_DEMO_PEER_IP
   @StorageLink('p2pDeviceName') p2pDeviceName: string = "";
   @StorageLink('p2pStateMessage') p2pStateMessage: string = "";
   @StorageLink('p2pDeviceMessage') p2pDeviceMessage: string = "";
@@ -207,39 +208,39 @@ struct P2pInterfaceTest {
   }
 
   init() {
-    console.log("init-----------")
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', "init-----------")
   }
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TestImageDisplay({ testItem: this.testItem })
-        PageTitle({ testItem: this.testItem })
+      Stack({alignContent: Alignment.TopStart}){
+        TestImageDisplay({testItem: this.testItem})
+        PageTitle({testItem: this.testItem})
       }
 
-      Stack().height("0.5vp").backgroundColor("#000000");
+      Stack().height(ConfigData.VP_0_5).backgroundColor($r("app.color.black"));
 
       Column() {
         Row() {
-          Text("本设备名称：")
-            .fontSize("20vp")
-            .height(40)
-            .padding({ top: 5 })
+          Text($r('app.string.wifitest_text_bsbmc'))
+            .fontSize(ConfigData.VP_20)
+            .height(ConfigData.VP_40)
+            .padding({top: ConfigData.VP_5})
             .width(ConfigData.WH_28_100)
             .align(Alignment.Start)
 
-          TextInput({ text: this.p2pDeviceName, placeholder: "请在右侧输入p2p的配置" })
-            .height(40)
+          TextInput({text: this.p2pDeviceName, placeholder: $r('app.string.wifitest_text_qzycsrpdpz')})
+            .height(ConfigData.VP_40)
             .borderStyle(BorderStyle.Dashed)
             .backgroundColor($r("app.color.white"))
             .onChange((str) => {
               this.p2pDeviceName = str;
             })
             .width(ConfigData.WH_45_100)
-            .padding({ top: 5, left: 5 })
+            .padding({top: ConfigData.VP_5, left: ConfigData.VP_5})
           Image($r('app.media.Switch'))
-            .height(50)
-            .padding({ top: 5, bottom: 5, left: 10 })
+            .height(ConfigData.VP_50)
+            .padding({top: ConfigData.VP_5, bottom: ConfigData.VP_5, left: ConfigData.VP_10})
             .width(ConfigData.WH_15_100)
             .onClick(() => {
               this.showList = !this.showList;
@@ -248,63 +249,87 @@ struct P2pInterfaceTest {
       }
       .align(Alignment.TopStart)
 
-      if (this.showList) {
+      if (this.showList){
         p2pSetting()
       } else {
         Column() {
           Scroll() {
             Column() {
-              Text("开关结果:" + this.p2pStateMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_p2p_switch'))
+                Span(this.p2pStateMessage)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("本机信息:" + this.p2pDeviceMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_p2p_local'))
+                Span(this.p2pDeviceMessage)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("发现信息:" + this.p2pDiscoveryMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_p2p_discover'))
+                Span(this.p2pDiscoveryMessage)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("连接状态:" + this.p2pLinkStateMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_p2p_link_state'))
+                Span(this.p2pLinkStateMessage)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("连接信息:" + this.p2pLinkMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_p2p_link_info'))
+                Span(this.p2pLinkMessage)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("对端设备:" + this.p2pPeerDeviceMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_p2p_peer'))
+                Span(this.p2pPeerDeviceMessage)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("对端设备[]:" + this.p2pPeerDeviceMessages)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_p2p_peers'))
+                Span(this.p2pPeerDeviceMessages)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("组信息:" + this.p2pGroupMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_p2p_group'))
+                Span(this.p2pGroupMessage)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
             }
             .width(ConfigData.WH_100_100)
           }
-          .scrollBarWidth(10)
+          .scrollBarWidth(ConfigData.VP_10)
           .scrollBar(BarState.Auto)
         }
-        .height(100)
+        .height(ConfigData.VP_100)
         .width(ConfigData.WH_95_100)
         .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
 
-        ContentTable({ testItem: this.testItem, apiItems: initP2pApiData() })
+        ContentTable({testItem: this.testItem, apiItems: initP2pApiData()})
       }
     }
     .alignItems(HorizontalAlign.Center)

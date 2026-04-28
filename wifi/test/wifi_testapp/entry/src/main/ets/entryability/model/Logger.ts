@@ -24,24 +24,24 @@ class Logger {
   private prefix: string;
   private format: string = "%{public}s, %{public}s";
 
-  constructor(prefix: string) {
+  constructor(prefix: string){
     this.prefix = prefix;
     this.domain = 0xFF00;
   }
 
-  debug(...args: string[]) {
+  debug(...args: string[]){
     hilog.debug(this.domain, this.prefix, this.format, args);
   }
 
-  info(...args: string[]) {
+  info(...args: string[]){
     hilog.info(this.domain, this.prefix, this.format, args);
   }
 
-  warn(...args: string[]) {
+  warn(...args: string[]){
     hilog.warn(this.domain, this.prefix, this.format, args);
   }
 
-  error(...args: string[]) {
+  error(...args: string[]){
     hilog.error(this.domain, this.prefix, this.format, args);
   }
 }

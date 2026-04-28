@@ -27,7 +27,7 @@ import DateTimeUtil from './DateTimeUtil';
 const TAG = "wifiTestApp [MediaUtils]";
 
 class MediaUtils {
-  async createAndGetFile(context: any) {
+  async createAndGetFile(context: any){
     let mediaTest = photoAccessHelper.getPhotoAccessHelper(context);
     let info = {
       prefix: 'IMG_',
@@ -44,7 +44,7 @@ class MediaUtils {
     return await mediaTest.createAsset(photoType, '.jpg', options);
   }
 
-  async savePicture(data: image.PixelMap, context: any) {
+  async savePicture(data: image.PixelMap, context: any){
     console.log(TAG, `savePicture`);
     let packOpts: image.PackingOption = {
       format: "image/jpeg",
@@ -57,7 +57,7 @@ class MediaUtils {
     imagePackerApi.release();
     try {
       await fs.write(file.fd, arrayBuffer);
-    } catch (err) {
+    } catch (err){
       console.log(`write failed, code is ${err.code}, message is ${err.message}`);
     }
     await fs.close(file.fd);

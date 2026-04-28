@@ -16,6 +16,20 @@
 import hilog from '@ohos.hilog';
 import BaseModel from './BaseModel';
 
+const LOG_DOMAIN = 0x1500;
+const LOG_TAG = 'wifiTestApp';
+
+function msgStr(msg: unknown): string {
+  if (typeof msg === 'string') {
+    return msg;
+  }
+  try {
+    return JSON.stringify(msg);
+  } catch (_e) {
+    return String(msg);
+  }
+}
+
 let LogLevel = {
   /**
    * debug
@@ -49,33 +63,33 @@ const LOG_LEVEL = LogLevel.INFO;
  *  log package tool class
  */
 export class LogUtil extends BaseModel {
-  debug(msg): void {
+  debug(msg: unknown): void {
     if (LogLevel.DEBUG >= LOG_LEVEL) {
-      hilog.debug(0x1500, 'wifiTestApp', '%{public}s', String(msg));
+      hilog.debug(LOG_DOMAIN, LOG_TAG, '%{public}s', msgStr(msg));
     }
   }
 
-  log(msg): void {
+  log(msg: unknown): void {
     if (LogLevel.INFO >= LOG_LEVEL) {
-      hilog.info(0x1500, 'wifiTestApp', '%{public}s', String(msg));
+      hilog.info(LOG_DOMAIN, LOG_TAG, '%{public}s', msgStr(msg));
     }
   }
 
-  info(msg): void {
+  info(msg: unknown): void {
     if (LogLevel.INFO >= LOG_LEVEL) {
-      hilog.info(0x1500, 'wifiTestApp', '%{public}s', String(msg));
+      hilog.info(LOG_DOMAIN, LOG_TAG, '%{public}s', msgStr(msg));
     }
   }
 
-  warn(msg): void {
+  warn(msg: unknown): void {
     if (LogLevel.WARN >= LOG_LEVEL) {
-      hilog.warn(0x1500, 'wifiTestApp', '%{public}s', String(msg));
+      hilog.warn(LOG_DOMAIN, LOG_TAG, '%{public}s', msgStr(msg));
     }
   }
 
-  error(msg): void {
+  error(msg: unknown): void {
     if (LogLevel.ERROR >= LOG_LEVEL) {
-      hilog.error(0x1500, 'wifiTestApp', '%{public}s', String(msg));
+      hilog.error(LOG_DOMAIN, LOG_TAG, '%{public}s', msgStr(msg));
     }
   }
 }

@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
-import { TestData } from '../entryability/model/testData';
+import hilog from '@ohos.hilog';
+import { TestData} from '../entryability/model/testData';
 import router from '@ohos.router';
 import screenshot from '@ohos.screenshot';
 import image from '@ohos.multimedia.image';
 import MediaUtils from '../entryability/model/MediaUtils';
-import ConfigData from '../utils/ConfigData';
+import ConfigData from '../Utils/ConfigData';
 
 const TAG = "wifiTestApp [pageTitle]"
 
@@ -40,53 +41,53 @@ export struct PageTitle {
   @State angle: number = 0
   getScreen = (isFullScreen: boolean) => {
     let screenshotOptions: screenshot.ScreenshotOptions = {
-      screenRect: { left: 0, top: 0, width: 400, height: 400 } ,
-      imageSize: { width: 400, height: 400 } ,
+      screenRect: { left: 0, top: 0, width: 400, height: 400},
+      imageSize: { width: 400, height: 400},
       rotation: 0,
       displayId: 0
     }
-    if (isFullScreen) {
+    if (isFullScreen){
       screenshotOptions = {
         rotation: 0
       }
     } else {
-      console.log(TAG, "error -----------")
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "error -----------")
     }
     try {
       screenshot.save(screenshotOptions, (err, data: image.PixelMap) => {
-        if (err) {
-          console.log(TAG, `Failed to save the screenshot. Error:${ JSON.stringify(err) }`)
+        if (err){
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to save the screenshot. Error:${ JSON.stringify(err) }`)
         }
-        console.log(TAG, 'save callback')
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'save callback')
         MediaUtils.savePicture(data, getContext(this))
       })
-    } catch( err) {
-      console.log(TAG, `save failed, code is ${ err.code }, message is ${ err.message }`)
+    } catch( err){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `save failed, code is ${ err.code }, message is ${ err.message }`)
     }
   }
 
   @Builder
-  CustomBtn(text: Resource, isFullScreen: boolean) {
+  CustomBtn(text: Resource, isFullScreen: boolean){
     Button() {
       Image($r('app.media.screenShot'))
-        .height(40)
-        .width(40)
+        .height(ConfigData.VP_40)
+        .width(ConfigData.VP_40)
     }
     .key(isFullScreen + 'FullScreenShot')
     .type(ButtonType.Normal)
     .backgroundColor($r("app.color.blue"))
     .height(ConfigData.WH_100_100)
     .width(ConfigData.WH_100_100)
-    .margin({ left: 3, right: 3, top: 2 })
+    .margin({left: ConfigData.VP_3, right: ConfigData.VP_3, top: ConfigData.VP_2})
     .onClick(() => {
-      console.log(TAG, 'onClick,screenshot')
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'onClick,screenshot')
       this.getScreen(isFullScreen)
     })
   }
 
   build() {
     Column() {
-      Flex({ alignItems: ItemAlign.Start }) {
+      Flex({alignItems: ItemAlign.Start}){
         Button() {
           Image($r('app.media.Back'))
             .width(ConfigData.WH_60_100)
@@ -96,15 +97,15 @@ export struct PageTitle {
         .width(ConfigData.WH_20_100)
         .height(ConfigData.WH_100_100)
         .backgroundColor($r("app.color.blue"))
-        .padding({ left: 1, top: 15 })
+        .padding({left: ConfigData.VP_1, top: ConfigData.VP_15})
         .onClick(() => {
           router.back()
         })
 
         Text(this.testItem != null ? this.testItem.detail: this.detail)
-          .fontSize(24)
-          .margin({ left: 3 })
-          .padding({ top: 18 })
+          .fontSize(ConfigData.VP_24)
+          .margin({left: ConfigData.VP_3})
+          .padding({top: ConfigData.VP_18})
 
         Scroll() {
           Column() {
@@ -114,68 +115,68 @@ export struct PageTitle {
           .height(ConfigData.WH_100_100)
           .borderWidth(this.myborderWidth)
           .borderRadius(this.myborderRadius)
-          .borderColor(Color.Green)
+          .borderColor($r('app.color.green'))
           .gesture(
-            GestureGroup(GestureMode.Parallel ,
-              TapGesture({ count: 2, fingers: 1 })
+            GestureGroup(GestureMode.Parallel,
+              TapGesture({count: 2, fingers: 1})
                 .onAction(() => {
                   this.myborderWidth += 1
-                }) ,
-              LongPressGesture({ fingers: 1, repeat: true, duration: 1000 })
+          }),
+              LongPressGesture({fingers: 1, repeat: true, duration: 1000})
                 .onAction((event: GestureEvent) => {
                   this.colOpacity -= 0.1
-                  if (event.repeat) {
-                    this.count ++
+                  if (event.repeat){
+                    this.count++
                   }
                 })
                 .onActionEnd(() => {
                   this.colOpacity = 1;
                   this.count = 0;
-                }) ,
-              PanGesture({ fingers: 1, direction: PanDirection.All, distance: 5.0 })
+          }),
+              PanGesture({fingers: 1, direction: PanDirection.All, distance: 5.0})
                 .onActionStart(() => {
-                  console.log(TAG, 'Pan start')
+                  hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'Pan start')
                 })
                 .onActionUpdate((event: GestureEvent) => {
                   this.offsetY = event.offsetY;
                   this.offsetX = event.offsetX;
                 })
                 .onActionEnd(() => {
-                  console.log(TAG, 'Pan end')
-                }) ,
-              PinchGesture({ fingers: 2, distance: 4 })
+                  hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'Pan end')
+          }),
+              PinchGesture({fingers: 2, distance: 4})
                 .onActionStart(() => {
-                  console.log(TAG, 'PinchGesture start')
+                  hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'PinchGesture start')
                 })
                 .onActionUpdate((event: GestureEvent) => {
                   this.myscale = event.scale
                   this.myborderRadius = 10
                 })
                 .onActionEnd(() => {
-                  console.log(TAG, 'PinchGesture end')
+                  hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'PinchGesture end')
                   this.getScreen(true);
-                }) ,
-              RotationGesture({ fingers: 2, angle: 2 })
+          }),
+              RotationGesture({fingers: 2, angle: 2})
                 .onActionStart(() => {
-                  console.log(TAG, 'RotationGesture start')
+                  hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'RotationGesture start')
                 })
                 .onActionUpdate((event: GestureEvent) => {
                   this.angle = event.angle
                 })
                 .onActionEnd(() => {
-                  console.log(TAG, 'RotationGesture end')
+                  hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'RotationGesture end')
                 })
             )
               .onCancel(() => {
-                console.log(TAG, 'Parallel gesture canceled')
+                hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'Parallel gesture canceled')
               })
           )
         }
         .layoutWeight(1)
       }
-      .height(61)
-      .backgroundColor('#FFedf2f5')
-      .padding({ left: 10 })
+      .height(ConfigData.VP_61)
+      .backgroundColor($r("app.color.ohcc_hex_ffedf2f5"))
+      .padding({left: ConfigData.VP_10})
       .borderColor($r("app.color.black"))
       .backgroundColor($r("app.color.blue"))
     }

@@ -15,7 +15,7 @@
 
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
-import ConfigData from '../utils/ConfigData';
+import ConfigData from '../Utils/ConfigData';
 /**
  * PswDialog page of WiFi test
  */
@@ -30,14 +30,14 @@ export struct P2pPswDialog {
   build() {
     Column() {
       Text(this.p2pScanInfo.deviceName)
-        .fontSize(20)
+        .fontSize(ConfigData.VP_20)
         .width(ConfigData.WH_95_100)
-      TextInput({ placeholder: 'input password' })
+      TextInput({placeholder: $r('app.string.wifitest_text_ip')})
         .key('input')
         .type(InputType.Password)
-        .placeholderColor(Color.Gray)
-        .fontSize(19)
-        .margin({ top: 15 })
+        .placeholderColor($r('app.color.color_999999_grey'))
+        .fontSize(ConfigData.VP_19)
+        .margin({top: ConfigData.VP_15})
         .width(ConfigData.WH_95_100)
         .onChange((value: string) => {
           this.psw = value
@@ -45,35 +45,35 @@ export struct P2pPswDialog {
       Row() {
         Button() {
           Text($r('app.string.sure'))
-            .fontColor(Color.Blue)
-            .fontSize(17)
+            .fontColor($r('app.color.main_blue'))
+            .fontSize(ConfigData.VP_17)
         }
         .layoutWeight(7)
-        .backgroundColor(Color.White)
-        .margin(5)
+        .backgroundColor($r('app.color.white'))
+        .margin(ConfigData.VP_5)
         .onClick(() => {
           this.controller.close()
           this.action(this.p2pScanInfo, this.psw)
         })
 
         Text()
-          .width(1).height(35)
-          .backgroundColor('#8F8F8F')
+          .width(ConfigData.VP_1).height(ConfigData.VP_35)
+          .backgroundColor($r("app.color.ohcc_hex_8f8f8f"))
         Button() {
           Text($r('app.string.cancel'))
-            .fontColor(Color.Red)
-            .fontSize(17)
+            .fontColor($r('app.color.red'))
+            .fontSize(ConfigData.VP_17)
         }
         .layoutWeight(7)
-        .backgroundColor(Color.White)
-        .margin(5)
+        .backgroundColor($r('app.color.white'))
+        .margin(ConfigData.VP_5)
         .onClick(() => {
           this.controller.close()
         })
       }
       .width(ConfigData.WH_100_100)
-      .margin({ top: ConfigData.WH_3_100 })
+      .margin({top: ConfigData.WH_3_100})
     }
-    .padding(15)
+    .padding(ConfigData.VP_15)
   }
 }

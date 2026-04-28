@@ -3,3 +3,10 @@
 /.idea
 **/build
 /.hvigor
+/oh_modules
+/autosign
+/scripts
+code-linter.json5
+/hvigor
+hvigorfile.ts
+oh-package-lock.json5

@@ -13,26 +13,27 @@
  * limitations under the License.
  */
 
+import ConfigData from '../Utils/ConfigData';
 /**
  *  ConfigComponent Page Of Wifi test
  */
 
 export class ComponentConfig {
-  WH_100_100 = '100%';
-  WH_10_100 = '10%';
-  WH_20_100 = '20%';
-  WH_30_100 = '30%';
-  WH_33_100 = '33%';
-  WH_35_100 = '35%';
-  WH_40_100 = '40%';
-  WH_45_100 = '45%';
-  WH_50_100 = '50%';
-  WH_55_100 = '55%';
-  WH_60_100 = '60%';
-  WH_70_100 = '70%';
-  WH_80_100 = '80%';
-  WH_83_100 = '83%';
-  WH_90_100 = '90%';
+  WH_100_100 = ConfigData.WH_100_100;
+  WH_10_100 = ConfigData.WH_10_100;
+  WH_20_100 = ConfigData.WH_20_100;
+  WH_30_100 = ConfigData.WH_30_100;
+  WH_33_100 = ConfigData.WH_33_100;
+  WH_35_100 = ConfigData.WH_35_100;
+  WH_40_100 = ConfigData.WH_40_100;
+  WH_45_100 = ConfigData.WH_45_100;
+  WH_50_100 = ConfigData.WH_50_100;
+  WH_55_100 = ConfigData.WH_55_100;
+  WH_60_100 = ConfigData.WH_60_100;
+  WH_70_100 = ConfigData.WH_70_100;
+  WH_80_100 = ConfigData.WH_80_100;
+  WH_83_100 = ConfigData.WH_83_100;
+  WH_90_100 = ConfigData.WH_90_100;
   value_20 = 20;
   font_20 = 20;
   MAX_LINES_1 = 1;

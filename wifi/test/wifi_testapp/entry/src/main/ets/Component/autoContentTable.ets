@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-import { TestData, TestAuto } from '../entryability/model/testData';
-import ConfigData from '../utils/ConfigData';
+import hilog from '@ohos.hilog';
+import { TestData, TestAuto} from '../entryability/model/testData';
+import ConfigData from '../Utils/ConfigData';
 
 const TAG = "wifiTestApp [autoContentTable]"
 /**
@@ -29,62 +30,62 @@ export struct AutoContentTable {
   @State localName: string = 'DaYuBlue'
   @Prop changeIndex: number;
 
-  @Builder IngredientItem(autoItem: TestAuto, index: number) {
+  @Builder IngredientItem(autoItem: TestAuto, index: number){
     Stack() {
       Flex() {
-        Flex({ alignItems: ItemAlign.Center }) {
+        Flex({alignItems: ItemAlign.Center}){
           Image($r('app.media.wifi'))
             .objectFit(ImageFit.Contain)
             .autoResize(false)
-            .height(26)
-            .width(25)
+            .height(ConfigData.VP_26)
+            .width(ConfigData.VP_25)
         }
-        .height(30)
+        .height(ConfigData.VP_30)
         .width(ConfigData.WH_10_100)
-        .padding({ left: 10 })
+        .padding({left: ConfigData.VP_10})
 
-        Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start }) {
+        Flex({direction: FlexDirection.Column, alignItems: ItemAlign.Start}){
           Row() {
             Text(autoItem.method)
-              .fontSize("17vp")
-              .margin({ top: "3vp", bottom: "3vp", left: "10vp" })
+              .fontSize(ConfigData.VP_17)
+              .margin({top: ConfigData.VP_3, bottom: ConfigData.VP_3, left: ConfigData.VP_10})
               .textAlign(TextAlign.Start)
-              .height(40)
-              .width(200)
+              .height(ConfigData.VP_40)
+              .width(ConfigData.VP_200)
           }
-          .height(30)
+          .height(ConfigData.VP_30)
           .width(ConfigData.WH_70_100)
         }
-        .height(30)
+        .height(ConfigData.VP_30)
         .layoutWeight(6)
 
-        Flex({ alignItems: ItemAlign.Center }) {
+        Flex({alignItems: ItemAlign.Center}){
           Text(this.changeIndex >= 0 ? this.getCurrentState(index) : autoItem.result)
-            .margin({ left: "10vp" })
-            .fontSize("17vp")
+            .margin({left: ConfigData.VP_10})
+            .fontSize(ConfigData.VP_17)
             .flexGrow(1)
         }
         .layoutWeight(3)
-        .padding({ left: 10 })
+        .padding({left: ConfigData.VP_10})
       }
     }
-    .height(40)
-    .borderRadius(10)
-    .margin({ top: 3, bottom: 3 })
+    .height(ConfigData.VP_40)
+    .borderRadius($r('app.float.wh_value_10'))
+    .margin({top: ConfigData.VP_3, bottom: ConfigData.VP_3})
     .backgroundColor($r("app.color.white"))
   }
 
-  getCurrentState(index: number) {
-    if (index <= this.changeIndex) {
+  getCurrentState(index: number){
+    if (index <= this.changeIndex){
       this.autoItemsX[index].result = 'pass';
     } else {
-      console.log(TAG, "index > this.changeIndex")
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "index > this.changeIndex")
     }
     return this.autoItemsX[index].result
   }
 
   aboutToAppear(): void {
-    console.log("auto组件构建完毕")
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', "auto组件构建完毕")
     //初始化私有变量
     this.autoItemsX = this.autoItems
   }
@@ -96,15 +97,15 @@ export struct AutoContentTable {
           direction: FlexDirection.Column,
           justifyContent: FlexAlign.SpaceBetween,
           alignItems: ItemAlign.Start
-        }) {
+        }){
           ForEach(this.autoItems, (item: TestAuto, index: number) => {
             this.IngredientItem(item, index)
           })
         }
       }
-      .scrollBarWidth(20)
+      .scrollBarWidth(ConfigData.VP_20)
     }
     .height(ConfigData.WH_80_100)
-    .padding({ top: 5, right: 10, left: 10 })
+    .padding({top: ConfigData.VP_5, right: ConfigData.VP_10, left: ConfigData.VP_10})
   }
 }

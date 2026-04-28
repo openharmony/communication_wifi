@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import wifi from '@ohos.wifi';
 
 const TAG = "wifiTestApp [basicDataSource]";
@@ -33,21 +34,21 @@ class BasicDataSource implements IDataSource {
   }
 
   registerDataChangeListener(listener: DataChangeListener): void {
-    if (this.listeners.indexOf(listener) < 0) {
-      console.log(TAG, 'add listener');
+    if (this.listeners.indexOf(listener) < 0){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'add listener');
       this.listeners.push(listener);
     } else {
-      console.log(TAG, 'indexOf(listener) >= 0');
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'indexOf(listener) >= 0');
     }
   }
 
   unregisterDataChangeListener(listener: DataChangeListener): void {
     const pos = this.listeners.indexOf(listener);
-    if (pos >= 0) {
-      console.log(TAG, 'remove listener');
+    if (pos >= 0){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'remove listener');
       this.listeners.splice(pos, 1);
     } else {
-      console.log(TAG, 'pos < 0');
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'pos < 0');
     }
   }
 
@@ -85,7 +86,7 @@ class BasicDataSource implements IDataSource {
 export default class WifiDataSource extends BasicDataSource {
   private dataArray: wifi.WifiScanInfo[] = [];
 
-  constructor(data: wifi.WifiScanInfo[]) {
+  constructor(data: wifi.WifiScanInfo[]){
     super();
     this.dataArray = data;
   }

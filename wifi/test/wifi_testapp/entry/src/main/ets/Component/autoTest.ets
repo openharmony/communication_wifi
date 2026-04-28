@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { TestData } from '../entryability/model/testData';
-import { TestList } from './testList';
+import { TestData} from '../entryability/model/testData';
+import { TestList} from './testList';
 
 /**
  * AutoTest Of WIFI test

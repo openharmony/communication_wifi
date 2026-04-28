@@ -13,14 +13,15 @@
  * limitations under the License.
  */
 
-import { PageTitle } from '../../component/pageTitle';
-import { TestImageDisplay } from '../../component/testImageDisplay';
-import { ContentTable } from '../../component/contentTable';
+import hilog from '@ohos.hilog';
+import { PageTitle} from '../../Component/pageTitle';
+import { TestImageDisplay} from '../../Component/testImageDisplay';
+import { ContentTable} from '../../Component/contentTable';
 import router from '@ohos.router';
-import ConfigData from '../../utils/ConfigData';
-import { initHotspotManagerApiData } from '../../entryability/model/testDataModels';
-import { TestData } from '../../entryability/model/testData';
-import { FilterTableManager } from '../../component/filterTableManager';
+import ConfigData from '../../Utils/ConfigData';
+import { initHotspotManagerApiData} from '../../entryability/model/testDataModels';
+import { TestData} from '../../entryability/model/testData';
+import { FilterTableManager} from '../../Component/filterTableManager';
 
 interface myParams extends Object {
   testItem: TestData
@@ -36,12 +37,12 @@ struct hotspotManagerInterfaceTest {
   @State showList: boolean = true;
   private testItem: TestData = (router.getParams() as myParams).testItem
   @State message: string = "";
-  @State h_ssid1: string = "testApp1";
-  @State h_securityType1: number = 3;
-  @State h_band1: number = 2;
-  @State h_preSharedKey1: string = "12345678";
-  @State h_maxConn1: number = 3;
-  @State h_channel1: number = 36;
+  @State h_ssid1: string = ConfigData.SCENARIO_HS_SSID;
+  @State h_securityType1: number = ConfigData.QV_MOCK_SECURITY_TYPE;
+  @State h_band1: number = ConfigData.SCENARIO_HS_BAND;
+  @State h_preSharedKey1: string = ConfigData.QV_MOCK_PRE_SHARED_KEY;
+  @State h_maxConn1: number = ConfigData.SCENARIO_HS_MAX_CONN;
+  @State h_channel1: number = ConfigData.SCENARIO_HS_CHANNEL;
   @StorageLink('hotspotManagerSsid') hotspotManagerSsid: string = "";
   @StorageLink('hotspotStateManagerMessage') hotspotStateManagerMessage: string = "";
   @StorageLink('getStationsManagerMessage') getStationsManagerMessage: string = "";
@@ -59,82 +60,97 @@ struct hotspotManagerInterfaceTest {
   }
 
   init() {
-    console.log("init-----------")
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', "init-----------")
   }
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TestImageDisplay({ testItem: this.testItem })
-        PageTitle({ testItem: this.testItem })
+      Stack({alignContent: Alignment.TopStart}){
+        TestImageDisplay({testItem: this.testItem})
+        PageTitle({testItem: this.testItem})
       }
 
-      Stack().height("0.5vp").backgroundColor("#000000");
+      Stack().height(ConfigData.VP_0_5).backgroundColor($r("app.color.black"));
       Column() {
         Row() {
-          Text("本设备热点名:")
-            .fontSize("18vp")
-            .height(60)
+          Text($r('app.string.wifitest_text_bsbrdm'))
+            .fontSize(ConfigData.VP_18)
+            .height(ConfigData.VP_60)
             .width(ConfigData.WH_30_100)
-            .padding({ left: 10 })
-          TextInput({ text: this.hotspotManagerSsid, placeholder: "在右侧输入热点的配置" })
-            .fontSize("18vp")
+            .padding({left: ConfigData.VP_10})
+          TextInput({text: this.hotspotManagerSsid, placeholder: $r('app.string.wifitest_text_zycsrrddpz')})
+            .fontSize(ConfigData.VP_18)
             .backgroundColor($r("app.color.white"))
             .onChange((strInput: string) => {
               this.hotspotManagerSsid = strInput;
             })
             .width(ConfigData.WH_50_100)
           Image($r('app.media.Switch'))
-            .height(50)
-            .padding({ top: 5, bottom: 5, left: 10 })
+            .height(ConfigData.VP_50)
+            .padding({top: ConfigData.VP_5, bottom: ConfigData.VP_5, left: ConfigData.VP_10})
             .width(ConfigData.WH_15_100)
             .onClick(() => {
               this.showList = !this.showList;
             })
         }
-        .margin({ top: "10vp", left: "20vp", right: "20vp" })
+        .margin({top: ConfigData.VP_10, left: ConfigData.VP_20, right: ConfigData.VP_20})
         .alignItems(VerticalAlign.Center)
         .width(ConfigData.WH_100_100)
-        .height(60)
+        .height(ConfigData.VP_60)
       }
       .align(Alignment.TopStart)
 
-      if (this.showList) {
+      if (this.showList){
         Column() {
           Scroll() {
             Column() {
-              Text("热点状态:" + this.hotspotStateManagerMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_hs_state'))
+                Span(this.hotspotStateManagerMessage)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("热点配置:" + this.getHotspotConfigManagerMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_hs_cfg'))
+                Span(this.getHotspotConfigManagerMessage)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("连接设备:" + this.getStationsManagerMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_hs_stations'))
+                Span(this.getStationsManagerMessage)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("加入状态:" + this.hotspotStaJoinManagerMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_hs_join'))
+                Span(this.hotspotStaJoinManagerMessage)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("离开状态:" + this.hotspotStaLeaveManagerMessage)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_hs_leave'))
+                Span(this.hotspotStaLeaveManagerMessage)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
             }
             .width(ConfigData.WH_100_100)
           }
-          .scrollBarWidth(10)
+          .scrollBarWidth(ConfigData.VP_10)
           .scrollBar(BarState.Auto)
         }
-        .height(100)
+        .height(ConfigData.VP_100)
         .width(ConfigData.WH_95_100)
         .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
 
@@ -142,7 +158,7 @@ struct hotspotManagerInterfaceTest {
           testItem: this.testItem, apiItems: initHotspotManagerApiData()
         })
       } else {
-        FilterTableManager({ testItem: this.testItem })
+        FilterTableManager({testItem: this.testItem})
       }
 
     }

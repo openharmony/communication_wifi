@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import promptAction from '@ohos.promptAction';
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
@@ -27,74 +28,74 @@ type CallbackType2 = (groups: wifiManager.WifiP2pDevice[]) => void;
 const TAG = "wifiTestApp [P2pModel]"
 
 export class P2pModel {
-  getP2pPeerDevices(callback: CallbackType2) {
-    console.log(TAG, 'scanP2p begin')
+  getP2pPeerDevices(callback: CallbackType2){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'scanP2p begin')
     try {
       wifiManager.getP2pPeerDevices((err, wifiP2pDevice) => {
         let p2pList: wifiManager.WifiP2pDevice[] = []
-        if (err) {
-          console.log(TAG, `scan p2p info err: ${ JSON.stringify(err) }`)
+        if (err){
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `scan p2p info err: ${ JSON.stringify(err) }`)
           callback(p2pList)
           return
         }
-        console.log(TAG, `scan p2p info call back: ` + JSON.stringify(wifiP2pDevice));
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `scan p2p info call back: ` + JSON.stringify(wifiP2pDevice));
         let len = Object.keys(wifiP2pDevice).length;
-        for (let i = 0 ; i < len ; ++i) {
+        for(let i = 0 ; i<len ; ++i){
           p2pList.push({
-            deviceName: wifiP2pDevice[i].deviceName ,
-            deviceAddress: wifiP2pDevice[i].deviceAddress ,
-            primaryDeviceType: wifiP2pDevice[i].primaryDeviceType ,
-            deviceStatus: wifiP2pDevice[i].deviceStatus ,
-            groupCapabilities: wifiP2pDevice[i].groupCapabilities ,
+            deviceName: wifiP2pDevice[i].deviceName,
+            deviceAddress: wifiP2pDevice[i].deviceAddress,
+            primaryDeviceType: wifiP2pDevice[i].primaryDeviceType,
+            deviceStatus: wifiP2pDevice[i].deviceStatus,
+            groupCapabilities: wifiP2pDevice[i].groupCapabilities,
           })
-          console.log(TAG, 'wifiP2pDevice:' + JSON.stringify(wifiP2pDevice[i]))
-          console.log(TAG, 'p2pList:' + JSON.stringify(p2pList))
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'wifiP2pDevice:' + JSON.stringify(wifiP2pDevice[i]))
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'p2pList:' + JSON.stringify(p2pList))
         }
         callback(p2pList)
       })
-    } catch( error) {
-      console.log(TAG, `Failed to testGetP2pPeerDevicesCallback. message: ${ error.message }, code: ${ error.code }`)
+    } catch( error){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetP2pPeerDevicesCallback. message: ${ error.message }, code: ${ error.code }`)
     }
   }
 
-  getCurrentGroup(callback: CallbackType1) {
-    console.log(TAG, 'scanP2pGroup begin')
+  getCurrentGroup(callback: CallbackType1){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'scanP2pGroup begin')
     wifiManager.getCurrentGroup((err, result) => {
-      let p2pGroupList: wifiManager.WifiP2pGroupInfo[] = []; // 初始化数组
-      if (err) {
-        console.log(TAG, `scan info err: ${ JSON.stringify(err) }`)
-        callback(p2pGroupList); // 在错误回调中返回空数组
+      let p2pGroupList: wifiManager.WifiP2pGroupInfo[] = [];// 初始化数组
+      if (err){
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `scan info err: ${ JSON.stringify(err) }`)
+        callback(p2pGroupList);// 在错误回调中返回空数组
         return
       }
       // 如果result是一个对象而不是数组
       let groupInfo: wifiManager.WifiP2pGroupInfo = {
-        isP2pGo: result.isP2pGo ,
-        ownerInfo: result.ownerInfo ,
-        passphrase: result.passphrase ,
-        interface: result.interface ,
-        groupName: result.groupName ,
-        networkId: result.networkId ,
-        frequency: result.frequency ,
-        clientDevices: result.clientDevices ,
-        goIpAddress: result.goIpAddress ,
+        isP2pGo: result.isP2pGo,
+        ownerInfo: result.ownerInfo,
+        passphrase: result.passphrase,
+        interface: result.interface,
+        groupName: result.groupName,
+        networkId: result.networkId,
+        frequency: result.frequency,
+        clientDevices: result.clientDevices,
+        goIpAddress: result.goIpAddress,
       };
       p2pGroupList.push(groupInfo);
       callback(p2pGroupList)
     })
   }
 
-  connectP2p(p2pScanInfo: wifiManager.WifiP2pDevice) {
-    promptAction.showToast({ message: 'connecting' })
-    console.log(TAG, `connect deviceAddress=${ p2pScanInfo.deviceAddress }`)
-    console.log(TAG, `p2pScanInfo:` + JSON.stringify(p2pScanInfo))
+  connectP2p(p2pScanInfo: wifiManager.WifiP2pDevice){
+    promptAction.showToast({message: 'connecting'})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `connect deviceAddress=${ p2pScanInfo.deviceAddress }`)
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `p2pScanInfo:` + JSON.stringify(p2pScanInfo))
     let config: wifiManager.WifiP2PConfig = {
-      deviceAddress: p2pScanInfo.deviceAddress ,
-      netId: - 2 ,
-      passphrase: "", //wifiP2pGroupInfo.passphrase
-      groupName: "", //wifiP2pGroupInfo.groupName
+      deviceAddress: p2pScanInfo.deviceAddress,
+      netId: - 2,
+      passphrase: "",//wifiP2pGroupInfo.passphrase
+      groupName: "",//wifiP2pGroupInfo.groupName
       goBand: 0
     }
-    console.log(TAG, `connectP2P success`)
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `connectP2P success`)
     wifiManager.createGroup(config)
   }
 }

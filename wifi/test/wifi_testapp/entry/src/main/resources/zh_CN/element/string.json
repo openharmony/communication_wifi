@@ -1901,3 +1901,960 @@
       "value": "1.1.1"
     },
     {
+      "name": "wifiConnectionChange",
+      "value": "连接状态: "
+    },
+    {
+      "name": "wifiRssiChange",
+      "value": "rssi: "
+    },
+    {
+      "name": "wifiScanStateChange",
+      "value": "scan状态: "
+    },
+    {
+      "name": "wifiStateChange",
+      "value": "wifi状态: "
+    },
+    {
+      "name": "wifi_IsActive",
+      "value": "wifi使能结果为："
+    },
+    {
+      "name": "wifi_aware",
+      "value": "WiFi Aware组网特性:"
+    },
+    {
+      "name": "wifi_direct",
+      "value": "WiFi-Direct特性:"
+    },
+    {
+      "name": "wifi_disEnable",
+      "value": "WIFI还未使能"
+    },
+    {
+      "name": "wifi_disEnable_confirm",
+      "value": "Wifi已关闭或关闭失败,请确认"
+    },
+    {
+      "name": "wifi_disEnable_result",
+      "value": "Wifi去使能执行结果："
+    },
+    {
+      "name": "wifi_enable",
+      "value": "wifi已经使能"
+    },
+    {
+      "name": "wifi_enable_confirm",
+      "value": "Wifi已打开或打开失败,请确认"
+    },
+    {
+      "name": "wifi_enable_result",
+      "value": "Wifi使能执行结果："
+    },
+    {
+      "name": "wifitest_text_012",
+      "value": "0, 1, 2"
+    },
+    {
+      "name": "wifitest_text_0fe13a",
+      "value": "08:fb:ea:1b:38:aa"
+    },
+    {
+      "name": "wifitest_text_1",
+      "value": "100"
+    },
+    {
+      "name": "wifitest_text_1_1",
+      "value": "1024"
+    },
+    {
+      "name": "wifitest_text_1_2",
+      "value": "10000"
+    },
+    {
+      "name": "wifitest_text_1_3",
+      "value": "12345678"
+    },
+    {
+      "name": "wifitest_text_2",
+      "value": "-2"
+    },
+    {
+      "name": "wifitest_text_3",
+      "value": "36"
+    },
+    {
+      "name": "wifitest_text_3_1",
+      "value": "3232235777"
+    },
+    {
+      "name": "wifitest_text_3_2",
+      "value": "3232235880"
+    },
+    {
+      "name": "wifitest_text_3_3",
+      "value": "3716386629"
+    },
+    {
+      "name": "wifitest_text_69d386",
+      "value": "6c:96:d7:3d:87:6f"
+    },
+    {
+      "name": "wifitest_text_6b5766",
+      "value": "6c:b1:58:75:63:67"
+    },
+    {
+      "name": "wifitest_text_ayz",
+      "value": "接口验证:"
+    },
+    {
+      "name": "wifitest_text_b",
+      "value": "band"
+    },
+    {
+      "name": "wifitest_text_b_1",
+      "value": "bssid"
+    },
+    {
+      "name": "wifitest_text_b_2",
+      "value": "bssid:"
+    },
+    {
+      "name": "wifitest_text_b_3",
+      "value": "bssid1:"
+    },
+    {
+      "name": "wifitest_text_b_4",
+      "value": "bssidM:"
+    },
+    {
+      "name": "wifitest_text_bddk",
+      "value": "本地端口: "
+    },
+    {
+      "name": "wifitest_text_bsbmc",
+      "value": "本设备名称："
+    },
+    {
+      "name": "wifitest_text_bsbrdm",
+      "value": "本设备热点名:"
+    },
+    {
+      "name": "wifitest_text_c",
+      "value": "channel"
+    },
+    {
+      "name": "wifitest_text_c_1",
+      "value": "creatorUid:"
+    },
+    {
+      "name": "wifitest_text_c_2",
+      "value": "creatorUid1:"
+    },
+    {
+      "name": "wifitest_text_c_3",
+      "value": "creatorUidM:"
+    },
+    {
+      "name": "wifitest_text_cjcsjs",
+      "value": "场景测试结束"
+    },
+    {
+      "name": "wifitest_text_cjcsks",
+      "value": "场景测试开始"
+    },
+    {
+      "name": "wifitest_text_cjlcyz",
+      "value": "场景流程验证:"
+    },
+    {
+      "name": "wifitest_text_cscs",
+      "value": "测试次数:"
+    },
+    {
+      "name": "wifitest_text_cscs_1",
+      "value": "测试次数："
+    },
+    {
+      "name": "wifitest_text_csjg",
+      "value": "测试结果："
+    },
+    {
+      "name": "wifitest_text_cssj",
+      "value": "传输数据"
+    },
+    {
+      "name": "wifitest_text_csxx",
+      "value": "测试消息:"
+    },
+    {
+      "name": "wifitest_text_d",
+      "value": "deviceName:"
+    },
+    {
+      "name": "wifitest_text_d_1",
+      "value": "deviceAddress:"
+    },
+    {
+      "name": "wifitest_text_d_2",
+      "value": "disableReason:"
+    },
+    {
+      "name": "wifitest_text_d_3",
+      "value": "devNameManager:"
+    },
+    {
+      "name": "wifitest_text_d_4",
+      "value": "disableReason1:"
+    },
+    {
+      "name": "wifitest_text_d_5",
+      "value": "disableReasonM:"
+    },
+    {
+      "name": "wifitest_text_d_6",
+      "value": "deviceAddressManager:"
+    },
+    {
+      "name": "wifitest_text_dk",
+      "value": "端口: "
+    },
+    {
+      "name": "wifitest_text_drz",
+      "value": "调试日志:"
+    },
+    {
+      "name": "wifitest_text_dxyh",
+      "value": "DNS响应（Hex）"
+    },
+    {
+      "name": "wifitest_text_fhjk",
+      "value": "返回接口"
+    },
+    {
+      "name": "wifitest_text_fscs",
+      "value": "发送次数: "
+    },
+    {
+      "name": "wifitest_text_fsjs",
+      "value": "发送/接收: "
+    },
+    {
+      "name": "wifitest_text_fsxx",
+      "value": "发送消息"
+    },
+    {
+      "name": "wifitest_text_fwdmsjtbddkddkhdljkyxsyyljdk",
+      "value": "服务端模式: 监听本地端口，等待客户端连接。可以向所有已连接的客户端广播消息。"
+    },
+    {
+      "name": "wifitest_text_fwdpz",
+      "value": "服务端配置"
+    },
+    {
+      "name": "wifitest_text_fwjb",
+      "value": "蜂窝句柄: "
+    },
+    {
+      "name": "wifitest_text_fwllzjfwgwd",
+      "value": "蜂窝链路（直接访问公网 DNS）"
+    },
+    {
+      "name": "wifitest_text_fwqdz",
+      "value": "服务器地址: "
+    },
+    {
+      "name": "wifitest_text_fwqmc",
+      "value": "服务器名称:"
+    },
+    {
+      "name": "wifitest_text_fwqpz",
+      "value": "服务器配置"
+    },
+    {
+      "name": "wifitest_text_fwzt",
+      "value": "服务状态: "
+    },
+    {
+      "name": "wifitest_text_fwzt_1",
+      "value": "蜂窝状态: "
+    },
+    {
+      "name": "wifitest_text_g",
+      "value": "goBand:"
+    },
+    {
+      "name": "wifitest_text_g_1",
+      "value": "groupName:"
+    },
+    {
+      "name": "wifitest_text_g_2",
+      "value": "goBandManager:"
+    },
+    {
+      "name": "wifitest_text_g_3",
+      "value": "groupNameManager:"
+    },
+    {
+      "name": "wifitest_text_hl",
+      "value": "Hello LinkEnhance!"
+    },
+    {
+      "name": "wifitest_text_hmkbzcwlqhsdzdzltjsyrhyz",
+      "value": "HTTP模块不支持网络切换时的自动重连，推荐使用 RCP HTTP验证"
+    },
+    {
+      "name": "wifitest_text_hqqpz",
+      "value": "HTTP请求配置"
+    },
+    {
+      "name": "wifitest_text_hqqpz_1",
+      "value": "HTTPS请求配置"
+    },
+    {
+      "name": "wifitest_text_i",
+      "value": "ipType:"
+    },
+    {
+      "name": "wifitest_text_i_1",
+      "value": "ipType1:"
+    },
+    {
+      "name": "wifitest_text_i_2",
+      "value": "ipTypeM:"
+    },
+    {
+      "name": "wifitest_text_i_3",
+      "value": "isHiddenSsid"
+    },
+    {
+      "name": "wifitest_text_i_4",
+      "value": "isHiddenSsid:"
+    },
+    {
+      "name": "wifitest_text_i_5",
+      "value": "isHiddenSsid1:"
+    },
+    {
+      "name": "wifitest_text_i_6",
+      "value": "isHiddenSsidM:"
+    },
+    {
+      "name": "wifitest_text_ip",
+      "value": "input password"
+    },
+    {
+      "name": "wifitest_text_ip_1",
+      "value": "input passphrase"
+    },
+    {
+      "name": "wifitest_text_ipd",
+      "value": "input peripheral deviceId."
+    },
+    {
+      "name": "wifitest_text_jtdk",
+      "value": "监听端口: "
+    },
+    {
+      "name": "wifitest_text_lcrz",
+      "value": "流程日志:"
+    },
+    {
+      "name": "wifitest_text_ljcsm",
+      "value": "连接超时(ms):"
+    },
+    {
+      "name": "wifitest_text_ljs",
+      "value": "连接数: "
+    },
+    {
+      "name": "wifitest_text_llzt",
+      "value": "链路状态: "
+    },
+    {
+      "name": "wifitest_text_lxs",
+      "value": "log显示："
+    },
+    {
+      "name": "wifitest_text_m",
+      "value": "maxConn"
+    },
+    {
+      "name": "wifitest_text_mbdk",
+      "value": "目标端口: "
+    },
+    {
+      "name": "wifitest_text_mbdz",
+      "value": "目标地址: "
+    },
+    {
+      "name": "wifitest_text_mbsbi",
+      "value": "目标设备IP："
+    },
+    {
+      "name": "wifitest_text_mrwzwbc",
+      "value": "默认网址:www.baidu.com"
+    },
+    {
+      "name": "wifitest_text_n",
+      "value": "netId:"
+    },
+    {
+      "name": "wifitest_text_n_1",
+      "value": "netId1:"
+    },
+    {
+      "name": "wifitest_text_n_2",
+      "value": "netIdM:"
+    },
+    {
+      "name": "wifitest_text_n_3",
+      "value": "netIdManager:"
+    },
+    {
+      "name": "wifitest_text_p",
+      "value": "passphrase:"
+    },
+    {
+      "name": "wifitest_text_p_1",
+      "value": "preSharedKey"
+    },
+    {
+      "name": "wifitest_text_p_2",
+      "value": "preSharedKey:"
+    },
+    {
+      "name": "wifitest_text_p_3",
+      "value": "preSharedKey1:"
+    },
+    {
+      "name": "wifitest_text_p_4",
+      "value": "preSharedKeyM:"
+    },
+    {
+      "name": "wifitest_text_p_5",
+      "value": "passphraseManager:"
+    },
+    {
+      "name": "wifitest_text_peyp",
+      "value": "Please enter your Password"
+    },
+    {
+      "name": "wifitest_text_qkrz",
+      "value": "清空日志"
+    },
+    {
+      "name": "wifitest_text_qqtnr",
+      "value": "请求体内容"
+    },
+    {
+      "name": "wifitest_text_qqtpz",
+      "value": "请求体配置"
+    },
+    {
+      "name": "wifitest_text_qsrddi",
+      "value": "请输入对端ip"
+    },
+    {
+      "name": "wifitest_text_qsrjjljdsbm",
+      "value": "请输入即将连接的设备物理地址"
+    },
+    {
+      "name": "wifitest_text_qsrxhcsmr3",
+      "value": "请输入循环次数，默认30"
+    },
+    {
+      "name": "wifitest_text_qsrxhcsmrw3",
+      "value": "请输入循环次数，默认为30"
+    },
+    {
+      "name": "wifitest_text_qsrxhcsmrw3_1",
+      "value": "请输入循环次数，默认为：30"
+    },
+    {
+      "name": "wifitest_text_quick_ip",
+      "value": "IP信息:"
+    },
+    {
+      "name": "wifitest_text_quick_net_cfg",
+      "value": "获取网络配置:"
+    },
+    {
+      "name": "wifitest_text_quick_scan",
+      "value": "扫描结果:"
+    },
+    {
+      "name": "wifitest_text_quick_wlan_link",
+      "value": "WLAN连接信息:"
+    },
+    {
+      "name": "wifitest_text_qzycsrpdpz",
+      "value": "请在右侧输入p2p的配置"
+    },
+    {
+      "name": "wifitest_text_qzycsrwdpz",
+      "value": "请在右侧输入WiFi的配置"
+    },
+    {
+      "name": "wifitest_text_r",
+      "value": "randomMacAddr:"
+    },
+    {
+      "name": "wifitest_text_r_1",
+      "value": "randomMacType:"
+    },
+    {
+      "name": "wifitest_text_r_2",
+      "value": "randomMacAddr1:"
+    },
+    {
+      "name": "wifitest_text_r_3",
+      "value": "randomMacAddrM:"
+    },
+    {
+      "name": "wifitest_text_r_4",
+      "value": "randomMacType1:"
+    },
+    {
+      "name": "wifitest_text_r_5",
+      "value": "randomMacTypeM:"
+    },
+    {
+      "name": "wifitest_text_rdi",
+      "value": "热点IP"
+    },
+    {
+      "name": "wifitest_text_rqqpz",
+      "value": "RCP 请求配置"
+    },
+    {
+      "name": "wifitest_text_s",
+      "value": "ssid"
+    },
+    {
+      "name": "wifitest_text_s_1",
+      "value": "ssid:"
+    },
+    {
+      "name": "wifitest_text_s_2",
+      "value": "ssid1:"
+    },
+    {
+      "name": "wifitest_text_s_3",
+      "value": "ssidM:"
+    },
+    {
+      "name": "wifitest_text_s_4",
+      "value": "securityType"
+    },
+    {
+      "name": "wifitest_text_s_5",
+      "value": "securityType:"
+    },
+    {
+      "name": "wifitest_text_s_6",
+      "value": "securityType1:"
+    },
+    {
+      "name": "wifitest_text_s_7",
+      "value": "securityTypeM:"
+    },
+    {
+      "name": "wifitest_text_s_8",
+      "value": "SetScanAlwaysAllowed:"
+    },
+    {
+      "name": "wifitest_text_sbi",
+      "value": "设备ID:"
+    },
+    {
+      "name": "wifitest_text_scs",
+      "value": "stress测试："
+    },
+    {
+      "name": "wifitest_text_scxz",
+      "value": "上传下载"
+    },
+    {
+      "name": "wifitest_text_sd",
+      "value": "staticIp_domains:"
+    },
+    {
+      "name": "wifitest_text_sd_1",
+      "value": "staticIp_domains1:"
+    },
+    {
+      "name": "wifitest_text_sd_2",
+      "value": "staticIp_domainsM:"
+    },
+    {
+      "name": "wifitest_text_sd_3",
+      "value": "staticIp_dnsServers:"
+    },
+    {
+      "name": "wifitest_text_sd_4",
+      "value": "staticIp_dnsServers1:"
+    },
+    {
+      "name": "wifitest_text_sd_5",
+      "value": "staticIp_dnsServersM:"
+    },
+    {
+      "name": "wifitest_text_sg",
+      "value": "staticIp_gateway:"
+    },
+    {
+      "name": "wifitest_text_sg_1",
+      "value": "staticIp_gateway1:"
+    },
+    {
+      "name": "wifitest_text_sg_2",
+      "value": "staticIp_gatewayM:"
+    },
+    {
+      "name": "wifitest_text_si",
+      "value": "会话 ID: "
+    },
+    {
+      "name": "wifitest_text_si_1",
+      "value": "staticIp_ipAddress:"
+    },
+    {
+      "name": "wifitest_text_si_2",
+      "value": "staticIp_ipAddress1:"
+    },
+    {
+      "name": "wifitest_text_si_3",
+      "value": "staticIp_ipAddressM:"
+    },
+    {
+      "name": "wifitest_text_sjdxzj",
+      "value": "数据大小(字节):"
+    },
+    {
+      "name": "wifitest_text_spz",
+      "value": "Socket配置"
+    },
+    {
+      "name": "wifitest_text_str",
+      "value": "警告 "
+    },
+    {
+      "name": "wifitest_text_szsyz",
+      "value": "SSL证书验证: "
+    },
+    {
+      "name": "wifitest_text_szt",
+      "value": "Socket状态: "
+    },
+    {
+      "name": "wifitest_text_tgb",
+      "value": "tcp关闭"
+    },
+    {
+      "name": "wifitest_text_tkq",
+      "value": "tcp开启"
+    },
+    {
+      "name": "wifitest_text_tl6",
+      "value": "TP-LINK_6365"
+    },
+    {
+      "name": "wifitest_text_wjb",
+      "value": "WiFi句柄: "
+    },
+    {
+      "name": "wifitest_text_wjywi",
+      "value": "WiFi局域网IP"
+    },
+    {
+      "name": "wifitest_text_wllsywn",
+      "value": "WiFi链路(使用WiFi netHandle)"
+    },
+    {
+      "name": "wifitest_text_wlqhcs",
+      "value": "网络切换次数: "
+    },
+    {
+      "name": "wifitest_text_wlyllzt",
+      "value": "网络与链路状态"
+    },
+    {
+      "name": "wifitest_text_wlzt",
+      "value": "网络状态: "
+    },
+    {
+      "name": "wifitest_text_wtszs",
+      "value": "WIFI调试助手"
+    },
+    {
+      "name": "wifitest_text_wy",
+      "value": "网页"
+    },
+    {
+      "name": "wifitest_text_wzt",
+      "value": "WiFi状态: "
+    },
+    {
+      "name": "wifitest_text_xncscshljsdsjsfxn",
+      "value": "性能测试: 测试HotspotManager连接时的数据收发性能"
+    },
+    {
+      "name": "wifitest_text_xncscspljsdsjsfxn",
+      "value": "性能测试: 测试p2p连接时的数据收发性能"
+    },
+    {
+      "name": "wifitest_text_xncscspljsdsjsfxn_1",
+      "value": "性能测试: 测试p2pManager连接时的数据收发性能"
+    },
+    {
+      "name": "wifitest_text_xncscsrdljsdsjsfxn",
+      "value": "性能测试: 测试热点连接时的数据收发性能"
+    },
+    {
+      "name": "wifitest_text_xncscswljsdsjsfxn",
+      "value": "性能测试: 测试wifi连接时的数据收发性能"
+    },
+    {
+      "name": "wifitest_text_xncscswljsdsjsfxn_1",
+      "value": "性能测试: 测试wifiManager连接时的数据收发性能"
+    },
+    {
+      "name": "wifitest_text_xysj",
+      "value": "响应数据"
+    },
+    {
+      "name": "wifitest_text_xyzt",
+      "value": "响应状态: "
+    },
+    {
+      "name": "wifitest_text_yljdw",
+      "value": "已连接的WiFi:"
+    },
+    {
+      "name": "wifitest_text_yxms",
+      "value": "运行模式"
+    },
+    {
+      "name": "wifitest_text_yxms_1",
+      "value": "运行模式: "
+    },
+    {
+      "name": "wifitest_text_zlcs",
+      "value": "重连次数: "
+    },
+    {
+      "name": "wifitest_text_zycsrrddpz",
+      "value": "在右侧输入热点的配置"
+    },
+    {
+      "name": "wifitest_text_wifi_link_status",
+      "value": "WiFi连接情况："
+    },
+    {
+      "name": "wifitest_text_open_web_ok",
+      "value": "打开web的成功次数："
+    },
+    {
+      "name": "wifitest_text_open_web_fail",
+      "value": "打开web的失败次数："
+    },
+    {
+      "name": "wifitest_text_test_progress",
+      "value": "测试进度状态："
+    },
+    {
+      "name": "wifitest_text_unit_space_percent",
+      "value": " %"
+    },
+    {
+      "name": "wifitest_text_http_request_time",
+      "value": "httpRequest耗时："
+    },
+    {
+      "name": "wifitest_text_sandbox_path",
+      "value": "数据文件沙箱路径："
+    },
+    {
+      "name": "wifitest_text_stress_count",
+      "value": "stress测试次数:"
+    },
+    {
+      "name": "wifitest_text_stress_time",
+      "value": "stress测试时间："
+    },
+    {
+      "name": "wifitest_text_bench_time",
+      "value": "性能测试时间："
+    },
+    {
+      "name": "wifitest_text_log_label",
+      "value": "log:\n"
+    },
+    {
+      "name": "wifitest_text_hs_state",
+      "value": "热点状态："
+    },
+    {
+      "name": "wifitest_text_hs_cfg",
+      "value": "热点配置："
+    },
+    {
+      "name": "wifitest_text_hs_stations",
+      "value": "连接设备："
+    },
+    {
+      "name": "wifitest_text_hs_join",
+      "value": "加入状态："
+    },
+    {
+      "name": "wifitest_text_hs_leave",
+      "value": "离开状态："
+    },
+    {
+      "name": "wifitest_text_hs_open_ok",
+      "value": "打开热点的成功次数："
+    },
+    {
+      "name": "wifitest_text_hs_open_fail",
+      "value": "打开热点的失败次数："
+    },
+    {
+      "name": "wifitest_text_hs_close_ok",
+      "value": "关闭热点的成功次数："
+    },
+    {
+      "name": "wifitest_text_hs_close_fail",
+      "value": "关闭热点的失败次数："
+    },
+    {
+      "name": "wifitest_text_wlan_on_ok",
+      "value": "打开WiFi的成功次数："
+    },
+    {
+      "name": "wifitest_text_wlan_on_fail",
+      "value": "打开WiFi的失败次数："
+    },
+    {
+      "name": "wifitest_text_wlan_off_ok",
+      "value": "关闭WiFi的成功次数："
+    },
+    {
+      "name": "wifitest_text_wlan_off_fail",
+      "value": "关闭WiFi的失败次数："
+    },
+    {
+      "name": "wifitest_text_wifi_connect_ok",
+      "value": "连接的成功次数："
+    },
+    {
+      "name": "wifitest_text_wifi_connect_fail",
+      "value": "连接的失败次数："
+    },
+    {
+      "name": "wifitest_text_wifi_disc_ok",
+      "value": "断连的成功次数："
+    },
+    {
+      "name": "wifitest_text_wifi_disc_fail",
+      "value": "断连的失败次数："
+    },
+    {
+      "name": "wifitest_text_scan_ok",
+      "value": "scan的成功次数："
+    },
+    {
+      "name": "wifitest_text_scan_fail",
+      "value": "scan的失败次数："
+    },
+    {
+      "name": "wifitest_text_scan_count",
+      "value": "scan的扫描个数："
+    },
+    {
+      "name": "wifitest_text_p2p_switch",
+      "value": "开关结果："
+    },
+    {
+      "name": "wifitest_text_p2p_local",
+      "value": "本机信息："
+    },
+    {
+      "name": "wifitest_text_p2p_discover",
+      "value": "发现信息："
+    },
+    {
+      "name": "wifitest_text_p2p_link_state",
+      "value": "连接状态："
+    },
+    {
+      "name": "wifitest_text_p2p_link_info",
+      "value": "连接信息："
+    },
+    {
+      "name": "wifitest_text_p2p_peer",
+      "value": "对端设备："
+    },
+    {
+      "name": "wifitest_text_p2p_peers",
+      "value": "对端设备[]："
+    },
+    {
+      "name": "wifitest_text_p2p_group",
+      "value": "组信息："
+    },
+    {
+      "name": "wifitest_text_unit_sp_ms",
+      "value": " ms"
+    },
+    {
+      "name": "wifitest_text_unit_ms",
+      "value": "ms"
+    },
+    {
+      "name": "wifitest_text_local_ip",
+      "value": "本地IP："
+    },
+    {
+      "name": "wifitest_text_rx_local_ip",
+      "value": "接收本地IP："
+    },
+    {
+      "name": "wifitest_text_user_name",
+      "value": "用户名："
+    },
+    {
+      "name": "wifitest_text_ellipsis",
+      "value": "..."
+    },
+    {
+      "name": "wifitest_btn_start_web_test",
+      "value": "开始web测试"
+    },
+    {
+      "name": "wifitest_btn_close_web_test",
+      "value": "关闭Web测试"
+    },
+    {
+      "name": "wifitest_toast_pls_connect_wifi",
+      "value": "wifi还未连接，请先连接WiFi"
+    },
+    {
+      "name": "wifitest_toast_pls_connect_wifi_to_start",
+      "value": "wifi还没连接,请先连接WiFi！"
+    },
+    {
+      "name": "wlan",
+      "value": "WLAN"
+    },
+    {
+      "name": "wlanIsConnected",
+      "value": "已连接"
+    },
+    {
+      "name": "wlan_available",
+      "value": "可用WLAN"
+    }
+  ]
+}

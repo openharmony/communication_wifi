@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-import { WifiModel } from '../../../entryability/model/wifiModel';
-import { InfoView } from '../../../component/infoView';
-import ConfigData from '../../../utils/ConfigData';
+import { WifiModel} from '../../../entryability/model/wifiModel';
+import { InfoView} from '../../../Component/infoView';
+import ConfigData from '../../../Utils/ConfigData';
 import router from '@ohos.router';
 /**
  * about Test Page Of Wifi test
@@ -27,7 +27,7 @@ struct About {
 
   build() {
     Column() {
-      Flex({ alignItems: ItemAlign.Start }) {
+      Flex({alignItems: ItemAlign.Start}){
         Button() {
           Image($r('app.media.Back'))
             .width(ConfigData.WH_60_100)
@@ -37,33 +37,33 @@ struct About {
         .width(ConfigData.WH_20_100)
         .height(ConfigData.WH_100_100)
         .backgroundColor($r("app.color.blue"))
-        .padding({ left: 1, top: 15 })
+        .padding({left: ConfigData.VP_1, top: ConfigData.VP_15})
         .onClick(() => {
           router.back()
         })
 
         Text($r('app.string.about'))
-          .fontColor(Color.White)
-          .fontSize(24)
-          .margin({ left: 3 })
-          .padding({ top: 18 })
+          .fontColor($r('app.color.white'))
+          .fontSize(ConfigData.VP_24)
+          .margin({left: ConfigData.VP_3})
+          .padding({top: ConfigData.VP_18})
       }
-      .height(61)
-      .backgroundColor('#FFedf2f5')
-      .padding({ left: 10 })
+      .height(ConfigData.VP_61)
+      .backgroundColor($r("app.color.ohcc_hex_ffedf2f5"))
+      .padding({left: ConfigData.VP_10})
       .borderColor($r("app.color.black"))
       .backgroundColor($r("app.color.blue"))
 
       Scroll() {
         Column() {
-          InfoView({ infoList: this.wifiModel.getIpInfo() })
-          InfoView({ infoList: this.wifiModel.getCountryCode() })
-          InfoView({ infoList: this.wifiModel.getFeatureSupport() })
+          InfoView({infoList: this.wifiModel.getIpInfo()})
+          InfoView({infoList: this.wifiModel.getCountryCode()})
+          InfoView({infoList: this.wifiModel.getFeatureSupport()})
         }
       }
       .layoutWeight(1)
     }
-    .size({ width: ConfigData.WH_100_100, height: ConfigData.WH_100_100 })
-    .backgroundColor('#F5F5F5')
+    .size({width: ConfigData.WH_100_100, height: ConfigData.WH_100_100})
+    .backgroundColor($r("app.color.ohcc_hex_f5f5f5"))
   }
 }

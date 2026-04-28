@@ -38,6 +38,7 @@
 #include "wifi_service_manager.h"
 #endif
 #include "wifi_chr_utils.h"
+#include "wifi_supplicant_hal_interface.h"
 
 DEFINE_WIFILOG_LABEL("WifiStaManager");
 
@@ -303,6 +304,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         WifiConfigCenter::GetInstance().UpdateLinkedInfo(instId);
         WifiConfigCenter::GetInstance().SetLastConnStaFreq(info.frequency);
+        InstallHpfAndSetSuspendMode(instId);
     }
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
@@ -316,17 +318,10 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     }
     NotifyScanForStaConnChanged(state, info.networkId, instId);
     PublishWifiOperateStateHiSysEvent(state);
-    if (info.connState == ConnState::AUTHENTICATING)
-    {
+    if (info.connState == ConnState::AUTHENTICATING) {
         WriteWifiOperateStateHiSysEvent(static_cast<int>(WifiOperateType::STA_AUTH),
             static_cast<int>(WifiOperateState::STA_AUTHING));
     }
-#ifdef FEATURE_HPF_SUPPORT
-    if (state == OperateResState::CONNECT_AP_CONNECTED) {
-        int screenState = WifiConfigCenter::GetInstance().GetScreenState();
-        WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
-    }
-#endif
 #ifndef OHOS_ARCH_LITE
     // 当网络检测成功时，取消断开任务
     if (state == OperateResState::CONNECT_NETWORK_ENABLED && staManagerEventHandler_ != nullptr) {
@@ -429,5 +424,18 @@ void WifiStaManager::StartSatelliteTimer(void)
     return;
 }
 #endif
+
+void WifiStaManager::InstallHpfAndSetSuspendMode(int instId)
+{
+    int screenState = WifiConfigCenter::GetInstance().GetScreenState();
+    // Must first set the SuspendMode before deploying the filtering rules for the set rules to take effect.
+    // If the order is reversed, SuspendMode will not take effect.
+#ifdef FEATURE_HPF_SUPPORT
+    WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
+#endif
+    if (instId == INSTID_WLAN0) {
+        WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);
+    }
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { CommonConstants } from '../common/constant/CommonConstant';
-import Logger from '../common/utils/Logger';
+import { CommonConstants} from '../common/constant/CommonConstant';
+import Logger from '../common/Utils/Logger';
 import TaskItemBean from '../common/bean/TaskItemBean';
 
 const TAG = 'wifiTestApp [DataModel]';
@@ -41,13 +41,13 @@ export class DataModel {
    *
    * @param selectArr: An array indicating whether historical data is selected.
    */
-  deleteData(selectArr: Array<boolean>) {
-    if (!selectArr) {
+  deleteData(selectArr: Array<boolean>){
+    if (!selectArr){
       Logger.error(TAG, 'Failed to delete data because selectArr is ' + selectArr);
     }
     let dataLen = this.targetData.length - CommonConstants.ONE_TASK;
-    for (let i = dataLen ; i >= 0 ; i --) {
-      if (selectArr[i]) {
+    for(let i = dataLen ; i>=0 ; i--){
+      if (selectArr[i]){
         this.targetData.splice(i, CommonConstants.ONE_TASK);
       }
     }
@@ -58,8 +58,8 @@ export class DataModel {
    *
    * @param Data of the RecordItemBean type to be added.
    */
-  addData(data: TaskItemBean) {
-    if (!data) {
+  addData(data: TaskItemBean){
+    if (!data){
       Logger.error(TAG, 'addData error because data is: ' + data);
       return;
     }
@@ -70,7 +70,7 @@ export class DataModel {
    * Get the latest progress.
    */
   getLatestProgressValue(): number {
-    if (this.targetData.length === 0) {
+    if (this.targetData.length === 0){
       return 0;
     }
     return this.targetData[this.targetData.length - CommonConstants.ONE_TASK].progressValue;
@@ -84,7 +84,7 @@ export class DataModel {
    * @param updateDate of update item.
    */
   updateProgress(index: number, updateValue: number, updateDate: string): boolean {
-    if (!this.targetData[index]) {
+    if (!this.targetData[index]){
       return false;
     }
     this.targetData[index].progressValue = updateValue;

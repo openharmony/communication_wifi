@@ -13,18 +13,19 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import promptAction from '@ohos.promptAction';
 import router from '@ohos.router';
-import { PageTitle } from '../../component/pageTitle';
-import { TestImageDisplay } from '../../component/testImageDisplay';
-import { TestData } from '../../entryability/model/testData';
-import { ScenarioContentTable } from '../../component/scenarioContentTable';
+import { PageTitle} from '../../Component/pageTitle';
+import { TestImageDisplay} from '../../Component/testImageDisplay';
+import { TestData} from '../../entryability/model/testData';
+import { ScenarioContentTable} from '../../Component/scenarioContentTable';
 import {
-  WifiConnectScenarioTestCase ,
+  WifiConnectScenarioTestCase,
   initWifiConnectScenarioData
 } from '../../entryability/model/scenarioTestDataModels'
 import * as WifiInterface from '../../entryability/model/wifiInterface';
-import ConfigData from '../../utils/ConfigData';
+import ConfigData from '../../Utils/ConfigData';
 
 interface myParams extends Object {
   testItem: TestData
@@ -42,27 +43,28 @@ interface IWifiAutoArrayItem {
 @Entry
 @Component
 struct wifiConnectScenarioTest {
-  @State message: string = 'wifiConnectScenarioTest';
+  @State message: string = ConfigData.TAG_MSG_WIFI_CONN;
   private testItem: TestData = (router.getParams() as myParams).testItem
-  @State changeIndex: number = - 1
+  @State changeIndex: number = ConfigData.ITEM_CLICK_NONE
   @StorageLink("wifiConnectScenarioMessage") wifiConnectScenarioMessage: string = ""
-  @State w_ssid: string = "TP-LINK_6365";
-  @State w_bssid: string = "6C:B1:58:75:63:65";
-  @State w_preSharedKey: string = "12345678";
+  @State w_ssid: string = ConfigData.QV_MOCK_SSID;
+  @State w_bssid: string = ConfigData.QV_MOCK_BSSID;
+  @State w_preSharedKey: string = ConfigData.QV_MOCK_PRE_SHARED_KEY;
   @State w_isHiddenSsid: boolean = false;
-  @State w_securityType: number = 3
-  @State w_creatorUid: number = 1;
-  @State w_disableReason: number = 0;
-  @State w_netId: number = 100;
-  @State w_randomMacType: number = 0;
-  @State w_randomMacAddr: string = "08:fb:ea:1b:38:aa"
-  @State w_ipType: number = 1;
-  @State w_staticIp_ipAddress: number = 3232235880;
-  @State w_staticIp_gateway: number = 3232235777;
-  @State w_staticIp_dnsServers: number = 3716386629;
-  @State w_staticIp_domains: Array<string> = ["0", "1", "2"];
-  @State w_networkId: number = 0; // id,netId,networkId是一个值嘛？
-  @State w_featureId: number = 1;
+  @State w_securityType: number = ConfigData.QV_MOCK_SECURITY_TYPE;
+  @State w_creatorUid: number = ConfigData.QV_MOCK_CREATOR_UID;
+  @State w_disableReason: number = ConfigData.QV_MOCK_DISABLE_REASON;
+  @State w_netId: number = ConfigData.QV_MOCK_NET_ID;
+  @State w_randomMacType: number = ConfigData.QV_MOCK_RANDOM_MAC_TYPE;
+  @State w_randomMacAddr: string = ConfigData.QV_MOCK_RANDOM_MAC_ADDR
+  @State w_ipType: number = ConfigData.QV_MOCK_IP_TYPE;
+  @State w_staticIp_ipAddress: number = ConfigData.QV_MOCK_STATIC_IP_ADDRESS;
+  @State w_staticIp_gateway: number = ConfigData.QV_MOCK_STATIC_GATEWAY;
+  @State w_staticIp_dnsServers: number = ConfigData.QV_MOCK_STATIC_DNS;
+  @State w_staticIp_domains: Array<string> = [ConfigData.QV_MOCK_DOMAIN_0, ConfigData.QV_MOCK_DOMAIN_1, ConfigData.QV_MOCK_DOMAIN_2];
+  @State w_networkId: number = ConfigData.SCENARIO_WM_NET_ID;
+  // id,netId,networkId是一个值嘛？
+  @State w_featureId: number = ConfigData.QV_MOCK_CREATOR_UID;
 
   aboutToAppear() {
     AppStorage.setOrCreate('w_ssid', this.w_ssid);
@@ -86,46 +88,46 @@ struct wifiConnectScenarioTest {
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TestImageDisplay({ testItem: this.testItem })
-        PageTitle({ testItem: this.testItem })
+      Stack({alignContent: Alignment.TopStart}){
+        TestImageDisplay({testItem: this.testItem})
+        PageTitle({testItem: this.testItem})
       }
 
-      Stack().height("1vp").backgroundColor("#000000");
+      Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
       Column() {
         Scroll() {
           Column() {
-            Text("场景流程验证:")
-              .fontSize("17vp")
-              .margin({ top: "10vp", bottom: "10vp", left: "20vp" })
+            Text($r('app.string.wifitest_text_cjlcyz'))
+              .fontSize(ConfigData.VP_17)
+              .margin({top: ConfigData.VP_10, bottom: ConfigData.VP_10, left: ConfigData.VP_20})
               .textAlign(TextAlign.Start)
               .width(ConfigData.WH_100_100)
             ScenarioContentTable({
-              scenarioItems: initWifiConnectScenarioData() ,
+              scenarioItems: initWifiConnectScenarioData(),
               //            testMessage: this.testMessage,  优化时修改
               changeIndex: this.changeIndex
             })
           }
           .width(ConfigData.WH_100_100)
-          .height(280)
+          .height(ConfigData.VP_280)
         }
-        .scrollBarWidth(10)
+        .scrollBarWidth(ConfigData.VP_10)
         .scrollBar(BarState.Auto)
 
-        Stack().height("1vp").backgroundColor("#000000");
+        Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
 
         Scroll() {
           Column() {
-            Text("流程日志:")
-              .fontSize("17vp")
-              .margin({ top: "8vp", bottom: "8vp", left: "20vp" })
+            Text($r('app.string.wifitest_text_lcrz'))
+              .fontSize(ConfigData.VP_17)
+              .margin({top: ConfigData.VP_8, bottom: ConfigData.VP_8, left: ConfigData.VP_20})
               .textAlign(TextAlign.Start)
               .width(ConfigData.WH_100_100)
             List() {
               ListItem() {
                 Text(this.wifiConnectScenarioMessage)
-                  .fontSize("17vp")
-                  .margin({ top: "5vp", left: "30vp", right: "10vp" })
+                  .fontSize(ConfigData.VP_17)
+                  .margin({top: ConfigData.VP_5, left: ConfigData.VP_30, right: ConfigData.VP_10})
                   .textAlign(TextAlign.Start)
                   .width(ConfigData.WH_90_100)
               }
@@ -135,99 +137,99 @@ struct wifiConnectScenarioTest {
             .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
           }
           .width(ConfigData.WH_100_100)
-          .height(260)
+          .height(ConfigData.VP_260)
         }
-        .scrollBarWidth(10)
+        .scrollBarWidth(ConfigData.VP_10)
         .scrollBar(BarState.On)
       }
-      .height(500)
+      .height(ConfigData.VP_500)
       .width(ConfigData.WH_100_100)
       .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
 
 
-      Stack().height("1vp").backgroundColor("#000000");
+      Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
       Column() {
-        Flex({ alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-          Button({ type: ButtonType.Normal, stateEffect: true }) {
-            Text('场景测试开始').fontSize("24vp").fontColor(0xffffff).margin({ left: 5, right: 5 })
+        Flex({alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween}){
+          Button({type: ButtonType.Normal, stateEffect: true}){
+            Text($r('app.string.wifitest_text_cjcsks')).fontSize(ConfigData.VP_24).fontColor($r('app.color.white')).margin({left: ConfigData.VP_5, right: ConfigData.VP_5})
           }
-          .borderRadius(8)
+          .borderRadius($r('app.float.wh_value_8'))
           .backgroundColor($r("app.color.blue"))
-          .width(100)
-          .height(66)
-          .margin({ top: "15vp", left: "20vp" })
+          .width(ConfigData.VP_100)
+          .height(ConfigData.VP_66)
+          .margin({top: ConfigData.VP_15, left: ConfigData.VP_20})
           .align(Alignment.Start)
           .onClick(async(event: ClickEvent) => {
-            promptAction.showToast({ message: '开始wifi连接场景测试' })
+            promptAction.showToast({message: $r('app.string.wifitest_toast_start_wifi_scenario')})
             await this.forLoop()
           })
 
-          Button({ type: ButtonType.Normal, stateEffect: true }) {
+          Button({type: ButtonType.Normal, stateEffect: true}){
             Row() {
-              Text('场景测试结束').fontSize("24vp").fontColor(0xffffff).margin({ left: 5, right: 5 })
+              Text($r('app.string.wifitest_text_cjcsjs')).fontSize(ConfigData.VP_24).fontColor($r('app.color.white')).margin({left: ConfigData.VP_5, right: ConfigData.VP_5})
             }.alignItems(VerticalAlign.Center)
           }
-          .borderRadius(8)
+          .borderRadius($r('app.float.wh_value_8'))
           .backgroundColor($r("app.color.blue"))
-          .width(100)
-          .height(66)
-          .margin({ top: "15vp", left: "10vp", right: "10vp" })
+          .width(ConfigData.VP_100)
+          .height(ConfigData.VP_66)
+          .margin({top: ConfigData.VP_15, left: ConfigData.VP_10, right: ConfigData.VP_10})
           .align(Alignment.Start)
           .onClick(async(event: ClickEvent) => {
             let wifiConnectScenarioMessage = ""
             // 断开连接
             wifiConnectScenarioMessage += WifiInterface.testDisconnect() + "\n"
-            console.log("testDisconnect success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testDisconnect success")
             await sleep(1)
             AppStorage.setOrCreate("wifiConnectScenarioMessage", wifiConnectScenarioMessage)
 
             // 移除所有网络配置
             wifiConnectScenarioMessage += WifiInterface.testRemoveAllNetwork() + "\n"
-            console.log("testRemoveAllNetwork success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testRemoveAllNetwork success")
             await sleep(1)
             AppStorage.setOrCreate("wifiConnectScenarioMessage", wifiConnectScenarioMessage)
 
             // 关闭WLAN状态改变事件
             wifiConnectScenarioMessage += WifiInterface.testOnWifiStateChange() + "\n"
-            console.log("testOffWifiStateChange success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testOffWifiStateChange success")
             await sleep(1)
             AppStorage.setOrCreate("wifiConnectScenarioMessage", wifiConnectScenarioMessage)
 
             //关闭WLAN连接状态改变事件
             wifiConnectScenarioMessage += WifiInterface.testOnWifiConnectionChange() + "\n"
-            console.log("testOffWifiConnectionChange success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testOffWifiConnectionChange success")
             await sleep(1)
             AppStorage.setOrCreate("wifiConnectScenarioMessage", wifiConnectScenarioMessage)
 
             //关闭扫描状态改变事件
             wifiConnectScenarioMessage += WifiInterface.testOnWifiScanStateChange() + "\n"
-            console.log("testOffWifiScanStateChange success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testOffWifiScanStateChange success")
             await sleep(1)
             AppStorage.setOrCreate("wifiConnectScenarioMessage", wifiConnectScenarioMessage)
 
             //关闭RSSI状态改变事件
             wifiConnectScenarioMessage += WifiInterface.testOnWifiRssiChange() + "\n"
-            console.log("testOffWifiRssiChange success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testOffWifiRssiChange success")
             await sleep(1)
             AppStorage.setOrCreate("wifiConnectScenarioMessage", wifiConnectScenarioMessage)
 
             //关Wifi
             wifiConnectScenarioMessage += WifiInterface.testDisableWifi() + "\n"
-            console.log("testDisableWifi success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testDisableWifi success")
             await sleep(1)
             AppStorage.setOrCreate("wifiConnectScenarioMessage", wifiConnectScenarioMessage)
           })
 
-          Button({ type: ButtonType.Normal, stateEffect: true }) {
+          Button({type: ButtonType.Normal, stateEffect: true}){
             Row() {
-              Text('清空日志').fontSize("24vp").fontColor(0xffffff).margin({ left: 5, right: 5 })
+              Text($r('app.string.wifitest_text_qkrz')).fontSize(ConfigData.VP_24).fontColor($r('app.color.white')).margin({left: ConfigData.VP_5, right: ConfigData.VP_5})
             }.alignItems(VerticalAlign.Center)
           }
-          .borderRadius(8)
+          .borderRadius($r('app.float.wh_value_8'))
           .backgroundColor($r("app.color.moon"))
-          .width(80)
-          .height(66)
-          .margin({ top: "15vp", right: "20vp" })
+          .width(ConfigData.VP_80)
+          .height(ConfigData.VP_66)
+          .margin({top: ConfigData.VP_15, right: ConfigData.VP_20})
           .align(Alignment.Start)
           .onClick(async(event: ClickEvent) => {
             let wifiConnectScenarioMessage = ""
@@ -252,10 +254,10 @@ struct wifiConnectScenarioTest {
     let Interface = WifiConnectScenarioTestCase.map(i => {
       // 查找与条件匹配的元素，并且确保其不是undefined
       const foundItem = wifiScenarioArray.find(itm => itm.name === i.api.name);
-      let para: string[] = foundItem ? foundItem.para : [];
-      return { name: i.api.name, para } as IWifiAutoArrayItem;
+      let para: string[] = foundItem ? foundItem.para: [];
+      return { name: i.api.name, para} as IWifiAutoArrayItem;
     })
-    for (let m = 0 ; m < Interface.length ; m ++) {
+    for(let m = 0 ; m<Interface.length ; m++){
       wifiConnectScenarioMessage += await WifiConnectScenarioTestCase[m].api(... Interface[m].para) + "\n"
       this.changeIndex = m
       await sleep(2)

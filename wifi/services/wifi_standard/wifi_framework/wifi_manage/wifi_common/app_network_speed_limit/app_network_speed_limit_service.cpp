@@ -33,7 +33,7 @@ namespace Wifi {
 
 DEFINE_WIFILOG_LABEL("AppNetworkSpeedLimitService");
 const std::string APP_NETWORK_SPEED_LIMIT_CLASS_NAME = "AppNetworkSpeedLimitService";
-const std::unordered_set<int> m_SaUidList = {5206}; // 5206: 云备份
+const std::unordered_set<int> m_saUidList = {5206}; // 5206: 云备份
 
 namespace {
     const int ON = 1;
@@ -317,7 +317,7 @@ void AppNetworkSpeedLimitService::UpdateBackgroundAppConfigs(const int enable)
             }
         }
     }
-    m_bgUidSet.insert(m_SaUidList.begin(), m_SaUidList.end());
+    m_bgUidSet.insert(m_saUidList.begin(), m_saUidList.end());
 }
 
 void AppNetworkSpeedLimitService::UpdateForegroundAppConfigs()

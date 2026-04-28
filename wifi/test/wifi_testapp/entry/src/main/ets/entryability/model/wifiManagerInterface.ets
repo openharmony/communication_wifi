@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import promptAction from '@ohos.promptAction';
 import router from '@ohos.router';
 import wifiManager from '@ohos.wifiManager';
-import LogDataManager from '../../utils/LogDataManager';
-import MessageDataManager from '../../utils/MessageDataManager';
-import { BusinessError } from '@ohos.base';
+import LogDataManager from '../../Utils/LogDataManager';
+import MessageDataManager from '../../Utils/MessageDataManager';
+import { BusinessError} from '@ohos.base';
 
 const TAG = "wifiTestApp [wifiManagerInterface]";
 
@@ -46,8 +47,8 @@ let wifiManagerEnable = false
 export function testEnableWifiManager() {
   try {
     let message = (MessageDataManager.testEnableWifi);
-    console.log(TAG, LogDataManager.testEnableWifiManager_StartLog)
-    if (wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testEnableWifiManager_StartLog)
+    if (wifiManagerEnable){
       message = (MessageDataManager.testIsActive)
     } else {
       let ret = wifiManager.enableWifi();
@@ -56,13 +57,13 @@ export function testEnableWifiManager() {
       wifiManagerEnable = true;
       AppStorage.setOrCreate('wifiManagerIsOn', wifiManagerEnable);
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testEnableWifiManager_EndLog)
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testEnableWifiManager_EndLog)
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testEnableWifiManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testEnableWifiManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testEnableWifiManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -70,8 +71,8 @@ export function testEnableWifiManager() {
 export function testDisableWifiManager() {
   try {
     let message = (MessageDataManager.testDisableWifi);
-    console.log(TAG, LogDataManager.testDisableWifiManager_StartLog)
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testDisableWifiManager_StartLog)
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
       let ret = wifiManager.disableWifi();
@@ -80,13 +81,13 @@ export function testDisableWifiManager() {
       wifiManagerEnable = false;
       AppStorage.setOrCreate('wifiManagerIsOn', wifiManagerEnable);
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testDisableWifiManager_EndLog)
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testDisableWifiManager_EndLog)
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testDisableWifiManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testDisableWifiManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testDisableWifiManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -94,8 +95,8 @@ export function testDisableWifiManager() {
 export function testEnableSemiWifiManager() {
   try {
     let message = (MessageDataManager.testEnableSemiWifi);
-    console.log(TAG, LogDataManager.testEnableSemiWifi_StartLog)
-    if (wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testEnableSemiWifi_StartLog)
+    if (wifiManagerEnable){
       message = (MessageDataManager.testIsActive)
     } else {
       let ret = wifiManager.enableSemiWifi();
@@ -104,13 +105,13 @@ export function testEnableSemiWifiManager() {
       wifiManagerEnable = true;
       AppStorage.setOrCreate('semiWifiManagerIsOn', wifiManagerEnable);
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testEnableSemiWifi_EndLog)
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testEnableSemiWifi_EndLog)
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testEnableWifiManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testEnableWifiManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testEnableWifiManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -118,21 +119,21 @@ export function testEnableSemiWifiManager() {
 export function testIsWifiActiveManager() {
   try {
     let message = (MessageDataManager.testIsActive);
-    console.log(TAG, LogDataManager.testIsWifiActiveManager_StartLog)
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testIsWifiActiveManager_StartLog)
     let ret = wifiManager.isWifiActive();
-    if (ret) {
+    if (ret){
       wifiManagerEnable = true
     } else {
       wifiManagerEnable = false
     }
     message = (MessageDataManager.testIsActiveResult) + ret
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testIsWifiActiveManager_EndLog)
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testIsWifiActiveManager_EndLog)
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testIsWifiActiveManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testIsWifiActiveManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testIsWifiActiveManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -140,23 +141,23 @@ export function testIsWifiActiveManager() {
 export function testScanManager() {
   try {
     let message = (MessageDataManager.testScan)
-    console.log(TAG, LogDataManager.testScanManager_StartLog)
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testScanManager_StartLog)
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
       let ret = wifiManager.scan()
       //scan返回值为void
       message = "scan 调用成功"
-      router.pushUrl({ url: PAGE_URI_WIFI_FOUND_MODE });
-      promptAction.showToast({ message: message })
+      router.pushUrl({url: PAGE_URI_WIFI_FOUND_MODE});
+      promptAction.showToast({message: message})
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testScanManager_EndLog)
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testScanManager_EndLog)
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testScanManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testScanManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testScanManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -164,23 +165,23 @@ export function testScanManager() {
 export function testStartScanManager() {
   try {
     let message = (MessageDataManager.testStartScan)
-    console.log(TAG, LogDataManager.testStartScanManager_StartLog)
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testStartScanManager_StartLog)
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
       let ret = wifiManager.startScan()
       //scan返回值为void
       message = "startScan 调用成功"
-      router.pushUrl({ url: PAGE_URI_WIFI_FOUND_MODE });
-      promptAction.showToast({ message: message })
+      router.pushUrl({url: PAGE_URI_WIFI_FOUND_MODE});
+      promptAction.showToast({message: message})
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testStartScanManager_EndLog)
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testStartScanManager_EndLog)
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testScanManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testScanManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testScanManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -188,19 +189,19 @@ export function testStartScanManager() {
 export function testGetScanInfoListManager() {
   try {
     let message = (MessageDataManager.testGetScanInfoList)
-    console.log(TAG, LogDataManager.testGetScanInfoListManager_StartLog);
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetScanInfoListManager_StartLog);
     let ret = wifiManager.getScanInfoList()
     message = "扫描结果为：" + JSON.stringify(ret)
-    console.log(TAG, "扫描结果为：" + JSON.stringify(ret));
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "扫描结果为：" + JSON.stringify(ret));
     let getScanInfoManagerMessage = JSON.stringify(ret)
     AppStorage.setOrCreate("getScanInfoManagerMessage", getScanInfoManagerMessage)
-    console.log(TAG, LogDataManager.testGetScanInfoListManager_EndLog);
-    promptAction.showToast({ message: message })
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetScanInfoListManager_EndLog);
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -208,27 +209,27 @@ export function testGetScanInfoListManager() {
 export function testGetScanResultsPromise() {
   try {
     let message = (MessageDataManager.testAddCandidateConfigPromise)
-    console.log(TAG, LogDataManager.testAddCandidateConfigPromiseManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigPromiseManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
       wifiManager.getScanResults().then(result => {
         //  @returns Returns {@code true} if the Candidate hotspot configuration is added, returns {@code false} otherwise.
-        console.log(TAG, LogDataManager.testAddCandidateConfigPromiseManager_successfulLog)
-        console.log(TAG, LogDataManager.testAddCandidateConfigManagerLog + JSON.stringify(result))
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigPromiseManager_successfulLog)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigManagerLog + JSON.stringify(result))
         message = (MessageDataManager.testAddCandidateConfig + JSON.stringify(result))
-        promptAction.showToast({ message: message })
-        console.log(TAG, LogDataManager.testAddCandidateConfigPromiseManager_EndLog)
+        promptAction.showToast({message: message})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigPromiseManager_EndLog)
       }).catch((err: BusinessError) => {
-        console.log(TAG, "testAddCandidateConfigManagerPromise err:" + JSON.stringify(err))
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "testAddCandidateConfigManagerPromise err:" + JSON.stringify(err))
       })
     }
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testAddCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testAddCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testAddCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -236,29 +237,29 @@ export function testGetScanResultsPromise() {
 export function testGetScanResultsCallback() {
   try {
     let message = (MessageDataManager.testAddCandidateConfigCallback)
-    console.log(TAG, LogDataManager.testAddCandidateConfigCallbackManager_StartLog)
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigCallbackManager_StartLog)
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
       wifiManager.getScanResults((err, result) => {
         //  @returns Returns {@code true} if the Candidate hotspot configuration is added, returns {@code false} otherwise.
-        if (err) {
-          console.error("addCandidateConfigCallback error");
+        if (err){
+          hilog.error(0x1500, 'wifiTestApp', '%{public}s', "addCandidateConfigCallback error");
           return;
         }
-        console.log(TAG, LogDataManager.testAddCandidateConfigCallbackManager_successfulLog)
-        console.log(TAG, LogDataManager.testAddCandidateConfigManagerLog + JSON.stringify(result))
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigCallbackManager_successfulLog)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigManagerLog + JSON.stringify(result))
         message = (MessageDataManager.testAddCandidateConfig + JSON.stringify(result))
-        promptAction.showToast({ message: message })
-        console.log(TAG, LogDataManager.testAddCandidateConfigCallbackManager_EndLog)
+        promptAction.showToast({message: message})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigCallbackManager_EndLog)
       })
     }
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testAddCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testAddCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testAddCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -266,19 +267,19 @@ export function testGetScanResultsCallback() {
 export function testGetScanResultsSync() {
   try {
     let message = (MessageDataManager.testGetScanInfoList)
-    console.log(TAG, LogDataManager.testGetScanInfoListManager_StartLog);
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetScanInfoListManager_StartLog);
     let ret = wifiManager.getScanResultsSync()
     message = "扫描结果为：" + JSON.stringify(ret)
-    console.log(TAG, "扫描结果为：" + JSON.stringify(ret));
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "扫描结果为：" + JSON.stringify(ret));
     let getScanInfoManagerMessage = JSON.stringify(ret)
     AppStorage.setOrCreate("getScanInfoManagerMessage", getScanInfoManagerMessage)
-    console.log(TAG, LogDataManager.testGetScanInfoListManager_EndLog);
-    promptAction.showToast({ message: message })
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetScanInfoListManager_EndLog);
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -286,10 +287,10 @@ export function testGetScanResultsSync() {
 export function testGetWifiDetailState() {
   try {
     let message = (MessageDataManager.testGetScanInfoList)
-    console.log(TAG, LogDataManager.testGetScanInfoListManager_StartLog);
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetScanInfoListManager_StartLog);
     let ret = wifiManager.getWifiDetailState()
     let wifiDetailStateMessage = ''
-    switch (ret) {
+    switch (ret){
       case - 1: wifiDetailStateMessage = "UNKNOWN";
         break;
       case 0: wifiDetailStateMessage = "INACTIVE";
@@ -307,15 +308,15 @@ export function testGetWifiDetailState() {
       default: wifiDetailStateMessage = '未知状态';
         break;
     }
-    console.log(TAG, "状态为：" + JSON.stringify(ret));
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "状态为：" + JSON.stringify(ret));
     message = "状态为：" + wifiDetailStateMessage
-    console.log(TAG, LogDataManager.testGetScanInfoListManager_EndLog);
-    promptAction.showToast({ message: message })
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetScanInfoListManager_EndLog);
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -325,19 +326,19 @@ export function testSetScanAlwaysAllowed() {
     let isAllowed: number = AppStorage.get("isAllowed")!
     let message = ''
     let scanAllowed: boolean = true
-    if (isAllowed == 0) {
+    if (isAllowed == 0){
       scanAllowed = false
     } else {
       scanAllowed = true
     }
     wifiManager.setScanAlwaysAllowed(scanAllowed)
     message = "setScanAlwaysAllowed"
-    console.log("setScanAlwaysAllowed")
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', "setScanAlwaysAllowed")
     return message
-  } catch( e) {
-    console.log(`Failed to testGetProfileConnState1. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', `Failed to testGetProfileConnState1. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetProfileConnState1. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -345,17 +346,17 @@ export function testSetScanAlwaysAllowed() {
 export function testGetScanAlwaysAllowed() {
   try {
     let message = (MessageDataManager.testGetScanInfoList)
-    console.log(TAG, LogDataManager.testGetScanInfoListManager_StartLog);
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetScanInfoListManager_StartLog);
     let ret: boolean = wifiManager.getScanAlwaysAllowed()
-    console.log(TAG, "获取扫描始终允许标志为：" + JSON.stringify(ret));
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "获取扫描始终允许标志为：" + JSON.stringify(ret));
     message = "获取扫描始终允许标志为：" + ret
-    console.log(TAG, LogDataManager.testGetScanInfoListManager_EndLog);
-    promptAction.showToast({ message: message })
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetScanInfoListManager_EndLog);
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetScanInfoListManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -363,28 +364,28 @@ export function testGetScanAlwaysAllowed() {
 export function testAddDeviceConfigManagerPromise() {
   try {
     let message = (MessageDataManager.testAddDeviceConfigPromise)
-    console.log(TAG, LogDataManager.testAddDeviceConfigPromiseManager_StartLog)
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddDeviceConfigPromiseManager_StartLog)
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
-      let wifiDeviceConfigManager: WifiDeviceConfigManager = AppStorage.get("wifiDeviceConfigManager")! //非空断言操作符
+      let wifiDeviceConfigManager: WifiDeviceConfigManager = AppStorage.get("wifiDeviceConfigManager")!//非空断言操作符
       wifiManager.addDeviceConfig(wifiDeviceConfigManager).then(result => {
         //  @returns Returns {@code networkId} if the configuration is added; returns {@code - 1} otherwise.
-        console.log(TAG, LogDataManager.testAddDeviceConfigPromiseManager_successfulLog)
-        console.log(TAG, LogDataManager.testAddDeviceConfigManagerLog + result)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddDeviceConfigPromiseManager_successfulLog)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddDeviceConfigManagerLog + result)
         message = (MessageDataManager.testAddDeviceConfig) + result
-        promptAction.showToast({ message: message })
-        console.log(TAG, LogDataManager.testAddDeviceConfigPromiseManager_EndLog)
+        promptAction.showToast({message: message})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddDeviceConfigPromiseManager_EndLog)
       }).catch((err: BusinessError) => {
-        console.log(TAG, "testAddDeviceConfigManagerPromise error:" + JSON.stringify(err))
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "testAddDeviceConfigManagerPromise error:" + JSON.stringify(err))
       })
     }
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testAddDeviceConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testAddDeviceConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testAddDeviceConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -392,31 +393,31 @@ export function testAddDeviceConfigManagerPromise() {
 export function testAddDeviceConfigManagerCallback() {
   try {
     let message = (MessageDataManager.testAddDeviceConfigCallback)
-    console.log(TAG, LogDataManager.testAddDeviceConfigCallbackManager_StartLog)
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddDeviceConfigCallbackManager_StartLog)
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
-      let wifiDeviceConfigManager: WifiDeviceConfigManager = AppStorage.get("wifiDeviceConfigManager")! //非空断言操作符
-      console.log(TAG, "testAddDeviceConfigManagerCallback wifiDeviceConfigManager:" + JSON.stringify(wifiDeviceConfigManager))
+      let wifiDeviceConfigManager: WifiDeviceConfigManager = AppStorage.get("wifiDeviceConfigManager")!//非空断言操作符
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "testAddDeviceConfigManagerCallback wifiDeviceConfigManager:" + JSON.stringify(wifiDeviceConfigManager))
       wifiManager.addDeviceConfig(wifiDeviceConfigManager, (err, result) => {
         //  @returns Returns {@code networkId} if the configuration is added; returns {@code - 1} otherwise.
-        if (err) {
-          console.error("addDeviceConfigCallback error:" + err);
+        if (err){
+          hilog.error(0x1500, 'wifiTestApp', '%{public}s', "addDeviceConfigCallback error:" + err);
           return;
         }
-        console.log(TAG, LogDataManager.testAddDeviceConfigCallbackManager_successfulLog)
-        console.log(TAG, LogDataManager.testAddDeviceConfigManagerLog + result)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddDeviceConfigCallbackManager_successfulLog)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddDeviceConfigManagerLog + result)
         message = (MessageDataManager.testAddDeviceConfig) + result
-        promptAction.showToast({ message: message })
-        console.log(TAG, LogDataManager.testAddDeviceConfigCallbackManager_EndLog)
+        promptAction.showToast({message: message})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddDeviceConfigCallbackManager_EndLog)
       });
     }
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testAddDeviceConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testAddDeviceConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testAddDeviceConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -424,28 +425,28 @@ export function testAddDeviceConfigManagerCallback() {
 export function testAddCandidateConfigManagerPromise() {
   try {
     let message = (MessageDataManager.testAddCandidateConfigPromise)
-    console.log(TAG, LogDataManager.testAddCandidateConfigPromiseManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigPromiseManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
-      let wifiDeviceConfigManager: WifiDeviceConfigManager = AppStorage.get("wifiDeviceConfigManager")! //非空断言操作符
+      let wifiDeviceConfigManager: WifiDeviceConfigManager = AppStorage.get("wifiDeviceConfigManager")!//非空断言操作符
       wifiManager.addCandidateConfig(wifiDeviceConfigManager).then(result => {
         //  @returns Returns {@code true} if the Candidate hotspot configuration is added, returns {@code false} otherwise.
-        console.log(TAG, LogDataManager.testAddCandidateConfigPromiseManager_successfulLog)
-        console.log(TAG, LogDataManager.testAddCandidateConfigManagerLog + result)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigPromiseManager_successfulLog)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigManagerLog + result)
         message = (MessageDataManager.testAddCandidateConfig + result)
-        promptAction.showToast({ message: message })
-        console.log(TAG, LogDataManager.testAddCandidateConfigPromiseManager_EndLog)
+        promptAction.showToast({message: message})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigPromiseManager_EndLog)
       }).catch((err: BusinessError) => {
-        console.log(TAG, "testAddCandidateConfigManagerPromise err:" + JSON.stringify(err))
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "testAddCandidateConfigManagerPromise err:" + JSON.stringify(err))
       })
     }
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testAddCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testAddCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testAddCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -453,31 +454,31 @@ export function testAddCandidateConfigManagerPromise() {
 export function testAddCandidateConfigManagerCallback() {
   try {
     let message = (MessageDataManager.testAddCandidateConfigCallback)
-    console.log(TAG, LogDataManager.testAddCandidateConfigCallbackManager_StartLog)
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigCallbackManager_StartLog)
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
-      let wifiDeviceConfigManager: WifiDeviceConfigManager = AppStorage.get("wifiDeviceConfigManager")! //非空断言操作符
-      console.log(TAG, "testAddCandidateConfigManagerCallback wifiDeviceConfigManager:" + JSON.stringify(wifiDeviceConfigManager))
+      let wifiDeviceConfigManager: WifiDeviceConfigManager = AppStorage.get("wifiDeviceConfigManager")!//非空断言操作符
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "testAddCandidateConfigManagerCallback wifiDeviceConfigManager:" + JSON.stringify(wifiDeviceConfigManager))
       wifiManager.addCandidateConfig(wifiDeviceConfigManager, (err, result) => {
         //  @returns Returns {@code true} if the Candidate hotspot configuration is added, returns {@code false} otherwise.
-        if (err) {
-          console.error("addCandidateConfigCallback error");
+        if (err){
+          hilog.error(0x1500, 'wifiTestApp', '%{public}s', "addCandidateConfigCallback error");
           return;
         }
-        console.log(TAG, LogDataManager.testAddCandidateConfigCallbackManager_successfulLog)
-        console.log(TAG, LogDataManager.testAddCandidateConfigManagerLog + result)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigCallbackManager_successfulLog)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigManagerLog + result)
         message = (MessageDataManager.testAddCandidateConfig + result)
-        promptAction.showToast({ message: message })
-        console.log(TAG, LogDataManager.testAddCandidateConfigCallbackManager_EndLog)
+        promptAction.showToast({message: message})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testAddCandidateConfigCallbackManager_EndLog)
       })
     }
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testAddCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testAddCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testAddCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -485,28 +486,28 @@ export function testAddCandidateConfigManagerCallback() {
 export function testRemoveCandidateConfigManagerPromise() {
   try {
     let message = (MessageDataManager.testRemoveCandidateConfigPromise)
-    console.log(TAG, LogDataManager.testRemoveCandidateConfigPromiseManager_StartLog)
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveCandidateConfigPromiseManager_StartLog)
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
-      let networkId: number = AppStorage.get("w_networkIdM")! //非空断言操作符
+      let networkId: number = AppStorage.get("w_networkIdM")!//非空断言操作符
       wifiManager.removeCandidateConfig(networkId).then(result => {
         //  @returns Returns {@code true} if the Candidate hotspot configuration is removed, returns {@code false} otherwise.
-        console.log(TAG, LogDataManager.testRemoveCandidateConfigPromiseManager_successfulLog)
-        console.log(TAG, LogDataManager.testRemoveCandidateConfigManagerLog + result)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveCandidateConfigPromiseManager_successfulLog)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveCandidateConfigManagerLog + result)
         message = MessageDataManager.testRemoveCandidateConfig + result
-        promptAction.showToast({ message: message })
-        console.log(TAG, LogDataManager.testRemoveCandidateConfigPromiseManager_EndLog)
+        promptAction.showToast({message: message})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveCandidateConfigPromiseManager_EndLog)
       }).catch((err: BusinessError) => {
-        console.log(TAG, "testRemoveCandidateConfigManagerPromise err:" + JSON.stringify(err))
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "testRemoveCandidateConfigManagerPromise err:" + JSON.stringify(err))
       })
     }
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testRemoveCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testRemoveCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveCandidateConfigManagerPromise. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -514,30 +515,30 @@ export function testRemoveCandidateConfigManagerPromise() {
 export function testRemoveCandidateConfigManagerCallback() {
   try {
     let message = (MessageDataManager.testRemoveCandidateConfigCallback)
-    console.log(TAG, LogDataManager.testRemoveCandidateConfigCallbackManager_StartLog)
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveCandidateConfigCallbackManager_StartLog)
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
-      let networkId: number = AppStorage.get("w_networkIdM")! //非空断言操作符
+      let networkId: number = AppStorage.get("w_networkIdM")!//非空断言操作符
       wifiManager.removeCandidateConfig(networkId, (err, result) => {
         //  @returns Returns {@code true} if the Candidate hotspot configuration is removed, returns {@code false} otherwise.
-        if (err) {
-          console.error("removeCandidateConfigCallback error");
+        if (err){
+          hilog.error(0x1500, 'wifiTestApp', '%{public}s', "removeCandidateConfigCallback error");
           return;
         }
-        console.log(TAG, LogDataManager.testRemoveCandidateConfigCallbackManager_successfulLog)
-        console.log(TAG, LogDataManager.testRemoveCandidateConfigManagerLog + result)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveCandidateConfigCallbackManager_successfulLog)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveCandidateConfigManagerLog + result)
         message = (MessageDataManager.testRemoveCandidateConfig + result)
-        promptAction.showToast({ message: message })
-        console.log(TAG, LogDataManager.testRemoveCandidateConfigCallbackManager_EndLog)
+        promptAction.showToast({message: message})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveCandidateConfigCallbackManager_EndLog)
       })
     }
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testRemoveCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testRemoveCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveCandidateConfigManagerCallback. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -545,17 +546,17 @@ export function testRemoveCandidateConfigManagerCallback() {
 export function testGetCandidateConfigsManager() {
   try {
     let message = (MessageDataManager.testGetCandidateConfigs)
-    console.log(TAG, LogDataManager.testGetCandidateConfigsManager_StartLog)
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetCandidateConfigsManager_StartLog)
     let ret = wifiManager.getCandidateConfigs()
     message = "候选配置：" + JSON.stringify(ret)
-    console.log(TAG, "候选配置：" + JSON.stringify(ret));
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testGetCandidateConfigsManager_EndLog)
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "候选配置：" + JSON.stringify(ret));
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetCandidateConfigsManager_EndLog)
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetCandidateConfigsManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetCandidateConfigsManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetCandidateConfigsManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -563,23 +564,23 @@ export function testGetCandidateConfigsManager() {
 export function testConnectToCandidateConfigManager() {
   try {
     let message = (MessageDataManager.testConnectToCandidateConfig)
-    console.log(TAG, LogDataManager.testConnectToCandidateConfigManager_StartLog)
-    let networkId: number = AppStorage.get("w_networkIdM")! //非空断言操作符
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testConnectToCandidateConfigManager_StartLog)
+    let networkId: number = AppStorage.get("w_networkIdM")!//非空断言操作符
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
       let ret = wifiManager.connectToCandidateConfig(networkId)
       //      connectToCandidateConfig的返回值为void，无法判断
       message = "connectToCandidateConfig 调用成功"
-      console.log(TAG, "connectToCandidateConfig 调用成功")
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "connectToCandidateConfig 调用成功")
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testConnectToCandidateConfigManager_EndLog)
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testConnectToCandidateConfigManager_EndLog)
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testConnectToCandidateConfigManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testConnectToCandidateConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testConnectToCandidateConfigManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -587,23 +588,23 @@ export function testConnectToCandidateConfigManager() {
 export function testConnectToNetworkManager() {
   try {
     let message = (MessageDataManager.testConnectToNetwork)
-    console.log(TAG, LogDataManager.testConnectToNetworkManager_StartLog)
-    let networkId: number = AppStorage.get("w_networkIdM")! //非空断言操作符
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testConnectToNetworkManager_StartLog)
+    let networkId: number = AppStorage.get("w_networkIdM")!//非空断言操作符
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
       let ret = wifiManager.connectToNetwork(networkId)
       //      connectToNetwork的返回值为void，无法判断
       message = "ConnectToNetwork 调用成功"
-      console.log(TAG, "connectToCandidateConfig 调用成功")
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "connectToCandidateConfig 调用成功")
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testConnectToNetworkManager_EndLog)
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testConnectToNetworkManager_EndLog)
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testConnectToNetworkManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testConnectToNetworkManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testConnectToNetworkManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -611,23 +612,23 @@ export function testConnectToNetworkManager() {
 export function testConnectToDeviceManager() {
   try {
     let message = (MessageDataManager.testConnectToDevice)
-    console.log(TAG, LogDataManager.testConnectToDeviceManager_StartLog)
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testConnectToDeviceManager_StartLog)
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
-      let wifiDeviceConfigManager: WifiDeviceConfigManager = AppStorage.get("wifiDeviceConfigManager")! //非空断言操作符
+      let wifiDeviceConfigManager: WifiDeviceConfigManager = AppStorage.get("wifiDeviceConfigManager")!//非空断言操作符
       let ret = wifiManager.connectToDevice(wifiDeviceConfigManager)
       //      connectToDevice的返回值为void，无法判断
       message = "connectToDevice 调用成功"
-      console.log(TAG, "connectToDevice 调用成功")
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "connectToDevice 调用成功")
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testConnectToDeviceManager_EndLog)
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testConnectToDeviceManager_EndLog)
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testConnectToDeviceManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testConnectToDeviceManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testConnectToDeviceManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -635,22 +636,22 @@ export function testConnectToDeviceManager() {
 export function testDisconnectManager() {
   try {
     let message = (MessageDataManager.testDisconnect)
-    console.log(TAG, LogDataManager.testDisconnectManager_StartLog)
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testDisconnectManager_StartLog)
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
       let ret = wifiManager.disconnect()
       //      disconnect的返回值为void
       message = "disconnect 调用成功"
-      console.log(TAG, "disconnect 调用成功")
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "disconnect 调用成功")
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testDisconnectManager_EndLog)
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testDisconnectManager_EndLog)
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testDisconnectManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testDisconnectManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testDisconnectManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -658,23 +659,23 @@ export function testDisconnectManager() {
 export function testGetSignalLevelManager() {
   try {
     let message = (MessageDataManager.testGetSignalLevel)
-    console.log(TAG, LogDataManager.testGetSignalLevelManager_StartLog)
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetSignalLevelManager_StartLog)
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
-      let rssi: number = AppStorage.get("w_rssi1")! //非空断言操作符
-      let band: number = AppStorage.get("w_band1")! //非空断言操作符
+      let rssi: number = AppStorage.get("w_rssi1")!//非空断言操作符
+      let band: number = AppStorage.get("w_band1")!//非空断言操作符
       let number = wifiManager.getSignalLevel(rssi, band)
       message = "getSignalLevel is: " + number
-      console.log(TAG, "getSignalLevel is: " + number)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "getSignalLevel is: " + number)
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testGetSignalLevelManager_EndLog)
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetSignalLevelManager_EndLog)
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetSignalLevelManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetSignalLevelManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetSignalLevelManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -682,26 +683,26 @@ export function testGetSignalLevelManager() {
 export function testGetLinkedInfoManagerPromise() {
   try {
     let message = (MessageDataManager.testGetLinkedInfoPromise)
-    console.log(TAG, LogDataManager.testGetLinkedInfoPromiseManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetLinkedInfoPromiseManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
       wifiManager.getLinkedInfo().then(data => {
-        console.log(TAG, LogDataManager.testGetLinkedInfoPromiseManager_successfulLog)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetLinkedInfoPromiseManager_successfulLog)
         message = "get wifi linked info: " + JSON.stringify(data)
-        console.log(TAG, "get wifi linked info: " + JSON.stringify(data));
-        promptAction.showToast({ message: message })
-        console.log(TAG, LogDataManager.testGetLinkedInfoPromiseManager_EndLog);
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "get wifi linked info: " + JSON.stringify(data));
+        promptAction.showToast({message: message})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetLinkedInfoPromiseManager_EndLog);
       }).catch((err: BusinessError) => {
-        console.log(TAG, "get linked info error:" + JSON.stringify(err));
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "get linked info error:" + JSON.stringify(err));
       });
     }
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetLinkedInfoManagerPromise. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetLinkedInfoManagerPromise. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetLinkedInfoManagerPromise. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -709,18 +710,18 @@ export function testGetLinkedInfoManagerPromise() {
 export function testGetLinkedInfoManagerCallback() {
   try {
     let message = (MessageDataManager.testGetLinkedInfoCallback)
-    console.log(TAG, LogDataManager.testGetLinkedInfoCallbackManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetLinkedInfoCallbackManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
       wifiManager.getLinkedInfo((err, data) => {
-        if (err) {
-          console.error("get linked info error");
+        if (err){
+          hilog.error(0x1500, 'wifiTestApp', '%{public}s', "get linked info error");
           message = "get linked info error"
-          promptAction.showToast({ message: message })
+          promptAction.showToast({message: message})
         }
-        console.log(TAG, LogDataManager.testGetLinkedInfoCallbackManager_successfulLog)
-        console.log(TAG, "get wifi linked info: " + JSON.stringify(data));
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetLinkedInfoCallbackManager_successfulLog)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "get wifi linked info: " + JSON.stringify(data));
         message = "get wifi linked info: " + JSON.stringify(data)
         let linkedInfoManagerMessage = JSON.stringify(data)
         AppStorage.setOrCreate("linkedInfoManagerMessage", linkedInfoManagerMessage)
@@ -732,16 +733,16 @@ export function testGetLinkedInfoManagerCallback() {
         AppStorage.setOrCreate("w_rssi1", rssi)
         AppStorage.setOrCreate("w_band1", band)
         AppStorage.setOrCreate("w_networkIdM", networkId)
-        promptAction.showToast({ message: message })
-        console.log(TAG, LogDataManager.testGetLinkedInfoCallbackManager_EndLog);
+        promptAction.showToast({message: message})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetLinkedInfoCallbackManager_EndLog);
       });
     }
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetLinkedInfoManagerCallback. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetLinkedInfoManagerCallback. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetLinkedInfoManagerCallback. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -749,20 +750,20 @@ export function testGetLinkedInfoManagerCallback() {
 export function testIsConnectedManager() {
   try {
     let message = (MessageDataManager.testIsConnected)
-    console.log(TAG, LogDataManager.testIsConnectedManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testIsConnectedManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
       let ret = wifiManager.isConnected()
       message = "isConnected: " + ret
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testIsConnectedManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testIsConnectedManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testIsConnectedManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testIsConnectedManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testIsConnectedManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -770,20 +771,20 @@ export function testIsConnectedManager() {
 export function testGetSupportedFeaturesManager() {
   try {
     let message = (MessageDataManager.testGetSupportedFeatures)
-    console.log(TAG, LogDataManager.testGetSupportedFeaturesManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetSupportedFeaturesManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
       let ret = wifiManager.getSupportedFeatures()
       message = "GetSupportedFeatures: " + ret
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testGetSupportedFeaturesManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetSupportedFeaturesManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetSupportedFeaturesManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetSupportedFeaturesManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetSupportedFeaturesManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -791,21 +792,21 @@ export function testGetSupportedFeaturesManager() {
 export function testIsFeatureSupportedManager() {
   try {
     let message = (MessageDataManager.testIsFeatureSupported)
-    console.log(TAG, LogDataManager.testIsFeatureSupportedManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testIsFeatureSupportedManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
-      let featureId: number = AppStorage.get("w_featureIdM")! //非空断言操作符
+      let featureId: number = AppStorage.get("w_featureIdM")!//非空断言操作符
       let ret = wifiManager.isFeatureSupported(featureId)
       message = "isFeatureSupported: " + ret
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testGetSupportedFeaturesManager_EndLog)
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetSupportedFeaturesManager_EndLog)
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testIsFeatureSupportedManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testIsFeatureSupportedManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testIsFeatureSupportedManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -813,20 +814,20 @@ export function testIsFeatureSupportedManager() {
 export function testGetDeviceMacAddressManager() {
   try {
     let message = (MessageDataManager.testGetDeviceMacAddress)
-    console.log(TAG, LogDataManager.testGetDeviceMacAddressManager_StartLog)
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetDeviceMacAddressManager_StartLog)
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
       let macAddress = wifiManager.getDeviceMacAddress()
       message = "macAddress: " + macAddress
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testGetDeviceMacAddressManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetDeviceMacAddressManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetDeviceMacAddressManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetDeviceMacAddressManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetDeviceMacAddressManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -834,8 +835,8 @@ export function testGetDeviceMacAddressManager() {
 export function testGetIpInfoManager() {
   try {
     let message = (MessageDataManager.testGetIpInfo)
-    console.log(TAG, LogDataManager.testGetIpInfoManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetIpInfoManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
       let IpInfo = wifiManager.getIpInfo()
@@ -843,13 +844,13 @@ export function testGetIpInfoManager() {
       let ipInfoManagerMessage = IpInfo
       AppStorage.setOrCreate("ipInfoManagerMessage", ipInfoManagerMessage)
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testGetIpInfoManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetIpInfoManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetIpInfoManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetIpInfoManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetIpInfoManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -857,16 +858,16 @@ export function testGetIpInfoManager() {
 export function testGetIpv6Info() {
   try {
     let message = (MessageDataManager.testGetCountryCode)
-    console.log(TAG, LogDataManager.testGetCountryCodeManager_StartLog);
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetCountryCodeManager_StartLog);
     let ret: wifiManager.Ipv6Info = wifiManager.getIpv6Info()
     message = "Ipv6Info: " + ret
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testGetCountryCodeManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetCountryCodeManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetCountryCodeManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetCountryCodeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetCountryCodeManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -874,20 +875,20 @@ export function testGetIpv6Info() {
 export function testGetCountryCodeManager() {
   try {
     let message = (MessageDataManager.testGetCountryCode)
-    console.log(TAG, LogDataManager.testGetCountryCodeManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetCountryCodeManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
       let ret = wifiManager.getCountryCode()
       message = "CountryCode is: " + ret
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testGetCountryCodeManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetCountryCodeManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetCountryCodeManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetCountryCodeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetCountryCodeManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -895,8 +896,8 @@ export function testGetCountryCodeManager() {
 export function testReassociateManager() {
   try {
     let message = (MessageDataManager.testReassociate)
-    console.log(TAG, LogDataManager.testReassociateManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testReassociateManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
       let ret = wifiManager.reassociate()
@@ -904,13 +905,13 @@ export function testReassociateManager() {
       //      message = "reassociate is: " + ret
       message = "reassociate 调用成功"
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testReassociateManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testReassociateManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testReassociateManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testReassociateManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testReassociateManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -918,21 +919,21 @@ export function testReassociateManager() {
 export function testReconnectManager() {
   try {
     let message = (MessageDataManager.testReConnect)
-    console.log(TAG, LogDataManager.testReConnectManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testReConnectManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive)
     } else {
       let ret = wifiManager.reconnect()
       //      reconnect的返回值为void
       message = "reconnect 调用成功"
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testReConnectManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testReConnectManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testReconnectManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testReconnectManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testReconnectManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -940,8 +941,8 @@ export function testReconnectManager() {
 export function testGetDeviceConfigsManager() {
   try {
     let message = (MessageDataManager.testGetDeviceConfigs)
-    console.log(TAG, LogDataManager.testGetDeviceConfigsManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetDeviceConfigsManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
       let array = wifiManager.getDeviceConfigs()
@@ -949,13 +950,13 @@ export function testGetDeviceConfigsManager() {
       let getDeviceConfigsManagerMessage = JSON.stringify(array)
       AppStorage.setOrCreate("getDeviceConfigsManagerMessage", getDeviceConfigsManagerMessage)
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testGetDeviceConfigsManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testGetDeviceConfigsManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetDeviceConfigsManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetDeviceConfigsManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetDeviceConfigsManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -963,21 +964,21 @@ export function testGetDeviceConfigsManager() {
 export function testUpdateDeviceConfigManager() {
   try {
     let message = (MessageDataManager.testUpdateNetwork)
-    console.log(TAG, LogDataManager.testUpdateNetworkManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testUpdateNetworkManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
-      let wifiDeviceConfigManager: WifiDeviceConfigManager = AppStorage.get("wifiDeviceConfigManager")! //非空断言操作符
+      let wifiDeviceConfigManager: WifiDeviceConfigManager = AppStorage.get("wifiDeviceConfigManager")!//非空断言操作符
       let ret: number = wifiManager.updateNetwork(wifiDeviceConfigManager)
       message = "updateNetwork: " + ret
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testUpdateNetworkManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testUpdateNetworkManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testUpdateDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testUpdateDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testUpdateDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -985,23 +986,23 @@ export function testUpdateDeviceConfigManager() {
 export function testDisableDeviceConfigManager() {
   try {
     let message = (MessageDataManager.testDisableNetwork)
-    console.log(TAG, LogDataManager.testDisableNetworkManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testDisableNetworkManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
-      let networkId: number = AppStorage.get("w_networkIdM")! //非空断言操作符
+      let networkId: number = AppStorage.get("w_networkIdM")!//非空断言操作符
       let ret = wifiManager.disableNetwork(networkId)
       // disableDeviceConfig的返回值为void
       message = "disableNetwork: " + ret
       message = "disableNetwork 调用成功"
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testDisableNetworkManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testDisableNetworkManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testDisableDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testDisableDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testDisableDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -1009,8 +1010,8 @@ export function testDisableDeviceConfigManager() {
 export function testRemoveAllDeviceConfigsManager() {
   try {
     let message = (MessageDataManager.testRemoveAllNetwork)
-    console.log(TAG, LogDataManager.testRemoveAllNetworkManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveAllNetworkManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
       let ret = wifiManager.removeAllNetwork()
@@ -1018,13 +1019,13 @@ export function testRemoveAllDeviceConfigsManager() {
       message = "removeAllNetwork: " + ret
       message = "removeAllDeviceConfigs 调用成功"
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testRemoveAllNetworkManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveAllNetworkManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testRemoveAllDeviceConfigsManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testRemoveAllDeviceConfigsManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveAllDeviceConfigsManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -1032,32 +1033,32 @@ export function testRemoveAllDeviceConfigsManager() {
 export function testRemoveDeviceConfigManager() {
   try {
     let message = (MessageDataManager.testRemoveDevice)
-    console.log(TAG, LogDataManager.testRemoveDeviceManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveDeviceManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
     } else {
-      let networkId: number = AppStorage.get("w_networkIdM")! //非空断言操作符
+      let networkId: number = AppStorage.get("w_networkIdM")!//非空断言操作符
       let ret = wifiManager.removeDevice(networkId)
       //      removeDeviceConfig的返回值为void
       //      message = "removeDevice " + ret
       message = "removeDeviceConfig 调用成功"
     }
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testRemoveDeviceManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveDeviceManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
 
 export function testIsBandTypeSupported() {
   try {
-    // let bandType:wifiManager.WifiBandType
-    // wifiManager.isBandTypeSupported(bandType)
-  } catch( e) {
+  // let bandType:wifiManager.WifiBandType
+  // wifiManager.isBandTypeSupported(bandType)
+  } catch( e){
 
   }
 }
@@ -1067,13 +1068,13 @@ export function testGet5GChannelList() {
     let message = ''
     let ret = wifiManager.get5GChannelList()
     message = "get5GChannelList:" + ret
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testRemoveDeviceManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveDeviceManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -1083,13 +1084,13 @@ export function testGetDisconnectedReason() {
     let message = ''
     let ret = wifiManager.getDisconnectedReason()
     message = "DisconnectedReason:" + ret
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testRemoveDeviceManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveDeviceManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -1099,13 +1100,13 @@ export function testStartPortalCertification() {
     let message = ''
     wifiManager.startPortalCertification()
     message = "startPortalCertification 调用成功"
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testRemoveDeviceManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveDeviceManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -1115,13 +1116,13 @@ export function testStartWifiDetection() {
     let message = ''
     // wifiManager.StartWifiDetection()
     message = "StartWifiDetection 调用成功"
-    promptAction.showToast({ message: message })
-    console.log(TAG, LogDataManager.testRemoveDeviceManager_EndLog);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testRemoveDeviceManager_EndLog);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -1131,16 +1132,16 @@ let wifiStateChangeManager = false
 export function testOnWifiStateChangeManager() {
   try {
     let message = "onWifiStateChange test"
-    console.log(TAG, LogDataManager.testOnWifiStateChangeManager_StartLog);
-    if (wifiStateChangeManager) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testOnWifiStateChangeManager_StartLog);
+    if (wifiStateChangeManager){
       wifiManager.off("wifiStateChange", () => {
-        promptAction.showToast({ message: "on.WifiStateChange监听已关闭" })
+        promptAction.showToast({message: "on.WifiStateChange监听已关闭"})
       })
       message = "关闭注册WLAN状态改变事件"
     } else {
       wifiManager.on("wifiStateChange", (number) => {
         let wifiStateMessage = ""
-        switch (number) {
+        switch (number){
           case 0: wifiStateMessage = "inactive";
             break;
           case 1: wifiStateMessage = "active";
@@ -1152,18 +1153,18 @@ export function testOnWifiStateChangeManager() {
           default: wifiStateMessage = '未知状态';
             break;
         }
-        promptAction.showToast({ message: "状态:" + wifiStateMessage })
-        console.log(TAG, LogDataManager.testOnWifiStateChangeManager_EndLog);
+        promptAction.showToast({message: "状态:" + wifiStateMessage})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testOnWifiStateChangeManager_EndLog);
       })
       message = "打开注册WLAN状态变化"
-      promptAction.showToast({ message: message })
+      promptAction.showToast({message: message})
     }
     wifiStateChangeManager = !wifiStateChangeManager
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testOnWifiStateChangeManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testOnWifiStateChangeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testOnWifiStateChangeManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -1173,20 +1174,20 @@ let wifiConnectionChangeManager = false
 export function testOnWifiConnectionChangeManager() {
   try {
     let message = "OnWifiConnectionChange test"
-    console.log(TAG, LogDataManager.testOnWifiConnectionChangeManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testOnWifiConnectionChangeManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
       return message
     }
-    if (wifiConnectionChangeManager) {
+    if (wifiConnectionChangeManager){
       wifiManager.off("wifiConnectionChange", () => {
-        promptAction.showToast({ message: "on.wifiConnectionChange监听已关闭" })
+        promptAction.showToast({message: "on.wifiConnectionChange监听已关闭"})
       })
       message = "关闭WLAN连接状态改变事件"
     } else {
       wifiManager.on("wifiConnectionChange", (number) => {
         let wifiConnectionMessage = ""
-        switch (number) {
+        switch (number){
           case 0: wifiConnectionMessage = "disconnected";
             break;
           case 1: wifiConnectionMessage = "connected";
@@ -1194,18 +1195,18 @@ export function testOnWifiConnectionChangeManager() {
           default: wifiConnectionMessage = '未知状态';
             break;
         }
-        promptAction.showToast({ message: "状态: " + wifiConnectionMessage })
-        console.log(TAG, LogDataManager.testOnWifiConnectionChangeManager_EndLog);
+        promptAction.showToast({message: "状态: " + wifiConnectionMessage})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testOnWifiConnectionChangeManager_EndLog);
       })
       message = "打开注册WLAN连接状态变化"
-      promptAction.showToast({ message: message })
+      promptAction.showToast({message: message})
     }
     wifiConnectionChangeManager = !wifiConnectionChangeManager
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testOnWifiConnectionChangeManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testOnWifiConnectionChangeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testOnWifiConnectionChangeManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -1215,20 +1216,20 @@ let wifiScanStateChangeManager = false
 export function testOnWifiScanStateChangeManager() {
   try {
     let message = "OnWifiScanStateChange test"
-    console.log(TAG, LogDataManager.testOnWifiScanStateChangeManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testOnWifiScanStateChangeManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
       return message
     }
-    if (wifiScanStateChangeManager) {
+    if (wifiScanStateChangeManager){
       wifiManager.off("wifiScanStateChange", () => {
-        promptAction.showToast({ message: "on.wifiScanStateChange监听已关闭" })
+        promptAction.showToast({message: "on.wifiScanStateChange监听已关闭"})
       })
       message = "关闭扫描状态改变事件"
     } else {
       wifiManager.on("wifiScanStateChange", (number) => {
         let wifiScanStateMessage = ""
-        switch (number) {
+        switch (number){
           case 0: wifiScanStateMessage = "scan fail";
             break;
           case 1: wifiScanStateMessage = "scan success";
@@ -1236,18 +1237,18 @@ export function testOnWifiScanStateChangeManager() {
           default: wifiScanStateMessage = '未知状态';
             break;
         }
-        promptAction.showToast({ message: "状态: " + wifiScanStateMessage })
-        console.log(TAG, LogDataManager.testOnWifiScanStateChangeManager_EndLog);
+        promptAction.showToast({message: "状态: " + wifiScanStateMessage})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testOnWifiScanStateChangeManager_EndLog);
       })
       message = "打开注册扫描状态变化"
-      promptAction.showToast({ message: message })
+      promptAction.showToast({message: message})
     }
     wifiScanStateChangeManager = !wifiScanStateChangeManager
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testOnWifiScanStateChangeManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testOnWifiScanStateChangeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testOnWifiScanStateChangeManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -1257,30 +1258,30 @@ let wifiRssiChangeManager = false
 export function testOnWifiRssiChangeManager() {
   try {
     let message = "OnWifiRssiChange test"
-    console.log(TAG, LogDataManager.testOnWifiRssiChangeManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testOnWifiRssiChangeManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
       return message
     }
-    if (wifiRssiChangeManager) {
+    if (wifiRssiChangeManager){
       wifiManager.off("wifiRssiChange", () => {
-        promptAction.showToast({ message: "on.wifiRssiChange监听已关闭" })
+        promptAction.showToast({message: "on.wifiRssiChange监听已关闭"})
       })
       message = "关闭RSSI状态变化事件"
     } else {
       wifiManager.on("wifiRssiChange", (number) => {
-        promptAction.showToast({ message: "rssi: " + number })
+        promptAction.showToast({message: "rssi: " + number})
       })
       message = "打开注册RSSI状态变化"
-      console.log(TAG, LogDataManager.testOnWifiRssiChangeManager_EndLog);
-      promptAction.showToast({ message: message })
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testOnWifiRssiChangeManager_EndLog);
+      promptAction.showToast({message: message})
     }
     wifiRssiChangeManager = !wifiRssiChangeManager
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testOnWifiRssiChangeManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testOnWifiRssiChangeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testOnWifiRssiChangeManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -1290,20 +1291,20 @@ let streamChangeManager = false
 export function testOnStreamChangeManager() {
   try {
     let message = "onStreamChange test"
-    console.log(TAG, LogDataManager.testOnStreamChangeManager_StartLog);
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testOnStreamChangeManager_StartLog);
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
       return message
     }
-    if (streamChangeManager) {
+    if (streamChangeManager){
       wifiManager.off("streamChange", () => {
-        promptAction.showToast({ message: "on.streamChange监听已关闭" })
+        promptAction.showToast({message: "on.streamChange监听已关闭"})
       })
       message = "关闭注册流改变事件"
     } else {
       wifiManager.on("streamChange", (number) => {
         let streamChangeMessage = ""
-        switch (number) {
+        switch (number){
           case 0: streamChangeMessage = "stream none";
             break;
           case 1: streamChangeMessage = "stream down";
@@ -1315,18 +1316,18 @@ export function testOnStreamChangeManager() {
           default: streamChangeMessage = '未知状态';
             break;
         }
-        promptAction.showToast({ message: "状态:" + streamChangeMessage })
-        console.log(TAG, LogDataManager.testOnStreamChangeManager_EndLog);
+        promptAction.showToast({message: "状态:" + streamChangeMessage})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testOnStreamChangeManager_EndLog);
       })
       message = "打开注册流变化"
-      promptAction.showToast({ message: message })
+      promptAction.showToast({message: message})
     }
     streamChangeManager = !streamChangeManager
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testOnStreamChangeManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testOnStreamChangeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testOnStreamChangeManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -1334,21 +1335,21 @@ export function testOnStreamChangeManager() {
 export function testGetLinkedInfoSyncManager() {
   try {
     let message = ''
-    console.log(TAG, "testGetLinkedInfoSyncManager_StartLog")
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "testGetLinkedInfoSyncManager_StartLog")
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
       return message
     }
     let linkedInfo = wifiManager.getLinkedInfoSync();
     message = "同步获取连接信息成功: " + JSON.stringify(linkedInfo)
     AppStorage.setOrCreate('linkedInfoSyncManagerMessage', JSON.stringify(linkedInfo));
-    promptAction.showToast({ message: message })
-    console.log(TAG, "testGetLinkedInfoSyncManager_EndLog")
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "testGetLinkedInfoSyncManager_EndLog")
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testGetLinkedInfoSyncManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetLinkedInfoSyncManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testGetLinkedInfoSyncManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -1358,21 +1359,21 @@ let deviceConfigChange = false
 export function testOnDeviceConfigChangeManager() {
   try {
     let message = "OnDeviceConfigChange test"
-    console.log(TAG, LogDataManager.testOnDeviceConfigChangeManager_StartLog);
-    console.log(TAG, "testOnDeviceConfigChange test");
-    if (!wifiManagerEnable) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testOnDeviceConfigChangeManager_StartLog);
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "testOnDeviceConfigChange test");
+    if (!wifiManagerEnable){
       message = (MessageDataManager.testIsInactive);
       return message
     }
-    if (deviceConfigChange) {
+    if (deviceConfigChange){
       wifiManager.off("deviceConfigChange", () => {
-        promptAction.showToast({ message: "on.deviceConfigChange监听已关闭" })
+        promptAction.showToast({message: "on.deviceConfigChange监听已关闭"})
       })
       message = "关闭注册设备配置改变事件"
     } else {
       wifiManager.on("deviceConfigChange", (number) => {
         let deviceConfigMessage = ""
-        switch (number) {
+        switch (number){
           case 0: deviceConfigMessage = "config is added";
             break;
           case 1: deviceConfigMessage = "config is changed";
@@ -1382,18 +1383,18 @@ export function testOnDeviceConfigChangeManager() {
           default: deviceConfigMessage = '未知状态';
             break;
         }
-        promptAction.showToast({ message: "状态:" + deviceConfigMessage })
-        console.log(TAG, LogDataManager.testOnDeviceConfigChangeManager_EndLog);
+        promptAction.showToast({message: "状态:" + deviceConfigMessage})
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, LogDataManager.testOnDeviceConfigChangeManager_EndLog);
       })
       message = "打开注册设备配置变化"
-      promptAction.showToast({ message: message })
+      promptAction.showToast({message: message})
     }
     deviceConfigChange = !deviceConfigChange
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testOnDeviceConfigChangeManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testOnDeviceConfigChangeManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testOnDeviceConfigChangeManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }

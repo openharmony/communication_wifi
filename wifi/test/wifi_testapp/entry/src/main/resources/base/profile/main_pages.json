@@ -1,6 +1,6 @@
 {
   "src": [
-    "pages/Index",
+    "pages/index",
     "pages/homePage",
     "pages/subManualApiTest/wifiInterfaceTest",
     "pages/subManualApiTest/hotspotInterfaceTest",
@@ -35,7 +35,7 @@
     "pages/subStressTest/hotspotManagerStressTest",
     "pages/subStressTest/p2pStressTest",
     "pages/subStressTest/p2pManagerStressTest",
-    "pages/subManualApiTest/subWifiTest/login",
+    "pages/subManualApiTest/subWifiTest/Login",
     "pages/subManualApiTest/subWifiTest/about",
     "pages/subManualApiTest/subWifiTest/wifiFound",
     "pages/subManualApiTest/subP2pTest/p2pFound",
@@ -43,11 +43,9 @@
     "pages/subAppTest/p2pDiscoveryTest",
     "pages/subAppTest/tcpSocketTest",
     "pages/subAppTest/udpSocketTest",
-    "pages/subAppTest/multipathSocketTest",
     "pages/subAppTest/httpSocketTest",
     "pages/subAppTest/httpsSocketTest",
-    "pages/subAppTest/rcpHttpTest",
-    "pages/subAppTest/tcpdump",
+
     "pages/subStabilityTest/wifiSwitchStabilityTest",
     "pages/subStabilityTest/wifiScanStabilityTest",
     "pages/subStabilityTest/wifiConnectStabilityTest",

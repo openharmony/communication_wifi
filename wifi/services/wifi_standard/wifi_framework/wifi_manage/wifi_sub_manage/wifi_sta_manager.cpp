@@ -304,7 +304,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         WifiConfigCenter::GetInstance().UpdateLinkedInfo(instId);
         WifiConfigCenter::GetInstance().SetLastConnStaFreq(info.frequency);
-        InstallHpfAndSetSuspendMode(state, instId);
+        InstallHpfAndSetSuspendMode(instId);
     }
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
@@ -425,7 +425,7 @@ void WifiStaManager::StartSatelliteTimer(void)
 }
 #endif
 
-void WifiStaManager::InstallHpfAndSetSuspendMode(OperateResState state, int instId)
+void WifiStaManager::InstallHpfAndSetSuspendMode(int instId)
 {
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     // Must first set the SuspendMode before deploying the filtering rules for the set rules to take effect.

@@ -1113,3 +1113,889 @@ const HotspotManagerTestCase: WifiTest[] = [
     'api': testAddHotspotBlockList,
     'result': 'None',
     'category': CaseCategory.HotspotManager
+},
+  {
+    'name': '删除热点黑名单',
+    'detail': '删除热点黑名单',
+    'method': 'delHotspotBlockList',
+    'api': testDelHotspotBlockList,
+    'result': 'None',
+    'category': CaseCategory.HotspotManager
+},
+  {
+    'name': '获取热点黑名单列表',
+    'detail': '获取热点黑名单列表',
+    'method': 'getHotspotBlockList',
+    'api': testGetHotspotBlockList,
+    'result': 'None',
+    'category': CaseCategory.HotspotManager
+  }
+]
+const p2pTestCase: WifiTest[] = [
+  {
+    'name': '注册P2P开关状态改变事件',
+    'detail': '注册P2P开关状态改变事件',
+    'method': 'on.P2pStateChange',
+    'api': testOnP2pStateChange,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '注册P2P连接状态改变事件',
+    'detail': '注册P2P连接状态改变事件',
+    'method': 'on.P2pConnectionChange',
+    'api': testOnP2pConnectionChange,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '注册P2P设备状态改变事件',
+    'detail': '注册P2P设备状态改变事件',
+    'method': 'on.p2pDeviceChange',
+    'api': testOnP2pDeviceChange,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '注册P2P对端设备状态改变事件',
+    'detail': '注册P2P对端设备状态改变事件',
+    'method': 'on.p2pPeerDeviceChange',
+    'api': testOnP2pPeerDeviceChange,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '注册P2P永久组状态改变事件',
+    'detail': '注册P2P永久组状态改变事件',
+    'method': 'on.p2pPersistentGroupChange',
+    'api': testOnP2pPersistentGroupChange,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '注册发现设备状态改变事件',
+    'detail': '注册发现设备状态改变事件',
+    'method': 'on.p2pDiscoveryChange',
+    'api': testOnP2pDiscoveryChange,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '设置设备名称',
+    'detail': '设置设备名称',
+    'method': 'setDeviceName',
+    'api': testSetDeviceName,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '创建群组',
+    'detail': '创建群组',
+    'method': 'createGroup',
+    'api': testCreateGroup,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '开始发现设备',
+    'detail': '开始发现设备',
+    'method': 'startDiscoverDevices',
+    'api': testStartDiscoverDevices,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '停止发现设备',
+    'detail': '停止发现设备',
+    'method': 'stopDiscoverDevices',
+    'api': testStopDiscoverDevices,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '执行P2P连接',
+    'detail': '执行P2P连接',
+    'method': 'p2pConnect',
+    'api': testP2pConnect,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '获取P2P连接信息Promise',
+    'detail': '获取P2P连接信息Promise',
+    'method': 'getP2pLinkedInfo',
+    'api': testGetP2pLinkedInfoPromise,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '获取P2P连接信息Callback',
+    'detail': '获取P2P连接信息Callback',
+    'method': 'getP2pLinkedInfo',
+    'api': testGetP2pLinkedInfoCallback,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '取消P2P连接',
+    'detail': '取消P2P连接',
+    'method': 'p2pCancelConnect',
+    'api': testP2pCancelConnect,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '获取P2P当前组信息Promise',
+    'detail': '获取P2P当前组信息Promise',
+    'method': 'getCurrentGroup',
+    'api': testGetCurrentGroupPromise,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '获取P2P当前组信息Callback',
+    'detail': '获取P2P当前组信息Callback',
+    'method': 'getCurrentGroup',
+    'api': testGetCurrentGroupCallback,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '获取P2P对端设备列表信息Promise',
+    'detail': '获取P2P对端设备列表信息Promise',
+    'method': 'getP2pPeerDevices',
+    'api': testGetP2pPeerDevicesPromise,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '获取P2P对端设备列表信息Callback',
+    'detail': '获取P2P对端设备列表信息Callback',
+    'method': 'getP2pPeerDevices',
+    'api': testGetP2pPeerDevicesCallback,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '移除群组',
+    'detail': '移除群组',
+    'method': 'removeGroup',
+    'api': testRemoveGroup,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+  {
+    'name': '删除永久组',
+    'detail': '删除永久组',
+    'method': 'deletePersistentGroup',
+    'api': testDeletePersistentGroup,
+    'result': 'None',
+    'category': CaseCategory.P2p
+},
+]
+const p2pManagerTestCase: WifiTest[] = [
+  {
+    'name': '注册P2P开关状态改变事件',
+    'detail': '注册P2P开关状态改变事件',
+    'method': 'on.P2pStateChange',
+    'api': testOnP2pStateChangeManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '注册P2P连接状态改变事件',
+    'detail': '注册P2P连接状态改变事件',
+    'method': 'on.P2pConnectionChange',
+    'api': testOnP2pConnectionChangeManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '注册P2P设备状态改变事件',
+    'detail': '注册P2P设备状态改变事件',
+    'method': 'on.p2pDeviceChange',
+    'api': testOnP2pDeviceChangeManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '注册P2P对端设备状态改变事件',
+    'detail': '注册P2P对端设备状态改变事件',
+    'method': 'on.p2pPeerDeviceChange',
+    'api': testOnP2pPeerDeviceChangeManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '注册P2P永久组状态改变事件',
+    'detail': '注册P2P永久组状态改变事件',
+    'method': 'on.p2pPersistentGroupChange',
+    'api': testOnP2pPersistentGroupChangeManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '注册发现设备状态改变事件',
+    'detail': '注册发现设备状态改变事件',
+    'method': 'on.p2pDiscoveryChange',
+    'api': testOnP2pDiscoveryChangeManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '设置设备名称',
+    'detail': '设置设备名称',
+    'method': 'setP2pDeviceName',
+    'api': testSetP2pDeviceNameManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '创建群组',
+    'detail': '创建群组',
+    'method': 'createGroup',
+    'api': testCreateP2pGroupManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '开始发现设备',
+    'detail': '开始发现设备',
+    'method': 'startDiscoverDevices',
+    'api': testStartDiscoverP2pDevicesManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '停止发现设备',
+    'detail': '停止发现设备',
+    'method': 'stopDiscoverDevices',
+    'api': testStopDiscoverP2pDevicesManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '执行P2P连接',
+    'detail': '执行P2P连接',
+    'method': 'p2pConnect',
+    'api': testP2pConnectManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '获取P2P连接信息Promise',
+    'detail': '获取P2P连接信息Promise',
+    'method': 'getP2pLinkedInfo',
+    'api': testGetP2pLinkedInfoManagerPromise,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '获取P2P连接信息Callback',
+    'detail': '获取P2P连接信息Callback',
+    'method': 'getP2pLinkedInfo',
+    'api': testGetP2pLinkedInfoManagerCallback,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '获取P2P当前组信息Promise',
+    'detail': '获取P2P当前组信息Promise',
+    'method': 'getCurrentGroup',
+    'api': testGetCurrentP2pGroupManagerPromise,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '获取P2P当前组信息Callback',
+    'detail': '获取P2P当前组信息Callback',
+    'method': 'getCurrentGroup',
+    'api': testGetCurrentP2pGroupManagerCallback,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '获取P2P对端设备列表信息Promise',
+    'detail': '获取P2P对端设备列表信息Promise',
+    'method': 'getP2pPeerDevices',
+    'api': testGetP2pPeerDevicesManagerPromise,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '获取P2P对端设备列表信息Callback',
+    'detail': '获取P2P对端设备列表信息Callback',
+    'method': 'getP2pPeerDevices',
+    'api': testGetP2pPeerDevicesManagerCallback,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '获取P2P本端设备信息Promise',
+    'detail': '获取P2P本端设备信息Promise',
+    'method': 'getP2pLocalDevice',
+    'api': testGetP2pLocalDeviceManagerPromise,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '获取P2P本端设备信息Callback',
+    'detail': '获取P2P本端设备信息Callback',
+    'method': 'getP2pLocalDevice',
+    'api': testGetP2pLocalDeviceManagerCallback,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '获取创建的所有P2P群组信息Promise',
+    'detail': '获取创建的所有P2P群组信息Promise',
+    'method': 'getP2pGroups',
+    'api': testGetP2pGroupsManagerPromise,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '获取创建的所有P2P群组信息Callback',
+    'detail': '获取创建的所有P2P群组信息Callback',
+    'method': 'getP2pGroups',
+    'api': testGetP2pGroupsManagerCallback,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '取消P2P连接',
+    'detail': '取消P2P连接',
+    'method': 'p2pCancelConnect',
+    'api': testP2pCancelConnectManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '移除群组',
+    'detail': '移除群组',
+    'method': 'removeGroup',
+    'api': testRemoveP2pGroupManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+  {
+    'name': '删除永久组',
+    'detail': '删除永久组',
+    'method': 'deletePersistentGroup',
+    'api': testDeletePersistentP2pGroupManager,
+    'result': 'None',
+    'category': CaseCategory.P2pManager
+},
+]
+export const LinkEnhanceTestCase: WifiTest[] = [
+  // Server相关接口测试
+  {
+    'name': '创建服务器',
+    'detail': '创建linkEnhance服务器实例',
+    'method': 'createServer',
+    'api': testCreateServer,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '启动服务器',
+    'detail': '启动linkEnhance服务器',
+    'method': 'server.start',
+    'api': testServerStart,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '停止服务器',
+    'detail': '停止linkEnhance服务器',
+    'method': 'server.stop',
+    'api': testServerStop,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '关闭服务器',
+    'detail': '关闭linkEnhance服务器并清理资源',
+    'method': 'server.close',
+    'api': testServerClose,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '监听连接接受事件(开/关)',
+    'detail': '注册/注销服务器连接接受事件监听',
+    'method': 'server.on/off.connectionAccepted',
+    'api': testServerOnConnectionAccepted,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '监听服务器停止事件(开/关)',
+    'detail': '注册/注销服务器停止事件监听',
+    'method': 'server.on/off.serverStopped',
+    'api': testServerOnServerStopped,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '创建连接',
+    'detail': '创建linkEnhance连接实例',
+    'method': 'createConnection',
+    'api': testCreateConnection,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '建立连接',
+    'detail': '连接到对端设备',
+    'method': 'connection.connect',
+    'api': testConnectionConnect,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '断开连接',
+    'detail': '断开与对端设备的连接',
+    'method': 'connection.disconnect',
+    'api': testConnectionDisconnect,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '关闭连接',
+    'detail': '关闭连接并清理资源',
+    'method': 'connection.close',
+    'api': testConnectionClose,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '获取对端设备ID',
+    'detail': '获取连接的对端设备ID',
+    'method': 'connection.getPeerDeviceId',
+    'api': testConnectionGetPeerDeviceId,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '发送数据',
+    'detail': '向对端设备发送数据',
+    'method': 'connection.sendData',
+    'api': testConnectionSendData,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '监听连接结果事件(开/关)',
+    'detail': '注册/注销连接结果事件监听',
+    'method': 'connection.on/off.connectResult',
+    'api': testConnectionOnConnectResult,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '监听断开连接事件(开/关)',
+    'detail': '注册/注销断开连接事件监听',
+    'method': 'connection.on/off.disconnected',
+    'api': testConnectionOnDisconnected,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+},
+  {
+    'name': '监听数据接收事件(开/关)',
+    'detail': '注册/注销数据接收事件监听',
+    'method': 'connection.on/off.dataReceived',
+    'api': testConnectionOnDataReceived,
+    'result': 'None',
+    'category': CaseCategory.LinkEnhance
+  }
+]
+const TestComposition: WifiTestComposition[] = [
+  {
+    'name': 'new api',
+    'detail': 'wifiManager测试',
+    'url': 'pages/newApi/AllInOneView',
+    'image': $r('app.media.wifi'),
+    'category': Category.NewApi
+},
+  {
+    'name': '快速验证测试',
+    'detail': '快速验证WiFi相关功能',
+    'url': 'pages/newApi/QuickVerifyTest',
+    'image': $r('app.media.wifi'),
+    'category': Category.NewApi
+},
+  {
+    'name': 'WIFI',
+    'detail': 'wifi发现',
+    'url': 'pages/subAppTest/wifiScanTest',
+    'image': $r('app.media.wifi'),
+    'category': Category.App
+},
+  {
+    'name': 'p2p扫描',
+    'detail': 'p2p扫描结果',
+    'url': 'pages/subAppTest/p2pDiscoveryTest',
+    'image': $r('app.media.WLAN'),
+    'category': Category.App
+},
+  {
+    'name': 'TCP Socket验证',
+    'detail': 'TCP连接测试',
+    'url': 'pages/subAppTest/tcpSocketTest',
+    'image': $r('app.media.wifi'),
+    'category': Category.App
+},
+  {
+    'name': 'UDP Socket验证',
+    'detail': 'UDP连接测试',
+    'url': 'pages/subAppTest/udpSocketTest',
+    'image': $r('app.media.wifi'),
+    'category': Category.App
+},
+  {
+    'name': 'Multipath Socket验证',
+    'detail': '蜂窝 + WiFi双路Socket验证',
+    'url': 'pages/subAppTest/multipathSocketTest',
+    'image': $r('app.media.wifi'),
+    'category': Category.App
+},
+  {
+    'name': 'HTTP验证',
+    'detail': 'HTTP请求测试',
+    'url': 'pages/subAppTest/httpSocketTest',
+    'image': $r('app.media.wifi'),
+    'category': Category.App
+},
+  {
+    'name': 'HTTPS验证',
+    'detail': 'HTTPS请求测试',
+    'url': 'pages/subAppTest/httpsSocketTest',
+    'image': $r('app.media.wifi'),
+    'category': Category.App
+},
+    {
+    'name': 'RCP验证',
+    'detail': 'RCP请求测试',
+    'url': 'pages/subAppTest/rcpHttpTest',
+    'image': $r('app.media.wifi'),
+    'category': Category.App
+},
+
+  {
+    'name': 'WIFI',
+    'detail': 'wifi测试',
+    'url': 'pages/subManualApiTest/wifiInterfaceTest',
+    'image': $r('app.media.wifi'),
+    'category': Category.API
+},
+  {
+    'name': 'WIFIManager',
+    'detail': 'wifiManager测试',
+    'url': 'pages/subManualApiTest/wifiManagerInterfaceTest',
+    'image': $r('app.media.wifi'),
+    'category': Category.API
+},
+  {
+    'name': 'HotSpot',
+    'detail': '热点测试',
+    'url': 'pages/subManualApiTest/hotspotInterfaceTest',
+    'image': $r('app.media.hotspot'),
+    'category': Category.API
+},
+  {
+    'name': 'HotSpotManager',
+    'detail': '热点Manager测试',
+    'url': 'pages/subManualApiTest/hotspotManagerInterfaceTest',
+    'image': $r('app.media.hotspot'),
+    'category': Category.API
+},
+  {
+    'name': 'P2p',
+    'detail': 'p2p测试',
+    'url': 'pages/subManualApiTest/p2pInterfaceTest',
+    'image': $r('app.media.WLAN'),
+    'category': Category.API
+},
+  {
+    'name': 'P2pManager',
+    'detail': 'p2pManager测试',
+    'url': 'pages/subManualApiTest/p2pManagerInterfaceTest',
+    'image': $r('app.media.WLAN'),
+    'category': Category.API
+},
+  {
+    'name': 'LinkEnhance',
+    'detail': '软总线增强连接测试',
+    'url': 'pages/subManualApiTest/linkEnhanceInterfaceTest',
+    'image': $r('app.media.WLAN'),
+    'category': Category.API
+},
+  {
+    'name': 'WiFiSwitchStabilityTest',
+    'detail': 'WiFi开关稳定性测试',
+    'url': 'pages/subStabilityTest/wifiSwitchStabilityTest',
+    'image': $r('app.media.ScenarioTest'),
+    'category': Category.Stability
+},
+  {
+    'name': 'WiFiScanStabilityTest',
+    'detail': 'WiFi搜索稳定性测试',
+    'url': 'pages/subStabilityTest/wifiScanStabilityTest',
+    'image': $r('app.media.ScenarioTest'),
+    'category': Category.Stability
+},
+  {
+    'name': 'WiFiConnectStabilityTest',
+    'detail': 'WiFi连接稳定性测试',
+    'url': 'pages/subStabilityTest/wifiConnectStabilityTest',
+    'image': $r('app.media.ScenarioTest'),
+    'category': Category.Stability
+},
+  {
+    'name': 'HotspotStabilityTest',
+    'detail': '热点稳定性测试',
+    'url': 'pages/subStabilityTest/hotspotStabilityTest',
+    'image': $r('app.media.ScenarioTest'),
+    'category': Category.Stability
+},
+  {
+    'name': 'WebLatencyTest',
+    'detail': '网页时延测试',
+    'url': 'pages/subStabilityTest/webLatencyTest',
+    'image': $r('app.media.ScenarioTest'),
+    'category': Category.Stability
+},
+  {
+    'name': 'WifiAutoTest',
+    'detail': 'wifi自动测试',
+    'url': 'pages/subAutoTest/wifiAutoTest',
+    'image': $r("app.media.AutoTestIcon"),
+    'category': Category.AutoTest
+},
+  {
+    'name': 'WifiManagerAutoTest',
+    'detail': 'wifiManager自动测试',
+    'url': 'pages/subAutoTest/wifiManagerAutoTest',
+    'image': $r("app.media.AutoTestIcon"),
+    'category': Category.AutoTest
+},
+  {
+    'name': 'HotspotAutoTest',
+    'detail': 'hotspot自动测试',
+    'url': 'pages/subAutoTest/hotspotAutoTest',
+    'image': $r("app.media.AutoTestIcon"),
+    'category': Category.AutoTest
+},
+  {
+    'name': 'HotspotManagerAutoTest',
+    'detail': 'hotspotManager自动测试',
+    'url': 'pages/subAutoTest/hotspotManagerAutoTest',
+    'image': $r("app.media.AutoTestIcon"),
+    'category': Category.AutoTest
+},
+  {
+    'name': 'P2pAutoTest',
+    'detail': 'p2p自动测试',
+    'url': 'pages/subAutoTest/p2pAutoTest',
+    'image': $r("app.media.AutoTestIcon"),
+    'category': Category.AutoTest
+},
+  {
+    'name': 'P2pManagerAutoTest',
+    'detail': 'p2pManager自动测试',
+    'url': 'pages/subAutoTest/p2pManagerAutoTest',
+    'image': $r("app.media.AutoTestIcon"),
+    'category': Category.AutoTest
+},
+  {
+    'name': 'WifiConnectScenarioTest',
+    'detail': 'Wifi连接场景测试',
+    'url': 'pages/subScenarioTest/wifiConnectScenarioTest',
+    'image': $r('app.media.ScenarioTest'),
+    'category': Category.Scenario
+},
+  {
+    'name': 'WifiManagerScanScenarioTest',
+    'detail': 'WifiManager扫描场景测试',
+    'url': 'pages/subScenarioTest/wifiManagerConnectScenarioTest',
+    'image': $r('app.media.ScenarioTest'),
+    'category': Category.Scenario
+},
+  {
+    'name': 'HotspotCreateScenarioTest',
+    'detail': '热点创建场景测试',
+    'url': 'pages/subScenarioTest/hotspotCreateScenarioTest',
+    'image': $r('app.media.ScenarioTest'),
+    'category': Category.Scenario
+},
+  {
+    'name': 'HotspotManagerCreateScenarioTest',
+    'detail': '热点Manager创建场景测试',
+    'url': 'pages/subScenarioTest/hotspotManagerCreateScenarioTest',
+    'image': $r('app.media.ScenarioTest'),
+    'category': Category.Scenario
+},
+  {
+    'name': 'P2pConnectScenarioTest',
+    'detail': 'P2p连接场景测试',
+    'url': 'pages/subScenarioTest/p2pConnectScenarioTest',
+    'image': $r('app.media.ScenarioTest'),
+    'category': Category.Scenario
+},
+  {
+    'name': 'P2pManagerConnectScenarioTest',
+    'detail': 'P2p连接场景测试',
+    'url': 'pages/subScenarioTest/p2pManagerConnectScenarioTest',
+    'image': $r('app.media.ScenarioTest'),
+    'category': Category.Scenario
+},
+  {
+    'name': 'WifiBenchmarkTest',
+    'detail': 'Wifi性能测试',
+    'url': 'pages/subBenchmarkTest/wifiBenchmarkTest',
+    'image': $r('app.media.Benchmark'),
+    'category': Category.BenchMark
+},
+  {
+    'name': 'WifiManagerBenchmarkTest',
+    'detail': 'WifiManager性能测试',
+    'url': 'pages/subBenchmarkTest/wifiManagerBenchmarkTest',
+    'image': $r('app.media.Benchmark'),
+    'category': Category.BenchMark
+},
+  {
+    'name': 'HotspotBenchmarkTest',
+    'detail': '热点性能测试',
+    'url': 'pages/subBenchmarkTest/hotspotBenchmarkTest',
+    'image': $r('app.media.Benchmark'),
+    'category': Category.BenchMark
+},
+  {
+    'name': 'HotspotManagerBenchmarkTest',
+    'detail': '热点Manager性能测试',
+    'url': 'pages/subBenchmarkTest/hotspotManagerBenchmarkTest',
+    'image': $r('app.media.Benchmark'),
+    'category': Category.BenchMark
+},
+  {
+    'name': 'P2pBenchmarkTest',
+    'detail': 'p2p性能测试',
+    'url': 'pages/subBenchmarkTest/p2pBenchmarkTest',
+    'image': $r('app.media.Benchmark'),
+    'category': Category.BenchMark
+},
+  {
+    'name': 'P2pManagerBenchmarkTest',
+    'detail': 'p2pManager性能测试',
+    'url': 'pages/subBenchmarkTest/p2pManagerBenchmarkTest',
+    'image': $r('app.media.Benchmark'),
+    'category': Category.BenchMark
+},
+  {
+    'name': 'WifiStressTest',
+    'detail': 'Wifi压力测试',
+    'url': 'pages/subStressTest/wifiStressTest',
+    'image': $r('app.media.StressTest'),
+    'category': Category.Stress
+},
+  {
+    'name': 'WifiManagerStressTest',
+    'detail': 'WifiManager压力测试',
+    'url': 'pages/subStressTest/wifiManagerStressTest',
+    'image': $r('app.media.StressTest'),
+    'category': Category.Stress
+},
+  {
+    'name': 'HotspotStressTest',
+    'detail': '热点压力测试',
+    'url': 'pages/subStressTest/hotspotStressTest',
+    'image': $r('app.media.StressTest'),
+    'category': Category.Stress
+},
+  {
+    'name': 'HotspotManagerStressTest',
+    'detail': '热点Manager压力测试',
+    'url': 'pages/subStressTest/hotspotManagerStressTest',
+    'image': $r('app.media.StressTest'),
+    'category': Category.Stress
+},
+  {
+    'name': 'P2pStressTest',
+    'detail': 'p2p压力测试',
+    'url': 'pages/subStressTest/p2pStressTest',
+    'image': $r('app.media.StressTest'),
+    'category': Category.Stress
+},
+  {
+    'name': 'P2pManagerStressTest',
+    'detail': 'p2pManager压力测试',
+    'url': 'pages/subStressTest/p2pManagerStressTest',
+    'image': $r('app.media.StressTest'),
+    'category': Category.Stress
+  }
+]
+
+export function initTestData(): Array<TestData> {
+  let TestDataArray: Array<TestData> = []
+  TestComposition.forEach(item => {
+    TestDataArray.push(new TestData(item.name, item.detail, item.url, item.image, item.category));
+  })
+  return TestDataArray;
+}
+
+export function initWifiApiData(): Array<TestApi> {
+  let TestApiArray: Array<TestApi> = []
+  WifiTestCase.forEach(item => {
+    TestApiArray.push(new TestApi(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestApiArray;
+}
+
+export function initHotspotApIData(): Array<TestApi> {
+  let TestApiArray: Array<TestApi> = []
+  HotspotTestCase.forEach(item => {
+    TestApiArray.push(new TestApi(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestApiArray;
+}
+
+export function initP2pApiData(): Array<TestApi> {
+  let TestApiArray: Array<TestApi> = []
+  p2pTestCase.forEach(item => {
+    TestApiArray.push(new TestApi(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestApiArray;
+}
+
+export function initWifiManagerApiData(): Array<TestApi> {
+  let TestApiArray: Array<TestApi> = []
+  WifiManagerTestCase.forEach(item => {
+    TestApiArray.push(new TestApi(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestApiArray;
+}
+
+export function initHotspotManagerApiData(): Array<TestApi> {
+  let TestApiArray: Array<TestApi> = []
+  HotspotManagerTestCase.forEach(item => {
+    TestApiArray.push(new TestApi(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestApiArray;
+}
+
+export function initP2pManagerApiData(): Array<TestApi> {
+  let TestApiArray: Array<TestApi> = []
+  p2pManagerTestCase.forEach(item => {
+    TestApiArray.push(new TestApi(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestApiArray;
+}
+
+export function initLinkEnhanceApiData(): Array<TestApi> {
+  let linkEnhanceApiArray: Array<TestApi> = []
+  LinkEnhanceTestCase.forEach(item => {
+    linkEnhanceApiArray.push(new TestApi(item.name, item.detail, item.method, item.api, item.result, item.category))
+  })
+  return linkEnhanceApiArray
+}

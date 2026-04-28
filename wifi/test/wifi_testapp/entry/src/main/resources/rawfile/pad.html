@@ -58,13 +58,12 @@
     }
 </style>
 <script>
-	var hilog = { info: function () {}, error: function () {}, warn: function () {}, debug: function () {} };
 	function initPad() {
 	    this.isPhone = false
 		func1()
 	}
 	function adapterDevice() {
-	    hilog.info(0x1500, 'wifiTestApp', '%{public}s','function adapterDevice')
+	    console.info('function adapterDevice')
 	    var v = document.querySelector('meta[name="viewport"]');
         if (v) {
             v.setAttribute('content', 'width=720, user-scalable=yes');
@@ -114,7 +113,7 @@
         image.style.width = '48px'
 		image.style.height = '48px'
         image.onclick = function() {
-            hilog.info(0x1500, 'wifiTestApp', '%{public}s','image.onclick')
+            console.info('image.onclick')
             etsObj.test(array[i].addr)
         }
         box.appendChild(image)
@@ -124,7 +123,7 @@
     }
     function uploadWord() {
         let inputDom = document.getElementById("searchCon")
-        hilog.info(0x1500, 'wifiTestApp', '%{public}s',`pad inputDom.value=${inputDom.value}`)
+        console.info(`pad inputDom.value=${inputDom.value}`)
         etsObj.searchWord(inputDom.value)
     }
  </script>

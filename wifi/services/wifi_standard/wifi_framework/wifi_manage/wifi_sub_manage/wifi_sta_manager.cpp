@@ -304,7 +304,7 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     if (state == OperateResState::CONNECT_AP_CONNECTED) {
         WifiConfigCenter::GetInstance().UpdateLinkedInfo(instId);
         WifiConfigCenter::GetInstance().SetLastConnStaFreq(info.frequency);
-        SetAndInstallSuspendMode(state, instId);
+        InstallHpfAndSetSuspendMode(state, instId);
     }
     bool isReport = true;
     int reportStateNum = static_cast<int>(ConvertConnStateInternal(state, isReport));
@@ -431,7 +431,7 @@ void WifiStaManager::InstallHpfAndSetSuspendMode(OperateResState state, int inst
     // Must first set the SuspendMode before deploying the filtering rules for the set rules to take effect.
     // If the order is reversed, SuspendMode will not take effect.
 #ifdef FEATURE_HPF_SUPPORT
-        WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
+    WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
 #endif
     if (instId == INSTID_WLAN0) {
         WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);

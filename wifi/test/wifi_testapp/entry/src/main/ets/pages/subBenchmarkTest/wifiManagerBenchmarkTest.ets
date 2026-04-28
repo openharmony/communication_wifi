@@ -13,19 +13,20 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import router from '@ohos.router';
-import { PageTitle } from '../../component/pageTitle';
-import { TestImageDisplay } from '../../component/testImageDisplay';
-import { TestData } from '../../entryability/model/testData';
-import ConfigData from "../../utils/ConfigData";
+import { PageTitle} from '../../Component/pageTitle';
+import { TestImageDisplay} from '../../Component/testImageDisplay';
+import { TestData} from '../../entryability/model/testData';
+import ConfigData from "../../Utils/ConfigData";
 import wifi from '@ohos.wifi';
-import { resolveIP } from '../../utils/Util';
+import { resolveIP} from '../../Utils/Util';
 import socket from '@ohos.net.socket';
 import http from '@ohos.net.http';
 import request from '@ohos.request';
 import common from '@ohos.app.ability.common';
-import abilityAccessCtrl, { Context, PermissionRequestResult } from '@ohos.abilityAccessCtrl';
-import { BusinessError } from '@ohos.base';
+import abilityAccessCtrl, { Context, PermissionRequestResult} from '@ohos.abilityAccessCtrl';
+import { BusinessError} from '@ohos.base';
 
 const TAG = 'wifiTestApp [Benchmark]'
 
@@ -51,13 +52,13 @@ interface myParams extends Object {
 }
 
 let localAddr: LocalAddr = {
-  address: resolveIP(wifi.getIpInfo().ipAddress) ,
-  family: 1,
-  port: 9090
+  address: resolveIP(wifi.getIpInfo().ipAddress),
+  family: ConfigData.SOCKET_AF_INET,
+  port: ConfigData.DEMO_UDP_PORT
 }
 let oppositeAddr: OppositeAddr = {
-  address: '' ,
-  family: 1,
+  address: '',
+  family: ConfigData.SOCKET_AF_INET,
   port: 0
 }
 let loginCount = 0
@@ -72,25 +73,25 @@ let udp = socket.constructUDPSocketInstance()
 @Component
 struct WifiManagerBenchmarkTest {
   @State showList: boolean = false;
-  @State message: string = 'WifiManagerBenchmarkTest';
+  @State message: string = ConfigData.PAGE_TAG_WIFI_M_BENCH;
   private testItem: TestData = (router.getParams() as myParams).testItem
-  @State changeIndex: number = - 1
+  @State changeIndex: number = ConfigData.ITEM_CLICK_NONE
   @StorageLink("wifiManagerBenchmarkTestMessage") wifiManagerBenchmarkTestMessage: string = ""
-  @State w_ssid1: string = "TP-LINK_6365";
-  @State w_bssid1: string = "6C:B1:58:75:63:65";
-  @State w_preSharedKey1: string = "12345678";
+  @State w_ssid1: string = ConfigData.QV_MOCK_SSID;
+  @State w_bssid1: string = ConfigData.QV_MOCK_BSSID;
+  @State w_preSharedKey1: string = ConfigData.QV_MOCK_PRE_SHARED_KEY;
   @State w_isHiddenSsid1: boolean = false;
-  @State w_securityType1: number = 3
-  @State w_creatorUid1: number = 1;
+  @State w_securityType1: number = ConfigData.QV_MOCK_SECURITY_TYPE
+  @State w_creatorUid1: number = ConfigData.QV_MOCK_CREATOR_UID;
   @State w_disableReason1: number = 0;
   @State w_netId1: number = 0;
   @State w_randomMacType1: number = 0;
-  @State w_randomMacAddr1: string = "08:fb:ea:1b:38:aa"
+  @State w_randomMacAddr1: string = ConfigData.QV_MOCK_RANDOM_MAC_ADDR
   @State w_ipType1: number = 1;
-  @State w_staticIp_ipAddress1: number = 3232235880;
-  @State w_staticIp_gateway1: number = 3232235777;
-  @State w_staticIp_dnsServers1: number = 3716386629;
-  @State w_staticIp_domains1: Array<string> = ["0", "1", "2"];
+  @State w_staticIp_ipAddress1: number = ConfigData.QV_MOCK_STATIC_IP_ADDRESS;
+  @State w_staticIp_gateway1: number = ConfigData.QV_MOCK_STATIC_GATEWAY;
+  @State w_staticIp_dnsServers1: number = ConfigData.QV_MOCK_STATIC_DNS;
+  @State w_staticIp_domains1: Array<string> = [ConfigData.QV_MOCK_DOMAIN_0, ConfigData.QV_MOCK_DOMAIN_1, ConfigData.QV_MOCK_DOMAIN_2];
   @State w_networkIdM: number = 0;
   @State w_featureIdM: number = 1;
   @State receivedSize: number = 0
@@ -121,62 +122,66 @@ struct WifiManagerBenchmarkTest {
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TestImageDisplay({ testItem: this.testItem })
-        PageTitle({ testItem: this.testItem })
+      Stack({alignContent: Alignment.TopStart}){
+        TestImageDisplay({testItem: this.testItem})
+        PageTitle({testItem: this.testItem})
       }
 
-      Stack().height("1vp").backgroundColor("#000000");
+      Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
 
       Column() {
         Scroll() {
           Column() {
-            Text("性能测试: 测试wifiManager连接时的数据收发性能")
-              .fontSize("18vp")
-              .margin({ top: "5vp", bottom: "5vp", left: "5vp" })
+            Text($r('app.string.wifitest_text_xncscswljsdsjsfxn_1'))
+              .fontSize(ConfigData.VP_18)
+              .margin({top: ConfigData.VP_5, bottom: ConfigData.VP_5, left: ConfigData.VP_5})
               .textAlign(TextAlign.Start)
               .width(ConfigData.WH_100_100)
           }
           .width(ConfigData.WH_100_100)
-          .height(60)
+          .height(ConfigData.VP_60)
         }
-        .scrollBarWidth(10)
+        .scrollBarWidth(ConfigData.VP_10)
         .scrollBar(BarState.Auto)
 
-        Stack().height("1vp").backgroundColor("#000000")
+        Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"))
 
         Column() {
-          Text("性能测试时间：" + this.wifiManagerBenchmarkTime + "ms")
-            .fontSize("20vp")
-            .margin({ top: "5vp", left: "10vp", bottom: "5vp" })
+          Text() {
+            Span($r('app.string.wifitest_text_bench_time'))
+            Span('' + this.wifiManagerBenchmarkTime)
+            Span($r('app.string.wifitest_text_unit_ms'))
+          }
+            .fontSize(ConfigData.VP_20)
+            .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, bottom: ConfigData.VP_5})
             .textAlign(TextAlign.Start)
             .width(ConfigData.WH_90_100)
             .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
 
-          Flex({ alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-            Button({ type: ButtonType.Normal, stateEffect: true }) {
-              Text('传输数据').fontSize("24vp").fontColor(0xffffff).margin({ left: 5, right: 5 })
+          Flex({alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween}){
+            Button({type: ButtonType.Normal, stateEffect: true}){
+              Text($r('app.string.wifitest_text_cssj')).fontSize(ConfigData.VP_24).fontColor($r('app.color.white')).margin({left: ConfigData.VP_5, right: ConfigData.VP_5})
             }
-            .borderRadius(8)
+            .borderRadius($r('app.float.wh_value_8'))
             .backgroundColor($r("app.color.blue"))
-            .width(120)
-            .height(60)
-            .margin({ top: "5vp", left: "50vp", bottom: "5vp" })
+            .width(ConfigData.VP_120)
+            .height(ConfigData.VP_60)
+            .margin({top: ConfigData.VP_5, left: ConfigData.VP_50, bottom: ConfigData.VP_5})
             .align(Alignment.Start)
             .onClick(async(event: ClickEvent) => {
               this.showList = false
             })
 
-            Button({ type: ButtonType.Normal, stateEffect: true }) {
+            Button({type: ButtonType.Normal, stateEffect: true}){
               Row() {
-                Text('上传下载').fontSize("24vp").fontColor(0xffffff).margin({ left: 5, right: 5 })
+                Text($r('app.string.wifitest_text_scxz')).fontSize(ConfigData.VP_24).fontColor($r('app.color.white')).margin({left: ConfigData.VP_5, right: ConfigData.VP_5})
               }.alignItems(VerticalAlign.Center)
             }
-            .borderRadius(8)
+            .borderRadius($r('app.float.wh_value_8'))
             .backgroundColor($r("app.color.blue"))
-            .width(120)
-            .height(60)
-            .margin({ top: "5vp", right: "50vp", bottom: "5vp" })
+            .width(ConfigData.VP_120)
+            .height(ConfigData.VP_60)
+            .margin({top: ConfigData.VP_5, right: ConfigData.VP_50, bottom: ConfigData.VP_5})
             .align(Alignment.Start)
             .onClick(async(event: ClickEvent) => {
               this.showList = true;
@@ -187,12 +192,12 @@ struct WifiManagerBenchmarkTest {
         }
         .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
         .width(ConfigData.WH_100_100)
-        .height(100)
+        .height(ConfigData.VP_100)
 
-        Stack().height("1vp").backgroundColor("#000000")
+        Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"))
 
         Column() {
-          if (!this.showList) {
+          if (!this.showList){
             socketTest()
           } else {
             upDownLoad()
@@ -218,27 +223,27 @@ struct socketTest {
   @State warnDialog: boolean = false
   @State warnText: string = ''
   @State roomNumber: string = ''
-  @State bindMsg: string = "未绑定"
-  @State receiveMsg: string = '待接收数据'
+  @State bindMsg: string = ConfigData.SOCKET_STR_NOT_BOUND
+  @State receiveMsg: string = ConfigData.SOCKET_STR_RX_PENDING
 
   bindOption() {
     let bindOption = udp.bind(localAddr)
     bindOption.then(() => {
-      console.log(TAG, 'bind success')
-      this.bindMsg = "绑定成功"
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'bind success')
+      this.bindMsg = ConfigData.SOCKET_STR_BIND_OK
     }).catch((err: BusinessError) => {
-      console.log(TAG, 'bind fail' + err)
-      this.bindMsg = "绑定失败"
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'bind fail' + err)
+      this.bindMsg = ConfigData.SOCKET_STR_BIND_FAIL
     })
     udp.on('message', data => {
-      console.log(TAG, `data:${ JSON.stringify(data) }`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `data:${ JSON.stringify(data) }`)
       let buffer = data.message
       let dataView = new DataView(buffer)
-      console.log(TAG, `length = ${ dataView.byteLength }`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `length = ${ dataView.byteLength }`)
       let str = ""
-      for (let i = 0 ;i < dataView.byteLength ; ++i) {
+      for(let i = 0 ;i<dataView.byteLength ; ++i){
         let c = String.fromCharCode(dataView.getUint8(i))
-        if (c != "\n") {
+        if (c != "\n"){
           str += c
         }
       }
@@ -248,102 +253,108 @@ struct socketTest {
   }
 
   build() {
-    Stack({ alignContent: Alignment.Center }) {
+    Stack({alignContent: Alignment.Center}){
       Column() {
-        if (this.ipDialog) {
+        if (this.ipDialog){
           Column() {
-            Text('本地IP：' + localAddr.address)
-              .fontSize(25)
-              .margin({ top: 10 })
-            TextInput({ placeholder: '请输入对端ip' })
-              .width(200)
-              .fontSize(25)
-              .margin({ top: 10 })
+            Text() {
+              Span($r('app.string.wifitest_text_local_ip'))
+              Span(localAddr.address)
+            }
+              .fontSize(ConfigData.VP_25)
+              .margin({top: ConfigData.VP_10})
+            TextInput({placeholder: $r('app.string.wifitest_text_qsrddi')})
+              .width(ConfigData.VP_200)
+              .fontSize(ConfigData.VP_25)
+              .margin({top: ConfigData.VP_10})
               .onChange((value: string) => {
                 oppositeAddr.address = value
                 oppositeAddr.port = 9090
               })
 
-            if (this.warnDialog) {
+            if (this.warnDialog){
               Text(this.warnText)
-                .width(200)
-                .fontSize(10)
-                .fontColor(Color.Red).margin({ top: 5 })
+                .width(ConfigData.VP_200)
+                .fontSize(ConfigData.VP_10)
+                .fontColor($r('app.color.red')).margin({top: ConfigData.VP_5})
             }
             Row() {
               Button($r('app.string.confirm'))
-                .fontColor(Color.Black)
-                .height(40)
-                .width(130)
-                .fontSize(25)
-                .margin({ bottom: 10 })
+                .fontColor($r('app.color.black'))
+                .height(ConfigData.VP_40)
+                .width(ConfigData.VP_130)
+                .fontSize(ConfigData.VP_25)
+                .margin({bottom: ConfigData.VP_10})
                 .onClick(() => {
-                  if (oppositeAddr.address === '') {
+                  if (oppositeAddr.address === ''){
                     this.warnDialog = true
                     this.warnText = '请先输入对端IP'
                   } else {
                     this.bindOption()
                     this.txtDialog = true
-                    console.log(TAG, `peer ip=${ oppositeAddr.address }`)
-                    console.log(TAG, `peer port=${ oppositeAddr.port }`)
-                    console.log(TAG, `peer port=${ localAddr.port }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `peer ip=${ oppositeAddr.address }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `peer port=${ oppositeAddr.port }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `peer port=${ localAddr.port }`)
                   }
                 })
-                .backgroundColor(0xffffff)
+                .backgroundColor($r('app.color.white'))
 
               Button($r('app.string.send_message'))
-                .fontColor(Color.Black)
-                .height(40)
-                .width(130)
-                .fontSize(25)
-                .margin({ bottom: 10 })
+                .fontColor($r('app.color.black'))
+                .height(ConfigData.VP_40)
+                .width(ConfigData.VP_130)
+                .fontSize(ConfigData.VP_25)
+                .margin({bottom: ConfigData.VP_10})
                 .onClick(() => {
                   {
                     //发送数据
                     udp.send({
                       data: 'online',
                       address: oppositeAddr
-                    }).then(data => {
-                      console.log(TAG, `send sucess: ${ data }`)
-                    }).catch((error: BusinessError) => {
-                      console.log(TAG, `TAG,send: ${ JSON.stringify(error) }`)
+                  }).then(data => {
+                      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `send sucess: ${ data }`)
+                  }).catch((error: BusinessError) => {
+                      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `TAG,send: ${ JSON.stringify(error) }`)
                     })
-                    console.log(TAG, `send peer ip=${ oppositeAddr.address }`)
-                    console.log(TAG, `send peer port=${ oppositeAddr.port }`)
-                    console.log(TAG, `send peer port=${ localAddr.port }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `send peer ip=${ oppositeAddr.address }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `send peer port=${ oppositeAddr.port }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `send peer port=${ localAddr.port }`)
                   }
                 })
-                .backgroundColor(0xffffff)
+                .backgroundColor($r('app.color.white'))
             }
 
             Text(this.bindMsg)
-              .width(200)
-              .fontSize(25)
-              .fontColor(Color.Red).margin({ top: 3 })
+              .width(ConfigData.VP_200)
+              .fontSize(ConfigData.VP_25)
+              .fontColor($r('app.color.red')).margin({top: ConfigData.VP_3})
           }
           .width(ConfigData.WH_80_100)
-          .height(200)
-          .margin({ top: ConfigData.WH_3_100 })
-          .backgroundColor(Color.White)
-          .border({ radius: 10, width: 3 })
+          .height(ConfigData.VP_200)
+          .margin({top: ConfigData.WH_3_100})
+          .backgroundColor($r('app.color.white'))
+          .border({radius: $r('app.float.wh_value_10'), width: ConfigData.VP_3})
         }
 
-        if (this.txtDialog) {
+        if (this.txtDialog){
           Column() {
-            Text('接收本地IP：' + localAddr.address)
-              .fontSize(25)
-              .margin({ top: 10 })
+            Text() {
+              Span($r('app.string.wifitest_text_rx_local_ip'))
+              Span(localAddr.address)
+            }
+              .fontSize(ConfigData.VP_25)
+              .margin({top: ConfigData.VP_10})
 
             Text(this.receiveMsg)
-              .width(200)
-              .fontSize(25)
-              .fontColor(Color.Red).margin({ top: 5 })
+              .width(ConfigData.VP_200)
+              .fontSize(ConfigData.VP_25)
+              .fontColor($r('app.color.red')).margin({top: ConfigData.VP_5})
           }
           .width(ConfigData.WH_80_100)
-          .height(200)
-          .margin({ top: ConfigData.WH_3_100 })
-          .backgroundColor(Color.White)
-          .border({ radius: 10, width: 3 })
+          .height(ConfigData.VP_200)
+          .margin({top: ConfigData.WH_3_100})
+          .backgroundColor($r('app.color.white'))
+          .border({radius: $r('app.float.wh_value_10'), width: ConfigData.VP_3})
         }
       }.width(ConfigData.WH_100_100).height(ConfigData.WH_100_100)
     }
@@ -358,46 +369,46 @@ struct upDownLoad {
   @State files: Array<string> = []
   @State uploads: Array<string> = []
   private downloadConfig: DownloadConfig = {
-    url: 'http://192.168.62.127:8000',
+    url: ConfigData.STRESS_DEMO_FILE_SERVER,
     filePath: ""
   }
 
   aboutToAppear() {
-    console.log(TAG, `enter Index aboutToAppear`)
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `enter Index aboutToAppear`)
     let context: Context = getContext(this) as common.UIAbilityContext;
     let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
     // requestPermissionsFromUser会判断权限的授权状态来决定是否唤起弹窗
     atManager.requestPermissionsFromUser(context, ['ohos.permission.INTERNET'])
       .then((data: PermissionRequestResult) => {
-        console.log(TAG, `grantPermission,requestPermissionsFromUser,result.requestCode=${ data }`)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `grantPermission,requestPermissionsFromUser,result.requestCode=${ data }`)
       })
-    this.files.push("http://192.168.62.127:8000")
+    this.files.push(ConfigData.STRESS_DEMO_FILE_SERVER)
     let httpRequest = http.createHttp()
     httpRequest.request(
-      'http://192.168.0.123/ ? tpl=list&folders - filter=&recursive',
+      ConfigData.STRESS_DEMO_FILE_LIST_URL,
       {
         method: http.RequestMethod.GET,
         header: {
           'Content - Type': 'text/plain'
         }
-      }, (err, data) => {
-      console.log(TAG, `error = ${ JSON.stringify(err) }`)
-      if (!err) {
-        console.log(TAG, `data = ${ JSON.stringify(data) }`)
+    }, (err, data) => {
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `error = ${ JSON.stringify(err) }`)
+      if (!err){
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `data = ${ JSON.stringify(data) }`)
         let result: string = data.result.toString()
-        console.log(TAG, `Result = ${ result }`)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Result = ${ result }`)
 
         let tempFiles = result.split('\r\n')
-        for (let i = 0 ; i < tempFiles.length ; i ++) {
+        for(let i = 0 ; i<tempFiles.length ; i++){
           let splitFiles = tempFiles[i].split('//')[1].split('/')
-          console.log(TAG, `splitFiles = ${ JSON.stringify(splitFiles) }`)
-          if (splitFiles.indexOf('upload') === - 1) {
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `splitFiles = ${ JSON.stringify(splitFiles) }`)
+          if (splitFiles.indexOf('upload') === - 1){
             this.files.push(tempFiles[i])
           }
         }
-        console.log(TAG, `files = ${ JSON.stringify(this.files) }`)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `files = ${ JSON.stringify(this.files) }`)
       } else {
-        console.log(TAG, `error: ${ JSON.stringify(err) }`)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `error: ${ JSON.stringify(err) }`)
         httpRequest.destroy()
       }
     })
@@ -408,78 +419,78 @@ struct upDownLoad {
       Scroll() {
         Column() {
           Text($r('app.string.choice_download_file'))
-            .fontSize(25)
+            .fontSize(ConfigData.VP_25)
             .alignSelf(ItemAlign.Start)
-            .margin({ top: 20, left: 10 })
+            .margin({top: ConfigData.VP_20, left: ConfigData.VP_10})
           ForEach(this.files, (item: string, index) => {
             Divider()
-              .margin({ top: 20 })
+              .margin({top: ConfigData.VP_20})
             Row() {
               Text(item)
-                .fontSize(25)
-                .constraintSize({ maxWidth: ConfigData.WH_75_100 })
+                .fontSize(ConfigData.VP_25)
+                .constraintSize({maxWidth: ConfigData.WH_75_100})
                 .fontWeight(FontWeight.Bold)
-                .margin({ top: 20, left: 10 })
+                .margin({top: ConfigData.VP_20, left: ConfigData.VP_10})
               Blank()
 
               Button($r('app.string.click_download'))
-                .margin({ top: 20, right: 10 })
+                .margin({top: ConfigData.VP_20, right: ConfigData.VP_10})
                 .onClick(async() => {
                   let fileindex = 1;
                   setInterval(() => {
                     this.downloadConfig.url = item
-                    console.log(TAG, `downloadConfig.url = ${ JSON.stringify(this.downloadConfig.url) }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `downloadConfig.url = ${ JSON.stringify(this.downloadConfig.url) }`)
                     this.downloadConfig.filePath = `/data/storage/el2/base/haps/entry/cache/ ${
-                    item.split('//')[1].split('/')[1] + fileindex }` // /data/storage/el2 /base/haps/entry/cache/
+                    item.split('//')[1].split('/')[1] + fileindex}` // /data/storage/el2 /base/haps/entry/cache/
 		    fileindex += 1
-                    console.log(TAG, `downloadConfig.filePath = ${ JSON.stringify(this.downloadConfig.filePath) }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `downloadConfig.filePath = ${ JSON.stringify(this.downloadConfig.filePath) }`)
                     request.downloadFile(getContext(), this.downloadConfig, (err, downloadTask) => {
-                      console.log(TAG, `download enter`)
-                      if (err) {
-                        console.log(TAG, `download err = ${ JSON.stringify(err) }`)
+                      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `download enter`)
+                      if (err){
+                        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `download err = ${ JSON.stringify(err) }`)
                         return
                       }
-                      console.log(TAG, `download data = ${ JSON.stringify(downloadTask) }`)
-                      console.log(TAG, `download end`)
+                      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `download data = ${ JSON.stringify(downloadTask) }`)
+                      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `download end`)
                     })
-                  }, 1000)
+                }, 1000)
 
                 })
             }
             .width(ConfigData.WH_100_100)
           }, (item: string) => item)
           Button($r('app.string.upload_page'))
-            .fontSize(30)
-            .width(180)
-            .height(50)
-            .margin({ top: 30 })
+            .fontSize(ConfigData.VP_30)
+            .width(ConfigData.VP_180)
+            .height(ConfigData.VP_50)
+            .margin({top: ConfigData.VP_30})
             .key('uploadBtn')
             .onClick(() => {
               router.pushUrl({
                 url: 'pages/Upload',
-                params: { uploads: this.uploads }
+                params: { uploads: this.uploads}
               })
             })
         }
         .width(ConfigData.WH_100_100)
       }
-      .constraintSize({ maxHeight: ConfigData.WH_87_100 })
+      .constraintSize({maxHeight: ConfigData.WH_87_100})
 
-      if (this.receivedSize !== 0 && this.totalSize !== 0 && this.files.length > 0) {
+      if (this.receivedSize !== 0 && this.totalSize !== 0 && this.files.length > 0){
         Row() {
           Text($r('app.string.download_progress'))
-            .fontSize(25)
+            .fontSize(ConfigData.VP_25)
             .fontWeight(FontWeight.Bold)
-            .margin({ left: 10 })
-          Progress({ value: this.receivedSize, total: this.totalSize, type: ProgressType.Capsule })
-            .color(Color.Grey)
+            .margin({left: ConfigData.VP_10})
+          Progress({value: this.receivedSize, total: this.totalSize, type: ProgressType.Capsule})
+            .color($r('app.color.color_999999_grey'))
             .width(ConfigData.WH_40_100)
-            .height(10)
-            .margin({ left: 10 })
+            .height(ConfigData.VP_10)
+            .margin({left: ConfigData.VP_10})
           Text(`${ JSON.stringify(Math.floor(this.receivedSize / this.totalSize * 100)) }%`)
-            .margin({ left: 10 })
+            .margin({left: ConfigData.VP_10})
         }
-        .margin({ top: 10 })
+        .margin({top: ConfigData.VP_10})
         .alignSelf(ItemAlign.Center)
       }
     }

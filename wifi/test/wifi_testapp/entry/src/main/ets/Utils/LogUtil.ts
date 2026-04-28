@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import BaseModel from './BaseModel';
 
 let LogLevel = {
@@ -49,36 +50,32 @@ const LOG_LEVEL = LogLevel.INFO;
  */
 export class LogUtil extends BaseModel {
   debug(msg): void {
-    console.log(msg)
-    if (LogLevel.DEBUG >= LOG_LEVEL){
-      console.log(msg);
+    if (LogLevel.DEBUG >= LOG_LEVEL) {
+      hilog.debug(0x1500, 'wifiTestApp', '%{public}s', String(msg));
     }
   }
 
   log(msg): void {
-    console.log(msg)
-    if (LogLevel.INFO >= LOG_LEVEL){
-      console.log(msg);
+    if (LogLevel.INFO >= LOG_LEVEL) {
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s', String(msg));
     }
   }
 
   info(msg): void {
-    console.log(msg)
-    if (LogLevel.INFO >= LOG_LEVEL){
-      console.log(msg);
+    if (LogLevel.INFO >= LOG_LEVEL) {
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s', String(msg));
     }
   }
 
   warn(msg): void {
-    console.log(msg)
-    if (LogLevel.WARN >= LOG_LEVEL){
-      console.warn(msg);
+    if (LogLevel.WARN >= LOG_LEVEL) {
+      hilog.warn(0x1500, 'wifiTestApp', '%{public}s', String(msg));
     }
   }
 
   error(msg): void {
-    if (LogLevel.ERROR >= LOG_LEVEL){
-      console.error(msg);
+    if (LogLevel.ERROR >= LOG_LEVEL) {
+      hilog.error(0x1500, 'wifiTestApp', '%{public}s', String(msg));
     }
   }
 }

@@ -19,12 +19,13 @@
     }
 </style>
 <script>
+    var hilog = { info: function () {}, error: function () {}, warn: function () {}, debug: function () {} };
     var isPhone = false;
     function initPhone() {
-        console.info('function init start')
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s', 'function init start')
 		this.isPhone = true
 		func1()
-		console.info('function init end')
+		hilog.info(0x1500, 'wifiTestApp', '%{public}s', 'function init end')
 	}
 	function initPad() {
 	    this.isPhone = false
@@ -69,7 +70,7 @@
         image.style.width = '96px'
 		image.style.height = '96px'
         image.onclick = function() {
-            console.info('image.onclick')
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', 'image.onclick')
             etsObj.test(array[i].addr)
         }
         box.appendChild(image)

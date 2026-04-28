@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import ConfigData from '../../../../Utils/ConfigData';
 /**
  * Style constants that can be used by all modules
  */
@@ -21,12 +22,12 @@ export class CommonConstants {
   /**
    * Full width.
    */
-  static readonly FULL_WIDTH: string = '100%';
+  static readonly FULL_WIDTH: string = ConfigData.WH_100_100;
 
   /**
    * Full height.
    */
-  static readonly FULL_HEIGHT: string = '100%';
+  static readonly FULL_HEIGHT: string = ConfigData.WH_100_100;
 
   /**
    * Normal font weight.
@@ -81,7 +82,7 @@ export class CommonConstants {
   /**
    * Margin left of book item.
    */
-  static readonly TARGET_MARGIN_LEFT: string = '5%';
+  static readonly TARGET_MARGIN_LEFT: string = ConfigData.WH_5_100;
 
   /**
    * Width of slider.
@@ -101,22 +102,22 @@ export class CommonConstants {
   /**
    * Button width of dialog.
    */
-  static readonly DIALOG_OPERATION_WIDTH: string = '70%';
+  static readonly DIALOG_OPERATION_WIDTH: string = ConfigData.WH_70_100;
 
   /**
    * Button height of dialog.
    */
-  static readonly DIALOG_OPERATION_HEIGHT: string = '6%';
+  static readonly DIALOG_OPERATION_HEIGHT: string = ConfigData.WH_6_100;
 
   /**
    * Button height of dialog.
    */
-  static readonly DIALOG_INPUT_HEIGHT: string = '40%';
+  static readonly DIALOG_INPUT_HEIGHT: string = ConfigData.WH_40_100;
 
   /**
    * Input margin of dialog.
    */
-  static readonly DIALOG_INPUT_MARGIN: string = '3%';
+  static readonly DIALOG_INPUT_MARGIN: string = ConfigData.WH_3_100;
 
   /**
    * Horizontal offset of dialog.
@@ -126,7 +127,7 @@ export class CommonConstants {
   /**
    * TextInput offset of dialog.
    */
-  static readonly TEXT_INPUT_HEIGHT: string = '15%';
+  static readonly TEXT_INPUT_HEIGHT: string = ConfigData.WH_15_100;
 
   /**
    * The smallest value of slider.
@@ -146,12 +147,12 @@ export class CommonConstants {
   /**
    * Width of slider.
    */
-  static readonly SLIDER_WIDTH: string = '90%';
+  static readonly SLIDER_WIDTH: string = ConfigData.WH_90_100;
 
   /**
    * Height of slider.
    */
-  static readonly SLIDER_HEIGHT: string = '20%';
+  static readonly SLIDER_HEIGHT: string = ConfigData.WH_20_100;
 
   /**
    * Height of slider button.
@@ -166,7 +167,7 @@ export class CommonConstants {
   /**
    * Margin top of slider button.
    */
-  static readonly SLIDER_INNER_WIDTH: string = '90%';
+  static readonly SLIDER_INNER_WIDTH: string = ConfigData.WH_90_100;
 
   /**
    * Width of checkbox.
@@ -181,12 +182,12 @@ export class CommonConstants {
   /**
    * Height of list.
    */
-  static readonly LIST_HEIGHT: string = '50%';
+  static readonly LIST_HEIGHT: string = ConfigData.WH_50_100;
 
   /**
    * Height of list board.
    */
-  static readonly LIST_BOARD_HEIGHT: string = '67%';
+  static readonly LIST_BOARD_HEIGHT: string = ConfigData.WH_67_100;
 
   /**
    * list space.
@@ -196,7 +197,7 @@ export class CommonConstants {
   /**
    * Width of task item.
    */
-  static readonly TASK_NAME_WIDTH: string = '30%';
+  static readonly TASK_NAME_WIDTH: string = ConfigData.WH_30_100;
 
   /**
    * Radius of list.

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { CommonConstants } from '../common/constant/CommonConstant';
+import { CommonConstants} from '../common/constant/CommonConstant';
 
 @Component
 export default struct TargetInformation {
@@ -29,7 +29,7 @@ export default struct TargetInformation {
     .padding($r('app.float.distance_16'))
     .width(CommonConstants.MAIN_BOARD_WIDTH)
     .height($r('app.float.target_info_height'))
-    .backgroundColor(Color.White)
+    .backgroundColor($r('app.color.white'))
     .borderRadius(CommonConstants.TARGET_BORDER_RADIUS)
   }
 
@@ -44,9 +44,9 @@ export default struct TargetInformation {
         Text($r('app.string.target_info'))
           .opacityTextStyle()
           .fontSize($r('app.float.font_15'))
-          .margin({ top: $r('app.float.distance_12') })
+          .margin({top: $r('app.float.distance_12')})
       }
-      .margin({ left: CommonConstants.TARGET_MARGIN_LEFT })
+      .margin({left: CommonConstants.TARGET_MARGIN_LEFT})
       .alignItems(HorizontalAlign.Start)
     }
     .width(CommonConstants.FULL_WIDTH)
@@ -66,7 +66,7 @@ export default struct TargetInformation {
           Text(this.latestUpdateDate)
             .opacityTextStyle()
         }
-        .margin({ top: $r('app.float.distance_2') })
+        .margin({top: $r('app.float.distance_2')})
       }
       .alignItems(HorizontalAlign.Start)
 
@@ -83,12 +83,12 @@ export default struct TargetInformation {
         }
 
         Progress({
-          value: this.completedTasksNumber ,
-          total: this.totalTasksNumber ,
+          value: this.completedTasksNumber,
+          total: this.totalTasksNumber,
           type: ProgressType.Ring
         })
-          .color($r('app.color.main_blue'))
-          .style({
+        .color($r('app.color.main_blue'))
+        .style({
             strokeWidth: CommonConstants.STROKE_WIDTH
           })
           .width($r('app.float.wh_value_48'))
@@ -97,7 +97,7 @@ export default struct TargetInformation {
     }
     .width(CommonConstants.FULL_WIDTH)
     .height($r('app.float.wh_value_48'))
-    .margin({ top: $r('app.float.distance_15') })
+    .margin({top: $r('app.float.distance_15')})
   }
 }
 

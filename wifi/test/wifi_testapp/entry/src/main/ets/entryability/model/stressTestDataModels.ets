@@ -1095,3 +1095,244 @@ export const P2pStressTestCase: StressTest[] = [
 
 export const P2pManagerStressTestCase: StressTest[] = [
   {
+    'name': '获取P2P连接信息Promise',
+    'detail': '获取P2P连接信息Promise',
+    'method': 'getP2pLinkedInfo',
+    'api': testGetP2pLinkedInfoManagerPromise,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '获取P2P连接信息Callback',
+    'detail': '获取P2P连接信息Callback',
+    'method': 'getP2pLinkedInfo',
+    'api': testGetP2pLinkedInfoManagerCallback,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '获取P2P当前组信息Promise',
+    'detail': '获取P2P当前组信息Promise',
+    'method': 'getCurrentGroup',
+    'api': testGetCurrentP2pGroupManagerPromise,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '获取P2P当前组信息Callback',
+    'detail': '获取P2P当前组信息Callback',
+    'method': 'getCurrentGroup',
+    'api': testGetCurrentP2pGroupManagerCallback,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '获取P2P对端设备列表信息Promise',
+    'detail': '获取P2P对端设备列表信息Promise',
+    'method': 'getP2pPeerDevices',
+    'api': testGetP2pPeerDevicesManagerPromise,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '获取P2P对端设备列表信息Callback',
+    'detail': '获取P2P对端设备列表信息Callback',
+    'method': 'getP2pPeerDevices',
+    'api': testGetP2pPeerDevicesManagerCallback,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '获取P2P对端设备列表信息Promise',
+    'detail': '获取P2P对端设备列表信息Promise',
+    'method': 'getP2pPeerDevices',
+    'api': testGetP2pLocalDeviceManagerPromise,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '获取P2P对端设备列表信息Callback',
+    'detail': '获取P2P对端设备列表信息Callback',
+    'method': 'getP2pPeerDevices',
+    'api': testGetP2pLocalDeviceManagerCallback,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+
+  {
+    'name': '开始发现设备',
+    'detail': '创建群组',
+    'method': 'createGroup',
+    'api': testCreateP2pGroupManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '停止发现设备',
+    'detail': '移除群组',
+    'method': 'removeGroup',
+    'api': testRemoveP2pGroupManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '设置设备名称',
+    'detail': '执行P2P连接',
+    'method': 'p2pConnect',
+    'api': testP2pConnectManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '取消P2P连接',
+    'detail': '取消P2P连接',
+    'method': 'p2pCancelConnect',
+    'api': testP2pCancelConnectManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '开始发现设备',
+    'detail': '开始发现设备',
+    'method': 'startDiscoverDevices',
+    'api': testStartDiscoverP2pDevicesManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '停止发现设备',
+    'detail': '停止发现设备',
+    'method': 'stopDiscoverDevices',
+    'api': testStopDiscoverP2pDevicesManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '删除永久组',
+    'detail': '删除永久组',
+    'method': 'deletePersistentGroup',
+    'api': testDeletePersistentP2pGroupManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '删除永久组',
+    'detail': '删除永久组',
+    'method': 'deletePersistentGroup',
+    'api': testGetP2pGroupsManagerPromise,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '删除永久组',
+    'detail': '删除永久组',
+    'method': 'deletePersistentGroup',
+    'api': testGetP2pGroupsManagerCallback,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '删除永久组',
+    'detail': '删除永久组',
+    'method': 'deletePersistentGroup',
+    'api': testSetP2pDeviceNameManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '注册P2P开关状态改变事件',
+    'detail': '注册P2P开关状态改变事件',
+    'method': 'On.P2pStateChange',
+    'api': testOnP2pStateChangeManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '注册P2P连接状态改变事件',
+    'detail': '注册P2P连接状态改变事件',
+    'method': 'On.P2pConnectionChange',
+    'api': testOnP2pConnectionChangeManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '注册P2P设备状态改变事件',
+    'detail': '注册P2P设备状态改变事件',
+    'method': 'On.p2pDeviceChange',
+    'api': testOnP2pDeviceChangeManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '注册P2P对端设备状态改变事件',
+    'detail': '注册P2P对端设备状态改变事件',
+    'method': 'On.p2pPeerDeviceChange',
+    'api': testOnP2pPeerDeviceChangeManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '注册P2P永久组状态改变事件',
+    'detail': '注册P2P永久组状态改变事件',
+    'method': 'On.p2pPersistentGroupChange',
+    'api': testOnP2pPersistentGroupChangeManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+  {
+    'name': '注册发现设备状态改变事件',
+    'detail': '注册发现设备状态改变事件',
+    'method': 'On.p2pDiscoveryChange',
+    'api': testOnP2pDiscoveryChangeManager,
+    'result': 'None',
+    'category': StressCategory.P2pManagerStress
+},
+]
+
+export function initWifiStressData(): Array<TestStress> {
+  let TestStressArray: Array<TestStress> = []
+  WifiStressTestCase.forEach(item => {
+    TestStressArray.push(new TestStress(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestStressArray;
+}
+
+export function initWifiManagerStressData(): Array<TestStress> {
+  let TestStressArray: Array<TestStress> = []
+  WifiManagerStressTestCase.forEach(item => {
+    TestStressArray.push(new TestStress(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestStressArray;
+}
+
+export function initHotspotStressData(): Array<TestStress> {
+  let TestStressArray: Array<TestStress> = []
+  HotspotStressTestCase.forEach(item => {
+    TestStressArray.push(new TestStress(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestStressArray;
+}
+
+export function initHotspotManagerStressData(): Array<TestStress> {
+  let TestStressArray: Array<TestStress> = []
+  HotspotManagerStressTestCase.forEach(item => {
+    TestStressArray.push(new TestStress(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestStressArray;
+}
+
+export function initP2pStressData(): Array<TestStress> {
+  let TestStressArray: Array<TestStress> = []
+  P2pStressTestCase.forEach(item => {
+    TestStressArray.push(new TestStress(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestStressArray;
+}
+
+export function initP2pManagerStressData(): Array<TestStress> {
+  let TestStressArray: Array<TestStress> = []
+  P2pManagerStressTestCase.forEach(item => {
+    TestStressArray.push(new TestStress(item.name, item.detail, item.method, item.api, item.result, item.category));
+  })
+  return TestStressArray;
+}

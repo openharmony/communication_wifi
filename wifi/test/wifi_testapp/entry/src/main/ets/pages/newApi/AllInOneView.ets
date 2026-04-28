@@ -13,13 +13,15 @@
  * limitations under the License.
  */
 
-import { wifiManager } from '@kit.ConnectivityKit';
-import { ChangeNameView } from './ChangeNameView';
-import { NormalNav } from './components/NormalNav';
-import { JSON } from '@kit.ArkTS';
-import { CreateGroupView } from './CreateGroupView';
-import { GlobalThis } from '../../utils/globalThis';
-import { common } from '@kit.AbilityKit';
+import hilog from '@ohos.hilog';
+import ConfigData from '../../Utils/ConfigData';
+import { wifiManager} from '@kit.ConnectivityKit';
+import { ChangeNameView} from './ChangeNameView';
+import { NormalNav} from './components/NormalNav';
+import { JSON} from '@kit.ArkTS';
+import { CreateGroupView} from './CreateGroupView';
+import { GlobalThis} from '../../Utils/globalThis';
+import { common} from '@kit.AbilityKit';
 
 const TAG = '[AllInOneView]'
 
@@ -30,15 +32,19 @@ INVITED	1	邀请状态。
 FAILED	2	失败状态。
 AVAILABLE	3	可用状态。
 UNAVAILABLE	4	不可用状态。*/
-const P2PDeviceStatusInfo = [$r('app.string.status_connected'), $r('app.string.status_invite'),
-  $r('app.string.status_fail'), $r('app.string.status_available'), $r('app.string.status_unavailable')]
+const P2PDeviceStatusInfo = [
+  $r('app.string.status_connected'),
+  $r('app.string.status_invite'),
+  $r('app.string.status_fail'),
+  $r('app.string.status_available'),
+  $r('app.string.status_unavailable')]
 @Observed
 export class P2PDevice {
   name: string
   address: string = ''
   status: number = 0
 
-  constructor(name: string) {
+  constructor(name: string){
     this.name = name
     this.status = 0
   }
@@ -75,7 +81,7 @@ class P2PGroup {
   goIpAddress: string*/
 
 
-  constructor(group: wifiManager.WifiP2pGroupInfo) {
+  constructor(group: wifiManager.WifiP2pGroupInfo){
     this.name = group.groupName
     this.networkId = group.networkId
     /*this.isGo = group.isP2pGo
@@ -119,30 +125,30 @@ export struct AllInOneView {
     this.addP2PListener()
     try {
       wifiManager.startDiscoverDevices()
-    } catch (e) {
+    } catch (e){
       JSON.stringify(e)
     }
     try {
       this.p2pLinkedInfo  = await wifiManager.getP2pLinkedInfo()
-      console.log(TAG, 'linkedInfo: ', JSON.stringify(this.p2pLinkedInfo))
-    } catch (e) {
-      console.log(JSON.stringify(e))
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s %{public}s', TAG, 'linkedInfo: ', JSON.stringify(this.p2pLinkedInfo))
+    } catch (e){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s', JSON.stringify(e))
     }
     try {
       let curGp = await wifiManager.getCurrentGroup()
-      console.log(TAG, `currentGroup: ${JSON.stringify(curGp)}`)
-    } catch (e) {
-      console.log(TAG, `getCurrentGroup Error ${JSON.stringify(e)}`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `currentGroup: ${JSON.stringify(curGp)}`)
+    } catch (e){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `getCurrentGroup Error ${JSON.stringify(e)}`)
     }
     try {
       let gps = await wifiManager.getP2pGroups()
-      console.log(TAG, 'Groups: ', JSON.stringify(gps))
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s %{public}s', TAG, 'Groups: ', JSON.stringify(gps))
       this.allGroup = gps.map(P2PGroup.from)
       let ldv = await wifiManager.getP2pLocalDevice()
       this.localDevice = P2PDevice.from(ldv)
-      console.log(TAG, JSON.stringify(this.localDevice))
-    } catch (e) {
-      console.log(TAG, 'err getP2pLocalDevice', JSON.stringify(e))
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, JSON.stringify(this.localDevice))
+    } catch (e){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s %{public}s', TAG, 'err getP2pLocalDevice', JSON.stringify(e))
     }
   }
 
@@ -152,32 +158,32 @@ export struct AllInOneView {
 
   addP2PListener() {
     wifiManager.on('p2pDeviceChange', () => {
-      console.log(TAG, 'p2pDeviceChange')
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'p2pDeviceChange')
     })
     wifiManager.on('p2pPersistentGroupChange', async () => {
-      console.log(TAG, 'p2pPersistentGroupChange')
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'p2pPersistentGroupChange')
       let gps = await wifiManager.getP2pGroups()
       this.allGroup = gps.map(P2PGroup.from)
     })
     wifiManager.on('p2pDiscoveryChange', (status) => {
-      console.log(TAG, `p2pDiscoveryChange: ${status}`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `p2pDiscoveryChange: ${status}`)
       this.isP2pDiscoverEnable = (status === 1)
     })
     wifiManager.on('p2pPeerDeviceChange', (_: wifiManager.WifiP2pDevice[]) => {
-      console.log(TAG, 'p2pPeerDeviceChange:', JSON.stringify(_))
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s %{public}s', TAG, 'p2pPeerDeviceChange:', JSON.stringify(_))
       let availDevice = _.filter(e => e.deviceStatus !== wifiManager.P2pDeviceStatus.CONNECTED)
       this.availableDevices = availDevice.map(P2PDevice.from)
       this.currentLinkedDevice = _.filter(e => e.deviceStatus === wifiManager.P2pDeviceStatus.CONNECTED).map(P2PDevice.from)
      })
     wifiManager.on('p2pConnectionChange', async (result: wifiManager.WifiP2pLinkedInfo) => {
-      console.log(TAG, 'p2pConnectionChange', JSON.stringify(result))
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s %{public}s', TAG, 'p2pConnectionChange', JSON.stringify(result))
       let device = await wifiManager.getP2pLocalDevice()
       this.localDevice = P2PDevice.from(device)
-      if (result.connectState === 0) {
+      if (result.connectState === 0){
         wifiManager.startDiscoverDevices()
       } else {
         let gp = await wifiManager.getCurrentGroup()
-        console.log(TAG, 'currentGroup:', JSON.stringify(gp))
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s %{public}s', TAG, 'currentGroup:', JSON.stringify(gp))
       }
 
     })
@@ -190,8 +196,8 @@ export struct AllInOneView {
       wifiManager.off('p2pDiscoveryChange')
       wifiManager.off('p2pPeerDeviceChange')
       wifiManager.off('p2pConnectionChange')
-    } catch (e) {
-      console.log(`wifiManager.off Error: ${JSON.stringify(e)}`)
+    } catch (e){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s', `wifiManager.off Error: ${JSON.stringify(e)}`)
     }
 
   }
@@ -200,14 +206,14 @@ export struct AllInOneView {
     Row() {
       Text($r('app.string.my_device'))
         .fontWeight(FontWeight.Bold)
-    }.height(60)
+    }.height(ConfigData.VP_60)
   }
 
   @Builder connectedDeviceHeader() {
     Row() {
       Text($r('app.string.connected_device'))
         .fontWeight(FontWeight.Bold)
-    }.height(60)
+    }.height(ConfigData.VP_60)
   }
 
   @Builder deviceHeader() {
@@ -215,7 +221,7 @@ export struct AllInOneView {
       Text($r('app.string.available_device'))
         .fontWeight(FontWeight.Bold)
     }
-    .height(60)
+    .height(ConfigData.VP_60)
   }
 
   @Builder groupHeader() {
@@ -223,16 +229,16 @@ export struct AllInOneView {
       Text($r('app.string.saved_group'))
         .fontWeight(FontWeight.Bold)
     }
-    .height(60)
+    .height(ConfigData.VP_60)
   }
 
   build() {
-    Navigation(this.pathInfo) {
+    Navigation(this.pathInfo){
       Column() {
         NormalNav({title: $r('app.string.new_api_test_title')})
         Button(this.isP2pDiscoverEnable ? $r('app.string.stop_scan') : $r('app.string.start_scan'))
           .onClick(() => {
-            if (this.isP2pDiscoverEnable) {
+            if (this.isP2pDiscoverEnable){
               wifiManager.stopDiscoverDevices()
             }
             wifiManager.startDiscoverDevices()
@@ -241,43 +247,43 @@ export struct AllInOneView {
           .onClick(() => {
             this.pathInfo.pushPath({name: 'createGroup'})
           })
-          .margin({top: 20})
-        List({ space: 10 }) {
-          if (this.localDevice !== null) {
-            ListItemGroup({ header: this.localDeviceHeaer(), style: ListItemGroupStyle.CARD }) {
-              ListItem({style: ListItemStyle.CARD}) {
+          .margin({top: ConfigData.VP_20})
+        List({space: ConfigData.VP_10}){
+          if (this.localDevice !== null){
+            ListItemGroup({header: this.localDeviceHeaer(), style: ListItemGroupStyle.CARD}){
+              ListItem({style: ListItemStyle.CARD}){
                 DeviceItemView({device: this.localDevice})
-              }.height(110)
+              }.height(ConfigData.VP_110)
               .onClick(() => {
                 this.pathInfo.pushPathByName('changeName', null, async () => {
-                  console.log('changeNameBack')
+                  hilog.info(0x1500, 'wifiTestApp', '%{public}s', 'changeNameBack')
                   let device = await wifiManager.getP2pLocalDevice()
                   this.localDevice = P2PDevice.from(device)
                 }, true)
               })
             }
           }
-          if (this.currentLinkedDevice.length > 0) {
-            ListItemGroup({ header: this.connectedDeviceHeader(), style: ListItemGroupStyle.CARD }) {
+          if (this.currentLinkedDevice.length > 0){
+            ListItemGroup({header: this.connectedDeviceHeader(), style: ListItemGroupStyle.CARD}){
               ForEach(this.currentLinkedDevice, (device: P2PDevice) => {
-                ListItem({style: ListItemStyle.CARD}) {
+                ListItem({style: ListItemStyle.CARD}){
                   DeviceItemView({device: device})
-                }.height(110)
+                }.height(ConfigData.VP_110)
                 .onClick(() => {
                   this.disconnect(device)
                 })
               })
             }
           }
-          ListItemGroup({ header: this.deviceHeader, style: ListItemGroupStyle.CARD }) {
+          ListItemGroup({header: this.deviceHeader, style: ListItemGroupStyle.CARD}){
             ForEach(this.availableDevices, (device: P2PDevice) => {
-              ListItem({style: ListItemStyle.CARD}) {
+              ListItem({style: ListItemStyle.CARD}){
                 DeviceItemView({device: device})
               }
-              .height(110)
+              .height(ConfigData.VP_110)
               .onClick(async () => {
-                console.log(`device.status === ${device.status}`)
-                if (device.status === wifiManager.P2pDeviceStatus.INVITED) {
+                hilog.info(0x1500, 'wifiTestApp', '%{public}s', `device.status === ${device.status}`)
+                if (device.status === wifiManager.P2pDeviceStatus.INVITED){
                   this.cancelConnect(device)
                 } else {
                   await this.connectToDevice(device)
@@ -285,11 +291,11 @@ export struct AllInOneView {
 
               })
             })
-          }.divider({strokeWidth: 2, startMargin: 10, endMargin: 10})
-          if (this.allGroup.length > 0) {
-            ListItemGroup({ header: this.groupHeader, style: ListItemGroupStyle.CARD }) {
+          }.divider({strokeWidth: ConfigData.VP_2, startMargin: ConfigData.VP_10, endMargin: ConfigData.VP_10})
+          if (this.allGroup.length > 0){
+            ListItemGroup({header: this.groupHeader, style: ListItemGroupStyle.CARD}){
               ForEach(this.allGroup, (group: P2PGroup) => {
-                ListItem({ style: ListItemStyle.CARD }) {
+                ListItem({style: ListItemStyle.CARD}){
                   GroupItemView({group: group})
                 }.onClick(() => {
                   this.deleteGroup(group)
@@ -299,18 +305,18 @@ export struct AllInOneView {
           }
         }
         .layoutWeight(1)
-        .margin({ top: 10 })
+        .margin({top: ConfigData.VP_10})
       }
-      .backgroundColor('#F2F2F2')
-      .width('100%')
-      .height('100%')
+      .backgroundColor($r("app.color.ohcc_hex_f2f2f2"))
+      .width(ConfigData.WH_100_100)
+      .height(ConfigData.WH_100_100)
     }
     .hideTitleBar(true)
     .navDestination(this.routeMap)
 
   }
 
-  cancelConnect(device: P2PDevice) {
+  cancelConnect(device: P2PDevice){
     let ctx = GlobalThis.getInstance().getContext('context')
     let message = ctx!.resourceManager.getStringSync($r("app.string.cancel_connect_alert_str"), device.name)
     AlertDialog.show({
@@ -325,17 +331,17 @@ export struct AllInOneView {
         value: $r('app.string.confirm_button'),
         action: () => {
           try {
-            console.log(TAG, `p2pCancelConnect`)
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `p2pCancelConnect`)
             wifiManager.p2pCancelConnect()
-          } catch (e) {
-            console.log(TAG, "p2pCancelConnect Error:" + JSON.stringify(e))
+          } catch (e){
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "p2pCancelConnect Error:" + JSON.stringify(e))
           }
         }
       }
     })
   }
 
-  disconnect(device: P2PDevice) {
+  disconnect(device: P2PDevice){
     let ctx = GlobalThis.getInstance().getContext('context')
     let message = ctx!.resourceManager.getStringSync($r("app.string.disconnect_alert_content"), device.name)
     AlertDialog.show({
@@ -345,7 +351,7 @@ export struct AllInOneView {
       primaryButton: {
         value: $r('app.string.cancel_button'),
         action: () => {
-          console.log("cancel disconnect")
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s', "cancel disconnect")
         }
       },
       secondaryButton: {
@@ -353,15 +359,15 @@ export struct AllInOneView {
         action: () => {
           try {
             wifiManager.removeGroup()
-          } catch (e) {
-            console.log("removeGroup err: " + JSON.stringify(e))
+          } catch (e){
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "removeGroup err: " + JSON.stringify(e))
           }
         }
       }
     })
   }
 
-  deleteGroup(group: P2PGroup) {
+  deleteGroup(group: P2PGroup){
     AlertDialog.show({
       alignment: DialogAlignment.Bottom,
       title: $r("app.string.abandon_group_alert_title"),
@@ -379,8 +385,8 @@ export struct AllInOneView {
     })
   }
 
-  async connectToDevice(device: P2PDevice) {
-    console.log('connect to device:', JSON.stringify(device))
+  async connectToDevice(device: P2PDevice){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', 'connect to device:', JSON.stringify(device))
     let config:wifiManager.WifiP2PConfig = {
       deviceAddress: device.address,
       netId:-1,
@@ -392,15 +398,15 @@ export struct AllInOneView {
     try {
       wifiManager.p2pConnect(config)
       wifiManager.startDiscoverDevices()
-    } catch (e) {
-      console.log(TAG, 'connect and create group error:', JSON.stringify(e))
+    } catch (e){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s %{public}s', TAG, 'connect and create group error:', JSON.stringify(e))
     }
   }
 
-  @Builder routeMap(name: string) {
-    if (name === 'changeName') {
+  @Builder routeMap(name: string){
+    if (name === 'changeName'){
       ChangeNameView()
-    } else if (name === 'createGroup') {
+    } else if (name === 'createGroup'){
       CreateGroupView()
     }
   }
@@ -422,26 +428,25 @@ export struct DeviceItemView {
 
   build() {
     Row() {
-      Column({space: 10}) {
+      Column({space: ConfigData.VP_10}){
         Text(`${this.deviceNameTitle}：${this.device.name}`)
         Text(`${this.deviceAddrTitle}：${this.device.address}`)
         Text(`${this.deviceStatusTitle}：${ctx.resourceManager.getStringSync(P2PDeviceStatusInfo[this.device.status])}`)
       }.alignItems(HorizontalAlign.Start)
       Blank().layoutWeight(1)
-      if (this.device.status === wifiManager.P2pDeviceStatus.INVITED) {
+      if (this.device.status === wifiManager.P2pDeviceStatus.INVITED){
         LoadingProgress()
-          .width(40)
-          .height(40)
-      .enableLoading(true)
+          .width(ConfigData.VP_40)
+          .height(ConfigData.VP_40)
+          .enableLoading(true)
+      }
     }
-    }
-    .padding({left: 15, right: 15})
+    .padding({left: ConfigData.VP_15, right: ConfigData.VP_15})
   }
 }
 
 @Component
 struct GroupItemView {
-
   @ObjectLink group: P2PGroup
   @State groupTitle: string = ''
 
@@ -451,11 +456,11 @@ struct GroupItemView {
 
   build() {
     Row() {
-      Column({space: 10}) {
+      Column({space: ConfigData.VP_10}){
         Text(`${this.groupTitle}：${this.group.name}`)
       }.alignItems(HorizontalAlign.Start)
       Blank().layoutWeight(1)
     }
-    .padding({left: 15, right: 15})
+    .padding({left: ConfigData.VP_15, right: ConfigData.VP_15})
   }
 }

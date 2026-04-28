@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-import { NormalNav } from "./components/NormalNav";
-import { wifiManager } from "@kit.ConnectivityKit";
+
+import ConfigData from '../../Utils/ConfigData';
+import { NormalNav} from "./components/NormalNav";
+import { wifiManager} from "@kit.ConnectivityKit";
 
 @Component
 export struct ChangeNameView {
@@ -34,12 +35,12 @@ export struct ChangeNameView {
         NormalNav({title: $r('app.string.device_name')})
         Row() {
           TextInput({text: $$this.deviceStr})
-        }.padding({left: 20, right: 20})
+        }.padding({left: ConfigData.VP_20, right: ConfigData.VP_20})
         Text($r('app.string.change_name_tip'))
-          .margin({ top: 20, left: 20, right: 20 })
+          .margin({top: ConfigData.VP_20, left: ConfigData.VP_20, right: ConfigData.VP_20})
         Blank()
           .layoutWeight(1)
-        Row({space: 40 }) {
+        Row({space: ConfigData.VP_40}){
           Button($r('app.string.cancel_button'))
             .onClick(() => {
               this.pathInfo.pop()
@@ -47,14 +48,14 @@ export struct ChangeNameView {
             .normalButtonStyle()
           Button($r('app.string.confirm_button'))
             .onClick(() => {
-              if (this.deviceStr.length > 0) {
+              if (this.deviceStr.length > 0){
                 wifiManager.setDeviceName(this.deviceStr)
                 this.pathInfo.pop(null, true)
               }
             })
             .normalButtonStyle()
         }
-        .margin({ bottom: 45 })
+        .margin({bottom: ConfigData.VP_45})
       }
     }
     .hideTitleBar(true)
@@ -63,8 +64,8 @@ export struct ChangeNameView {
 
 @Extend(Button)
 function normalButtonStyle() {
-  .width(150)
-  .height(40)
-  .backgroundColor('#F2F2F2')
-  .fontColor(Color.Blue)
+  .width(ConfigData.VP_150)
+  .height(ConfigData.VP_40)
+  .backgroundColor($r("app.color.ohcc_hex_f2f2f2"))
+  .fontColor($r('app.color.main_blue'))
 }

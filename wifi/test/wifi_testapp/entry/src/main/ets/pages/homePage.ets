@@ -13,18 +13,18 @@
  * limitations under the License.
  */
 
-import { Category, TestData } from '../entryability/model/testData';
-import { initTestData } from '../entryability/model/testDataModels';
-import { MainPageTitle } from '../component/mainPageTitle';
-import { ManualApiTest } from '../component/manualApiTestComponent';
-import { ManualSceneTest } from '../component/manualSceneTest';
-import { AutoTest } from '../component/autoTest';
-import { AppTest } from '../component/appTest';
-import { StabilityTest } from "../component/stabilityTest";
-import { BenchmarkTest } from '../component/benchmarkTest';
-import { StressTest } from "../component/stressTest";
-import ConfigData from '../utils/ConfigData';
-import { NewApiTest } from '../component/NewApiTest';
+import { Category, TestData} from '../entryability/model/testData';
+import { initTestData} from '../entryability/model/testDataModels';
+import { MainPageTitle} from '../Component/mainPageTitle';
+import { ManualApiTest} from '../Component/manualApiTestComponent';
+import { ManualSceneTest} from '../Component/manualSceneTest';
+import { AutoTest} from '../Component/autoTest';
+import { AppTest} from '../Component/appTest';
+import { StabilityTest} from "../Component/stabilityTest";
+import { BenchmarkTest} from '../Component/benchmarkTest';
+import { StressTest} from "../Component/stressTest";
+import ConfigData from '../Utils/ConfigData';
+import { NewApiTest} from '../Component/NewApiTest';
 
 const TAG = 'wifiTestApp [homePage]';
 
@@ -40,39 +40,39 @@ struct TestCategory {
     Stack() {
       Tabs() {
         TabContent() {
-          NewApiTest({ testItems: this.testItems.filter(item => (item.category === Category.NewApi))})
-        }.tabBar('新接口测试').margin({top: $r("app.float.distance_5")})
+          NewApiTest({testItems: this.testItems.filter(item => (item.category === Category.NewApi))})
+        }.tabBar($r('app.string.new_api_test_title')).margin({top: $r("app.float.distance_5")})
 
         TabContent() {
-          AppTest({ testItems: this.testItems.filter(item => (item.category === Category.App))})
-        }.tabBar($r("app.string.App")).margin({ top: $r("app.float.distance_5") })
+          AppTest({testItems: this.testItems.filter(item => (item.category === Category.App))})
+        }.tabBar($r("app.string.App")).margin({top: $r("app.float.distance_5")})
 
         TabContent() {
-          ManualApiTest({ testItems: this.testItems.filter(item => (item.category === Category.API))})
-        }.tabBar($r("app.string.api")).margin({ top: $r("app.float.distance_5") })
+          ManualApiTest({testItems: this.testItems.filter(item => (item.category === Category.API))})
+        }.tabBar($r("app.string.api")).margin({top: $r("app.float.distance_5")})
 
         TabContent() {
-          StabilityTest({ testItems: this.testItems.filter(item => (item.category === Category.Stability))})
-        }.tabBar($r("app.string.stability")).margin({ top: $r("app.float.distance_5") })
+          StabilityTest({testItems: this.testItems.filter(item => (item.category === Category.Stability))})
+        }.tabBar($r("app.string.stability")).margin({top: $r("app.float.distance_5")})
 
         TabContent() {
-          AutoTest({ testItems: this.testItems.filter(item => (item.category === Category.AutoTest))})
-        }.tabBar($r("app.string.autotest")).margin({ top: $r("app.float.distance_5") })
+          AutoTest({testItems: this.testItems.filter(item => (item.category === Category.AutoTest))})
+        }.tabBar($r("app.string.autotest")).margin({top: $r("app.float.distance_5")})
 
         TabContent() {
-          ManualSceneTest({ testItems: this.testItems.filter(item => (item.category === Category.Scenario))})
-        }.tabBar($r("app.string.scenario")).margin({ top: $r("app.float.distance_5") })
+          ManualSceneTest({testItems: this.testItems.filter(item => (item.category === Category.Scenario))})
+        }.tabBar($r("app.string.scenario")).margin({top: $r("app.float.distance_5")})
 
         TabContent() {
-          BenchmarkTest({ testItems: this.testItems.filter(item => (item.category === Category.BenchMark))})
-        }.tabBar($r("app.string.benchmark")).margin({ top: $r("app.float.distance_5") })
+          BenchmarkTest({testItems: this.testItems.filter(item => (item.category === Category.BenchMark))})
+        }.tabBar($r("app.string.benchmark")).margin({top: $r("app.float.distance_5")})
 
         TabContent() {
-          StressTest({ testItems: this.testItems.filter(item => (item.category === Category.Stress))})
-        }.tabBar($r("app.string.stress")).margin({ top: $r("app.float.distance_5") })
+          StressTest({testItems: this.testItems.filter(item => (item.category === Category.Stress))})
+        }.tabBar($r("app.string.stress")).margin({top: $r("app.float.distance_5")})
       }
       .barWidth(ConfigData.WH_80_100)
-      .barHeight("40vp")
+      .barHeight(ConfigData.VP_40)
       .align(Alignment.TopStart)
       .barMode(BarMode.Scrollable)
       .backgroundColor($r("app.color.white"))
@@ -91,12 +91,12 @@ struct HomePage {
   build() {
     Column() {
       MainPageTitle()
-      Stack({ alignContent: Alignment.TopEnd }) {
-        TestCategory({ testItems: this.testItems })
+      Stack({alignContent: Alignment.TopEnd}){
+        TestCategory({testItems: this.testItems})
         Image($r('app.media.Switch'))
-          .height(30)
-          .width(30)
-          .margin({ top: $r("app.float.distance_5"), right: $r("app.float.distance_10") })
+          .height(ConfigData.VP_30)
+          .width(ConfigData.VP_30)
+          .margin({top: $r("app.float.distance_5"), right: $r("app.float.distance_10")})
           .onClick(() => {
           })
       }

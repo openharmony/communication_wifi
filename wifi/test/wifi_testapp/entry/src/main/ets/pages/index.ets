@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import ConfigData from '../utils/ConfigData';
+import ConfigData from '../Utils/ConfigData';
 
 /*
  ** index of page, not useful in wifi test
@@ -22,13 +22,13 @@ import ConfigData from '../utils/ConfigData';
 @Entry
 @Component
 struct Index {
-  @State message: string = 'Hello World'
+  @State message: string = ConfigData.PAGE_INDEX_PLACEHOLDER
 
   build() {
     Row() {
       Column() {
         Text(this.message)
-          .fontSize(50)
+          .fontSize(ConfigData.VP_50)
           .fontWeight(FontWeight.Bold)
       }
       .width(ConfigData.WH_100_100)

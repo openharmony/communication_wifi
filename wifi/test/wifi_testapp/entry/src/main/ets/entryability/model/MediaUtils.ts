@@ -46,7 +46,7 @@ class MediaUtils {
   }
 
   async savePicture(data: image.PixelMap, context: any){
-    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `savePicture`);
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'savePicture');
     let packOpts: image.PackingOption = {
       format: "image/jpeg",
       quality: 100
@@ -59,10 +59,11 @@ class MediaUtils {
     try {
       await fs.write(file.fd, arrayBuffer);
     } catch (err){
-      hilog.error(0x1500, 'wifiTestApp', '%{public}s', `write failed, code is ${err.code}, message is ${err.message}`);
+      hilog.error(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG,
+        `write failed, code is ${err.code}, message is ${err.message}`);
     }
     await fs.close(file.fd);
-    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `write done`);
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'write done');
     promptAction.showToast({
       message: '图片保存成功',
       duration: 1000

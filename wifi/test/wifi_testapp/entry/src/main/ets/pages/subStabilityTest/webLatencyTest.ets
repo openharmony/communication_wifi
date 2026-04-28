@@ -418,14 +418,12 @@ struct webLatencyTest {
 
         let httpRequest = http.createHttp();
         this.requestStartTime = new Date().getTime()
-        console.time("request")
         httpRequest.request(ConfigData.WEB_DEMO_ADDR_BAIDU, (err: Error, data: http.HttpResponse) => {
           if (!err){
             hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'Result:' + data.result);
             hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'code:' + data.responseCode);
             hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'header:' + JSON.stringify(data.header));
             hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'cookies:' + data.cookies);
-            console.timeEnd("request")
             this.requestEndTime = new Date().getTime()
             this.requestCostTime = this.requestEndTime - this.requestStartTime
             let time2: number = new Date().getTime()

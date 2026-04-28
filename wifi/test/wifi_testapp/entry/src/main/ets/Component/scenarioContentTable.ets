@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-import ConfigData from '../utils/ConfigData';
-import { TestScenario } from '../entryability/model/testData';
+import hilog from '@ohos.hilog';
+import ConfigData from '../Utils/ConfigData';
+import { TestScenario} from '../entryability/model/testData';
 import promptAction from '@ohos.promptAction';
 
 const TAG = "wifiTestApp [scenarioContentTable]"
@@ -29,59 +30,59 @@ export struct ScenarioContentTable {
   @Prop changeIndex: number;
   @State localName: string = 'DaYuBlue'
 
-  @Builder IngredientItem(scenarioItem: TestScenario, index: number) {
+  @Builder IngredientItem(scenarioItem: TestScenario, index: number){
     Stack() {
       Flex() {
-        Flex({ direction: FlexDirection.Column, alignItems: ItemAlign.Start }) {
+        Flex({direction: FlexDirection.Column, alignItems: ItemAlign.Start}){
           Row() {
             Text(scenarioItem.detail)
-              .fontSize("17vp")
-              .margin({ top: "3vp", bottom: "3vp", left: "10vp" })
+              .fontSize(ConfigData.VP_17)
+              .margin({top: ConfigData.VP_3, bottom: ConfigData.VP_3, left: ConfigData.VP_10})
               .textAlign(TextAlign.Start)
-              .height(40)
-              .width(30)
+              .height(ConfigData.VP_40)
+              .width(ConfigData.VP_30)
 
             Text(scenarioItem.method)
-              .fontSize("17vp")
-              .margin({ top: "3vp", bottom: "3vp", left: "10vp" })
+              .fontSize(ConfigData.VP_17)
+              .margin({top: ConfigData.VP_3, bottom: ConfigData.VP_3, left: ConfigData.VP_10})
               .textAlign(TextAlign.Start)
-              .height(40)
-              .width(240)
+              .height(ConfigData.VP_40)
+              .width(ConfigData.VP_240)
           }
-          .height(30)
+          .height(ConfigData.VP_30)
           .width(ConfigData.WH_70_100)
         }
-        .height(30)
+        .height(ConfigData.VP_30)
         .layoutWeight(6)
 
-        Flex({ alignItems: ItemAlign.Center }) {
+        Flex({alignItems: ItemAlign.Center}){
           Text(this.changeIndex >= 0 ? this.getCurrentState(index) : scenarioItem.result)
-            .margin({ left: "10vp" })
-            .fontSize("17vp")
+            .margin({left: ConfigData.VP_10})
+            .fontSize(ConfigData.VP_17)
             .flexGrow(1)
         }
         .layoutWeight(3)
-        .padding({ left: 10 })
-        .margin({ left: 10 })
+        .padding({left: ConfigData.VP_10})
+        .margin({left: ConfigData.VP_10})
       }
     }
-    .height(40)
-    .borderRadius(10)
-    .margin({ top: 3, bottom: 3 })
+    .height(ConfigData.VP_40)
+    .borderRadius($r('app.float.wh_value_10'))
+    .margin({top: ConfigData.VP_3, bottom: ConfigData.VP_3})
     .backgroundColor($r("app.color.white"))
   }
 
-  getCurrentState(index: number) {
-    if (index <= this.changeIndex) {
+  getCurrentState(index: number){
+    if (index <= this.changeIndex){
       this.scenarioItemsX[index].result = 'pass';
     } else {
-      console.log(TAG, "index > this.changeIndex")
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "index > this.changeIndex")
     }
     return this.scenarioItemsX[index].result
   }
 
   aboutToAppear(): void {
-    console.log(TAG, "scenario组件构建完毕")
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "scenario组件构建完毕")
     //初始化私有变量
     this.scenarioItemsX = this.scenarioItems
   }
@@ -93,15 +94,15 @@ export struct ScenarioContentTable {
           direction: FlexDirection.Column,
           justifyContent: FlexAlign.SpaceBetween,
           alignItems: ItemAlign.Start
-        }) {
+        }){
           ForEach(this.scenarioItems, (item: TestScenario, index: number) => {
             this.IngredientItem(item, index)
           })
         }
       }
-      .scrollBarWidth(20)
+      .scrollBarWidth(ConfigData.VP_20)
     }
     .height(ConfigData.WH_80_100)
-    .padding({ top: 5, right: 10, left: 10 })
+    .padding({top: ConfigData.VP_5, right: ConfigData.VP_10, left: ConfigData.VP_10})
   }
 }

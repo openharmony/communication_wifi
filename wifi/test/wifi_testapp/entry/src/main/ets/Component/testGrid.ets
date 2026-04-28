@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-import { TestData } from '../entryability/model/testData';
-import { TestGridItem } from './testGridItem';
+import ConfigData from '../Utils/ConfigData';
+import { TestData} from '../entryability/model/testData';
+import { TestGridItem} from './testGridItem';
 /**
  * TestGrid component page of wifi test
  */
@@ -36,7 +37,7 @@ export struct TestGrid {
       Grid() {
         ForEach(this.testItems, (item: TestData) => {
           GridItem() {
-            TestGridItem({ testItem: item })
+            TestGridItem({testItem: item})
           }
         }, (item: TestData) => item.id.toString())
       }
@@ -47,6 +48,6 @@ export struct TestGrid {
       .height(this.heightValue)
     }
     .scrollBar(BarState.Off)
-    .padding({ left: 16, right: 16 })
+    .padding({left: ConfigData.VP_16, right: ConfigData.VP_16})
   }
 }

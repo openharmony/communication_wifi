@@ -425,7 +425,7 @@ void WifiStaManager::StartSatelliteTimer(void)
 }
 #endif
 
-void WifiStaManager::SetAndInstallSuspendMode(OperateResState state, int instId)
+void WifiStaManager::InstallHpfAndSetSuspendMode(OperateResState state, int instId)
 {
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();
     // Must first set the SuspendMode before deploying the filtering rules for the set rules to take effect.

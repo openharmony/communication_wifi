@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-import ConfigData from '../utils/ConfigData';
-import { TestData } from '../entryability/model/testData';
+import hilog from '@ohos.hilog';
+import ConfigData from '../Utils/ConfigData';
+import { TestData} from '../entryability/model/testData';
 
 /**
  * Test - ListItem component of wifi test
@@ -25,38 +26,38 @@ export struct TestListItem {
   private testItem!: TestData
 
   aboutToAppear() {
-    console.info("TestListItem testItem:" + JSON.stringify(this.testItem))
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', "TestListItem testItem:" + JSON.stringify(this.testItem))
   }
 
   build() {
-    Navigator({ target: this.testItem.url }) {
-      Flex({ justifyContent: FlexAlign.Start, alignItems: ItemAlign.Center }) {
+    Navigator({target: this.testItem.url}){
+      Flex({justifyContent: FlexAlign.Start, alignItems: ItemAlign.Center}){
         Row() {
           Image(this.testItem.image)
             .objectFit(ImageFit.Contain)
             .autoResize(false)
-            .height(60)
-            .width(60)
+            .height(ConfigData.VP_60)
+            .width(ConfigData.VP_60)
         }
         .backgroundColor($r("app.color.white"))
         .width(ConfigData.WH_30_100)
 
         Text(this.testItem.name)
-          .fontSize(20)
+          .fontSize(ConfigData.VP_20)
           .flexGrow(1)
-          .margin({ left: 12 })
+          .margin({left: ConfigData.VP_12})
           .width(ConfigData.WH_45_100)
         Text(this.testItem.detail)
-          .fontSize(17)
-          .margin({ left: 10, right: 5 })
+          .fontSize(ConfigData.VP_17)
+          .margin({left: ConfigData.VP_10, right: ConfigData.VP_5})
           .width(ConfigData.WH_45_100)
       }
-      .height(85)
+      .height(ConfigData.VP_85)
     }
-    .params({ testItem: this.testItem })
-    .margin({ right: 10, left: 10, top: 10 })
-    .padding({ left: 15, right: 15 })
-    .borderRadius(10)
+    .params({testItem: this.testItem})
+    .margin({right: ConfigData.VP_10, left: ConfigData.VP_10, top: ConfigData.VP_10})
+    .padding({left: ConfigData.VP_15, right: ConfigData.VP_15})
+    .borderRadius($r('app.float.wh_value_10'))
     .backgroundColor($r("app.color.white"))
   }
 }

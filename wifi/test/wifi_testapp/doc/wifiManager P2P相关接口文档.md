@@ -18,20 +18,24 @@
 
 5. 示例：
 ```typescript
+import hilog from '@ohos.hilog';
+const HILOG_DOMAIN = 0x1500;
+const HILOG_TAG = 'wifiTestApp';
+
 import { wifiManager } from '@kit.ConnectivityKit';
     // 开启设备发现后，需要监听p2pPeerDeviceChange事件来获取所有的对端设备
     wifiManager.on('p2pPeerDeviceChange', async (_: wifiManager.WifiP2pDevice[]) => {
-      console.log(TAG, 'p2pPeerDeviceChange:', JSON.stringify(_))
+      hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s %{public}s %{public}s', TAG, 'p2pPeerDeviceChange:', JSON.stringify(_))
       try {
         let devices = await wifiManager.getP2pPeerDevices()
         this.allDevice = devices.map(P2PDevice.from)
       } catch (e) {
-        console.log(JSON.stringify(e))
+        hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', JSON.stringify(e))
       }
     })
     // 因为startDiscoveryDevices一段事件后会自动关闭，如果要求一直开启扫描，需要监听p2pDiscoverChange事件，在状态为0时重新开启设备发现
    wifiManager.on('p2pDiscoveryChange', (status) => {
-      console.log(TAG, `p2pDiscoveryChange: ${status}`)
+      hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s %{public}s', TAG, `p2pDiscoveryChange: ${status}`)
       if (status === 0) {
         wifiManager.startDiscoverDevices()
       }
@@ -39,7 +43,7 @@ import { wifiManager } from '@kit.ConnectivityKit';
 	try {
 		wifiManager.startDiscoverDevices();	
 	}catch(error){
-		console.error("failed:" + JSON.stringify(error));
+		hilog.error(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "failed:" + JSON.stringify(error));
 	}
 ```
 6. 说明：
@@ -58,12 +62,16 @@ import { wifiManager } from '@kit.ConnectivityKit';
 | 2801001      | Wi-Fi STA disabled.       |
 5. 示例：
 ```typescript
+import hilog from '@ohos.hilog';
+const HILOG_DOMAIN = 0x1500;
+const HILOG_TAG = 'wifiTestApp';
+
 import { wifiManager } from '@kit.ConnectivityKit';
 
 	try {
 		wifiManager.stopDiscoverDevices();	
 	}catch(error){
-		console.error("failed:" + JSON.stringify(error));
+		hilog.error(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "failed:" + JSON.stringify(error));
 	}
 ```
 6. 说明： 
@@ -192,18 +200,22 @@ import { wifiManager } from '@kit.ConnectivityKit';
 
 6. 示例：
 ```typescript
+import hilog from '@ohos.hilog';
+const HILOG_DOMAIN = 0x1500;
+const HILOG_TAG = 'wifiTestApp';
+
 import { wifiManager } from '@kit.ConnectivityKit';
 
 	wifiManager.getP2pGroups((err, data:wifiManager.WifiP2pGroupInfo) => {
     if (err) {
-        console.error("get P2P groups error");
+        hilog.error(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "get P2P groups error");
         return;
     }
-		console.info("get P2P groups: " + JSON.stringify(data));
+		hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "get P2P groups: " + JSON.stringify(data));
 	});
 
 	wifiManager.getP2pGroups().then(data => {
-		console.info("get P2P groups: " + JSON.stringify(data));
+		hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "get P2P groups: " + JSON.stringify(data));
 	});
 ```
 
@@ -232,13 +244,17 @@ import { wifiManager } from '@kit.ConnectivityKit';
 6. 示例：
 
 ```typescript
+import hilog from '@ohos.hilog';
+const HILOG_DOMAIN = 0x1500;
+const HILOG_TAG = 'wifiTestApp';
+
 import { wifiManager } from '@kit.ConnectivityKit';
 
 	try {
 		let name = "****";
 		wifiManager.setDeviceName(name);	
 	}catch(error){
-		console.error("failed:" + JSON.stringify(error));
+		hilog.error(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "failed:" + JSON.stringify(error));
 	}
 ```
 
@@ -279,7 +295,7 @@ import { wifiManager } from '@kit.ConnectivityKit';
    		wifiManager.createGroup(config);	
    		
    	}catch(error){
-   		console.error("failed:" + JSON.stringify(error));
+   		hilog.error(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "failed:" + JSON.stringify(error));
    	}
    ```
 
@@ -307,18 +323,22 @@ import { wifiManager } from '@kit.ConnectivityKit';
 6. 示例：
 
 ```typescript
+import hilog from '@ohos.hilog';
+const HILOG_DOMAIN = 0x1500;
+const HILOG_TAG = 'wifiTestApp';
+
 import { wifiManager } from '@kit.ConnectivityKit';
 	// p2p已经建组或者连接成功，才能正常获取到当前组信息
 	wifiManager.getCurrentGroup((err, data:wifiManager.WifiP2pGroupInfo) => {
     if (err) {
-        console.error("get current P2P group error");
+        hilog.error(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "get current P2P group error");
         return;
     }
-		console.info("get current P2P group: " + JSON.stringify(data));
+		hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "get current P2P group: " + JSON.stringify(data));
 	});
 
 	wifiManager.getCurrentGroup().then(data => {
-		console.info("get current P2P group: " + JSON.stringify(data));
+		hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "get current P2P group: " + JSON.stringify(data));
 	});
 ```
 
@@ -337,12 +357,16 @@ import { wifiManager } from '@kit.ConnectivityKit';
    | 2801001      | Wi-Fi STA disabled.       |
 5. 示例：
 ```typescript
+import hilog from '@ohos.hilog';
+const HILOG_DOMAIN = 0x1500;
+const HILOG_TAG = 'wifiTestApp';
+
 import { wifiManager } from '@kit.ConnectivityKit';
 
 	try {
 		wifiManager.removeGroup();	
 	}catch(error){
-		console.error("failed:" + JSON.stringify(error));
+		hilog.error(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "failed:" + JSON.stringify(error));
 	}
 ```
 
@@ -370,37 +394,41 @@ import { wifiManager } from '@kit.ConnectivityKit';
 6 示例：
 
 ```typescript
+import hilog from '@ohos.hilog';
+const HILOG_DOMAIN = 0x1500;
+const HILOG_TAG = 'wifiTestApp';
+
 import { wifiManager } from '@kit.ConnectivityKit';
   
   let recvP2pConnectionChangeFunc = (result:wifiManager.WifiP2pLinkedInfo) => {
-      console.info("p2p connection change receive event: " + JSON.stringify(result));
+      hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "p2p connection change receive event: " + JSON.stringify(result));
       wifiManager.getP2pLinkedInfo((err, data:wifiManager.WifiP2pLinkedInfo) => {
           if (err) {
-              console.error('failed to get getP2pLinkedInfo: ' + JSON.stringify(err));
+              hilog.error(HILOG_DOMAIN, HILOG_TAG, '%{public}s', 'failed to get getP2pLinkedInfo: ' + JSON.stringify(err));
               return;
           }
-          console.info("get getP2pLinkedInfo: " + JSON.stringify(data));
+          hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "get getP2pLinkedInfo: " + JSON.stringify(data));
       });
   }
   wifiManager.on("p2pConnectionChange", recvP2pConnectionChangeFunc);
   
   let recvP2pDeviceChangeFunc = (result:wifiManager.WifiP2pDevice) => {
-      console.info("p2p device change receive event: " + JSON.stringify(result));
+      hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "p2p device change receive event: " + JSON.stringify(result));
   }
   wifiManager.on("p2pDeviceChange", recvP2pDeviceChangeFunc);
   
   let recvP2pPeerDeviceChangeFunc = (result:wifiManager.WifiP2pDevice[]) => {
-      console.info("p2p peer device change receive event: " + JSON.stringify(result));
+      hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "p2p peer device change receive event: " + JSON.stringify(result));
       wifiManager.getP2pPeerDevices((err, data:wifiManager.WifiP2pDevice) => {
           if (err) {
-              console.error('failed to get peer devices: ' + JSON.stringify(err));
+              hilog.error(HILOG_DOMAIN, HILOG_TAG, '%{public}s', 'failed to get peer devices: ' + JSON.stringify(err));
               return;
           }
-          console.info("get peer devices: " + JSON.stringify(data));
+          hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "get peer devices: " + JSON.stringify(data));
           let len = data.length;
           for (let i = 0; i < len; ++i) {
               if (data[i].deviceName === "my_test_device") {
-                  console.info("p2p connect to test device: " + data[i].deviceAddress);
+                  hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "p2p connect to test device: " + data[i].deviceAddress);
                   let config:wifiManager.WifiP2PConfig = {
                       deviceAddress:data[i].deviceAddress,
                       netId:-2,
@@ -416,14 +444,14 @@ import { wifiManager } from '@kit.ConnectivityKit';
   wifiManager.on("p2pPeerDeviceChange", recvP2pPeerDeviceChangeFunc);
   
   let recvP2pPersistentGroupChangeFunc = () => {
-      console.info("p2p persistent group change receive event");
+      hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "p2p persistent group change receive event");
   
       wifiManager.getCurrentGroup((err, data:wifiManager.WifiP2pGroupInfo) => {
           if (err) {
-              console.error('failed to get current group: ' + JSON.stringify(err));
+              hilog.error(HILOG_DOMAIN, HILOG_TAG, '%{public}s', 'failed to get current group: ' + JSON.stringify(err));
               return;
           }
-          console.info("get current group: " + JSON.stringify(data));
+          hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "get current group: " + JSON.stringify(data));
       });
   }
   wifiManager.on("p2pPersistentGroupChange", recvP2pPersistentGroupChangeFunc);
@@ -432,7 +460,7 @@ import { wifiManager } from '@kit.ConnectivityKit';
   setTimeout(() =>  {wifiManager.off("p2pDeviceChange", recvP2pDeviceChangeFunc);}, 125 * 1000);
   setTimeout(() =>  {wifiManager.off("p2pPeerDeviceChange", recvP2pPeerDeviceChangeFunc);}, 125 * 1000);
   setTimeout(() =>  {wifiManager.off("p2pPersistentGroupChange", recvP2pPersistentGroupChangeFunc);}, 125 * 1000);
-  console.info("start discover devices -> " + wifiManager.startDiscoverDevices());
+  hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "start discover devices -> " + wifiManager.startDiscoverDevices());
 ```
 
 ## wifiManager.p2pCancelConnect
@@ -454,12 +482,16 @@ import { wifiManager } from '@kit.ConnectivityKit';
 5. 示例：
 
 ```typescript
+import hilog from '@ohos.hilog';
+const HILOG_DOMAIN = 0x1500;
+const HILOG_TAG = 'wifiTestApp';
+
 import { wifiManager } from '@kit.ConnectivityKit';
 
 	try {
 		wifiManager.p2pCancelConnect();	
 	}catch(error){
-		console.error("failed:" + JSON.stringify(error));
+		hilog.error(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "failed:" + JSON.stringify(error));
 	}
 ```
 
@@ -490,10 +522,14 @@ import { wifiManager } from '@kit.ConnectivityKit';
 6. 示例：
 
 ```typescript
+import hilog from '@ohos.hilog';
+const HILOG_DOMAIN = 0x1500;
+const HILOG_TAG = 'wifiTestApp';
+
  import { wifiManager } from '@kit.ConnectivityKit';
   
   let recvP2pDeviceChangeFunc = (result:wifiManager.WifiP2pDevice) => {
-      console.info("Receive p2p device change event: " + result);
+      hilog.info(HILOG_DOMAIN, HILOG_TAG, '%{public}s', "Receive p2p device change event: " + result);
   }
   
   // Register event

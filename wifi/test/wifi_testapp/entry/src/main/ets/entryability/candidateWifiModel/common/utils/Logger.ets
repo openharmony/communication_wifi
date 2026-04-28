@@ -26,24 +26,24 @@ class Logger {
    * @param Prefix Identifies the log tag.
    * @param domain Domain Indicates the service domain, which is a hexadecimal integer ranging from 0x0 to 0xFFFFF.
    */
-  constructor(prefix: string = 'MyApp', domain: number = 0xFF00) {
+  constructor(prefix: string = 'MyApp', domain: number = 0xFF00){
     this.prefix = prefix;
     this.domain = domain;
   }
 
-  debug(...args: string[]) {
+  debug(...args: string[]){
     hilog.debug(this.domain, this.prefix, this.format, args)
   }
 
-  info(...args: string[]) {
+  info(...args: string[]){
     hilog.info(this.domain, this.prefix, this.format, args)
   }
 
-  warn(...args: string[]) {
+  warn(...args: string[]){
     hilog.warn(this.domain, this.prefix, this.format, args)
   }
 
-  error(...args: string[]) {
+  error(...args: string[]){
     hilog.error(this.domain, this.prefix, this.format, args)
   }
 }

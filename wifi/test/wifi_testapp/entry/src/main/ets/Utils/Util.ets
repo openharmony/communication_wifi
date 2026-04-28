@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-export function resolveIP(ip: number) {
-  if (ip < 0 || ip > 0xFFFFFFFF) {
+export function resolveIP(ip: number){
+  if (ip < 0 || ip > 0xFFFFFFFF){
     throw new Error("The number is not normal!");
   }
   return (ip >>> 24) + "." + (ip >> 16 & 0xFF) + "." + (ip >> 8 & 0xFF) + "." + (ip & 0xFF);

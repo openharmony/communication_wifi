@@ -13,19 +13,20 @@
  * limitations under the License.
  */
 
-import { PageTitle } from '../../component/pageTitle';
-import { TestImageDisplay } from '../../component/testImageDisplay';
+import hilog from '@ohos.hilog';
+import { PageTitle} from '../../Component/pageTitle';
+import { TestImageDisplay} from '../../Component/testImageDisplay';
 import router from '@ohos.router';
-import ConfigData from '../../utils/ConfigData';
-import { TestData } from '../../entryability/model/testData';
+import ConfigData from '../../Utils/ConfigData';
+import { TestData} from '../../entryability/model/testData';
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
-import wantAgent, { WantAgent } from '@ohos.app.ability.wantAgent';
+import wantAgent, { WantAgent} from '@ohos.app.ability.wantAgent';
 import ohosWantAgentInfo from '@ohos.wantAgent';
 import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
-import { BusinessError } from '@ohos.base';
+import { BusinessError} from '@ohos.base';
 import abilityAccessCtrl from '@ohos.abilityAccessCtrl';
 import notificationManager from '@ohos.notificationManager';
 
@@ -48,14 +49,14 @@ struct WiFiConnectStabilityTest {
   @State disconnect_StartTime: number = 0
   @State disconnect_EndTime: number = 0
   @State disconnect_SpendTime: number = 0
-  @State connectNumber: number = 0 // 打开WiFi的次数
-  @State disconnectNumber: number = 0 // 关闭WiFi的次数
-  @State connectSuccessNumber: number = 0 // 打开WiFi的成功次数
-  @State connectFailNumber: number = 0 // 打开WiFi的失败次数
-  @State disconnectSuccessNumber: number = 0 // 关闭WiFi的成功次数
-  @State disconnectFailNumber: number = 0 // 关闭WiFi的失败次数
-  @State message: string = "测试结果"
-  @State testNumbers: number = 30 //测试次数
+  @State connectNumber: number = 0// 打开WiFi的次数
+  @State disconnectNumber: number = 0// 关闭WiFi的次数
+  @State connectSuccessNumber: number = 0// 打开WiFi的成功次数
+  @State connectFailNumber: number = 0// 打开WiFi的失败次数
+  @State disconnectSuccessNumber: number = 0// 关闭WiFi的成功次数
+  @State disconnectFailNumber: number = 0// 关闭WiFi的失败次数
+  @State message: string = ConfigData.STABILITY_STR_TEST_RESULT
+  @State testNumbers: number = ConfigData.DEFAULT_TEST_LOOP_COUNT
   @State successTimes: number = 0
   @State failTimes: number = 0
   @State connectionMessage: string = ""
@@ -64,15 +65,15 @@ struct WiFiConnectStabilityTest {
   @State showList: boolean = false;
   @State ipInfo: number = 0
   @StorageLink('wifiConfig') wifiConfig: wifiManager.WifiDeviceConfig = {
-    ssid: "TP-LINK_6365",
-    preSharedKey: "12345678" ,
+    ssid: ConfigData.QV_MOCK_SSID,
+    preSharedKey: ConfigData.QV_MOCK_PRE_SHARED_KEY,
     securityType: 3,
   }
 
   aboutToAppear() {
     // 请求发送通知的许可
     notificationManager.requestEnableNotification().then(() => {
-      console.info(`[EntryAbility] requestEnableNotification success`);
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s', `[EntryAbility] requestEnableNotification success`);
       // 申请WiFi相关权限
       let atManager = abilityAccessCtrl.createAtManager();
       try {
@@ -90,16 +91,16 @@ struct WiFiConnectStabilityTest {
           "ohos.permission.GET_WIFI_INFO_INTERNAL"
 ])
           .then((data) => {
-            console.info(`[EntryAbility], data: ${ JSON.stringify(data) }`);
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', `[EntryAbility], data: ${ JSON.stringify(data) }`);
           })
           .catch((err: BusinessError) => {
-            console.info(`[EntryAbility], err: ${ JSON.stringify(err) }`);
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', `[EntryAbility], err: ${ JSON.stringify(err) }`);
           })
-      } catch( err) {
-        console.info(`[EntryAbility], catch err->${ JSON.stringify(err) }`);
+      } catch( err){
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s', `[EntryAbility], catch err->${ JSON.stringify(err) }`);
       }
     }).catch((err: BusinessError) => {
-      console.error(`[EntryAbility] requestEnableNotification failed, code is ${ err.code }, message is ${ err.message }`);
+      hilog.error(0x1500, 'wifiTestApp', '%{public}s', `[EntryAbility] requestEnableNotification failed, code is ${ err.code }, message is ${ err.message }`);
     });
   }
 
@@ -110,20 +111,20 @@ struct WiFiConnectStabilityTest {
     let wantAgentInfo: wantAgent.WantAgentInfo = {
       wants: [
         {
-          bundleName: (context as common.UIAbilityContext).abilityInfo.bundleName ,
+          bundleName: (context as common.UIAbilityContext).abilityInfo.bundleName,
           abilityName: (context as common.UIAbilityContext).abilityInfo.name
         }
-] ,
-      operationType: ohosWantAgentInfo.OperationType.START_ABILITY ,
+],
+      operationType: ohosWantAgentInfo.OperationType.START_ABILITY,
       requestCode: 0,
       wantAgentFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG]
     };
     wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
-      backgroundTaskManager.startBackgroundRunning(context ,
+      backgroundTaskManager.startBackgroundRunning(context,
         backgroundTaskManager.BackgroundMode.DATA_TRANSFER, wantAgentObj).then(() => {
-        console.info(`Succeeded in operationing startBackgroundRunning.`);
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s', `Succeeded in operationing startBackgroundRunning.`);
       }).catch((err: BusinessError) => {
-        console.error(`Failed to operation startBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
+        hilog.error(0x1500, 'wifiTestApp', '%{public}s', `Failed to operation startBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
       });
     });
   }
@@ -131,28 +132,28 @@ struct WiFiConnectStabilityTest {
   // 停止长时任务
   stopContinuousTask() {
     backgroundTaskManager.stopBackgroundRunning(getContext()).then(() => {
-      console.info(`Succeeded in operationing stopBackgroundRunning.`);
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s', `Succeeded in operationing stopBackgroundRunning.`);
     }).catch((err: BusinessError) => {
-      console.error(`Failed to operation stopBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
+      hilog.error(0x1500, 'wifiTestApp', '%{public}s', `Failed to operation stopBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
     });
   }
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TestImageDisplay({ testItem: this.testItem })
-        PageTitle({ testItem: this.testItem })
+      Stack({alignContent: Alignment.TopStart}){
+        TestImageDisplay({testItem: this.testItem})
+        PageTitle({testItem: this.testItem})
       }
 
-      Stack().height("1vp").backgroundColor($r("app.color.black"));
+      Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
 
       Column() {
         Row() {
-          Text("测试次数：").fontSize($r('app.float.font_18')).width(ConfigData.WH_25_100).padding({ left: "10vp" })
-          TextInput({ placeholder: "请输入循环次数，默认为30" })
-            .placeholderColor(Color.Grey)
-            .placeholderFont({ size: $r('app.float.font_16') })
-            .caretColor(Color.Blue)
+          Text($r('app.string.wifitest_text_cscs_1')).fontSize($r('app.float.font_18')).width(ConfigData.WH_25_100).padding({left: ConfigData.VP_10})
+          TextInput({placeholder: $r('app.string.wifitest_text_qsrxhcsmrw3')})
+            .placeholderColor($r('app.color.color_999999_grey'))
+            .placeholderFont({size: $r('app.float.font_16')})
+            .caretColor($r('app.color.main_blue'))
             .width(ConfigData.WH_50_100)
             .fontSize($r('app.float.font_16'))
             .fontColor($r('app.color.title_black_color'))
@@ -160,8 +161,8 @@ struct WiFiConnectStabilityTest {
               this.testNumbers = parseInt(value);
             })
           Image($r('app.media.Switch'))
-            .height(50)
-            .padding({ top: 5, bottom: 5, left: 5 })
+            .height(ConfigData.VP_50)
+            .padding({top: ConfigData.VP_5, bottom: ConfigData.VP_5, left: ConfigData.VP_5})
             .width(ConfigData.WH_15_100)
             .onClick(() => {
               this.showList = !this.showList;
@@ -169,64 +170,79 @@ struct WiFiConnectStabilityTest {
         }
       }.width(ConfigData.WH_100_100).height(ConfigData.WH_6_100).backgroundColor($r("app.color.lead"))
 
-      if (this.showList) {
+      if (this.showList){
         setWifiDevice()
       } else {
         Column() {
 
           Column() {
-            Text("测试结果：")
-              .fontSize("22vp")
+            Text($r('app.string.wifitest_text_csjg'))
+              .fontSize(ConfigData.VP_22)
               .width(ConfigData.WH_95_100)
               .align(Alignment.TopStart)
-              .padding({ top: "10vp" })
+              .padding({top: ConfigData.VP_10})
             Scroll() {
               Column() {
-                Text("测试次数：" + this.testNumbers)
-                  .fontSize("18vp")
-                  .margin({ top: "5vp", left: "10vp", right: "5vp" })
+                Text() {
+                  Span($r('app.string.wifitest_text_cscs_1'))
+                  Span('' + this.testNumbers)
+                }
+                  .fontSize(ConfigData.VP_18)
+                  .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, right: ConfigData.VP_5})
                   .textAlign(TextAlign.Start)
                   .width(ConfigData.WH_90_100)
-                Text("连接的成功次数：" + this.connectSuccessNumber)
-                  .fontSize("18vp")
-                  .margin({ top: "5vp", left: "10vp", right: "5vp" })
+                Text() {
+                  Span($r('app.string.wifitest_text_wifi_connect_ok'))
+                  Span('' + this.connectSuccessNumber)
+                }
+                  .fontSize(ConfigData.VP_18)
+                  .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, right: ConfigData.VP_5})
                   .textAlign(TextAlign.Start)
                   .width(ConfigData.WH_90_100)
-                Text("连接的失败次数：" + this.connectFailNumber)
-                  .fontSize("18vp")
-                  .margin({ top: "5vp", left: "10vp", right: "5vp" })
+                Text() {
+                  Span($r('app.string.wifitest_text_wifi_connect_fail'))
+                  Span('' + this.connectFailNumber)
+                }
+                  .fontSize(ConfigData.VP_18)
+                  .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, right: ConfigData.VP_5})
                   .textAlign(TextAlign.Start)
                   .width(ConfigData.WH_90_100)
-                Text("断连的成功次数：" + this.disconnectSuccessNumber)
-                  .fontSize("18vp")
-                  .margin({ top: "5vp", left: "10vp", right: "5vp" })
+                Text() {
+                  Span($r('app.string.wifitest_text_wifi_disc_ok'))
+                  Span('' + this.disconnectSuccessNumber)
+                }
+                  .fontSize(ConfigData.VP_18)
+                  .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, right: ConfigData.VP_5})
                   .textAlign(TextAlign.Start)
                   .width(ConfigData.WH_90_100)
-                Text("断连的失败次数：" + this.disconnectFailNumber)
-                  .fontSize("18vp")
-                  .margin({ top: "5vp", left: "10vp", right: "5vp" })
+                Text() {
+                  Span($r('app.string.wifitest_text_wifi_disc_fail'))
+                  Span('' + this.disconnectFailNumber)
+                }
+                  .fontSize(ConfigData.VP_18)
+                  .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, right: ConfigData.VP_5})
                   .textAlign(TextAlign.Start)
                   .width(ConfigData.WH_90_100)
               }
               .width(ConfigData.WH_95_100)
               .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
             }
-            .scrollBarWidth(10)
+            .scrollBarWidth(ConfigData.VP_10)
             .scrollBar(BarState.Auto)
 
           }.width(ConfigData.WH_100_100).height(ConfigData.WH_35_100)
 
           Column() {
-            Text("log显示：")
-              .fontSize("22vp")
+            Text($r('app.string.wifitest_text_lxs'))
+              .fontSize(ConfigData.VP_22)
               .width(ConfigData.WH_95_100)
               .align(Alignment.TopStart)
-              .padding({ top: "10vp" })
+              .padding({top: ConfigData.VP_10})
             List() {
               ListItem() {
                 Text(this.connectionMessageLog)
-                  .fontSize("18vp")
-                  .margin({ top: "5vp", left: "10vp", right: "5vp" })
+                  .fontSize(ConfigData.VP_18)
+                  .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, right: ConfigData.VP_5})
                   .textAlign(TextAlign.Start)
                   .width(ConfigData.WH_90_100)
               }
@@ -237,15 +253,15 @@ struct WiFiConnectStabilityTest {
           }.width(ConfigData.WH_100_100).height(ConfigData.WH_60_100)
         }.width(ConfigData.WH_100_100).height(ConfigData.WH_60_100).backgroundColor($r("app.color.lead"))
 
-        Stack().height("1vp").backgroundColor($r("app.color.black"));
+        Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
 
         Column() {
           Row() {
             Button("开始连接测试")
               .operateButtonStyle($r('app.color.main_blue'))
-              .padding({ right: "10vp" })
+              .padding({right: ConfigData.VP_10})
               .onClick(async(event: ClickEvent) => {
-                console.log(TAG, "start WiFiConnect test-------------")
+                hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "start WiFiConnect test-------------")
                 this.startContinuousTask();
                 await this.forLoop()
               })
@@ -254,10 +270,10 @@ struct WiFiConnectStabilityTest {
 
             Button("关闭连接测试")
               .operateButtonStyle($r('app.color.main_blue'))
-              .padding({ right: "10vp" })
+              .padding({right: ConfigData.VP_10})
               .onClick(async(event: ClickEvent) => {
                 this.connectionLoopState = false
-                console.log(TAG, "准备测试停止 -------------")
+                hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "准备测试停止 -------------")
                 this.connectionMessageLog = ""
                 this.connectNumber = 0;
                 this.stopContinuousTask();
@@ -269,11 +285,11 @@ struct WiFiConnectStabilityTest {
   }
 
   onConnectionState() {
-    console.log(TAG, "on.wifiConnectionChange start--------")
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "on.wifiConnectionChange start--------")
     wifiManager.on("wifiConnectionChange", (number) => {
-      console.log(TAG, " on.wifiConnectionChange --------")
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, " on.wifiConnectionChange --------")
       let wifiConnectionMessage = ""
-      switch (number) {
+      switch (number){
         case 0: wifiConnectionMessage = "disconnected";
           break;
         case 1: wifiConnectionMessage = "connected";
@@ -281,23 +297,23 @@ struct WiFiConnectStabilityTest {
         default: wifiConnectionMessage = '未知状态';
           break;
       }
-      console.log(TAG, "wifi连接状态为:" + wifiConnectionMessage)
-      if (number == 1) {
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "wifi连接状态为:" + wifiConnectionMessage)
+      if (number == 1){
         // 打时间戳
         this.connect_EndTime = new Date().getTime()
-        console.log(TAG, "WIFI连接结束时间: " + this.connect_EndTime + "ms")
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "WIFI连接结束时间: " + this.connect_EndTime + "ms")
         this.ipInfo = wifiManager.getIpInfo().ipAddress
-      } else if (number == 0) {
+      } else if (number == 0){
         this.disconnect_EndTime = new Date().getTime()
-        console.log(TAG, "WIFI断连结束时间: " + this.disconnect_EndTime + "ms")
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "WIFI断连结束时间: " + this.disconnect_EndTime + "ms")
         let removeMessage = wifiManager.removeAllNetwork()
-        console.log(TAG, "移除网络配置接口的调用结果: " + removeMessage)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "移除网络配置接口的调用结果: " + removeMessage)
       }
-      console.log(TAG, " on.wifiConnectionChange callback success --------")
-      promptAction.showToast({ message: "wifi连接状态: " + wifiConnectionMessage })
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, " on.wifiConnectionChange callback success --------")
+      promptAction.showToast({message: "wifi连接状态: " + wifiConnectionMessage})
       this.connectionMessage = wifiConnectionMessage
       AppStorage.setOrCreate("connectionMessage", this.connectionMessage)
-      console.log(TAG, " on.wifiConnectionChange callback end--------")
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, " on.wifiConnectionChange callback end--------")
       return this.connectionMessage
     })
   }
@@ -316,84 +332,84 @@ struct WiFiConnectStabilityTest {
     this.disconnectFailNumber = 0
 
     this.connectionMessageLog = ""
-    this.onConnectionState() // 监听函数
-    let funcMessage = false // 函数信息
-    for (this.connectNumber ; this.connectNumber < this.testNumbers ; this.connectNumber ++) {
-      if (!this.connectionLoopState) {
-        console.log(TAG, "测试结束------------")
+    this.onConnectionState()// 监听函数
+    let funcMessage = false// 函数信息
+    for(this.connectNumber ; this.connectNumber<this.testNumbers ; this.connectNumber++){
+      if (!this.connectionLoopState){
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "测试结束------------")
         break;
       } else {
         let wifiState = wifiManager.isWifiActive()
-        if (!wifiState) {
+        if (!wifiState){
           wifiManager.enableWifi()
-          console.log(TAG, "wifi当前未使能，已经使能，正常开始测试------")
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "wifi当前未使能，已经使能，正常开始测试------")
         } else {
-          console.log(TAG, "wifi当前使能，正常开始测试------")
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "wifi当前使能，正常开始测试------")
         }
         await sleep(3)
 
         wifiManager.connectToDevice(this.wifiConfig)
         // 打时间戳
         this.connect_StartTime = new Date().getTime()
-        console.log(TAG, "第" + (this.connectNumber + 1) + "次WIFI连接-----")
-        console.log(TAG, "第" + (this.connectNumber + 1) + "次WIFI连接开始时间: " + this.connect_StartTime + "ms")
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + (this.connectNumber + 1) + "次WIFI连接-----")
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + (this.connectNumber + 1) + "次WIFI连接开始时间: " + this.connect_StartTime + "ms")
         this.connectionMessageLog += "第" + (this.connectNumber + 1) + "次WIFI连接接口的调用" + "\n"
-        console.log(TAG, "第" + (this.connectNumber + 1) + "次WIFI连接接口的调用")
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + (this.connectNumber + 1) + "次WIFI连接接口的调用")
         await sleep(15)
-        this.connectionMessage = AppStorage.get("connectionMessage")! //非空断言操作符
+        this.connectionMessage = AppStorage.get("connectionMessage")!//非空断言操作符
         // promptAction.showToast( { message: funcMessage })
-        if (this.connectionMessage == "connected") {
+        if (this.connectionMessage == "connected"){
           this.connect_SpendTime = this.connect_EndTime - this.connect_StartTime
           this.connectionMessageLog += "第" + (this.connectNumber + 1) + "次WIFI连接耗时: " + this.connect_SpendTime + "ms; IP: " + this.ipInfo + "\n"
-          console.log(TAG, "第" + (this.connectNumber + 1) + "次WIFI连接耗时: " + this.connect_SpendTime + "ms; IP: " + this.ipInfo)
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + (this.connectNumber + 1) + "次WIFI连接耗时: " + this.connect_SpendTime + "ms; IP: " + this.ipInfo)
           this.connectSuccessNumber = this.connectSuccessNumber + 1
           this.connectionMessageLog += "连接成功的次数：" + this.connectSuccessNumber + "\n"
-          console.log(TAG, "连接成功的次数：" + this.connectSuccessNumber)
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "连接成功的次数：" + this.connectSuccessNumber)
           // funcMessage = wifiManager.disconnect()
           this.disconnectNumber = this.disconnectNumber + 1
           this.disconnect_StartTime = new Date().getTime()
-          console.log(TAG, "第" + this.disconnectNumber + "次WIFI断连-----")
-          console.log(TAG, "第" + this.disconnectNumber + "次WIFI断连开始时间: " + this.disconnect_StartTime + "ms")
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + this.disconnectNumber + "次WIFI断连-----")
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + this.disconnectNumber + "次WIFI断连开始时间: " + this.disconnect_StartTime + "ms")
           this.connectionMessageLog += "第" + this.disconnectNumber + "次WIFI断连接口的调用结果：" + funcMessage + "\n"
-          console.log(TAG, "第" + this.disconnectNumber + "次WIFI断连接口的调用结果：" + funcMessage)
-          console.log(TAG, "disconnectNumber: " + this.disconnectNumber)
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + this.disconnectNumber + "次WIFI断连接口的调用结果：" + funcMessage)
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "disconnectNumber: " + this.disconnectNumber)
           await sleep(15)
           // promptAction.showToast( { message: funcMessage })
-          this.connectionMessage = AppStorage.get("connectionMessage")! //非空断言操作符
-          if (this.connectionMessage == "disconnected") {
+          this.connectionMessage = AppStorage.get("connectionMessage")!//非空断言操作符
+          if (this.connectionMessage == "disconnected"){
             this.disconnect_SpendTime = this.disconnect_EndTime - this.disconnect_StartTime
             this.connectionMessageLog += "第" + this.disconnectNumber + "次WIFI断连耗时: " + this.disconnect_SpendTime + "ms" + "\n"
-            console.log(TAG, "第" + this.disconnectNumber + "次WIFI断连耗时: " + this.disconnect_SpendTime + "ms")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + this.disconnectNumber + "次WIFI断连耗时: " + this.disconnect_SpendTime + "ms")
             this.disconnectSuccessNumber = this.disconnectSuccessNumber + 1
             this.connectionMessageLog += "断连成功的次数：" + this.disconnectSuccessNumber + "\n"
-            console.log(TAG, "断连成功的次数：" + this.disconnectSuccessNumber)
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "断连成功的次数：" + this.disconnectSuccessNumber)
             await sleep(15)
           } else {
             this.disconnectFailNumber = this.disconnectFailNumber + 1
-            console.log(TAG, "断连失败的次数：" + this.disconnectFailNumber)
-            console.log(TAG, "第" + this.disconnectNumber + "次WIFI断连失败")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "断连失败的次数：" + this.disconnectFailNumber)
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + this.disconnectNumber + "次WIFI断连失败")
           }
-        } else if (this.connectionMessage == "disconnected") {
+        } else if (this.connectionMessage == "disconnected"){
           this.connectFailNumber = this.connectFailNumber + 1
-          console.log(TAG, "连接失败的次数：" + this.connectFailNumber)
-          console.log(TAG, "第" + (this.connectNumber + 1) + "次WIFI连接失败")
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "连接失败的次数：" + this.connectFailNumber)
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + (this.connectNumber + 1) + "次WIFI连接失败")
         } else {
-          console.log("第" + (this.connectNumber + 1) + "次连接后状态不清楚");
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s', "第" + (this.connectNumber + 1) + "次连接后状态不清楚");
         }
       }
     }
-    console.log(TAG, "测试结束 -------------")
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "测试结束 -------------")
     this.stopContinuousTask();
   }
 }
 
 @Component
 struct setWifiDevice {
-  @StorageLink('w_networkIdM') w_networkIdM: number = 0; // id,netId,networkId是一个值嘛？
+  @StorageLink('w_networkIdM') w_networkIdM: number = 0;// id,netId,networkId是一个值嘛？
   @StorageLink('w_featureIdM') w_featureIdM: number = 1;
   @StorageLink('wifiConfig') wifiConfig: wifiManager.WifiDeviceConfig = {
-    ssid: "TP-LINK_6365",
-    preSharedKey: "12345678" ,
+    ssid: ConfigData.QV_MOCK_SSID,
+    preSharedKey: ConfigData.QV_MOCK_PRE_SHARED_KEY,
     securityType: 3,
   }
 
@@ -404,79 +420,79 @@ struct setWifiDevice {
   build() {
     Column() {
       Row() {
-        Text("ssidM:").fontSize("18vp").width(70)
-        TextInput({ text: this.wifiConfig.ssid, placeholder:"TP-LINK_6365" })
-          .fontSize("15vp")
+        Text($r('app.string.wifitest_text_s_3')).fontSize(ConfigData.VP_18).width(ConfigData.VP_70)
+        TextInput({text: this.wifiConfig.ssid, placeholder: $r('app.string.wifitest_text_tl6')})
+          .fontSize(ConfigData.VP_15)
           .onChange((strInput: string) => {
             //判断合法性
-            if (strInput.length >= 1) {
+            if (strInput.length >= 1){
               this.wifiConfig.ssid = strInput;
             }
           })
           .width(ConfigData.WH_80_100)
-          .borderRadius(1)
+          .borderRadius($r('app.float.wh_value_1'))
       }
       .backgroundColor($r("app.color.moon"))
-      .padding(5)
+      .padding(ConfigData.VP_5)
       .justifyContent(FlexAlign.Start)
       .alignItems(VerticalAlign.Center)
 
       Scroll() {
         Column() {
-          Stack().height("0.25vp").backgroundColor("#000000");
+          Stack().height(ConfigData.VP_0_25).backgroundColor($r("app.color.black"));
           Column() {
             Row() {
-              Text("preSharedKeyM:").fontSize("15vp").width(120);
-              TextInput({ text: this.wifiConfig.preSharedKey, placeholder: "12345678" })
-                .fontSize("15vp")
+              Text($r('app.string.wifitest_text_p_4')).fontSize(ConfigData.VP_15).width(ConfigData.VP_120);
+              TextInput({text: this.wifiConfig.preSharedKey, placeholder: $r('app.string.wifitest_text_1_3')})
+                .fontSize(ConfigData.VP_15)
                 .onChange((strInput: string) => {
                   //判断合法性
-                  if (strInput.length >= 1) {
+                  if (strInput.length >= 1){
                     this.wifiConfig.preSharedKey = strInput;
                   }
                 })
                 .width(ConfigData.WH_80_100)
-                .borderRadius(1)
+                .borderRadius($r('app.float.wh_value_1'))
             }
             .backgroundColor($r("app.color.spring"))
-            .padding(5)
+            .padding(ConfigData.VP_5)
             .justifyContent(FlexAlign.Start)
             .alignItems(VerticalAlign.Center)
 
             Row() {
-              Text("securityTypeM:").fontSize("15vp").width(110);
+              Text($r('app.string.wifitest_text_s_7')).fontSize(ConfigData.VP_15).width(ConfigData.VP_110);
               Column() {
                 Select([
-                  { value: 'WIFI_SEC_TYPE_INVALID' },
-                  { value: 'WIFI_SEC_TYPE_OPEN' },
-                  { value: 'WIFI_SEC_TYPE_WEP' },
-                  { value: 'WIFI_SEC_TYPE_PSK' },
-                  { value: 'WIFI_SEC_TYPE_SAE' }
+                  { value: 'WIFI_SEC_TYPE_INVALID'},
+                  { value: 'WIFI_SEC_TYPE_OPEN'},
+                  { value: 'WIFI_SEC_TYPE_WEP'},
+                  { value: 'WIFI_SEC_TYPE_PSK'},
+                  { value: 'WIFI_SEC_TYPE_SAE'}
 ])
                   .selected(3)
                   .value('WIFI_SEC_TYPE_PSK')
-                  .font({ size: 17 })
-                  .selectedOptionFont({ size: 17 })
-                  .optionFont({ size: 15 })
+                  .font({size: ConfigData.VP_17})
+                  .selectedOptionFont({size: ConfigData.VP_17})
+                  .optionFont({size: ConfigData.VP_15})
                   .width(ConfigData.WH_80_100)
                   .onSelect((index: number) => {
-                    console.log(TAG, "Select:" + index)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "Select:" + index)
                     this.wifiConfig.securityType = index;
                   })
               }
               .width(ConfigData.WH_80_100)
-              .borderRadius(1)
+              .borderRadius($r('app.float.wh_value_1'))
             }
             .backgroundColor($r("app.color.spring"))
-            .padding(5)
+            .padding(ConfigData.VP_5)
             .justifyContent(FlexAlign.Start)
             .alignItems(VerticalAlign.Center)
           }
 
-          Stack().height("0.25vp").backgroundColor("#000000");
+          Stack().height(ConfigData.VP_0_25).backgroundColor($r("app.color.black"));
         }
       }
-      .scrollBarWidth(10)
+      .scrollBarWidth(ConfigData.VP_10)
       .scrollBar(BarState.On)
     }
     .height(ConfigData.WH_58_100)
@@ -487,7 +503,7 @@ struct setWifiDevice {
  * Custom button style.
  */
 @Extend(Button)
-function operateButtonStyle(color: Resource) {
+function operateButtonStyle(color: Resource){
   .width($r('app.float.button_width'))
   .height($r('app.float.button_height'))
   .fontSize($r('app.float.font_16'))

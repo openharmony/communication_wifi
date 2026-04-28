@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 
-import ConfigData from '../utils/ConfigData';
+import hilog from '@ohos.hilog';
+import ConfigData from '../Utils/ConfigData';
 import wifiManager from '@ohos.wifiManager';
 
 /**
@@ -29,55 +30,55 @@ export struct WifiView {
   @State isLock: boolean = true
 
   aboutToAppear() {
-    console.log(TAG, `aboutToAppear ${ JSON.stringify(this.wifiScanInfo) }`)
-    if (this.wifiScanInfo) {
-      if (this.wifiScanInfo.securityType) {
-        if (this.wifiScanInfo.securityType === 1) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `aboutToAppear ${ JSON.stringify(this.wifiScanInfo) }`)
+    if (this.wifiScanInfo){
+      if (this.wifiScanInfo.securityType){
+        if (this.wifiScanInfo.securityType === 1){
           this.securityString = $r('app.string.open')
           this.isLock = false
         } else {
-          console.log(TAG, "this.wifi.securityType != 0 && this.wifi.securityType != 1")
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "this.wifi.securityType != 0 && this.wifi.securityType != 1")
         }
       } else {
-        console.log(TAG, "this.wifi.securityType is false")
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "this.wifi.securityType is false")
       }
     } else {
-      console.log(TAG, "this.wifi is false")
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "this.wifi is false")
     }
   }
 
   build() {
     Row() {
       Column() {
-        if (this.wifiScanInfo) {
-          if (this.wifiScanInfo.ssid) {
+        if (this.wifiScanInfo){
+          if (this.wifiScanInfo.ssid){
             Text(this.wifiScanInfo.ssid)
-              .fontSize(20)
+              .fontSize(ConfigData.VP_20)
               .width(ConfigData.WH_100_100)
           }
         }
         Text(this.securityString)
-          .fontSize(18)
-          .fontColor(Color.Gray)
+          .fontSize(ConfigData.VP_18)
+          .fontColor($r('app.color.color_999999_grey'))
           .width(ConfigData.WH_100_100)
       }
       .layoutWeight(1)
 
-      Stack({ alignContent: Alignment.BottomEnd }) {
+      Stack({alignContent: Alignment.BottomEnd}){
         Image($r('app.media.wifi'))
-          .height(30).width(30)
+          .height(ConfigData.VP_30).width(ConfigData.VP_30)
           .objectFit(ImageFit.Contain)
-        if (this.isLock) {
+        if (this.isLock){
           Image($r('app.media.lock'))
             .objectFit(ImageFit.Contain)
-            .width(15).height(15)
+            .width(ConfigData.VP_15).height(ConfigData.VP_15)
         }
       }
-      .width(40).height(40)
-      .margin({ right: 10 })
+      .width(ConfigData.VP_40).height(ConfigData.VP_40)
+      .margin({right: ConfigData.VP_10})
     }
-    .backgroundColor(Color.White)
+    .backgroundColor($r('app.color.white'))
     .width(ConfigData.WH_100_100)
-    .padding(10)
+    .padding(ConfigData.VP_10)
   }
 }

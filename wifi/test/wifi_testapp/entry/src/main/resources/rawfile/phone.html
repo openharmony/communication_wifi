@@ -58,13 +58,12 @@
     }
 </style>
 <script>
-    var hilog = { info: function () {}, error: function () {}, warn: function () {}, debug: function () {} };
     var isPhone = false;
     function initPhone() {
-        hilog.info(0x1500, 'wifiTestApp', '%{public}s','function init')
+        console.info('function init')
 		this.isPhone = true
 		func1()
-		hilog.info(0x1500, 'wifiTestApp', '%{public}s','function init end')
+		console.info('function init end')
 	}
 	function initPad() {
 	    this.isPhone = false
@@ -72,7 +71,7 @@
 	}
 	function uploadWord() {
         let inputDom = document.getElementById("searchCon")
-        hilog.info(0x1500, 'wifiTestApp', '%{public}s',`inputDom.value= ${inputDom.value}`)
+        console.info(`inputDom.value= ${inputDom.value}`)
         etsObj.searchWord(inputDom.value)
     }
 
@@ -115,7 +114,7 @@
         image.style.width = '48px'
 		image.style.height = '48px'
         image.onclick = function() {
-            hilog.info(0x1500, 'wifiTestApp', '%{public}s','image.onclick')
+            console.info('image.onclick')
             etsObj.test(array[i].addr)
         }
         box.appendChild(image)
@@ -126,10 +125,10 @@
     }
 
     function searchWord(e) {
-        hilog.info(0x1500, 'wifiTestApp', '%{public}s',`searchWord keyCode=${e.keyCode}`)
+        console.info(`searchWord keyCode=${e.keyCode}`)
         if (e.keyCode == 13) {
             let inputDom = document.getElementById("searchCon")
-            hilog.info(0x1500, 'wifiTestApp', '%{public}s',`phone inputDom.value=${inputDom.value}`)
+            console.info(`phone inputDom.value=${inputDom.value}`)
             etsObj.searchWord(inputDom.value)
             return true
         }

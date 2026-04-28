@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import ComponentConfig from './componentconfig';
 
 /**
@@ -47,25 +48,25 @@ export default struct EntryComponentTable {
             .fontSize(this.fontSize)
             .textAlign(TextAlign.Start)
             .maxLines(ComponentConfig.MAX_LINES_3)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .textOverflow({overflow: TextOverflow.Ellipsis})
           Row() {
             Text($r('app.string.version'))
               .fontColor($r('sys.color.ohos_id_color_text_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .textAlign(TextAlign.Start)
               .maxLines(ComponentConfig.MAX_LINES_1)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .textOverflow({overflow: TextOverflow.Ellipsis})
               .visibility('MainAbility/pagesapplicationInfo' === this.settingUri ? Visibility.Visible: Visibility.None)
-              .margin({ top: $r('sys.float.ohos_id_text_margin_vertical') });
+              .margin({top: $r('sys.float.ohos_id_text_margin_vertical')});
             Text(this.settingSummary)
               .fontColor($r('sys.color.ohos_id_color_text_secondary'))
               .fontSize($r('sys.float.ohos_id_text_size_body2'))
               .fontWeight('sans - serif')
               .textAlign(TextAlign.Start)
               .maxLines(ComponentConfig.MAX_LINES_1)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .textOverflow({overflow: TextOverflow.Ellipsis})
               .visibility(null === this.settingSummary || undefined === this.settingSummary ? Visibility.None: Visibility.Visible)
-              .margin({ top: $r('sys.float.ohos_id_text_margin_vertical') });
+              .margin({top: $r('sys.float.ohos_id_text_margin_vertical')});
           }
         }
         .alignItems(HorizontalAlign.Start);
@@ -81,23 +82,23 @@ export default struct EntryComponentTable {
           .fontColor($r('sys.color.ohos_id_color_text_secondary'))
           .fontWeight('sans - serif')
           .height($r('app.float.wh_value_40'))
-          .margin({ left: $r('sys.float.ohos_id_elements_margin_horizontal_l') })
+          .margin({left: $r('sys.float.ohos_id_elements_margin_horizontal_l')})
           .align(Alignment.End);
 
-        if (!this.settingArrowStyle && this.settingArrow) {
+        if (!this.settingArrowStyle && this.settingArrow){
           Image(this.settingArrow)
             .visibility(null === this.settingArrow ? Visibility.None: Visibility.Visible)
             .width($r("app.float.wh_value_12"))
             .height($r("app.float.wh_value_24"))
-            .margin({ left: $r("app.float.distance_4"), right: $r("app.float.distance_8") })
+            .margin({left: $r("app.float.distance_4"), right: $r("app.float.distance_8")})
 
-        } else if (this.settingArrow) {
+        } else if (this.settingArrow){
           Image(this.settingArrow)
             .visibility(null === this.settingArrow ? Visibility.None: Visibility.Visible)
             .width($r('app.float.wh_value_48'))
             .height($r('app.float.wh_value_48'))
             .padding($r('app.float.distance_4'))
-            .margin({ left: $r('app.float.distance_4'), right: $r('app.float.distance_4') })
+            .margin({left: $r('app.float.distance_4'), right: $r('app.float.distance_4')})
             .borderRadius($r("sys.float.ohos_id_corner_radius_default_l"))
             .onClick(this.onArrowClick);
         }
@@ -107,7 +108,7 @@ export default struct EntryComponentTable {
     }
     .height(this.heightSize)
     .width(ComponentConfig.WH_100_100)
-    .padding({ left: $r('sys.float.ohos_id_default_padding_start') })
+    .padding({left: $r('sys.float.ohos_id_default_padding_start')})
     .borderRadius($r("sys.float.ohos_id_corner_radius_default_l"))
     .alignItems(VerticalAlign.Center)
     .linearGradient((this.isEnabled && this.isTouched) ? {
@@ -120,13 +121,13 @@ export default struct EntryComponentTable {
       colors: [[$r("sys.color.ohos_id_color_foreground_contrary"), 1], [$r("sys.color.ohos_id_color_foreground_contrary"), 1]]
     })
     .onTouch((event: TouchEvent) => {
-      if (event.type === TouchType.Down) {
+      if (event.type === TouchType.Down){
         this.isTouched = true;
-      } else if (event.type === TouchType.Up) {
+      } else if (event.type === TouchType.Up){
         this.isTouched = false;
       } else {
-        console.log("event.type != TouchType.Down");
-        console.log("event.type != TouchType.Up");
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s', "event.type != TouchType.Down");
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s', "event.type != TouchType.Up");
       }
     })
   }

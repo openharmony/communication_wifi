@@ -108,7 +108,6 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
             fclose(fp);
         }
     );
-    
     t.detach();
     return true;
 }

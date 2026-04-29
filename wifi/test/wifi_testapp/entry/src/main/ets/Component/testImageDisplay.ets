@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-import { TestData } from '../entryability/model/testData';
-import ConfigData from '../utils/ConfigData';
+import { TestData} from '../entryability/model/testData';
+import ConfigData from '../Utils/ConfigData';
 
 /**
  * Test - ImageDisplay page of wifi test
@@ -25,33 +25,33 @@ export struct TestImageDisplay {
   private testItem!: TestData
 
   build() {
-    Stack({ alignContent: Alignment.BottomStart }) {
-      Flex({ alignItems: ItemAlign.Start }) {
+    Stack({alignContent: Alignment.BottomStart}){
+      Flex({alignItems: ItemAlign.Start}){
         Stack() {
           Image(this.testItem.image)
-            .height(100)
-            .width(100)
-            .margin({ left: "20vp", top: "20vp" })
+            .height(ConfigData.VP_100)
+            .width(ConfigData.VP_100)
+            .margin({left: ConfigData.VP_20, top: ConfigData.VP_20})
         }
         .width(ConfigData.WH_20_100)
 
         Column() {
           Text(this.testItem.name)
-            .fontSize(26)
+            .fontSize(ConfigData.VP_26)
             .fontWeight(500)
-            .margin({ left: "26vp", top: "20vp" })
+            .margin({left: ConfigData.VP_26, top: ConfigData.VP_20})
             .width(ConfigData.WH_90_100)
           Text(this.testItem.detail)
-            .fontSize(18)
+            .fontSize(ConfigData.VP_18)
             .fontWeight(500)
-            .margin({ top: "8vp" })
+            .margin({top: ConfigData.VP_8})
             .width(ConfigData.WH_80_100)
         }
         .width(ConfigData.WH_70_100)
-        .padding({ left: "20vp", top: "15vp" })
+        .padding({left: ConfigData.VP_20, top: ConfigData.VP_15})
       }
     }
-    .backgroundColor('#FFedf2f5')
-    .height(160)
+    .backgroundColor($r("app.color.ohcc_hex_ffedf2f5"))
+    .height(ConfigData.VP_160)
   }
 }

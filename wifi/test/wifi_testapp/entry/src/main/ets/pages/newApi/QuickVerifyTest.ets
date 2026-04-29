@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
-import { PageTitle } from '../../component/pageTitle';
-import { TestImageDisplay } from '../../component/testImageDisplay';
-import { ContentTable } from '../../component/contentTable';
+import hilog from '@ohos.hilog';
+import { PageTitle} from '../../Component/pageTitle';
+import { TestImageDisplay} from '../../Component/testImageDisplay';
+import { ContentTable} from '../../Component/contentTable';
 import router from '@ohos.router';
-import ConfigData from '../../utils/ConfigData';
-import { initNewWifiManagerApiData } from '../../entryability/model/newWifiManagerTestData';
-import { TestData } from '../../entryability/model/testData';
+import ConfigData from '../../Utils/ConfigData';
+import { initNewWifiManagerApiData} from '../../entryability/model/newWifiManagerTestData';
+import { TestData} from '../../entryability/model/testData';
 import wifiManager from '@ohos.wifiManager';
 
 interface myParams extends Object {
@@ -52,23 +53,23 @@ struct QuickVerifyDeviceSetting {
   @StorageLink('w_networkIdMQuick') w_networkIdMQuick: number = 0;
   @StorageLink('w_featureIdMQuick') w_featureIdMQuick: number = 1;
   @StorageLink('wifiDeviceConfigManagerQuick') wifiDeviceConfigManagerQuick: wifiManager.WifiDeviceConfig = {
-    ssid: "TP-LINK_6365",
-    bssid: "6C:B1:58:75:63:65",
-    preSharedKey: "12345678",
+    ssid: ConfigData.QV_MOCK_SSID,
+    bssid: ConfigData.QV_MOCK_BSSID,
+    preSharedKey: ConfigData.QV_MOCK_PRE_SHARED_KEY,
     isHiddenSsid: false,
     securityType: 3,
     creatorUid: 1,
     disableReason: 0,
     netId: 1,
     randomMacType: 0,
-    randomMacAddr: "08:fb:ea:1b:38:aa",
+    randomMacAddr: ConfigData.QV_MOCK_RANDOM_MAC_ADDR,
     ipType: 1,
     staticIp: {
-      ipAddress: 3232235880,
-      gateway: 3232235777,
-      prefixLength: 0,
-      dnsServers: [3716386629],
-      domains: ["0", "1", "2"]
+      ipAddress: ConfigData.QV_MOCK_STATIC_IP_ADDRESS,
+      gateway: ConfigData.QV_MOCK_STATIC_GATEWAY,
+      prefixLength: ConfigData.QV_MOCK_STATIC_PREFIX_LENGTH,
+      dnsServers: [ConfigData.QV_MOCK_STATIC_DNS],
+      domains: [ConfigData.QV_MOCK_DOMAIN_0, ConfigData.QV_MOCK_DOMAIN_1, ConfigData.QV_MOCK_DOMAIN_2]
     }
   }
 
@@ -78,111 +79,111 @@ struct QuickVerifyDeviceSetting {
   build() {
     Column() {
       Row() {
-        Text("SetScanAlwaysAllowed:").fontSize("17vp").width(200)
-        TextInput({ text: this.isAllowedQuick.toString(), placeholder: "1" })
-          .fontSize("15vp")
+        Text($r('app.string.wifitest_text_s_8')).fontSize(ConfigData.VP_17).width(ConfigData.VP_200)
+        TextInput({text: this.isAllowedQuick.toString(), placeholder: ConfigData.QV_MOCK_DOMAIN_1})
+          .fontSize(ConfigData.VP_15)
           .onChange((strInput: string) => {
-            if (strInput.length >= 1) {
+            if (strInput.length >= 1){
               this.isAllowedQuick = Number(strInput);
             }
           })
           .width(ConfigData.WH_50_100)
-          .borderRadius(1)
+          .borderRadius($r('app.float.wh_value_1'))
       }
       .backgroundColor($r("app.color.moon"))
-      .padding(5)
+      .padding(ConfigData.VP_5)
       .justifyContent(FlexAlign.Start)
       .alignItems(VerticalAlign.Center)
 
       Row() {
-        Text("ssidM:").fontSize("17vp").width(70)
-        TextInput({ text: this.wifiDeviceConfigManagerQuick.ssid, placeholder:"TP-LINK_6365" })
-          .fontSize("15vp")
+        Text($r('app.string.wifitest_text_s_3')).fontSize(ConfigData.VP_17).width(ConfigData.VP_70)
+        TextInput({text: this.wifiDeviceConfigManagerQuick.ssid, placeholder: $r('app.string.wifitest_text_tl6')})
+          .fontSize(ConfigData.VP_15)
           .onChange((strInput: string) => {
-            if (strInput.length >= 1) {
+            if (strInput.length >= 1){
               this.wifiDeviceConfigManagerQuick.ssid = strInput;
             }
           })
           .width(ConfigData.WH_80_100)
-          .borderRadius(1)
+          .borderRadius($r('app.float.wh_value_1'))
       }
       .backgroundColor($r("app.color.moon"))
-      .padding(5)
+      .padding(ConfigData.VP_5)
       .justifyContent(FlexAlign.Start)
       .alignItems(VerticalAlign.Center)
 
       Scroll() {
         Column() {
-          Stack().height("0.25vp").backgroundColor("#000000");
+          Stack().height(ConfigData.VP_0_25).backgroundColor($r("app.color.black"));
           Column() {
             Row() {
-              Text("bssidM:").fontSize("15vp").width(60);
-              TextInput({ text: this.wifiDeviceConfigManagerQuick.bssid, placeholder: "6c:b1:58:75:63:67" })
-                .fontSize("15vp")
+              Text($r('app.string.wifitest_text_b_4')).fontSize(ConfigData.VP_15).width(ConfigData.VP_60);
+              TextInput({text: this.wifiDeviceConfigManagerQuick.bssid, placeholder: $r('app.string.wifitest_text_6b5766')})
+                .fontSize(ConfigData.VP_15)
                 .onChange((strInput: string) => {
-                  if (strInput.length >= 1) {
+                  if (strInput.length >= 1){
                     this.wifiDeviceConfigManagerQuick!.bssid = strInput;
                   }
                 })
                 .width(ConfigData.WH_80_100)
-                .borderRadius(1)
+                .borderRadius($r('app.float.wh_value_1'))
             }
-            .padding(3)
+            .padding(ConfigData.VP_3)
             .justifyContent(FlexAlign.Start)
             .alignItems(VerticalAlign.Center)
             .backgroundColor($r("app.color.spring"))
 
             Row() {
-              Text("preSharedKeyM:").fontSize("15vp").width(110);
-              TextInput({ text: this.wifiDeviceConfigManagerQuick.preSharedKey, placeholder: "12345678" })
-                .fontSize("15vp")
+              Text($r('app.string.wifitest_text_p_4')).fontSize(ConfigData.VP_15).width(ConfigData.VP_110);
+              TextInput({text: this.wifiDeviceConfigManagerQuick.preSharedKey, placeholder: $r('app.string.wifitest_text_1_3')})
+                .fontSize(ConfigData.VP_15)
                 .onChange((strInput: string) => {
-                  if (strInput.length >= 1) {
+                  if (strInput.length >= 1){
                     this.wifiDeviceConfigManagerQuick!.preSharedKey = strInput;
                   }
                 })
                 .width(ConfigData.WH_80_100)
-                .borderRadius(1)
+                .borderRadius($r('app.float.wh_value_1'))
             }
             .backgroundColor($r("app.color.spring"))
-            .padding(5)
+            .padding(ConfigData.VP_5)
             .justifyContent(FlexAlign.Start)
             .alignItems(VerticalAlign.Center)
 
             Row() {
-              Text("securityTypeM:").fontSize(15).width(100);
+              Text($r('app.string.wifitest_text_s_7')).fontSize(ConfigData.VP_15).width(ConfigData.VP_100);
               Column() {
                 Select([
-                  { value: 'WIFI_SEC_TYPE_INVALID' },
-                  { value: 'WIFI_SEC_TYPE_OPEN' },
-                  { value: 'WIFI_SEC_TYPE_WEP' },
-                  { value: 'WIFI_SEC_TYPE_PSK' },
-                  { value: 'WIFI_SEC_TYPE_SAE' }
+                  { value: 'WIFI_SEC_TYPE_INVALID'},
+                  { value: 'WIFI_SEC_TYPE_OPEN'},
+                  { value: 'WIFI_SEC_TYPE_WEP'},
+                  { value: 'WIFI_SEC_TYPE_PSK'},
+                  { value: 'WIFI_SEC_TYPE_SAE'}
 ])
                   .selected(3)
                   .value('WIFI_SEC_TYPE_PSK')
-                  .font({ size: 17 })
-                  .selectedOptionFont({ size: 17 })
-                  .optionFont({ size: 15 })
+                  .font({size: ConfigData.VP_17})
+                  .selectedOptionFont({size: ConfigData.VP_17})
+                  .optionFont({size: ConfigData.VP_15})
                   .width(ConfigData.WH_80_100)
                   .onSelect((index: number) => {
-                    console.log(TAG, "Select:" + index)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "Select:" + index)
                     this.wifiDeviceConfigManagerQuick!.securityType = index;
                   })
               }
               .width(ConfigData.WH_80_100)
-              .borderRadius(1)
+              .borderRadius($r('app.float.wh_value_1'))
             }
             .backgroundColor($r("app.color.spring"))
-            .padding(5)
+            .padding(ConfigData.VP_5)
             .justifyContent(FlexAlign.Start)
             .alignItems(VerticalAlign.Center)
           }
 
-          Stack().height("0.25vp").backgroundColor("#000000");
+          Stack().height(ConfigData.VP_0_25).backgroundColor($r("app.color.black"));
         }
       }
-      .scrollBarWidth(10)
+      .scrollBarWidth(ConfigData.VP_10)
       .scrollBar(BarState.On)
     }
     .height(ConfigData.WH_58_100)
@@ -196,7 +197,7 @@ struct QuickVerifyTest {
   private testItem: TestData = (router.getParams() as myParams).testItem
   @State message: string = "";
   @State deviceId: string = '';
-  @State currentClick: number = - 1;
+  @State currentClick: number = ConfigData.ITEM_CLICK_NONE;
   @StorageLink('isAllowedQuick') isAllowedQuick: number = 1;
   @StorageLink('pairedSsidMQuick') pairedSsidMQuick: string = "";
   @StorageLink('w_networkIdMQuick') w_networkIdMQuick: number = 0;
@@ -206,23 +207,23 @@ struct QuickVerifyTest {
   @StorageLink('getDeviceConfigsManagerMessageQuick') getDeviceConfigsManagerMessageQuick: string = '';
   @StorageLink('getScanInfoManagerMessageQuick') getScanInfoManagerMessageQuick: string = '';
   @StorageLink('wifiDeviceConfigManagerQuick') wifiDeviceConfigManagerQuick: wifiManager.WifiDeviceConfig = {
-    ssid: "TP-LINK_6365",
-    bssid: "6C:B1:58:75:63:65",
-    preSharedKey: "12345678",
+    ssid: ConfigData.QV_MOCK_SSID,
+    bssid: ConfigData.QV_MOCK_BSSID,
+    preSharedKey: ConfigData.QV_MOCK_PRE_SHARED_KEY,
     isHiddenSsid: false,
-    securityType: 3,
-    creatorUid: 1,
-    disableReason: 0,
-    netId: 100,
-    randomMacType: 0,
-    randomMacAddr: "08:fb:ea:1b:38:aa",
-    ipType: 1,
+    securityType: ConfigData.QV_MOCK_SECURITY_TYPE,
+    creatorUid: ConfigData.QV_MOCK_CREATOR_UID,
+    disableReason: ConfigData.QV_MOCK_DISABLE_REASON,
+    netId: ConfigData.QV_MOCK_NET_ID,
+    randomMacType: ConfigData.QV_MOCK_RANDOM_MAC_TYPE,
+    randomMacAddr: ConfigData.QV_MOCK_RANDOM_MAC_ADDR,
+    ipType: ConfigData.QV_MOCK_IP_TYPE,
     staticIp: {
-      ipAddress: 3232235880,
-      gateway: 3232235777,
-      prefixLength: 0,
-      dnsServers: [3716386629],
-      domains: ["0", "1", "2"]
+      ipAddress: ConfigData.QV_MOCK_STATIC_IP_ADDRESS,
+      gateway: ConfigData.QV_MOCK_STATIC_GATEWAY,
+      prefixLength: ConfigData.QV_MOCK_STATIC_PREFIX_LENGTH,
+      dnsServers: [ConfigData.QV_MOCK_STATIC_DNS],
+      domains: [ConfigData.QV_MOCK_DOMAIN_0, ConfigData.QV_MOCK_DOMAIN_1, ConfigData.QV_MOCK_DOMAIN_2]
     }
   }
 
@@ -231,37 +232,37 @@ struct QuickVerifyTest {
   }
 
   init() {
-    console.log("QuickVerifyTest init-----------")
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', "QuickVerifyTest init-----------")
   }
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TestImageDisplay({ testItem: this.testItem })
-        PageTitle({ testItem: this.testItem })
+      Stack({alignContent: Alignment.TopStart}){
+        TestImageDisplay({testItem: this.testItem})
+        PageTitle({testItem: this.testItem})
       }
 
-      Stack().height("0.5vp").backgroundColor("#000000");
+      Stack().height(ConfigData.VP_0_5).backgroundColor($r("app.color.black"));
       Column() {
         Row() {
-          Text("已连接的WiFi:")
-            .fontSize("17vp")
-            .height(40)
+          Text($r('app.string.wifitest_text_yljdw'))
+            .fontSize(ConfigData.VP_17)
+            .height(ConfigData.VP_40)
             .width(ConfigData.WH_30_100)
             .align(Alignment.Start)
 
-          TextInput({ text: this.pairedSsidMQuick, placeholder: "请在右侧输入WiFi的配置" })
-            .height(40)
+          TextInput({text: this.pairedSsidMQuick, placeholder: $r('app.string.wifitest_text_qzycsrwdpz')})
+            .height(ConfigData.VP_40)
             .borderStyle(BorderStyle.Dashed)
             .backgroundColor($r("app.color.white"))
             .onChange((str) => {
               this.deviceId = str;
             })
             .width(ConfigData.WH_45_100)
-            .padding({ top: 5, left: 5 })
+            .padding({top: ConfigData.VP_5, left: ConfigData.VP_5})
           Image($r('app.media.Switch'))
-            .height(50)
-            .padding({ top: 5, bottom: 5, left: 10 })
+            .height(ConfigData.VP_50)
+            .padding({top: ConfigData.VP_5, bottom: ConfigData.VP_5, left: ConfigData.VP_10})
             .width(ConfigData.WH_15_100)
             .onClick(() => {
               this.showList = !this.showList;
@@ -270,39 +271,51 @@ struct QuickVerifyTest {
       }
       .align(Alignment.Start)
 
-      if (this.showList) {
+      if (this.showList){
         QuickVerifyDeviceSetting()
       } else {
         Column() {
           Scroll() {
             Column() {
-              Text("WLAN连接信息:" + this.linkedInfoManagerMessageQuick)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_quick_wlan_link'))
+                Span(this.linkedInfoManagerMessageQuick)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("IP信息:" + this.ipInfoManagerMessageQuick)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_quick_ip'))
+                Span(this.ipInfoManagerMessageQuick)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("获取网络配置:" + this.getDeviceConfigsManagerMessageQuick)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_quick_net_cfg'))
+                Span(this.getDeviceConfigsManagerMessageQuick)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("扫描结果:" + this.getScanInfoManagerMessageQuick)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "10vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_quick_scan'))
+                Span(this.getScanInfoManagerMessageQuick)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
             }
             .width(ConfigData.WH_100_100)
           }
-          .scrollBarWidth(10)
+          .scrollBarWidth(ConfigData.VP_10)
           .scrollBar(BarState.Auto)
         }
-        .height(100)
+        .height(ConfigData.VP_100)
         .width(ConfigData.WH_95_100)
         .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
 

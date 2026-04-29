@@ -1,0 +1,4 @@
+# 本地技能/工具目录，不纳入版本库
+/skills/
+.hvigor
+/.cursor

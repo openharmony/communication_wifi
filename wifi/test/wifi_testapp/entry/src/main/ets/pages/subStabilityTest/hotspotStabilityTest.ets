@@ -13,19 +13,20 @@
  * limitations under the License.
  */
 
-import { PageTitle } from '../../component/pageTitle';
-import { TestImageDisplay } from '../../component/testImageDisplay';
+import hilog from '@ohos.hilog';
+import { PageTitle} from '../../Component/pageTitle';
+import { TestImageDisplay} from '../../Component/testImageDisplay';
 import router from '@ohos.router';
-import ConfigData from '../../utils/ConfigData';
-import { TestData } from '../../entryability/model/testData';
+import ConfigData from '../../Utils/ConfigData';
+import { TestData} from '../../entryability/model/testData';
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
 import promptAction from '@ohos.promptAction';
 import common from '@ohos.app.ability.common';
-import wantAgent, { WantAgent } from '@ohos.app.ability.wantAgent';
+import wantAgent, { WantAgent} from '@ohos.app.ability.wantAgent';
 import ohosWantAgentInfo from '@ohos.wantAgent';
 import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
-import { BusinessError } from '@ohos.base';
+import { BusinessError} from '@ohos.base';
 import abilityAccessCtrl from '@ohos.abilityAccessCtrl';
 import notificationManager from '@ohos.notificationManager';
 
@@ -48,15 +49,15 @@ struct HotspotStabilityTest {
   @State close_StartTime: number = 0
   @State close_EndTime: number = 0
   @State close_SpendTime: number = 0
-  @State openHotspotNumber: number = 0 // 打开Hotspot的次数
-  @State closeHotspotNumber: number = 0 // 关闭Hotspot的次数
-  @State openSuccessNumber: number = 0 // 打开Hotspot的成功次数
-  @State openFailNumber: number = 0 // 打开Hotspot的失败次数
-  @State closeSuccessNumber: number = 0 // 关闭Hotspot的成功次数
-  @State closeFailNumber: number = 0 // 关闭Hotspot的失败次数
+  @State openHotspotNumber: number = 0// 打开Hotspot的次数
+  @State closeHotspotNumber: number = 0// 关闭Hotspot的次数
+  @State openSuccessNumber: number = 0// 打开Hotspot的成功次数
+  @State openFailNumber: number = 0// 打开Hotspot的失败次数
+  @State closeSuccessNumber: number = 0// 关闭Hotspot的成功次数
+  @State closeFailNumber: number = 0// 关闭Hotspot的失败次数
 
-  @State message: string = "测试结果:"
-  @State testNumbers: number = 30 //测试次数
+  @State message: string = ConfigData.STABILITY_STR_TEST_RESULT_COLON
+  @State testNumbers: number = ConfigData.DEFAULT_TEST_LOOP_COUNT
   @State successTimes: number = 0
   @State failTimes: number = 0
   @State hotspotMessage: string = ""
@@ -66,7 +67,7 @@ struct HotspotStabilityTest {
   aboutToAppear() {
     // 请求发送通知的许可
     notificationManager.requestEnableNotification().then(() => {
-      console.info(`[EntryAbility] requestEnableNotification success`);
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s', `[EntryAbility] requestEnableNotification success`);
       // 申请WiFi相关权限
       let atManager = abilityAccessCtrl.createAtManager();
       try {
@@ -84,16 +85,16 @@ struct HotspotStabilityTest {
           "ohos.permission.GET_WIFI_INFO_INTERNAL"
 ])
           .then((data) => {
-            console.info(`[EntryAbility], data: ${ JSON.stringify(data) }`);
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', `[EntryAbility], data: ${ JSON.stringify(data) }`);
           })
           .catch((err: BusinessError) => {
-            console.info(`[EntryAbility], err: ${ JSON.stringify(err) }`);
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', `[EntryAbility], err: ${ JSON.stringify(err) }`);
           })
-      } catch( err) {
-        console.info(`[EntryAbility], catch err->${ JSON.stringify(err) }`);
+      } catch( err){
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s', `[EntryAbility], catch err->${ JSON.stringify(err) }`);
       }
     }).catch((err: BusinessError) => {
-      console.error(`[EntryAbility] requestEnableNotification failed, code is ${ err.code }, message is ${ err.message }`);
+      hilog.error(0x1500, 'wifiTestApp', '%{public}s', `[EntryAbility] requestEnableNotification failed, code is ${ err.code }, message is ${ err.message }`);
     });
   }
 
@@ -104,20 +105,20 @@ struct HotspotStabilityTest {
     let wantAgentInfo: wantAgent.WantAgentInfo = {
       wants: [
         {
-          bundleName: (context as common.UIAbilityContext).abilityInfo.bundleName ,
+          bundleName: (context as common.UIAbilityContext).abilityInfo.bundleName,
           abilityName: (context as common.UIAbilityContext).abilityInfo.name
         }
-] ,
-      operationType: ohosWantAgentInfo.OperationType.START_ABILITY ,
+],
+      operationType: ohosWantAgentInfo.OperationType.START_ABILITY,
       requestCode: 0,
       wantAgentFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG]
     };
     wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
-      backgroundTaskManager.startBackgroundRunning(context ,
+      backgroundTaskManager.startBackgroundRunning(context,
         backgroundTaskManager.BackgroundMode.DATA_TRANSFER, wantAgentObj).then(() => {
-        console.info(`Succeeded in operationing startBackgroundRunning.`);
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s', `Succeeded in operationing startBackgroundRunning.`);
       }).catch((err: BusinessError) => {
-        console.error(`Failed to operation startBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
+        hilog.error(0x1500, 'wifiTestApp', '%{public}s', `Failed to operation startBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
       });
     });
   }
@@ -125,28 +126,28 @@ struct HotspotStabilityTest {
   // 停止长时任务
   stopContinuousTask() {
     backgroundTaskManager.stopBackgroundRunning(getContext()).then(() => {
-      console.info(`Succeeded in operationing stopBackgroundRunning.`);
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s', `Succeeded in operationing stopBackgroundRunning.`);
     }).catch((err: BusinessError) => {
-      console.error(`Failed to operation stopBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
+      hilog.error(0x1500, 'wifiTestApp', '%{public}s', `Failed to operation stopBackgroundRunning. Code is ${ err.code }, message is ${ err.message }`);
     });
   }
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TestImageDisplay({ testItem: this.testItem })
-        PageTitle({ testItem: this.testItem })
+      Stack({alignContent: Alignment.TopStart}){
+        TestImageDisplay({testItem: this.testItem})
+        PageTitle({testItem: this.testItem})
       }
 
-      Stack().height("1vp").backgroundColor($r("app.color.black"));
+      Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
 
       Column() {
         Row() {
-          Text("测试次数：").fontSize($r('app.float.font_18')).width(ConfigData.WH_25_100).padding({ left: "10vp" })
-          TextInput({ placeholder: "请输入循环次数，默认为：30" })
-            .placeholderColor(Color.Grey)
-            .placeholderFont({ size: $r('app.float.font_16') })
-            .caretColor(Color.Blue)
+          Text($r('app.string.wifitest_text_cscs_1')).fontSize($r('app.float.font_18')).width(ConfigData.WH_25_100).padding({left: ConfigData.VP_10})
+          TextInput({placeholder: $r('app.string.wifitest_text_qsrxhcsmrw3_1')})
+            .placeholderColor($r('app.color.color_999999_grey'))
+            .placeholderFont({size: $r('app.float.font_16')})
+            .caretColor($r('app.color.main_blue'))
             .width(ConfigData.WH_70_100)
             .fontSize($r('app.float.font_16'))
             .fontColor($r('app.color.title_black_color'))
@@ -156,58 +157,73 @@ struct HotspotStabilityTest {
         }
 
         Column() {
-          Text("测试结果：")
-            .fontSize("22vp")
+          Text($r('app.string.wifitest_text_csjg'))
+            .fontSize(ConfigData.VP_22)
             .width(ConfigData.WH_95_100)
             .align(Alignment.TopStart)
-            .padding({ top: "10vp" })
+            .padding({top: ConfigData.VP_10})
           Scroll() {
             Column() {
-              Text("测试次数：" + this.testNumbers)
-                .fontSize("18vp")
-                .margin({ top: "5vp", left: "10vp", right: "5vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_cscs_1'))
+                Span('' + this.testNumbers)
+              }
+                .fontSize(ConfigData.VP_18)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, right: ConfigData.VP_5})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("打开热点的成功次数：" + this.openSuccessNumber)
-                .fontSize("18vp")
-                .margin({ top: "5vp", left: "10vp", right: "5vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_hs_open_ok'))
+                Span('' + this.openSuccessNumber)
+              }
+                .fontSize(ConfigData.VP_18)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, right: ConfigData.VP_5})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("打开热点的失败次数：" + this.openFailNumber)
-                .fontSize("18vp")
-                .margin({ top: "5vp", left: "10vp", right: "5vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_hs_open_fail'))
+                Span('' + this.openFailNumber)
+              }
+                .fontSize(ConfigData.VP_18)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, right: ConfigData.VP_5})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("关闭热点的成功次数：" + this.closeSuccessNumber)
-                .fontSize("18vp")
-                .margin({ top: "5vp", left: "10vp", right: "5vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_hs_close_ok'))
+                Span('' + this.closeSuccessNumber)
+              }
+                .fontSize(ConfigData.VP_18)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, right: ConfigData.VP_5})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("关闭热点的失败次数：" + this.closeFailNumber)
-                .fontSize("18vp")
-                .margin({ top: "5vp", left: "10vp", right: "5vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_hs_close_fail'))
+                Span('' + this.closeFailNumber)
+              }
+                .fontSize(ConfigData.VP_18)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, right: ConfigData.VP_5})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
             }
             .width(ConfigData.WH_95_100)
             .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
           }
-          .scrollBarWidth(10)
+          .scrollBarWidth(ConfigData.VP_10)
           .scrollBar(BarState.Auto)
         }.width(ConfigData.WH_100_100).height(ConfigData.WH_30_100)
 
         Column() {
-          Text("log显示：")
-            .fontSize("22vp")
+          Text($r('app.string.wifitest_text_lxs'))
+            .fontSize(ConfigData.VP_22)
             .height(ConfigData.WH_15_100)
             .width(ConfigData.WH_95_100)
             .align(Alignment.TopStart)
-            .padding({ top: "18vp" })
+            .padding({top: ConfigData.VP_18})
           List() {
             ListItem() {
               Text(this.hotspotMessageLog)
-                .fontSize("18vp")
-                .margin({ top: "5vp", left: "20vp", right: "5vp" })
+                .fontSize(ConfigData.VP_18)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_20, right: ConfigData.VP_5})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
             }
@@ -219,15 +235,15 @@ struct HotspotStabilityTest {
 
       }.width(ConfigData.WH_100_100).height(ConfigData.WH_67_100).backgroundColor($r("app.color.lead"))
 
-      Stack().height("1vp").backgroundColor($r("app.color.black"));
+      Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
 
       Column() {
         Row() {
           Button("开始热点测试")
             .operateButtonStyle($r('app.color.main_blue'))
-            .padding({ right: "10vp" })
+            .padding({right: ConfigData.VP_10})
             .onClick(async(event: ClickEvent) => {
-              console.log(TAG, "start HotspotSwitch test-------------")
+              hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "start HotspotSwitch test-------------")
               this.startContinuousTask();
               await this.forLoop()
             })
@@ -236,10 +252,10 @@ struct HotspotStabilityTest {
 
           Button("关闭热点测试")
             .operateButtonStyle($r('app.color.main_blue'))
-            .padding({ right: "10vp" })
+            .padding({right: ConfigData.VP_10})
             .onClick(async(event: ClickEvent) => {
               this.hotspotLoopState = false
-              console.log(TAG, "准备测试停止 -------------")
+              hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "准备测试停止 -------------")
               this.hotspotMessageLog = ""
               this.openHotspotNumber = 0
               this.stopContinuousTask();
@@ -250,11 +266,11 @@ struct HotspotStabilityTest {
   }
 
   onHotspotStateChange() {
-    console.log(TAG, "on.hotspotStateChange start--------")
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "on.hotspotStateChange start--------")
     wifiManager.on("hotspotStateChange", (number) => {
-      console.log(TAG, " on.hotspotStateChange --------")
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, " on.hotspotStateChange --------")
       let hotspotStateMessage = ""
-      switch (number) {
+      switch (number){
         case 0: hotspotStateMessage = "inactive";
           break;
         case 1: hotspotStateMessage = "active";
@@ -266,20 +282,20 @@ struct HotspotStabilityTest {
         default: hotspotStateMessage = '未知状态';
           break;
       }
-      console.log(TAG, "热点开关状态为:" + hotspotStateMessage)
-      if (number == 1) {
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "热点开关状态为:" + hotspotStateMessage)
+      if (number == 1){
         // 打时间戳
         this.open_EndTime = new Date().getTime()
-        console.log(TAG, "热点使能结束时间: " + this.open_EndTime + "ms")
-      } else if (number == 0) {
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "热点使能结束时间: " + this.open_EndTime + "ms")
+      } else if (number == 0){
         this.close_EndTime = new Date().getTime()
-        console.log(TAG, "热点去使能结束时间: " + this.close_EndTime + "ms")
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "热点去使能结束时间: " + this.close_EndTime + "ms")
       }
-      console.log(TAG, " on.hotspotStateChange callback success --------")
-      promptAction.showToast({ message: "热点状态: " + hotspotStateMessage })
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, " on.hotspotStateChange callback success --------")
+      promptAction.showToast({message: "热点状态: " + hotspotStateMessage})
       this.hotspotMessage = hotspotStateMessage
       AppStorage.setOrCreate("hotspotMessage", this.hotspotMessage)
-      console.log(TAG, " on.hotspotStateChange callback end--------")
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, " on.hotspotStateChange callback end--------")
       return this.hotspotMessage
     })
     return this.hotspotMessage
@@ -299,72 +315,72 @@ struct HotspotStabilityTest {
     this.closeFailNumber = 0
 
     this.hotspotMessageLog = ""
-    this.onHotspotStateChange() // 监听函数
-    let funcMessage = false // 函数信息
-    for (this.openHotspotNumber ; this.openHotspotNumber < this.testNumbers ; this.openHotspotNumber ++) {
-      if (!this.hotspotLoopState) {
-        console.log(TAG, "测试结束------------")
+    this.onHotspotStateChange()// 监听函数
+    let funcMessage = false// 函数信息
+    for(this.openHotspotNumber ; this.openHotspotNumber<this.testNumbers ; this.openHotspotNumber++){
+      if (!this.hotspotLoopState){
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "测试结束------------")
         break;
       } else {
         let wifiState = wifiManager.isWifiActive()
-        if (wifiState) {
+        if (wifiState){
           wifiManager.disableWifi()
-          console.log(TAG, "wifi当前已使能，已经去使能，正常开始测试------")
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "wifi当前已使能，已经去使能，正常开始测试------")
         } else {
-          console.log(TAG, "wifi当前未使能，正常开始测试------")
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "wifi当前未使能，正常开始测试------")
         }
         await sleep(3)
 
         // funcMessage = wifiManager.enableHotspot()
         // 打时间戳
         this.open_StartTime = new Date().getTime()
-        console.log(TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能-----")
-        console.log(TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能开始时间: " + this.open_StartTime + "ms")
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能-----")
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能开始时间: " + this.open_StartTime + "ms")
         this.hotspotMessageLog += "第" + (this.openHotspotNumber + 1) + "次热点使能结果：" + funcMessage + "\n"
-        console.log(TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能结果：" + funcMessage)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能结果：" + funcMessage)
         await sleep(10)
-        this.hotspotMessage = AppStorage.get("hotspotMessage") ! //非空断言操作符
+        this.hotspotMessage = AppStorage.get("hotspotMessage") !//非空断言操作符
         // promptAction.showToast( { message: funcMessage })
-        if (this.hotspotMessage == "active") {
+        if (this.hotspotMessage == "active"){
           this.open_SpendTime = this.open_EndTime - this.open_StartTime
           this.hotspotMessageLog += "第" + (this.openHotspotNumber + 1) + "次热点使能耗时: " + this.open_SpendTime + "ms" + "\n"
-          console.log(TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能耗时: " + this.open_SpendTime + "ms")
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能耗时: " + this.open_SpendTime + "ms")
           this.openSuccessNumber = this.openSuccessNumber + 1
           this.hotspotMessageLog += "热点使能成功的次数：" + this.openSuccessNumber + "\n"
-          console.log(TAG, "热点使能成功的次数：" + this.openSuccessNumber)
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "热点使能成功的次数：" + this.openSuccessNumber)
           // funcMessage = wifiManager.disableHotspot()
           this.closeHotspotNumber = this.closeHotspotNumber + 1
           this.close_StartTime = new Date().getTime()
-          console.log(TAG, "第" + this.closeHotspotNumber + "次热点去使能-----")
-          console.log(TAG, "第" + this.closeHotspotNumber + "次热点去使能开始时间: " + this.close_StartTime + "ms")
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + this.closeHotspotNumber + "次热点去使能-----")
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + this.closeHotspotNumber + "次热点去使能开始时间: " + this.close_StartTime + "ms")
           this.hotspotMessageLog += "第" + this.closeHotspotNumber + "次热点去使能结果：" + funcMessage + "\n"
-          console.log(TAG, "第" + this.closeHotspotNumber + "次热点去使能结果：" + funcMessage)
-          console.log(TAG, "closeHotspotNumber: " + this.closeHotspotNumber)
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + this.closeHotspotNumber + "次热点去使能结果：" + funcMessage)
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "closeHotspotNumber: " + this.closeHotspotNumber)
           await sleep(10)
-          this.hotspotMessage = AppStorage.get("hotspotMessage") ! //非空断言操作符
-          if (this.hotspotMessage == "inactive") {
+          this.hotspotMessage = AppStorage.get("hotspotMessage") !//非空断言操作符
+          if (this.hotspotMessage == "inactive"){
             this.close_SpendTime = this.close_EndTime - this.close_StartTime
             this.hotspotMessageLog += "第" + this.closeHotspotNumber + "次热点去使能耗时: " + this.close_SpendTime + "ms" + "\n"
-            console.log(TAG, "第" + this.closeHotspotNumber + "次热点去使能耗时: " + this.close_SpendTime + "ms")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + this.closeHotspotNumber + "次热点去使能耗时: " + this.close_SpendTime + "ms")
             this.closeSuccessNumber = this.closeSuccessNumber + 1
             this.hotspotMessageLog += "热点去使能成功的次数：" + this.closeSuccessNumber + "\n"
-            console.log(TAG, "热点去使能成功的次数：" + this.closeSuccessNumber)
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "热点去使能成功的次数：" + this.closeSuccessNumber)
             await sleep(7)
           } else {
             this.closeFailNumber = this.closeFailNumber + 1
-            console.log(TAG, "热点去使能失败的次数：" + this.closeFailNumber)
-            console.log(TAG, "第" + this.closeHotspotNumber + "次热点去使能失败")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "热点去使能失败的次数：" + this.closeFailNumber)
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + this.closeHotspotNumber + "次热点去使能失败")
           }
-        } else if (this.hotspotMessage == "inactive") {
+        } else if (this.hotspotMessage == "inactive"){
           this.openFailNumber = this.openFailNumber + 1
-          console.log(TAG, "热点使能失败的次数：" + this.openFailNumber)
-          console.log(TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能失败")
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "热点使能失败的次数：" + this.openFailNumber)
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "第" + (this.openHotspotNumber + 1) + "次热点使能失败")
         } else {
-          console.log("第" + (this.openHotspotNumber + 1) + "次开热点后状态不清楚");
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s', "第" + (this.openHotspotNumber + 1) + "次开热点后状态不清楚");
         }
       }
     }
-    console.log(TAG, "测试结束 -------------")
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "测试结束 -------------")
     this.stopContinuousTask();
   }
 }
@@ -372,7 +388,7 @@ struct HotspotStabilityTest {
 /**
  * Custom button style.
  */
-@Extend(Button) function operateButtonStyle(color: Resource) {
+@Extend(Button) function operateButtonStyle(color: Resource){
   .width($r('app.float.button_width'))
   .height($r('app.float.button_height'))
   .fontSize($r('app.float.font_16'))

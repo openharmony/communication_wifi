@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import wifi from '@ohos.wifi';
 import router from '@ohos.router';
-import { resolveIP } from '../../../utils/Util';
+import { resolveIP} from '../../../Utils/Util';
 import socket from '@ohos.net.socket';
-import { BusinessError } from '@ohos.base';
-import ConfigData from '../../../utils/ConfigData';
+import { BusinessError} from '@ohos.base';
+import ConfigData from '../../../Utils/ConfigData';
 
 const TAG = 'wifiTestApp [login]'
 
@@ -35,13 +36,13 @@ interface OppositeAddr {
 }
 
 let localAddr: LocalAddr = {
-  address: resolveIP(wifi.getIpInfo().ipAddress) ,
-  family: 1,
-  port: 9090
+  address: resolveIP(wifi.getIpInfo().ipAddress),
+  family: ConfigData.SOCKET_AF_INET,
+  port: ConfigData.DEMO_UDP_PORT
 }
 let oppositeAddr: OppositeAddr = {
-  address: '' ,
-  family: 1,
+  address: '',
+  family: ConfigData.SOCKET_AF_INET,
   port: 0
 }
 let loginCount = 0
@@ -63,34 +64,34 @@ struct Login {
   @State warnDialog: boolean = false
   @State warnText: string = ''
   @State roomNumber: string = ''
-  @State receiveMsg: string = '待接收数据'
+  @State receiveMsg: string = ConfigData.SOCKET_STR_RX_PENDING
 
   bindOption() {
     let bindOption = udp.bind(localAddr);
     bindOption.then(() => {
-      console.log(TAG, 'bind success')
-      this.receiveMsg = "绑定成功"
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'bind success')
+      this.receiveMsg = ConfigData.SOCKET_STR_BIND_OK
     }).catch((err: BusinessError) => {
-      console.log(TAG, 'bind fail' + err)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'bind fail' + err)
     })
     udp.on('message', data => {
-      console.log(TAG, `data:${ JSON.stringify(data) }`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `data:${ JSON.stringify(data) }`)
       let buffer = data.message
       let dataView = new DataView(buffer)
-      console.log(TAG, `length = ${ dataView.byteLength }`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `length = ${ dataView.byteLength }`)
       let str = ""
-      for (let i = 0 ;i < dataView.byteLength ; ++i) {
+      for(let i = 0 ;i<dataView.byteLength ; ++i){
         let c = String.fromCharCode(dataView.getUint8(i))
-        if (c != "\n") {
+        if (c != "\n"){
           str += c
         }
       }
-      if (str == 'ok') {
+      if (str == 'ok'){
         router.clear()
         loginCount += 1
         router.pushUrl({
-          url: 'pages/Index' ,
-          params: { address: oppositeAddr.address, port: oppositeAddr.port, loginCount: loginCount }
+          url: 'pages/index',
+          params: { address: oppositeAddr.address, port: oppositeAddr.port, loginCount: loginCount}
         })
       } else {
         this.receiveMsg = str
@@ -100,127 +101,136 @@ struct Login {
   }
 
   build() {
-    Stack({ alignContent: Alignment.Center }) {
+    Stack({alignContent: Alignment.Center}){
       Column() {
         Text($r('app.string.MainAbility_label'))
           .width(ConfigData.WH_100_100)
-          .height(50)
-          .backgroundColor('#0D9FFB')
+          .height(ConfigData.VP_50)
+          .backgroundColor($r("app.color.ohcc_hex_0d9ffb"))
           .textAlign(TextAlign.Start)
-          .fontSize(25)
-          .padding({ left: 10 })
-          .fontColor(Color.White)
+          .fontSize(ConfigData.VP_25)
+          .padding({left: ConfigData.VP_10})
+          .fontColor($r('app.color.white'))
           .fontWeight(FontWeight.Bold)
-        if (!this.ipDialog) {
+        if (!this.ipDialog){
           Column() {
             Image(this.login_feng ? $r('app.color.blue') : $r('app.color.moon'))
-              .width(100)
-              .height(100)
+              .width(ConfigData.VP_100)
+              .height(ConfigData.VP_100)
               .objectFit(ImageFit.Fill)
-            Text('用户名：' + this.user).fontSize(25).margin({ top: 50 })
+            Text() {
+              Span($r('app.string.wifitest_text_user_name'))
+              Span(this.user)
+            }.fontSize(ConfigData.VP_25).margin({top: ConfigData.VP_50})
 
             Button() {
-              Text($r('app.string.create_room')).fontSize(25).fontColor(Color.White)
+              Text($r('app.string.create_room')).fontSize(ConfigData.VP_25).fontColor($r('app.color.white'))
             }
             .width('150')
-            .height(50)
-            .margin({ top: 30 })
+            .height(ConfigData.VP_50)
+            .margin({top: ConfigData.VP_30})
             .type(ButtonType.Capsule)
             .onClick(() => {
               this.roomDialog = true
               this.bindOption()
             })
-          }.width(ConfigData.WH_90_100).margin({ top: 100 })
+          }.width(ConfigData.WH_90_100).margin({top: ConfigData.VP_100})
         }
 
-        if (this.ipDialog) {
+        if (this.ipDialog){
           Column() {
-            Text('本地IP：' + localAddr.address)
-              .fontSize(25)
-              .margin({ top: 10 })
-            TextInput({ placeholder: '请输入对端ip' })
-              .width(200)
-              .fontSize(25)
-              .margin({ top: 10 })
+            Text() {
+              Span($r('app.string.wifitest_text_local_ip'))
+              Span(localAddr.address)
+            }
+              .fontSize(ConfigData.VP_25)
+              .margin({top: ConfigData.VP_10})
+            TextInput({placeholder: $r('app.string.wifitest_text_qsrddi')})
+              .width(ConfigData.VP_200)
+              .fontSize(ConfigData.VP_25)
+              .margin({top: ConfigData.VP_10})
               .onChange((value: string) => {
                 oppositeAddr.address = value
-                oppositeAddr.port = 9090
+                oppositeAddr.port = ConfigData.DEMO_UDP_PORT
               })
 
-            if (this.warnDialog) {
+            if (this.warnDialog){
               Text(this.warnText)
-                .width(200)
-                .fontSize(10)
-                .fontColor(Color.Red).margin({ top: 5 })
+                .width(ConfigData.VP_200)
+                .fontSize(ConfigData.VP_10)
+                .fontColor($r('app.color.red')).margin({top: ConfigData.VP_5})
             }
             Button($r('app.string.confirm'))
-              .fontColor(Color.Black)
-              .height(50)
-              .width(100)
-              .fontSize(25)
-              .margin({ bottom: 10 })
+              .fontColor($r('app.color.black'))
+              .height(ConfigData.VP_50)
+              .width(ConfigData.VP_100)
+              .fontSize(ConfigData.VP_25)
+              .margin({bottom: ConfigData.VP_10})
               .onClick(() => {
-                if (oppositeAddr.address === '') {
+                if (oppositeAddr.address === ''){
                   this.warnDialog = true
                   this.warnText = '请先输入对端IP'
                 } else {
                   this.bindOption()
                   this.txtDialog = true
-                  console.log(TAG, `peer ip=${ oppositeAddr.address }`)
-                  console.log(TAG, `peer port=${ oppositeAddr.port }`)
-                  console.log(TAG, `peer port=${ localAddr.port }`)
+                  hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `peer ip=${ oppositeAddr.address }`)
+                  hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `peer port=${ oppositeAddr.port }`)
+                  hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `peer port=${ localAddr.port }`)
                 }
               })
-              .backgroundColor(0xffffff)
+              .backgroundColor($r('app.color.white'))
 
             Button($r('app.string.send_message'))
-              .fontColor(Color.Black)
-              .height(50)
-              .width(100)
-              .fontSize(25)
-              .margin({ bottom: 10 })
+              .fontColor($r('app.color.black'))
+              .height(ConfigData.VP_50)
+              .width(ConfigData.VP_100)
+              .fontSize(ConfigData.VP_25)
+              .margin({bottom: ConfigData.VP_10})
               .onClick(() => {
                 {
                   //发送数据
                   udp.send({
-                    data: 'online' ,
+                    data: 'online',
                     address: oppositeAddr
-                  }).then(data => {
-                    console.log(TAG, `send sucess: ${ data }`)
-                  }).catch((error: BusinessError) => {
-                    console.log(TAG, `TAG,send: ${ JSON.stringify(error) }`)
+                }).then(data => {
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `send sucess: ${ data }`)
+                }).catch((error: BusinessError) => {
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `TAG,send: ${ JSON.stringify(error) }`)
                   })
 
-                  console.log(TAG, `send peer ip=${ oppositeAddr.address }`)
-                  console.log(TAG, `send peer port=${ oppositeAddr.port }`)
-                  console.log(TAG, `send peer port=${ localAddr.port }`)
+                  hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `send peer ip=${ oppositeAddr.address }`)
+                  hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `send peer port=${ oppositeAddr.port }`)
+                  hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `send peer port=${ localAddr.port }`)
                 }
               })
-              .backgroundColor(0xffffff)
+              .backgroundColor($r('app.color.white'))
           }
           .width(ConfigData.WH_80_100)
-          .height(200)
-          .margin({ top: ConfigData.WH_10_100 })
-          .backgroundColor(Color.White)
-          .border({ radius: 10, width: 3 })
+          .height(ConfigData.VP_200)
+          .margin({top: ConfigData.WH_10_100})
+          .backgroundColor($r('app.color.white'))
+          .border({radius: $r('app.float.wh_value_10'), width: ConfigData.VP_3})
         }
 
-        if (this.txtDialog) {
+        if (this.txtDialog){
           Column() {
-            Text('接收本地IP：' + localAddr.address)
-              .fontSize(25)
-              .margin({ top: 10 })
+            Text() {
+              Span($r('app.string.wifitest_text_rx_local_ip'))
+              Span(localAddr.address)
+            }
+              .fontSize(ConfigData.VP_25)
+              .margin({top: ConfigData.VP_10})
 
             Text(this.receiveMsg)
-              .width(200)
-              .fontSize(25)
-              .fontColor(Color.Red).margin({ top: 5 })
+              .width(ConfigData.VP_200)
+              .fontSize(ConfigData.VP_25)
+              .fontColor($r('app.color.red')).margin({top: ConfigData.VP_5})
           }
           .width(ConfigData.WH_80_100)
-          .height(200)
-          .margin({ top: ConfigData.WH_10_100 })
-          .backgroundColor(Color.White)
-          .border({ radius: 10, width: 3 })
+          .height(ConfigData.VP_200)
+          .margin({top: ConfigData.WH_10_100})
+          .backgroundColor($r('app.color.white'))
+          .border({radius: $r('app.float.wh_value_10'), width: ConfigData.VP_3})
         }
       }.width(ConfigData.WH_100_100).height(ConfigData.WH_100_100)
     }

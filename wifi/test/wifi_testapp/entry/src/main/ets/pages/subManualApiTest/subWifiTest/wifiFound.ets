@@ -13,10 +13,11 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import wifi from '@ohos.wifi';
-import { AvailableWifi } from '../../../component/availableWifi';
-import { TitleBar } from '../../../component/titleBar';
-import ConfigData from '../../../utils/ConfigData';
+import { AvailableWifi} from '../../../Component/availableWifi';
+import { TitleBar} from '../../../Component/titleBar';
+import ConfigData from '../../../Utils/ConfigData';
 
 const TAG = 'wifiTestApp [wifiFound]'
 
@@ -32,47 +33,47 @@ struct WifiFound {
   @State isLinked: boolean = false
   @State isSwitchOn: boolean = false
   @State linkedInfo: wifi.WifiLinkedInfo = {
-    ssid: '' ,
-    bssid: '' ,
+    ssid: '',
+    bssid: '',
     networkId: 0,
     rssi: 0,
     band: 0,
     linkSpeed: 0,
     frequency: 0,
-    isHidden: false ,
-    isRestricted: false ,
+    isHidden: false,
+    isRestricted: false,
     chload: 0,
     snr: 0,
-    macAddress: '' ,
+    macAddress: '',
     ipAddress: 0,
-    suppState: wifi.SuppState.DISCONNECTED ,
+    suppState: wifi.SuppState.DISCONNECTED,
     connState: wifi.ConnState.DISCONNECTED
   }
 
   scan() {
-    if (!this.isScanning) {
-      return; // 如果不需要扫描，则直接返回
+    if (!this.isScanning){
+      return;// 如果不需要扫描，则直接返回
     } else {
       wifi.getScanInfos((err, result) => {
-        if (err) {
-          console.log(TAG, `scan info err: ${ JSON.stringify(err) }`)
+        if (err){
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `scan info err: ${ JSON.stringify(err) }`)
         }
-        console.log(TAG, `scan info call back: ${ result.length }`)
-        for (let i = 0 ; i < result.length ; ++i) {
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `scan info call back: ${ result.length }`)
+        for(let i = 0 ; i<result.length ; ++i){
           this.wifiList.push({
-            ssid: result[i].ssid ,
-            bssid: result[i].bssid ,
-            capabilities: result[i].capabilities ,
-            securityType: result[i].securityType ,
-            rssi: result[i].rssi ,
-            band: result[i].band ,
-            frequency: result[i].frequency ,
-            channelWidth: result[i].channelWidth ,
-            timestamp: result[i].timestamp ,
+            ssid: result[i].ssid,
+            bssid: result[i].bssid,
+            capabilities: result[i].capabilities,
+            securityType: result[i].securityType,
+            rssi: result[i].rssi,
+            band: result[i].band,
+            frequency: result[i].frequency,
+            channelWidth: result[i].channelWidth,
+            timestamp: result[i].timestamp,
           })
         }
-        console.log(TAG, "wifiList:" + JSON.stringify(this.wifiList))
-        if (this.isScanning) { // 再次检查是否还需要继续扫描
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "wifiList:" + JSON.stringify(this.wifiList))
+        if (this.isScanning){// 再次检查是否还需要继续扫描
           setTimeout(() => {
             this.scan()
           }, 2000)
@@ -83,12 +84,12 @@ struct WifiFound {
 
   getLinkedInfo() {
     wifi.getLinkedInfo((err, linkedInfo) => {
-      if (err) {
-        console.log(TAG, `getLinkedInfo err: ${ JSON.stringify(err) }`)
+      if (err){
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `getLinkedInfo err: ${ JSON.stringify(err) }`)
         return
       }
-      console.log(TAG, `linkedInfo: ${ JSON.stringify(linkedInfo) }`)
-      if (linkedInfo === null || linkedInfo.bssid === '') {
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `linkedInfo: ${ JSON.stringify(linkedInfo) }`)
+      if (linkedInfo === null || linkedInfo.bssid === ''){
         this.isLinked = false
         // this.linkedInfo.ssid ='空'
         return
@@ -101,13 +102,13 @@ struct WifiFound {
 
   addListener() {
     wifi.on('wifiConnectionChange', state => {
-      console.log(TAG, `wifiConnectionChange: ${ state }`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `wifiConnectionChange: ${ state }`)
       this.getLinkedInfo()
     })
     wifi.on('wifiStateChange', state => {
-      console.log(TAG, `wifiStateLisener state: ${ state }`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `wifiStateLisener state: ${ state }`)
       this.wifiList = []
-      if (state === 1) { // 1: wifi is enable, 0:wifi is disable
+      if (state === 1){// 1: wifi is enable, 0:wifi is disable
         wifi.scan()
         this.scan()
       }
@@ -115,10 +116,10 @@ struct WifiFound {
   }
 
   aboutToAppear() {
-    if (wifi.isWifiActive()) {
-      console.log(TAG, 'wifi is active')
+    if (wifi.isWifiActive()){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'wifi is active')
       this.isSwitchOn = true
-      this.isScanning = true; // 在页面出现时开始扫描
+      this.isScanning = true;// 在页面出现时开始扫描
       wifi.scan()
       this.scan()
       this.getLinkedInfo()
@@ -128,22 +129,22 @@ struct WifiFound {
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TitleBar({ detail: this.testItem })
+      Stack({alignContent: Alignment.TopStart}){
+        TitleBar({detail: this.testItem})
       }
 
       Row() {
         Text($r('app.string.wlan'))
-          .fontSize(22)
+          .fontSize(ConfigData.VP_22)
           .fontWeight(FontWeight.Bold)
           .layoutWeight(1)
           .align(Alignment.TopStart)
         Column() {
-          Toggle({ type: ToggleType.Switch, isOn: this.isSwitchOn })
+          Toggle({type: ToggleType.Switch, isOn: this.isSwitchOn})
             .onChange((isOn: boolean) => {
-              console.log(TAG, `wifi swtich is: ${ isOn }`)
+              hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `wifi swtich is: ${ isOn }`)
               this.wifiList = []
-              if (isOn) {
+              if (isOn){
                 this.isSwitchOn = true
                 wifi.enableWifi()
                 wifi.scan()
@@ -159,34 +160,34 @@ struct WifiFound {
       }
       .width(ConfigData.WH_95_100)
 
-      if (this.isLinked) {
+      if (this.isLinked){
         Text($r('app.string.wlanIsConnected'))
-          .fontSize(22)
+          .fontSize(ConfigData.VP_22)
           .width(ConfigData.WH_95_100)
           .align(Alignment.TopStart)
         Row() {
           Text(this.linkedInfo.ssid)
-            .fontSize(20)
-            .fontColor(Color.Black)
+            .fontSize(ConfigData.VP_20)
+            .fontColor($r('app.color.black'))
             .layoutWeight(1)
           Text($r('app.string.wlanIsConnected'))
-            .fontSize(18)
-            .fontColor(Color.Black)
+            .fontSize(ConfigData.VP_18)
+            .fontColor($r('app.color.black'))
         }
         .width(ConfigData.WH_95_100)
-        .padding(10)
-        .margin(10)
-        .border({ radius: 15, color: Color.Gray, width: 1 })
-        .backgroundColor(Color.White)
+        .padding(ConfigData.VP_10)
+        .margin(ConfigData.VP_10)
+        .border({radius: $r('app.float.wh_value_15'), color: $r('app.color.color_999999_grey'), width: ConfigData.VP_1})
+        .backgroundColor($r('app.color.white'))
       }
-      AvailableWifi({ wifiList: $wifiList, linkedInfo: $linkedInfo })
+      AvailableWifi({wifiList: $wifiList, linkedInfo: $linkedInfo})
     }
-    .size({ width: ConfigData.WH_100_100, height: ConfigData.WH_100_100 })
-    .backgroundColor('#F5F5F5')
+    .size({width: ConfigData.WH_100_100, height: ConfigData.WH_100_100})
+    .backgroundColor($r("app.color.ohcc_hex_f5f5f5"))
   }
 
   aboutToDisappear() {
-    this.isScanning = false; // 设置标志，告诉scan方法停止新的扫描
+    this.isScanning = false;// 设置标志，告诉scan方法停止新的扫描
     wifi.off('wifiConnectionChange')
     wifi.off('wifiStateChange')
   }

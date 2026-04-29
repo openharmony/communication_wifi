@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@ohos.abilityAccessCtrl';
+import { Context} from '@ohos.abilityAccessCtrl';
 // 构造单例对象
 export class GlobalThis {
   private constructor() {
@@ -23,7 +23,7 @@ export class GlobalThis {
   private _uiContexts = new Map<string, Context>();
 
   public static getInstance(): GlobalThis {
-    if (!GlobalThis.instance) {
+    if (!GlobalThis.instance){
       GlobalThis.instance = new GlobalThis();
     }
     return GlobalThis.instance;
@@ -37,5 +37,5 @@ export class GlobalThis {
     this._uiContexts.set(key, value);
   }
 
-  // 其他需要传递的内容依此扩展
+// 其他需要传递的内容依此扩展
 }

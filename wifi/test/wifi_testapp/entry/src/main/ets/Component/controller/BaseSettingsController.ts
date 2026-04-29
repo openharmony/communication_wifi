@@ -29,8 +29,8 @@ export default abstract class BaseSettingsController implements ISettingsControl
     this.getComponent = () => component;
 
     // set default property values by component
-    for (let key in this) {
-      if (key in component) {
+    for(let key in this){
+      if (key in component){
         this[key] = component[key];
       }
     }
@@ -44,7 +44,7 @@ export default abstract class BaseSettingsController implements ISettingsControl
    * If you want to transport resource string or color, ets. AppStorage is suggested @StorageLink.
    */
   bindProperties(componentProperties: string[], controllerProperties?: string[]): ISettingsController {
-    for (let i = 0; i < componentProperties.length; i++) {
+    for(let i = 0; i<componentProperties.length; i++){
       this.defineBoundProperty(componentProperties[i], controllerProperties ? controllerProperties[i] : componentProperties[i]);
     }
     return this;
@@ -81,7 +81,7 @@ export default abstract class BaseSettingsController implements ISettingsControl
       get: function () {
         return __v;
       },
-      set: function (value) {
+      set: function (value){
         __v = value;
         this.getComponent()[componentProperty] = value;
       }

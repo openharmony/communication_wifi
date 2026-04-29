@@ -13,39 +13,40 @@
  * limitations under the License.
  */
 
+import ConfigData from '../../Utils/ConfigData';
 import chrlogservice from '@hms.chr.chrlogservice';
 import hilog from '@ohos.hilog';
 
 @Entry
 @Component
 struct TcpDumpOpen {
-  @State tcpStatusMsg: string = '等待获取...'; // 状态文本
+  @State tcpStatusMsg: string = ConfigData.TCPDUMP_STR_WAIT;// 状态文本
 
   async updateTcpStatus() {
     hilog.info(0x0000, 'testTag', 'updateTcpStatus start-------------');
     try {
       let result: boolean = await chrlogservice.getTcpdumpStatus();
       hilog.info(0x0000, 'testTag', `updateTcpStatus result: ${result}`);
-      if (result === true) {
-        this.tcpStatusMsg = 'TCP已打开';
-      } else if (result === false) {
-        this.tcpStatusMsg = 'TCP已关闭';
+      if (result === true){
+        this.tcpStatusMsg = ConfigData.TCPDUMP_STR_ON;
+      } else if (result === false){
+        this.tcpStatusMsg = ConfigData.TCPDUMP_STR_OFF;
       }
-    } catch (err) {
-      this.tcpStatusMsg = '状态获取失败';
+    } catch (err){
+      this.tcpStatusMsg = ConfigData.TCPDUMP_STR_FETCH_FAIL;
       hilog.error(0x0000, 'testTag', `setTcpStatusAndUpdateUI error: ${JSON.stringify(err)}`);
     }
   }
 
-  async setTcpStatusAndUpdateUI(status: boolean) {
+  async setTcpStatusAndUpdateUI(status: boolean){
     hilog.info(0x0000, 'testTag', `setTcpStatusAndUpdateUI called, status=${status}`);
     try {
       await chrlogservice.handleTcpdumpSwitch(status);
       hilog.info(0x0000, 'testTag', `handleTcpdumpSwitch success, status=${status}`);
       await this.updateTcpStatus();
-    } catch (err) {
+    } catch (err){
       hilog.error(0x0000, 'testTag', `setTcpStatusAndUpdateUI error: ${JSON.stringify(err)}`);
-      this.tcpStatusMsg = '状态获取失败';
+      this.tcpStatusMsg = ConfigData.TCPDUMP_STR_FETCH_FAIL;
     }
   }
 
@@ -58,46 +59,46 @@ struct TcpDumpOpen {
   build() {
     Column() {
       Text(this.tcpStatusMsg)
-        .fontSize('22vp')
-        .fontColor(0x333333)
-        .margin({ bottom: '20vp' })
+        .fontSize(ConfigData.VP_22)
+        .fontColor($r('app.color.color_333333_grey'))
+        .margin({bottom: ConfigData.VP_20})
 
-      Button({ type: ButtonType.Normal, stateEffect: true }) {
+      Button({type: ButtonType.Normal, stateEffect: true}){
         Row() {
-          Text('tcp开启')
-            .fontSize("24vp")
-            .fontColor(0xffffff)
-            .margin({ left: 5, right: 5 })
+          Text($r('app.string.wifitest_text_tkq'))
+            .fontSize(ConfigData.VP_24)
+            .fontColor($r('app.color.white'))
+            .margin({left: ConfigData.VP_5, right: ConfigData.VP_5})
         }.alignItems(VerticalAlign.Center)
       }
-      .borderRadius(8)
+      .borderRadius($r('app.float.wh_value_8'))
       .backgroundColor($r("app.color.blue"))
-      .width(180)
-      .height(50)
-      .margin({ top: "10vp", bottom: "10vp" })
+      .width(ConfigData.VP_180)
+      .height(ConfigData.VP_50)
+      .margin({top: ConfigData.VP_10, bottom: ConfigData.VP_10})
       .onClick(() => {
         this.setTcpStatusAndUpdateUI(true);
       })
 
-      Button({ type: ButtonType.Normal, stateEffect: true }) {
+      Button({type: ButtonType.Normal, stateEffect: true}){
         Row() {
-          Text('tcp关闭')
-            .fontSize("24vp")
-            .fontColor(0xffffff)
-            .margin({ left: 5, right: 5 })
+          Text($r('app.string.wifitest_text_tgb'))
+            .fontSize(ConfigData.VP_24)
+            .fontColor($r('app.color.white'))
+            .margin({left: ConfigData.VP_5, right: ConfigData.VP_5})
         }.alignItems(VerticalAlign.Center)
       }
-      .borderRadius(8)
+      .borderRadius($r('app.float.wh_value_8'))
       .backgroundColor($r("app.color.blue"))
-      .width(180)
-      .height(50)
-      .margin({ top: "10vp", bottom: "10vp" })
+      .width(ConfigData.VP_180)
+      .height(ConfigData.VP_50)
+      .margin({top: ConfigData.VP_10, bottom: ConfigData.VP_10})
       .onClick(() => {
         this.setTcpStatusAndUpdateUI(false);
       })
     }
-    .width('100%')
-    .height('100%')
+    .width(ConfigData.WH_100_100)
+    .height(ConfigData.WH_100_100)
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
     .backgroundColor($r("sys.color.ohos_id_color_sub_background"))

@@ -13,22 +13,23 @@
  * limitations under the License.
  */
 
-import { PageTitle } from '../../component/pageTitle';
-import { TestImageDisplay } from '../../component/testImageDisplay';
-import { StressContentTable } from '../../component/stressContentTable';
+import hilog from '@ohos.hilog';
+import { PageTitle} from '../../Component/pageTitle';
+import { TestImageDisplay} from '../../Component/testImageDisplay';
+import { StressContentTable} from '../../Component/stressContentTable';
 import router from '@ohos.router';
-import ConfigData from '../../utils/ConfigData';
-import { initP2pManagerStressData } from '../../entryability/model/stressTestDataModels';
-import { TestData } from '../../entryability/model/testData';
+import ConfigData from '../../Utils/ConfigData';
+import { initP2pManagerStressData} from '../../entryability/model/stressTestDataModels';
+import { TestData} from '../../entryability/model/testData';
 import wifi from '@ohos.wifi';
-import { resolveIP } from '../../utils/Util';
+import { resolveIP} from '../../Utils/Util';
 import socket from '@ohos.net.socket';
 
 import http from '@ohos.net.http';
 import request from '@ohos.request';
 import common from '@ohos.app.ability.common';
-import abilityAccessCtrl, { Context, PermissionRequestResult } from '@ohos.abilityAccessCtrl';
-import { BusinessError } from '@ohos.base';
+import abilityAccessCtrl, { Context, PermissionRequestResult} from '@ohos.abilityAccessCtrl';
+import { BusinessError} from '@ohos.base';
 
 const TAG = 'wifiTestApp [Stress]'
 
@@ -57,12 +58,12 @@ interface myParams extends Object {
 
 let localAddr: LocalAddr = {
   address: resolveIP(wifi.getIpInfo().ipAddress),
-  family: 1,
-  port: 9090
+  family: ConfigData.SOCKET_AF_INET,
+  port: ConfigData.DEMO_UDP_PORT
 }
 let oppositeAddr: OppositeAddr = {
   address: '',
-  family: 1,
+  family: ConfigData.SOCKET_AF_INET,
   port: 0
 }
 let loginCount = 0
@@ -82,13 +83,13 @@ struct P2pManagerStressTest {
   private testItem: TestData = (router.getParams() as myParams).testItem
   @State message: string = "";
   @State deviceId: string = '';
-  @State currentClick: number = - 1;
-  @State deviceAddressManager: string = '6c:96:d7:3d:87:6f';
-  @State netIdManager: number = - 2;
-  @State passphraseManager: string = "12345678";
-  @State groupNameManager: string = "testGroup"
+  @State currentClick: number = ConfigData.ITEM_CLICK_NONE;
+  @State deviceAddressManager: string = ConfigData.P2P_DEMO_ADDRESS;
+  @State netIdManager: number = ConfigData.P2P_DEMO_NET_ID;
+  @State passphraseManager: string = ConfigData.QV_MOCK_PRE_SHARED_KEY;
+  @State groupNameManager: string = ConfigData.P2P_DEMO_GROUP_NAME
   @State goBandManager: number = 0;
-  @State devNameManager: string = "MyTestDevice"
+  @State devNameManager: string = ConfigData.P2P_DEMO_DEVICE_NAME
   @StorageLink('stressNumber') stressNumber: number = 0;
   @StorageLink('stressTime') stressTime: number = 0;
   @StorageLink('pairedMac') pairedMac: string = "";
@@ -103,38 +104,38 @@ struct P2pManagerStressTest {
   }
 
   init() {
-    console.log("init-----------")
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', "init-----------")
   }
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TestImageDisplay({ testItem: this.testItem })
-        PageTitle({ testItem: this.testItem })
+      Stack({alignContent: Alignment.TopStart}){
+        TestImageDisplay({testItem: this.testItem})
+        PageTitle({testItem: this.testItem})
       }
 
-      Stack().height("0.5vp").backgroundColor("#000000");
+      Stack().height(ConfigData.VP_0_5).backgroundColor($r("app.color.black"));
       Column() {
         Row() {
-          Text("目标设备IP：")
-            .fontSize("20vp")
-            .height(40)
-            .padding({ top: 5 })
+          Text($r('app.string.wifitest_text_mbsbi'))
+            .fontSize(ConfigData.VP_20)
+            .height(ConfigData.VP_40)
+            .padding({top: ConfigData.VP_5})
             .width(ConfigData.WH_28_100)
             .align(Alignment.Start)
 
-          TextInput({ text: this.pairedMac, placeholder: "请输入即将连接的设备MAC" })
-            .height(40)
+          TextInput({text: this.pairedMac, placeholder: $r('app.string.wifitest_text_qsrjjljdsbm')})
+            .height(ConfigData.VP_40)
             .borderStyle(BorderStyle.Dashed)
             .backgroundColor($r("app.color.white"))
             .onChange((str) => {
               this.deviceId = str;
             })
             .width(ConfigData.WH_45_100)
-            .padding({ top: 5, left: 5 })
+            .padding({top: ConfigData.VP_5, left: ConfigData.VP_5})
           Image($r('app.media.Switch'))
-            .height(50)
-            .padding({ top: 5, bottom: 5, left: 10 })
+            .height(ConfigData.VP_50)
+            .padding({top: ConfigData.VP_5, bottom: ConfigData.VP_5, left: ConfigData.VP_10})
             .width(ConfigData.WH_15_100)
             .onClick(() => {
               this.showList = !this.showList;
@@ -143,69 +144,76 @@ struct P2pManagerStressTest {
       }
       .align(Alignment.Start)
 
-      if (this.showList) {
+      if (this.showList){
         p2pManagerSetting()
       } else {
         Column() {
           Scroll() {
             Column() {
-              Text("stress测试：")
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "15vp" })
+              Text($r('app.string.wifitest_text_scs'))
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_15})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_100_100)
-              Text("stress测试次数:" + this.stressNumber)
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "15vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_stress_count'))
+                Span('' + this.stressNumber)
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_15})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
-              Text("stress测试时间：" + this.stressTime + "ms")
-                .fontSize("17vp")
-                .margin({ top: "5vp", left: "15vp" })
+              Text() {
+                Span($r('app.string.wifitest_text_stress_time'))
+                Span('' + this.stressTime)
+                Span($r('app.string.wifitest_text_unit_ms'))
+              }
+                .fontSize(ConfigData.VP_17)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_15})
                 .textAlign(TextAlign.Start)
                 .width(ConfigData.WH_90_100)
 
-              Flex({ alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-                Button({ type: ButtonType.Normal, stateEffect: true }) {
-                  Text('传输数据').fontSize("20vp").fontColor(0xffffff).margin({ left: 2, right: 2 })
+              Flex({alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween}){
+                Button({type: ButtonType.Normal, stateEffect: true}){
+                  Text($r('app.string.wifitest_text_cssj')).fontSize(ConfigData.VP_20).fontColor($r('app.color.white')).margin({left: ConfigData.VP_2, right: ConfigData.VP_2})
                 }
-                .borderRadius(8)
+                .borderRadius($r('app.float.wh_value_8'))
                 .backgroundColor($r("app.color.blue"))
-                .width(100)
-                .height(60)
-                .margin({ top: "5vp", left: "10vp", bottom: "5vp" })
+                .width(ConfigData.VP_100)
+                .height(ConfigData.VP_60)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, bottom: ConfigData.VP_5})
                 .align(Alignment.Start)
                 .onClick(async(event: ClickEvent) => {
                   this.showListItems = true
                   this.showListItem = false
                 })
 
-                Button({ type: ButtonType.Normal, stateEffect: true }) {
+                Button({type: ButtonType.Normal, stateEffect: true}){
                   Row() {
-                    Text('上传下载').fontSize("20vp").fontColor(0xffffff).margin({ left: 2, right: 2 })
+                    Text($r('app.string.wifitest_text_scxz')).fontSize(ConfigData.VP_20).fontColor($r('app.color.white')).margin({left: ConfigData.VP_2, right: ConfigData.VP_2})
                   }.alignItems(VerticalAlign.Center)
                 }
-                .borderRadius(8)
+                .borderRadius($r('app.float.wh_value_8'))
                 .backgroundColor($r("app.color.blue"))
-                .width(100)
-                .height(60)
-                .margin({ top: "5vp", left: "10vp", right: "10vp", bottom: "5vp" })
+                .width(ConfigData.VP_100)
+                .height(ConfigData.VP_60)
+                .margin({top: ConfigData.VP_5, left: ConfigData.VP_10, right: ConfigData.VP_10, bottom: ConfigData.VP_5})
                 .align(Alignment.Center)
                 .onClick(async(event: ClickEvent) => {
                   this.showListItem = true
                   this.showListItems = false
                 })
 
-                Button({ type: ButtonType.Normal, stateEffect: true }) {
+                Button({type: ButtonType.Normal, stateEffect: true}){
                   Row() {
-                    Text('返回接口').fontSize("20vp").fontColor(0xffffff).margin({ left: 2, right: 2 })
+                    Text($r('app.string.wifitest_text_fhjk')).fontSize(ConfigData.VP_20).fontColor($r('app.color.white')).margin({left: ConfigData.VP_2, right: ConfigData.VP_2})
                   }.alignItems(VerticalAlign.Bottom)
                 }
-                .borderRadius(8)
+                .borderRadius($r('app.float.wh_value_8'))
                 .backgroundColor($r("app.color.blue"))
-                .width(100)
-                .height(60)
-                .margin({ top: "5vp", right: "10vp", bottom: "5vp" })
+                .width(ConfigData.VP_100)
+                .height(ConfigData.VP_60)
+                .margin({top: ConfigData.VP_5, right: ConfigData.VP_10, bottom: ConfigData.VP_5})
                 .align(Alignment.End)
                 .onClick(async(event: ClickEvent) => {
                   this.showListItem = false
@@ -217,19 +225,19 @@ struct P2pManagerStressTest {
             }
             .width(ConfigData.WH_100_100)
           }
-          .scrollBarWidth(10)
+          .scrollBarWidth(ConfigData.VP_10)
           .scrollBar(BarState.Auto)
         }
-        .height(130)
+        .height(ConfigData.VP_130)
         .width(ConfigData.WH_95_100)
         .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
 
-        if (this.showListItems == true && this.showListItem == false) {
+        if (this.showListItems == true && this.showListItem == false){
           socketTest()
-        } else if (this.showListItems == false && this.showListItem == true) {
+        } else if (this.showListItems == false && this.showListItem == true){
           upDownLoad()
         } else {
-          StressContentTable({ testItem: this.testItem, apiItems: initP2pManagerStressData() })
+          StressContentTable({testItem: this.testItem, apiItems: initP2pManagerStressData()})
         }
       }
     }
@@ -241,12 +249,12 @@ struct P2pManagerStressTest {
 
 @Component
 struct p2pManagerSetting {
-  @State deviceAddressManager: string = '6c:96:d7:3d:87:6f';
-  @State netIdManager: number = - 2;
-  @State passphraseManager: string = "12345678";
-  @State groupNameManager: string = "testGroup"
+  @State deviceAddressManager: string = ConfigData.P2P_DEMO_ADDRESS;
+  @State netIdManager: number = ConfigData.P2P_DEMO_NET_ID;
+  @State passphraseManager: string = ConfigData.QV_MOCK_PRE_SHARED_KEY;
+  @State groupNameManager: string = ConfigData.P2P_DEMO_GROUP_NAME
   @State goBandManager: number = 0;
-  @State devNameManager: string = "MyTestDevice"
+  @State devNameManager: string = ConfigData.P2P_DEMO_DEVICE_NAME
 
   aboutToAppear() {
     AppStorage.setOrCreate("deviceAddressManager", this.deviceAddressManager)
@@ -260,120 +268,120 @@ struct p2pManagerSetting {
   build() {
     Column() {
       Row() {
-        Text("deviceAddressManager:").fontSize(16).width(120)
-        TextInput({ text: this.deviceAddressManager, placeholder: '6c:96:d7:3d:87:6f' })
-          .fontSize("15vp")
+        Text($r('app.string.wifitest_text_d_6')).fontSize(ConfigData.VP_16).width(ConfigData.VP_120)
+        TextInput({text: this.deviceAddressManager, placeholder: $r('app.string.wifitest_text_69d386')})
+          .fontSize(ConfigData.VP_15)
           .onChange((strInput: string) => {
             this.deviceAddressManager = strInput;
             //判断合法性
-            if (strInput.length >= 1) {
+            if (strInput.length >= 1){
               AppStorage.setOrCreate('deviceAddressManager', strInput);
             }
           })
           .width(ConfigData.WH_80_100)
-          .borderRadius(1)
+          .borderRadius($r('app.float.wh_value_1'))
       }
       .backgroundColor($r("app.color.moon"))
-      .padding(5)
+      .padding(ConfigData.VP_5)
       .justifyContent(FlexAlign.Start)
       .alignItems(VerticalAlign.Center)
 
       Column() {
-        Stack().height("0.25vp").backgroundColor("#000000");
+        Stack().height(ConfigData.VP_0_25).backgroundColor($r("app.color.black"));
         Column() {
           Row() {
-            Text("netIdManager:").fontSize(15).width(60);
-            TextInput({ text: this.netIdManager.toString(), placeholder: "-2" })
-              .fontSize("15vp")
+            Text($r('app.string.wifitest_text_n_3')).fontSize(ConfigData.VP_15).width(ConfigData.VP_60);
+            TextInput({text: this.netIdManager.toString(), placeholder: $r('app.string.wifitest_text_2')})
+              .fontSize(ConfigData.VP_15)
               .onChange((strInput: string) => {
                 this.netIdManager = Number(strInput);
                 //判断合法性
-                if (strInput.length >= 1) {
+                if (strInput.length >= 1){
                   AppStorage.setOrCreate('netIdManager', strInput);
                 }
               })
               .width(ConfigData.WH_80_100)
-              .borderRadius(1)
+              .borderRadius($r('app.float.wh_value_1'))
           }
-          .padding(5)
+          .padding(ConfigData.VP_5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
           .backgroundColor($r("app.color.spring"))
 
           Row() {
-            Text("passphraseManager:").fontSize(15).width(100);
-            TextInput({ text: this.passphraseManager, placeholder: "input passphrase" })
-              .fontSize("15vp")
+            Text($r('app.string.wifitest_text_p_5')).fontSize(ConfigData.VP_15).width(ConfigData.VP_100);
+            TextInput({text: this.passphraseManager, placeholder: $r('app.string.wifitest_text_ip_1')})
+              .fontSize(ConfigData.VP_15)
               .onChange((strInput: string) => {
                 this.passphraseManager = strInput;
-                if (strInput.length >= 1) {
+                if (strInput.length >= 1){
                   AppStorage.setOrCreate('passphraseManager', strInput);
                 }
               })
               .width(ConfigData.WH_80_100)
-              .borderRadius(1)
+              .borderRadius($r('app.float.wh_value_1'))
           }
           .backgroundColor($r("app.color.spring"))
-          .padding(5)
+          .padding(ConfigData.VP_5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
 
           Row() {
-            Text("groupNameManager:").fontSize(15).width(100);
-            TextInput({ text: this.groupNameManager, placeholder: "testGroup" })
-              .fontSize("15vp")
+            Text($r('app.string.wifitest_text_g_3')).fontSize(ConfigData.VP_15).width(ConfigData.VP_100);
+            TextInput({text: this.groupNameManager, placeholder: ConfigData.P2P_DEMO_GROUP_NAME})
+              .fontSize(ConfigData.VP_15)
               .onChange((strInput: string) => {
                 this.groupNameManager = strInput;
-                if (strInput.length >= 1) {
+                if (strInput.length >= 1){
                   AppStorage.setOrCreate('groupNameManager', strInput);
                 }
               })
               .width(ConfigData.WH_80_100)
-              .borderRadius(1)
+              .borderRadius($r('app.float.wh_value_1'))
           }
           .backgroundColor($r("app.color.spring"))
-          .padding(5)
+          .padding(ConfigData.VP_5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
 
           Row() {
-            Text("goBandManager:").fontSize(15).width(80);
-            TextInput({ text: this.goBandManager.toString(), placeholder: "0" })
-              .fontSize("15vp")
+            Text($r('app.string.wifitest_text_g_2')).fontSize(ConfigData.VP_15).width(ConfigData.VP_80);
+            TextInput({text: this.goBandManager.toString(), placeholder: ConfigData.QV_MOCK_DOMAIN_0})
+              .fontSize(ConfigData.VP_15)
               .onChange((strInput: string) => {
                 this.goBandManager = Number(strInput);
-                if (strInput.length >= 1) {
+                if (strInput.length >= 1){
                   AppStorage.setOrCreate('goBandManager', strInput);
                 }
               })
               .width(ConfigData.WH_80_100)
-              .borderRadius(1)
+              .borderRadius($r('app.float.wh_value_1'))
           }
           .backgroundColor($r("app.color.spring"))
-          .padding(5)
+          .padding(ConfigData.VP_5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
 
           Row() {
-            Text("devNameManager:").fontSize(15).width(100);
-            TextInput({ text: this.devNameManager, placeholder: "MyTestDevice" })
-              .fontSize("15vp")
+            Text($r('app.string.wifitest_text_d_3')).fontSize(ConfigData.VP_15).width(ConfigData.VP_100);
+            TextInput({text: this.devNameManager, placeholder: ConfigData.P2P_DEMO_DEVICE_NAME})
+              .fontSize(ConfigData.VP_15)
               .onChange((strInput: string) => {
                 this.devNameManager = strInput;
-                if (strInput.length >= 1) {
+                if (strInput.length >= 1){
                   AppStorage.setOrCreate('devNameManager', strInput);
                 }
               })
               .width(ConfigData.WH_80_100)
-              .borderRadius(1)
+              .borderRadius($r('app.float.wh_value_1'))
           }
           .backgroundColor($r("app.color.spring"))
-          .padding(5)
+          .padding(ConfigData.VP_5)
           .justifyContent(FlexAlign.Start)
           .alignItems(VerticalAlign.Center)
         }
 
-        Stack().height("0.25vp").backgroundColor("#000000");
+        Stack().height(ConfigData.VP_0_25).backgroundColor($r("app.color.black"));
       }
     }
   }
@@ -391,27 +399,27 @@ struct socketTest {
   @State warnDialog: boolean = false
   @State warnText: string = ''
   @State roomNumber: string = ''
-  @State bindMsg: string = "未绑定"
-  @State receiveMsg: string = '待接收数据'
+  @State bindMsg: string = ConfigData.SOCKET_STR_NOT_BOUND
+  @State receiveMsg: string = ConfigData.SOCKET_STR_RX_PENDING
 
   bindOption() {
     let bindOption = udp.bind(localAddr)
     bindOption.then(() => {
-      console.log(TAG, 'bind success')
-      this.bindMsg = "绑定成功"
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'bind success')
+      this.bindMsg = ConfigData.SOCKET_STR_BIND_OK
     }).catch((err: BusinessError) => {
-      console.log(TAG, 'bind fail' + err)
-      this.bindMsg = "绑定失败"
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'bind fail' + err)
+      this.bindMsg = ConfigData.SOCKET_STR_BIND_FAIL
     })
     udp.on('message', data => {
-      console.log(TAG, `data:${ JSON.stringify(data) }`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `data:${ JSON.stringify(data) }`)
       let buffer = data.message
       let dataView = new DataView(buffer)
-      console.log(TAG, `length = ${ dataView.byteLength }`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `length = ${ dataView.byteLength }`)
       let str = ""
-      for (let i = 0 ;i < dataView.byteLength ; ++i) {
+      for(let i = 0 ;i<dataView.byteLength ; ++i){
         let c = String.fromCharCode(dataView.getUint8(i))
-        if (c != "\n") {
+        if (c != "\n"){
           str += c
         }
       }
@@ -422,104 +430,110 @@ struct socketTest {
   }
 
   build() {
-    Stack({ alignContent: Alignment.Center }) {
+    Stack({alignContent: Alignment.Center}){
       Column() {
-        if (this.ipDialog) {
+        if (this.ipDialog){
           Column() {
-            Text('本地IP：' + localAddr.address)
-              .fontSize(25)
-              .margin({ top: 10 })
-            TextInput({ placeholder: '请输入对端ip' })
-              .width(200)
-              .fontSize(25)
-              .margin({ top: 10 })
+            Text() {
+              Span($r('app.string.wifitest_text_local_ip'))
+              Span(localAddr.address)
+            }
+              .fontSize(ConfigData.VP_25)
+              .margin({top: ConfigData.VP_10})
+            TextInput({placeholder: $r('app.string.wifitest_text_qsrddi')})
+              .width(ConfigData.VP_200)
+              .fontSize(ConfigData.VP_25)
+              .margin({top: ConfigData.VP_10})
               .onChange((value: string) => {
                 oppositeAddr.address = value
                 oppositeAddr.port = 9090
               })
 
-            if (this.warnDialog) {
+            if (this.warnDialog){
               Text(this.warnText)
-                .width(200)
-                .fontSize(10)
-                .fontColor(Color.Red).margin({ top: 5 })
+                .width(ConfigData.VP_200)
+                .fontSize(ConfigData.VP_10)
+                .fontColor($r('app.color.red')).margin({top: ConfigData.VP_5})
             }
             Row() {
               Button($r('app.string.confirm'))
-                .fontColor(Color.Black)
-                .height(40)
-                .width(130)
-                .fontSize(25)
-                .margin({ bottom: 10 })
+                .fontColor($r('app.color.black'))
+                .height(ConfigData.VP_40)
+                .width(ConfigData.VP_130)
+                .fontSize(ConfigData.VP_25)
+                .margin({bottom: ConfigData.VP_10})
                 .onClick(() => {
-                  if (oppositeAddr.address === '') {
+                  if (oppositeAddr.address === ''){
                     this.warnDialog = true
                     this.warnText = '请先输入对端IP'
                   } else {
                     this.bindOption()
                     this.txtDialog = true
-                    console.log(TAG, `peer ip=${ oppositeAddr.address }`)
-                    console.log(TAG, `peer port=${ oppositeAddr.port }`)
-                    console.log(TAG, `peer port=${ localAddr.port }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `peer ip=${ oppositeAddr.address }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `peer port=${ oppositeAddr.port }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `peer port=${ localAddr.port }`)
                   }
                 })
-                .backgroundColor(0xffffff)
+                .backgroundColor($r('app.color.white'))
 
               Button($r('app.string.send_message'))
-                .fontColor(Color.Black)
-                .height(40)
-                .width(130)
-                .fontSize(25)
-                .margin({ bottom: 10 })
+                .fontColor($r('app.color.black'))
+                .height(ConfigData.VP_40)
+                .width(ConfigData.VP_130)
+                .fontSize(ConfigData.VP_25)
+                .margin({bottom: ConfigData.VP_10})
                 .onClick(() => {
                   {
                     //发送数据
                     udp.send({
-                      data: '1', //online
+                      data: ConfigData.QV_MOCK_DOMAIN_1,//online
                       address: oppositeAddr
-                    }).then(data => {
-                      console.log(TAG, `send sucess: ${ data }`)
-                    }).catch((error: BusinessError) => {
-                      console.log(TAG, `TAG,send: ${ JSON.stringify(error) }`)
+                  }).then(data => {
+                      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `send sucess: ${ data }`)
+                  }).catch((error: BusinessError) => {
+                      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `TAG,send: ${ JSON.stringify(error) }`)
                     })
 
-                    console.log(TAG, `send peer ip=${ oppositeAddr.address }`)
-                    console.log(TAG, `send peer port=${ oppositeAddr.port }`)
-                    console.log(TAG, `send peer port=${ localAddr.port }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `send peer ip=${ oppositeAddr.address }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `send peer port=${ oppositeAddr.port }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `send peer port=${ localAddr.port }`)
                   }
                 })
-                .backgroundColor(0xffffff)
+                .backgroundColor($r('app.color.white'))
             }
 
             Text(this.bindMsg)
-              .width(200)
-              .fontSize(25)
-              .fontColor(Color.Red).margin({ top: 5 })
+              .width(ConfigData.VP_200)
+              .fontSize(ConfigData.VP_25)
+              .fontColor($r('app.color.red')).margin({top: ConfigData.VP_5})
           }
           .width(ConfigData.WH_80_100)
-          .height(200)
-          .margin({ top: ConfigData.WH_3_100 })
-          .backgroundColor(Color.White)
-          .border({ radius: 10, width: 3 })
+          .height(ConfigData.VP_200)
+          .margin({top: ConfigData.WH_3_100})
+          .backgroundColor($r('app.color.white'))
+          .border({radius: $r('app.float.wh_value_10'), width: ConfigData.VP_3})
         }
 
-        if (this.txtDialog) {
+        if (this.txtDialog){
           Column() {
-            Text('接收本地IP：' + localAddr.address)
-              .fontSize(25)
-              .margin({ top: 10 })
+            Text() {
+              Span($r('app.string.wifitest_text_rx_local_ip'))
+              Span(localAddr.address)
+            }
+              .fontSize(ConfigData.VP_25)
+              .margin({top: ConfigData.VP_10})
 
             Text(this.receiveMsg)
-              .width(200)
-              .fontSize(25)
-              .fontColor(Color.Red).margin({ top: 5 })
+              .width(ConfigData.VP_200)
+              .fontSize(ConfigData.VP_25)
+              .fontColor($r('app.color.red')).margin({top: ConfigData.VP_5})
 
           }
           .width(ConfigData.WH_80_100)
-          .height(180)
-          .margin({ top: ConfigData.WH_3_100 })
-          .backgroundColor(Color.White)
-          .border({ radius: 10, width: 3 })
+          .height(ConfigData.VP_180)
+          .margin({top: ConfigData.WH_3_100})
+          .backgroundColor($r('app.color.white'))
+          .border({radius: $r('app.float.wh_value_10'), width: ConfigData.VP_3})
         }
 
       }.width(ConfigData.WH_100_100).height(ConfigData.WH_100_100)
@@ -535,46 +549,46 @@ struct upDownLoad {
   @State files: Array<string> = []
   @State uploads: Array<string> = []
   private downloadConfig: DownloadConfig = {
-    url: 'http://192.168.62.127:8000',
+    url: ConfigData.STRESS_DEMO_FILE_SERVER,
     filePath: ""
   }
 
   aboutToAppear() {
-    console.log(TAG, `enter Index aboutToAppear`)
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `enter Index aboutToAppear`)
     let context: Context = getContext(this) as common.UIAbilityContext;
     let atManager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
     // requestPermissionsFromUser会判断权限的授权状态来决定是否唤起弹窗
     atManager.requestPermissionsFromUser(context, ['ohos.permission.INTERNET'])
       .then((data: PermissionRequestResult) => {
-        console.log(TAG, `grantPermission,requestPermissionsFromUser,result.requestCode=${ data }`)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `grantPermission,requestPermissionsFromUser,result.requestCode=${ data }`)
       })
-    this.files.push("http://192.168.62.127:8000")
+    this.files.push(ConfigData.STRESS_DEMO_FILE_SERVER)
     let httpRequest = http.createHttp()
     httpRequest.request(
-      'http://192.168.0.123/ ? tpl=list&folders - filter=&recursive' ,
+      ConfigData.STRESS_DEMO_FILE_LIST_URL,
       {
-        method: http.RequestMethod.GET ,
+        method: http.RequestMethod.GET,
         header: {
           'Content - Type': 'text/plain'
         }
-      }, (err, data) => {
-      console.log(TAG, `error = ${ JSON.stringify(err) }`)
-      if (!err) {
-        console.log(TAG, `data = ${ JSON.stringify(data) }`)
+    }, (err, data) => {
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `error = ${ JSON.stringify(err) }`)
+      if (!err){
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `data = ${ JSON.stringify(data) }`)
         let result: string = data.result.toString()
-        console.log(TAG, `Result = ${ result }`)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Result = ${ result }`)
 
         let tempFiles = result.split('\r\n')
-        for (let i = 0 ; i < tempFiles.length ; i ++) {
+        for(let i = 0 ; i<tempFiles.length ; i++){
           let splitFiles = tempFiles[i].split('//')[1].split('/')
-          console.log(TAG, `splitFiles = ${ JSON.stringify(splitFiles) }`)
-          if (splitFiles.indexOf('upload') === - 1) {
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `splitFiles = ${ JSON.stringify(splitFiles) }`)
+          if (splitFiles.indexOf('upload') === - 1){
             this.files.push(tempFiles[i])
           }
         }
-        console.log(TAG, `files = ${ JSON.stringify(this.files) }`)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `files = ${ JSON.stringify(this.files) }`)
       } else {
-        console.log(TAG, `error: ${ JSON.stringify(err) }`)
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `error: ${ JSON.stringify(err) }`)
         httpRequest.destroy()
       }
     })
@@ -585,83 +599,83 @@ struct upDownLoad {
       Scroll() {
         Column() {
           Text($r('app.string.choice_download_file'))
-            .fontSize(25)
+            .fontSize(ConfigData.VP_25)
             .alignSelf(ItemAlign.Start)
-            .margin({ top: 20, left: 10 })
+            .margin({top: ConfigData.VP_20, left: ConfigData.VP_10})
           ForEach(this.files, (item: string, index) => {
             Divider()
-              .margin({ top: 20 })
+              .margin({top: ConfigData.VP_20})
             Row() {
               Text(item)
-                .fontSize(25)
-                .constraintSize({ maxWidth: ConfigData.WH_75_100 })
+                .fontSize(ConfigData.VP_25)
+                .constraintSize({maxWidth: ConfigData.WH_75_100})
                 .fontWeight(FontWeight.Bold)
-                .margin({ top: 20, left: 10 })
+                .margin({top: ConfigData.VP_20, left: ConfigData.VP_10})
               Blank()
 
               Button($r('app.string.click_download'))
-                .margin({ top: 20, right: 10 })
+                .margin({top: ConfigData.VP_20, right: ConfigData.VP_10})
                 .onClick(async() => {
                   let fileindex = 1;
                   setInterval(() => {
                     //                    let resourceManage = await resourceManager.getResourceManager()
                     //                    let downloadSuccess = await resourceManage.getString($r('app.string.download_success').id)
                     this.downloadConfig.url = item
-                    console.log(TAG, `downloadConfig.url = ${ JSON.stringify(this.downloadConfig.url) }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `downloadConfig.url = ${ JSON.stringify(this.downloadConfig.url) }`)
                     this.downloadConfig.filePath = `/data/storage/el2/base/haps/entry/cache/ ${
-                    item.split('//')[1].split('/')[1] + fileindex }`
-                    //                    /data/storage/el2/base/haps/entry/cache/ 
+                    item.split('//')[1].split('/')[1] + fileindex}`
+            //                    /data/storage/el2/base/haps/entry/cache/ 
 		    fileindex += 1
-                    console.log(TAG, `downloadConfig.filePath = ${ JSON.stringify(this.downloadConfig.filePath) }`)
+                    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `downloadConfig.filePath = ${ JSON.stringify(this.downloadConfig.filePath) }`)
                     request.downloadFile(getContext(), this.downloadConfig, (err, downloadTask) => {
-                      console.log(TAG, `download enter`)
-                      if (err) {
-                        console.log(TAG, `download err = ${ JSON.stringify(err) }`)
+                      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `download enter`)
+                      if (err){
+                        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `download err = ${ JSON.stringify(err) }`)
                         return
                       }
-                      console.log(TAG, `download data = ${ JSON.stringify(downloadTask) }`)
+                      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `download data = ${ JSON.stringify(downloadTask) }`)
 
-                      console.log(TAG, `download end`)
+                      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `download end`)
                     })
-                  }, 1000)
+                }, 1000)
 
                 })
             }
             .width(ConfigData.WH_100_100)
           }, (item: string) => item)
           Button($r('app.string.upload_page'))
-            .fontSize(30)
-            .width(180)
-            .height(50)
-            .margin({ top: 30 })
+            .fontSize(ConfigData.VP_30)
+            .width(ConfigData.VP_180)
+            .height(ConfigData.VP_50)
+            .margin({top: ConfigData.VP_30})
             .key('uploadBtn')
             .onClick(() => {
               router.pushUrl({
                 url: 'pages/Upload',
-                params: { uploads: this.uploads }
+                params: { uploads: this.uploads}
               })
             })
 
         }
         .width(ConfigData.WH_100_100)
       }
-      .constraintSize({ maxHeight: ConfigData.WH_87_100 })
+      .constraintSize({maxHeight: ConfigData.WH_87_100})
 
-      if (this.receivedSize !== 0 && this.totalSize !== 0 && this.files.length > 0) {
+      if (this.receivedSize !== 0 && this.totalSize !== 0 && this.files.length > 0){
         Row() {
           Text($r('app.string.download_progress'))
-            .fontSize(25)
+            .fontSize(ConfigData.VP_25)
             .fontWeight(FontWeight.Bold)
-            .margin({ left: 10 })
-          Progress({ value: this.receivedSize, total: this.totalSize, type: ProgressType.Capsule })
-            .color(Color.Grey)
+            .margin({left: ConfigData.VP_10})
+          Progress({value: this.receivedSize, total: this.totalSize, type: ProgressType.Capsule})
+            .color($r('app.color.color_999999_grey'))
             .width(ConfigData.WH_40_100)
-            .height(10)
-            .margin({ left: 10 })
+            .height(ConfigData.VP_10)
+            .margin({left: ConfigData.VP_10})
           Text(`${ JSON.stringify(Math.floor(this.receivedSize / this.totalSize * 100)) }%`)
-            .margin({ left: 10 })
+            .margin({left: ConfigData.VP_10})
         }
-        .margin({ top: 10 })
+        .margin({top: ConfigData.VP_10})
         .alignSelf(ItemAlign.Center)
       }
     }

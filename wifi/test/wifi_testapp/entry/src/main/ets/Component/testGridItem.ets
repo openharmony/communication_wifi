@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-import { TestData } from '../entryability/model/testData';
+import { TestData} from '../entryability/model/testData';
 import router from '@ohos.router';
-import ConfigData from '../utils/ConfigData';
+import ConfigData from '../Utils/ConfigData';
 /**
  * Test - GridItem page of wifi test
  */
@@ -29,27 +29,27 @@ export struct TestGridItem {
       Row() {
         Image(this.testItem.image)
           .objectFit(ImageFit.Contain)
-          .height(152)
+          .height(ConfigData.VP_152)
           .width(ConfigData.WH_100_100)
-      }.backgroundColor('#FFf1f3f5')
+      }.backgroundColor($r("app.color.ohcc_hex_fff1f3f5"))
 
-      Flex({ justifyContent: FlexAlign.Start, alignItems: ItemAlign.Center }) {
+      Flex({justifyContent: FlexAlign.Start, alignItems: ItemAlign.Center}){
         Text(this.testItem.name)
-          .fontSize(14)
+          .fontSize(ConfigData.VP_14)
           .flexGrow(1)
-          .padding({ left: 8 })
+          .padding({left: ConfigData.VP_8})
         Text(this.testItem.detail)
-          .fontSize(14)
-          .margin({ right: 6 })
+          .fontSize(ConfigData.VP_14)
+          .margin({right: ConfigData.VP_6})
       }
-      .height(32)
+      .height(ConfigData.VP_32)
       .width(ConfigData.WH_100_100)
-      .backgroundColor('#FFe5e5e5')
+      .backgroundColor($r("app.color.ohcc_hex_ffe5e5e5"))
     }
-    .height(184)
+    .height(ConfigData.VP_184)
     .width(ConfigData.WH_100_100)
     .onClick(() => {
-      router.pushUrl({ url: 'MainAbility/pagesTestDetail', params: { testId: this.testItem } })
+      router.pushUrl({url: 'MainAbility/pagesTestDetail', params: { testId: this.testItem}})
     })
   }
 }

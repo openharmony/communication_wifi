@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-import { TestData } from '../entryability/model/testData';
-import { TestListItem } from './testListItems';
-import ConfigData from '../utils/ConfigData';
+import hilog from '@ohos.hilog';
+import { TestData} from '../entryability/model/testData';
+import { TestListItem} from './testListItems';
+import ConfigData from '../Utils/ConfigData';
 /**
  * Test - List component page of wifi test
  */
@@ -25,7 +26,7 @@ export struct TestList {
   private testItems!: TestData[]
 
   aboutToAppear() {
-    console.info("TestList testItems:" + JSON.stringify(this.testItems))
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', "TestList testItems:" + JSON.stringify(this.testItems))
   }
 
   build() {

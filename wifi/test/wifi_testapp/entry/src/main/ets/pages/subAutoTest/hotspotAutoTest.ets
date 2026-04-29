@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
-import ConfigData from '../../utils/ConfigData';
+import hilog from '@ohos.hilog';
+import ConfigData from '../../Utils/ConfigData';
 import router from '@ohos.router';
-import { TestData } from '../../entryability/model/testData';
-import { PageTitle } from '../../component/pageTitle';
-import { TestImageDisplay } from '../../component/testImageDisplay';
-import { HotspotAutoTestCase, initHotspotAutoData } from '../../entryability/model/autoTestDataModels';
-import { AutoContentTable } from '../../component/autoContentTable';
+import { TestData} from '../../entryability/model/testData';
+import { PageTitle} from '../../Component/pageTitle';
+import { TestImageDisplay} from '../../Component/testImageDisplay';
+import { HotspotAutoTestCase, initHotspotAutoData} from '../../entryability/model/autoTestDataModels';
+import { AutoContentTable} from '../../Component/autoContentTable';
 import promptAction from '@ohos.promptAction';
 
 interface myParams extends Object {
@@ -37,17 +38,17 @@ interface IWifiAutoArrayItem {
 @Entry
 @Component
 struct HotspotAutoTest {
-  @State message: string = 'HotspotAutoTest';
+  @State message: string = ConfigData.PAGE_TAG_HS_AUTO;
   private testItem: TestData = (router.getParams() as myParams).testItem
-  @State changeIndex: number = - 1
+  @State changeIndex: number = ConfigData.ITEM_CLICK_NONE
   //  @State autoTextMessage: string ="None";
   @StorageLink("hotspotAutoTestMessage") hotspotAutoTestMessage: string = ""
-  @State h_ssid: string = "testApp1";
-  @State h_securityType: number = 3;
-  @State h_band: number = 2;
-  @State h_preSharedKey: string = "12345678";
-  @State h_maxConn: number = 3;
-  @State h_channel: number = 36;
+  @State h_ssid: string = ConfigData.SCENARIO_HS_SSID;
+  @State h_securityType: number = ConfigData.QV_MOCK_SECURITY_TYPE;
+  @State h_band: number = ConfigData.SCENARIO_HS_BAND;
+  @State h_preSharedKey: string = ConfigData.QV_MOCK_PRE_SHARED_KEY;
+  @State h_maxConn: number = ConfigData.SCENARIO_HS_MAX_CONN;
+  @State h_channel: number = ConfigData.SCENARIO_HS_CHANNEL;
 
   aboutToAppear() {
     AppStorage.setOrCreate("h_ssid", this.h_ssid)
@@ -60,18 +61,18 @@ struct HotspotAutoTest {
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TestImageDisplay({ testItem: this.testItem })
-        PageTitle({ testItem: this.testItem })
+      Stack({alignContent: Alignment.TopStart}){
+        TestImageDisplay({testItem: this.testItem})
+        PageTitle({testItem: this.testItem})
       }
 
-      Stack().height("1vp").backgroundColor("#000000");
+      Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
       Column() {
         Scroll() {
           Column() {
-            Text("API验证:")
-              .fontSize("17vp")
-              .margin({ top: "10vp", bottom: "10vp", left: "15vp" })
+            Text($r('app.string.wifitest_text_ayz'))
+              .fontSize(ConfigData.VP_17)
+              .margin({top: ConfigData.VP_10, bottom: ConfigData.VP_10, left: ConfigData.VP_15})
               .textAlign(TextAlign.Start)
               .width(ConfigData.WH_100_100)
             AutoContentTable({
@@ -82,25 +83,28 @@ struct HotspotAutoTest {
             })
           }
           .width(ConfigData.WH_100_100)
-          .height(280)
+          .height(ConfigData.VP_280)
         }
-        .scrollBarWidth(10)
+        .scrollBarWidth(ConfigData.VP_10)
         .scrollBar(BarState.Auto)
 
-        Stack().height("1vp").backgroundColor("#000000");
+        Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
 
         Scroll() {
           Column() {
-            Text("Debug日志:")
-              .fontSize("17vp")
-              .margin({ top: "8vp", bottom: "8vp", left: "15vp" })
+            Text($r('app.string.wifitest_text_drz'))
+              .fontSize(ConfigData.VP_17)
+              .margin({top: ConfigData.VP_8, bottom: ConfigData.VP_8, left: ConfigData.VP_15})
               .textAlign(TextAlign.Start)
               .width(ConfigData.WH_100_100)
             List() {
               ListItem() {
-                Text("log:" + "\n" + this.hotspotAutoTestMessage)
-                  .fontSize("17vp")
-                  .margin({ top: "5vp", left: "30vp", right: "10vp" })
+                Text() {
+                  Span($r('app.string.wifitest_text_log_label'))
+                  Span(this.hotspotAutoTestMessage)
+                }
+                  .fontSize(ConfigData.VP_17)
+                  .margin({top: ConfigData.VP_5, left: ConfigData.VP_30, right: ConfigData.VP_10})
                   .textAlign(TextAlign.Start)
                   .width(ConfigData.WH_90_100)
               }
@@ -110,35 +114,35 @@ struct HotspotAutoTest {
             .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
           }
           .width(ConfigData.WH_100_100)
-          .height(260)
+          .height(ConfigData.VP_260)
         }
-        .scrollBarWidth(10)
+        .scrollBarWidth(ConfigData.VP_10)
         .scrollBar(BarState.On)
       }
-      .height(500)
+      .height(ConfigData.VP_500)
       .width(ConfigData.WH_100_100)
       .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
 
 
-      Stack().height("1vp").backgroundColor("#000000");
+      Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
       Column() {
-        Button({ type: ButtonType.Normal, stateEffect: true }) {
+        Button({type: ButtonType.Normal, stateEffect: true}){
           Row() {
-            Text('自动测试').fontSize("24vp").fontColor(0xffffff).margin({ left: 5, right: 5 })
+            Text($r('app.string.autotest')).fontSize(ConfigData.VP_24).fontColor($r('app.color.white')).margin({left: ConfigData.VP_5, right: ConfigData.VP_5})
           }.alignItems(VerticalAlign.Center)
         }
-        .borderRadius(8)
+        .borderRadius($r('app.float.wh_value_8'))
         .backgroundColor($r("app.color.blue"))
-        .width(180)
-        .height(50)
-        .margin({ top: "15vp" })
+        .width(ConfigData.VP_180)
+        .height(ConfigData.VP_50)
+        .margin({top: ConfigData.VP_15})
         .onClick(async(event: ClickEvent) => {
           await this.forLoop()
 
           let msg = ""
           msg = "测试"
-          console.log(msg)
-          promptAction.showToast({ message: msg })
+          hilog.info(0x1500, 'wifiTestApp', '%{public}s', msg)
+          promptAction.showToast({message: msg})
         })
       }
       .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
@@ -156,11 +160,11 @@ struct HotspotAutoTest {
     let Interface = HotspotAutoTestCase.map(i => {
       // 查找与条件匹配的元素，并且确保其不是undefined
       const foundItem = hotspotAutoArray.find(itm => itm.name === i.api.name);
-      let para: string[] = foundItem ? foundItem.para : [];
-      return { name: i.api.name, para } as IWifiAutoArrayItem;
+      let para: string[] = foundItem ? foundItem.para: [];
+      return { name: i.api.name, para} as IWifiAutoArrayItem;
     });
 
-    for (let m = 0 ; m < Interface.length ; m ++) {
+    for(let m = 0 ; m<Interface.length ; m++){
       hotspotAutoTestMessage += await HotspotAutoTestCase[m].api(... Interface[m].para) + "\n"
       this.changeIndex = m
       await sleep(2)

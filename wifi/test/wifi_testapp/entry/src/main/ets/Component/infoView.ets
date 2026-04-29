@@ -17,7 +17,7 @@
  * info view Of WiFi test
  */
 
-import ConfigData from '../utils/ConfigData';
+import ConfigData from '../Utils/ConfigData';
 
 interface IpInfo {
   key: Resource,
@@ -33,22 +33,22 @@ export struct InfoView {
       ForEach(this.infoList, (item: IpInfo, index) => {
         Column() {
           Text(item.key)
-            .fontColor(Color.Black)
-            .fontSize(20)
+            .fontColor($r('app.color.black'))
+            .fontSize(ConfigData.VP_20)
             .width(ConfigData.WH_100_100)
           Text(item.value)
-            .fontColor(Color.Black)
-            .fontSize(20)
+            .fontColor($r('app.color.black'))
+            .fontSize(ConfigData.VP_20)
             .width(ConfigData.WH_100_100)
-            .margin({ top: 5, bottom: 5 })
-          if (index < this.infoList.length - 1) {
-            Divider().color(Color.Grey)
+            .margin({top: ConfigData.VP_5, bottom: ConfigData.VP_5})
+          if (index < this.infoList.length - 1){
+            Divider().color($r('app.color.color_999999_grey'))
           }
         }
-        .padding(5)
+        .padding(ConfigData.VP_5)
       }, (item: IpInfo) => JSON.stringify(item))
     }
-    .margin(10)
-    .border({ width: 1, color: Color.Gray, radius: 15 })
+    .margin(ConfigData.VP_10)
+    .border({width: ConfigData.VP_1, color: $r('app.color.color_999999_grey'), radius: $r('app.float.wh_value_15')})
   }
 }

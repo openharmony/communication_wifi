@@ -13,7 +13,22 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import BaseModel from './BaseModel';
+
+const LOG_DOMAIN = 0x1500;
+const LOG_TAG = 'wifiTestApp';
+
+function msgStr(msg: unknown): string {
+  if (typeof msg === 'string') {
+    return msg;
+  }
+  try {
+    return JSON.stringify(msg);
+  } catch (_e) {
+    return String(msg);
+  }
+}
 
 let LogLevel = {
   /**
@@ -48,37 +63,33 @@ const LOG_LEVEL = LogLevel.INFO;
  *  log package tool class
  */
 export class LogUtil extends BaseModel {
-  debug(msg): void {
-    console.log(msg)
+  debug(msg: unknown): void {
     if (LogLevel.DEBUG >= LOG_LEVEL) {
-      console.log(msg);
+      hilog.debug(LOG_DOMAIN, LOG_TAG, '%{public}s', msgStr(msg));
     }
   }
 
-  log(msg): void {
-    console.log(msg)
+  log(msg: unknown): void {
     if (LogLevel.INFO >= LOG_LEVEL) {
-      console.log(msg);
+      hilog.info(LOG_DOMAIN, LOG_TAG, '%{public}s', msgStr(msg));
     }
   }
 
-  info(msg): void {
-    console.log(msg)
+  info(msg: unknown): void {
     if (LogLevel.INFO >= LOG_LEVEL) {
-      console.log(msg);
+      hilog.info(LOG_DOMAIN, LOG_TAG, '%{public}s', msgStr(msg));
     }
   }
 
-  warn(msg): void {
-    console.log(msg)
+  warn(msg: unknown): void {
     if (LogLevel.WARN >= LOG_LEVEL) {
-      console.warn(msg);
+      hilog.warn(LOG_DOMAIN, LOG_TAG, '%{public}s', msgStr(msg));
     }
   }
 
-  error(msg): void {
+  error(msg: unknown): void {
     if (LogLevel.ERROR >= LOG_LEVEL) {
-      console.error(msg);
+      hilog.error(LOG_DOMAIN, LOG_TAG, '%{public}s', msgStr(msg));
     }
   }
 }

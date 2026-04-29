@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import wifi from '@ohos.wifi';
 import wifiManager from '@ohos.wifiManager';
-import { AvailableP2p } from '../../../component/availableP2p';
-import { P2pTitleBar } from '../../../component/p2pTitleBar';
-import { P2pModel } from '../../../entryability/model/p2pModel';
-import ConfigData from '../../../utils/ConfigData';
+import { AvailableP2p} from '../../../Component/availableP2p';
+import { P2pTitleBar} from '../../../Component/p2pTitleBar';
+import { P2pModel} from '../../../entryability/model/p2pModel';
+import ConfigData from '../../../Utils/ConfigData';
 
 const TAG = 'wifiTestApp [p2pFound]'
 const PERMISSION_P2P_NAME: string = 'ohos.permission.LOCATION'
@@ -29,7 +30,7 @@ const PERMISSION_P2P_NAME: string = 'ohos.permission.LOCATION'
 @Component
 struct P2pFound {
   private p2pModel: P2pModel = new P2pModel()
-  private testItem: string = "p2p扫描"
+  private testItem: string = ConfigData.P2P_FOUND_PAGE_CAPTION
   @State p2pList: Array<wifiManager.WifiP2pDevice> = []
   @State p2pIsLinked: boolean = false
   @State p2pIsSwitchOn: boolean = false
@@ -41,9 +42,9 @@ struct P2pFound {
 
   scan() {
     this.p2pModel.getP2pPeerDevices((result: wifiManager.WifiP2pDevice[]) => {
-      if (this.p2pIsSwitchOn) {
+      if (this.p2pIsSwitchOn){
         this.p2pList = result
-        console.log('scan p2pList:' + JSON.stringify(this.p2pList))
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s', 'scan p2pList:' + JSON.stringify(this.p2pList))
         setTimeout(() => {
           this.scan()
         }, 2000)
@@ -53,12 +54,12 @@ struct P2pFound {
 
   getP2pLinkedInfo() {
     wifiManager.getP2pLinkedInfo((err, p2pLinkedInfo) => {
-      if (err) {
-        console.log(TAG, `getLinkedInfo err: ${ JSON.stringify(err) }`)
+      if (err){
+        hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `getLinkedInfo err: ${ JSON.stringify(err) }`)
         return
       }
-      console.log(TAG, `p2pLinkedInfo: ${ JSON.stringify(p2pLinkedInfo) }`)
-      if (p2pLinkedInfo === null || p2pLinkedInfo.connectState === 0) {
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `p2pLinkedInfo: ${ JSON.stringify(p2pLinkedInfo) }`)
+      if (p2pLinkedInfo === null || p2pLinkedInfo.connectState === 0){
         this.p2pIsLinked = false
         this.p2pLinkedInfo = {
           connectState: 0,
@@ -75,13 +76,13 @@ struct P2pFound {
   addP2pListener() {
     wifiManager.on('p2pConnectionChange', wifiP2pLinkedInfo => {
       let state = wifiP2pLinkedInfo.connectState
-      console.log(TAG, `p2pConnectionChange: ${ state }`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `p2pConnectionChange: ${ state }`)
       this.getP2pLinkedInfo()
     })
     wifiManager.on('p2pStateChange', state => {
-      console.log(TAG, `p2pStateLisener state: ${ state }`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `p2pStateLisener state: ${ state }`)
       this.p2pList = []
-      if (state === 1) { // 1: wifi is enable, 0:wifi is disable
+      if (state === 1){// 1: wifi is enable, 0:wifi is disable
         wifiManager.startDiscoverDevices()
         this.scan()
       }
@@ -89,8 +90,8 @@ struct P2pFound {
   }
 
   aboutToAppear() {
-    if (wifiManager.isWifiActive()) {
-      console.log(TAG, 'wifi is active')
+    if (wifiManager.isWifiActive()){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, 'wifi is active')
       this.p2pIsSwitchOn = true
       wifiManager.startDiscoverDevices()
       this.scan()
@@ -101,22 +102,22 @@ struct P2pFound {
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        P2pTitleBar({ detail: this.testItem })
+      Stack({alignContent: Alignment.TopStart}){
+        P2pTitleBar({detail: this.testItem})
       }
 
       Row() {
         Text($r('app.string.wlan'))
-          .fontSize(22)
+          .fontSize(ConfigData.VP_22)
           .fontWeight(FontWeight.Bold)
           .layoutWeight(1)
           .align(Alignment.TopStart)
         Column() {
-          Toggle({ type: ToggleType.Switch, isOn: this.p2pIsSwitchOn })
+          Toggle({type: ToggleType.Switch, isOn: this.p2pIsSwitchOn})
             .onChange((isOn: boolean) => {
-              console.log(TAG, `wifi swtich is: ${ isOn }`)
+              hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `wifi swtich is: ${ isOn }`)
               this.p2pList = []
-              if (isOn) {
+              if (isOn){
                 this.p2pIsSwitchOn = true
                 wifiManager.enableWifi()
                 wifiManager.startDiscoverDevices()
@@ -132,10 +133,10 @@ struct P2pFound {
       }
       .width(ConfigData.WH_95_100)
 
-      AvailableP2p({ p2pList: $p2pList, p2pLinkedInfo: $p2pLinkedInfo })
+      AvailableP2p({p2pList: $p2pList, p2pLinkedInfo: $p2pLinkedInfo})
     }
-    .size({ width: ConfigData.WH_100_100, height: ConfigData.WH_100_100 })
-    .backgroundColor('#F5F5F5')
+    .size({width: ConfigData.WH_100_100, height: ConfigData.WH_100_100})
+    .backgroundColor($r("app.color.ohcc_hex_f5f5f5"))
   }
 
   aboutToDisappear() {

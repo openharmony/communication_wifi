@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
+import ConfigData from '../../Utils/ConfigData';
 import promptAction from '@ohos.promptAction';
 
 import wifiManager from '@ohos.wifiManager';
@@ -29,22 +31,22 @@ export function testIsMeteredHotspot() {
     let message = ''
     let ret = wifiManager.isMeteredHotspot()
     message = "DisconnectedReason:" + ret
-    promptAction.showToast({ message: message });
-    console.log(TAG + message);
+    promptAction.showToast({message: message});
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', TAG + message);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
 
 export function testEnableHiLinkHandshake() {
   try {
-    // let config:wifiManager.WifiDeviceConfig
-    // wifiManager.enableHiLinkHandshake(true,'',config)
-  } catch( e) {
+  // let config:wifiManager.WifiDeviceConfig
+  // wifiManager.enableHiLinkHandshake(true,'',config)
+  } catch( e){
   }
 }
 
@@ -53,13 +55,13 @@ export function testFactoryReset() {
     let message = ''
     wifiManager.factoryReset()
     message = "factoryReset:"
-    promptAction.showToast({ message: message })
-    console.log(TAG + message);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', TAG + message);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -67,20 +69,20 @@ export function testFactoryReset() {
 export function testEnableHotspotManager() {
   try {
     let message = " enableHotspot test"
-    if (hotspotManagerEnable) {
+    if (hotspotManagerEnable){
       message = "热点已经使能"
     } else {
-      wifiManager.enableHotspot() //enableHotspot的返回值为void
+      wifiManager.enableHotspot()//enableHotspot的返回值为void
       message = "热点使能执行结果：true"
       hotspotManagerEnable = true
       AppStorage.setOrCreate('hotspotIsOn', hotspotManagerEnable);
     }
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( err) {
-    console.log(TAG, `Failed to testEnableHotspotManager. message: ${ err.message }, code: ${ err.code }`)
+  } catch( err){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testEnableHotspotManager. message: ${ err.message }, code: ${ err.code }`)
     let message = `Failed to testEnableHotspotManager. message: ${ err.message }, code: ${ err.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -88,20 +90,20 @@ export function testEnableHotspotManager() {
 export function testDisableHotspotManager() {
   try {
     let message = "disableWifi test"
-    if (!hotspotManagerEnable) {
+    if (!hotspotManagerEnable){
       message = '热点还未使能';
     } else {
-      wifiManager.disableHotspot(); //disableHotspot的返回值为void
+      wifiManager.disableHotspot();//disableHotspot的返回值为void
       message = "热点去使能执行结果：true"
       hotspotManagerEnable = false;
       AppStorage.setOrCreate('hotspotIsOn', hotspotManagerEnable);
     }
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( err) {
-    console.log(TAG, `Failed to testDisableHotspotManager. message: ${ err.message }, code: ${ err.code }`)
+  } catch( err){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testDisableHotspotManager. message: ${ err.message }, code: ${ err.code }`)
     let message = `Failed to testDisableHotspotManager. message: ${ err.message }, code: ${ err.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -111,12 +113,12 @@ export function testIsHotspotDualBandSupportedManager(): string {
     let message = " isHotspotDualBandSupported test"
     let ret = wifiManager.isHotspotDualBandSupported()
     message = "热点支持双频结果：" + ret
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( err) {
-    console.log(TAG, `Failed to testIsHotspotDualBandSupportedManager. message: ${ err.message }, code: ${ err.code }`)
+  } catch( err){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testIsHotspotDualBandSupportedManager. message: ${ err.message }, code: ${ err.code }`)
     let message = `Failed to testIsHotspotDualBandSupportedManager. message: ${ err.message }, code: ${ err.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -125,18 +127,18 @@ export function testIsHostActiveManager(): string {
   try {
     let message = "isHostActive test"
     let ret = wifiManager.isHotspotActive()
-    if (ret) {
+    if (ret){
       hotspotManagerEnable = true
     } else {
       hotspotManagerEnable = false
     }
     message = "HostActive is " + ret
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( err) {
-    console.log(TAG, `Failed to testIsHostActiveManager. message: ${ err.message }, code: ${ err.code }`)
+  } catch( err){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testIsHostActiveManager. message: ${ err.message }, code: ${ err.code }`)
     let message = `Failed to testIsHostActiveManager. message: ${ err.message }, code: ${ err.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -147,30 +149,30 @@ export function testSetHotspotConfigManager(): string {
     let ssid = "testApp123"
     let securityType = 3
     let band = 1;
-    let preSharedKey = "12345678"
+    let preSharedKey = ConfigData.QV_MOCK_PRE_SHARED_KEY
     let maxConn = 3
     let channel = 6
     // TODO: 设备调试时候需要打开
-    ssid = AppStorage.get("h_ssid1")! //非空断言操作符
+    ssid = AppStorage.get("h_ssid1")!//非空断言操作符
     //  let securityType=AppStorage.get("h_securityType1")
     //  let band = AppStorage.get("h_band1")
-    preSharedKey = AppStorage.get("h_preSharedKey1")! //非空断言操作符
+    preSharedKey = AppStorage.get("h_preSharedKey1")!//非空断言操作符
     //  let maxConn = AppStorage.get("h_maxConn1")
     let config: wifiManager.HotspotConfig = {
-      ssid: ssid ,
-      securityType: securityType ,
-      band: band ,
-      preSharedKey: preSharedKey ,
-      maxConn: maxConn ,
+      ssid: ssid,
+      securityType: securityType,
+      band: band,
+      preSharedKey: preSharedKey,
+      maxConn: maxConn,
     }
     let ret = wifiManager.setHotspotConfig(config)
     message = "SetHotspotConfig 调用成功"
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( err) {
-    console.log(TAG, `Failed to testSetHotspotConfigManager. message: ${ err.message }, code: ${ err.code }`)
+  } catch( err){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testSetHotspotConfigManager. message: ${ err.message }, code: ${ err.code }`)
     let message = `Failed to testSetHotspotConfigManager. message: ${ err.message }, code: ${ err.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -182,15 +184,15 @@ export function testGetHotspotConfigManager(): string {
     message = "HotspotConfig is " + JSON.stringify(ret)
     let hotspotManagerSsid = ret.ssid
     AppStorage.setOrCreate("hotspotManagerSsid", hotspotManagerSsid)
-    console.log(TAG, "HotspotConfig is" + JSON.stringify(ret))
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "HotspotConfig is" + JSON.stringify(ret))
     let getHotspotConfigManagerMessage = JSON.stringify(ret)
     AppStorage.setOrCreate("getHotspotConfigManagerMessage", getHotspotConfigManagerMessage)
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( err) {
-    console.log(TAG, `Failed to testGetHotspotConfigManager. message: ${ err.message }, code: ${ err.code }`)
+  } catch( err){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetHotspotConfigManager. message: ${ err.message }, code: ${ err.code }`)
     let message = `Failed to testGetHotspotConfigManager. message: ${ err.message }, code: ${ err.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -200,32 +202,32 @@ export function testGetHotspotStationsManager(): string {
     let message = "GetStations test"
     let ret = wifiManager.getStations()
     message = "GetStations is" + JSON.stringify(ret)
-    console.log(TAG, "GetStations is" + JSON.stringify(ret))
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "GetStations is" + JSON.stringify(ret))
     let getStationsManagerMessage = JSON.stringify(ret)
     AppStorage.setOrCreate("getStationsManagerMessage", getStationsManagerMessage)
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
-  } catch( err) {
-    console.log(TAG, `Failed to testGetHotspotStationsManager. message: ${ err.message }, code: ${ err.code }`)
+  } catch( err){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testGetHotspotStationsManager. message: ${ err.message }, code: ${ err.code }`)
     let message = `Failed to testGetHotspotStationsManager. message: ${ err.message }, code: ${ err.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
 
 export function testAddHotspotBlockList() {
   try {
-    // let stationInfo:wifiManager.StationInfo
-    // wifiManager.addHotspotBlockList(stationInfo)
-  } catch( e) {
+  // let stationInfo:wifiManager.StationInfo
+  // wifiManager.addHotspotBlockList(stationInfo)
+  } catch( e){
   }
 }
 
 export function testDelHotspotBlockList() {
   try {
-    // let stationInfo:wifiManager.StationInfo
-    // wifiManager.delHotspotBlockList(stationInfo)
-  } catch( e) {
+  // let stationInfo:wifiManager.StationInfo
+  // wifiManager.delHotspotBlockList(stationInfo)
+  } catch( e){
 
   }
 }
@@ -235,13 +237,13 @@ export function testGetHotspotBlockList() {
     let message = ''
     let ret = wifiManager.getHotspotBlockList()
     message = "DisconnectedReason:" + JSON.stringify(ret)
-    promptAction.showToast({ message: message })
-    console.log(TAG + message);
+    promptAction.showToast({message: message})
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', TAG + message);
     return message
-  } catch( e) {
-    console.log(TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
+  } catch( e){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`)
     let message = `Failed to testRemoveDeviceConfigManager. message: ${ e.message }, code: ${ e.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -251,16 +253,16 @@ let hotspotStateChangeManager = false
 export function testOnHotspotStateChangeManager(): string {
   try {
     let message = "onHotspotStateChange test"
-    console.log(TAG, "testOnHotspotStateChange test");
-    if (hotspotStateChangeManager) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, "testOnHotspotStateChange test");
+    if (hotspotStateChangeManager){
       wifiManager.off("hotspotStateChange", () => {
-        promptAction.showToast({ message: "on.hotspotStateChange监听已关闭" })
+        promptAction.showToast({message: "on.hotspotStateChange监听已关闭"})
       })
       message = "关闭注册热点状态改变事件"
     } else {
       wifiManager.on("hotspotStateChange", (number) => {
         let hotspotStateManagerMessage = ""
-        switch (number) {
+        switch (number){
           case 0: hotspotStateManagerMessage = "inactive";
             break;
           case 1: hotspotStateManagerMessage = "active";
@@ -272,18 +274,18 @@ export function testOnHotspotStateChangeManager(): string {
           default: hotspotStateManagerMessage = '未知状态';
             break;
         }
-        promptAction.showToast({ message: "状态为:" + hotspotStateManagerMessage })
+        promptAction.showToast({message: "状态为:" + hotspotStateManagerMessage})
         AppStorage.setOrCreate("hotspotStateManagerMessage", hotspotStateManagerMessage)
       })
       message = "打开注册热点状态变化"
-      promptAction.showToast({ message: message })
+      promptAction.showToast({message: message})
     }
     hotspotStateChangeManager = !hotspotStateChangeManager
     return message
-  } catch( err) {
-    console.log(TAG, `Failed to testOnHotspotStateChangeManager. message: ${ err.message }, code: ${ err.code }`)
+  } catch( err){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testOnHotspotStateChangeManager. message: ${ err.message }, code: ${ err.code }`)
     let message = `Failed to testOnHotspotStateChangeManager. message: ${ err.message }, code: ${ err.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -293,10 +295,10 @@ let hotspotStaJoinManager = false
 export function testOnHotspotStaJoinManager() {
   try {
     let message = "onHotspotStaJoin test"
-    console.log(TAG, " testOnHotspotStaJoin ")
-    if (hotspotStaJoinManager) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, " testOnHotspotStaJoin ")
+    if (hotspotStaJoinManager){
       wifiManager.off("hotspotStaJoin", () => {
-        promptAction.showToast({ message: "on.hotspotStaJoin监听已关闭" })
+        promptAction.showToast({message: "on.hotspotStaJoin监听已关闭"})
       })
       message = "关闭注册Wi-Fi 热点 sta加入变化事件"
     } else {
@@ -304,17 +306,17 @@ export function testOnHotspotStaJoinManager() {
         let hotspotStaJoinManagerMessage = "name:" + data.name + ";macAddress:" + data.macAddress + ";ipAddress:" + data.ipAddress
         message = "状态为: " + JSON.stringify(data)
         AppStorage.setOrCreate("hotspotStaJoinManagerMessage", message)
-        promptAction.showToast({ message: hotspotStaJoinManagerMessage })
+        promptAction.showToast({message: hotspotStaJoinManagerMessage})
       })
       message = "打开注册Wi-Fi 热点 sta加入变化"
-      promptAction.showToast({ message: message })
+      promptAction.showToast({message: message})
     }
     hotspotStaJoinManager = !hotspotStaJoinManager
     return message
-  } catch( err) {
-    console.log(TAG, `Failed to testOnHotspotStaJoinManager. message: ${ err.message }, code: ${ err.code }`)
+  } catch( err){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testOnHotspotStaJoinManager. message: ${ err.message }, code: ${ err.code }`)
     let message = `Failed to testOnHotspotStaJoinManager. message: ${ err.message }, code: ${ err.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }
@@ -324,10 +326,10 @@ let hotspotStaLeaveManager = false
 export function testOnHotspotStaLeaveManager() {
   try {
     let message = "onHotspotStaLeave test"
-    console.log(TAG, " testOnHotspotStaLeave ")
-    if (hotspotStaLeaveManager) {
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, " testOnHotspotStaLeave ")
+    if (hotspotStaLeaveManager){
       wifiManager.off("hotspotStaLeave", () => {
-        promptAction.showToast({ message: "on.hotspotStaLeave监听已关闭" })
+        promptAction.showToast({message: "on.hotspotStaLeave监听已关闭"})
       })
       message = "关闭注册Wi-Fi 热点 sta离开变化事件"
     } else {
@@ -335,17 +337,17 @@ export function testOnHotspotStaLeaveManager() {
         let hotspotStaLeaveManagerMessage = "name:" + data.name + ";macAddress:" + data.macAddress + ";ipAddress:" + data.ipAddress
         message = "状态为: " + JSON.stringify(data)
         AppStorage.setOrCreate("hotspotStaLeaveManagerMessage", message)
-        promptAction.showToast({ message: hotspotStaLeaveManagerMessage })
+        promptAction.showToast({message: hotspotStaLeaveManagerMessage})
       })
       message = "打开注册Wi-Fi 热点 sta离开变化"
-      promptAction.showToast({ message : message })
+      promptAction.showToast({message: message})
     }
     hotspotStaLeaveManager = !hotspotStaLeaveManager
     return message
-  } catch( err) {
-    console.log(TAG, `Failed to testOnHotspotStaLeaveManager. message: ${ err.message }, code: ${ err.code }`)
+  } catch( err){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `Failed to testOnHotspotStaLeaveManager. message: ${ err.message }, code: ${ err.code }`)
     let message = `Failed to testOnHotspotStaLeaveManager. message: ${ err.message }, code: ${ err.code }`
-    promptAction.showToast({ message: message })
+    promptAction.showToast({message: message})
     return message
   }
 }

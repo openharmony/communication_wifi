@@ -13,8 +13,9 @@
  * limitations under the License.
  */
 
-import { TestData } from '../entryability/model/testData';
-import { TestList } from './testList';
+import hilog from '@ohos.hilog';
+import { TestData} from '../entryability/model/testData';
+import { TestList} from './testList';
 
 /**
  * Manual-Api Test Of Wifi test
@@ -25,7 +26,7 @@ export struct ManualApiTest {
   private testItems!: TestData[]
 
   aboutToAppear() {
-    console.info("ManualApiTest testItems:" + JSON.stringify(this.testItems))
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', "ManualApiTest testItems:" + JSON.stringify(this.testItems))
   }
 
   build() {

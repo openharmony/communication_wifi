@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import promptAction from '@ohos.promptAction';
 
 export class WebObject {
   controller: WebController;
   isRegistered: boolean;
 
-  constructor(controller: WebController, isRegistered: boolean) {
+  constructor(controller: WebController, isRegistered: boolean){
     this.controller = controller
     this.isRegistered = isRegistered
   }
@@ -30,14 +31,14 @@ export class WebKey {
   key: number;
   timestamp: number;
 
-  constructor(key: number, timestamp: number) {
+  constructor(key: number, timestamp: number){
     this.key = key
     this.timestamp = timestamp
   }
 }
 
 export enum LoadingStatus {
-  LOADING ,
+  LOADING,
   END
 }
 
@@ -53,20 +54,20 @@ export class Browser {
   tabsController: TabsController = new TabsController()
   webControllerArray: Array<WebObject> = [new WebObject(new WebController(), false)]
 
-  deleteTab(index: number) {
-    console.log(TAG, `delete before tab index= ${ index } controller length ${ this.webControllerArray.length } tabArrayIndex= ${ this.tabArrayIndex }`)
+  deleteTab(index: number){
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `delete before tab index= ${ index } controller length ${ this.webControllerArray.length } tabArrayIndex= ${ this.tabArrayIndex }`)
     this.webArray.splice(index, 1)
     this.webControllerArray.splice(index, 1)
-    if (this.tabArrayIndex > index || this.tabArrayIndex === this.webArray.length) {
+    if (this.tabArrayIndex > index || this.tabArrayIndex === this.webArray.length){
       this.tabArrayIndex -= 1
     };
-    for (let i = index ;i < this.webArray.length ; ++i) {
+    for(let i = index ;i<this.webArray.length ; ++i){
       this.webArray[i].key -= 1
     }
-    for (let i = 0 ;i < this.webArray.length ; ++i) {
-      console.log(TAG, `key ${ this.webArray[i].key }, time=${ this.webArray[i].timestamp }`)
+    for(let i = 0 ;i<this.webArray.length ; ++i){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `key ${ this.webArray[i].key }, time=${ this.webArray[i].timestamp }`)
     }
-    console.log(`delete after tab index=${ index }, controller length=${ this.webControllerArray.length }, tabArrayIndex=${ this.tabArrayIndex }`)
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s', `delete after tab index=${ index }, controller length=${ this.webControllerArray.length }, tabArrayIndex=${ this.tabArrayIndex }`)
     this.tabsController.changeIndex(this.tabArrayIndex)
   }
 
@@ -75,7 +76,7 @@ export class Browser {
   }
 
   addTab() {
-    if (this.webArray.length > 10) {
+    if (this.webArray.length > 10){
       promptAction.showToast({
         message: '页签数量已满'
       })
@@ -86,13 +87,13 @@ export class Browser {
     this.webControllerArray.push(object)
     this.webArray.push(new WebKey(this.webArray.length, new Date().getTime()))
     this.tabArrayIndex = this.webArray.length - 1
-    console.log(TAG, `add tab index= ${ this.tabArrayIndex }`)
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `add tab index= ${ this.tabArrayIndex }`)
     setTimeout(() => {
       this.tabsController.changeIndex(this.tabArrayIndex)
     }, 50)
   }
 
-  setTabArrayIndex(tabArrayIndex: number) {
+  setTabArrayIndex(tabArrayIndex: number){
     this.tabArrayIndex = tabArrayIndex
   }
 
@@ -100,7 +101,7 @@ export class Browser {
     return this.tabArrayIndex
   }
 
-  setInputVal(inputValue: string) {
+  setInputVal(inputValue: string){
     this.inputValue = inputValue
   }
 
@@ -108,19 +109,19 @@ export class Browser {
     return this.inputValue
   }
 
-  loadUrl(addr: Resource | string) {
+  loadUrl(addr: Resource | string){
     addr = "https://" + addr;
-    this.webControllerArray[this.tabArrayIndex].controller.loadUrl({ url: addr })
+    this.webControllerArray[this.tabArrayIndex].controller.loadUrl({url: addr})
   }
 
   Back() {
-    if (this.webControllerArray[this.tabArrayIndex].controller.accessBackward()) {
+    if (this.webControllerArray[this.tabArrayIndex].controller.accessBackward()){
       this.webControllerArray[this.tabArrayIndex].controller.backward()
     }
   }
 
   Forward() {
-    if (this.webControllerArray[this.tabArrayIndex].controller.accessForward()) {
+    if (this.webControllerArray[this.tabArrayIndex].controller.accessForward()){
       this.webControllerArray[this.tabArrayIndex].controller.forward()
     }
   }

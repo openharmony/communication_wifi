@@ -13,18 +13,19 @@
  * limitations under the License.
  */
 
+import hilog from '@ohos.hilog';
 import promptAction from '@ohos.promptAction';
 import router from '@ohos.router';
-import { PageTitle } from '../../component/pageTitle';
-import { TestImageDisplay } from '../../component/testImageDisplay';
-import { TestData } from '../../entryability/model/testData';
-import { ScenarioContentTable } from '../../component/scenarioContentTable';
+import { PageTitle} from '../../Component/pageTitle';
+import { TestImageDisplay} from '../../Component/testImageDisplay';
+import { TestData} from '../../entryability/model/testData';
+import { ScenarioContentTable} from '../../Component/scenarioContentTable';
 import {
-  P2pManagerConnectScenarioTestCase ,
+  P2pManagerConnectScenarioTestCase,
   initP2pManagerConnectScenarioData
 } from '../../entryability/model/scenarioTestDataModels'
 import * as P2pManagerInterface from '../../entryability/model/p2pManagerInterface';
-import ConfigData from '../../utils/ConfigData';
+import ConfigData from '../../Utils/ConfigData';
 
 interface myParams extends Object {
   testItem: TestData
@@ -32,7 +33,7 @@ interface myParams extends Object {
 
 interface IWifiAutoArrayItem {
   name: string;
-  para: string[]; // 替换any[]为实际参数类型
+  para: string[];// 替换any[]为实际参数类型
 }
 
 /**
@@ -41,16 +42,16 @@ interface IWifiAutoArrayItem {
 @Entry
 @Component
 struct p2pManagerConnectScenarioTest {
-  @State message: string = 'p2pManagerConnectScenarioTest';
+  @State message: string = ConfigData.TAG_MSG_P2P_M_CONN;
   private testItem: TestData = (router.getParams() as myParams).testItem
-  @State changeIndex: number = - 1
+  @State changeIndex: number = ConfigData.ITEM_CLICK_NONE
   @StorageLink("p2pManagerConnectScenarioMessage") p2pManagerConnectScenarioMessage: string = ""
-  @State deviceAddressManager: string = '6c:96:d7:3d:87:6f';
-  @State netIdManager: number = - 2;
-  @State passphraseManager: string = "12345678";
-  @State groupNameManager: string = "testGroup"
-  @State goBandManager: number = 0;
-  @State devNameManager: string = "MyTestDevice"
+  @State deviceAddressManager: string = ConfigData.P2P_DEMO_ADDRESS;
+  @State netIdManager: number = ConfigData.P2P_DEMO_NET_ID;
+  @State passphraseManager: string = ConfigData.QV_MOCK_PRE_SHARED_KEY;
+  @State groupNameManager: string = ConfigData.P2P_DEMO_GROUP_NAME;
+  @State goBandManager: number = ConfigData.P2P_DEMO_GO_BAND;
+  @State devNameManager: string = ConfigData.P2P_DEMO_DEVICE_NAME;
 
   aboutToAppear() {
     AppStorage.setOrCreate("deviceAddressManager", this.deviceAddressManager)
@@ -63,47 +64,47 @@ struct p2pManagerConnectScenarioTest {
 
   build() {
     Column() {
-      Stack({ alignContent: Alignment.TopStart }) {
-        TestImageDisplay({ testItem: this.testItem })
-        PageTitle({ testItem: this.testItem })
+      Stack({alignContent: Alignment.TopStart}){
+        TestImageDisplay({testItem: this.testItem})
+        PageTitle({testItem: this.testItem})
       }
 
-      Stack().height("1vp").backgroundColor("#000000");
+      Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
       Column() {
         Scroll() {
           Column() {
-            Text("场景流程验证:")
-              .fontSize("17vp")
-              .margin({ top: "10vp", bottom: "10vp", left: "20vp" })
+            Text($r('app.string.wifitest_text_cjlcyz'))
+              .fontSize(ConfigData.VP_17)
+              .margin({top: ConfigData.VP_10, bottom: ConfigData.VP_10, left: ConfigData.VP_20})
               .textAlign(TextAlign.Start)
               .width(ConfigData.WH_100_100)
             ScenarioContentTable({
               // testItem: this.testItem,
-              scenarioItems: initP2pManagerConnectScenarioData() ,
+              scenarioItems: initP2pManagerConnectScenarioData(),
               //            testMessage: this.testMessage,  优化时修改
               changeIndex: this.changeIndex
             })
           }
           .width(ConfigData.WH_100_100)
-          .height(280)
+          .height(ConfigData.VP_280)
         }
-        .scrollBarWidth(10)
+        .scrollBarWidth(ConfigData.VP_10)
         .scrollBar(BarState.Auto)
 
-        Stack().height("1vp").backgroundColor("#000000");
+        Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
 
         Scroll() {
           Column() {
-            Text("流程日志:")
-              .fontSize("17vp")
-              .margin({ top: "8vp", bottom: "8vp", left: "20vp" })
+            Text($r('app.string.wifitest_text_lcrz'))
+              .fontSize(ConfigData.VP_17)
+              .margin({top: ConfigData.VP_8, bottom: ConfigData.VP_8, left: ConfigData.VP_20})
               .textAlign(TextAlign.Start)
               .width(ConfigData.WH_100_100)
             List() {
               ListItem() {
                 Text(this.p2pManagerConnectScenarioMessage)
-                  .fontSize("17vp")
-                  .margin({ top: "5vp", left: "30vp", right: "10vp" })
+                  .fontSize(ConfigData.VP_17)
+                  .margin({top: ConfigData.VP_5, left: ConfigData.VP_30, right: ConfigData.VP_10})
                   .textAlign(TextAlign.Start)
                   .width(ConfigData.WH_90_100)
               }
@@ -113,117 +114,117 @@ struct p2pManagerConnectScenarioTest {
             .backgroundColor($r("sys.color.ohos_id_color_foreground_contrary"))
           }
           .width(ConfigData.WH_100_100)
-          .height(260)
+          .height(ConfigData.VP_260)
         }
-        .scrollBarWidth(10)
+        .scrollBarWidth(ConfigData.VP_10)
         .scrollBar(BarState.On)
       }
-      .height(500)
+      .height(ConfigData.VP_500)
       .width(ConfigData.WH_100_100)
       .backgroundColor($r("sys.color.ohos_id_color_sub_background"))
 
 
-      Stack().height("1vp").backgroundColor("#000000");
+      Stack().height(ConfigData.VP_1).backgroundColor($r("app.color.black"));
       Column() {
-        Flex({ alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween }) {
-          Button({ type: ButtonType.Normal, stateEffect: true }) {
-            Text('场景测试开始').fontSize("24vp").fontColor(0xffffff).margin({ left: 5, right: 5 })
+        Flex({alignItems: ItemAlign.Center, justifyContent: FlexAlign.SpaceBetween}){
+          Button({type: ButtonType.Normal, stateEffect: true}){
+            Text($r('app.string.wifitest_text_cjcsks')).fontSize(ConfigData.VP_24).fontColor($r('app.color.white')).margin({left: ConfigData.VP_5, right: ConfigData.VP_5})
           }
-          .borderRadius(8)
+          .borderRadius($r('app.float.wh_value_8'))
           .backgroundColor($r("app.color.blue"))
-          .width(100)
-          .height(66)
-          .margin({ top: "15vp", left: "20vp" })
+          .width(ConfigData.VP_100)
+          .height(ConfigData.VP_66)
+          .margin({top: ConfigData.VP_15, left: ConfigData.VP_20})
           .align(Alignment.Start)
           .onClick(async(event: ClickEvent) => {
-            promptAction.showToast({ message: '开始p2p连接场景测试' })
+            promptAction.showToast({message: $r('app.string.wifitest_toast_start_p2p_scenario')})
             await this.forLoop()
           })
 
-          Button({ type: ButtonType.Normal, stateEffect: true }) {
+          Button({type: ButtonType.Normal, stateEffect: true}){
             Row() {
-              Text('场景测试结束').fontSize("24vp").fontColor(0xffffff).margin({ left: 5, right: 5 })
+              Text($r('app.string.wifitest_text_cjcsjs')).fontSize(ConfigData.VP_24).fontColor($r('app.color.white')).margin({left: ConfigData.VP_5, right: ConfigData.VP_5})
             }.alignItems(VerticalAlign.Center)
           }
-          .borderRadius(8)
+          .borderRadius($r('app.float.wh_value_8'))
           .backgroundColor($r("app.color.blue"))
-          .width(100)
-          .height(66)
-          .margin({ top: "15vp", left: "10vp", right: "10vp" })
+          .width(ConfigData.VP_100)
+          .height(ConfigData.VP_66)
+          .margin({top: ConfigData.VP_15, left: ConfigData.VP_10, right: ConfigData.VP_10})
           .align(Alignment.Start)
           .onClick(async(event: ClickEvent) => {
             let p2pManagerConnectScenarioMessage = ""
             // 停止发现设备
             p2pManagerConnectScenarioMessage += P2pManagerInterface.testStopDiscoverP2pDevicesManager() + "\n"
-            console.log("testStopDiscoverP2pDevicesManager success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testStopDiscoverP2pDevicesManager success")
             await sleep(1)
             AppStorage.setOrCreate("p2pManagerConnectScenarioMessage", p2pManagerConnectScenarioMessage)
 
             //取消P2P连接
             p2pManagerConnectScenarioMessage += P2pManagerInterface.testP2pCancelConnectManager() + "\n"
-            console.log("testP2pCancelConnectManager success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testP2pCancelConnectManager success")
             await sleep(1)
             AppStorage.setOrCreate("p2pManagerConnectScenarioMessage", p2pManagerConnectScenarioMessage)
 
             //移除群组
             p2pManagerConnectScenarioMessage += P2pManagerInterface.testRemoveP2pGroupManager() + "\n"
-            console.log("testRemoveP2pGroupManager success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testRemoveP2pGroupManager success")
             await sleep(1)
             AppStorage.setOrCreate("p2pManagerConnectScenarioMessage", p2pManagerConnectScenarioMessage)
 
             //删除永久组
             p2pManagerConnectScenarioMessage += P2pManagerInterface.testDeletePersistentP2pGroupManager() + "\n"
-            console.log("testDeletePersistentP2pGroupManager success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testDeletePersistentP2pGroupManager success")
             await sleep(1)
             AppStorage.setOrCreate("p2pManagerConnectScenarioMessage", p2pManagerConnectScenarioMessage)
 
             //关闭P2P开关状态改变事件
             p2pManagerConnectScenarioMessage += P2pManagerInterface.testOnP2pStateChangeManager() + "\n"
-            console.log("testOffP2pStateChangeManager success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testOffP2pStateChangeManager success")
             await sleep(1)
             AppStorage.setOrCreate("p2pManagerConnectScenarioMessage", p2pManagerConnectScenarioMessage)
 
             //关闭P2P连接状态改变事件
             p2pManagerConnectScenarioMessage += P2pManagerInterface.testOnP2pConnectionChangeManager() + "\n"
-            console.log("testOffP2pConnectionChangeManager success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testOffP2pConnectionChangeManager success")
             await sleep(1)
             AppStorage.setOrCreate("p2pManagerConnectScenarioMessage", p2pManagerConnectScenarioMessage)
 
             //关闭P2P设备状态改变事件
             p2pManagerConnectScenarioMessage += P2pManagerInterface.testOnP2pDeviceChangeManager() + "\n"
-            console.log("testOffP2pDeviceChangeManager success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testOffP2pDeviceChangeManager success")
             await sleep(1)
             AppStorage.setOrCreate("p2pManagerConnectScenarioMessage", p2pManagerConnectScenarioMessage)
 
             //关闭P2P对端设备状态改变事件
             p2pManagerConnectScenarioMessage += P2pManagerInterface.testOnP2pPeerDeviceChangeManager() + "\n"
-            console.log("testOffP2pPeerDeviceChangeManager success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testOffP2pPeerDeviceChangeManager success")
             await sleep(1)
             AppStorage.setOrCreate("p2pManagerConnectScenarioMessage", p2pManagerConnectScenarioMessage)
 
             //关闭P2P永久组状态改变事件
             p2pManagerConnectScenarioMessage += P2pManagerInterface.testOnP2pPersistentGroupChangeManager() + "\n"
-            console.log("testOffP2pPersistentGroupChangeManager success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testOffP2pPersistentGroupChangeManager success")
             await sleep(1)
             AppStorage.setOrCreate("p2pManagerConnectScenarioMessage", p2pManagerConnectScenarioMessage)
 
             //关闭发现设备状态改变事件
             p2pManagerConnectScenarioMessage += P2pManagerInterface.testOnP2pDiscoveryChangeManager() + "\n"
-            console.log("testOffP2pDiscoveryChangeManager success")
+            hilog.info(0x1500, 'wifiTestApp', '%{public}s', "testOffP2pDiscoveryChangeManager success")
             await sleep(1)
             AppStorage.setOrCreate("p2pManagerConnectScenarioMessage", p2pManagerConnectScenarioMessage)
           })
 
-          Button({ type: ButtonType.Normal, stateEffect: true }) {
+          Button({type: ButtonType.Normal, stateEffect: true}){
             Row() {
-              Text('清空日志').fontSize("24vp").fontColor(0xffffff).margin({ left: 5, right: 5 })
+              Text($r('app.string.wifitest_text_qkrz')).fontSize(ConfigData.VP_24).fontColor($r('app.color.white')).margin({left: ConfigData.VP_5, right: ConfigData.VP_5})
             }.alignItems(VerticalAlign.Center)
           }
-          .borderRadius(8)
+          .borderRadius($r('app.float.wh_value_8'))
           .backgroundColor($r("app.color.moon"))
-          .width(80)
-          .height(66)
-          .margin({ top: "15vp", right: "20vp" })
+          .width(ConfigData.VP_80)
+          .height(ConfigData.VP_66)
+          .margin({top: ConfigData.VP_15, right: ConfigData.VP_20})
           .align(Alignment.Start)
           .onClick(async(event: ClickEvent) => {
             let p2pManagerConnectScenarioMessage = ""
@@ -243,19 +244,19 @@ struct p2pManagerConnectScenarioTest {
   async forLoop() {
     let p2pManagerConnectScenarioMessage = ""
     let hotspotManagerScenarioArray: IWifiAutoArrayItem[] = [{
-      name: "testSetDeviceNameManager" ,
-      para: ["MyTestDevice"]
+      name: "testSetDeviceNameManager",
+      para: [ConfigData.P2P_DEMO_DEVICE_NAME]
     }]
 
     //拼装数组
     let Interface = P2pManagerConnectScenarioTestCase.map(i => {
       // 查找与条件匹配的元素，并且确保其不是undefined
       const foundItem = hotspotManagerScenarioArray.find(itm => itm.name === i.api.name);
-      let para: string[] = foundItem ? foundItem.para : [];
-      return { name: i.api.name, para } as IWifiAutoArrayItem
+      let para: string[] = foundItem ? foundItem.para: [];
+      return { name: i.api.name, para} as IWifiAutoArrayItem
     })
 
-    for (let m = 0 ; m < Interface.length ; m ++) {
+    for(let m = 0 ; m<Interface.length ; m++){
       p2pManagerConnectScenarioMessage += P2pManagerConnectScenarioTestCase[m].api(... Interface[m].para) + "\n"
       this.changeIndex = m
       await sleep(1)

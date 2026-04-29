@@ -17,8 +17,8 @@
  * 新接口测试下的wifiManager测试数据 - 只包含几个主要的测试用例
  */
 
-import { TestApi, CaseCategory } from './testData';
-import { 
+import { TestApi, CaseCategory} from './testData';
+import {
   testIsWifiActiveManager,
   testEnableWifiManager,
   testDisableWifiManager,
@@ -35,29 +35,29 @@ interface WifiTest {
 
 export const NewWifiManagerTestCase: WifiTest[] = [
   {
-    'name': '是否已使能' ,
-    'detail': '是否已使能' ,
-    'method': 'isWifiActive' ,
-    'api': testIsWifiActiveManager ,
-    'result': 'None' ,
+    'name': '是否已使能',
+    'detail': '是否已使能',
+    'method': 'isWifiActive',
+    'api': testIsWifiActiveManager,
+    'result': 'None',
     'category': CaseCategory.WifiManager
-  },
+},
   {
-    'name': '开Wifi' ,
-    'detail': '使能Wifi' ,
-    'method': 'enableWifi' ,
-    'api': testEnableWifiManager ,
-    'result': 'None' ,
+    'name': '开Wifi',
+    'detail': '使能Wifi',
+    'method': 'enableWifi',
+    'api': testEnableWifiManager,
+    'result': 'None',
     'category': CaseCategory.WifiManager
-  },
+},
   {
-    'name': '关wifi' ,
-    'detail': '去使能wifi' ,
-    'method': 'disableWifi' ,
-    'api': testDisableWifiManager ,
-    'result': 'None' ,
+    'name': '关wifi',
+    'detail': '去使能wifi',
+    'method': 'disableWifi',
+    'api': testDisableWifiManager,
+    'result': 'None',
     'category': CaseCategory.WifiManager
-  },
+},
 ]
 
 export function initNewWifiManagerApiData(): Array<TestApi> {

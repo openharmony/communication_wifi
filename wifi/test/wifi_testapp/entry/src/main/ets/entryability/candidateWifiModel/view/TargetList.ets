@@ -15,7 +15,7 @@
 
 import TaskItemBean from '../common/bean/TaskItemBean';
 import TargetListItem from './TargetListItem';
-import { CommonConstants } from '../common/constant/CommonConstant';
+import { CommonConstants} from '../common/constant/CommonConstant';
 import DataModel from '../viewmodel/DataModel';
 
 @Component
@@ -36,11 +36,11 @@ export default struct TargetList {
           .fontWeight(CommonConstants.FONT_WEIGHT_LARGE)
           .fontColor($r('app.color.title_black_color'))
         Blank()
-        if (this.targetData.length > 0) {
-          if (this.isEditMode) {
+        if (this.targetData.length > 0){
+          if (this.isEditMode){
             Text($r('app.string.cancel_button'))
               .operateTextStyle($r('app.color.main_blue'))
-              .margin({ left: $r('app.float.distance_16') })
+              .margin({left: $r('app.float.distance_16')})
               .onClick(() => {
                 this.selectAll = false;
                 this.isEditMode = false;
@@ -72,32 +72,32 @@ export default struct TargetList {
       .width(CommonConstants.FULL_WIDTH)
       .height($r('app.float.wh_value_30'))
       .padding({
-        left: $r('app.float.distance_16') ,
+        left: $r('app.float.distance_16'),
         right: $r('app.float.distance_11')
       })
 
-      List({ space: CommonConstants.LIST_SPACE }) {
+      List({space: CommonConstants.LIST_SPACE}){
         ForEach(this.targetData, (item: TaskItemBean, index: number) => {
           ListItem() {
             TargetListItem({
-              taskItem: item ,
-              index: index ,
-              selectArr: $selectArray ,
-              isEditMode: this.isEditMode ,
+              taskItem: item,
+              index: index,
+              selectArr: $selectArray,
+              isEditMode: this.isEditMode,
               clickIndex: $clickIndex
             })
           }
         }, (item: TaskItemBean, index) => JSON.stringify(item) + index)
       }
       .edgeEffect(EdgeEffect.None)
-      .margin({ top: $r('app.float.distance_12') })
+      .margin({top: $r('app.float.distance_12')})
       .width(CommonConstants.FULL_WIDTH)
       .height(CommonConstants.LIST_HEIGHT)
 
       Blank()
         .width(CommonConstants.FULL_WIDTH)
         .height(CommonConstants.DIALOG_OPERATION_HEIGHT)
-      if (this.isEditMode) {
+      if (this.isEditMode){
         Button($r('app.string.delete_button'))
           .opacity(this.isSelectRows() ? CommonConstants.NO_OPACITY: CommonConstants.OPACITY)
           .enabled(this.isSelectRows() ? true: false)
@@ -115,7 +115,7 @@ export default struct TargetList {
     }
     .width(CommonConstants.MAIN_BOARD_WIDTH)
     .height(CommonConstants.LIST_BOARD_HEIGHT)
-    .padding({ top: $r('app.float.distance_16') })
+    .padding({top: $r('app.float.distance_16')})
   }
 
   /**
@@ -129,11 +129,11 @@ export default struct TargetList {
    * Whether to select all.
    */
   isSelectAll(): boolean {
-    if (this.selectArray.length === 0) {
+    if (this.selectArray.length === 0){
       return false;
     }
     let deSelectCount = this.selectArray.filter(selected => selected === false).length;
-    if (deSelectCount === 0) {
+    if (deSelectCount === 0){
       this.selectAll = true;
       return true;
     }
@@ -146,7 +146,7 @@ export default struct TargetList {
    *
    * @param selectStatus true: Select all. Otherwise, deselect all.
    */
-  selectAllOrCancel(selectStatus: boolean) {
+  selectAllOrCancel(selectStatus: boolean){
     let newSelectArray: Array<boolean> = []
     this.targetData.forEach(() => {
       newSelectArray.push(selectStatus);
@@ -168,7 +168,7 @@ export default struct TargetList {
 /**
  * Custom text button style.
  */
-@Extend(Text) function operateTextStyle(color: Resource) {
+@Extend(Text) function operateTextStyle(color: Resource){
   .fontSize($r('app.float.font_16'))
   .fontColor(color)
   .lineHeight($r('app.float.wh_value_19'))
@@ -178,7 +178,7 @@ export default struct TargetList {
 /**
  * Custom button style.
  */
-@Extend(Button) function operateButtonStyle(color: Resource) {
+@Extend(Button) function operateButtonStyle(color: Resource){
   .width($r('app.float.button_width'))
   .height($r('app.float.button_height'))
   .fontSize($r('app.float.font_16'))

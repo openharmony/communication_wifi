@@ -12,11 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-import { wifiManager } from "@kit.ConnectivityKit";
-import { promptAction } from "@kit.ArkUI";
-import { DeviceItemView, P2PDevice } from "./AllInOneView";
-import { NormalNav } from "./components/NormalNav";
+
+import hilog from '@ohos.hilog';
+import ConfigData from '../../Utils/ConfigData';
+import { wifiManager} from "@kit.ConnectivityKit";
+import { promptAction} from "@kit.ArkUI";
+import { DeviceItemView, P2PDevice} from "./AllInOneView";
+import { NormalNav} from "./components/NormalNav";
 
 const TAG = "CreateGroupView"
 
@@ -62,14 +64,14 @@ export struct CreateGroupView {
       this.allDevices = ds.map(P2PDevice.from)
     })
     wifiManager.on('p2pDiscoveryChange', (status: number) => {
-      if (status === 0) {
+      if (status === 0){
         wifiManager.startDiscoverDevices()
       }
     })
     try {
       wifiManager.startDiscoverDevices()
-    } catch (e) {
-      console.log(TAG, `startDiscoverDevices Error: ${JSON.stringify(e)}`)
+    } catch (e){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `startDiscoverDevices Error: ${JSON.stringify(e)}`)
     }
   }
 
@@ -80,15 +82,15 @@ export struct CreateGroupView {
 
   @Builder
   createGroupSheetBuilder() {
-    Column({space: 20}) {
+    Column({space: ConfigData.VP_20}){
       TextInput({text: $$this.groupName, placeholder: $r('app.string.input_create_name_tip')})
       TextInput({text:$$this.pwd, placeholder: $r('app.string.input_create_pwd_tip')})
-      Row({ space: 20}) {
+      Row({space: ConfigData.VP_20}){
         Button($r('app.string.confirm_button'),{type: ButtonType.Normal})
-          .height(40)
+          .height(ConfigData.VP_40)
           .layoutWeight(1)
           .onClick(() => {
-            if (this.groupName.length <= 0 || this.pwd.length <= 0) {
+            if (this.groupName.length <= 0 || this.pwd.length <= 0){
               promptAction.showToast({message: $r('app.string.input_pwd_name_tip')})
             } else {
               this.showCreateGroupSheet = false
@@ -96,14 +98,14 @@ export struct CreateGroupView {
             }
           })
         Button($r('app.string.cancel_button'),{type: ButtonType.Normal})
-          .height(40)
+          .height(ConfigData.VP_40)
           .layoutWeight(1)
           .onClick(() => {
             this.showCreateGroupSheet = false
           })
-      }.width('100%')
+      }.width(ConfigData.WH_100_100)
     }
-    .padding(20)
+    .padding(ConfigData.VP_20)
   }
 
   @Builder
@@ -119,14 +121,14 @@ export struct CreateGroupView {
             this.pwdInputDialog.open()
           })
         })
-      }.divider({strokeWidth: 1, color: Color.Gray})
+      }.divider({strokeWidth: ConfigData.VP_1, color: $r('app.color.color_999999_grey')})
     }
-    .padding(20)
+    .padding(ConfigData.VP_20)
   }
 
   build() {
     NavDestination() {
-      Column({space: 20}) {
+      Column({space: ConfigData.VP_20}){
         NormalNav({title: $r('app.string.create_group_test_title')})
         Button($r('app.string.create_group'))
           .bindSheet($$this.showCreateGroupSheet, this.createGroupSheetBuilder(), {
@@ -142,8 +144,8 @@ export struct CreateGroupView {
           .onClick(() => {
             this.showConnectTestSheet = true
           })
-        if (this.groupInfo) {
-          Column({space: 10}) {
+        if (this.groupInfo){
+          Column({space: ConfigData.VP_10}){
             Text($r('app.string.created_group_title'))
               .fontWeight(FontWeight.Bolder)
             Text() {
@@ -166,15 +168,15 @@ export struct CreateGroupView {
               try {
                 wifiManager.removeGroup()
                 this.groupInfo = undefined
-              } catch (e) {
-                console.log(TAG, `removeGroup error: ${JSON.stringify(e)}`)
+              } catch (e){
+                hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `removeGroup error: ${JSON.stringify(e)}`)
               }
             })
-          }.width('90%')
-          .border({width: 2})
-          .padding(10)
+          }.width(ConfigData.WH_90_100)
+          .border({width: ConfigData.VP_2})
+          .padding(ConfigData.VP_10)
         }
-      }.padding(20)
+      }.padding(ConfigData.VP_20)
     }
     .hideTitleBar(true)
   }
@@ -189,7 +191,7 @@ export struct CreateGroupView {
         groupName: this.groupName,
         goBand: 0
       }
-      console.log(`deviceAddress: ${config.deviceAddress}, netId: ${config.netId}, pwd: ${config.passphrase}, gpname: ${config.groupName}, goBand: ${config.goBand}`)
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s', `deviceAddress: ${config.deviceAddress}, netId: ${config.netId}, pwd: ${config.passphrase}, gpname: ${config.groupName}, goBand: ${config.goBand}`)
       wifiManager.createGroup(config)
       this.groupInfo = {
         groupName: this.groupName,
@@ -197,8 +199,8 @@ export struct CreateGroupView {
         goAddr: deviceInfo.deviceAddress,
         goName: deviceInfo.deviceName
       }
-    } catch (e) {
-      console.log(TAG, `createGroup Error: ${JSON.stringify(e)}`)
+    } catch (e){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `createGroup Error: ${JSON.stringify(e)}`)
     }
   }
 
@@ -211,11 +213,11 @@ export struct CreateGroupView {
       groupName: this.connectGroupName,
       goBand: 0
     }
-    console.log(TAG, `startConnect config: ${JSON.stringify(config)}`)
+    hilog.info(0x1500, 'wifiTestApp', '%{public}s %{public}s', TAG, `startConnect config: ${JSON.stringify(config)}`)
     try {
       wifiManager.p2pConnect(config)
-    } catch (e) {
-      console.log(`p2pConnect Error: ${JSON.stringify(e)}`)
+    } catch (e){
+      hilog.info(0x1500, 'wifiTestApp', '%{public}s', `p2pConnect Error: ${JSON.stringify(e)}`)
     }
   }
 }
@@ -229,27 +231,27 @@ struct CustomInputDialog {
   @Link pwd: string
   @Link gpName: string
   build() {
-    Column({space: 20}) {
+    Column({space: ConfigData.VP_20}){
       Text(this.title)
       TextInput({text: $$this.gpName, placeholder: $r('app.string.input_create_name_tip')})
       TextInput({text: $$this.pwd,placeholder: $r('app.string.input_create_pwd_tip')})
-      Row({space: 20}) {
+      Row({space: ConfigData.VP_20}){
         Button($r('app.string.confirm_button'), {
           type: ButtonType.Normal
         })
-          .layoutWeight(1)
-          .onClick(() => {
+        .layoutWeight(1)
+        .onClick(() => {
           this.confirm()
         })
         Button($r('app.string.cancel_button'), {
           type: ButtonType.Normal
         })
-          .layoutWeight(1)
-          .onClick(() => {
+        .layoutWeight(1)
+        .onClick(() => {
           this.cancel()
         })
       }
     }
-    .padding(20)
+    .padding(ConfigData.VP_20)
   }
 }

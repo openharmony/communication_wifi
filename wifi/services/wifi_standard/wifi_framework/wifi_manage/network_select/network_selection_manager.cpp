@@ -178,8 +178,8 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
     for (auto &pair: wifiDeviceConfigs) {
         size_t index = static_cast<size_t>(pair.second);
         if (index >= networkCandidates.size()) {
-        LOGE("wifiDeviceConfigs: Invalid index"); 
-        continue; 
+        LOGE("wifiDeviceConfigs: Invalid index");
+        continue;
     }
         if (wifiDevicesInfo.rdbuf() ->in_avail() != 0) { wifiDevicesInfo << ","; }
         wifiDevicesInfo << "\"" << pair.first << "_" <<

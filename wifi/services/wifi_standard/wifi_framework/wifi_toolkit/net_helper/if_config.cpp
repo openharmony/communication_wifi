@@ -74,7 +74,10 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
                 return;
             }
             int pid = fork();
-            if (pid == -1) { return; }
+            if (pid == -1) {
+                LOGE("ifconfig fork child process failed.");
+                return;
+            }
             if (pid == 0) {
                 const char *execveStr[MAX_COMMAND_ARG];
                 int i = 0;
@@ -94,7 +97,10 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
             }
             close(fd[1]);
             FILE *fp = fdopen(fd[0], "r");
-            if (fp == nullptr) { return; }
+            if (fp == nullptr) {
+                LOGE("ifconfig fdopen failed.");
+                return;
+            }
             char buffer[RECEIVE_BUFFER_LEN];
             while (fgets(buffer, sizeof(buffer), fp) != nullptr) {
                 LOGD("exec cmd receive: %{public}s", buffer);
@@ -102,10 +108,7 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
             fclose(fp);
         }
     );
-    if (!t.joinable()) {
-        LOGE("Thread creation failed.");
-        return false;
-    }
+    
     t.detach();
     return true;
 }

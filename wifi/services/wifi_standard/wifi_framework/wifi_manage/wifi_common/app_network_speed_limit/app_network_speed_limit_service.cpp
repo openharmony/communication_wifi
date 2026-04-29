@@ -51,6 +51,7 @@ namespace {
     const int GAME_BOOST_DISABLE = 0;
     const int BOOST_UDP_TYPE = 17;
     constexpr int64_t LOW_LATENCY_EXIT_TIMEOUT = 3 * 60 * 1000;
+    const std::unordered_set<int> SA_UID_LIST = {5206}; // 5206: 云备份
 }
 
 AppNetworkSpeedLimitService::AppNetworkSpeedLimitService()
@@ -316,6 +317,7 @@ void AppNetworkSpeedLimitService::UpdateBackgroundAppConfigs(const int enable)
             }
         }
     }
+    m_bgUidSet.insert(SA_UID_LIST.begin(), SA_UID_LIST.end());
 }
 
 void AppNetworkSpeedLimitService::UpdateForegroundAppConfigs()

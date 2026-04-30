@@ -109,9 +109,11 @@ private:
      *
      * @param filtedReason candidate networks filtedReason
      */
-    std::string BuildReasonsString(const std::map<std::string,
-        std::set<NetworkSelection::FiltedReason, NetworkSelection::FiltedReasonComparator,
-        std::allocator<NetworkSelection::FiltedReason>>> &filtedReason, int subcode);    
+    std::string BuildReasonsString(
+        const std::map<std::string,
+            std::set<NetworkSelection::FiltedReason, NetworkSelection::FiltedReasonComparator,
+                std::allocator<NetworkSelection::FiltedReason>>> &filtedReason,
+        int subcode);
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
     /**
      * report wifi forgery protection hisysevent

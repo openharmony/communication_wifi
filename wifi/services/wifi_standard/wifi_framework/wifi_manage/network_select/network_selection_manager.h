@@ -95,6 +95,23 @@ private:
      */
     std::string GetFilteredReasonForChr(
         std::vector<NetworkSelection::NetworkCandidate> &networkCandidates);
+
+    /**
+     * get filtered reason for chr
+     *
+     * @param networkCandidates candidate networks
+     */
+    std::string GetFilteredLastReasonForChr(
+        std::vector<NetworkSelection::NetworkCandidate> &networkCandidates);
+    
+    /**
+     * get filtered reason for chr
+     *
+     * @param filtedReason candidate networks filtedReason
+     */
+    std::string BuildReasonsString(const std::map<std::string,
+        std::set<NetworkSelection::FiltedReason, NetworkSelection::FiltedReasonComparator,
+        std::allocator<NetworkSelection::FiltedReason>>> &filtedReason, int subcode);    
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
     /**
      * report wifi forgery protection hisysevent

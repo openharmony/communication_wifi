@@ -239,6 +239,11 @@ void EnhanceWriteAutoConnectFailEvent(const std::string &failReason, const std::
         return;
     }
     cJSON_AddStringToObject(root, "FAIL_REASON", failReason.c_str());
+    if (!subReason.empty()) {
+        cJSON *subJson = cJSON_Parse(subReason.c_str());
+        cJSON_AddItemToObject(root, "SUB_REASON", subJson);
+    }
+
     cJSON_AddStringToObject(root, "SUB_REASON", subReason.c_str());
  
     char *jsonStr = cJSON_PrintUnformatted(root);
@@ -716,6 +721,30 @@ void EnhanceWriteSpeedTestHiSysEvent(const WifiSpeedTestStatisticInfo &speedTest
     }
     cJSON_free(jsonStr);
     cJSON_Delete(root);
+}
+
+
+std::string MapToJson(const std::map<int, std::string> &data)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return "";
+    }
+    
+    for (const auto &pair : data) {
+        std::string key = std::to_string(pair.first);
+        cJSON_AddStringToObject(root, key.c_str(), pair.second.c_str());
+    }
+    
+    char *jsonStr = cJSON_PrintUnformatted(root);
+    std::string result;
+    if (jsonStr != nullptr) {
+        result = jsonStr;
+        free(jsonStr);
+    }
+    cJSON_Delete(root);
+    return result;
 }
 }  // namespace Wifi
 }  // namespace OHOS

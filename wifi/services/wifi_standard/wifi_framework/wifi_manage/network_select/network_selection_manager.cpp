@@ -119,6 +119,7 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     std::string selectedInfo;
     if (bestNetworkCandidates.empty()) {
         if (!isSavedNetEmpty) {
+            failReason = GetFilteredLastReasonForChr(networkCandidates);
             EnhanceWriteAutoSelectHiSysEvent(static_cast<int>(type), selectedInfo, filteredReason, savedResult);
         }
         return false;
@@ -144,6 +145,48 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     networkSelectionResult.wifiDeviceConfig = bestNetworkCandidates.at(0)->wifiDeviceConfig;
     networkSelectionResult.interScanInfo = bestNetworkCandidates.at(0)->interScanInfo;
     return true;
+}
+
+std::string NetworkSelectionManager::BuildReasonsString(const std::map<std::string,
+    std::set<NetworkSelection::FiltedReason, NetworkSelection::FiltedReasonComparator,
+    std::allocator<NetworkSelection::FiltedReason>>> &filtedReason, int subcode)
+{
+    std::string reasons;
+    std::string subcodeStr = std::to_string(subcode);
+    for (const auto &pair : filtedReason) {
+        for (const auto &reason : pair.second) {
+            if (!reasons.empty()) {
+                reasons += "|";
+            }
+            reasons += NetworkSelection::filtReasonToString[reason];
+            if (reasons == "NETWORK_STATUS_DISABLE") {
+                reasons += "_";
+                reasons += subcodeStr;
+            }
+        }
+    }
+    return reasons;
+}
+ 
+std::string NetworkSelectionManager::GetFilteredLastReasonForChr(
+    std::vector<NetworkSelection::NetworkCandidate> &networkCandidates)
+{
+    std::map<int, std::string> reasonMap;
+    
+    for (size_t i = 0; i < networkCandidates.size(); i++) {
+        int networkId = networkCandidates.at(i).wifiDeviceConfig.networkId;
+        if (networkId == INVALID_NETWORK_ID) {
+            continue;
+        }
+        int subcode = static_cast<int>(networkCandidates.at(i).wifiDeviceConfig.
+            networkSelectionStatus.networkSelectionDisableReason);
+        std::string reasons = BuildReasonsString(networkCandidates.at(i).filtedReason, subcode);
+        if (!reasons.empty()) {
+            reasonMap[networkId] = reasons;
+        }
+    }
+    
+    return MapToJson(reasonMap);
 }
 
 void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::NetworkCandidate> &networkCandidates,

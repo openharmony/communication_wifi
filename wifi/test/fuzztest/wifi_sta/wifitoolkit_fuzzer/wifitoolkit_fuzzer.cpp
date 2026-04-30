@@ -350,6 +350,7 @@ void WifinetworkselectionmanagerTest()
     m_NetworkSelectionManager->ConvertScanInfo(wifiScanInfo, interScanInfo);
     m_NetworkSelectionManager->GetFilteredReasonForChr(networkCandidates);
     m_NetworkSelectionManager->GetSavedNetInfoForChr(networkCandidates, isSavedNetEmpty);
+    m_NetworkSelectionManager->GetFilteredLastReasonForChr(networkCandidates);
 }
 
 void WifinotificationutilTest()

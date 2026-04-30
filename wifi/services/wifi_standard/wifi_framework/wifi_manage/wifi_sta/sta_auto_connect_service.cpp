@@ -250,7 +250,7 @@ bool StaAutoConnectService::IsAutoConnectFailByP2PEnhanceFilter(const std::vecto
         }
     }
     if (!isMatched) {
-        EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_FAIL", "P2P_ENHANCE_FILTER");
+        EnhanceWriteAutoConnectFailEvent("P2P_ENHANCE_FILTER", "");
         return true;
     }
     return false;

@@ -243,8 +243,6 @@ void EnhanceWriteAutoConnectFailEvent(const std::string &failReason, const std::
         cJSON *subJson = cJSON_Parse(subReason.c_str());
         cJSON_AddItemToObject(root, "SUB_REASON", subJson);
     }
-
-    cJSON_AddStringToObject(root, "SUB_REASON", subReason.c_str());
  
     char *jsonStr = cJSON_PrintUnformatted(root);
     if (jsonStr == nullptr) {

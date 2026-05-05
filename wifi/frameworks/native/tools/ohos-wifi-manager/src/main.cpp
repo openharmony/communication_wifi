@@ -299,7 +299,8 @@ void PrintUsage(const char* progName)
 
 int main(int argc, char** argv)
 {
-    if (argc < 2) {
+    int argcSubcommandNum = 2;
+    if (argc < argcSubcommandNum) {
         PrintUsage(argv[0]);
         return 1;
     }
@@ -314,8 +315,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    int cmdArgc = argc - 2;
-    char** cmdArgv = argv + 2;
+    int cmdArgc = argc - argcSubcommandNum;
+    char** cmdArgv = argv + argcSubcommandNum;
 
     WIFI_LOGI("Executing command: %{public}s", cmdName.c_str());
     int ret = it->second.handler(cmdArgc, cmdArgv);

@@ -134,7 +134,7 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     if (IsOutdoorFilter(bestNetworkCandidates.at(0))) {
         WIFI_LOGI("bestNetworkCandidates do not satisfy outdoor select condition");
         iodStatisticInfo.outdoorFilterCnt++;
-        failReason = "IOD_FILTER";
+        EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_IOD_FILTER", "");
         EnhanceWriteIodHiSysEvent(iodStatisticInfo);
         return false;
     }

@@ -37,6 +37,8 @@ public:
     virtual bool GetWifiAllowSemiActive() const = 0;
     virtual void SetWifiStopState(bool state) = 0;
     virtual bool GetWifiStopState() const= 0;
+    virtual void SetTxRxGoodButNoInternet(bool isTxRxGoodButNoInternet) = 0;
+    virtual bool GetTxRxGoodButNoInternet() const = 0;
     virtual void SetStaIfaceName(const std::string &ifaceName, int instId = 0) = 0;
     virtual std::string GetStaIfaceName(int instId = 0) = 0;
     virtual int GetWifiState(int instId = 0) = 0;
@@ -225,6 +227,8 @@ public:
     MOCK_CONST_METHOD0(GetWifiAllowSemiActive, bool());
     MOCK_METHOD1(SetWifiStopState, void(bool state));
     MOCK_CONST_METHOD0(GetWifiStopState, bool());
+    MOCK_METHOD1(SetTxRxGoodButNoInternet, void(bool isTxRxGoodButNoInternet));
+    MOCK_CONST_METHOD0(GetTxRxGoodButNoInternet, bool());
     MOCK_METHOD2(SetStaIfaceName, void(const std::string &ifaceName, int));
     MOCK_METHOD1(GetStaIfaceName, std::string(int));
     MOCK_METHOD1(GetWifiState, int(int));

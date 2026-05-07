@@ -238,10 +238,10 @@ void WifiCountryCodeManager::DealApStateChanged(ApState state, int id, int hotsp
     WIFI_LOGI("ap state change, state=%{public}d, id=%{public}d", state, id);
     if (state == ApState::AP_STATE_STARTED) {
         WifiCountryCodeManager::GetInstance().UpdateWifiCountryCode();
+        WriteSoftApOperateHiSysEvent(static_cast<int>(SoftApChrEventType::SOFT_AP_OPEN_SUC_CNT));
     } else if (state != ApState::AP_STATE_STARTING && state != ApState::AP_STATE_STARTED) {
         std::string moduleName = "ApService_" + std::to_string(id);
         WifiCountryCodeManager::GetInstance().UnregisterWifiCountryCodeChangeListener(moduleName);
-        WriteSoftApOperateHiSysEvent(static_cast<int>(SoftApChrEventType::SOFT_AP_OPEN_SUC_CNT));
     }
 }
 #endif

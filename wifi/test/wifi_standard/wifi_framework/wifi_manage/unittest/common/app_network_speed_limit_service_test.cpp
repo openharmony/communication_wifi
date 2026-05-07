@@ -78,6 +78,10 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, LimitSpeed_HighTemp, TestSize.Level1)
     sleep(1);
     EXPECT_NE(BG_LIMIT_LEVEL_3,
         AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_TEMP]);
+    AppNetworkSpeedLimitService::GetInstance().LimitSpeed(BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT, BG_LIMIT_LEVEL_3);
+    sleep(1);
+    EXPECT_NE(BG_LIMIT_LEVEL_3,
+        AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT]);
 }
 
 

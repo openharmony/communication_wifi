@@ -175,7 +175,8 @@ bool AppNetworkSpeedLimitService::ShouldLimitSpeedInBackground(const std::string
 void AppNetworkSpeedLimitService::LimitSpeed(const int controlId, const int limitMode)
 {
     WIFI_LOGI("%{public}s enter, controlId=%{public}d, limitMode=%{public}d", __FUNCTION__, controlId, limitMode);
-    if (controlId == BgLimitControl::BG_LIMIT_CONTROL_ID_TEMP) {
+    if (controlId == BgLimitControl::BG_LIMIT_CONTROL_ID_TEMP ||
+        controlId == BgLimitControl::BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT) {
         // ignore high temp limit speed
         return;
     }

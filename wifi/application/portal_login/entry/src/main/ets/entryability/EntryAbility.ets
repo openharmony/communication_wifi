@@ -105,9 +105,9 @@ export default class EntryAbility extends UIAbility {
     hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onBackground');
     try {
       wifiManager.startWifiDetection();
-      hilog.info(DOMAIN, 'TAG', '%{public}s', 'onBackground startWifiDetection');
+      hilog.info(DOMAIN, TAG, '%{public}s', 'onBackground startWifiDetection');
     } catch (error) {
-      hilog.error(DOMAIN, 'TAG', '%{public}s',
+      hilog.error(DOMAIN, TAG, '%{public}s',
         `onBackground startWifiDetection. Code:${error.code}, message:${error.message}`);
     }
   }

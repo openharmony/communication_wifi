@@ -2117,11 +2117,6 @@ ErrCode WifiDeviceServiceImpl::StartWifiDetection()
         WIFI_LOGE("%{public}s manage wifi PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_PERMISSION_DENIED;
     }
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
-    if (pService == nullptr) {
-        WIFI_LOGE("pService is nullptr!");
-        return WIFI_OPT_STA_NOT_OPENED;
-    }
     pService->StartWifiDetection();
     return WIFI_OPT_SUCCESS;
 }

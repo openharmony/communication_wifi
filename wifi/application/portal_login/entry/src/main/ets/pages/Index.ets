@@ -444,7 +444,7 @@ struct Index {
               this.webviewController.setCustomUserAgent(this.selectedUA);
               hilog.info(DOMAIN, TAG, '%{public}s', 'setCustomUserAgent enter.');
               wifiManager.startWifiDetection();
-              hilog.info(DOMAIN, 'TAG', '%{public}s', 'onPageEnd startWifiDetection');
+              hilog.info(DOMAIN, TAG, '%{public}s', 'onPageEnd startWifiDetection');
             } catch (error) {
               hilog.error(DOMAIN, TAG, '%{public}s', `onPageBegin. Code:${error.code}, message:${error.message}`);
             }
@@ -467,9 +467,9 @@ struct Index {
             hilog.info(DOMAIN, TAG, '%{public}s', 'Url:' + safeAnonymize(this.webUrl));
             try {
               wifiManager.startWifiDetection();
-              hilog.info(DOMAIN, 'TAG', '%{public}s', 'onPageEnd startWifiDetection');
+              hilog.info(DOMAIN, TAG, '%{public}s', 'onPageEnd startWifiDetection');
             } catch (error) {
-              hilog.error(DOMAIN, 'TAG', '%{public}s',
+              hilog.error(DOMAIN, TAG, '%{public}s',
                 `onPageEnd startWifiDetection. Code:${error.code}, message:${error.message}`);
             }
             if (event.url == 'about:blank') {

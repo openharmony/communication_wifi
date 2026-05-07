@@ -103,6 +103,8 @@ void EnhanceWriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6In
 void EnhanceWriteIodHiSysEvent(const IodStatisticInfo &iodStatisticInfo);
 
 void EnhanceWriteSpeedTestHiSysEvent(const WifiSpeedTestStatisticInfo &speedTestinfo);
+
+std::string MapToJson(const std::map<int, std::string> &data);
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

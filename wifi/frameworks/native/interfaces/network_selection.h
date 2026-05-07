@@ -61,6 +61,7 @@ enum FiltedReason {
     CONFIG_NULL,
 };
 
+extern std::map<FiltedReason, std::string> filtReasonToString;
 struct FiltedReasonComparator {
     bool operator()(const FiltedReason& lhs, const FiltedReason& rhs) const
     {

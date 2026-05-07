@@ -838,5 +838,35 @@ HWTEST_F(NetworkSelectionTest, IsOutdoorFilterTestWlanPage, TestSize.Level1)
     EXPECT_EQ(mgr.rssiCntMap_.size(), 0);
 }
 
+HWTEST_F(NetworkSelectionTest, BuildReasonsStringTest, TestSize.Level1)
+{
+    NetworkSelectionManager mgr;
+    std::map<std::string, std::set<NetworkSelection::FiltedReason,
+        NetworkSelection::FiltedReasonComparator, std::allocator<NetworkSelection::FiltedReason>>> filtedReason;
+    filtedReason["rssi"].insert(NetworkSelection::POOR_SIGNAL);
+    filtedReason["security"].insert(NetworkSelection::NOT_SECURE_WIFI);
+    std::string result = mgr.BuildReasonsString(filtedReason, 0);
+    EXPECT_TRUE(result.find("POOR_SIGNAL") != std::string::npos);
+    EXPECT_TRUE(result.find("NOT_SECURE_WIFI") != std::string::npos);
+}
+ 
+HWTEST_F(NetworkSelectionTest, BuildReasonsStringWithSubcodeTest, TestSize.Level1)
+{
+    NetworkSelectionManager mgr;
+    std::map<std::string, std::set<NetworkSelection::FiltedReason,
+        NetworkSelection::FiltedReasonComparator, std::allocator<NetworkSelection::FiltedReason>>> filtedReason;
+    filtedReason["config"].insert(NetworkSelection::NETWORK_STATUS_DISABLE);
+    std::string result = mgr.BuildReasonsString(filtedReason, 5);
+    EXPECT_TRUE(result.find("NETWORK_STATUS_DISABLE_5") != std::string::npos);
+}
+ 
+HWTEST_F(NetworkSelectionTest, BuildReasonsStringEmptyTest, TestSize.Level1)
+{
+    NetworkSelectionManager mgr;
+    std::map<std::string, std::set<NetworkSelection::FiltedReason,
+        NetworkSelection::FiltedReasonComparator, std::allocator<NetworkSelection::FiltedReason>>> filtedReason;
+    std::string result = mgr.BuildReasonsString(filtedReason, 0);
+    EXPECT_TRUE(result.empty());
+}
 }
 }

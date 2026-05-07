@@ -2089,6 +2089,26 @@ ErrCode WifiDeviceServiceImpl::StartWifiDetection()
         WIFI_LOGE("%{public}s NOT System APP, PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_NON_SYSTEMAPP;
     }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+#ifndef OHOS_ARCH_LITE
+    // Check if the caller is in the NetDetectionAllowList whitelist
+    std::vector<PackageInfo> netDetectionAllowList;
+    if (WifiSettings::GetInstance().GetPackageInfoByName("NetDetectionAllowList", netDetectionAllowList) == 0) {
+        std::string callerBundleName = GetBundleName();
+        for (const auto& pkgInfo : netDetectionAllowList) {
+            if (callerBundleName == pkgInfo.name) {
+                WIFI_LOGI("%{public}s is in NetDetectionAllowList, skip permission check.", callerBundleName.c_str());
+                // Skip permission check and proceed with detection
+                pService->StartWifiDetection();
+                return WIFI_OPT_SUCCESS;
+            }
+        }
+    }
+#endif
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("%{public}s set wifi info PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_PERMISSION_DENIED;

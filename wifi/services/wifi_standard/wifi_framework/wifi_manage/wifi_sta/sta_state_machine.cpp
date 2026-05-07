@@ -2668,6 +2668,7 @@ void StaStateMachine::HandleNetCheckResult(SystemNetWorkState netState, const st
         netState = SystemNetWorkState::NETWORK_IS_WORKING;
         isTxRxGoodButNoInternet = true;
     }
+    WifiConfigCenter::GetInstance().SetTxRxGoodButNoInternet(isTxRxGoodButNoInternet);
 #ifdef FEATURE_SELF_CURE_SUPPORT
     if (selfCureService_ != nullptr) {
         selfCureService_->NotifyTxRxGoodButNoInternet(isTxRxGoodButNoInternet);

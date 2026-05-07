@@ -162,6 +162,16 @@ bool WifiConfigCenter::GetWifiStopState() const
     return mWifiStoping.load();
 }
 
+void WifiConfigCenter::SetTxRxGoodButNoInternet(bool isTxRxGoodButNoInternet)
+{
+    txRxGoodButNoInternet_ = isTxRxGoodButNoInternet;
+}
+
+bool WifiConfigCenter::GetTxRxGoodButNoInternet() const
+{
+    return txRxGoodButNoInternet_.load();
+}
+
 void WifiConfigCenter::SetStaIfaceName(const std::string &ifaceName, int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);

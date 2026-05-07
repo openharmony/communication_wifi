@@ -17,6 +17,7 @@
 #include "wifi_logger.h"
 #include "wifi_pro_interface.h"
 #include "wifi_pro_service.h"
+#include "wifi_config_center.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -57,6 +58,11 @@ void WifiProInterface::InitCallback()
     WIFI_LOGI("Enter InitCallback");
     staCallback_.callbackModuleName = "WifiProService";
     staCallback_.OnStaConnChanged = [this](OperateResState state, const WifiLinkedInfo &linkedInfo, int32_t instId) {
+        if (state == OperateResState::CONNECT_NETWORK_ENABLED &&
+            WifiConfigCenter::GetInstance().GetTxRxGoodButNoInternet()) {
+            WIFI_LOGI("WifiPro restore real net state: NETWORK_DISABLED for TxRx good but no internet");
+            state = OperateResState::CONNECT_NETWORK_DISABLED;
+        }
         this->DealStaConnChanged(state, linkedInfo, instId);
     };
     staCallback_.OnStaRssiLevelChanged = [this](int32_t rssi, int32_t instId) {

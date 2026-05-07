@@ -84,6 +84,10 @@ public:
 
     bool GetWifiStopState() const;
 
+    void SetTxRxGoodButNoInternet(bool isTxRxGoodButNoInternet);
+
+    bool GetTxRxGoodButNoInternet() const;
+
     void SetStaIfaceName(const std::string &ifaceName, int instId = 0);
 
     std::string GetStaIfaceName(int instId = 0);
@@ -438,6 +442,7 @@ private:
     ConnectSettings mCandidateConnectSettings;
     std::atomic<bool> mWifiAllowSemiActive {false};
     std::atomic<bool> mWifiStoping {false};
+    std::atomic<bool> txRxGoodButNoInternet_ {false};
     std::vector<std::string> mStaIfaceName = {"wlan0", "wlan1"};
     std::map<int, std::atomic<int>> mWifiState;
     std::map<int, WifiDetailState> mWifiDetailState;

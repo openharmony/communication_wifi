@@ -134,6 +134,10 @@ void PackageXmlParser::GetLandscapeSwitchLimitList(std::vector<PackageInfo> &pac
 {
     packageList = mLandscapeSwitchLimitList_;
 }
+void PackageXmlParser::GetNetDetectionAllowList(std::vector<PackageInfo> &packageList)
+{
+    packageList = mNetDetectionAllowList_;
+}
 void PackageXmlParser::GetScanForegroundAllowLimitList(std::vector<PackageInfo> &packageList)
 {
     packageList = mScanForegroundAllowLimitList_;

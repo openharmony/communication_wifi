@@ -2082,8 +2082,10 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
 ErrCode WifiDeviceServiceImpl::StartWifiDetection()
 {
 #ifndef OHOS_ARCH_LITE
+    std::string bundleName;
+    GetBundleNameByUid(GetCallingUid(), bundleName);
     WIFI_LOGI("StartWifiDetection(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
-        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+        GetCallingPid(), GetCallingUid(), bundleName.c_str());
 #endif
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("%{public}s NOT System APP, PERMISSION_DENIED!", __FUNCTION__);
@@ -2098,10 +2100,9 @@ ErrCode WifiDeviceServiceImpl::StartWifiDetection()
     // Check if the caller is in the NetDetectionAllowList whitelist
     std::vector<PackageInfo> netDetectionAllowList;
     if (WifiSettings::GetInstance().GetPackageInfoByName("NetDetectionAllowList", netDetectionAllowList) == 0) {
-        std::string callerBundleName = GetBundleName();
         for (const auto& pkgInfo : netDetectionAllowList) {
-            if (callerBundleName == pkgInfo.name) {
-                WIFI_LOGI("%{public}s is in NetDetectionAllowList, skip permission check.", callerBundleName.c_str());
+            if (bundleName == pkgInfo.name) {
+                WIFI_LOGI("%{public}s is in NetDetectionAllowList, skip permission check.", bundleName.c_str());
                 // Skip permission check and proceed with detection
                 pService->StartWifiDetection();
                 return WIFI_OPT_SUCCESS;

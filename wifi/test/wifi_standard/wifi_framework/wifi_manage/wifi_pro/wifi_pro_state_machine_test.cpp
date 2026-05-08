@@ -889,6 +889,28 @@ HWTEST_F(WifiProStateMachineTest, Try5gHandoverTest01, TestSize.Level1)
     EXPECT_FALSE(ret);
 }
 
+HWTEST_F(WifiProStateMachineTest, Try5gHandoverTest02, TestSize.Level1)
+{
+    auto linkedInfo = std::make_shared<WifiLinkedInfo>();
+    linkedInfo->bssid = "11:22:33:44:55:66";
+    linkedInfo->ssid = "current_ap";
+    linkedInfo->rssi = -60;
+    linkedInfo->band = 2; // 5G
+    pWifiProStateMachine_->pCurrWifiInfo_ = linkedInfo;
+
+    std::vector<InterScanInfo> scanInfos;
+    InterScanInfo currentScan;
+    currentScan.bssid = linkedInfo->bssid;
+    currentScan.ssid = linkedInfo->ssid;
+    currentScan.rssi = linkedInfo->rssi;
+    currentScan.band = 2; // 5G
+    scanInfos.push_back(currentScan);
+
+    bool ret = pWifiProStateMachine_->pWifiHasNetState_->Try5gHandover(scanInfos);
+
+    EXPECT_FALSE(ret);
+}
+
 HWTEST_F(WifiProStateMachineTest, TryHigherCategoryNetworkSelectionTest01, TestSize.Level1)
 {
     auto linkedInfo = std::make_shared<WifiLinkedInfo>();

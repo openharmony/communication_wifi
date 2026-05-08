@@ -1650,7 +1650,6 @@ int32_t ChipIfaceCallback::OnWifiNetlinkMessage(uint32_t type, const std::vector
 bool HalDeviceManager::IsWlanSupported(bool &isSupported)
 {
     LOGI("IsWlanSupported start");
-    std::lock_guard<std::mutex> lock(mMutex);
     if (g_isWlanSupportedCached) {
         isSupported = g_isWlanSupportedResult;
         LOGI("IsWlanSupported return cached result: %{public}d", isSupported);

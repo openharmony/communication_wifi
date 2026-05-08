@@ -2131,6 +2131,7 @@ void WifiSettings::InitPackageInfoConfig()
     std::vector<PackageInfo> permissionTrustList;
     std::vector<PackageInfo> scanLimitPackage;
     std::vector<PackageInfo> landscapeSwitchLimitList;
+    std::vector<PackageInfo> netDetectionAllowList;
     std::vector<PackageInfo> scanForegroundAllowLimitList;
     std::vector<PackageInfo> scanBackgroundAllowLimitList;
     xmlParser->GetScanControlPackages(scanControlPackageMap);
@@ -2139,6 +2140,7 @@ void WifiSettings::InitPackageInfoConfig()
     xmlParser->GetAclAuthPackages(permissionTrustList);
     xmlParser->GetScanLimitPackages(scanLimitPackage);
     xmlParser->GetLandscapeSwitchLimitList(landscapeSwitchLimitList);
+    xmlParser->GetNetDetectionAllowList(netDetectionAllowList);
     xmlParser->GetScanForegroundAllowLimitList(scanForegroundAllowLimitList);
     xmlParser->GetScanBackgroundAllowLimitList(scanBackgroundAllowLimitList);
     
@@ -2149,6 +2151,7 @@ void WifiSettings::InitPackageInfoConfig()
     mPackageInfoMap.insert_or_assign("AclAuthPackages", permissionTrustList);
     mPackageInfoMap.insert_or_assign("ScanLimitPackages", scanLimitPackage);
     mPackageInfoMap.insert_or_assign("LandscapeSwitchLimitList", landscapeSwitchLimitList);
+    mPackageInfoMap.insert_or_assign("NetDetectionAllowList", netDetectionAllowList);
     mPackageInfoMap.insert_or_assign("ScanForegroundAllowLimitList", scanForegroundAllowLimitList);
     mPackageInfoMap.insert_or_assign("ScanBackgroundAllowLimitList", scanBackgroundAllowLimitList);
 #endif

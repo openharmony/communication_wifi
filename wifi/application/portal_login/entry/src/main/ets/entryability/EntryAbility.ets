@@ -16,6 +16,7 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
+import { wifiManager } from '@kit.ConnectivityKit';
 import { setUrl, setNetId, setShouldShowBrowseItem, setIsInOOBE, getIsInOOBE, loadUAWhiteList } from '../common/utils';
 import { updateOnNewWant, updateOnBackground } from '../common/chr';
 import { emitter } from '@kit.BasicServicesKit';
@@ -102,5 +103,12 @@ export default class EntryAbility extends UIAbility {
     // Ability has back to background
     updateOnBackground();
     hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onBackground');
+    try {
+      wifiManager.startWifiDetection();
+      hilog.info(DOMAIN, TAG, '%{public}s', 'onBackground startWifiDetection');
+    } catch (error) {
+      hilog.error(DOMAIN, TAG, '%{public}s',
+        `onBackground startWifiDetection. Code:${error.code}, message:${error.message}`);
+    }
   }
 }

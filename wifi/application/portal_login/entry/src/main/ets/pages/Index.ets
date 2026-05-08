@@ -19,6 +19,7 @@ import { i18n, resourceManager  } from '@kit.LocalizationKit';
 import { common, OpenLinkOptions, abilityAccessCtrl, Permissions } from '@kit.AbilityKit';
 import { BusinessError, emitter } from '@kit.BasicServicesKit';
 import { SymbolGlyphModifier, window } from '@kit.ArkUI';
+import { wifiManager } from '@kit.ConnectivityKit';
 import { connection } from '@kit.NetworkKit';
 import { call } from '@kit.TelephonyKit';
 import {
@@ -388,6 +389,12 @@ struct Index {
           return false;
         })
         .onLoadIntercept((event) => {
+          try {
+            wifiManager.startWifiDetection();
+            hilog.info(DOMAIN, TAG, '%{public}s', 'onLoadIntercept startWifiDetection');
+          } catch (error) {
+            hilog.error(DOMAIN, TAG, '%{public}s', `onLoadIntercept startWifiDetection. Code:${error.code}, message:${error.message}`);
+          }
           if (event) {
             let url: string = event.data.getRequestUrl();
             // 判断链接是否为拨号链接
@@ -463,6 +470,13 @@ struct Index {
           if (event) {
             this.webUrl = event.url;
             hilog.info(DOMAIN, TAG, '%{public}s', 'Url:' + safeAnonymize(this.webUrl));
+            try {
+              wifiManager.startWifiDetection();
+              hilog.info(DOMAIN, TAG, '%{public}s', 'onPageEnd startWifiDetection');
+            } catch (error) {
+              hilog.error(DOMAIN, TAG, '%{public}s',
+                `onPageEnd startWifiDetection. Code:${error.code}, message:${error.message}`);
+            }
             if (event.url == 'about:blank') {
               hilog.info(DOMAIN, TAG, '%{public}s', 'about:blank exit.');
               exitApp(this.context);

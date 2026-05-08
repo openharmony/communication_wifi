@@ -2082,13 +2082,34 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
 ErrCode WifiDeviceServiceImpl::StartWifiDetection()
 {
 #ifndef OHOS_ARCH_LITE
+    std::string bundleName;
+    GetBundleNameByUid(GetCallingUid(), bundleName);
     WIFI_LOGI("StartWifiDetection(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
-        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+        GetCallingPid(), GetCallingUid(), bundleName.c_str());
 #endif
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("%{public}s NOT System APP, PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_NON_SYSTEMAPP;
     }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
+    if (pService == nullptr) {
+        WIFI_LOGE("pService is nullptr!");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+#ifndef OHOS_ARCH_LITE
+    // Check if the caller is in the NetDetectionAllowList whitelist
+    std::vector<PackageInfo> netDetectionAllowList;
+    if (WifiSettings::GetInstance().GetPackageInfoByName("NetDetectionAllowList", netDetectionAllowList) == 0) {
+        for (const auto& pkgInfo : netDetectionAllowList) {
+            if (bundleName == pkgInfo.name) {
+                WIFI_LOGI("%{public}s is in NetDetectionAllowList, skip permission check.", bundleName.c_str());
+                // Skip permission check and proceed with detection
+                pService->StartWifiDetection();
+                return WIFI_OPT_SUCCESS;
+            }
+        }
+    }
+#endif
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("%{public}s set wifi info PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_PERMISSION_DENIED;
@@ -2096,11 +2117,6 @@ ErrCode WifiDeviceServiceImpl::StartWifiDetection()
     if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("%{public}s manage wifi PERMISSION_DENIED!", __FUNCTION__);
         return WIFI_OPT_PERMISSION_DENIED;
-    }
-    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(m_instId);
-    if (pService == nullptr) {
-        WIFI_LOGE("pService is nullptr!");
-        return WIFI_OPT_STA_NOT_OPENED;
     }
     pService->StartWifiDetection();
     return WIFI_OPT_SUCCESS;

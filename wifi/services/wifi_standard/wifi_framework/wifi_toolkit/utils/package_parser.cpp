@@ -39,6 +39,7 @@ bool PackageXmlParser::ParseInternal(xmlNodePtr node)
     mAclAuthList.clear();
     mScanLimitPackage_.clear();
     mLandscapeSwitchLimitList_.clear();
+    mNetDetectionAllowList_.clear();
     mScanForegroundAllowLimitList_.clear();
     mScanBackgroundAllowLimitList_.clear();
     for (xmlNodePtr subNode = node->children; subNode != nullptr; subNode = subNode->next) {
@@ -55,6 +56,8 @@ bool PackageXmlParser::ParseInternal(xmlNodePtr node)
             GetPackageList(subNode, mScanLimitPackage_);
         } else if (tagName == TAG_LANDSCAPE_SWITCH_LIMIT) {
             GetPackageList(subNode, mLandscapeSwitchLimitList_);
+        } else if (tagName == TAG_NET_DETECTION_ALLOW) {
+            GetPackageList(subNode, mNetDetectionAllowList_);
         } else if (tagName == TAG_SCAN_FOREGROUND_ALLOW_LIMIT) {
             GetPackageList(subNode, mScanForegroundAllowLimitList_);
         } else if (tagName == TAG_SCAN_BACKGROUND_ALLOW_LIMIT) {
@@ -130,6 +133,10 @@ void PackageXmlParser::GetScanLimitPackages(std::vector<PackageInfo> &packageLis
 void PackageXmlParser::GetLandscapeSwitchLimitList(std::vector<PackageInfo> &packageList)
 {
     packageList = mLandscapeSwitchLimitList_;
+}
+void PackageXmlParser::GetNetDetectionAllowList(std::vector<PackageInfo> &packageList)
+{
+    packageList = mNetDetectionAllowList_;
 }
 void PackageXmlParser::GetScanForegroundAllowLimitList(std::vector<PackageInfo> &packageList)
 {

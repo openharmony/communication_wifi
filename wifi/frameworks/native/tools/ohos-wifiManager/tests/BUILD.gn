@@ -19,7 +19,7 @@ test_group("ohos_wifi_sta_test") {
     ]
 
     deps = [
-        "//foundation/communication/wifi/wifi/frameworks/native/tools/ohos-wifi-manager:ohos-wifi-manager",
+        "//foundation/communication/wifi/wifi/frameworks/native/tools/ohos-wifiManager:ohos-wifiManager",
         "//third_party/gtest:gtest_main",
     ]
 

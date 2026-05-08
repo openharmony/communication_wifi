@@ -31,47 +31,47 @@ protected:
 
 TEST_F(WifiCliTest, TestHelpCommand)
 {
-    const char* argv[] = {"ohos-wifi-manager", "sta-enable", "--help"};
+    const char* argv[] = {"ohos-wifiManager", "sta-enable", "--help"};
     int argc = 3;
     char** argv_copy = const_cast<char**>(argv);
 
-    int result = system("ohos-wifi-manager sta-enable --help > /dev/null 2>&1");
+    int result = system("ohos-wifiManager sta-enable --help > /dev/null 2>&1");
     EXPECT_EQ(result, 0);
 }
 
 TEST_F(WifiCliTest, TestStaEnableCommand)
 {
-    int result = system("ohos-wifi-manager sta-enable > /dev/null 2>&1");
+    int result = system("ohos-wifiManager sta-enable > /dev/null 2>&1");
     EXPECT_TRUE(result == 0 || result != 0);
 }
 
 TEST_F(WifiCliTest, TestStaDisableCommand)
 {
-    int result = system("ohos-wifi-manager sta-disable > /dev/null 2>&1");
+    int result = system("ohos-wifiManager sta-disable > /dev/null 2>&1");
     EXPECT_TRUE(result == 0 || result != 0);
 }
 
 TEST_F(WifiCliTest, TestScanStartCommand)
 {
-    int result = system("ohos-wifi-manager scan-start > /dev/null 2>&1");
+    int result = system("ohos-wifiManager scan-start > /dev/null 2>&1");
     EXPECT_TRUE(result == 0 || result != 0);
 }
 
 TEST_F(WifiCliTest, TestScanListCommand)
 {
-    int result = system("ohos-wifi-manager scan-list > /dev/null 2>&1");
+    int result = system("ohos-wifiManager scan-list > /dev/null 2>&1");
     EXPECT_TRUE(result == 0 || result != 0);
 }
 
 TEST_F(WifiCliTest, TestUnknownCommand)
 {
-    int result = system("ohos-wifi-manager unknown-cmd > /dev/null 2>&1");
+    int result = system("ohos-wifiManager unknown-cmd > /dev/null 2>&1");
     EXPECT_NE(result, 0);
 }
 
 TEST_F(WifiCliTest, TestNoCommand)
 {
-    int result = system("ohos-wifi-manager > /dev/null 2>&1");
+    int result = system("ohos-wifiManager > /dev/null 2>&1");
     EXPECT_NE(result, 0);
 }
 

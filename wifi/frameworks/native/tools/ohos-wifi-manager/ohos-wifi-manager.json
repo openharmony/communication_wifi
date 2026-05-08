@@ -1,8 +1,8 @@
 {
-    "name": "ohos-wifi-manager",
+    "name": "ohos-wifiManager",
     "version": "1.0.0",
     "description": "WiFi STA mode control tool for enabling/disabling STA mode and scanning networks",
-    "executablePath": "/system/bin/cli_tool/executable/ohos-wifi-manager",
+    "executablePath": "/system/bin/cli_tool/executable/ohos-wifiManager",
     "requirePermissions": [],
     "hasSubCommand": true,
     "inputSchema": {

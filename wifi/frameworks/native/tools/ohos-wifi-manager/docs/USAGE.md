@@ -3,7 +3,7 @@
 ## 基本用法
 
 ```bash
-ohos-wifi-manager <command>
+ohos-wifiManager <command>
 ```
 
 ## 命令列表
@@ -20,25 +20,25 @@ ohos-wifi-manager <command>
 ### 启用 WiFi STA 模式
 
 ```bash
-ohos-wifi-manager sta-enable
+ohos-wifiManager sta-enable
 ```
 
 ### 禁用 WiFi STA 模式
 
 ```bash
-ohos-wifi-manager sta-disable
+ohos-wifiManager sta-disable
 ```
 
 ### 启动 WiFi 扫描
 
 ```bash
-ohos-wifi-manager scan-start
+ohos-wifiManager scan-start
 ```
 
 ### 列出扫描结果
 
 ```bash
-ohos-wifi-manager scan-list
+ohos-wifiManager scan-list
 ```
 
 ## 输出格式

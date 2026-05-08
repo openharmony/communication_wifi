@@ -20,7 +20,7 @@ if (defined(ohos_lite)) {
 }
 
 import("//build/ohos/cli/ohos_cli_executable.gni")
-ohos_cli_executable("ohos-wifi-manager") {
+ohos_cli_executable("ohos-wifiManager") {
     sources = [
         "src/main.cpp",
     ]
@@ -58,7 +58,7 @@ ohos_cli_executable("ohos-wifi-manager") {
     install_enable = true
     install_images = ["system"]
     relative_install_dir = "cli_tool/executable"
-    cli_config_file = "ohos-wifi-manager.json"
+    cli_config_file = "ohos-wifiManager.json"
     part_name = "wifi"
     subsystem_name = "communication"
 }

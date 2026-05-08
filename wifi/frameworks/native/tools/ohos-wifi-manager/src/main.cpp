@@ -92,7 +92,7 @@ void OutputErrorJson(const std::string& code, const std::string& message, const 
     cJSON_Delete(root);
 }
 
-int cmd_sta_enable(int argc, char** argv)
+int cmdStaEnable(int argc, char** argv)
 {
     WIFI_LOGI("sta-enable command started");
 
@@ -133,7 +133,7 @@ int cmd_sta_enable(int argc, char** argv)
     return 1;
 }
 
-int cmd_sta_disable(int argc, char** argv)
+int cmdStaDisable(int argc, char** argv)
 {
     WIFI_LOGI("sta-disable command started");
 
@@ -171,7 +171,7 @@ int cmd_sta_disable(int argc, char** argv)
     return 1;
 }
 
-int cmd_scan_start(int argc, char** argv)
+int cmdScanStart(int argc, char** argv)
 {
     WIFI_LOGI("scan-start command started");
 
@@ -209,7 +209,7 @@ int cmd_scan_start(int argc, char** argv)
     return 1;
 }
 
-int cmd_scan_list(int argc, char** argv)
+int cmdScanList(int argc, char** argv)
 {
     WIFI_LOGI("scan-list command started");
 
@@ -266,7 +266,7 @@ int cmd_scan_list(int argc, char** argv)
     return 1;
 }
 
-int cmd_help(int argc, char** argv)
+int cmdHelp(int argc, char** argv)
 {
     WIFI_LOGI("help command called");
     std::cerr << "Available commands:\n";
@@ -278,11 +278,11 @@ int cmd_help(int argc, char** argv)
 
 void InitCommands()
 {
-    g_commands["sta-enable"] = {"sta-enable", "Enable WiFi STA mode", cmd_sta_enable};
-    g_commands["sta-disable"] = {"sta-disable", "Disable WiFi STA mode", cmd_sta_disable};
-    g_commands["scan-start"] = {"scan-start", "Start WiFi scan", cmd_scan_start};
-    g_commands["scan-list"] = {"scan-list", "List scan results", cmd_scan_list};
-    g_commands["--help"] = {"--help", "Show help information", cmd_help};
+    g_commands["sta-enable"] = {"sta-enable", "Enable WiFi STA mode", cmdStaEnable};
+    g_commands["sta-disable"] = {"sta-disable", "Disable WiFi STA mode", cmdStaDisable};
+    g_commands["scan-start"] = {"scan-start", "Start WiFi scan", cmdScanStart};
+    g_commands["scan-list"] = {"scan-list", "List scan results", cmdScanList};
+    g_commands["--help"] = {"--help", "Show help information", cmdHelp};
 }
 
 void PrintUsage(const char* progName)

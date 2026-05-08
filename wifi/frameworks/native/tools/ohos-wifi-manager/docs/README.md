@@ -1,4 +1,4 @@
-# ohos-wifi-manager
+# ohos-wifiManager
 
 ## 概述
 
@@ -23,5 +23,5 @@ WiFi STA（Station）模式控制工具，提供启用/禁用 STA 模式和 WiFi
 ## 安装路径
 
 ```
-/system/bin/cli_tool/executable/ohos-wifi-manager
+/system/bin/cli_tool/executable/ohos-wifiManager
 ```

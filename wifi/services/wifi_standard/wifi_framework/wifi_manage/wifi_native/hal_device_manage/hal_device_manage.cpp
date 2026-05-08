@@ -29,6 +29,9 @@
 #include "hdf_remote_service.h"
 #include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+#include "parameters.h"
+#endif
 
 #undef LOG_TAG
 #define LOG_TAG "HalDeviceManager"
@@ -54,6 +57,12 @@ constexpr int32_t MAX_CONNECT_DEFAULT = 8;
 constexpr int32_t CMD_SET_P2P_HIGH_PERF = 103;
 static bool g_isWlanSupportedCached = false;
 static bool g_isWlanSupportedResult = false;
+
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+const char* WLAN_PLUGGABLE_STATE = "persist.wlan.pluggable.state";
+const char* WLAN_PLUGGABLE_STATE_EXTRACT = "0";
+const char* WLAN_PLUGGABLE_STATE_EMPLACE = "1";
+#endif
 
 HalDeviceManager::HalDeviceManager()
 {
@@ -1647,23 +1656,20 @@ bool HalDeviceManager::IsWlanSupported(bool &isSupported)
         LOGI("IsWlanSupported return cached result: %{public}d", isSupported);
         return true;
     }
-    std::vector<uint32_t> chipIds;
-    CHECK_NULL_AND_RETURN(g_IWifi, false);
-
-    int32_t ret = g_IWifi->GetAvailableChips(chipIds);
-    if (ret != HDF_SUCCESS) {
-        isSupported = false;
-        LOGE("IsWlanSupported, call GetAvailableChips failed! ret:%{public}d", ret);
-        return false;
-    }
-
-    if (!chipIds.empty()) {
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+    std::string wlanPluggableState = WLAN_PLUGGABLE_STATE_EXTRACT;
+    std::string strValue = system::GetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EXTRACT);
+    if (strValue == WLAN_PLUGGABLE_STATE_EMPLACE) {
+        LOGI("IsWlanSupported wlan supported");
         isSupported = true;
-        LOGI("IsWlanSupported, WiFi hardware is supported, chip count:%{public}zu", chipIds.size());
     } else {
+        LOGI("IsWlanSupported wlan not supported");
         isSupported = false;
-        LOGI("IsWlanSupported, WiFi hardware is not supported");
     }
+#else
+    LOGI("IsWlanSupported no define WLAN_PLUGGABLE_SUPPORTED default true");
+    isSupported = true;
+#endif
     g_isWlanSupportedResult = isSupported;
     g_isWlanSupportedCached = true;
     return true;

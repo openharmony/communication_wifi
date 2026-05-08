@@ -80,6 +80,7 @@ declare_args() {
   wifi_feature_with_ipv6_selfcure = true
   wifi_feature_with_dynamic_adjust_wifi_power_save = false
   wifi_feature_enhance_switch_support = true
+  wifi_feature_pluggable_supported = false
 }
 
 memory_optimization_cflags = [

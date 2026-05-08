@@ -389,6 +389,12 @@ struct Index {
           return false;
         })
         .onLoadIntercept((event) => {
+          try {
+            wifiManager.startWifiDetection();
+            hilog.info(DOMAIN, 'TAG', '%{public}s', 'onLoadIntercept startWifiDetection');
+          } catch (error) {
+            hilog.error(DOMAIN, 'TAG', '%{public}s', `onLoadIntercept startWifiDetection. Code:${error.code}, message:${error.message}`);
+          }
           if (event) {
             let url: string = event.data.getRequestUrl();
             // 判断链接是否为拨号链接
@@ -443,10 +449,9 @@ struct Index {
             try {
               this.webviewController.setCustomUserAgent(this.selectedUA);
               hilog.info(DOMAIN, TAG, '%{public}s', 'setCustomUserAgent enter.');
-              wifiManager.startWifiDetection();
-              hilog.info(DOMAIN, TAG, '%{public}s', 'onPageEnd startWifiDetection');
             } catch (error) {
-              hilog.error(DOMAIN, TAG, '%{public}s', `onPageBegin. Code:${error.code}, message:${error.message}`);
+              hilog.error(DOMAIN, TAG, '%{public}s',
+                `onPageBegin Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
             }
           }
           try {

@@ -308,6 +308,8 @@ typedef enum {
 typedef enum {
     KEYBOARD_MOUSE_SCENE,
     D2D_SCENE,
+    PROXY_SCENE,
+    AUDIO_SCENE,
     OTHER_SCENE
 } CoexistReason;
 #endif // WIFI_LITE_WIFI_DEVICE_CONFIG_H

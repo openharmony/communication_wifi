@@ -161,11 +161,12 @@ private:
     void InitPidfile(void);
     void CheckSapcoExist(void);
     void ProcessExtMsg(WifiCloseServiceCode code);
+    void GetZeroWaitSupportFeatures(bool &support) const;
 private:
     std::mutex initStatusMutex;
     mutable std::mutex mutex;
     InitStatus mInitStatus;
-    long mSupportedFeatures;
+    long mSupportedFeatures = 0;
     bool g_supportsapcoexistflag;
     std::unique_ptr<WifiEventHandler> mCloseServiceThread = nullptr;
     std::unique_ptr<WifiEventHandler> mStartServiceThread = nullptr;

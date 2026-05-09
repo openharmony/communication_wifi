@@ -593,6 +593,8 @@ public:
      * @return WifiDeviceFeatures - A structure indicating device features.
      */
     virtual WifiDeviceFeatures GetDeviceFeatures() = 0;
+
+    virtual void GetZeroWaitDfsSupport(bool& support) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

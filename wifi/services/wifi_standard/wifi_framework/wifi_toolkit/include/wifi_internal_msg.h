@@ -72,6 +72,7 @@ enum class WifiFeatures {
     WIFI_FEATURE_WPA3_SAE = 0x8000000,       // The feature id indicates support WPA3-Personal SAE
     WIFI_FEATURE_WPA3_SUITE_B = 0x10000000,  // The feature id indicates support WPA3-Enterprise Suite-B
     WIFI_FEATURE_OWE = 0x20000000,           // The feature id indicates support Enhanced Open
+    WIFI_FEATURE_ZEROWAIT_DFS_SUPPORT = 0x80000000, // The feature id indicates support Zero Wait DFS
 };
 
 enum class OperateResState {

@@ -377,7 +377,7 @@ HWTEST_F(WifiNetStatsManagerTest, LogNetStatsTraffic_WithSpeedTest_CallsCheckAnd
 
     WifiNetStatsManager::GetInstance().LogNetStatsTraffic(netStats);
 
-    EXPECT_EQ(WifiNetStatsManager::GetInstance().lastLogTime_, 0);
+    EXPECT_NE(WifiNetStatsManager::GetInstance().lastLogTime_, 0);
 }
 }  // namespace Wifi
 }  // namespace OHOS

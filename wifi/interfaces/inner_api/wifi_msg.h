@@ -118,6 +118,8 @@ enum CoexistState : int {
 enum CoexistReason : int {
     KEYBOARD_MOUSE_SCENE,
     D2D_SCENE,
+    PROXY_SCENE,
+    AUDIO_SCENE,
     OTHER_SCENE,
 };
 

@@ -61,7 +61,7 @@ constexpr int FUZZY_BSSID_MAX_MATCH_CNT = 30;
 
 enum class WifiOprMidState { CLOSED = 0, OPENING = 1, RUNNING = 2, CLOSING = 3, SEMI_ACTIVE, UNKNOWN };
 
-enum class WifiFeatures {
+enum class WifiFeatures : unsigned long {
     WIFI_FEATURE_INFRA = 0x0001,             // The feature id indicates support basic infrastructure mode
     WIFI_FEATURE_INFRA_5G = 0x0002,          // The feature id indicates support 5 GHz Band
     WIFI_FEATURE_PASSPOINT = 0x0004,         // The feature id indicates support GAS/ANQP

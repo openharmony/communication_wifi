@@ -262,7 +262,7 @@ int WifiManager::GetSupportedFeatures(long &features) const
     }
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SAE);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SUITE_B);
-    bool support;
+    bool support = false;
     GetZeroWaitSupportFeatures(support);
     if (support) {
         supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_ZEROWAIT_DFS_SUPPORT);
@@ -283,7 +283,7 @@ void WifiManager::GetZeroWaitSupportFeatures(bool &support) const
 {
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService != nullptr) {
-        pEnhanceService->GetZeroWaitDfsSupport(support);
+        support = pEnhanceService->GetDeviceFeatures().isZeroWaitDfsSupport;
     }
 }
 

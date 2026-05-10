@@ -1289,6 +1289,7 @@ using EnhanceConfigVariant = std::variant<WifiFastReconnectConfig>;
 struct WifiDeviceFeatures {
     bool isP2pSupportDfsOffload { false };
     bool isEnableScanOnlyOnHotspot { false };
+    bool isZeroWaitDfsSupport { false };
 };
 }  // namespace Wifi
 }  // namespace OHOS

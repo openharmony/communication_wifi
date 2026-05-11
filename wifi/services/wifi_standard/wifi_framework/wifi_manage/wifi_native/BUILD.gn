@@ -191,8 +191,7 @@ if (defined(ohos_lite)) {
       "hdf_core:libhdi",
       "hdf_core:libpub_utils",
       "hilog:libhilog",
-      "samgr:samgr_proxy",
-      "init:libbegetutil",
+      "samgr:samgr_proxy", 
     ]
 
     if (wifi_feature_with_local_random_mac) {
@@ -208,10 +207,6 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_hdi_chip_supported) {
       defines += [ "HDI_CHIP_INTERFACE_SUPPORT" ]
       external_deps += [ "drivers_interface_wlan:libchip_proxy_2.0" ]
-    }
-
-    if (wifi_feature_pluggable_supported) {
-      defines += [ "WLAN_PLUGGABLE_SUPPORTED" ]
     }
 
     cflags = memory_optimization_cflags

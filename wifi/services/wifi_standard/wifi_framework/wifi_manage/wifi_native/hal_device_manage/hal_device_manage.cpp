@@ -29,9 +29,6 @@
 #include "hdf_remote_service.h"
 #include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
-#ifdef WLAN_PLUGGABLE_SUPPORTED
-#include "parameters.h"
-#endif
 
 #undef LOG_TAG
 #define LOG_TAG "HalDeviceManager"
@@ -55,14 +52,6 @@ OnChipServiceDied HalDeviceManager::g_chipHdiServiceDiedCb = nullptr;
 constexpr int32_t CMD_SET_MAX_CONNECT = 102;
 constexpr int32_t MAX_CONNECT_DEFAULT = 8;
 constexpr int32_t CMD_SET_P2P_HIGH_PERF = 103;
-static bool g_isWlanSupportedCached = false;
-static bool g_isWlanSupportedResult = false;
-
-#ifdef WLAN_PLUGGABLE_SUPPORTED
-const char* WLAN_PLUGGABLE_STATE = "persist.wlan.pluggable.state";
-const char* WLAN_PLUGGABLE_STATE_EXTRACT = "0";
-const char* WLAN_PLUGGABLE_STATE_EMPLACE = "1";
-#endif
 
 HalDeviceManager::HalDeviceManager()
 {
@@ -889,8 +878,6 @@ void HalDeviceManager::ResetHalDeviceManagerInfo(bool isRemoteDied)
     mIWifiStaIfaces.clear();
     mIWifiApIfaces.clear();
     mIWifiP2pIfaces.clear();
-    g_isWlanSupportedCached = false;
-    g_isWlanSupportedResult = false;
     if (g_chipHdiServiceDiedCb && isRemoteDied) {
         g_chipHdiServiceDiedCb();
     }
@@ -1645,33 +1632,6 @@ int32_t ChipIfaceCallback::OnWifiNetlinkMessage(uint32_t type, const std::vector
         g_netlinkReportCallback(type, recvMsg);
     }
     return 0;
-}
-
-bool HalDeviceManager::IsWlanSupported(bool &isSupported)
-{
-    LOGI("IsWlanSupported start");
-    if (g_isWlanSupportedCached) {
-        isSupported = g_isWlanSupportedResult;
-        LOGI("IsWlanSupported return cached result: %{public}d", isSupported);
-        return true;
-    }
-#ifdef WLAN_PLUGGABLE_SUPPORTED
-    std::string wlanPluggableState = WLAN_PLUGGABLE_STATE_EXTRACT;
-    std::string strValue = system::GetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EXTRACT);
-    if (strValue == WLAN_PLUGGABLE_STATE_EMPLACE) {
-        LOGI("IsWlanSupported wlan supported");
-        isSupported = true;
-    } else {
-        LOGI("IsWlanSupported wlan not supported");
-        isSupported = false;
-    }
-#else
-    LOGI("IsWlanSupported no define WLAN_PLUGGABLE_SUPPORTED default true");
-    isSupported = true;
-#endif
-    g_isWlanSupportedResult = isSupported;
-    g_isWlanSupportedCached = true;
-    return true;
 }
 
 }  // namespace Wifi

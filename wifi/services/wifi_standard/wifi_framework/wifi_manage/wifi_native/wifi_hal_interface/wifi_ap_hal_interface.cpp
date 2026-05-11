@@ -74,7 +74,7 @@ WifiErrorNo WifiApHalInterface::SetSoftApConfig(const std::string &ifName, const
 
 WifiErrorNo WifiApHalInterface::SetMaxConnectNum(const std::string &ifName, int32_t channel, int32_t maxConn)
 {
-#ifdef HDI_WPA_INTERFACE_SUPPORT
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
     if (!HalDeviceManager::GetInstance().SetMaxConnectNum(ifName, channel, maxConn)) {
         return WIFI_HAL_OPT_FAILED;
     }

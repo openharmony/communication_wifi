@@ -2960,7 +2960,7 @@ ErrCode WifiDeviceServiceImpl::IsWlanSupported(bool &isSupported)
 {
     WIFI_LOGI("Enter IsWlanSupported.");
 #ifdef WLAN_PLUGGABLE_SUPPORTED
-    std::string strValue = system::GetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EXTRACT);
+    std::string strValue = system::GetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EMPLACE);
     if (strValue == WLAN_PLUGGABLE_STATE_EXTRACT) {
         LOGI("IsWlanSupported wlan not supported");
         isSupported = false;

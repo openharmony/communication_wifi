@@ -534,12 +534,12 @@ WifiErrorNo WifiStaHalInterface::SetRoamConfig(const WifiHalRoamConfig &config)
     return WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo WifiStaHalInterface::WpaAutoConnect(int enable)
+WifiErrorNo WifiStaHalInterface::WpaAutoConnect(int enable, int instId)
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
     return mHdiWpaClient->ReqWpaAutoConnect(
-        enable, WifiConfigCenter::GetInstance().GetStaIfaceName(INSTID_WLAN0).c_str());
+        enable, WifiConfigCenter::GetInstance().GetStaIfaceName(instId).c_str());
 #endif
     return WIFI_HAL_OPT_FAILED;
 }

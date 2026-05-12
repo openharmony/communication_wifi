@@ -471,7 +471,7 @@ ErrCode StaStateMachine::ClosedState::GetRealMacAddressFromHal()
 
 void StaStateMachine::ClosedState::StartWifiProcess()
 {
-    if (WifiStaHalInterface::GetInstance().WpaAutoConnect(false) != WIFI_HAL_OPT_OK) {
+    if (WifiStaHalInterface::GetInstance().WpaAutoConnect(false, pStaStateMachine->m_instId) != WIFI_HAL_OPT_OK) {
         WIFI_LOGI("The automatic Wpa connection is disabled failed.");
     }
     int screenState = WifiConfigCenter::GetInstance().GetScreenState();

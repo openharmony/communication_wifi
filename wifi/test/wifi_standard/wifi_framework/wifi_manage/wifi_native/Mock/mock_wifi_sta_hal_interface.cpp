@@ -267,7 +267,7 @@ WifiErrorNo WifiStaHalInterface::SetRoamConfig(const WifiHalRoamConfig &config)
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo WifiStaHalInterface::WpaAutoConnect(int enable)
+WifiErrorNo WifiStaHalInterface::WpaAutoConnect(int enable, int instId)
 {
     return (MockWifiStaHalInterface::GetInstance().GetRetResult() == WIFI_HAL_OPT_OK) ?
         WIFI_HAL_OPT_OK : WIFI_HAL_OPT_FAILED;

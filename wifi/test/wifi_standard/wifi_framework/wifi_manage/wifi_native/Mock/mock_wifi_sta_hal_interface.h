@@ -76,7 +76,7 @@ public:
     WifiErrorNo GetRoamingCapabilities(WifiHalRoamCapability &capability);
     WifiErrorNo SetBssid(int networkId, const std::string &bssid, const std::string &ifaceName);
     WifiErrorNo SetRoamConfig(const WifiHalRoamConfig &config);
-    WifiErrorNo WpaAutoConnect(int enable);
+    WifiErrorNo WpaAutoConnect(int enable, int instId);
     WifiErrorNo WpaBlocklistClear();
     WifiErrorNo GetNetworkList(std::vector<WifiHalWpaNetworkInfo> &networkList);
     WifiErrorNo GetConnectSignalInfo(const std::string &ifaceName, const std::string &endBssid,

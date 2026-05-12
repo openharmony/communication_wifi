@@ -344,9 +344,9 @@ HWTEST_F(WifiStaHalInterfaceTest, SetRoamConfigTest, TestSize.Level1)
 
 HWTEST_F(WifiStaHalInterfaceTest, WpaAutoConnectTest, TestSize.Level1)
 {
-    WifiErrorNo ret = WifiStaHalInterface::GetInstance().WpaAutoConnect(1);
+    WifiErrorNo ret = WifiStaHalInterface::GetInstance().WpaAutoConnect(1, INSTID_WLAN0);
     EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
-    ret = WifiStaHalInterface::GetInstance().WpaAutoConnect(0);
+    ret = WifiStaHalInterface::GetInstance().WpaAutoConnect(0, INSTID_WLAN1);
     EXPECT_TRUE(ret == WIFI_HAL_OPT_OK);
 }
 

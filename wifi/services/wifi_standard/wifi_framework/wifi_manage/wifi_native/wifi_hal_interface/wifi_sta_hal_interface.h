@@ -318,9 +318,10 @@ public:
      * @Description Wpa_s disable/enable(0/1) automatic reconnection.
      *
      * @param enable
+     * @param instId
      * @return WifiErrorNo
      */
-    WifiErrorNo WpaAutoConnect(int enable);
+    WifiErrorNo WpaAutoConnect(int enable, int instId);
 
     /**
      * @Description Clearing the wpa Blocklist.

@@ -2810,7 +2810,7 @@ void StaStateMachine::PublishPortalNitificationAndLogin()
         WIFI_LOGI("%{public}s not allow publish, m_instId:%{public}d", __func__, m_instId);
         return;
     }
-    if (!WifiConfigCenter::GetInstance().IsAllowPopUp()) {
+    if (IsKidWatchDevice()) {
         return;
     }
     if (selfCureService_ != nullptr && selfCureService_->IsSelfCureOnGoing()) {

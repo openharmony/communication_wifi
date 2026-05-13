@@ -587,7 +587,7 @@ WifiErrorNo WifiP2PHalInterface::TempGroupAdd(int freq)
 
 WifiErrorNo WifiP2PHalInterface::SetP2pHighPerf(bool isEnable)
 {
-#ifdef HDI_WPA_INTERFACE_SUPPORT
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
     std::string ifName = WifiConfigCenter::GetInstance().GetP2pIfaceName();
     if (!HalDeviceManager::GetInstance().SetP2pHighPerf(ifName, isEnable)) {
         return WIFI_HAL_OPT_FAILED;

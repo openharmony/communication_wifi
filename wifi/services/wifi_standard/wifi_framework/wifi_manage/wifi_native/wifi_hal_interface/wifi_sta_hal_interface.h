@@ -156,14 +156,6 @@ public:
     WifiErrorNo SetTxPower(int power);
 
     /**
-     * @Description Check whether Wifi hardware module is present and supported
-     *
-     * @param isSupported - [out] whether WiFi hardware is supported
-     * @return WifiErrorNo
-     */
-    WifiErrorNo IsWlanSupported(bool &isSupported);
-
-    /**
      * @Description Scan by specified parameter.
      *
      * @param scanParam

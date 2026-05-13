@@ -46,6 +46,9 @@
 #include "wifi_sta_hal_interface.h"
 #include "block_connect_service.h"
 #include "wifi_hisysevent.h"
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+#include "parameters.h"
+#endif
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {
@@ -60,6 +63,12 @@ bool g_hiLinkActive = false;
 constexpr int HILINK_CMD_MAX_LEN = 1024;
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
 constexpr const int MAX_MDM_RESTRICTED_SIZE = 200;
+#endif
+
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+const char* WLAN_PLUGGABLE_STATE = "persist.wlan.pluggable.state";
+const char* WLAN_PLUGGABLE_STATE_EXTRACT = "0";
+const char* WLAN_PLUGGABLE_STATE_EMPLACE = "1";
 #endif
 
 #ifdef OHOS_ARCH_LITE
@@ -2950,10 +2959,19 @@ ErrCode WifiDeviceServiceImpl::GetWifiCapability(int capability, bool &enabled)
 ErrCode WifiDeviceServiceImpl::IsWlanSupported(bool &isSupported)
 {
     WIFI_LOGI("Enter IsWlanSupported.");
-    if (WifiStaHalInterface::GetInstance().IsWlanSupported(isSupported) != WIFI_HAL_OPT_OK) {
-        WIFI_LOGE("IsWlanSupported: Check hardware support failed!");
-        return WIFI_OPT_FAILED;
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+    std::string strValue = system::GetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EMPLACE);
+    if (strValue == WLAN_PLUGGABLE_STATE_EXTRACT) {
+        LOGI("IsWlanSupported wlan not supported");
+        isSupported = false;
+    } else {
+        LOGI("IsWlanSupported wlan supported");
+        isSupported = true;
     }
+#else
+    LOGI("IsWlanSupported no define WLAN_PLUGGABLE_SUPPORTED default true");
+    isSupported = true;
+#endif
     return WIFI_OPT_SUCCESS;
 }
 

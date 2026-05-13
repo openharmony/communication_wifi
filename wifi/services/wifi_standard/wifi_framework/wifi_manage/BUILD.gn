@@ -372,6 +372,10 @@ if (defined(ohos_lite)) {
       defines += [ "DYNAMIC_UNLOAD_SA" ]
     }
 
+    if (wifi_feature_pluggable_supported) {
+      defines += [ "WLAN_PLUGGABLE_SUPPORTED" ]
+    }
+
     external_deps = [
       "ability_base:want",
       "ability_runtime:app_manager",
@@ -386,6 +390,11 @@ if (defined(ohos_lite)) {
       "window_manager:libdm_lite",
       "netmanager_base:net_conn_manager_if",
     ]
+
+    if (wifi_feature_pluggable_supported) {
+      external_deps += [ "init:libbegetutil" ]
+    }
+
     if (defined(global_parts_info) &&
       defined(global_parts_info.telephony_core_service) &&
       defined(global_parts_info.telephony_state_registry) &&

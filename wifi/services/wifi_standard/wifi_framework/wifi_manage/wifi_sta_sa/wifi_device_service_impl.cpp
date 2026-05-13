@@ -862,7 +862,7 @@ ErrCode WifiDeviceServiceImpl::AnonymizeSensitiveFields(WifiDeviceConfig &config
     // 对EAP配置中的敏感字段进行脱敏
     if (config.keyMgmt == KEY_MGMT_EAP || config.keyMgmt == KEY_MGMT_SUITE_B_192) {
         config.wifiEapConfig.password = "*";
-        if (memset_s(config.wifiEapConfig.certPassword, sizeof(config.wifiEapConfig.certPassword), '*', 
+        if (memset_s(config.wifiEapConfig.certPassword, sizeof(config.wifiEapConfig.certPassword), '*',
             sizeof(config.wifiEapConfig.certPassword) - 1) != EOK) {
             WIFI_LOGE("AnonymizeSensitiveFields memset_s certPassword error!");
             return WIFI_OPT_FAILED;

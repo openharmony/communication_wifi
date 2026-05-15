@@ -22,6 +22,7 @@
       "phone",
       "tablet",
       "2in1",
+      "wearable",
       "tv"
     ],
     "deliveryWithInstall": true,

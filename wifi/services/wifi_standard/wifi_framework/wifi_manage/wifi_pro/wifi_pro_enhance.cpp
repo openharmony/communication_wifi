@@ -26,7 +26,7 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiProEnhance");
 static constexpr int FEATURE_VALUE_LEN = 16;
 static constexpr int FEATURE_VALUE_ON = 1;
-static constexpr const char *FEATURE_NAME = "runtime.enhance_switch";
+static constexpr const char *FEATURE_NAME = "const.wifi.enhance_switch_enable";
 
 WifiProEnhance &WifiProEnhance::GetInstance()
 {

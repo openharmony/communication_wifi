@@ -1170,6 +1170,7 @@ private:
     int mLastConnectNetId;      /* last request connect netword id */
     int mConnectFailedCnt;      /* mLastConnectNetId connect failed count */
     std::string curForegroundAppBundleName_ = "";
+    std::atomic<int> curForegroundAppUid_{WIFI_INVALID_UID};
     int staSignalPollDelayTime_ = STA_SIGNAL_POLL_DELAY;
     OperateResState lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
     int isAudioOn_ = 0;

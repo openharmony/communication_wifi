@@ -101,5 +101,10 @@ int32_t NetConnClient::UnregisterNetConnCallback(const sptr<INetConnCallback> &c
     return NETMANAGER;
 }
 
+int32_t NetConnClient::CloseSocketsUid(int32_t netId, uint32_t uid)
+{
+    return NETMANAGER;
+}
+
 } // namespace Wifi
 } // namespace OHOS

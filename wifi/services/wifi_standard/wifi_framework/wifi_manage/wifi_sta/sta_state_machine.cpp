@@ -3541,6 +3541,11 @@ void StaStateMachine::ApReconnectState::StartConnectEvent(InternalMessagePtr msg
 
     WIFI_LOGI("ReconnectState StartConnect m_instId: %{public}d, networkId:%{public}d, bssid:%{public}s",
         pStaStateMachine->m_instId, networkId, MacAnonymize(bssid).c_str());
+#ifndef OHOS_ARCH_LITE
+    if (pStaStateMachine->m_NetWorkState) {
+        pStaStateMachine->m_NetWorkState->CloseSocketsUidByWifiNetId(pStaStateMachine->curForegroundAppUid_);
+    }
+#endif
     if (pStaStateMachine->StartConnectToNetwork(networkId, bssid,
         NETWORK_SELECTED_BY_WIFIPRO_ENHANCE) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("ReconnectState StartConnect fail");
@@ -5169,6 +5174,7 @@ void StaStateMachine::HandleForegroundAppChangedAction(InternalMessagePtr msg)
     if (appStateData.state == static_cast<int>(AppExecFwk::AppProcessState::APP_STATE_FOREGROUND) &&
         appStateData.isFocused) {
         curForegroundAppBundleName_ = appStateData.bundleName;
+        curForegroundAppUid_ = appStateData.uid;
         std::string sceneboardBundle = WifiSettings::GetInstance().GetPackageName("SCENEBOARD_BUNDLE");
         if (curForegroundAppBundleName_ != "" && sceneboardBundle != "" &&
             curForegroundAppBundleName_ != sceneboardBundle) {

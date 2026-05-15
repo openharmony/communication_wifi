@@ -73,7 +73,7 @@ static char *RpcClientReadMsg(RpcClient *client)
 
 static void RpcClientDealReadMsg(RpcClient *client, char *buff)
 {
-    if (client == NULL) {
+    if (client == NULL || client->context == NULL) {
         if (buff != NULL) {
             free(buff);
             buff = NULL;

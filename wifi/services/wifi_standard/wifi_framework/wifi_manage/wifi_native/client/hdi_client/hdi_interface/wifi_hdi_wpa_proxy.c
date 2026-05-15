@@ -206,7 +206,6 @@ static void HdiWpaResetGlobalObj()
         pthread_mutex_unlock(&g_wpaObjMutex);
         return;
     }
-    pthread_mutex_lock(&g_wpaObjMutex);
     IWpaInterfaceReleaseInstance(HDI_WPA_SERVICE_NAME, g_wpaObj, false);
     g_wpaObj = NULL;
     if (g_devMgr != NULL) {

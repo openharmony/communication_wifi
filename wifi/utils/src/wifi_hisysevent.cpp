@@ -25,17 +25,6 @@ namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiHiSysEvent");
 
-const std::map<int, std::string> g_connectTypeTransMap {
-    { NETWORK_SELECTED_BY_UNKNOWN, "UNKNOWN" },
-    { NETWORK_SELECTED_BY_AUTO, "AUTO_CONNECT" },
-    { NETWORK_SELECTED_BY_USER, "SELECT_CONNECT" },
-    { NETWORK_SELECTED_BY_RETRY, "RETRY_CONNECT" },
-    { NETWORK_SELECTED_BY_WIFIPRO, "WIFIPRO_CONNECT" },
-    { NETWORK_SELECTED_BY_SELFCURE, "SELFCURE_CONNECT" },
-    { NETWORK_SELECTED_BY_ROAM, "ROMA_CONNECT" },
-    { NETWORK_SELECTED_BY_REASSOC, "REASSOC" },
-    { NETWORK_SELECTED_BY_MDM, "MDM" },
-};
 constexpr int MAX_DNS_NUM = 10;
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
 constexpr int MIN_RISKINFO_REPORT_INTERVAL = 2 * 60 * 60; // 上报间隔不短于2小时
@@ -699,28 +688,21 @@ void WriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int linkSpeed)
     cJSON_Delete(root);
 }
 
-void WriteConnectTypeHiSysEvent(int connectType, bool isFirstConnect)
+void WriteConnectTypeHiSysEvent(const std::string &connectTypeStr)
 {
     cJSON *root = cJSON_CreateObject();
     if (root == nullptr) {
         WIFI_LOGE("Failed to create cJSON object");
         return;
     }
-    std::string connectTypeStr = "";
-    if (g_connectTypeTransMap.find(connectType) != g_connectTypeTransMap.end()) {
-        connectTypeStr = g_connectTypeTransMap.at(connectType);
-    }
-    if (isFirstConnect) {
-        connectTypeStr = "FIRST_CONNECT";
-    }
     cJSON_AddStringToObject(root, "CONNECT_TYPE", connectTypeStr.c_str());
- 
+
     char *jsonStr = cJSON_PrintUnformatted(root);
     if (jsonStr == nullptr) {
         cJSON_Delete(root);
         return;
     }
-    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "_CONNECT_TYPE", "EVENT_VALUE", std::string(jsonStr));
+    WriteEvent("WIFI_CHR_EVENT", "EVENT_NAME", "EVENT_CONNECT_TYPE", "EVENT_VALUE", std::string(jsonStr));
     cJSON_free(jsonStr);
     cJSON_Delete(root);
 }

@@ -56,7 +56,7 @@ HWTEST_F(WifiHisyseventTest, WriteLinkInfoHiSysEventTest, TestSize.Level1)
 
 HWTEST_F(WifiHisyseventTest, WirteConnectTypeHiSysEventTest, TestSize.Level1)
 {
-    WriteConnectTypeHiSysEvent(0);
+    WriteConnectTypeHiSysEvent("");
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 

@@ -293,7 +293,7 @@ void WriteArpInfoHiSysEvent(uint64_t arpRtt, int32_t arpFailedCount, int32_t gat
 
 void WriteLinkInfoHiSysEvent(int signalLevel, int rssi, int band, int linkSpeed);
 
-void WriteConnectTypeHiSysEvent(int connectType, bool isFirstConnect = false);
+void WriteConnectTypeHiSysEvent(const std::string &connectTypeStr);
 
 void WriteWifiLinkTypeHiSysEvent(const std::string &ssid, int32_t wifiLinkType, const std::string &triggerReason);
 

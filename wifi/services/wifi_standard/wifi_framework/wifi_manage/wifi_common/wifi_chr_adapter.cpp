@@ -35,6 +35,10 @@ const std::map<int, std::string> g_connectTypeTransMap {
     { NETWORK_SELECTED_BY_ROAM, "ROMA_CONNECT" },
     { NETWORK_SELECTED_BY_REASSOC, "REASSOC" },
     { NETWORK_SELECTED_BY_MDM, "MDM" },
+    { NETWORK_SELECTED_BY_HILINK, "HILINK" },
+    { NETWORK_SELECTED_BY_GENELINK, "GENELINK" },
+    { NETWORK_SELECTED_BY_FAST_RECONNECT, "FAST_RECONNECT" },
+    { NETWORK_SELECTED_BY_WIFIPRO_ENHANCE, "WIFIPRO_ENHANCE" },
 };
 constexpr int MAX_DNS_NUM = 10;
  
@@ -366,8 +370,8 @@ void EnhanceWriteConnectTypeHiSysEvent(int connectType, bool isFirstConnect)
         cJSON_Delete(root);
         return;
     }
-    if (!EnhanceWriteEventIpc("_CONNECT_TYPE", std::string(jsonStr))) {
-        WriteConnectTypeHiSysEvent(connectType, isFirstConnect);
+    if (!EnhanceWriteEventIpc("EVENT_CONNECT_TYPE", std::string(jsonStr))) {
+        WriteConnectTypeHiSysEvent(connectTypeStr);
     }
     free(jsonStr);
     cJSON_Delete(root);

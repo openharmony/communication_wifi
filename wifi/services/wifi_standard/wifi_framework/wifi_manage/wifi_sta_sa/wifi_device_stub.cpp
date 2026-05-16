@@ -587,7 +587,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteInt32(config.wepTxKeyIndex);
     reply.WriteInt32(config.priority);
     reply.WriteBool(config.hiddenSSID);
-    reply.WriteInt32((int)config.wifiIpConfig.assignMethod);
+    reply.WriteInt32(static_cast<int32_t>(config.wifiIpConfig.assignMethod));
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.ipAddress.address);
     reply.WriteInt32(config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
     reply.WriteInt32(config.wifiIpConfig.staticIpAddress.ipAddress.flags);
@@ -598,15 +598,16 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteString(config.wifiIpConfig.staticIpAddress.domains);
     WriteEapConfig(reply, config.wifiEapConfig);
     WriteWifiDeviceConfigProxyExtral(reply, config);
-    reply.WriteInt32((int)config.wifiPrivacySetting);
+    reply.WriteInt32(static_cast<int>(config.wifiPrivacySetting));
     reply.WriteInt32(config.uid);
     reply.WriteString(config.callProcessName);
     reply.WriteString(config.ancoCallProcessName);
     reply.WriteInt32(config.wifiWapiConfig.wapiPskType);
     reply.WriteString(config.wifiWapiConfig.wapiAsCertData);
     reply.WriteString(config.wifiWapiConfig.wapiUserCertData);
-    reply.WriteInt32((int)config.networkSelectionStatus.status);
-    reply.WriteInt32((int)config.networkSelectionStatus.networkSelectionDisableReason);
+    reply.WriteInt32(static_cast<int32_t>(config.networkSelectionStatus.status));
+    reply.WriteInt32(static_cast<int32_t>(
+        config.networkSelectionStatus.networkSelectionDisableReason));
     reply.WriteBool(config.networkSelectionStatus.seenInLastQualifiedNetworkSelection);
     reply.WriteBool(config.isPortal);
     reply.WriteBool(config.noInternetAccess);
@@ -620,7 +621,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
 
 void WifiDeviceStub::WriteWifiDeviceConfigProxyExtral(MessageParcel &reply, const WifiDeviceConfig &config)
 {
-    reply.WriteInt32((int)config.wifiProxyconfig.configureMethod);
+    reply.WriteInt32(static_cast<int32_t>(config.wifiProxyconfig.configureMethod));
     reply.WriteString(config.wifiProxyconfig.autoProxyConfig.pacWebAddress);
     reply.WriteString(config.wifiProxyconfig.manualProxyConfig.serverHostName);
     reply.WriteInt32(config.wifiProxyconfig.manualProxyConfig.serverPort);
@@ -786,7 +787,7 @@ void WifiDeviceStub::OnGetChangeDeviceConfig(uint32_t code, MessageParcel &data,
     Wifi::WifiDeviceConfig config;
     ErrCode ret = GetChangeDeviceConfig(value, config);
     reply.WriteInt32(0);
-    reply.WriteInt32((int)value);
+    reply.WriteInt32(static_cast<int>(value));
     reply.WriteInt32(config.networkId);
     reply.WriteString(config.ssid);
     reply.WriteString(config.bssid);
@@ -1383,7 +1384,7 @@ void WifiDeviceStub::OnGetDisconnectedReason(uint32_t code, MessageParcel &data,
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
     if (ret == WIFI_OPT_SUCCESS) {
-        reply.WriteInt32((int)reason);
+        reply.WriteInt32(static_cast<int32_t>(reason));
     }
     return;
 }

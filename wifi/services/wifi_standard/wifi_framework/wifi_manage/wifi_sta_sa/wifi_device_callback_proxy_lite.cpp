@@ -80,7 +80,7 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     (void)WriteInt32(&data, info.linkSpeed);
     (void)WriteString(&data, info.macAddress.c_str());
     (void)WriteUint32(&data, info.ipAddress);
-    (void)WriteInt32(&data, (int)info.connState);
+    (void)WriteInt32(&data, static_cast<int>(info.connState));
     (void)WriteBool(&data, info.ifHiddenSSID);
     (void)WriteInt32(&data, info.rxLinkSpeed);
     (void)WriteInt32(&data, info.txLinkSpeed);
@@ -88,8 +88,8 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     (void)WriteInt32(&data, info.snr);
     (void)WriteInt32(&data, info.isDataRestricted);
     (void)WriteString(&data, info.portalUrl.c_str());
-    (void)WriteInt32(&data, (int)info.supplicantState);
-    (void)WriteInt32(&data, (int)info.detailedState);
+    (void)WriteInt32(&data, static_cast<int>(info.supplicantState));
+    (void)WriteInt32(&data, static_cast<int>(info.detailedState));
 
     IpcIo reply;
     MessageOption option;

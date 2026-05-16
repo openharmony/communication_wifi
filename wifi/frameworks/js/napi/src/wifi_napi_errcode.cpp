@@ -126,7 +126,7 @@ static napi_value GetCallbackErrorValue(napi_env env, const int32_t errCode, con
 
 void HandleCallbackErrCode(const napi_env &env, const AsyncContext &info)
 {
-    WIFI_LOGI("HandleCallbackErrCode, errCode = %{public}d", (int)info.errorCode);
+    WIFI_LOGI("HandleCallbackErrCode, errCode = %{public}d", static_cast<int>(info.errorCode));
     constexpr int RESULT_PARAMS_NUM = 2;
     napi_value undefine = NapiGetUndefined(env);
     napi_value callback = nullptr;
@@ -160,7 +160,7 @@ void HandleCallbackErrCode(const napi_env &env, const AsyncContext &info)
 
 void HandlePromiseErrCode(    const napi_env &env, const AsyncContext &info)
 {
-    WIFI_LOGD("HandlePromiseErrCode, errCode = %{public}d", (int)info.errorCode);
+    WIFI_LOGD("HandlePromiseErrCode, errCode = %{public}d", static_cast<int>(info.errorCode));
     if (info.errorCode == ErrCode::WIFI_OPT_SUCCESS) {
         napi_resolve_deferred(env, info.deferred, info.result);
     } else {

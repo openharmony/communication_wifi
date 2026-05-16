@@ -233,7 +233,8 @@ bool ScanStateMachine::InitState::ExecuteStateMsg(InternalMessagePtr msg)
         case RESTART_SYSTEM_SCAN_TIMER:
         case RESTART_COMMON_SCAN_TIMER:
         case SYSTEM_SINGLE_SCAN_TIMER:
-            pScanStateMachine->ReportScanInnerEvent((ScanInnerEventType)msg->GetMessageName());
+            pScanStateMachine->ReportScanInnerEvent(
+                static_cast<ScanInnerEventType>(msg->GetMessageName()));
             return true;
         case SCAN_UPDATE_COUNTRY_CODE:
             HandleUpdateCountryCode(msg);
@@ -846,7 +847,7 @@ bool ScanStateMachine::GetCommonScanConfig(InternalMessagePtr interMessage, Inte
         scanConfig.scanFreqs.push_back(freq);
     }
 
-    scanConfig.fullScanFlag = (bool)interMessage->GetIntFromMessage();
+    scanConfig.fullScanFlag = static_cast<bool>(interMessage->GetIntFromMessage());
     scanConfig.backScanPeriod = interMessage->GetIntFromMessage();
     scanConfig.bssidsNumPerScan = interMessage->GetIntFromMessage();
     scanConfig.maxScansCache = interMessage->GetIntFromMessage();

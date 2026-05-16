@@ -326,7 +326,7 @@ ErrCode ScanService::Scan(ScanType scanType, int scanStyle)
 
 ErrCode ScanService::ScanWithParam(const WifiScanParams &params, ScanType scanType)
 {
-    WIFI_LOGI("Enter ScanWithParam, freqs num:%{public}d.\n", (int)params.freqs.size());
+    WIFI_LOGI("Enter ScanWithParam, freqs num:%{public}d.\n", static_cast<int>(params.freqs.size()));
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->SetScanType(scanType);
  
     if (params.scanStyle == SCAN_TYPE_LOW_PRIORITY && (mEnhanceService == nullptr ||
@@ -944,7 +944,7 @@ void ScanService::MergeScanResult(std::vector<WifiScanInfo> &results, std::vecto
         results.push_back(*storedIter);
     }
 
-    WIFI_LOGI("Save %{public}d scan results.", (int)(results.size()));
+    WIFI_LOGI("Save %{public}d scan results.", static_cast<int>(results.size()));
     if (WifiConfigCenter::GetInstance().GetWifiScanConfig()->SaveScanInfoList(results) != 0) {
         WIFI_LOGE("SaveScanInfoList failed.\n");
     }
@@ -979,7 +979,7 @@ bool ScanService::StoreFullScanInfo(
     WIFI_LOGI("Enter StoreFullScanInfo.\n");
     /* Filtering result. */
     WIFI_LOGI("scanConfig.scanTime is %" PRId64 ".\n", scanConfig.scanTime);
-    WIFI_LOGI("Receive %{public}d scan results.\n", (int)(scanInfoList.size()));
+    WIFI_LOGI("Receive %{public}d scan results.\n", static_cast<int>(scanInfoList.size()));
     if (scanInfoList.size() == 0) {
         /* Don't overwrite ScanInfoList */
         std::vector<WifiScanInfo> results;
@@ -1739,7 +1739,7 @@ ErrCode ScanService::AllowExternScan(ScanType scanType, int &scanStyle)
     appId = GetCallingUid();
 #endif
     ScanMode scanMode = WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetAppRunningState();
-    WIFI_LOGI("AllowExternScan, scanMode is %{public}d", (int)scanMode);
+    WIFI_LOGI("AllowExternScan, scanMode is %{public}d", static_cast<int>(scanMode));
     if (WifiConfigCenter::GetInstance().GetSystemMode() == SystemMode::M_FACTORY_MODE) {
         WIFI_LOGI("Enter AllowExternScan FactoryMode, extern scan has allowed.");
         return WIFI_OPT_SUCCESS;
@@ -2386,7 +2386,7 @@ bool ScanService::GetSavedNetworkSsidList(std::vector<std::string> &savedNetwork
             savedNetworkSsid.push_back(iter->ssid);
         }
     }
-    WIFI_LOGI("Saved network list size:%{public}d", (int)savedNetworkSsid.size());
+    WIFI_LOGI("Saved network list size:%{public}d", static_cast<int>(savedNetworkSsid.size()));
     return true;
 }
 
@@ -2428,7 +2428,7 @@ bool ScanService::GetHiddenNetworkSsidList(std::vector<std::string> &hiddenNetwo
         AddSsidToHiddenNetworkList(iter->ssid, hiddenNetworkSsid);
     }
 
-    WIFI_LOGI("Find %{public}d hidden NetworkSsid.\n", (int)hiddenNetworkSsid.size());
+    WIFI_LOGI("Find %{public}d hidden NetworkSsid.\n", static_cast<int>(hiddenNetworkSsid.size()));
     return true;
 }
 

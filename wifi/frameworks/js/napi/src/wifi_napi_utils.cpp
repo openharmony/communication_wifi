@@ -197,7 +197,7 @@ std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& o
     NAPI_CALL_BASE(env, napi_get_typedarray_info(env, fieldValue, &type, &length, nullptr, &buffer, &offset), {});
     if (type != napi_uint8_array || buffer == nullptr) {
         WIFI_LOGW("JsObjectToU8Vector, %{public}s, buffer is nullptr: %{public}d",
-            fieldStr, (int)(buffer == nullptr));
+            fieldStr, static_cast<int>(buffer == nullptr));
         return {};
     }
 
@@ -388,7 +388,7 @@ static napi_value DoCallBackAsyncWork(const napi_env& env, AsyncContext *asyncCo
             napi_delete_async_work(env, context->work);
             delete context;
         },
-        (void *)asyncContext,
+        static_cast<void *>(asyncContext),
         &asyncContext->work);
     NAPI_CALL(env, napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_user_initiated));
     return UndefinedNapiValue(env);
@@ -424,7 +424,7 @@ static napi_value DoPromiseAsyncWork(const napi_env& env, AsyncContext *asyncCon
                 context->completeFunc(data);
             }
         },
-        (void *)asyncContext,
+        static_cast<void *>(asyncContext),
         &asyncContext->work);
     napi_queue_async_work_with_qos(env, asyncContext->work, napi_qos_user_initiated);
     return UndefinedNapiValue(env);

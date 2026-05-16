@@ -359,7 +359,7 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
         return;
     }
 
-    const char *dataBuffer = (const char *)data.ReadBuffer(cfgLen);
+    const char *dataBuffer = static_cast<const char *>(data.ReadBuffer(cfgLen));
     if (dataBuffer == nullptr) {
         WIFI_LOGE("read buffer error!");
         return;

@@ -47,12 +47,12 @@ static const char *GetName(Feature *feature)
 
 static void OnInitialize(Feature *feature, Service *parent, Identity identity)
 {
-    if (feature != NULL) {
-        WifiDeviceFeature *deviceFeature = (WifiDeviceFeature *)feature;
+    if (feature != nullptr) {
+        WifiDeviceFeature *deviceFeature = static_cast<WifiDeviceFeature *>(feature);
         deviceFeature->identity = identity;
         deviceFeature->parent = parent;
     }
-    if (g_devServiceImpl != NULL) {
+    if (g_devServiceImpl != nullptr) {
         g_devServiceImpl->OnStart();
     }
 }
@@ -62,9 +62,9 @@ static void OnStop(Feature *feature, Identity identity)
     if (g_devServiceImpl != NULL) {
         g_devServiceImpl->OnStop();
     }
-    if (feature != NULL) {
-        WifiDeviceFeature *deviceFeature = (WifiDeviceFeature *)feature;
-        deviceFeature->identity.queueId = NULL;
+    if (feature != nullptr) {
+        WifiDeviceFeature *deviceFeature = static_cast<WifiDeviceFeature *>(feature);
+        deviceFeature->identity.queueId = nullptr;
         deviceFeature->identity.featureId = -1;
         deviceFeature->identity.serviceId = -1;
     }

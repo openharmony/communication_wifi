@@ -69,7 +69,7 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     data.WriteInt32(info.linkSpeed);
     data.WriteString(info.macAddress);
     data.WriteInt32(info.ipAddress);
-    data.WriteInt32((int)info.connState);
+    data.WriteInt32(static_cast<int>(info.connState));
     data.WriteBool(info.ifHiddenSSID);
     data.WriteInt32(info.rxLinkSpeed);
     data.WriteInt32(info.txLinkSpeed);
@@ -77,8 +77,8 @@ void WifiDeviceCallBackProxy::OnWifiConnectionChanged(int state, const WifiLinke
     data.WriteInt32(info.snr);
     data.WriteInt32(info.isDataRestricted);
     data.WriteString(info.portalUrl);
-    data.WriteInt32((int)info.supplicantState);
-    data.WriteInt32((int)info.detailedState);
+    data.WriteInt32(static_cast<int>(info.supplicantState));
+    data.WriteInt32(static_cast<int>(info.detailedState));
     data.WriteBool(info.isAncoConnected);
     data.WriteBool(info.isMloConnected);
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_CONNECTION_CHANGE), data,
@@ -169,7 +169,7 @@ void WifiDeviceCallBackProxy::OnDeviceConfigChanged(ConfigChange value)
         return;
     }
     data.WriteInt32(0);
-    data.WriteInt32((int)value);
+    data.WriteInt32(static_cast<int>(value));
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_CBK_CMD_DEVICE_CONFIG_CHANGE), data,
         reply, option);
     if (error != ERR_NONE) {

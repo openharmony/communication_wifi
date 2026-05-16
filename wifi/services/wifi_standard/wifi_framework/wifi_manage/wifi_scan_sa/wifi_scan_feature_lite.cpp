@@ -47,24 +47,24 @@ static const char *GetName(Feature *feature)
 
 static void OnInitialize(Feature *feature, Service *parent, Identity identity)
 {
-    if (feature != NULL) {
-        WifiScanFeature *scanFeature = (WifiScanFeature *)feature;
+    if (feature != nullptr) {
+        WifiScanFeature *scanFeature = static_cast<WifiScanFeature *>(feature);
         scanFeature->identity = identity;
         scanFeature->parent = parent;
     }
-    if (g_scanServiceImpl != NULL) {
+    if (g_scanServiceImpl != nullptr) {
         g_scanServiceImpl->OnStart();
     }
 }
 
 static void OnStop(Feature *feature, Identity identity)
 {
-    if (g_scanServiceImpl != NULL) {
+    if (g_scanServiceImpl != nullptr) {
         g_scanServiceImpl->OnStop();
     }
-    if (feature != NULL) {
-        WifiScanFeature *scanFeature = (WifiScanFeature *)feature;
-        scanFeature->identity.queueId = NULL;
+    if (feature != nullptr) {
+        WifiScanFeature *scanFeature = static_cast<WifiScanFeature *>(feature);
+        scanFeature->identity.queueId = nullptr;
         scanFeature->identity.featureId = -1;
         scanFeature->identity.serviceId = -1;
     }

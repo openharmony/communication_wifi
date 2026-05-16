@@ -57,29 +57,29 @@ void WifiDeviceStub::ReadIpAddress(IpcIo *req, WifiIpAddress &address)
 void WifiDeviceStub::ReadEapConfig(IpcIo *req, WifiEapConfig &wifiEapConfig)
 {
     size_t size;
-    wifiEapConfig.eap = (char *)ReadString(req, &size);
+    wifiEapConfig.eap = static_cast<char *>(ReadString(req, &size));
     int phase2Method = 0;
     (void)ReadInt32(req, &phase2Method);
     wifiEapConfig.phase2Method = Phase2Method(phase2Method);
 
-    wifiEapConfig.identity = (char *)ReadString(req, &size);
-    wifiEapConfig.anonymousIdentity = (char *)ReadString(req, &size);
-    wifiEapConfig.password = (char *)ReadString(req, &size);
+    wifiEapConfig.identity = static_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.anonymousIdentity = static_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.password = static_cast<char *>(ReadString(req, &size));
 
-    wifiEapConfig.caCertPath = (char *)ReadString(req, &size);
-    wifiEapConfig.caCertAlias = (char *)ReadString(req, &size);
+    wifiEapConfig.caCertPath = static_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.caCertAlias = static_cast<char *>(ReadString(req, &size));
 
-    wifiEapConfig.clientCert = (char *)ReadString(req, &size);
+    wifiEapConfig.clientCert = static_cast<char *>(ReadString(req, &size));
     if (strcpy_s(wifiEapConfig.certPassword, sizeof(wifiEapConfig.certPassword),
-        (char *)ReadString(req, &size)) != EOK) {
+        static_cast<char *>(ReadString(req, &size))) != EOK) {
         WIFI_LOGE("%{public}s: failed to copy", __func__);
     }
-    wifiEapConfig.privateKey = (char *)ReadString(req, &size);
+    wifiEapConfig.privateKey = static_cast<char *>(ReadString(req, &size));
 
-    wifiEapConfig.altSubjectMatch = (char *)ReadString(req, &size);
-    wifiEapConfig.domainSuffixMatch = (char *)ReadString(req, &size);
-    wifiEapConfig.realm = (char *)ReadString(req, &size);
-    wifiEapConfig.plmn = (char *)ReadString(req, &size);
+    wifiEapConfig.altSubjectMatch = static_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.domainSuffixMatch = static_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.realm = static_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.plmn = static_cast<char *>(ReadString(req, &size));
     (void)ReadInt32(req, &wifiEapConfig.eapSubId);
 }
 
@@ -88,18 +88,18 @@ void WifiDeviceStub::ReadWifiDeviceConfig(IpcIo *req, WifiDeviceConfig &config)
     int tmpInt;
     size_t size;
     (void)ReadInt32(req, &config.networkId);
-    config.bssid = (char *)ReadString(req, &size);
-    config.ssid = (char *)ReadString(req, &size);
+    config.bssid = static_cast<char *>(ReadString(req, &size));
+    config.ssid = static_cast<char *>(ReadString(req, &size));
     (void)ReadInt32(req, &config.band);
     (void)ReadInt32(req, &config.channel);
     (void)ReadInt32(req, &config.frequency);
     (void)ReadInt32(req, &config.level);
     (void)ReadBool(req, &config.isPasspoint);
     (void)ReadBool(req, &config.isEphemeral);
-    config.preSharedKey = (char *)ReadString(req, &size);
-    config.keyMgmt = (char *)ReadString(req, &size);
+    config.preSharedKey = static_cast<char *>(ReadString(req, &size));
+    config.keyMgmt = static_cast<char *>(ReadString(req, &size));
     for (int i = 0; i < WEPKEYS_SIZE; i++) {
-        config.wepKeys[i] = (char *)ReadString(req, &size);
+        config.wepKeys[i] = static_cast<char *>(ReadString(req, &size));
     }
     (void)ReadInt32(req, &config.wepTxKeyIndex);
     (void)ReadInt32(req, &config.priority);
@@ -113,21 +113,21 @@ void WifiDeviceStub::ReadWifiDeviceConfig(IpcIo *req, WifiDeviceConfig &config)
     ReadIpAddress(req, config.wifiIpConfig.staticIpAddress.gateway);
     ReadIpAddress(req, config.wifiIpConfig.staticIpAddress.dnsServer1);
     ReadIpAddress(req, config.wifiIpConfig.staticIpAddress.dnsServer2);
-    config.wifiIpConfig.staticIpAddress.domains = (char *)ReadString(req, &size);
-    config.wifiEapConfig.eap = (char *)ReadString(req, &size);
-    config.wifiEapConfig.identity = (char *)ReadString(req, &size);
-    config.wifiEapConfig.password = (char *)ReadString(req, &size);
+    config.wifiIpConfig.staticIpAddress.domains = static_cast<char *>(ReadString(req, &size));
+    config.wifiEapConfig.eap = static_cast<char *>(ReadString(req, &size));
+    config.wifiEapConfig.identity = static_cast<char *>(ReadString(req, &size));
+    config.wifiEapConfig.password = static_cast<char *>(ReadString(req, &size));
     (void)ReadInt32(req, &tmpInt);
     config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(tmpInt);
-    config.wifiProxyconfig.autoProxyConfig.pacWebAddress = (char *)ReadString(req, &size);
-    config.wifiProxyconfig.manualProxyConfig.serverHostName = (char *)ReadString(req, &size);
+    config.wifiProxyconfig.autoProxyConfig.pacWebAddress = static_cast<char *>(ReadString(req, &size));
+    config.wifiProxyconfig.manualProxyConfig.serverHostName = static_cast<char *>(ReadString(req, &size));
     (void)ReadInt32(req, &config.wifiProxyconfig.manualProxyConfig.serverPort);
-    config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = (char *)ReadString(req, &size);
+    config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = static_cast<char *>(ReadString(req, &size));
     (void)ReadInt32(req, &tmpInt);
     config.wifiPrivacySetting = WifiPrivacyConfig(tmpInt);
     (void)ReadInt32(req, &config.wifiWapiConfig.wapiPskType);
-    config.wifiWapiConfig.wapiAsCertData = (char *)ReadString(req, &size);
-    config.wifiWapiConfig.wapiUserCertData = (char *)ReadString(req, &size);
+    config.wifiWapiConfig.wapiAsCertData = static_cast<char *>(ReadString(req, &size));
+    config.wifiWapiConfig.wapiUserCertData = static_cast<char *>(ReadString(req, &size));
 }
 
 void WifiDeviceStub::WriteIpAddress(IpcIo *reply, const WifiIpAddress &address)
@@ -182,7 +182,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(IpcIo *reply, const WifiDeviceConfig 
     (void)WriteInt32(reply, config.wepTxKeyIndex);
     (void)WriteInt32(reply, config.priority);
     (void)WriteBool(reply, config.hiddenSSID);
-    (void)WriteInt32(reply, (int)config.wifiIpConfig.assignMethod);
+    (void)WriteInt32(reply, static_cast<int>(config.wifiIpConfig.assignMethod));
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.ipAddress.address);
     (void)WriteInt32(reply, config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
     (void)WriteInt32(reply, config.wifiIpConfig.staticIpAddress.ipAddress.flags);
@@ -192,18 +192,18 @@ void WifiDeviceStub::WriteWifiDeviceConfig(IpcIo *reply, const WifiDeviceConfig 
     WriteIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer2);
     (void)WriteString(reply, config.wifiIpConfig.staticIpAddress.domains.c_str());
     WriteEapConfig(reply, config.wifiEapConfig);
-    (void)WriteInt32(reply, (int)config.wifiProxyconfig.configureMethod);
+    (void)WriteInt32(reply, static_cast<int>(config.wifiProxyconfig.configureMethod));
     (void)WriteString(reply, config.wifiProxyconfig.autoProxyConfig.pacWebAddress.c_str());
     (void)WriteString(reply, config.wifiProxyconfig.manualProxyConfig.serverHostName.c_str());
     (void)WriteInt32(reply, config.wifiProxyconfig.manualProxyConfig.serverPort);
     (void)WriteString(reply, config.wifiProxyconfig.manualProxyConfig.exclusionObjectList.c_str());
-    (void)WriteInt32(reply, (int)config.wifiPrivacySetting);
-    (void)WriteInt32(reply, (int)config.uid);
-    (void)WriteInt32(reply, (int)config.wifiWapiConfig.wapiPskType);
+    (void)WriteInt32(reply, static_cast<int>(config.wifiPrivacySetting));
+    (void)WriteInt32(reply, static_cast<int>(config.uid));
+    (void)WriteInt32(reply, static_cast<int>(config.wifiWapiConfig.wapiPskType));
     (void)WriteBool(reply, config.isAllowAutoConnect);
     (void)WriteBool(reply, config.isSecureWifi);
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
-    (void)WriteInt32(reply, (int)config.riskType);
+    (void)WriteInt32(reply, static_cast<int>(config.riskType));
 #endif
 }
 

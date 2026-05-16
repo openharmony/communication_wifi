@@ -170,7 +170,7 @@ ErrCode WifiDeviceProxy::InitWifiProtect(const WifiProtectType &protectType, con
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    data.WriteInt32((int)protectType);
+    data.WriteInt32(static_cast<int>(protectType));
     data.WriteCString(protectName.c_str());
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), data,
         reply, option);
@@ -204,7 +204,7 @@ ErrCode WifiDeviceProxy::GetWifiProtectRef(const WifiProtectMode &protectMode, c
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);
-    data.WriteInt32((int)protectMode);
+    data.WriteInt32(static_cast<int32_t>(protectMode));
     data.WriteCString(protectName.c_str());
     int error = Remote()->SendRequest(static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_PROTECT), data,
         reply, option);
@@ -357,7 +357,7 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     data.WriteInt32(config.wepTxKeyIndex);
     data.WriteInt32(config.priority);
     data.WriteBool(config.hiddenSSID);
-    data.WriteInt32((int)config.wifiIpConfig.assignMethod);
+    data.WriteInt32(static_cast<int32_t>(config.wifiIpConfig.assignMethod));
     WriteIpAddress(data, config.wifiIpConfig.staticIpAddress.ipAddress.address);
     data.WriteInt32(config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
     data.WriteInt32(config.wifiIpConfig.staticIpAddress.ipAddress.flags);
@@ -367,12 +367,12 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     WriteIpAddress(data, config.wifiIpConfig.staticIpAddress.dnsServer2);
     data.WriteString(config.wifiIpConfig.staticIpAddress.domains);
     WriteEapConfig(data, config.wifiEapConfig);
-    data.WriteInt32((int)config.wifiProxyconfig.configureMethod);
+    data.WriteInt32(static_cast<int>(config.wifiProxyconfig.configureMethod));
     data.WriteString(config.wifiProxyconfig.autoProxyConfig.pacWebAddress);
     data.WriteString(config.wifiProxyconfig.manualProxyConfig.serverHostName);
     data.WriteInt32(config.wifiProxyconfig.manualProxyConfig.serverPort);
     data.WriteString(config.wifiProxyconfig.manualProxyConfig.exclusionObjectList);
-    data.WriteInt32((int)config.wifiPrivacySetting);
+    data.WriteInt32(static_cast<int>(config.wifiPrivacySetting));
     data.WriteString(config.callProcessName);
     data.WriteString(config.ancoCallProcessName);
     data.WriteInt32(config.uid);

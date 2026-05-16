@@ -229,8 +229,8 @@ void WifiDeviceStub::OnInitWifiProtect(uint32_t code, IpcIo *req, IpcIo *reply)
     size_t size;
     int type = 0;
     (void)ReadInt32(req, &type);
-    WifiProtectType protectType = (WifiProtectType)type;
-    std::string protectName = (char *)ReadString(req, &size);
+    WifiProtectType protectType = static_cast<WifiProtectType>(type);
+    std::string protectName = static_cast<char *>(ReadString(req, &size));
     ErrCode ret = InitWifiProtect(protectType, protectName);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
@@ -242,8 +242,8 @@ void WifiDeviceStub::OnGetWifiProtectRef(uint32_t code, IpcIo *req, IpcIo *reply
     size_t size;
     int mode = 0;
     (void)ReadInt32(req, &mode);
-    WifiProtectMode protectMode = (WifiProtectMode)mode;
-    std::string protectName = (char *)ReadString(req, &size);
+    WifiProtectMode protectMode = static_cast<WifiProtectMode>(mode);
+    std::string protectName = static_cast<char *>(ReadString(req, &size));
     ErrCode ret = GetWifiProtectRef(protectMode, protectName);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
@@ -253,7 +253,7 @@ void WifiDeviceStub::OnPutWifiProtectRef(uint32_t code, IpcIo *req, IpcIo *reply
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     size_t size;
-    std::string protectName = (char *)ReadString(req, &size);
+    std::string protectName = static_cast<char *>(ReadString(req, &size));
     ErrCode ret = PutWifiProtectRef(protectName);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
@@ -445,8 +445,8 @@ void WifiDeviceStub::OnStartWps(uint32_t code, IpcIo *req, IpcIo *reply)
     int setup;
     (void)ReadInt32(req, &setup);
     config.setup = SetupMethod(setup);
-    config.pin = (char *)ReadString(req, &size);
-    config.bssid = (char *)ReadString(req, &size);
+    config.pin = static_cast<char *>(ReadString(req, &size));
+    config.bssid = static_cast<char *>(ReadString(req, &size))
 
     ErrCode ret = StartWps(config);
     (void)WriteInt32(reply, 0);
@@ -503,7 +503,7 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, IpcIo *req, IpcIo *reply)
         (void)WriteInt32(reply, wifiInfo.linkSpeed);
         (void)WriteString(reply, wifiInfo.macAddress.c_str());
         (void)WriteUint32(reply, wifiInfo.ipAddress);
-        (void)WriteInt32(reply, (int)wifiInfo.connState);
+        (void)WriteInt32(reply, static_cast<int>(wifiInfo.connState));
         (void)WriteBool(reply, wifiInfo.ifHiddenSSID);
         (void)WriteInt32(reply, wifiInfo.rxLinkSpeed);
         (void)WriteInt32(reply, wifiInfo.txLinkSpeed);
@@ -511,12 +511,12 @@ void WifiDeviceStub::OnGetLinkedInfo(uint32_t code, IpcIo *req, IpcIo *reply)
         (void)WriteInt32(reply, wifiInfo.snr);
         (void)WriteInt32(reply, wifiInfo.isDataRestricted);
         (void)WriteString(reply, wifiInfo.portalUrl.c_str());
-        (void)WriteInt32(reply, (int)wifiInfo.supplicantState);
-        (void)WriteInt32(reply, (int)wifiInfo.detailedState);
-        (void)WriteInt32(reply, (int)wifiInfo.wifiStandard);
-        (void)WriteInt32(reply, (int)wifiInfo.maxSupportedRxLinkSpeed);
-        (void)WriteInt32(reply, (int)wifiInfo.maxSupportedTxLinkSpeed);
-        (void)WriteInt32(reply, (int)wifiInfo.channelWidth);
+        (void)WriteInt32(reply, static_cast<int>(wifiInfo.supplicantState));
+        (void)WriteInt32(reply, static_cast<int>(wifiInfo.detailedState));
+        (void)WriteInt32(reply, static_cast<int>(wifiInfo.wifiStandard));
+        (void)WriteInt32(reply, static_cast<int>(wifiInfo.maxSupportedRxLinkSpeed));
+        (void)WriteInt32(reply, static_cast<int>(wifiInfo.maxSupportedTxLinkSpeed));
+        (void)WriteInt32(reply, static_cast<int>(wifiInfo.channelWidth));
         (void)WriteBool(reply, wifiInfo.wifiTxRxValid);
     }
 }
@@ -565,7 +565,7 @@ void WifiDeviceStub::OnSetCountryCode(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     size_t size;
-    std::string countrycode = (char *)ReadString(req, &size);
+    std::string countrycode = static_cast<char *>(ReadString(req, &size));
     ErrCode ret = SetCountryCode(countrycode);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
@@ -605,7 +605,7 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply)
     std::vector<std::string> event;
     if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
         for (int i = 0; i < eventNum; ++i) {
-            event.emplace_back((char *)ReadString(req, &size));
+            event.emplace_back(static_cast<char *>(ReadString(req, &size)));
         }
     }
 

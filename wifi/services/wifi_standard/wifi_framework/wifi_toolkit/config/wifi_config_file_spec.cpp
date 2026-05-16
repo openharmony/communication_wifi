@@ -621,7 +621,7 @@ static std::string OutPutWifiRestrictedInfoListInfo(WifiRestrictedInfo &item)
     std::ostringstream ss;
     ss << "    " << "<WifiRestrictedInfo>" << std::endl;
     ss << "    " << "ssid=" << ValidateString(item.ssid) << std::endl;
-    ss << "    " << "HexSsid=" << ConvertArrayToHex((uint8_t*)&item.ssid[0], item.ssid.length()) << std::endl;
+    ss << "    " << "HexSsid=" << ConvertArrayToHex(static_cast<uint8_t*>(item.ssid.data()), item.ssid.length()) << std::endl;
     ss << "    " << "bssid=" << item.bssid << std::endl;
     ss << "    " << "wifiRestrictedType=" << item.wifiRestrictedType << std::endl;
     ss << "    " << "uid=" << item.uid << std::endl;
@@ -658,11 +658,11 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"bssid=" << item.bssid << std::endl;
     ss << "    " <<"userSelectBssid=" << item.userSelectBssid << std::endl;
     ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;
-    ss << "    " <<"HexSsid=" << ConvertArrayToHex((uint8_t*)&item.ssid[0], item.ssid.length()) << std::endl;
+    ss << "    " <<"HexSsid=" << ConvertArrayToHex(static_cast<uint8_t*>(item.ssid.data()), item.ssid.length()) << std::endl;
     ss << "    " <<"frequency=" << item.frequency << std::endl;
     ss << "    " <<"isPasspoint=" << item.isPasspoint << std::endl;
     ss << "    " <<"priority=" << item.priority << std::endl;
-    ss << "    " <<"hiddenSSID=" << (int)item.hiddenSSID << std::endl;
+    ss << "    " <<"hiddenSSID=" << static_cast<int>(item.hiddenSSID) << std::endl;
     ss << "    " <<"keyMgmt=" << item.keyMgmt << std::endl;
     ss << "    " <<"keyMgmtBitset=" << item.keyMgmtBitset << std::endl;
     ss << "    " <<"lastConnectTime=" << item.lastConnectTime << std::endl;
@@ -694,7 +694,7 @@ static std::string OutPutWifiIpConfig(WifiIpConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfigIp>" << std::endl;
-    ss << "    " <<"wifiIpConfig.assignMethod=" << (int)item.assignMethod << std::endl;
+    ss << "    " <<"wifiIpConfig.assignMethod=" << static_cast<int>(item.assignMethod) << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.ipAddress.address.family="
        << item.staticIpAddress.ipAddress.address.family << std::endl;
     ss << "    " <<"wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4="
@@ -765,7 +765,7 @@ static std::string OutPutWifiProxyConfig(WifiProxyConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfigProxy>" << std::endl;
-    ss << "    " <<"wifiProxyconfig.configureMethod=" << (int)item.configureMethod << std::endl;
+    ss << "    " <<"wifiProxyconfig.configureMethod=" << static_cast<int>(item.configureMethod) << std::endl;
     ss << "    " <<"wifiProxyconfig.autoProxyConfig.pacWebAddress="
        << item.autoProxyConfig.pacWebAddress << std::endl;
     ss << "    " <<"wifiProxyconfig.ManualProxyConfig.serverHostName="
@@ -782,7 +782,7 @@ static std::string OutPutWifiDeviceConfigPrivacy(WifiDeviceConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfigPrivacy>" << std::endl;
-    ss << "    " <<"wifiPrivacySetting=" << (int)item.wifiPrivacySetting << std::endl;
+    ss << "    " <<"wifiPrivacySetting=" << static_cast<int>(item.wifiPrivacySetting) << std::endl;
     ss << "    " <<"</WifiDeviceConfigPrivacy>" << std::endl;
     return ss.str();
 }
@@ -1823,7 +1823,8 @@ template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &
     ss << "    " <<"<WifiStoreRandomMac>" << std::endl;
     ss << "    " <<"version=" << item.version << std::endl;
     ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;
-    ss << "    " <<"HexSsid=" << ConvertArrayToHex((uint8_t*)&item.ssid[0], item.ssid.length()) << std::endl;
+    ss << "    " <<"HexSsid=" << ConvertArrayToHex(static_cast<uint8_t*>(
+        item.ssid.data()), item.ssid.length()) << std::endl;
     ss << "    " <<"keyMgmt=" << item.keyMgmt << std::endl;
     ss << "    " <<"peerBssid=" << item.peerBssid << std::endl;
     ss << "    " <<"randomMac=" << item.randomMac << std::endl;
@@ -1984,7 +1985,7 @@ static std::string OutPutWifiBackupConfig(WifiBackupConfig &item)
     ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;
     ss << "    " <<"HexSsid=" << ConvertArrayToHex((uint8_t*)&item.ssid[0], item.ssid.length()) << std::endl;
     ss << "    " <<"priority=" << item.priority << std::endl;
-    ss << "    " <<"hiddenSSID=" << (int)item.hiddenSSID << std::endl;
+    ss << "    " <<"hiddenSSID=" << static_cast<int>(item.hiddenSSID) << std::endl;
     ss << "    " <<"keyMgmt=" << item.keyMgmt << std::endl;
     ss << "    " <<"keyMgmtBitset=" << item.keyMgmtBitset << std::endl;
     ss << "    " <<"networkStatusHistory=" << item.networkStatusHistory << std::endl;
@@ -2102,7 +2103,7 @@ std::string OutTClassString<HotspotBackupConfig>(HotspotBackupConfig &item)
     ss << "    " <<"passwdDefault=" << item.passwdDefault << std::endl;
     ss << "    " <<"hotspotConfig=" << item.hotspotConfig << std::endl;
     ss << "    " <<"preSharedKey=" << item.preSharedKey << std::endl;
-    ss << "    " <<"band=" << (int)item.band << std::endl;
+    ss << "    " <<"band=" << static_cast<int>(item.band) << std::endl;
     ss << "    " <<"deviceName=" << item.deviceName << std::endl;
     ss << "    " <<"deviceBssid=" << item.deviceBssid << std::endl;
     ss << "    " <<"deviceIpAddr=" << item.deviceIpAddr << std::endl;

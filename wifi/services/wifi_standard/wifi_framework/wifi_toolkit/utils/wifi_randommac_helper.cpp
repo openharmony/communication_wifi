@@ -171,14 +171,14 @@ unsigned long long WifiRandomMacHelper::BytesToLonglong(const std::vector<uint8_
     }
     unsigned long long value = 0;
     value = (
-        (((unsigned long long)byte[OFFSET_VALUE_0] << OFFSET_VALUE_56) & 0xFF00000000000000L) |
-        (((unsigned long long)byte[OFFSET_VALUE_1] << OFFSET_VALUE_48) & 0xFF000000000000L) |
-        (((unsigned long long)byte[OFFSET_VALUE_2] << OFFSET_VALUE_40) & 0xFF0000000000L) |
-        (((unsigned long long)byte[OFFSET_VALUE_3] << OFFSET_VALUE_32) & 0xFF00000000L) |
-        (((unsigned long long)byte[OFFSET_VALUE_4] << OFFSET_VALUE_24) & 0xFF000000L)|
-        (((unsigned long long)byte[OFFSET_VALUE_5] << OFFSET_VALUE_16) & 0xFF0000L)|
-        (((unsigned long long)byte[OFFSET_VALUE_6] << OFFSET_VALUE_8) & 0xFF00L)|
-        ((unsigned long long)byte[OFFSET_VALUE_7] & 0xFFL));
+        static_cast<unsigned long long>(byte[OFFSET_VALUE_0]) << OFFSET_VALUE_56 & 0xFF00000000000000LL |
+        static_cast<unsigned long long>(byte[OFFSET_VALUE_1]) << OFFSET_VALUE_48 & 0xFF000000000000LL |
+        static_cast<unsigned long long>(byte[OFFSET_VALUE_2]) << OFFSET_VALUE_40 & 0xFF0000000000LL |
+        static_cast<unsigned long long>(byte[OFFSET_VALUE_3]) << OFFSET_VALUE_32 & 0xFF00000000LL |
+        static_cast<unsigned long long>(byte[OFFSET_VALUE_4]) << OFFSET_VALUE_24 & 0xFF000000LL |
+        static_cast<unsigned long long>(byte[OFFSET_VALUE_5]) << OFFSET_VALUE_16 & 0xFF0000LL |
+        static_cast<unsigned long long>(byte[OFFSET_VALUE_6]) << OFFSET_VALUE_8 & 0xFF00LL |
+        static_cast<unsigned long long>(byte[OFFSET_VALUE_7]) & 0xFFLL);
     return value;
 }
 

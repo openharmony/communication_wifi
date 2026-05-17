@@ -689,7 +689,7 @@ void AppNetworkSpeedLimitService::GameNetworkSpeedLimitConfigs(const WifiNetwork
 {
     WIFI_LOGI("%{public}s enter game limit configs, game state is %{public}d, game rtt is %{public}d", __FUNCTION__,
         networkControlInfo.state, networkControlInfo.rtt);
-    ReportGameSceneChange(networkControlInfo.state);
+    ReportGameSceneInfo(networkControlInfo);
     switch (networkControlInfo.state) {
         case GameSceneId::MSG_GAME_STATE_START:
         case GameSceneId::MSG_GAME_STATE_FOREGROUND:
@@ -912,14 +912,14 @@ void AppNetworkSpeedLimitService::ReportGameLatencyFeature(bool enabled, const s
     pEnhanceService->SetGameLatencyFeatureEnabled(enabled, featureName);
 }
 
-void AppNetworkSpeedLimitService::ReportGameSceneChange(int state)
+void AppNetworkSpeedLimitService::ReportGameSceneInfo(const WifiNetworkControlInfo &networkControlInfo)
 {
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGD("%{public}s: pEnhanceService is null", __FUNCTION__);
         return;
     }
-    pEnhanceService->ReportGameSceneChange(state);
+    pEnhanceService->ReportGameSceneInfo(networkControlInfo);
 }
 } // namespace Wifi
 } // namespace OHOS

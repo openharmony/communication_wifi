@@ -115,7 +115,7 @@ private:
     void CheckAndResetGamePowerMode(const std::string &bundleName);
     void UpdateAncoAppInfos(const WifiNetworkControlInfo &networkControlInfo);
     void ReportGameLatencyFeature(bool enabled, const std::string& featureName);
-    void ReportGameSceneChange(int state);
+    void ReportGameSceneInfo(const WifiNetworkControlInfo &networkControlInfo);
     void RecordAppNetworkSpeedLimitServiceChr(const std::string &records);
 
 private:

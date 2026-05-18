@@ -1825,7 +1825,7 @@ template <> std::string OutTClassString<WifiStoreRandomMac>(WifiStoreRandomMac &
     ss << "    " <<"<WifiStoreRandomMac>" << std::endl;
     ss << "    " <<"version=" << item.version << std::endl;
     ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;
-    ss << "    " <<"HexSsid=" << ConvertArrayToHex(static_cast<uint8_t*>(
+    ss << "    " <<"HexSsid=" << ConvertArrayToHex(reinterpret_cast<uint8_t*>(
         item.ssid.data()), item.ssid.length()) << std::endl;
     ss << "    " <<"keyMgmt=" << item.keyMgmt << std::endl;
     ss << "    " <<"peerBssid=" << item.peerBssid << std::endl;

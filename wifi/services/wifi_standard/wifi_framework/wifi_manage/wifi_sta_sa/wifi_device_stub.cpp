@@ -581,9 +581,7 @@ void WifiDeviceStub::WriteWifiDeviceConfig(MessageParcel &reply, const WifiDevic
     reply.WriteBool(config.isEphemeral);
     reply.WriteString(config.preSharedKey);
     reply.WriteString(config.keyMgmt);
-    for (int j = 0; j < WEPKEYS_SIZE; j++) {
-        reply.WriteString(config.wepKeys[j]);
-    }
+    for (int j = 0; j < WEPKEYS_SIZE; j++) { reply.WriteString(config.wepKeys[j]); }
     reply.WriteInt32(config.wepTxKeyIndex);
     reply.WriteInt32(config.priority);
     reply.WriteBool(config.hiddenSSID);

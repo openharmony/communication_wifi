@@ -621,7 +621,8 @@ static std::string OutPutWifiRestrictedInfoListInfo(WifiRestrictedInfo &item)
     std::ostringstream ss;
     ss << "    " << "<WifiRestrictedInfo>" << std::endl;
     ss << "    " << "ssid=" << ValidateString(item.ssid) << std::endl;
-    ss << "    " << "HexSsid=" << ConvertArrayToHex(reinterpret_cast<uint8_t*>(item.ssid.data()), item.ssid.length()) << std::endl;
+    ss << "    " << "HexSsid=" << ConvertArrayToHex(
+        reinterpret_cast<uint8_t*>(item.ssid.data()), item.ssid.length()) << std::endl;
     ss << "    " << "bssid=" << item.bssid << std::endl;
     ss << "    " << "wifiRestrictedType=" << item.wifiRestrictedType << std::endl;
     ss << "    " << "uid=" << item.uid << std::endl;
@@ -658,7 +659,8 @@ static std::string OutPutWifiDeviceConfig(WifiDeviceConfig &item)
     ss << "    " <<"bssid=" << item.bssid << std::endl;
     ss << "    " <<"userSelectBssid=" << item.userSelectBssid << std::endl;
     ss << "    " <<"ssid=" << ValidateString(item.ssid) << std::endl;
-    ss << "    " <<"HexSsid=" << ConvertArrayToHex(reinterpret_cast<uint8_t*>(item.ssid.data()), item.ssid.length()) << std::endl;
+    ss << "    " <<"HexSsid=" << ConvertArrayToHex(
+        reinterpret_cast<uint8_t*>(item.ssid.data()), item.ssid.length()) << std::endl;
     ss << "    " <<"frequency=" << item.frequency << std::endl;
     ss << "    " <<"isPasspoint=" << item.isPasspoint << std::endl;
     ss << "    " <<"priority=" << item.priority << std::endl;

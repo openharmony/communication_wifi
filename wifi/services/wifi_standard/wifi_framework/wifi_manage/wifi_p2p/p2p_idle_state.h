@@ -146,6 +146,12 @@ private:
     virtual bool ProcessGroupStartedEvt(InternalMessagePtr msg) const;
 
     /**
+     * @Description Handle group started event as gc role
+     * @param group - current p2p group info
+     */
+    void HandleGroupStartedAsGc(const WifiP2pGroupInfo &group) const;
+
+    /**
      * @Description Process the invitation received message received by the state machine
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle

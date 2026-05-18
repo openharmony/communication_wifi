@@ -21,6 +21,7 @@
 #include "p2p_state_machine.h"
 #include "wifi_logger.h"
 #include "p2p_native_define.h"
+#include "wifi_config_center.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pEnabledState");
 
@@ -132,6 +133,10 @@ void P2pEnabledState::InitProcessMsg()
         [this](InternalMessagePtr msg) { return this->ProcessSetP2pHighPerf(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_SET_GROUP_TYPE,
         [this](const InternalMessagePtr msg) { return this->ProcessCmdHid2dSetGroupType(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_GET_SIGNAL,
+        [this](const InternalMessagePtr msg) { return this->ProcessCmdGetSignal(msg); }));
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SCREEN_STATE_CHANGED,
+        [this](const InternalMessagePtr msg) { return this->ProcessScreenStateChangedEvent(msg); }));
 }
 
 bool P2pEnabledState::ProcessCmdDisable(InternalMessagePtr msg) const
@@ -748,6 +753,35 @@ bool P2pEnabledState::ProcessCmdHid2dSetGroupType(InternalMessagePtr msg) const
         WIFI_LOGI("P2pEnabledState info.GetConnectState(): %{public}d", info.GetConnectState());
     }
 
+    return EXECUTED;
+}
+
+bool P2pEnabledState::ProcessCmdGetSignal(InternalMessagePtr msg) const
+{
+    WIFI_LOGD("P2pEnabledState recv CMD_GET_SIGNAL");
+    p2pStateMachine.DealP2pSignalPollResult();
+    return EXECUTED;
+}
+ 	 
+bool P2pEnabledState::ProcessScreenStateChangedEvent(InternalMessagePtr msg) const
+{
+    if (msg == nullptr) {
+        WIFI_LOGE("P2pEnabledState::ProcessScreenStateChangedEvent msg is null");
+        return EXECUTED;
+    }
+    int screenState = msg->GetParam1();
+    bool newEnableSignalPollSwitchFlag = screenState == MODE_STATE_OPEN;
+    bool originEnableSignalPollSwitchFlag = p2pStateMachine.SetSignalAcquisitionSwitch(newEnableSignalPollSwitchFlag);
+
+    WifiP2pLinkedInfo p2pLinkedInfo;
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pLinkedInfo);
+    bool p2pConnected = p2pLinkedInfo.GetConnectState() != P2pConnectedState::P2P_DISCONNECTED;
+    WIFI_LOGD("ProcessScreenStateChangedEvent, origin flag is %{public}d, set new flag %{public}d,\
+        p2p connect status is %{public}d",
+        originEnableSignalPollSwitchFlag, newEnableSignalPollSwitchFlag, p2pConnected);
+    if (newEnableSignalPollSwitchFlag && !originEnableSignalPollSwitchFlag && p2pConnected) {
+        p2pStateMachine.StartP2pSignalPollTimer();
+    }
     return EXECUTED;
 }
 

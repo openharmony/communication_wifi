@@ -775,6 +775,90 @@ HWTEST_F(WifiHalDeviceManagerTest, SetMaxConnectNumTest_01, TestSize.Level1)
     ifaceName = "wlan1";
     HalDeviceManager::GetInstance().SetMaxConnectNum(ifaceName, 1, 1);
 }
+
+static std::string BuildSignalPollResultData(
+    int32_t rssi = -60, int32_t freq = 2412, int32_t txBitrate = 65,
+    int32_t rxBitrate = 72, int32_t noise = -90, int32_t snr = 30,
+    int32_t chload = 10, int32_t ulDelay = 5,
+    uint64_t txBytes = 1024, uint64_t rxBytes = 2048,
+    int32_t txFailed = 1, int32_t txPackets = 100, int32_t rxPackets = 200,
+    uint16_t chloadSelfVal = 3, uint16_t paddingVal = 0,
+    int32_t c0Rssi = -55, int32_t c1Rssi = -65,
+    const std::vector<uint8_t>& ext = {})
+{
+    std::string buf;
+    auto appendInt32 = [&](int32_t v) {
+        buf.append(reinterpret_cast<const char*>(&v), sizeof(int32_t));
+    };
+    auto appendUInt32 = [&](uint32_t v) {
+        buf.append(reinterpret_cast<const char*>(&v), sizeof(uint32_t));
+    };
+    auto appendUInt64 = [&](uint64_t v) {
+        buf.append(reinterpret_cast<const char*>(&v), sizeof(uint64_t));
+    };
+    auto appendUInt16 = [&](uint16_t v) {
+        buf.append(reinterpret_cast<const char*>(&v), sizeof(uint16_t));
+    };
+    appendInt32(rssi);
+    appendInt32(freq);
+    appendInt32(txBitrate);
+    appendInt32(rxBitrate);
+    appendInt32(noise);
+    appendInt32(snr);
+    appendInt32(chload);
+    appendInt32(ulDelay);
+    appendUInt64(txBytes);
+    appendUInt64(rxBytes);
+    appendInt32(txFailed);
+    appendInt32(txPackets);
+    appendInt32(rxPackets);
+    appendUInt16(chloadSelfVal);
+    appendUInt16(paddingVal);
+    appendInt32(c0Rssi);
+    appendInt32(c1Rssi);
+    appendUInt32(static_cast<uint32_t>(ext.size()));
+    if (!ext.empty()) {
+        buf.append(reinterpret_cast<const char *>(ext.data()), ext.size());
+    }
+    return buf;
+}
+ 	 
+HWTEST_F(WifiHalDeviceManagerTest, ReadInt32Success, TestSize.Level1)
+{
+    int32_t testValue = 0x12345678;
+    std::string buf(reinterpret_cast<const char*>(&testValue), sizeof(int32_t));
+    size_t offset = 0;
+    int32_t value = 0;
+    EXPECT_TRUE(HalDeviceManager::GetInstance().ReadInt32(
+        reinterpret_cast<const signed char*>(buf.data()), buf.size(), offset, value));
+    EXPECT_EQ(value, testValue);
+    EXPECT_EQ(offset, sizeof(int32_t));
+}
+ 	 
+HWTEST_F(WifiHalDeviceManagerTest, ReadInt32BufferOverflow, TestSize.Level1)
+{
+    int32_t testValue = 100;
+    std::string buf(reinterpret_cast<const char*>(&testValue), sizeof(int32_t));
+    size_t offset = 1;
+    int32_t value = 0;
+    EXPECT_FALSE(HalDeviceManager::GetInstance().ReadInt32(
+        reinterpret_cast<const signed char*>(buf.data()), buf.size(), offset, value));
+}
+ 	 
+HWTEST_F(WifiHalDeviceManagerTest, DeserializeSuccessNoExtData, TestSize.Level1)
+{
+    std::string buf = BuildSignalPollResultData(
+        -50, 5180, 120, 130, -85, 35, 5, 2, 4096, 8192, 0, 50, 60,
+        1, 0, -40, -50, {});
+    SignalPollResult result{};
+    EXPECT_TRUE(HalDeviceManager::GetInstance().DeserializeSignalPollResultFromPtr(
+        reinterpret_cast<const signed char*>(buf.data()), buf.size(), result));
+    EXPECT_EQ(result.currentRssi, -50);
+    EXPECT_EQ(result.associatedFreq, 5180);
+    EXPECT_EQ(result.c0Rssi, -40);
+    EXPECT_EQ(result.c1Rssi, -50);
+    EXPECT_TRUE(result.ext.empty());
+}
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

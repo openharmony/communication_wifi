@@ -753,6 +753,12 @@ void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventD
         }
 #endif
     }
+#ifdef FEATURE_P2P_SUPPORT
+    IP2pService *pP2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (pP2pService != nullptr) {
+        pP2pService->OnScreenStateChanged(screenStateNew);
+    }
+#endif
 }
 
 void CesEventSubscriber::OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEventData &eventData)

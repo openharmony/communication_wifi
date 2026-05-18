@@ -26,6 +26,7 @@ namespace Wifi {
 constexpr long ENABLE_P2P_TIMED_OUT__INTERVAL = 15000;
 /* The time of clears service requests processed in records. */
 constexpr long REMOVE_SERVICE_REQUEST_RECORD = 3000;
+constexpr long P2P_SIGNAL_POLL_DELAY = 3 * 1000;
 
 enum class P2pStateMachineState : unsigned char {
     NO_SUPPORT,
@@ -168,6 +169,8 @@ enum class P2P_STATE_MACHINE_CMD {
     DISABLE_P2P_TIMED_OUT,
     REMOVE_SERVICE_REQUEST_RECORD,
     P2P_CONNECT_FAILED,
+    CMD_GET_SIGNAL, // get signal info
+ 	CMD_SCREEN_STATE_CHANGED, // screen state changed
 };
 
 enum class DHCPTYPE {

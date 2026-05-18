@@ -596,5 +596,38 @@ WifiErrorNo WifiP2PHalInterface::SetP2pHighPerf(bool isEnable)
 #endif
     return WIFI_HAL_OPT_FAILED;
 }
+
+WifiErrorNo WifiP2PHalInterface::GetP2pSignalInfo(const std::string &interfaceName, const std::string &macAddress,
+    WifiSignalPollInfo &signalInfo)
+{
+    signalInfo.timeStamp = GetCurrentTimeSeconds();
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    SignalPollResult signalPollResult;
+    if (!HalDeviceManager::GetInstance().GetP2pSignalInfo(interfaceName, macAddress, signalPollResult)) {
+        return WIFI_HAL_OPT_FAILED;
+    }
+
+    signalInfo.signal = signalPollResult.currentRssi;
+    signalInfo.txrate = signalPollResult.txBitrate;
+    signalInfo.rxrate = signalPollResult.rxBitrate;
+    signalInfo.noise = signalPollResult.currentNoise;
+    signalInfo.frequency = signalPollResult.associatedFreq;
+    signalInfo.txPackets = signalPollResult.currentTxPackets;
+    signalInfo.rxPackets = signalPollResult.currentRxPackets;
+    signalInfo.snr = signalPollResult.currentSnr;
+    signalInfo.chload = signalPollResult.currentChload;
+    signalInfo.ulDelay = signalPollResult.currentUlDelay;
+    signalInfo.txBytes = static_cast<unsigned int>(signalPollResult.currentTxBytes);
+    signalInfo.rxBytes = static_cast<unsigned int>(signalPollResult.currentRxBytes);
+    signalInfo.txFailed = signalPollResult.currentTxFailed;
+    signalInfo.chloadSelf = signalPollResult.chloadSelf;
+    signalInfo.c0Rssi = signalPollResult.c0Rssi;
+    signalInfo.c1Rssi = signalPollResult.c1Rssi;
+    signalInfo.ext.assign(signalPollResult.ext.begin(), signalPollResult.ext.end());
+    signalInfo.extLen = static_cast<int>(signalInfo.ext.size());
+    return WIFI_HAL_OPT_OK;
+#endif
+    return WIFI_HAL_OPT_FAILED;
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -186,6 +186,24 @@ bool P2pGroupOperatingState::ProcessCmdCreateGroup(const InternalMessagePtr msg)
     return EXECUTED;
 }
 
+void P2pGroupOperatingState::UpdateGroupOwnerInfo(WifiP2pGroupInfo &group, const std::string &goAddr) const
+{
+    if (group.IsGroupOwner()) { /* append setting the device name if this is GO */
+        WifiP2pDevice thisDevice = deviceManager.GetThisDevice();
+        WifiP2pDevice tempDevice = thisDevice;
+        tempDevice.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
+        tempDevice.SetDeviceAddress(goAddr);
+        group.SetOwner(tempDevice);
+        group.SetExplicitGroup(WifiConfigCenter::GetInstance().IsExplicitGroup());
+    } else {
+        WifiP2pDevice dev = deviceManager.GetDevices(goAddr);
+        dev.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
+        if (dev.IsValid()) {
+            group.SetOwner(dev);
+        }
+    }
+}
+
 bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessagePtr msg) const
 {
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::CREATE_GROUP_TIMED_OUT));
@@ -209,20 +227,7 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessagePtr msg
     }
 
     std::string goAddr = group.GetOwner().GetDeviceAddress();
-    if (group.IsGroupOwner()) { /* append setting the device name if this is GO */
-        WifiP2pDevice thisDevice = deviceManager.GetThisDevice();
-        WifiP2pDevice tempDevice = thisDevice;
-        tempDevice.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
-        tempDevice.SetDeviceAddress(goAddr);
-        group.SetOwner(tempDevice);
-        group.SetExplicitGroup(WifiConfigCenter::GetInstance().IsExplicitGroup());
-    } else {
-        WifiP2pDevice dev = deviceManager.GetDevices(goAddr);
-        dev.SetP2pDeviceStatus(P2pDeviceStatus::PDS_CONNECTED);
-        if (dev.IsValid()) {
-            group.SetOwner(dev);
-        }
-    }
+    UpdateGroupOwnerInfo(group, goAddr);
     group.SetCreatorUid(WifiConfigCenter::GetInstance().GetP2pCreatorUid());
     WifiConfigCenter::GetInstance().SaveP2pCreatorUid(-1);
     group.SetP2pGroupStatus(P2pGroupStatus::GS_STARTED);
@@ -239,6 +244,7 @@ bool P2pGroupOperatingState::ProcessGroupStartedEvt(const InternalMessagePtr msg
     SharedLinkManager::IncreaseSharedLink();
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_CONNECTED);
     WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true);
+    p2pStateMachine.StartP2pSignalPollTimer();
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     return EXECUTED;
 }

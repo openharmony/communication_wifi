@@ -377,6 +377,13 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode Hid2dSetGroupType(GroupLiveType groupType) override;
+
+    /**
+     * @Description Handle screen state changed event
+     *
+     * @param screenState - MODE_STATE_OPEN (screen on) / MODE_STATE_CLOSE (screen off)
+     */
+    void OnScreenStateChanged(int screenState) override;
 private:
     /**
      * @Description - P2P state machine deregistration event callback.

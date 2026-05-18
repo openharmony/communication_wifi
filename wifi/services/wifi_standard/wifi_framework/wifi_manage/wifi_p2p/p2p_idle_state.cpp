@@ -343,22 +343,7 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
     WifiConfigCenter::GetInstance().SaveP2pCreatorUid(-1);
     p2pStateMachine.groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, group);
     if (!p2pStateMachine.groupManager.GetCurrentGroup().IsGroupOwner()) {
-        p2pStateMachine.StartDhcpClientInterface();
-
-        const WifiP2pDevice &owner = groupManager.GetCurrentGroup().GetOwner();
-        WifiP2pDevice device = deviceManager.GetDevices(owner.GetDeviceAddress());
-        if (device.IsValid()) {
-            device.SetP2pDeviceStatus(owner.GetP2pDeviceStatus());
-            WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
-            copy.SetOwner(device);
-            groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, copy);
-
-            deviceManager.UpdateDeviceStatus(owner.GetDeviceAddress(), P2pDeviceStatus::PDS_CONNECTED);
-
-            p2pStateMachine.BroadcastP2pPeersChanged();
-        } else {
-            WIFI_LOGW("fail:No GO device information is found.");
-        }
+        HandleGroupStartedAsGc(group);
     } else {
         WifiP2pGroupInfo currGrp = p2pStateMachine.groupManager.GetCurrentGroup();
         WifiP2pDevice owner = currGrp.GetOwner();
@@ -377,8 +362,29 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
     }
 
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_CONNECTED);
+    p2pStateMachine.StartP2pSignalPollTimer();
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     return EXECUTED;
+}
+
+void P2pIdleState::HandleGroupStartedAsGc(const WifiP2pGroupInfo &group) const
+{
+    p2pStateMachine.StartDhcpClientInterface();
+
+    const WifiP2pDevice &owner = groupManager.GetCurrentGroup().GetOwner();
+    WifiP2pDevice device = deviceManager.GetDevices(owner.GetDeviceAddress());
+    if (device.IsValid()) {
+        device.SetP2pDeviceStatus(owner.GetP2pDeviceStatus());
+        WifiP2pGroupInfo copy = groupManager.GetCurrentGroup();
+        copy.SetOwner(device);
+        groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, copy);
+
+        deviceManager.UpdateDeviceStatus(owner.GetDeviceAddress(), P2pDeviceStatus::PDS_CONNECTED);
+
+        p2pStateMachine.BroadcastP2pPeersChanged();
+    } else {
+        WIFI_LOGW("fail:No GO device information is found.");
+    }
 }
 
 bool P2pIdleState::ProcessInvitationReceivedEvt(InternalMessagePtr msg) const

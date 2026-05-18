@@ -508,5 +508,34 @@ HWTEST_F(WifiP2pHalInterfaceTest, P2pStop_SUCCESS, TestSize.Level1)
 {
     EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, WifiP2PHalInterface::GetInstance().StopP2p());
 }
+
+HWTEST_F(WifiP2pHalInterfaceTest, GetP2pSignalInfo_SUCCESS, TestSize.Level1)
+{
+    std::string interfaceName = "p2p-p2p0-0";
+    std::string macAddress = "aa:bb:cc:dd:ee:ff";
+    WifiSignalPollInfo signalInfo;
+    WifiErrorNo ret = WifiP2PHalInterface::GetInstance().GetP2pSignalInfo(interfaceName, macAddress, signalInfo);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_OK, ret);
+    EXPECT_GT(signalInfo.timeStamp, 0);
+    EXPECT_GE(signalInfo.signal, 0);
+#else
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, ret);
+#endif
+}
+ 	 
+HWTEST_F(WifiP2pHalInterfaceTest, GetP2pSignalInfo_FAILED, TestSize.Level1)
+{
+    std::string interfaceName = "";
+    std::string macAddress = "invalid_mac";
+    WifiSignalPollInfo signalInfo;
+    WifiErrorNo ret = WifiP2PHalInterface::GetInstance().GetP2pSignalInfo(interfaceName, macAddress, signalInfo);
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, ret);
+#else
+    EXPECT_EQ(WifiErrorNo::WIFI_HAL_OPT_FAILED, ret);
+#endif
+    EXPECT_EQ(signalInfo.timeStamp, 0);
+}
 }  // namespace Wifi
 }  // namespace OHOS

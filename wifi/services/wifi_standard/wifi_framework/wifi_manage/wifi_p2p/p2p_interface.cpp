@@ -312,5 +312,10 @@ ErrCode P2pInterface::Hid2dSetGroupType(GroupLiveType groupType)
 {
     return p2pService.Hid2dSetGroupType(groupType);
 }
+
+void P2pInterface::OnScreenStateChanged(int screenState)
+{
+    p2pService.OnScreenStateChanged(screenState);
+}
 }  // namespace Wifi
 }  // namespace OHOS

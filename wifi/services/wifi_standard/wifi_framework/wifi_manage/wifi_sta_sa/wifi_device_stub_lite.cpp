@@ -446,7 +446,7 @@ void WifiDeviceStub::OnStartWps(uint32_t code, IpcIo *req, IpcIo *reply)
     (void)ReadInt32(req, &setup);
     config.setup = SetupMethod(setup);
     config.pin = reinterpret_cast<char *>(ReadString(req, &size));
-    config.bssid = reinterpret_cast<char *>(ReadString(req, &size))
+    config.bssid = reinterpret_cast<char *>(ReadString(req, &size));
 
     ErrCode ret = StartWps(config);
     (void)WriteInt32(reply, 0);

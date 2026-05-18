@@ -63,7 +63,7 @@ static void OnStop(Feature *feature, Identity identity)
         g_devServiceImpl->OnStop();
     }
     if (feature != nullptr) {
-        WifiDeviceFeature *deviceFeature = reinterpret_castt<WifiDeviceFeature *>(feature);
+        WifiDeviceFeature *deviceFeature = reinterpret_cast<WifiDeviceFeature *>(feature);
         deviceFeature->identity.queueId = nullptr;
         deviceFeature->identity.featureId = -1;
         deviceFeature->identity.serviceId = -1;

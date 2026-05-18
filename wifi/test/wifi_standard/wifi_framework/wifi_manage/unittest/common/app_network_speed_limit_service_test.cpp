@@ -901,13 +901,22 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, AdjustSpeedLimitByRttTest01, TestSize.
     WifiNetworkControlInfo info;
     info.bundleName = "com.tencent.tmgp.sgame.hw";
     info.sceneId = BG_LIMIT_CONTROL_ID_GAME;
-    info.state = GameSceneId::MSG_GAME_STATE_FOREGROUND;
+    info.state = GameSceneId::MSG_GAME_STATE_BACKGROUND;
     info.uid = 20010001;
     info.rtt = 50;
- 
-    AppNetworkSpeedLimitService::GetInstance().GameNetworkSpeedLimitConfigs(info);
-    AppNetworkSpeedLimitService::GetInstance().UpdateGameRttData(220); // upgrade
-    AppNetworkSpeedLimitService::GetInstance().UpdateGameRttData(20);  // downgrade
+    AppNetworkSpeedLimitService::GetInstance().AdjustSpeedLimitByRtt(20);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, AdjustSpeedLimitByRttTest02, TestSize.Level1)
+{
+    WifiNetworkControlInfo info;
+    info.bundleName = "";
+    info.sceneId = BG_LIMIT_CONTROL_ID_GAME;
+    info.state = GameSceneId::MSG_GAME_STATE_BACKGROUND;
+    info.uid = 20010001;
+    info.rtt = 50;
+    AppNetworkSpeedLimitService::GetInstance().AdjustSpeedLimitByRtt(100);
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 } // namespace Wifi

@@ -114,20 +114,20 @@ void WifiDeviceStub::ReadWifiDeviceConfig(IpcIo *req, WifiDeviceConfig &config)
     ReadIpAddress(req, config.wifiIpConfig.staticIpAddress.dnsServer1);
     ReadIpAddress(req, config.wifiIpConfig.staticIpAddress.dnsServer2);
     config.wifiIpConfig.staticIpAddress.domains = reinterpret_cast<char *>(ReadString(req, &size));
-    config.wifiEapConfig.eap = static_cast<char *>(ReadString(req, &size));
-    config.wifiEapConfig.identity = static_cast<char *>(ReadString(req, &size));
-    config.wifiEapConfig.password = static_cast<char *>(ReadString(req, &size));
+    config.wifiEapConfig.eap = reinterpret_cast<char *>(ReadString(req, &size));
+    config.wifiEapConfig.identity = reinterpret_cast<char *>(ReadString(req, &size));
+    config.wifiEapConfig.password = reinterpret_cast<char *>(ReadString(req, &size));
     (void)ReadInt32(req, &tmpInt);
     config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(tmpInt);
-    config.wifiProxyconfig.autoProxyConfig.pacWebAddress = static_cast<char *>(ReadString(req, &size));
-    config.wifiProxyconfig.manualProxyConfig.serverHostName = static_cast<char *>(ReadString(req, &size));
+    config.wifiProxyconfig.autoProxyConfig.pacWebAddress = reinterpret_cast<char *>(ReadString(req, &size));
+    config.wifiProxyconfig.manualProxyConfig.serverHostName = reinterpret_cast<char *>(ReadString(req, &size));
     (void)ReadInt32(req, &config.wifiProxyconfig.manualProxyConfig.serverPort);
-    config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = static_cast<char *>(ReadString(req, &size));
+    config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = reinterpret_cast<char *>(ReadString(req, &size));
     (void)ReadInt32(req, &tmpInt);
     config.wifiPrivacySetting = WifiPrivacyConfig(tmpInt);
     (void)ReadInt32(req, &config.wifiWapiConfig.wapiPskType);
-    config.wifiWapiConfig.wapiAsCertData = static_cast<char *>(ReadString(req, &size));
-    config.wifiWapiConfig.wapiUserCertData = static_cast<char *>(ReadString(req, &size));
+    config.wifiWapiConfig.wapiAsCertData = reinterpret_cast<char *>(ReadString(req, &size));
+    config.wifiWapiConfig.wapiUserCertData = reinterpret_cast<char *>(ReadString(req, &size));
 }
 
 void WifiDeviceStub::WriteIpAddress(IpcIo *reply, const WifiIpAddress &address)
@@ -230,7 +230,7 @@ void WifiDeviceStub::OnInitWifiProtect(uint32_t code, IpcIo *req, IpcIo *reply)
     int type = 0;
     (void)ReadInt32(req, &type);
     WifiProtectType protectType = static_cast<WifiProtectType>(type);
-    std::string protectName = static_cast<char *>(ReadString(req, &size));
+    std::string protectName = reinterpret_cast<char *>(ReadString(req, &size));
     ErrCode ret = InitWifiProtect(protectType, protectName);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
@@ -243,7 +243,7 @@ void WifiDeviceStub::OnGetWifiProtectRef(uint32_t code, IpcIo *req, IpcIo *reply
     int mode = 0;
     (void)ReadInt32(req, &mode);
     WifiProtectMode protectMode = static_cast<WifiProtectMode>(mode);
-    std::string protectName = static_cast<char *>(ReadString(req, &size));
+    std::string protectName = reinterpret_cast<char *>(ReadString(req, &size));
     ErrCode ret = GetWifiProtectRef(protectMode, protectName);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
@@ -253,7 +253,7 @@ void WifiDeviceStub::OnPutWifiProtectRef(uint32_t code, IpcIo *req, IpcIo *reply
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     size_t size;
-    std::string protectName = static_cast<char *>(ReadString(req, &size));
+    std::string protectName = reinterpret_cast<char *>(ReadString(req, &size));
     ErrCode ret = PutWifiProtectRef(protectName);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
@@ -445,8 +445,8 @@ void WifiDeviceStub::OnStartWps(uint32_t code, IpcIo *req, IpcIo *reply)
     int setup;
     (void)ReadInt32(req, &setup);
     config.setup = SetupMethod(setup);
-    config.pin = static_cast<char *>(ReadString(req, &size));
-    config.bssid = static_cast<char *>(ReadString(req, &size))
+    config.pin = reinterpret_cast<char *>(ReadString(req, &size));
+    config.bssid = reinterpret_cast<char *>(ReadString(req, &size))
 
     ErrCode ret = StartWps(config);
     (void)WriteInt32(reply, 0);
@@ -565,7 +565,7 @@ void WifiDeviceStub::OnSetCountryCode(uint32_t code, IpcIo *req, IpcIo *reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u", __func__, code);
     size_t size;
-    std::string countrycode = static_cast<char *>(ReadString(req, &size));
+    std::string countrycode = reinterpret_cast<char *>(ReadString(req, &size));
     ErrCode ret = SetCountryCode(countrycode);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
@@ -605,7 +605,7 @@ void WifiDeviceStub::OnRegisterCallBack(uint32_t code, IpcIo *req, IpcIo *reply)
     std::vector<std::string> event;
     if (eventNum > 0 && eventNum <= MAX_READ_EVENT_SIZE) {
         for (int i = 0; i < eventNum; ++i) {
-            event.emplace_back(static_cast<char *>(ReadString(req, &size)));
+            event.emplace_back(reinterpret_cast<char *>(ReadString(req, &size)));
         }
     }
 

@@ -189,13 +189,13 @@ int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, IpcIo *
     (void)ReadInt32(data, &state);
     WifiLinkedInfo info;
     (void)ReadInt32(data, &info.networkId);
-    info.ssid = static_cast<char *>(ReadString(data, &readLen));
-    info.bssid = static_cast<char *>(ReadString(data, &readLen));
+    info.ssid = reinterpret_cast<char *>(ReadString(data, &readLen));
+    info.bssid = reinterpret_cast<char *>(ReadString(data, &readLen));
     (void)ReadInt32(data, &info.rssi);
     (void)ReadInt32(data, &info.band);
     (void)ReadInt32(data, &info.frequency);
     (void)ReadInt32(data, &info.linkSpeed);
-    info.macAddress = static_cast<char *>(ReadString(data, &readLen));
+    info.macAddress = reinterpret_cast<char *>(ReadString(data, &readLen));
     (void)ReadUint32(data, &info.ipAddress);
     int tmpConnState = 0;
     (void)ReadInt32(data, &tmpConnState);
@@ -210,7 +210,7 @@ int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, IpcIo *
     (void)ReadInt32(data, &info.chload);
     (void)ReadInt32(data, &info.snr);
     (void)ReadInt32(data, &info.isDataRestricted);
-    info.portalUrl = static_cast<char *>(ReadString(data, &readLen));
+    info.portalUrl = reinterpret_cast<char *>(ReadString(data, &readLen));
     int tmpState = 0;
     (void)ReadInt32(data, &tmpState);
     if (tmpState >= 0 && tmpState <= int(SupplicantState::INVALID)) {
@@ -245,7 +245,7 @@ int WifiDeviceCallBackStub::RemoteOnWifiWpsStateChanged(uint32_t code, IpcIo *da
     size_t readLen;
     int state = 0;
     (void)ReadInt32(data, &state);
-    std::string pinCode = static_cast<char *>(ReadString(data, &readLen));
+    std::string pinCode = reinterpret_cast<char *>(ReadString(data, &readLen));
     OnWifiWpsStateChanged(state, pinCode);
     return 0;
 }

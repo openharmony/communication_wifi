@@ -61,7 +61,7 @@ constexpr int FUZZY_BSSID_MAX_MATCH_CNT = 30;
 
 enum class WifiOprMidState { CLOSED = 0, OPENING = 1, RUNNING = 2, CLOSING = 3, SEMI_ACTIVE, UNKNOWN };
 
-enum class WifiFeatures {
+enum class WifiFeatures : unsigned long {
     WIFI_FEATURE_INFRA = 0x0001,             // The feature id indicates support basic infrastructure mode
     WIFI_FEATURE_INFRA_5G = 0x0002,          // The feature id indicates support 5 GHz Band
     WIFI_FEATURE_PASSPOINT = 0x0004,         // The feature id indicates support GAS/ANQP
@@ -72,6 +72,7 @@ enum class WifiFeatures {
     WIFI_FEATURE_WPA3_SAE = 0x8000000,       // The feature id indicates support WPA3-Personal SAE
     WIFI_FEATURE_WPA3_SUITE_B = 0x10000000,  // The feature id indicates support WPA3-Enterprise Suite-B
     WIFI_FEATURE_OWE = 0x20000000,           // The feature id indicates support Enhanced Open
+    WIFI_FEATURE_ZEROWAIT_DFS_SUPPORT = 0x80000000, // The feature id indicates support Zero Wait DFS
 };
 
 enum class OperateResState {

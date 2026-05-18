@@ -262,6 +262,11 @@ int WifiManager::GetSupportedFeatures(long &features) const
     }
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SAE);
     supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_WPA3_SUITE_B);
+    bool support = false;
+    GetZeroWaitSupportFeatures(support);
+    if (support) {
+        supportedFeatures |= static_cast<long>(WifiFeatures::WIFI_FEATURE_ZEROWAIT_DFS_SUPPORT);
+    }
     features = supportedFeatures;
 
     return 0;
@@ -272,6 +277,14 @@ void WifiManager::AddSupportedFeatures(WifiFeatures feature)
     std::unique_lock<std::mutex> lock(mutex);
     mSupportedFeatures = static_cast<long>(static_cast<unsigned long>(mSupportedFeatures) |
         static_cast<unsigned long>(feature));
+}
+
+void WifiManager::GetZeroWaitSupportFeatures(bool &support) const
+{
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr) {
+        support = pEnhanceService->GetDeviceFeatures().isZeroWaitDfsSupport;
+    }
 }
 
 void WifiManager::PushServiceCloseMsg(WifiCloseServiceCode code, int instId)

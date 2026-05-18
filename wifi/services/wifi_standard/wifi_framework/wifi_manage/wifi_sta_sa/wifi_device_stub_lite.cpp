@@ -57,29 +57,29 @@ void WifiDeviceStub::ReadIpAddress(IpcIo *req, WifiIpAddress &address)
 void WifiDeviceStub::ReadEapConfig(IpcIo *req, WifiEapConfig &wifiEapConfig)
 {
     size_t size;
-    wifiEapConfig.eap = static_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.eap = reinterpret_cast<char *>(ReadString(req, &size));
     int phase2Method = 0;
     (void)ReadInt32(req, &phase2Method);
     wifiEapConfig.phase2Method = Phase2Method(phase2Method);
 
-    wifiEapConfig.identity = static_cast<char *>(ReadString(req, &size));
-    wifiEapConfig.anonymousIdentity = static_cast<char *>(ReadString(req, &size));
-    wifiEapConfig.password = static_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.identity = reinterpret_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.anonymousIdentity = reinterpret_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.password = reinterpret_cast<char *>(ReadString(req, &size));
 
-    wifiEapConfig.caCertPath = static_cast<char *>(ReadString(req, &size));
-    wifiEapConfig.caCertAlias = static_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.caCertPath = reinterpret_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.caCertAlias = reinterpret_cast<char *>(ReadString(req, &size));
 
-    wifiEapConfig.clientCert = static_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.clientCert = reinterpret_cast<char *>(ReadString(req, &size));
     if (strcpy_s(wifiEapConfig.certPassword, sizeof(wifiEapConfig.certPassword),
-        static_cast<char *>(ReadString(req, &size))) != EOK) {
+        reinterpret_cast<char *>(ReadString(req, &size))) != EOK) {
         WIFI_LOGE("%{public}s: failed to copy", __func__);
     }
-    wifiEapConfig.privateKey = static_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.privateKey = reinterpret_cast<char *>(ReadString(req, &size));
 
-    wifiEapConfig.altSubjectMatch = static_cast<char *>(ReadString(req, &size));
-    wifiEapConfig.domainSuffixMatch = static_cast<char *>(ReadString(req, &size));
-    wifiEapConfig.realm = static_cast<char *>(ReadString(req, &size));
-    wifiEapConfig.plmn = static_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.altSubjectMatch = reinterpret_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.domainSuffixMatch = reinterpret_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.realm = reinterpret_cast<char *>(ReadString(req, &size));
+    wifiEapConfig.plmn = reinterpret_cast<char *>(ReadString(req, &size));
     (void)ReadInt32(req, &wifiEapConfig.eapSubId);
 }
 
@@ -88,18 +88,18 @@ void WifiDeviceStub::ReadWifiDeviceConfig(IpcIo *req, WifiDeviceConfig &config)
     int tmpInt;
     size_t size;
     (void)ReadInt32(req, &config.networkId);
-    config.bssid = static_cast<char *>(ReadString(req, &size));
-    config.ssid = static_cast<char *>(ReadString(req, &size));
+    config.bssid = reinterpret_cast<char *>(ReadString(req, &size));
+    config.ssid = reinterpret_cast<char *>(ReadString(req, &size));
     (void)ReadInt32(req, &config.band);
     (void)ReadInt32(req, &config.channel);
     (void)ReadInt32(req, &config.frequency);
     (void)ReadInt32(req, &config.level);
     (void)ReadBool(req, &config.isPasspoint);
     (void)ReadBool(req, &config.isEphemeral);
-    config.preSharedKey = static_cast<char *>(ReadString(req, &size));
-    config.keyMgmt = static_cast<char *>(ReadString(req, &size));
+    config.preSharedKey = reinterpret_cast<char *>(ReadString(req, &size));
+    config.keyMgmt = reinterpret_cast<char *>(ReadString(req, &size));
     for (int i = 0; i < WEPKEYS_SIZE; i++) {
-        config.wepKeys[i] = static_cast<char *>(ReadString(req, &size));
+        config.wepKeys[i] = reinterpret_cast<char *>(ReadString(req, &size));
     }
     (void)ReadInt32(req, &config.wepTxKeyIndex);
     (void)ReadInt32(req, &config.priority);
@@ -113,7 +113,7 @@ void WifiDeviceStub::ReadWifiDeviceConfig(IpcIo *req, WifiDeviceConfig &config)
     ReadIpAddress(req, config.wifiIpConfig.staticIpAddress.gateway);
     ReadIpAddress(req, config.wifiIpConfig.staticIpAddress.dnsServer1);
     ReadIpAddress(req, config.wifiIpConfig.staticIpAddress.dnsServer2);
-    config.wifiIpConfig.staticIpAddress.domains = static_cast<char *>(ReadString(req, &size));
+    config.wifiIpConfig.staticIpAddress.domains = reinterpret_cast<char *>(ReadString(req, &size));
     config.wifiEapConfig.eap = static_cast<char *>(ReadString(req, &size));
     config.wifiEapConfig.identity = static_cast<char *>(ReadString(req, &size));
     config.wifiEapConfig.password = static_cast<char *>(ReadString(req, &size));

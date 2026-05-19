@@ -164,6 +164,7 @@ ohos_unittest("wifi_sub_manage_unittest") {
     "googletest:gmock_main",
     "googletest:gtest_main",
     "hilog:libhilog",
+    "icu:shared_icuuc",
     "init:libbegetutil",
     "ipc:ipc_single",
     "libxml2:libxml2",

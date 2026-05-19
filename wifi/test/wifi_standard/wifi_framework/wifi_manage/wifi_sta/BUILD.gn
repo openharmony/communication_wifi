@@ -177,6 +177,7 @@ local_base_external_deps = [
   "googletest:gtest_main",
   "hilog:libhilog",
   "init:libbegetutil",
+  "icu:shared_icuuc",
   "ipc:ipc_single",
   "libxml2:libxml2",
   "netmanager_base:net_conn_manager_if",

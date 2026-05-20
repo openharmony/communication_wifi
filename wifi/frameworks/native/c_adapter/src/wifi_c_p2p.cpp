@@ -123,7 +123,7 @@ static void ConvertP2PDeviceCToCpp(const WifiP2pDevice& p2pDevice, OHOS::Wifi::W
     cppDevice.SetP2pDeviceStatus(OHOS::Wifi::P2pDeviceStatus(static_cast<int>(p2pDevice.status)));
 
     OHOS::Wifi::WifiP2pWfdInfo wfdInfo;
-    wfdInfo.SetWfdEnabled((bool)p2pDevice.wfdInfo.wfdEnabled);
+    wfdInfo.SetWfdEnabled(static_cast<bool>(p2pDevice.wfdInfo.wfdEnabled));
     wfdInfo.SetDeviceInfo(p2pDevice.wfdInfo.deviceInfo);
     wfdInfo.SetCtrlPort(p2pDevice.wfdInfo.ctrlPort);
     wfdInfo.SetMaxThroughput(p2pDevice.wfdInfo.maxThroughput);
@@ -140,13 +140,13 @@ static void ConvertGroupInfoCToCpp(const WifiP2pGroupInfo* group, OHOS::Wifi::Wi
     OHOS::Wifi::WifiP2pDevice owner;
     ConvertP2PDeviceCToCpp(group->owner, owner);
     cppGroup.SetOwner(owner);
-    cppGroup.SetIsGroupOwner((bool)group->isP2pGroupOwner);
+    cppGroup.SetIsGroupOwner(static_cast<bool>(group->isP2pGroupOwner));
     cppGroup.SetPassphrase(group->passphrase);
     cppGroup.SetInterface(group->interface);
     cppGroup.SetGroupName(group->groupName);
     cppGroup.SetNetworkId(group->networkId);
     cppGroup.SetFrequency(group->frequency);
-    cppGroup.SetIsPersistent((bool)group->isP2pPersistent);
+    cppGroup.SetIsPersistent(static_cast<bool>(group->isP2pPersistent));
     cppGroup.SetP2pGroupStatus(OHOS::Wifi::P2pGroupStatus(static_cast<int>(group->groupStatus)));
     std::vector<OHOS::Wifi::WifiP2pDevice> clientDevices;
     for (int i = 0; i != group->clientDevicesSize && i < MAX_DEVICES_NUM; ++i) {
@@ -273,7 +273,7 @@ static OHOS::Wifi::ErrCode ConvertGroupInfoCppToC(const OHOS::Wifi::WifiP2pGroup
             return OHOS::Wifi::WIFI_OPT_FAILED;
         }
     }
-    group->clientDevicesSize = (int)vecDevices.size();
+    group->clientDevicesSize = static_cast<int>(vecDevices.size());
     if (memcpy_s(group->goIpAddress, IP_ADDR_STR_LEN,
         cppGroup.GetGoIpAddress().c_str(), cppGroup.GetGoIpAddress().size() + 1) != EOK) {
         WIFI_LOGE("memcpy_s interface failed!");

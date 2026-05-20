@@ -373,7 +373,7 @@ bool WifiProtectManager::ChangeWifiPowerMode()
         default:
             /* Invalid mode, don't change currentOpMode , and exit with error */
             LOGE("%{public}s Invalid new protect Mode: %{public}d",
-                __func__, (int)newProtectMode);
+                __func__, static_cast<int>(newProtectMode));
             return false;
     }
 

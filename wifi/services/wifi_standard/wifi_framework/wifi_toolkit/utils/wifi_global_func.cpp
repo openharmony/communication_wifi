@@ -287,7 +287,7 @@ std::string Vec2Stream(const std::string &prefix, const std::vector<char> &vecCh
     ss << prefix;
     int temp = 0;
     for (std::size_t i = 0; i < vecChar.size(); i++) {
-        temp = (unsigned char)(vecChar[i]);
+        temp = static_cast<unsigned char>(vecChar[i]);
         ss << std::setfill('0') << std::setw(hexCharLen) << std::hex << std::uppercase << temp << " ";
     }
     ss << sufffix;

@@ -237,7 +237,7 @@ WifiOprMidState WifiConfigCenter::GetWifiMidState(int instId)
 bool WifiConfigCenter::SetWifiMidState(WifiOprMidState expState, WifiOprMidState state, int instId)
 {
     WIFI_LOGI("SetWifiMidState expState:%{public}d,state:%{public}d,instId:%{public}d",
-        (int)expState, (int)state, instId);
+        static_cast<int>(expState), static_cast<int>(state), instId);
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto iter = mStaMidState.find(instId);
     if (iter != mStaMidState.end()) {
@@ -251,7 +251,7 @@ bool WifiConfigCenter::SetWifiMidState(WifiOprMidState expState, WifiOprMidState
 
 void WifiConfigCenter::SetWifiMidState(WifiOprMidState state, int instId)
 {
-    WIFI_LOGI("SetWifiMidState ,state:%{public}d,instId:%{public}d", (int)state, instId);
+    WIFI_LOGI("SetWifiMidState ,state:%{public}d,instId:%{public}d", static_cast<int>(state), instId);
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto ret = mStaMidState.emplace(instId, state);
     if (!ret.second) {
@@ -449,7 +449,7 @@ std::string WifiConfigCenter::GetConnectTimeoutBssid(int instId)
     auto iter = mBssidToTimeoutTime.find(instId);
     if (iter != mBssidToTimeoutTime.end()) {
         const int timeout = 30; // 30s
-        if (iter->second.second - static_cast<int>(time(NULL)) > timeout) {
+        if (iter->second.second - static_cast<int>(time(nullptr)) > timeout) {
             return "";
         }
         return iter->second.first;

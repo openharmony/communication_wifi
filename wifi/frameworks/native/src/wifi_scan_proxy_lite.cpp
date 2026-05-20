@@ -107,7 +107,7 @@ static int IpcCallback(void *owner, int code, IpcIo *reply)
 
     switch (data->funcId) {
         case static_cast<uint32_t>(ScanInterfaceCode::WIFI_SVR_CMD_IS_SCAN_ALWAYS_ACTIVE): {
-            (void)ReadBool(reply, (bool *)data->variable);
+            (void)ReadBool(reply, static_cast<bool*>(data->variable));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES): {

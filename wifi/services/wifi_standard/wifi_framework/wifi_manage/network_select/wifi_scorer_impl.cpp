@@ -283,7 +283,7 @@ double NoInternetNetworkStatusHistoryScorer::Score(NetworkCandidate &networkCand
     vNetworkStatusHistory = NetworkStatusHistoryManager::GetCurrentNetworkStatusHistory2Array(
         networkCandidate.wifiDeviceConfig.networkStatusHistory);
  
-    int nSize = (int)vNetworkStatusHistory.size();
+    int nSize = static_cast<int>(vNetworkStatusHistory.size());
     for (int i = 0; i < nSize; i++) {
         if (i >= MAX_HISTORY_NETWORK_STATUS_NUM) {
             break;

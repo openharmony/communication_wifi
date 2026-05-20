@@ -64,7 +64,9 @@ void WifiChrUtils::GetSignalPollInfoArray(std::vector<WifiSignalPollInfo> &wifiS
 bool WifiChrUtils::IsBeaconLost(const std::string &bssid, const int32_t signalLevel, const int32_t screenState,
     const int32_t instId)
 {
-    if (signalLevel < 0) return false;
+    if (signalLevel < 0) {
+        return false;
+    }
     WifiSignalPollInfo wifiCheckInfo;
     {
         std::unique_lock<std::mutex> lock(signalInfoMutex);

@@ -1619,7 +1619,7 @@ ErrCode WifiP2pProxy::Hid2dGetSelfWifiCfgInfo(SelfCfgType cfgType,
 
     *getDatValidLen = reply.ReadInt32();
     if (*getDatValidLen > 0) {
-        const char *dataBuffer = (const char *)reply.ReadBuffer(*getDatValidLen);
+        const char *dataBuffer = reinterpret_cast<const char *>(reply.ReadBuffer(*getDatValidLen));
         if (dataBuffer == nullptr) {
             WIFI_LOGE("`%{public}s` inner communication error!", __func__);
             return WIFI_OPT_FAILED;

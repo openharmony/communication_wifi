@@ -3231,7 +3231,7 @@ void StaStateMachine::LinkedState::NetDetectionNotify(InternalMessagePtr msg)
         return;
     }
 
-    SystemNetWorkState netstate = (SystemNetWorkState)msg->GetParam1();
+    SystemNetWorkState netstate = static_cast<SystemNetWorkState>(msg->GetParam1());
     std::string url;
     if (!msg->GetMessageObj(url)) {
         WIFI_LOGW("Failed to obtain portal url.");
@@ -6009,7 +6009,7 @@ std::string StaStateMachine::GetGsmAuthResponseWithoutLength(EapSimGsmAuthParam 
             return "";
         }
 
-        if (GSM_AUTH_CHALLENGE_SRES_LEN + GSM_AUTH_CHALLENGE_KC_LEN != nonce.size()) {
+        if (nonce.size() != GSM_AUTH_CHALLENGE_SRES_LEN + GSM_AUTH_CHALLENGE_KC_LEN) {
             WIFI_LOGE("%{public}s: invalid length, size: %{public}zu", __func__, nonce.size());
             return "";
         }

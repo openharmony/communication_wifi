@@ -449,7 +449,7 @@ int SelfCureUtils::String2InternetSelfCureHistoryInfo(const std::string selfCure
     }
     std::vector<std::string> histories = TransStrToVec(selfCureHistory, '|');
     if (histories.size() != SELFCURE_HISTORY_LENGTH) {
-        WIFI_LOGE("self cure history length = %{public}lu", (unsigned long) histories.size());
+        WIFI_LOGE("self cure history length = %{public}lu", static_cast<unsigned long>(histories.size()));
         info = selfCureHistoryInfo;
         return -1;
     }

@@ -1956,9 +1956,6 @@ bool ScanService::IsProductPnoScanDisabled()
     if (GetDeviceType() == ProductDeviceType::GLASSES) {
         return true;
     }
-    if (IsKidWatchDevice()) {
-        return true;
-    }
     return false;
 }
 

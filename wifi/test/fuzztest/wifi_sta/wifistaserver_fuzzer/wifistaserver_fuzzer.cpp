@@ -38,6 +38,7 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int U32_AT_SIZE_ZERO = 4;
+constexpr int WAIT_TIME_MS = 4 * 1000;
 constexpr int ZERO = 0;
 constexpr int ONE = 1;
 constexpr int TWO = 2;
@@ -748,6 +749,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::RegisterStaServiceCallbackFuzzTest();
     OHOS::Wifi::RegisterStaServiceCallbackTest();
     OHOS::Wifi::ConvertStringTest();
+    usleep(OHOS::Wifi::WAIT_TIME_MS);
     return 0;
 }
 }

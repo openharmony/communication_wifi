@@ -258,6 +258,7 @@ private:
 #ifdef DYNAMIC_UNLOAD_SA
     void StopUnloadStaTimer(void) override;
 #endif
+    ErrCode AnonymizeSensitiveFields(WifiDeviceConfig &config);
     bool IsDisableWifiProhibitedByEdm(void);
     void ReportWifiConfigStatus(WifiConfigReportType reportType);
 

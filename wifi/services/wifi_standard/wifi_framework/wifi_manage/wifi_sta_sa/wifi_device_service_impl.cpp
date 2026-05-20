@@ -862,6 +862,29 @@ void WifiDeviceServiceImpl::ReplaceConfigWhenCandidateConnected(std::vector<Wifi
     result.push_back(wifiConfig);
 }
 
+ErrCode WifiDeviceServiceImpl::AnonymizeSensitiveFields(WifiDeviceConfig &config)
+{
+    if (WifiAuthCenter::IsSystemAccess()) {
+        return WIFI_OPT_SUCCESS;
+    }
+    
+    // 对EAP配置中的敏感字段进行脱敏
+    if (config.keyMgmt == KEY_MGMT_EAP || config.keyMgmt == KEY_MGMT_SUITE_B_192) {
+        config.wifiEapConfig.password = "";
+        if (memset_s(config.wifiEapConfig.certPassword, sizeof(config.wifiEapConfig.certPassword), 0,
+            sizeof(config.wifiEapConfig.certPassword) - 1) != EOK) {
+            WIFI_LOGE("AnonymizeSensitiveFields memset_s certPassword error!");
+            return WIFI_OPT_FAILED;
+        }
+        config.wifiEapConfig.certPassword[sizeof(config.wifiEapConfig.certPassword) - 1] = '\0';
+    }
+    
+    // 对预共享密钥进行脱敏
+    config.preSharedKey = "";
+    
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &result, bool isCandidate)
 {
     int apiVersion = WifiPermissionUtils::GetApiVersion();
@@ -899,6 +922,14 @@ ErrCode WifiDeviceServiceImpl::GetDeviceConfigs(std::vector<WifiDeviceConfig> &r
     } else {
         WifiSettings::GetInstance().GetDeviceConfig(result);
         ReplaceConfigWhenCandidateConnected(result);
+    }
+
+    for (auto &config : result) {
+        ErrCode ret = AnonymizeSensitiveFields(config);
+        if (ret != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("GetDeviceConfigs: AnonymizeSensitiveFields failed!");
+            return ret;
+        }
     }
     return WIFI_OPT_SUCCESS;
 }

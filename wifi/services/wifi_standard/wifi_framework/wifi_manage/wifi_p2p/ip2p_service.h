@@ -395,6 +395,12 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode Hid2dSetGroupType(GroupLiveType groupType) = 0;
+
+    /**
+     * @Description Handle screen state changed event
+     * @param screenState - MODE_STATE_OPEN (screen on)/MODE_STATE_CLOSE (Screen off)
+     */
+    virtual void OnScreenStateChanged(int screenState) = 0;
 };
 } // namespace Wifi
 } // namespace OHOS

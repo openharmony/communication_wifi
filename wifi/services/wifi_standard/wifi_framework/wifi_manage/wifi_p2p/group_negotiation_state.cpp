@@ -116,6 +116,7 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
     if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");
     }
+    p2pStateMachine.StartP2pSignalPollTimer();
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     return EXECUTED;
 }

@@ -26,6 +26,7 @@
 #include "wifi_error_no.h"
 #include "wifi_hid2d_msg.h"
 #include "wifi_p2p_msg.h"
+#include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -525,6 +526,17 @@ public:
      * @return WifiErrorNo
      */
     WifiErrorNo SetP2pHighPerf(bool isEnable);
+
+    /**
+    * @Description Get current P2P connect signal info
+    *
+    * @param ifaceName p2p interface name
+    * @param macAddr mac address
+    * @param signalInfo output signal poll info structure
+    * @return WifiErrorNo - WIFI_HAL_OPT_OK on success
+    */
+    WifiErrorNo GetP2pSignalInfo(const std::string &ifaceName, const std::string &macAddr,
+        WifiSignalPollInfo &signalInfo);
 private:
     P2pHalCallback mP2pCallback;
 };

@@ -575,5 +575,12 @@ ErrCode WifiP2pService::Hid2dSetGroupType(GroupLiveType groupType)
     return WIFI_OPT_SUCCESS;
 }
 
+void WifiP2pService::OnScreenStateChanged(int screenState)
+{
+    WIFI_LOGD("WifiP2pService::OnScreenStateChanged, screenState=%{public}d", screenState);
+    p2pStateMachine.SendMessage(
+        static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SCREEN_STATE_CHANGED), screenState);
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

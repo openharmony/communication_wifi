@@ -42,6 +42,7 @@ void GroupFormedState::GoInState()
 void GroupFormedState::GoOutState()
 {
     WIFI_LOGI("             GoOutState");
+    p2pStateMachine.StopP2pSignalPollTimer();
 }
 
 void GroupFormedState::Init()
@@ -152,6 +153,7 @@ bool GroupFormedState::ProcessProvDiscEvt(const InternalMessagePtr msg) const
 bool GroupFormedState::ProcessGroupStartedEvt(const InternalMessagePtr msg) const
 {
     WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
+    p2pStateMachine.StartP2pSignalPollTimer();
     return EXECUTED;
 }
 

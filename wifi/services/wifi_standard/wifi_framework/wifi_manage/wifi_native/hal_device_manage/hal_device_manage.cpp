@@ -29,6 +29,7 @@
 #include "hdf_remote_service.h"
 #include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
+#include "securec.h"
 
 #undef LOG_TAG
 #define LOG_TAG "HalDeviceManager"
@@ -52,6 +53,8 @@ OnChipServiceDied HalDeviceManager::g_chipHdiServiceDiedCb = nullptr;
 constexpr int32_t CMD_SET_MAX_CONNECT = 102;
 constexpr int32_t MAX_CONNECT_DEFAULT = 8;
 constexpr int32_t CMD_SET_P2P_HIGH_PERF = 103;
+constexpr int32_t CMD_GET_SIGNAL = 104;
+constexpr size_t SIGNAL_POLL_RESULT_FIXED_SIZE = 76;
 
 HalDeviceManager::HalDeviceManager()
 {
@@ -1632,6 +1635,167 @@ int32_t ChipIfaceCallback::OnWifiNetlinkMessage(uint32_t type, const std::vector
         g_netlinkReportCallback(type, recvMsg);
     }
     return 0;
+}
+
+bool HalDeviceManager::GetP2pSignalInfo(const std::string &interfaceName, const std::string &macAddr,
+    SignalPollResult &signalPollResult)
+{
+    std::string ifaceName = "p2p0";
+    std::string result;
+    if (!SendCmdToDriver(ifaceName, interfaceName, CMD_GET_SIGNAL, macAddr, result)) {
+        return false;
+    }
+    const signed char *signedCharPointer = reinterpret_cast<const signed char *>(result.data());
+    DeserializeSignalPollResultFromPtr(signedCharPointer, result.size(), signalPollResult);
+    LOGI("HalDeviceManager GetP2pSignalInfo finish, currentRssi %{public}d, associatedFreq %{public}d,\
+        txBitrate %{public}d, rxBitrate %{public}d, currentNoise %{public}d, currentSnr %{public}d,\
+        currentChload %{public}d, currentUlDelay %{public}d, currentTxBytes %{public}llu, currentRxBytes %{public}llu,\
+        currentTxFailed %{public}d, currentTxPackets %{public}d, currentRxPackets %{public}d,\
+        chloadSelf %{public}d, c0Rssi %{public}d, c1Rssi %{public}d",
+        signalPollResult.currentRssi, signalPollResult.associatedFreq, signalPollResult.txBitrate,
+        signalPollResult.rxBitrate, signalPollResult.currentNoise, signalPollResult.currentSnr,
+        signalPollResult.currentChload, signalPollResult.currentUlDelay, signalPollResult.currentTxBytes,
+        signalPollResult.currentRxBytes, signalPollResult.currentTxFailed, signalPollResult.currentTxPackets,
+        signalPollResult.currentRxPackets, signalPollResult.chloadSelf, signalPollResult.c0Rssi,
+        signalPollResult.c1Rssi);
+    return true;
+}
+ 	 
+bool HalDeviceManager::ReadInt32(const signed char *buf, size_t bufSize, size_t &offset, int32_t &value)
+{
+    if (offset + sizeof(int32_t) > bufSize) {
+        LOGE("ReadInt32: buffer overflow, offset:%{public}d, size:%{public}d", static_cast<int>(offset),
+            static_cast<int>(bufSize));
+        return false;
+    }
+    if (memcpy_s(&value, sizeof(int32_t), buf + offset, sizeof(int32_t)) != EOK) {
+        LOGE("ReadInt32: memcpy_s failed");
+        return false;
+    }
+    offset += sizeof(int32_t);
+    return true;
+}
+ 	 
+bool HalDeviceManager::ReadUInt32(const signed char *buf, size_t bufSize, size_t &offset, uint32_t &value)
+{
+    if (offset + sizeof(uint32_t) > bufSize) {
+        LOGE("ReadUInt32: buffer overflow, offset:%{public}d, size:%{public}d", static_cast<int>(offset),
+            static_cast<int>(bufSize));
+        return false;
+    }
+    if (memcpy_s(&value, sizeof(uint32_t), buf + offset, sizeof(uint32_t)) != EOK) {
+        LOGE("ReadUInt32: memcpy_s failed");
+        return false;
+    }
+    offset += sizeof(uint32_t);
+    return true;
+}
+ 	 
+bool HalDeviceManager::ReadUInt64(const signed char *buf, size_t bufSize, size_t &offset, uint64_t &value)
+{
+    if (offset + sizeof(uint64_t) > bufSize) {
+        LOGE("ReadUInt64: buffer overflow, offset:%{public}d, size:%{public}d", static_cast<int>(offset),
+            static_cast<int>(bufSize));
+        return false;
+    }
+    if (memcpy_s(&value, sizeof(uint64_t), buf + offset, sizeof(uint64_t)) != EOK) {
+        LOGE("ReadUInt64: memcpy_s failed");
+        return false;
+    }
+    offset += sizeof(uint64_t);
+    return true;
+}
+ 	 
+bool HalDeviceManager::ReadUInt16(const signed char *buf, size_t bufSize, size_t &offset, uint16_t &value)
+{
+    if (offset + sizeof(uint16_t) > bufSize) {
+        LOGE("ReadUInt16: buffer overflow, offset:%{public}d, size:%{public}d", static_cast<int>(offset),
+            static_cast<int>(bufSize));
+        return false;
+    }
+    if (memcpy_s(&value, sizeof(uint16_t), buf + offset, sizeof(uint16_t)) != EOK) {
+        LOGE("ReadUInt16: memcpy_s failed");
+        return false;
+    }
+    offset += sizeof(uint16_t);
+    return true;
+}
+ 	 
+bool HalDeviceManager::ReadBytes(const signed char *buf, size_t bufSize, size_t &offset, uint8_t *data, size_t len)
+{
+    if (offset + len > bufSize) {
+        LOGE("ReadBytes: buffer overflow, offset:%{public}d, len:%{public}d, size:%{public}d", static_cast<int>(offset),
+            static_cast<int>(len), static_cast<int>(bufSize));
+        return false;
+    }
+    if (memcpy_s(data, len, buf + offset, len) != EOK) {
+        LOGE("ReadBytes: memcpy_s failed");
+        return false;
+    }
+    offset += len;
+    return true;
+}
+
+void HalDeviceManager::DeserializeSignalPollBaseAttribute(const signed char *data, size_t dataSize, size_t &offset,
+    SignalPollResult &result)
+{
+    ReadInt32(data, dataSize, offset, result.currentRssi);
+    ReadInt32(data, dataSize, offset, result.associatedFreq);
+    ReadInt32(data, dataSize, offset, result.txBitrate);
+    ReadInt32(data, dataSize, offset, result.rxBitrate);
+    ReadInt32(data, dataSize, offset, result.currentNoise);
+    ReadInt32(data, dataSize, offset, result.currentSnr);
+    ReadInt32(data, dataSize, offset, result.currentChload);
+    ReadInt32(data, dataSize, offset, result.currentUlDelay);
+    ReadUInt64(data, dataSize, offset, result.currentTxBytes);
+    ReadUInt64(data, dataSize, offset, result.currentRxBytes);
+    ReadInt32(data, dataSize, offset, result.currentTxFailed);
+    ReadInt32(data, dataSize, offset, result.currentTxPackets);
+    ReadInt32(data, dataSize, offset, result.currentRxPackets);
+    ReadUInt16(data, dataSize, offset, result.chloadSelf);
+}
+ 	 
+bool HalDeviceManager::DeserializeSignalPollResultFromPtr(const signed char *data, size_t dataSize,
+    SignalPollResult &result)
+{
+    if (data == nullptr) {
+        LOGE("DeserializeSignalPollResultFromPtr: null data pointer");
+        return false;
+    }
+    if (dataSize < SIGNAL_POLL_RESULT_FIXED_SIZE) {
+        LOGE("DeserializeSignalPollResultFromPtr: data too small, size:%{public}d", static_cast<int>(dataSize));
+        return false;
+    }
+    size_t offset = 0;
+    DeserializeSignalPollBaseAttribute(data, dataSize, offset, result);
+    uint16_t padding = 0;
+    if (!ReadUInt16(data, dataSize, offset, padding)) {
+        return false;
+    }
+    if (!ReadInt32(data, dataSize, offset, result.c0Rssi)) {
+        return false;
+    }
+    if (!ReadInt32(data, dataSize, offset, result.c1Rssi)) {
+        return false;
+    }
+
+    uint32_t extLen = 0;
+    if (!ReadUInt32(data, dataSize, offset, extLen)) {
+        return false;
+    }
+    if (offset + extLen > dataSize) {
+        LOGE("DeserializeSignalPollResult: ext data overflow, offset:%{public}d,ext length:%{public}d,\
+            size:%{public}d",
+            static_cast<int>(offset), extLen, static_cast<int>(dataSize));
+        return false;
+    }
+    result.ext.resize(extLen);
+    if (extLen > 0) {
+        if (!ReadBytes(data, dataSize, offset, result.ext.data(), extLen)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 }  // namespace Wifi

@@ -1501,5 +1501,106 @@ void P2pStateMachine::CancelWpsPbc(void)
 #endif
     return;
 }
+
+bool P2pStateMachine::GetP2pSignalPollInfo(WifiSignalPollInfo &signalInfo, std::string &p2pInterfaceName)
+{
+    std::string macAddress;
+    WifiP2pGroupInfo groupInfo = groupManager.GetCurrentGroup();
+    p2pInterfaceName = groupInfo.GetInterface();
+    WIFI_LOGI("GetP2pSignalPollInfo, p2pInterfaceName: %{public}s", p2pInterfaceName.data());
+    bool isGroupOwner = groupInfo.IsGroupOwner();
+    if (isGroupOwner) {
+        std::vector<WifiP2pDevice> clientDevices = groupInfo.GetClientDevices();
+        int p2pClientNum = static_cast<int>(clientDevices.size());
+        if (p2pClientNum > 0) {
+            macAddress = clientDevices[0].GetRandomDeviceAddress();
+            WIFI_LOGI("GetP2pSignalPollInfo, get go mac success");
+        }
+    } else {
+        WifiP2pDevice device = groupInfo.GetOwner();
+        macAddress = device.GetRandomDeviceAddress();
+        WIFI_LOGI("GetP2pSignalPollInfo, get gc mac success");
+    }
+    WifiErrorNo ret = WifiP2PHalInterface::GetInstance().GetP2pSignalInfo(p2pInterfaceName, macAddress, signalInfo);
+    if (ret != WIFI_HAL_OPT_OK) {
+        WIFI_LOGI("GetP2pSignalPollInfo failed: %{public}d", ret);
+        return false;
+    }
+    signalInfo.timeStamp = GetCurrentTimeSeconds();
+    return true;
+}
+ 	 
+void P2pStateMachine::DealP2pSignalPollResult()
+{
+    WifiSignalPollInfo signalInfo;
+    std::string p2pInterfaceName;
+    if (!GetP2pSignalPollInfo(signalInfo, p2pInterfaceName)) {
+        WIFI_LOGE("DealP2pSignalPollResult: Get signal info failed");
+        return;
+    }
+    JudgeP2pSignalPoll(signalInfo, p2pInterfaceName);
+}
+ 	 
+void P2pStateMachine::StartP2pSignalPollTimer()
+{
+    InitChipSupportSignalAcquisitionFlag();
+    WIFI_LOGD("StartP2pSignalPollTimer: enable switch = %{public}d, chip support flag = %{public}d",
+        enableP2pSignalPoll_, chipSupportSignalAcquisitionFlag);
+    if (!enableP2pSignalPoll_ || chipSupportSignalAcquisitionFlag != 1) {
+        return;
+    }
+    StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_GET_SIGNAL));
+    StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_GET_SIGNAL), p2pSignalPollDelayTime_, MsgLogLevel::LOG_D);
+}
+ 	 
+void P2pStateMachine::StopP2pSignalPollTimer()
+{
+    enableP2pSignalPoll_ = false;
+    StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_GET_SIGNAL));
+}
+ 	 
+void P2pStateMachine::JudgeP2pSignalPoll(const WifiSignalPollInfo &signalInfo, const std::string p2pInterfaceName)
+{
+    if (pEnhanceService != nullptr) {
+        pEnhanceService->SetEnhanceP2pSignalPollInfo(signalInfo, p2pInterfaceName);
+    }
+    WifiP2pLinkedInfo p2pLinkedInfo;
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pLinkedInfo);
+    bool p2pConnected = p2pLinkedInfo.GetConnectState() != P2pConnectedState::P2P_DISCONNECTED;
+    WIFI_LOGD("judge p2p signal collect flag, p2pConnected flag %{public}d, enableP2pSignalPoll flag %{public}d",
+        p2pConnected, enableP2pSignalPoll_);
+    if (enableP2pSignalPoll_ && p2pConnected) {
+        StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_GET_SIGNAL));
+        StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_GET_SIGNAL),
+            p2pSignalPollDelayTime_, MsgLogLevel::LOG_D);
+    }
+}
+ 	 
+ 	 
+bool P2pStateMachine::SetSignalAcquisitionSwitch(bool switchFlag)
+{
+    bool originFlag = enableP2pSignalPoll_;
+    enableP2pSignalPoll_ = switchFlag;
+    return originFlag;
+}
+ 	 
+void P2pStateMachine::InitChipSupportSignalAcquisitionFlag()
+{
+    if (chipSupportSignalAcquisitionFlag == -1) {
+        if (pEnhanceService == nullptr) {
+            WIFI_LOGW("enhance service noit init");
+            return;
+        }
+        WifiDeviceFeatures wifiDeviceFeatures = pEnhanceService->GetDeviceFeatures();
+        WIFI_LOGD("query wifi device feature success, chip support p2p signal flag is %{public}d",
+            wifiDeviceFeatures.supportP2pSignalAcquisition);
+        if (wifiDeviceFeatures.supportP2pSignalAcquisition) {
+            chipSupportSignalAcquisitionFlag = 1;
+        } else {
+            // already query, chip not support
+            chipSupportSignalAcquisitionFlag = 0;
+        }
+    }
+}
 } // namespace Wifi
 } // namespace OHOS

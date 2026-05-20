@@ -41,6 +41,7 @@
 #include "wifi_hid2d_service_utils.h"
 #include "dhcp_c_api.h"
 #include "p2p_group_remove_state.h"
+#include "wifi_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -139,6 +140,43 @@ public:
     bool GetConnectedStationInfo(std::map<std::string, StationInfo> &result);
 
     void SetEnhanceService(IEnhanceService* enhanceService);
+
+    /**
+    * @Description - get p2p link signal poll info
+    * @param  signalInfo - output signal information
+    * @param p2pInterfaceName p2p interface name
+    * @return true on success, false on failure
+    */
+    bool GetP2pSignalPollInfo(WifiSignalPollInfo &signalInfo, std::string &p2pInterfaceName);
+ 	 
+    /**
+    * @Description Process p2p signal poll result
+    */
+    void DealP2pSignalPollResult();
+ 	 
+    /**
+    * @Description judge whether to enable p2p signal poll and start next timer
+    * @param signalInfo signalInfo
+    * @param p2pInterfaceName p2p interface name
+    */
+    virtual void JudgeP2pSignalPoll(const WifiSignalPollInfo &signalInfo, const std::string p2pInterfaceName);
+ 	 
+    /**
+    * @Description start p2p signal poll timer
+    */
+    void StartP2pSignalPollTimer();
+ 	 
+    /**
+    * @Description stop p2p signal poll timer
+    */
+    void StopP2pSignalPollTimer();
+ 	 
+    /**
+    * @Description set signal poll switch true:open false close
+    * @param switchFlag switchFlag
+    * @return origin flag
+    */
+    bool SetSignalAcquisitionSwitch(bool switchFlag);
 
 private:
     /**
@@ -453,6 +491,7 @@ private:
     bool ReinvokeGroup(WifiP2pConfigInternal &config, int networkId, const WifiP2pDevice &device) const;
     void SetClientInfo(HalP2pGroupConfig &wpaConfig, WifiP2pGroupInfo &grpBuf) const;
     void FilterInvalidGroup() const;
+    void InitChipSupportSignalAcquisitionFlag();
 
 private:
     mutable std::mutex cbMapMutex;
@@ -488,7 +527,10 @@ private:
     std::string p2pDevIface;
     static std::mutex m_gcJoinmutex;
     IEnhanceService* pEnhanceService { nullptr };
-
+    bool enableP2pSignalPoll_ = true;
+    int p2pSignalPollDelayTime_ = P2P_SIGNAL_POLL_DELAY;
+    // initial: -1, in StartP2pSignalPollTimer method called, query chip type and modify this flag
+    int chipSupportSignalAcquisitionFlag = -1;
 public:
     std::vector<std::string> curClientList;
 };

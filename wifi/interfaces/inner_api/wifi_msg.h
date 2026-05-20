@@ -1292,6 +1292,7 @@ struct WifiDeviceFeatures {
     bool isP2pSupportDfsOffload { false };
     bool isEnableScanOnlyOnHotspot { false };
     bool isZeroWaitDfsSupport { false };
+    bool supportP2pSignalAcquisition {false};
 };
 }  // namespace Wifi
 }  // namespace OHOS

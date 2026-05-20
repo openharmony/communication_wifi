@@ -593,6 +593,14 @@ public:
      * @return WifiDeviceFeatures - A structure indicating device features.
      */
     virtual WifiDeviceFeatures GetDeviceFeatures() = 0;
+
+    /**
+     * @Description set the enhance p2p signal poll info
+     *
+     * @param info -signal info
+     * @param p2pInterfaceName interface name
+     */
+    virtual void SetEnhanceP2pSignalPollInfo(const WifiSignalPollInfo &info, const std::string p2pInterfaceName) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

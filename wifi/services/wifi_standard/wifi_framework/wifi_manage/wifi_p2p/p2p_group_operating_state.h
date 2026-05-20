@@ -149,6 +149,8 @@ private:
 
     WifiErrorNo CreateGroupByConfig(int netId, const WifiP2pConfigInternal &config, int freq) const;
 
+    void UpdateGroupOwnerInfo(WifiP2pGroupInfo &group, const std::string &goAddr) const;
+
     int GetGroupFreq(WifiP2pConfigInternal &config) const;
 private:
     using ProcessFun = std::function<bool(const InternalMessagePtr)> const;

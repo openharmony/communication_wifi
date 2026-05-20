@@ -302,6 +302,22 @@ private:
      */
     virtual bool ProcessCmdHid2dSetGroupType(InternalMessagePtr msg) const;
 
+    /**
+     * @Description Process the p2p get signal command recived by the state machine
+     *
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessCmdGetSignal(InternalMessagePtr msg) const;
+ 	 
+    /**
+     * @Description Process the screen state changed event recived by the state machine
+     *
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessScreenStateChangedEvent(InternalMessagePtr msg) const;
+
 private:
     void P2pConfigInitExt(bool &result);
 

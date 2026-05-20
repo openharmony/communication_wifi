@@ -446,6 +446,15 @@ public:
 
     void RegisterChipHdiDeathCallback(OnChipServiceDied cb);
 
+    /**
+     * @Description get p2p scene signal info
+     * @param ifaceName interfaceName
+     * @param macAddr mac address
+     * @param signalPollResult result carrier
+     * @return bool
+     */
+    bool GetP2pSignalInfo(const std::string &ifaceName, const std::string &macAddr, SignalPollResult &signalPollResult);
+
 private:
     bool CheckReloadChipHdiService();
     bool CheckChipHdiStarted();
@@ -488,6 +497,14 @@ private:
     static void AddChipHdiDeathRecipient();
     static void RemoveChipHdiDeathRecipient();
     IChipIface *FindIface(const std::string &ifaceName);
+    bool ReadInt32(const signed char* buf, size_t bufSize, size_t &offset, int32_t &value);
+    bool ReadUInt32(const signed char* buf, size_t bufSize, size_t &offset, uint32_t &value);
+    bool ReadUInt64(const signed char* buf, size_t bufSize, size_t &offset, uint64_t &value);
+    bool ReadUInt16(const signed char* buf, size_t bufSize, size_t &offset, uint16_t &value);
+    bool ReadBytes(const signed char* buf, size_t bufSize, size_t &offset, uint8_t* data, size_t len);
+    void DeserializeSignalPollBaseAttribute(const signed char* data, size_t dataSize, size_t &offset,
+                                            SignalPollResult &result);
+    bool DeserializeSignalPollResultFromPtr(const signed char* data, size_t dataSize, SignalPollResult &result);
 
 private:
     static std::map<std::pair<std::string, IfaceType>, InterfaceCacheEntry> mInterfaceInfoCache;

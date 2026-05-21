@@ -2063,7 +2063,7 @@ ErrCode WifiDeviceServiceImpl::StartPortalCertification()
 
 ErrCode WifiDeviceServiceImpl::FactoryReset()
 {
-    WIFI_LOGI("Enter FactoryReset.");
+    WIFI_LOGI("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot! m_instId:%{public}d", m_instId);
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("FactoryReset: NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
@@ -2079,7 +2079,6 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
-    WIFI_LOGI("WifiDeviceServiceImpl FactoryReset sta,p2p,hotspot! m_instId:%{public}d", m_instId);
     if (m_instId == INSTID_WLAN0 || m_instId == INSTID_WLAN1) {
         WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_SEMI_ENABLED, m_instId);
 #ifndef OHOS_ARCH_LITE
@@ -2104,10 +2103,11 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     IWifiProService *pWifiProService = WifiServiceManager::GetInstance().GetWifiProServiceInst(m_instId);
     if (pWifiProService != nullptr) {
         WifiDeviceConfig config;
-        pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(ConfigChange::CONFIG_REMOVE),
-            config, true);
+        pWifiProService->OnWifiDeviceConfigChange(static_cast<int32_t>(ConfigChange::CONFIG_REMOVE), config, true);
     }
 #endif
+    WifiSettings::GetInstance().SetWifiCapability(static_cast<int32_t>(WifiCapability::WIFI_AUTO_ENABLE),
+        true, m_instId);
     /* p2p */
     WifiSettings::GetInstance().RemoveWifiP2pGroupInfo();
     WifiSettings::GetInstance().SyncWifiP2pGroupInfoConfig();

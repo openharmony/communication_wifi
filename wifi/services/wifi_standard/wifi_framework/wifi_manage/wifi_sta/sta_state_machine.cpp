@@ -5825,7 +5825,7 @@ bool StaStateMachine::IsScanResultExpired(const std::string &bssid, int &freq)
             return false;
         }
     }
-    WIFI_LOGW("BSSID %{public}s not found in scan results", bssid.c_str());
+    WIFI_LOGW("BSSID %{public}s not found in scan results", MacAnonymize(bssid).c_str());
     return false;
 }
 

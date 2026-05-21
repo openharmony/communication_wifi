@@ -4775,7 +4775,7 @@ void StaStateMachine::InsertOrUpdateNetworkStatusHistory(const NetworkStatus &ne
         wifiDeviceConfig.noInternetAccess = true;
     }
     if (networkStatus == NetworkStatus::HAS_INTERNET) {
-        wifiDeviceConfig.lastHasInternetTime = time(0);
+        wifiDeviceConfig.lastHasInternetTime = time(nullptr);
         wifiDeviceConfig.noInternetAccess = false;
         WifiConfigCenter::GetInstance().GetIpInfo(wifiDeviceConfig.lastDhcpResult, m_instId);
     }

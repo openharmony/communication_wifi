@@ -412,7 +412,7 @@ private:
     void NotifySelfCureCompleted(int status);
     void HandleConnectFailed();
     void ForceStopSelfCure();
-    bool CheckSelfCureWifiResultExt(SelfCureState selfCureL2State);
+    bool CheckSelfCureWifiResultExt(SelfCureState wifiSelfCureState);
     void UpdateAutoJoinBlockTime(const std::string& conditionName, int64_t blockTimeMs);
     void RemoveAutoJoinBlockTime(const std::string& conditionName);
     void SetDeviceConfigForUpdateById(int networkId);

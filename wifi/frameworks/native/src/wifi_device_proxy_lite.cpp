@@ -44,7 +44,9 @@ static void ReadIpAddress(IpcIo *reply, WifiIpAddress &address)
     }
     int tmpAddress = 0;
     for (int i = 0; i < size; i++) {
-        (void)ReadInt8(reply, (int8_t *)&tmpAddress);
+        int8_t byteValue = 0;
+        (void)ReadInt8(reply, &byteValue);
+        tmpAddress = static_cast<int>(byteValue);
         address.addressIpv6.push_back(tmpAddress);
     }
     return;
@@ -69,25 +71,25 @@ static void Parse5GChannels(IpcIo *reply, std::vector<int> &result)
 static void ReadEapConfig(IpcIo *reply, WifiEapConfig &wifiEapConfig)
 {
     size_t readLen;
-    wifiEapConfig.eap = (char *)ReadString(reply, &readLen);
+    wifiEapConfig.eap = reinterpret_cast<char *>(ReadString(reply, &readLen));
     int phase2Method = 0;
     (void)ReadInt32(reply, &phase2Method);
     wifiEapConfig.phase2Method = Phase2Method(phase2Method);
-    wifiEapConfig.identity = (char *)ReadString(reply, &readLen);
-    wifiEapConfig.anonymousIdentity = (char *)ReadString(reply, &readLen);
-    wifiEapConfig.password = (char *)ReadString(reply, &readLen);
-    wifiEapConfig.caCertPath = (char *)ReadString(reply, &readLen);
-    wifiEapConfig.caCertAlias = (char *)ReadString(reply, &readLen);
-    wifiEapConfig.clientCert = (char *)ReadString(reply, &readLen);
+    wifiEapConfig.identity = reinterpret_cast<char *>(ReadString(reply, &readLen));
+    wifiEapConfig.anonymousIdentity = reinterpret_cast<char *>(ReadString(reply, &readLen));
+    wifiEapConfig.password = reinterpret_cast<char *>(ReadString(reply, &readLen));
+    wifiEapConfig.caCertPath = reinterpret_cast<char *>(ReadString(reply, &readLen));
+    wifiEapConfig.caCertAlias = reinterpret_cast<char *>(ReadString(reply, &readLen));
+    wifiEapConfig.clientCert = reinterpret_cast<char *>(ReadString(reply, &readLen));
     if (strcpy_s(wifiEapConfig.certPassword, sizeof(wifiEapConfig.certPassword),
-        (char *)ReadString(reply, &readLen)) != EOK) {
+        reinterpret_cast<char *>(ReadString(reply, &readLen))) != EOK) {
         WIFI_LOGE("%{public}s: failed to copy", __func__);
     }
-    wifiEapConfig.privateKey = (char *)ReadString(reply, &readLen);
-    wifiEapConfig.altSubjectMatch = (char *)ReadString(reply, &readLen);
-    wifiEapConfig.domainSuffixMatch = (char *)ReadString(reply, &readLen);
-    wifiEapConfig.realm = (char *)ReadString(reply, &readLen);
-    wifiEapConfig.plmn = (char *)ReadString(reply, &readLen);
+    wifiEapConfig.privateKey = reinterpret_cast<char *>(ReadString(reply, &readLen));
+    wifiEapConfig.altSubjectMatch = reinterpret_cast<char *>(ReadString(reply, &readLen));
+    wifiEapConfig.domainSuffixMatch = reinterpret_cast<char *>(ReadString(reply, &readLen));
+    wifiEapConfig.realm = reinterpret_cast<char *>(ReadString(reply, &readLen));
+    wifiEapConfig.plmn = reinterpret_cast<char *>(ReadString(reply, &readLen));
     (void)ReadInt32(reply, &wifiEapConfig.eapSubId);
 }
 
@@ -160,17 +162,17 @@ static void ReadLinkedInfo(IpcIo *reply, WifiLinkedInfo &info)
 {
     size_t readLen;
     (void)ReadInt32(reply, &info.networkId);
-    info.ssid = (char *)ReadString(reply, &readLen);
-    info.bssid = (char *)ReadString(reply, &readLen);
+    info.ssid = reinterpret_cast<char *>(ReadString(reply, &readLen));
+    info.bssid = reinterpret_cast<char *>(ReadString(reply, &readLen));
     (void)ReadInt32(reply, &info.rssi);
     (void)ReadInt32(reply, &info.band);
     (void)ReadInt32(reply, &info.frequency);
     (void)ReadInt32(reply, &info.linkSpeed);
-    info.macAddress = (char *)ReadString(reply, &readLen);
+    info.macAddress = reinterpret_cast<char *>(ReadString(reply, &readLen));
     (void)ReadUint32(reply, &info.ipAddress);
     int tmpConnState = 0;
     (void)ReadInt32(reply, &tmpConnState);
-    if ((tmpConnState >= 0) && (tmpConnState <= (int)ConnState::UNKNOWN)) {
+    if ((tmpConnState >= 0) && (tmpConnState <= static_cast<int>(ConnState::UNKNOWN))) {
         info.connState = ConnState(tmpConnState);
     } else {
         info.connState = ConnState::UNKNOWN;
@@ -181,31 +183,31 @@ static void ReadLinkedInfo(IpcIo *reply, WifiLinkedInfo &info)
     (void)ReadInt32(reply, &info.chload);
     (void)ReadInt32(reply, &info.snr);
     (void)ReadInt32(reply, &info.isDataRestricted);
-    info.portalUrl = (char *)ReadString(reply, &readLen);
-
+    info.portalUrl = reinterpret_cast<char *>(ReadString(reply, &readLen));
+ 
     int tmpState = 0;
     (void)ReadInt32(reply, &tmpState);
-    if ((tmpState >= 0) && (tmpState <= (int)SupplicantState::INVALID)) {
-        info.supplicantState = (SupplicantState)tmpState;
+    if ((tmpState >= 0) && (tmpState <= static_cast<int>(SupplicantState::INVALID))) {
+        info.supplicantState = static_cast<SupplicantState>(tmpState);
     } else {
         info.supplicantState = SupplicantState::INVALID;
     }
-
+ 
     int tmpDetailState = 0;
     (void)ReadInt32(reply, &tmpDetailState);
-    if ((tmpDetailState >= 0) && (tmpDetailState <= (int)DetailedState::INVALID)) {
-        info.detailedState = (DetailedState)tmpDetailState;
+    if ((tmpDetailState >= 0) && (tmpDetailState <= static_cast<int>(DetailedState::INVALID))) {
+        info.detailedState = static_cast<DetailedState>(tmpDetailState);
     } else {
         info.detailedState = DetailedState::INVALID;
     }
     (void)ReadInt32(reply, &info.wifiStandard);
     (void)ReadInt32(reply, &info.maxSupportedRxLinkSpeed);
     (void)ReadInt32(reply, &info.maxSupportedTxLinkSpeed);
-
-    int tmpChanWidth = (int)WifiChannelWidth::WIDTH_INVALID;
+ 
+    int tmpChanWidth = static_cast<int>(WifiChannelWidth::WIDTH_INVALID);
     (void)ReadInt32(reply, &tmpChanWidth);
-    if ((tmpChanWidth >= 0) && (tmpChanWidth <= (int)WifiChannelWidth::WIDTH_INVALID)) {
-        info.channelWidth = (WifiChannelWidth)tmpChanWidth;
+    if ((tmpChanWidth >= 0) && (tmpChanWidth <= static_cast<int>(WifiChannelWidth::WIDTH_INVALID))) {
+        info.channelWidth = static_cast<WifiChannelWidth>(tmpChanWidth);
     } else {
         info.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     }
@@ -230,64 +232,64 @@ static int IpcCallback(void *owner, int code, IpcIo *reply)
             code, owner == nullptr, reply == nullptr);
         return ERR_FAILED;
     }
-
-    struct IpcOwner *data = (struct IpcOwner *)owner;
+ 
+    struct IpcOwner *data = static_cast<struct IpcOwner *>(owner);
     (void)ReadInt32(reply, &data->exception);
     (void)ReadInt32(reply, &data->retCode);
     if (data->exception != 0 || data->retCode != WIFI_OPT_SUCCESS || data->variable == nullptr) {
         return ERR_NONE;
     }
-
+ 
     switch (data->funcId) {
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_ADD_DEVICE_CONFIG):
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG):
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_STATE):
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL): {
-            (void)ReadInt32(reply, (int32_t *)data->variable);
+            (void)ReadInt32(reply, static_cast<int32_t *>(data->variable));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED):
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE):
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_LATENCY_MODE): {
-            (void)ReadBool(reply, (bool *)data->variable);
+            (void)ReadBool(reply, static_cast<bool *>(data->variable));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_COUNTRY_CODE):
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DERVICE_MAC_ADD): {
             size_t readLen = 0;
-            *((std::string *)data->variable) = (char *)ReadString(reply, &readLen);
+            *(static_cast<std::string *>(data->variable)) = reinterpret_cast<char *>(ReadString(reply, &readLen));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES): {
             int64_t features = 0;
             ReadInt64(reply, &features);
-            *((long *)data->variable) = features;
+            *(static_cast<long *>(data->variable)) = features;
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIGS): {
-            ParseDeviceConfigs(reply, *((std::vector<WifiDeviceConfig> *)data->variable));
+            ParseDeviceConfigs(reply, *(static_cast<std::vector<WifiDeviceConfig> *>(data->variable)));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_LINKED_INFO): {
-            ReadLinkedInfo(reply, *((WifiLinkedInfo *)data->variable));
+            ReadLinkedInfo(reply, *(static_cast<WifiLinkedInfo *>(data->variable)));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_INFO): {
-            ReadDhcpInfo(reply, *((IpInfo *)data->variable));
+            ReadDhcpInfo(reply, *(static_cast<IpInfo *>(data->variable)));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED): {
-            (void)ReadBool(reply, (bool *)data->variable);
+            (void)ReadBool(reply, static_cast<bool *>(data->variable));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_5G_CHANNELLIST): {
-            Parse5GChannels(reply, *((std::vector<int> *)data->variable));
+            Parse5GChannels(reply, *(static_cast<std::vector<int> *>(data->variable)));
             break;
         }
         default:
             break;
     }
-
+ 
     return ERR_NONE;
 }
 
@@ -445,7 +447,7 @@ ErrCode WifiDeviceProxy::InitWifiProtect(const WifiProtectType &protectType, con
         return WIFI_OPT_FAILED;
     }
     (void)WriteInt32(&req, 0);
-    (void)WriteInt32(&req, (int)protectType);
+    (void)WriteInt32(&req, static_cast<int>(protectType));
     (void)WriteString(&req, protectName.c_str());
     owner.funcId = static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT);
     int error = remote_->Invoke(remote_, static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_INIT_WIFI_PROTECT), &req,
@@ -480,7 +482,7 @@ ErrCode WifiDeviceProxy::GetWifiProtectRef(const WifiProtectMode &protectMode, c
         return WIFI_OPT_FAILED;
     }
     (void)WriteInt32(&req, 0);
-    (void)WriteInt32(&req, (int)protectMode);
+    (void)WriteInt32(&req, static_cast<int>(protectMode));
     (void)WriteString(&req, protectName.c_str());
     owner.funcId = static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_PROTECT);
     int error = remote_->Invoke(remote_, static_cast<int32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_PROTECT), &req,
@@ -596,7 +598,7 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, IpcIo &r
     (void)WriteInt32(&req, config.wepTxKeyIndex);
     (void)WriteInt32(&req, config.priority);
     (void)WriteBool(&req, config.hiddenSSID);
-    (void)WriteInt32(&req, (int)config.wifiIpConfig.assignMethod);
+    (void)WriteInt32(&req, static_cast<int>(config.wifiIpConfig.assignMethod));
     WriteIpAddress(req, config.wifiIpConfig.staticIpAddress.ipAddress.address);
     (void)WriteInt32(&req, config.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
     (void)WriteInt32(&req, config.wifiIpConfig.staticIpAddress.ipAddress.flags);
@@ -606,13 +608,13 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, IpcIo &r
     WriteIpAddress(req, config.wifiIpConfig.staticIpAddress.dnsServer2);
     (void)WriteString(&req, config.wifiIpConfig.staticIpAddress.domains.c_str());
     WriteEapConfig(req, config.wifiEapConfig);
-    (void)WriteInt32(&req, (int)config.wifiProxyconfig.configureMethod);
+    (void)WriteInt32(&req, static_cast<int>(config.wifiProxyconfig.configureMethod));
     (void)WriteString(&req, config.wifiProxyconfig.autoProxyConfig.pacWebAddress.c_str());
     (void)WriteString(&req, config.wifiProxyconfig.manualProxyConfig.serverHostName.c_str());
     (void)WriteInt32(&req, config.wifiProxyconfig.manualProxyConfig.serverPort);
     (void)WriteString(&req, config.wifiProxyconfig.manualProxyConfig.exclusionObjectList.c_str());
-    (void)WriteInt32(&req, (int)config.wifiPrivacySetting);
-    (void)WriteInt32(&req, (int)config.wifiWapiConfig.wapiPskType);
+    (void)WriteInt32(&req, static_cast<int>(config.wifiPrivacySetting));
+    (void)WriteInt32(&req, static_cast<int>(config.wifiWapiConfig.wapiPskType));
     (void)WriteString(&req, config.wifiWapiConfig.wapiAsCertData.c_str());
     (void)WriteString(&req, config.wifiWapiConfig.wapiUserCertData.c_str());
 }
@@ -1454,7 +1456,7 @@ ErrCode WifiDeviceProxy::RegisterCallBack(const std::shared_ptr<IWifiDeviceCallB
 
     g_sid.handle = IPC_INVALID_HANDLE;
     g_sid.token = SERVICE_TYPE_ANONYMOUS;
-    g_sid.cookie = (uintptr_t)&g_objStub;
+    g_sid.cookie = reinterpret_cast<uintptr_t>(&g_objStub);
 
     IpcIo req;
     char data[IPC_DATA_SIZE_SMALL];

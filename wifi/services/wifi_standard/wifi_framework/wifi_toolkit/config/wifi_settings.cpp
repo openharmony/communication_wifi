@@ -568,7 +568,7 @@ int WifiSettings::SetDeviceAfterConnect(int networkId, int rssi)
         return -1;
     }
     LOGD("Set Device After Connect");
-    iter->second.lastConnectTime = time(0);
+    iter->second.lastConnectTime = time(nullptr);
     iter->second.lastDisconnectTime = iter->second.lastConnectTime;
     iter->second.numRebootsSinceLastUse = 0;
     iter->second.numAssociation++;

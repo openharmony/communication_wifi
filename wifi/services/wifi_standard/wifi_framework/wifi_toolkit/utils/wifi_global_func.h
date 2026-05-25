@@ -501,7 +501,7 @@ bool IsStartUpWifiEnableSupport();
  * @return false - close
  */
 
- bool IsWlanPluggableCapabilitySupport();
+bool IsWlanPluggableCapabilitySupport();
 /**
  * @Description is fold product supprt signal smoothe
  *

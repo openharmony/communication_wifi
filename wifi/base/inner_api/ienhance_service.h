@@ -558,7 +558,7 @@ public:
      *
      * @param state - game scene state
      */
-    virtual void ReportGameSceneChange(int state) = 0;
+    virtual void ReportGameSceneInfo(const WifiNetworkControlInfo &networkControlInfo) = 0;
  
     /**
      * @Description receive device config change

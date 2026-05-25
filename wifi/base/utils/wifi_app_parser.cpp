@@ -38,6 +38,7 @@ constexpr auto XML_TAG_SECTION_HEADER_APP_LIVE_STREAM_LIST = "AppLiveStream";
 constexpr auto XML_TAG_SECTION_HEADER_APP_GAME_BACKGROUND_LIMIT_LIST = "GameBackgroundLimitListApp";
 constexpr auto XML_TAG_SECTION_HEADER_RSS_GAME_LIST = "RssGameList";
 constexpr auto XML_TAG_SECTION_HEADER_ASYNC_DELAY_TIME = "AsyncDelayTime";
+constexpr auto XML_TAG_SECTION_HEADER_HIGAME_EXCLUDE_LIST = "HiGameExcludeList";
 constexpr auto XML_TAG_SECTION_KEY_GAME_RTT = "mGameRtt";
 constexpr auto XML_TAG_SECTION_KEY_GAME_RTT_GAP = "mGameRttGap";
 constexpr auto XML_TAG_SECTION_KEY_GAME_NAME = "gameName";
@@ -58,6 +59,7 @@ const std::unordered_map<std::string, AppType> appTypeMap = {
     { XML_TAG_SECTION_HEADER_APP_LIVE_STREAM_LIST, AppType::LIVE_STREAM_APP},
     { XML_TAG_SECTION_HEADER_APP_GAME_BACKGROUND_LIMIT_LIST, AppType::GAME_BACKGROUND_LIMIT_LIST_APP},
     { XML_TAG_SECTION_HEADER_RSS_GAME_LIST, AppType::RSS_GAME_LIST_APP},
+    { XML_TAG_SECTION_HEADER_HIGAME_EXCLUDE_LIST, AppType::HIGAME_EXCLUDE_LIST_APP},
     { XML_TAG_SECTION_KEY_GAME_RTT, AppType::GAME_RTT},
 };
 
@@ -170,15 +172,14 @@ void AppParserInner::ParseAppList(const xmlNodePtr &innode)
             case AppType::HIGH_TEMP_LIMIT_SPEED_APP:
                 result_.m_highTempLimitSpeedAppVec.push_back(ParseHighTempLimitSpeedAppInfo(node));
                 break;
+            case AppType::HIGAME_EXCLUDE_LIST_APP:
+                result_.m_hiGameExcludeAppVec.push_back(ParseHiGameExcludeAppInfo(node));
+                break;
             default:
                 WIFI_LOGD("app type: %{public}s is not monitored", GetNodeValue(node).c_str());
                 break;
         }
     }
-    WIFI_LOGI("%{public}s out,result_.m_highTempLimitSpeedAppVec count:%{public}d!",
-        __FUNCTION__, (int)result_.m_highTempLimitSpeedAppVec.size());
-    WIFI_LOGI("%{public}s out,result_.m_multilinkAppVec count:%{public}d!",
-        __FUNCTION__, (int)result_.m_multilinkAppVec.size());
 }
 
 void AppParserInner::ParseNetworkControlAppList(const xmlNodePtr &innode)
@@ -404,6 +405,21 @@ RssGameListAppInfo AppParserInner::ParseRssGameListAppInfo(const xmlNodePtr &inn
     return appInfo;
 }
 
+HiGameExcludeAppInfo AppParserInner::ParseHiGameExcludeAppInfo(const xmlNodePtr &innode)
+{
+    HiGameExcludeAppInfo appInfo;
+    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
+    if (value == NULL) {
+        WIFI_LOGE("%{public}s xml parser HiGame exclude app info error.", __FUNCTION__);
+        return appInfo;
+    }
+    std::string packageName = std::string(reinterpret_cast<char *>(value));
+    appInfo.packageName = packageName;
+    WIFI_LOGD("%{public}s packageName:%{public}s", __FUNCTION__, packageName.c_str());
+    xmlFree(value);
+    return appInfo;
+}
+
 void AppParserInner::ParseAsyncLimitSpeedDelayTime(const xmlNodePtr &innode)
 {
     xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_DELAY_TIME));
@@ -548,6 +564,13 @@ bool AppParser::IsRssGameApp(const std::string &bundleName) const
     std::shared_lock<std::shared_mutex> lock(appParserMutex_);
     return std::any_of(result_.m_rssGameListAppVec.begin(), result_.m_rssGameListAppVec.end(),
         [bundleName](const RssGameListAppInfo &app) { return app.packageName == bundleName; });
+}
+
+bool AppParser::IsHiGameExcludeApp(const std::string &bundleName) const
+{
+    std::shared_lock<std::shared_mutex> lock(appParserMutex_);
+    return std::any_of(result_.m_hiGameExcludeAppVec.begin(), result_.m_hiGameExcludeAppVec.end(),
+        [bundleName](const HiGameExcludeAppInfo &app) { return app.packageName == bundleName; });
 }
 
 bool AppParser::IsOverGameRtt(const std::string &bundleName, const int gameRtt) const

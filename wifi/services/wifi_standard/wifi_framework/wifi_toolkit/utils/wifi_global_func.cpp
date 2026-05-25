@@ -663,7 +663,7 @@ bool IsWlanPluggableCapabilitySupport()
     int errCode = GetParamValue(PROP_WLAN_PLUGGABLE_ENABLE, DEFAULT_WLAN_PLUGGABLE_ENABLE,
         preValue, PROP_WLAN_PLUGGABLE_ENABLE_LEN);
     if (errCode > 0) {
-        if (strncmp(preValue, STARTUP_WIFI_ENABLE, STARTUP_WIFI_ENABLE_LEN) == 0) {
+        if (strncmp(preValue, WIFI_PLUGGABLE_ENABLE, WLAN_PLUGGABLE_ENABLE_LEN) == 0) {
             LOGI("param startup_wifi_enable is true.");
             return true;
         }

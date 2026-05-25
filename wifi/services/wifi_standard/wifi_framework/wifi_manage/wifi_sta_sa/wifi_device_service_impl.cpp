@@ -2991,6 +2991,11 @@ ErrCode WifiDeviceServiceImpl::IsWlanSupported(bool &isSupported)
 {
     WIFI_LOGI("Enter IsWlanSupported.");
 #ifdef WLAN_PLUGGABLE_SUPPORTED
+    if (!IsWlanPluggableCapabilitySupport()) {
+        LOGI("IsWlanSupported wlan pluggable capability not support, default true");
+        isSupported = true;
+        return WIFI_OPT_SUCCESS;
+    }
     std::string strValue = system::GetParameter(WLAN_PLUGGABLE_STATE, WLAN_PLUGGABLE_STATE_EMPLACE);
     if (strValue == WLAN_PLUGGABLE_STATE_EXTRACT) {
         LOGI("IsWlanSupported wlan not supported");

@@ -71,6 +71,12 @@ constexpr const char* VENDOR_COUNTRY_KEY = "const.cust.custPath";
 constexpr const char* VENDOR_COUNTRY_DEFAULT = "";
 constexpr const int32_t SYS_PARAMETER_SIZE = 256;
 constexpr const int32_t PARAMETER_ERROR_CODE = 0;
+constexpr int PROP_WLAN_PLUGGABLE_ENABLE_LEN = 16;
+constexpr int WLAN_PLUGGABLE_ENABLE_LEN = 4;
+constexpr const char* PROP_WLAN_PLUGGABLE_ENABLE = "const.wifi.hw_supported_wlan";
+constexpr const char* DEFAULT_WLAN_PLUGGABLE_ENABLE = "false";
+constexpr const char* WIFI_PLUGGABLE_ENABLE = "true";
+
 
 constexpr int PROP_FSS_ENABLE_LEN = 16;
 constexpr int FSS_ENABLE_LEN = 4;
@@ -641,6 +647,21 @@ bool IsStartUpWifiEnableSupport()
     char preValue[PROP_STARTUP_WIFI_ENABLE_LEN] = {0};
     int errCode = GetParamValue(PROP_STARTUP_WIFI_ENABLE, DEFAULT_STARTUP_WIFI_ENABLE,
         preValue, PROP_STARTUP_WIFI_ENABLE_LEN);
+    if (errCode > 0) {
+        if (strncmp(preValue, STARTUP_WIFI_ENABLE, STARTUP_WIFI_ENABLE_LEN) == 0) {
+            LOGI("param startup_wifi_enable is true.");
+            return true;
+        }
+    }
+    return false;
+}
+
+bool IsWlanPluggableCapabilitySupport()
+{
+    LOGI("Enter IsWlanPluggableCapabilitySupport");
+    char preValue[PROP_WLAN_PLUGGABLE_ENABLE_LEN] = {0};
+    int errCode = GetParamValue(PROP_WLAN_PLUGGABLE_ENABLE, DEFAULT_WLAN_PLUGGABLE_ENABLE,
+        preValue, PROP_WLAN_PLUGGABLE_ENABLE_LEN);
     if (errCode > 0) {
         if (strncmp(preValue, STARTUP_WIFI_ENABLE, STARTUP_WIFI_ENABLE_LEN) == 0) {
             LOGI("param startup_wifi_enable is true.");

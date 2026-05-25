@@ -495,6 +495,14 @@ bool CheckDeviceTypeByVendorCountry();
  */
 bool IsStartUpWifiEnableSupport();
 /**
+ * @Description is support wlan pluggable capability
+ *
+ * @return true - open
+ * @return false - close
+ */
+
+ bool IsWlanPluggableCapabilitySupport();
+/**
  * @Description is fold product supprt signal smoothe
  *
  * @return true - smoothe

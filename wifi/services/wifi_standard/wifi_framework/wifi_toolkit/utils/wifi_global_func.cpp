@@ -73,7 +73,7 @@ constexpr const int32_t SYS_PARAMETER_SIZE = 256;
 constexpr const int32_t PARAMETER_ERROR_CODE = 0;
 constexpr int PROP_WLAN_PLUGGABLE_ENABLE_LEN = 16;
 constexpr int WLAN_PLUGGABLE_ENABLE_LEN = 4;
-constexpr const char* PROP_WLAN_PLUGGABLE_ENABLE = "const.wifi.hw_supported_wlan";
+constexpr const char* PROP_WLAN_PLUGGABLE_ENABLE = "const.wifi.hw_supported_wlan_pluggable";
 constexpr const char* DEFAULT_WLAN_PLUGGABLE_ENABLE = "false";
 constexpr const char* WIFI_PLUGGABLE_ENABLE = "true";
 

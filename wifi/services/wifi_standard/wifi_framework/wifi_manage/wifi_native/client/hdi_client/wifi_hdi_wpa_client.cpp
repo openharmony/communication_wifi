@@ -687,7 +687,7 @@ WifiErrorNo WifiHdiWpaClient::RegisterApEvent(IWifiApMonitorEventCallback callba
 
 void WifiHdiWpaClient::AppendStr(std::string &dst, const char* format, va_list args)
 {
-    char space[MAX_CMD_BUFFER_SIZE] __attribute__((__uninitialized__));
+    char space[MAX_CMD_BUFFER_SIZE] = {0};
     va_list argsTmp;
 
     va_copy(argsTmp, args);

@@ -250,7 +250,7 @@ void StaMonitor::OnWpaSsidWrongKeyCallBack(const std::string &bssid)
     }
 
     /* Notification state machine wpa password wrong event. */
-     if (msg == nullptr) {
+    if (msg == nullptr) {
         WIFI_LOGE("CreateMessage failed");
         return;
     }

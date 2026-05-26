@@ -1147,6 +1147,7 @@ typedef enum {
     BG_LIMIT_LEVEL_9,
     BG_LIMIT_LEVEL_10,
     BG_LIMIT_LEVEL_11,
+    BG_LIMIT_LEVEL_12,
 } BgLimitLevel;
 
 enum class WapiPskType {

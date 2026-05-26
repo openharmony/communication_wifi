@@ -70,6 +70,7 @@ public:
     void HandleForegroundAppChangedAction(const AppExecFwk::AppStateData &appStateData);
     void HandleProcessCreatedEvent(const AppExecFwk::ProcessData &processData);
     void HandleProcessStateChangedEvent(const AppExecFwk::ProcessData &processData);
+    void HandleAirplaneModeChangedEvent();
     void ReceiveNetworkControlInfo(const WifiNetworkControlInfo &networkControlInfo);
     void LimitSpeed(const int controlId, const int limitMode);
     void HandleNetworkConnectivityChange(int32_t bearType, int32_t code);
@@ -117,6 +118,8 @@ private:
     void ReportGameLatencyFeature(bool enabled, const std::string& featureName);
     void ReportGameSceneInfo(const WifiNetworkControlInfo &networkControlInfo);
     void RecordAppNetworkSpeedLimitServiceChr(const std::string &records);
+    bool UpdateSpecialWifiState(const std::string& ssid);
+    void StricterKeyFGLimit();
 
 private:
     StaServiceCallback m_staCallback;
@@ -145,6 +148,9 @@ private:
     std::atomic<uint32_t> activePowerScenes_{POWER_SCENE_NONE};
     std::atomic<bool> isFirstRtt_{false};
     std::mutex rttMutex_;
+    std::mutex SpeWifiMutex_;
+    std::string currSsid_;
+    bool isAirplaneModeOn_;
 };
 } // namespace Wifi
 } // namespace OHOS

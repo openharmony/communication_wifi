@@ -51,6 +51,7 @@ namespace {
     const int GAME_BOOST_DISABLE = 0;
     const int BOOST_UDP_TYPE = 17;
     constexpr int64_t LOW_LATENCY_EXIT_TIMEOUT = 3 * 60 * 1000;
+    const std::vector<std::string> SPECIAL_WIFI_SSID_LIST = {"juneyaoair", "CEAIR-WIFI"};
     // 5206: 云备份; 1009: 端云同步服务; 6666：后台系统升级
     const std::unordered_set<int> SA_UID_LIST = {5206, 1009, 6666};
 }
@@ -88,7 +89,7 @@ void AppNetworkSpeedLimitService::Init()
     m_asyncSendLimit = std::make_unique<WifiEventHandler>("StartSendLimitInfoThread");
     if (IsTopNLimitSpeedSceneInNow()) {
         WIFI_LOGI("%{public}s the current foreground application is TopN.", __FUNCTION__);
-        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+        StricterKeyFGLimit();
     }
     WIFI_LOGD("AppNetworkSpeedLimitService initialization complete.");
 }
@@ -108,10 +109,13 @@ void AppNetworkSpeedLimitService::InitCellarLimitRecord()
 
 void AppNetworkSpeedLimitService::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
+    std::unique_lock<std::mutex> lock(SpeWifiMutex_);
     if (state == OperateResState::DISCONNECT_DISCONNECTED) {
         HandleWifiConnectStateChanged(false);
+        currSsid_ = "";
     } else if (state == OperateResState::CONNECT_AP_CONNECTED) {
         HandleWifiConnectStateChanged(true);
+        currSsid_ = info.ssid;
     }
 }
 
@@ -158,6 +162,12 @@ void AppNetworkSpeedLimitService::HandleProcessStateChangedEvent(const AppExecFw
     asyncParamInfo.bundleName = processData.bundleName;
     asyncParamInfo.uid = processData.uid;
     AsyncLimitSpeed(asyncParamInfo);
+}
+
+void AppNetworkSpeedLimitService::HandleAirplaneModeChangedEvent()
+{
+    std::unique_lock<std::mutex> lock(SpeWifiMutex_);
+    isAirplaneModeOn_ = (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN);
 }
 
 bool AppNetworkSpeedLimitService::ShouldLimitSpeedInBackground(const std::string &bundleName)
@@ -641,7 +651,7 @@ void AppNetworkSpeedLimitService::ForegroundAppChangedAction(const std::string &
     // don't distinguishing between WiFi and cellular links
     if (AppParser::GetInstance().IsKeyForegroundApp(bundleName)) {
         WIFI_LOGI("%{public}s top app speed limit is running, update background app list", __FUNCTION__);
-        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+        StricterKeyFGLimit();
     } else if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
         WIFI_LOGI("%{public}s top app speed limit is turnning off, update background app list", __FUNCTION__);
         SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_OFF, m_isHighPriorityTransmit);
@@ -663,7 +673,7 @@ void AppNetworkSpeedLimitService::BackgroundAppChangedAction(const AsyncParamInf
             m_isHighPriorityTransmit);
     }
     if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
-        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+        StricterKeyFGLimit();
     }
 }
 
@@ -682,7 +692,7 @@ void AppNetworkSpeedLimitService::ForegroundAppStateChangedAction(const AsyncPar
             m_isHighPriorityTransmit);
     }
     if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
-        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+        StricterKeyFGLimit();
     }
 }
 
@@ -921,6 +931,26 @@ void AppNetworkSpeedLimitService::ReportGameSceneInfo(const WifiNetworkControlIn
         return;
     }
     pEnhanceService->ReportGameSceneInfo(networkControlInfo);
+}
+
+bool AppNetworkSpeedLimitService::UpdateSpecialWifiState(const std::string& ssid)
+{
+    for (const auto& specialSsid : SPECIAL_WIFI_SSID_LIST) {
+        if (ssid == specialSsid) {
+            return true;
+        }
+    }
+    return false;
+}
+ 
+void AppNetworkSpeedLimitService::StricterKeyFGLimit()
+{
+    std::unique_lock<std::mutex> lock(SpeWifiMutex_);
+    if (isAirplaneModeOn_ && UpdateSpecialWifiState(currSsid_)) {
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_12, m_isHighPriorityTransmit);
+    } else {
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+    }
 }
 } // namespace Wifi
 } // namespace OHOS

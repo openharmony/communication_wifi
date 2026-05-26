@@ -642,6 +642,10 @@ void WifiConfigCenter::SetWifiScanOnlyMidState(WifiOprMidState state, int instId
 
 int WifiConfigCenter::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo)
 {
+    if (wifiScanConfig == nullptr) {
+        WIFI_LOGE("wifiScanConfig is null");
+        return -1;
+    }
     std::vector<WifiScanInfo> wifiScanInfoList;
     wifiScanConfig->GetScanInfoListInner(wifiScanInfoList);
     for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
@@ -657,6 +661,10 @@ int WifiConfigCenter::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo)
 
 void WifiConfigCenter::SetMloWifiLinkedMaxSpeed(int instId)
 {
+    if (wifiScanConfig == nullptr) {
+        WIFI_LOGE("wifiScanConfig is null");
+        return;
+    }
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto mloIter = mWifiMloLinkedInfo.find(instId);
     if (mloIter == mWifiMloLinkedInfo.end()) {
@@ -1382,6 +1390,10 @@ bool WifiConfigCenter::HasWifiActive()
 
 void WifiConfigCenter::UpdateLinkedInfo(int instId)
 {
+    if (wifiScanConfig == nullptr) {
+        WIFI_LOGE("wifiScanConfig is null");
+        return;
+    }
     std::vector<WifiScanInfo> wifiScanInfoList;
     wifiScanConfig->GetScanInfoListInner(wifiScanInfoList);
     std::unique_lock<std::mutex> lock(mStaMutex);

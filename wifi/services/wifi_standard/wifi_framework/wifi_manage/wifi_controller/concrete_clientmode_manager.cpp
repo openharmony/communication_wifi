@@ -38,6 +38,10 @@ ErrCode ConcreteClientModeManager::RegisterCallback(const ConcreteModeCallback &
 
 void ConcreteClientModeManager::SetRole(ConcreteManagerRole role)
 {
+    if (pConcreteMangerMachine == nullptr) {
+        WIFI_LOGE("pConcreteMangerMachine is null");
+        return;
+    }
     pConcreteMangerMachine->SendMessage(CONCRETE_CMD_SET_TARGET_ROLE, static_cast<int>(role));
     curRole = role;
     if (role == ConcreteManagerRole::ROLE_CLIENT_STA) {

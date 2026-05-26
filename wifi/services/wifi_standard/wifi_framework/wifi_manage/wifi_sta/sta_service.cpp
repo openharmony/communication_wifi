@@ -1285,6 +1285,10 @@ bool StaService::VoWifiDetectSet(std::string cmd)
 
 void StaService::GetDetectNetState(OperateResState &state)
 {
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("pStaStateMachine is null");
+        return;
+    }
     pStaStateMachine->GetDetectNetState(state);
 }
 

@@ -285,6 +285,9 @@ void UIExtensionAbilityConnection::OnAbilityConnectDone(const AppExecFwk::Elemen
     data.WriteString16(u"parameters");
     data.WriteString16(Str8ToStr16(commandStr_));
 
+    if (remoteObject == nullptr) {
+        return;
+    }
     int32_t errCode = remoteObject->SendRequest(IAbilityConnection::ON_ABILITY_CONNECT_DONE, data, reply, option);
     WIFI_LOGI("AbilityConnectionWrapperProxy::OnAbilityConnectDone result %{public}d", errCode);
 }

@@ -89,7 +89,7 @@ void AppNetworkSpeedLimitService::Init()
     m_asyncSendLimit = std::make_unique<WifiEventHandler>("StartSendLimitInfoThread");
     if (IsTopNLimitSpeedSceneInNow()) {
         WIFI_LOGI("%{public}s the current foreground application is TopN.", __FUNCTION__);
-        StricterKeyFGLimit();
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
     }
     WIFI_LOGD("AppNetworkSpeedLimitService initialization complete.");
 }
@@ -109,13 +109,10 @@ void AppNetworkSpeedLimitService::InitCellarLimitRecord()
 
 void AppNetworkSpeedLimitService::DealStaConnChanged(OperateResState state, const WifiLinkedInfo &info, int instId)
 {
-    std::unique_lock<std::mutex> lock(SpeWifiMutex_);
     if (state == OperateResState::DISCONNECT_DISCONNECTED) {
         HandleWifiConnectStateChanged(false);
-        currSsid_ = "";
     } else if (state == OperateResState::CONNECT_AP_CONNECTED) {
         HandleWifiConnectStateChanged(true);
-        currSsid_ = info.ssid;
     }
 }
 
@@ -162,12 +159,6 @@ void AppNetworkSpeedLimitService::HandleProcessStateChangedEvent(const AppExecFw
     asyncParamInfo.bundleName = processData.bundleName;
     asyncParamInfo.uid = processData.uid;
     AsyncLimitSpeed(asyncParamInfo);
-}
-
-void AppNetworkSpeedLimitService::HandleAirplaneModeChangedEvent()
-{
-    std::unique_lock<std::mutex> lock(SpeWifiMutex_);
-    isAirplaneModeOn_ = (WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN);
 }
 
 bool AppNetworkSpeedLimitService::ShouldLimitSpeedInBackground(const std::string &bundleName)
@@ -426,6 +417,12 @@ void AppNetworkSpeedLimitService::SendLimitCmd2Drv(const int controlId, const in
 {
     WIFI_LOGD("enter SendLimitCmd2Drv");
     m_bgLimitRecordMap[controlId] = limitMode;
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (controlId == BG_LIMIT_CONTROL_ID_KEY_FG_APP && limitMode != BG_LIMIT_OFF
+        && WifiConfigCenter::GetInstance().GetAirplaneModeState() && UpdateSpecialWifiState(linkedInfo.ssid)) {
+        m_bgLimitRecordMap[controlId] = BG_LIMIT_LEVEL_12;
+    }
     // Skip speed limit if VPN is connected
     if (isVpnConnected_) {
         WIFI_LOGD("%{public}s VPN is connected, cancel speed limit setting", __FUNCTION__);
@@ -651,7 +648,7 @@ void AppNetworkSpeedLimitService::ForegroundAppChangedAction(const std::string &
     // don't distinguishing between WiFi and cellular links
     if (AppParser::GetInstance().IsKeyForegroundApp(bundleName)) {
         WIFI_LOGI("%{public}s top app speed limit is running, update background app list", __FUNCTION__);
-        StricterKeyFGLimit();
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
     } else if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
         WIFI_LOGI("%{public}s top app speed limit is turnning off, update background app list", __FUNCTION__);
         SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_OFF, m_isHighPriorityTransmit);
@@ -673,7 +670,7 @@ void AppNetworkSpeedLimitService::BackgroundAppChangedAction(const AsyncParamInf
             m_isHighPriorityTransmit);
     }
     if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
-        StricterKeyFGLimit();
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
     }
 }
 
@@ -692,7 +689,7 @@ void AppNetworkSpeedLimitService::ForegroundAppStateChangedAction(const AsyncPar
             m_isHighPriorityTransmit);
     }
     if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
-        StricterKeyFGLimit();
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
     }
 }
 
@@ -941,16 +938,6 @@ bool AppNetworkSpeedLimitService::UpdateSpecialWifiState(const std::string& ssid
         }
     }
     return false;
-}
- 
-void AppNetworkSpeedLimitService::StricterKeyFGLimit()
-{
-    std::unique_lock<std::mutex> lock(SpeWifiMutex_);
-    if (isAirplaneModeOn_ && UpdateSpecialWifiState(currSsid_)) {
-        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_12, m_isHighPriorityTransmit);
-    } else {
-        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
-    }
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -778,7 +778,6 @@ void CesEventSubscriber::OnReceiveAirplaneEvent(const OHOS::EventFwk::CommonEven
             WifiConfigCenter::GetInstance().SetWifiStateOnAirplaneChanged(MODE_STATE_CLOSE);
             WifiManager::GetInstance().GetWifiTogglerManager()->AirplaneToggled(0);
         }
-        AppNetworkSpeedLimitService::GetInstance().HandleAirplaneModeChangedEvent();
     }
 }
 

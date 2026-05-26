@@ -19,7 +19,6 @@
 #include "wifi_scan_control_msg.h"
 #include "wifi_msg.h"
 #include "wifi_crowdsourced_data.h"
-#include <vector>
 
 namespace OHOS {
 namespace Wifi {

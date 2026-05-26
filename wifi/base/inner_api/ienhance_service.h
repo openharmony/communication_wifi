@@ -19,6 +19,7 @@
 #include "wifi_scan_control_msg.h"
 #include "wifi_msg.h"
 #include "wifi_crowdsourced_data.h"
+#include <vector>
 
 namespace OHOS {
 namespace Wifi {
@@ -140,6 +141,13 @@ public:
      * @param netState - net state
      */
     virtual void NotifyInternetState(const int netState) = 0;
+
+    /**
+     * @Description Deal scan results
+     *
+     * @param results - scan results
+     */
+    virtual void DealScanResult(const std::vector<InterScanInfo>& results) = 0;
 
     /**
      * @Description Notify wur state

@@ -232,8 +232,6 @@ public:
 
     ErrCode GetWifiCapability(int capability, bool &enabled) override;
 
-    bool IsWlanPluggableCapabilitySupport();
-
     ErrCode IsWlanSupported(bool &isSupported) override;
 private:
     bool Init();

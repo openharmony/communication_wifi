@@ -494,7 +494,6 @@ bool CheckDeviceTypeByVendorCountry();
  * @return false - close
  */
 bool IsStartUpWifiEnableSupport();
-
 /**
  * @Description is fold product supprt signal smoothe
  *

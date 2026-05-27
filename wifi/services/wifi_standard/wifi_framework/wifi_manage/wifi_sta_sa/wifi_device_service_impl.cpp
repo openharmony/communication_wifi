@@ -58,6 +58,13 @@ constexpr const char *BROKER_PROCESS_PROTECT_FLAG = "register_process_info";
 constexpr int WIFI_BROKER_NETWORK_ID = -2;
 constexpr int RSS_UID = 1096;
 constexpr int RESOURCE_MANAGER_UID = 7680;
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+constexpr int PROP_WLAN_PLUGGABLE_ENABLE_LEN = 16;
+constexpr int WLAN_PLUGGABLE_ENABLE_LEN = 4;
+constexpr const char* PROP_WLAN_PLUGGABLE_ENABLE = "const.wifi.hw_supported_wlan_pluggable";
+constexpr const char* DEFAULT_WLAN_PLUGGABLE_ENABLE = "false";
+constexpr const char* WIFI_PLUGGABLE_ENABLE = "true";
+#endif
 
 bool g_hiLinkActive = false;
 constexpr int HILINK_CMD_MAX_LEN = 1024;
@@ -2986,6 +2993,23 @@ ErrCode WifiDeviceServiceImpl::GetWifiCapability(int capability, bool &enabled)
     return WIFI_OPT_NOT_SUPPORTED;
 #endif
 }
+
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+bool IsWlanPluggableCapabilitySupport()
+{
+    LOGI("Enter IsWlanPluggableCapabilitySupport");
+    char preValue[PROP_WLAN_PLUGGABLE_ENABLE_LEN] = {0};
+    int errCode = GetParamValue(PROP_WLAN_PLUGGABLE_ENABLE, DEFAULT_WLAN_PLUGGABLE_ENABLE,
+        preValue, PROP_WLAN_PLUGGABLE_ENABLE_LEN);
+    if (errCode > 0) {
+        if (strncmp(preValue, WIFI_PLUGGABLE_ENABLE, WLAN_PLUGGABLE_ENABLE_LEN) == 0) {
+            LOGI("param startup_wifi_enable is true.");
+            return true;
+        }
+    }
+    return false;
+}
+#endif
 
 ErrCode WifiDeviceServiceImpl::IsWlanSupported(bool &isSupported)
 {

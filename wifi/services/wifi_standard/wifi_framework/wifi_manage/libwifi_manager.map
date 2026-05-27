@@ -301,7 +301,6 @@
         "OHOS::Wifi::IsAllowScanAnyTime(OHOS::Wifi::tagScanControlInfo const&)";
         "OHOS::Wifi::ConvertConnStateInternal(OHOS::Wifi::OperateResState, bool&)";
         "OHOS::Wifi::IsStartUpWifiEnableSupport()";
-        "OHOS::Wifi::IsWlanPluggableCapabilitySupport()";
         "OHOS::Wifi::WifiSettings::SetP2pDeviceName(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiConfigCenter::SetP2pBusinessType(OHOS::Wifi::P2pBusinessType const&)";
         "OHOS::Wifi::HexStringToVec(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::vector<char, std::__h::allocator<char>>&)";

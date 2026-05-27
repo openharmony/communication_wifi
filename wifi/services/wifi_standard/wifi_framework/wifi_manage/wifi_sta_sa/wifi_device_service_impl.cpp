@@ -3002,7 +3002,7 @@ ErrCode WifiDeviceServiceImpl::IsWlanSupported(bool &isSupported)
     int errCode = GetParamValue(PROP_WLAN_PLUGGABLE_ENABLE, DEFAULT_WLAN_PLUGGABLE_ENABLE,
         preValue, PROP_WLAN_PLUGGABLE_ENABLE_LEN);
     if ((errCode > 0) && strncmp(preValue, WIFI_PLUGGABLE_ENABLE, WLAN_PLUGGABLE_ENABLE_LEN) == 0) {
-        LOGI("param startup_wifi_enable is true.");
+        LOGI("IsWlanSupported wlan pluggable capability support");
     } else {
         LOGI("IsWlanSupported wlan pluggable capability not support, default true");
         isSupported = true;

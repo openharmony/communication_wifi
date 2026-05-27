@@ -2994,28 +2994,16 @@ ErrCode WifiDeviceServiceImpl::GetWifiCapability(int capability, bool &enabled)
 #endif
 }
 
-#ifdef WLAN_PLUGGABLE_SUPPORTED
-bool IsWlanPluggableCapabilitySupport()
-{
-    LOGI("Enter IsWlanPluggableCapabilitySupport");
-    char preValue[PROP_WLAN_PLUGGABLE_ENABLE_LEN] = {0};
-    int errCode = GetParamValue(PROP_WLAN_PLUGGABLE_ENABLE, DEFAULT_WLAN_PLUGGABLE_ENABLE,
-        preValue, PROP_WLAN_PLUGGABLE_ENABLE_LEN);
-    if (errCode > 0) {
-        if (strncmp(preValue, WIFI_PLUGGABLE_ENABLE, WLAN_PLUGGABLE_ENABLE_LEN) == 0) {
-            LOGI("param startup_wifi_enable is true.");
-            return true;
-        }
-    }
-    return false;
-}
-#endif
-
 ErrCode WifiDeviceServiceImpl::IsWlanSupported(bool &isSupported)
 {
     WIFI_LOGI("Enter IsWlanSupported.");
 #ifdef WLAN_PLUGGABLE_SUPPORTED
-    if (!IsWlanPluggableCapabilitySupport()) {
+    char preValue[PROP_WLAN_PLUGGABLE_ENABLE_LEN] = {0};
+    int errCode = GetParamValue(PROP_WLAN_PLUGGABLE_ENABLE, DEFAULT_WLAN_PLUGGABLE_ENABLE,
+        preValue, PROP_WLAN_PLUGGABLE_ENABLE_LEN);
+    if ((errCode > 0) && strncmp(preValue, WIFI_PLUGGABLE_ENABLE, WLAN_PLUGGABLE_ENABLE_LEN) == 0) {
+        LOGI("param startup_wifi_enable is true.");
+    } else {
         LOGI("IsWlanSupported wlan pluggable capability not support, default true");
         isSupported = true;
         return WIFI_OPT_SUCCESS;

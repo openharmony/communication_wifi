@@ -232,7 +232,7 @@ public:
 
     ErrCode GetWifiCapability(int capability, bool &enabled) override;
 
-    static bool IsWlanPluggableCapabilitySupport();
+    bool IsWlanPluggableCapabilitySupport();
 
     ErrCode IsWlanSupported(bool &isSupported) override;
 private:

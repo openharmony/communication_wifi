@@ -249,6 +249,10 @@ void WifiScanManager::DealScanInfoNotify(std::vector<InterScanInfo> &results, in
         pWifiProService->DealScanResult(results);
     }
 #endif
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr) {
+        pEnhanceService->DealScanResult(results);
+    }
 }
 
 void WifiScanManager::DealStoreScanInfoEvent(std::vector<InterScanInfo> &results, int instId)

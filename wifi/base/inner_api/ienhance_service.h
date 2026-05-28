@@ -142,6 +142,13 @@ public:
     virtual void NotifyInternetState(const int netState) = 0;
 
     /**
+     * @Description Deal scan results
+     *
+     * @param results - scan results
+     */
+    virtual void DealScanResult(const std::vector<InterScanInfo>& results) = 0;
+
+    /**
      * @Description Notify wur state
      *
      * @param wurState - wur state

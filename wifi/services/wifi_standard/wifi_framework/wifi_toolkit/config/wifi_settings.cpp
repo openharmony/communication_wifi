@@ -587,7 +587,7 @@ int WifiSettings::SetDeviceAfterDisconnect(int networkId)
     if (iter == mWifiDeviceConfig.end()) {
         return -1;
     }
-    iter->second.lastDisconnectTime = time(0);
+    iter->second.lastDisconnectTime = time(nullptr);
     return 0;
 }
 
@@ -1649,7 +1649,7 @@ bool WifiSettings::IsRandomMacDisabled(int instId)
     return false;
 }
 
-int WifiSettings::SetWifiCapability(int capability, bool enable, int instId)
+int WifiSettings::SetWifiCapability(int capability, bool enabled, int instId)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     switch (capability) {

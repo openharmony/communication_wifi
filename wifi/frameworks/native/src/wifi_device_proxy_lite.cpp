@@ -106,18 +106,18 @@ static void ParseDeviceConfigs(IpcIo *reply, std::vector<WifiDeviceConfig> &resu
     for (int i = 0; i < retSize; ++i) {
         WifiDeviceConfig config;
         (void)ReadInt32(reply, &config.networkId);
-        config.bssid = (char *)ReadString(reply, &readLen);
-        config.ssid = (char *)ReadString(reply, &readLen);
+        config.bssid = reinterpret_cast<char *>(ReadString(reply, &readLen));
+        config.ssid = reinterpret_cast<char *>(ReadString(reply, &readLen));
         (void)ReadInt32(reply, &config.band);
         (void)ReadInt32(reply, &config.channel);
         (void)ReadInt32(reply, &config.frequency);
         (void)ReadInt32(reply, &config.level);
         (void)ReadBool(reply, &config.isPasspoint);
         (void)ReadBool(reply, &config.isEphemeral);
-        config.preSharedKey = (char *)ReadString(reply, &readLen);
-        config.keyMgmt = (char *)ReadString(reply, &readLen);
+        config.preSharedKey = reinterpret_cast<char *>(ReadString(reply, &readLen));
+        config.keyMgmt = reinterpret_cast<char *>(ReadString(reply, &readLen));
         for (int j = 0; j < WEPKEYS_SIZE; j++) {
-            config.wepKeys[j] = (char *)ReadString(reply, &readLen);
+            config.wepKeys[j] = reinterpret_cast<char *>(ReadString(reply, &readLen));
         }
         (void)ReadInt32(reply, &config.wepTxKeyIndex);
         (void)ReadInt32(reply, &config.priority);
@@ -132,15 +132,15 @@ static void ParseDeviceConfigs(IpcIo *reply, std::vector<WifiDeviceConfig> &resu
         ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.gateway);
         ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer1);
         ReadIpAddress(reply, config.wifiIpConfig.staticIpAddress.dnsServer2);
-        config.wifiIpConfig.staticIpAddress.domains = (char *)ReadString(reply, &readLen);
+        config.wifiIpConfig.staticIpAddress.domains = reinterpret_cast<char *>(ReadString(reply, &readLen));
         ReadEapConfig(reply, config.wifiEapConfig);
         int proxyMethod = 0;
         (void)ReadInt32(reply, &proxyMethod);
         config.wifiProxyconfig.configureMethod = ConfigureProxyMethod(proxyMethod);
-        config.wifiProxyconfig.autoProxyConfig.pacWebAddress = (char *)ReadString(reply, &readLen);
-        config.wifiProxyconfig.manualProxyConfig.serverHostName = (char *)ReadString(reply, &readLen);
+        config.wifiProxyconfig.autoProxyConfig.pacWebAddress = reinterpret_cast<char *>(ReadString(reply, &readLen));
+        config.wifiProxyconfig.manualProxyConfig.serverHostName = reinterpret_cast<char *>(ReadString(reply, &readLen));
         (void)ReadInt32(reply, &config.wifiProxyconfig.manualProxyConfig.serverPort);
-        config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = (char *)ReadString(reply, &readLen);
+        config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = reinterpret_cast<char *>(ReadString(reply, &readLen));
         int privacyConfig = 0;
         (void)ReadInt32(reply, &privacyConfig);
         config.wifiPrivacySetting = WifiPrivacyConfig(privacyConfig);

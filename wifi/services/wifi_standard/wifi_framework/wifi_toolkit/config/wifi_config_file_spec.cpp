@@ -863,7 +863,7 @@ void ClearTClass<HotspotConfig>(HotspotConfig &item)
     item.SetChannel(0);
     item.SetMaxConn(0);
     item.SetIpAddress("");
-    item.SetLeaseTime((int)DHCP_LEASE_TIME);
+    item.SetLeaseTime(static_cast<int>(DHCP_LEASE_TIME));
     item.SetRandomMac("");
     return;
 }
@@ -2010,7 +2010,7 @@ static std::string OutPutWifiBackupConfigPrivacy(WifiBackupConfig &item)
 {
     std::ostringstream ss;
     ss << "    " <<"<WifiDeviceConfigPrivacy>" << std::endl;
-    ss << "    " <<"wifiPrivacySetting=" << (int)item.wifiPrivacySetting << std::endl;
+    ss << "    " <<"wifiPrivacySetting=" << static_cast<int>(item.wifiPrivacySetting) << std::endl;
     ss << "    " <<"</WifiDeviceConfigPrivacy>" << std::endl;
     return ss.str();
 }

@@ -140,7 +140,8 @@ static void ParseDeviceConfigs(IpcIo *reply, std::vector<WifiDeviceConfig> &resu
         config.wifiProxyconfig.autoProxyConfig.pacWebAddress = reinterpret_cast<char *>(ReadString(reply, &readLen));
         config.wifiProxyconfig.manualProxyConfig.serverHostName = reinterpret_cast<char *>(ReadString(reply, &readLen));
         (void)ReadInt32(reply, &config.wifiProxyconfig.manualProxyConfig.serverPort);
-        config.wifiProxyconfig.manualProxyConfig.exclusionObjectList = reinterpret_cast<char *>(ReadString(reply, &readLen));
+        config.wifiProxyconfig.manualProxyConfig.exclusionObjectList =
+            reinterpret_cast<char *>(ReadString(reply, &readLen));
         int privacyConfig = 0;
         (void)ReadInt32(reply, &privacyConfig);
         config.wifiPrivacySetting = WifiPrivacyConfig(privacyConfig);

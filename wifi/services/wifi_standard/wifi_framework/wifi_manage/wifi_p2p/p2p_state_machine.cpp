@@ -1376,7 +1376,7 @@ void P2pStateMachine::ClearGroup() const
         return;
     }
     for (ifa = ifaddr, n = 0; ifa != nullptr; ifa = ifa->ifa_next, n++) {
-        if (strncmp("p2p-", ifa->ifa_name, P2P_PREFIX_LEN) == 0) {
+        if (ifa->ifa_name && strncmp("p2p-", ifa->ifa_name, P2P_PREFIX_LEN) == 0) {
             WIFI_LOGE("has p2p group, remove");
             iface.assign(ifa->ifa_name);
             WifiP2PHalInterface::GetInstance().GroupRemove(iface);

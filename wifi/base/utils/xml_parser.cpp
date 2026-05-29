@@ -158,6 +158,7 @@ std::vector<unsigned char> XmlParser::GetByteArrValue(xmlNodePtr node)
     int num = CheckDataLegal(temp);
     xmlChar *value = xmlNodeGetContent(node);
     if (value == nullptr) {
+        xmlFree(numChar);
         return byteArr;
     }
     std::string valueStr = std::string(reinterpret_cast<char *>(value));

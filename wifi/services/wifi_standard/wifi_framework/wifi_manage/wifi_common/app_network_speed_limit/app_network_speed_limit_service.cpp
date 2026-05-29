@@ -426,7 +426,7 @@ void AppNetworkSpeedLimitService::SendLimitCmd2Drv(const int controlId, const in
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     if (controlId == BG_LIMIT_CONTROL_ID_KEY_FG_APP && limitMode != BG_LIMIT_OFF
         && WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN
-        && std::find(SPECIAL_WIFI_SSID_LIST.begin(), SPECIAL_WIFI_SSID_LIST.end(), linkedInfo.ssid) 
+        && std::find(SPECIAL_WIFI_SSID_LIST.begin(), SPECIAL_WIFI_SSID_LIST.end(), linkedInfo.ssid)
         != SPECIAL_WIFI_SSID_LIST.end()) {
         m_bgLimitRecordMap[controlId] = BG_LIMIT_LEVEL_12;
     }

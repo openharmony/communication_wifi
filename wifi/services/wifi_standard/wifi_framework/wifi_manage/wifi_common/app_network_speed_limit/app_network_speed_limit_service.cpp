@@ -417,16 +417,18 @@ void AppNetworkSpeedLimitService::SendLimitCmd2Drv(const int controlId, const in
 {
     WIFI_LOGD("enter SendLimitCmd2Drv");
     m_bgLimitRecordMap[controlId] = limitMode;
-    WifiLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    if (controlId == BG_LIMIT_CONTROL_ID_KEY_FG_APP && limitMode != BG_LIMIT_OFF
-        && WifiConfigCenter::GetInstance().GetAirplaneModeState() && UpdateSpecialWifiState(linkedInfo.ssid)) {
-        m_bgLimitRecordMap[controlId] = BG_LIMIT_LEVEL_12;
-    }
     // Skip speed limit if VPN is connected
     if (isVpnConnected_) {
         WIFI_LOGD("%{public}s VPN is connected, cancel speed limit setting", __FUNCTION__);
         return;
+    }
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (controlId == BG_LIMIT_CONTROL_ID_KEY_FG_APP && limitMode != BG_LIMIT_OFF
+        && WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN
+        && std::find(SPECIAL_WIFI_SSID_LIST.begin(), SPECIAL_WIFI_SSID_LIST.end(), linkedInfo.ssid) 
+        != SPECIAL_WIFI_SSID_LIST.end()) {
+        m_bgLimitRecordMap[controlId] = BG_LIMIT_LEVEL_12;
     }
     m_limitSpeedMode = GetBgLimitMaxMode();
     int64_t delayTime = 0;
@@ -928,16 +930,6 @@ void AppNetworkSpeedLimitService::ReportGameSceneInfo(const WifiNetworkControlIn
         return;
     }
     pEnhanceService->ReportGameSceneInfo(networkControlInfo);
-}
-
-bool AppNetworkSpeedLimitService::UpdateSpecialWifiState(const std::string& ssid)
-{
-    for (const auto& specialSsid : SPECIAL_WIFI_SSID_LIST) {
-        if (ssid == specialSsid) {
-            return true;
-        }
-    }
-    return false;
 }
 } // namespace Wifi
 } // namespace OHOS

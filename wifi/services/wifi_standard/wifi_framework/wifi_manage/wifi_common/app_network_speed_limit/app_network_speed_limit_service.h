@@ -117,7 +117,6 @@ private:
     void ReportGameLatencyFeature(bool enabled, const std::string& featureName);
     void ReportGameSceneInfo(const WifiNetworkControlInfo &networkControlInfo);
     void RecordAppNetworkSpeedLimitServiceChr(const std::string &records);
-    bool UpdateSpecialWifiState(const std::string& ssid);
 
 private:
     StaServiceCallback m_staCallback;

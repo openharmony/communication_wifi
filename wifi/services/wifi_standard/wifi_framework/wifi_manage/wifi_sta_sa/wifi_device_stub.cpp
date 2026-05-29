@@ -413,7 +413,7 @@ void WifiDeviceStub::OnSetWifiRestrictedList(uint32_t code, MessageParcel &data,
     }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
-    if (size < 0 || size > MAX_LIMIT_SIZE) {
+    if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteInt32(result);
     }
     return;

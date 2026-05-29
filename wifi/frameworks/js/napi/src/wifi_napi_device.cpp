@@ -168,7 +168,7 @@ static ErrCode NativeInfoElemsToJsObj(const napi_env& env,
                 return WIFI_OPT_FAILED;
             }
         }
-        SetValueUtf8String(env, "content", (const char *)buf, ieObj, inLen - 1);
+        SetValueUtf8String(env, "content", reinterpret_cast<const char *>(buf), ieObj, inLen - 1);
         status = napi_set_element(env, arr, idx_ie++, ieObj);
         if (status != napi_ok) {
             WIFI_LOGE("set content error");

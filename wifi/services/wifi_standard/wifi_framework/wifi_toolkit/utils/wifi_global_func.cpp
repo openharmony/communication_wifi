@@ -700,7 +700,8 @@ bool ParseJsonKey(const cJSON *jsonValue, const std::string &key, std::string &v
 
 bool ParseJson(const std::string &jsonString, const std::string &type, const std::string &key, std::string &value)
 {
-    cJSON *root = cJSON_Parse(jsonString.c_str());
+    std::string jsonStringTemp = jsonString;
+    cJSON *root = cJSON_Parse(jsonStringTemp.c_str());
     if (root == nullptr) {
         LOGE("ParseJson failed to parse json data.");
         return false;

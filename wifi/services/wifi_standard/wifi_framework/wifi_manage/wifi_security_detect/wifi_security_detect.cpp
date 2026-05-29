@@ -136,7 +136,7 @@ bool WifiSecurityDetect::IsSettingSecurityDetectOn()
         return false;
     }
     std::string valueResult;
-    if (resultSet->GoToFirstRow() != NativeRdb::E_OK) {
+    if (resultSet->GoToFirstRow() != DataShare::E_OK) {
         operatePtr->Release();
         return false;
     }

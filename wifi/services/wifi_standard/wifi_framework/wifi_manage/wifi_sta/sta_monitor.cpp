@@ -203,9 +203,9 @@ void StaMonitor::OnBssidChangedCallBack(const std::string &reason, const std::st
         reason.c_str(),
         MacAnonymize(bssid).c_str());
     if (pStaStateMachine == nullptr) {
-            WIFI_LOGE("The statemachine pointer is null.");
-            return;
-        }
+        WIFI_LOGE("The statemachine pointer is null.");
+        return;
+    }
     InternalMessagePtr msg = pStaStateMachine->CreateMessage();
     if (msg == nullptr) {
         WIFI_LOGE("CreateMessage failed");

@@ -136,7 +136,10 @@ bool WifiSecurityDetect::IsSettingSecurityDetectOn()
         return false;
     }
     std::string valueResult;
-    resultSet->GoToFirstRow();
+    if (resultSet->GoToFirstRow() != DataShare::E_OK) {
+        operatePtr->Release();
+        return false;
+    }
     resultSet->GetString(0, valueResult);
     if (valueResult == "1") {
         WIFI_LOGI("SecurityDetectOn");

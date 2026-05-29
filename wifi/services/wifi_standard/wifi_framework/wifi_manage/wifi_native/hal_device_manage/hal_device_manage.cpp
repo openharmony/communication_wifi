@@ -668,7 +668,7 @@ int32_t HalDeviceManager::IfaceSetTxPower(
     if (iter != mWifiIfaces.end()) {
         const sptr<IChipIface> &iface = iter->second;
         CHECK_NULL_AND_RETURN(iface, false);
-        int32_t result = iface->SetTxPower(power);
+        result = iface->SetTxPower(power);
         if (result != HDF_SUCCESS) {
             LOGE("SetTxPower, call SetTxPower failed! Result:%{public}d", result);
         }

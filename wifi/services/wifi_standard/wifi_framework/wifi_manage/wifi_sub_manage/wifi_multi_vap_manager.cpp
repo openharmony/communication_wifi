@@ -169,6 +169,7 @@ bool WifiMultiVapManager::CheckEnhanceWifiConnected()
                 NI_NUMERICHOST);
             if (ret != 0) {
                 WIFI_LOGE("getnameinfo() failed: %{public}s\n", gai_strerror(ret));
+                freeifaddrs(ifaddr);
                 return false;
             }
         }

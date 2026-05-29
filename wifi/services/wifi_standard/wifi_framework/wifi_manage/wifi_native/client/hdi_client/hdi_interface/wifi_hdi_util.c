@@ -838,7 +838,7 @@ int Get80211ElemsFromIE(const uint8_t *start, size_t len, struct HdiElems *elems
 
         switch (id) {
             case HDI_EID_SSID:
-                if (elen > SSID_MAX_LEN || found_ssid) {
+                if (elen == 0 || elen > SSID_MAX_LEN || found_ssid) {
                     LOGI("Ignored too long SSID HdiElem (elen=%{public}u) or ssid found", elen);
                     break;
                 }

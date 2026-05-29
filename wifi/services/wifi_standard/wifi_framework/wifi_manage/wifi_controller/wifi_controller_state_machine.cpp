@@ -412,6 +412,11 @@ void WifiControllerMachine::MakeConcreteManager(ConcreteManagerRole role, int id
     WIFI_LOGE("Enter MakeConcreteManager");
     auto clientmode = std::make_shared<ConcreteClientModeManager>(role, id);
     clientmode->RegisterCallback(WifiManager::GetInstance().GetWifiTogglerManager()->GetConcreteCallback());
+    ErrCode initRet = clientmode->InitConcreteManager();
+    if (initRet != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("InitConcreteManager failed");
+        return;
+    }
     clientmode->InitConcreteManager();
     concreteManagers.AddManager(clientmode);
 }

@@ -920,7 +920,7 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, AdjustSpeedLimitByRttTest02, TestSize.
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
-HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_NonSpecialWifiWithAirplaneMode_KeepOriginalLevel, TestSize.Level1)
+HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_NonSpecialWifiWithAirplaneMode, TestSize.Level1)
 {
     AppNetworkSpeedLimitService::GetInstance().isVpnConnected_ = false;
     AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap.clear();
@@ -946,7 +946,7 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_NonSpecialWifiWithAir
     EXPECT_EQ(BG_LIMIT_LEVEL_3, mode);
 }
 
-HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_SpecialWifiWithoutAirplaneMode_KeepOriginalLevel, TestSize.Level1)
+HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_SpecialWifiWithoutAirplaneMode, TestSize.Level1)
 {
     AppNetworkSpeedLimitService::GetInstance().isVpnConnected_ = false;
     AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap.clear();

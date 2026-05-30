@@ -919,5 +919,109 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, AdjustSpeedLimitByRttTest02, TestSize.
     AppNetworkSpeedLimitService::GetInstance().AdjustSpeedLimitByRtt(100);
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_NonSpecialWifiWithAirplaneMode, TestSize.Level1)
+{
+    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_ = false;
+    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap.clear();
+
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.ssid = "NormalWifi";
+
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAirplaneModeState())
+        .WillRepeatedly(Return(MODE_STATE_OPEN));
+    MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+
+    int controlId = BG_LIMIT_CONTROL_ID_KEY_FG_APP;
+    int limitMode = BG_LIMIT_LEVEL_3;
+    int enable = 1;
+    int uid = 20010001;
+
+    AppNetworkSpeedLimitService::GetInstance().SendLimitCmd2Drv(controlId, limitMode, enable, uid);
+
+    sleep(1);
+    int mode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP];
+    EXPECT_EQ(BG_LIMIT_LEVEL_3, mode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_SpecialWifiWithoutAirplaneMode, TestSize.Level1)
+{
+    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_ = false;
+    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap.clear();
+
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.ssid = "juneyaoair";
+
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAirplaneModeState())
+        .WillRepeatedly(Return(MODE_STATE_CLOSE));
+    MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+
+    int controlId = BG_LIMIT_CONTROL_ID_KEY_FG_APP;
+    int limitMode = BG_LIMIT_LEVEL_3;
+    int enable = 1;
+    int uid = 20010001;
+
+    AppNetworkSpeedLimitService::GetInstance().SendLimitCmd2Drv(controlId, limitMode, enable, uid);
+
+    sleep(1);
+    int mode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP];
+    EXPECT_EQ(BG_LIMIT_LEVEL_3, mode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_NotKeyFgAppControlId_KeepOriginalLevel, TestSize.Level1)
+{
+    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_ = false;
+    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap.clear();
+
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.ssid = "juneyaoair";
+
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAirplaneModeState())
+        .WillRepeatedly(Return(MODE_STATE_OPEN));
+    MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+
+    int controlId = BG_LIMIT_CONTROL_ID_GAME;
+    int limitMode = BG_LIMIT_LEVEL_3;
+    int enable = 1;
+    int uid = 20010001;
+
+    AppNetworkSpeedLimitService::GetInstance().SendLimitCmd2Drv(controlId, limitMode, enable, uid);
+
+    sleep(1);
+    int mode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_GAME];
+    EXPECT_EQ(BG_LIMIT_LEVEL_3, mode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_KeyFgAppWithLimitOff_KeepOffLevel, TestSize.Level1)
+{
+    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_ = false;
+    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap.clear();
+
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.ssid = "juneyaoair";
+
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetAirplaneModeState())
+        .WillRepeatedly(Return(MODE_STATE_OPEN));
+    MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+
+    int controlId = BG_LIMIT_CONTROL_ID_KEY_FG_APP;
+    int limitMode = BG_LIMIT_OFF;
+    int enable = 1;
+    int uid = 20010001;
+
+    AppNetworkSpeedLimitService::GetInstance().SendLimitCmd2Drv(controlId, limitMode, enable, uid);
+
+    sleep(1);
+    int mode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP];
+    EXPECT_EQ(BG_LIMIT_OFF, mode);
+}
 } // namespace Wifi
 } // namespace OHOS

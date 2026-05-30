@@ -1075,6 +1075,12 @@ void WifiP2pStub::OnHid2dSetPeerWifiCfgInfo(
     int cfgType = data.ReadInt32();
     int len = data.ReadInt32();
     const char *dataBuffer = reinterpret_cast<const char *>(data.ReadBuffer(len));
+    if (dataBuffer == nullptr) {
+        WIFI_LOGE("`%{public}s` dataBuffer is null", __func__);
+        reply.WriteInt32(0);
+        reply.WriteInt32(WIFI_OPT_FAILED);
+        return;
+    }
     if (memcpy_s(cfgData, CFG_DATA_MAX_BYTES, dataBuffer, len) != EOK) {
         WIFI_LOGE("`%{public}s` memcpy_s failed!", __func__);
         reply.WriteInt32(0);

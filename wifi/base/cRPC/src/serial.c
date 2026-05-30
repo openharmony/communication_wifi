@@ -160,7 +160,7 @@ int WriteUStr(Context *context, const unsigned char *uStr, unsigned int len)
         return -1;
     }
 
-    int inLen = (len << 1) + 1;
+    size_t inLen = ((size_t)len << 1) + 1;
     char *buf = (char *)calloc(inLen + 1, sizeof(char));
     if (buf == NULL) {
         return -1;

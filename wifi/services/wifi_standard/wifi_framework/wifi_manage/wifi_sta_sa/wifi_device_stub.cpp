@@ -397,7 +397,7 @@ void WifiDeviceStub::OnSetWifiRestrictedList(uint32_t code, MessageParcel &data,
     int size = data.ReadInt32();
     ErrCode ret = WIFI_OPT_FAILED;
     int result = INVALID_NETWORK_ID;
-    if (size > MAX_MDM_RESTRICTED_SIZE) {
+    if (size < 0 || size > MAX_MDM_RESTRICTED_SIZE) {
         ret = WIFI_OPT_MDM_OUT_MAX_NUM;
     } else {
         std::vector<WifiRestrictedInfo> wifiList;

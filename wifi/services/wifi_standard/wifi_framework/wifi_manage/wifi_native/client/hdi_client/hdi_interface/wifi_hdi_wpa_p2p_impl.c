@@ -1028,7 +1028,11 @@ WifiErrorNo HdiP2pConnect(P2pConnectInfo *info, char *replyPin, int size)
     wpsParam.goIntent = info->goIntent;
     wpsParam.provdisc = info->provdisc;
     uint8_t addr[ETH_ALEN];
-    hwaddr_aton(info->peerDevAddr, addr);
+    if (hwaddr_aton(info->peerDevAddr, addr) != 0) {
+        LOGE("HdiP2pConnect: peerDevAddr is invalid");
+        pthread_mutex_unlock(GetWpaObjMutex());
+        return WIFI_HAL_OPT_INVALID_PARAM;
+    }
     wpsParam.peerDevAddr = addr;
     wpsParam.peerDevAddrLen = ETH_ALEN;
     wpsParam.pin = (uint8_t *)info->pin;

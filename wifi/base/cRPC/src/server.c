@@ -62,7 +62,11 @@ static int OnAccept(RpcServer *server, unsigned int mask)
     Context *context = CreateContext(CONTEXT_BUFFER_MIN_SIZE);
     if (context != NULL) {
         context->fd = fd;
-        InsertHashTable(server->clients, context);
+        if (InsertHashTable(server->clients, context) < 0) {
+            close(fd);
+            ReleaseContext(context);
+            return -1;
+        }
         AddFdEvent(server->loop, fd, READ_EVENT | WRIT_EVENT);
     } else {
         close(fd);
@@ -287,6 +291,9 @@ int EmitEvent(RpcServer *server, int event)
     if (server == NULL) {
         return -1;
     }
+    if (event < 0) {
+        return -1;
+    }
     int num = sizeof(server->events) / sizeof(server->events[0]);
     pthread_mutex_lock(&server->mutex);
     if (server->nEvents >= num) {
@@ -308,7 +315,9 @@ int RegisterCallback(RpcServer *server, int event, Context *context)
     if ((server == NULL) || (context == NULL)) {
         return -1;
     }
-
+    if (event < 0) {
+        return -1;
+    }
     uint32_t num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
     int pos = event % num;
     if (pos >= MAX_EVENT_NODE_COUNT) {
@@ -336,6 +345,9 @@ int UnRegisterCallback(RpcServer *server, int event, const Context *context)
         return -1;
     }
 
+    if (event < 0) {
+        return -1;
+    }
     uint32_t num = sizeof(server->eventNode) / sizeof(server->eventNode[0]);
     int pos = event % num;
     if (pos >= MAX_EVENT_NODE_COUNT) {

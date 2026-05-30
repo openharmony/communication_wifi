@@ -104,6 +104,9 @@ std::string XmlParser::GetStringValue(xmlNodePtr node)
         return "";
     }
     xmlChar *value = xmlNodeGetContent(node);
+    if (value == nullptr) {
+        return "";
+    }
     std::string result = std::string(reinterpret_cast<char *>(value));
     xmlFree(value);
     return result;
@@ -154,6 +157,10 @@ std::vector<unsigned char> XmlParser::GetByteArrValue(xmlNodePtr node)
     std::string temp = std::string(reinterpret_cast<char *>(numChar));
     int num = CheckDataLegal(temp);
     xmlChar *value = xmlNodeGetContent(node);
+    if (value == nullptr) {
+        xmlFree(numChar);
+        return byteArr;
+    }
     std::string valueStr = std::string(reinterpret_cast<char *>(value));
     xmlFree(numChar);
     xmlFree(value);
@@ -184,6 +191,10 @@ std::map<std::string, std::string> XmlParser::GetStringMapValue(xmlNodePtr innod
                 return strMap;
             }
             xmlChar* xvalue = xmlNodeGetContent(node);
+            if (xvalue == nullptr) {
+                xmlFree(xname);
+                return strMap;
+            }
             name = std::string(reinterpret_cast<char *>(xname));
             value = std::string(reinterpret_cast<char *>(xvalue));
             strMap[name] = value;

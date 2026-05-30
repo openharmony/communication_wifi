@@ -275,6 +275,10 @@ int ReadInt(Context *context, int *iData)
         return -1;
     }
 
+    if (iData == NULL) {
+        return -1;
+    }
+
     char szTmp[TMP_CHAR_LEN] = {0};
     int len = ReadNextNum(context, szTmp, sizeof(szTmp));
     if (len < 0) {
@@ -307,6 +311,10 @@ int ReadInt64(Context *context, int64_t *pInt64)
         return -1;
     }
 
+    if (pInt64 == NULL) {
+        return -1;
+    }
+
     char szTmp[TMP_CHAR_LEN] = {0};
     int len = ReadNextNum(context, szTmp, sizeof(szTmp));
     if (len < 0) {
@@ -336,6 +344,10 @@ int ReadDouble(Context *context, double *dData)
 int ReadChar(Context *context, char *cData)
 {
     if (context == NULL) {
+        return -1;
+    }
+
+    if (cData == NULL) {
         return -1;
     }
 

@@ -642,6 +642,10 @@ void WifiConfigCenter::SetWifiScanOnlyMidState(WifiOprMidState state, int instId
 
 int WifiConfigCenter::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo)
 {
+    if (wifiScanConfig == nullptr) {
+        WIFI_LOGE("wifiScanConfig is null");
+        return -1;
+    }
     std::vector<WifiScanInfo> wifiScanInfoList;
     wifiScanConfig->GetScanInfoListInner(wifiScanInfoList);
     for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
@@ -658,6 +662,10 @@ int WifiConfigCenter::SetWifiLinkedStandardAndMaxSpeed(WifiLinkedInfo &linkInfo)
 void WifiConfigCenter::SetMloWifiLinkedMaxSpeed(int instId)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
+    if (wifiScanConfig == nullptr) {
+        WIFI_LOGE("wifiScanConfig is null");
+        return;
+    }
     auto mloIter = mWifiMloLinkedInfo.find(instId);
     if (mloIter == mWifiMloLinkedInfo.end()) {
         return;
@@ -1382,26 +1390,39 @@ bool WifiConfigCenter::HasWifiActive()
 
 void WifiConfigCenter::UpdateLinkedInfo(int instId)
 {
+    if (wifiScanConfig == nullptr) {
+        WIFI_LOGE("wifiScanConfig is null");
+        return;
+    }
     std::vector<WifiScanInfo> wifiScanInfoList;
     wifiScanConfig->GetScanInfoListInner(wifiScanInfoList);
-    std::unique_lock<std::mutex> lock(mStaMutex);
+    //Avoid multithreading problems
+    std::map<int, WifiLinkedInfo> tempWifiLinkedInfo;
+    {
+        std::unique_lock<std::mutex> lock(mStaMutex);
+        tempWifiLinkedInfo = mWifiLinkedInfo;
+    }
     for (auto iter = wifiScanInfoList.begin(); iter != wifiScanInfoList.end(); ++iter) {
-        if (iter->bssid == mWifiLinkedInfo[instId].bssid) {
-            if (mWifiLinkedInfo[instId].channelWidth == WifiChannelWidth::WIDTH_INVALID) {
-                mWifiLinkedInfo[instId].channelWidth = iter->channelWidth;
+        if (iter->bssid == tempWifiLinkedInfo[instId].bssid) {
+            if (tempWifiLinkedInfo[instId].channelWidth == WifiChannelWidth::WIDTH_INVALID) {
+                tempWifiLinkedInfo[instId].channelWidth = iter->channelWidth;
             }
-            mWifiLinkedInfo[instId].isHiLinkNetwork = iter->isHiLinkNetwork;
+            tempWifiLinkedInfo[instId].isHiLinkNetwork = iter->isHiLinkNetwork;
             if (iter->isHiLinkNetwork == HILINK_PRO_NETWORK) {
-                mWifiLinkedInfo[instId].isHiLinkProNetwork = true;
+                tempWifiLinkedInfo[instId].isHiLinkProNetwork = true;
             }
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
-            mWifiLinkedInfo[instId].riskType = iter->riskType;
+            tempWifiLinkedInfo[instId].riskType = iter->riskType;
 #endif
             break;
         }
     }
-    WifiCategory category = wifiScanConfig->GetWifiCategoryRecord(mWifiLinkedInfo[instId].bssid);
-    mWifiLinkedInfo[instId].supportedWifiCategory = category;
+    WifiCategory category = wifiScanConfig->GetWifiCategoryRecord(tempWifiLinkedInfo[instId].bssid);
+    tempWifiLinkedInfo[instId].supportedWifiCategory = category;
+    {
+        std::unique_lock<std::mutex> lock(mStaMutex);
+        mWifiLinkedInfo = tempWifiLinkedInfo;
+    }
     LOGD("WifiSettings UpdateLinkedInfo.");
 }
 

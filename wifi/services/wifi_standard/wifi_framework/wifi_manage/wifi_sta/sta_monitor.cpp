@@ -189,7 +189,10 @@ void StaMonitor::OnWpaStaNotifyCallBack(const std::string &notifyParam)
 void StaMonitor::OnWpaHilinkCallBack(const std::string &bssid)
 {
     WIFI_LOGI("OnWpaHilinkCallBack() enter");
-
+    if (pStaStateMachine == nullptr) {
+        WIFI_LOGE("OnWpaHilinkCallBack: pStaStateMachine is null");
+        return;
+    }
     pStaStateMachine->SendMessage(WIFI_SVR_COM_STA_HILINK_TRIGGER_WPS, bssid);
     return;
 }
@@ -205,8 +208,8 @@ void StaMonitor::OnBssidChangedCallBack(const std::string &reason, const std::st
     }
     InternalMessagePtr msg = pStaStateMachine->CreateMessage();
     if (msg == nullptr) {
-    WIFI_LOGE("CreateMessage failed");
-    return;
+        WIFI_LOGE("CreateMessage failed");
+        return;
     }
 
     if (strcmp(reason.c_str(), "LINK_SWITCH") == 0) {
@@ -248,6 +251,10 @@ void StaMonitor::OnWpaSsidWrongKeyCallBack(const std::string &bssid)
 
     /* Notification state machine wpa password wrong event. */
     InternalMessagePtr msg = pStaStateMachine->CreateMessage();
+    if (msg == nullptr) {
+        WIFI_LOGE("CreateMessage failed");
+        return;
+    }
     msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT);
     msg->AddStringMessageBody(bssid);
     pStaStateMachine->SendMessage(msg);
@@ -276,6 +283,10 @@ void StaMonitor::OnWpaConnectionRejectCallBack(const AssocRejectInfo &assocRejec
 
     /* Notification state machine wpa password wrong event. */
     InternalMessagePtr msg = pStaStateMachine->CreateMessage();
+    if (msg == nullptr) {
+        WIFI_LOGE("CreateMessage failed");
+        return;
+    }
     msg->SetMessageName(WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT);
     msg->AddStringMessageBody(assocRejectInfo.bssid);
     msg->SetParam1(assocRejectInfo.statusCode);

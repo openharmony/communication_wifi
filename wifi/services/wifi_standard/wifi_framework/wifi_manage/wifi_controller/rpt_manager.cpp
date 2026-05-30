@@ -78,6 +78,10 @@ bool RptManager::IsRptRunning()
 
 void RptManager::OnP2pConnectionChanged(P2pConnectedState p2pConnState)
 {
+    if (pRptManagerMachine == nullptr) {
+        WIFI_LOGE("pRptManagerMachine is null");
+        return;
+    }
     if (p2pConnState == P2pConnectedState::P2P_CONNECTED) {
         auto msg = pRptManagerMachine->CreateMessage(RPT_CMD_ON_GROUP_CREATED);
         pRptManagerMachine->SendMessage(msg);

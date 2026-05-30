@@ -215,6 +215,10 @@ void StaAutoConnectService::ConnectNetwork(NetworkSelectionResult &networkSelect
     WIFI_LOGI("AutoSelectDevice networkId: %{public}d, ssid: %{public}s, bssid: %{public}s.",
         networkId, SsidAnonymize(ssid).c_str(), MacAnonymize(bssid).c_str());
     auto message = pStaStateMachine->CreateMessage(WIFI_SVR_CMD_STA_CONNECT_SAVED_NETWORK);
+    if (message == nullptr) {
+        WIFI_LOGE("CreateMessage failed");
+        return;
+    }
     message->SetParam1(networkId);
     message->SetParam2(selectedType);
     message->AddStringMessageBody(bssid);

@@ -1647,7 +1647,7 @@ bool HalDeviceManager::GetP2pSignalInfo(const std::string &interfaceName, const 
     }
     const signed char *signedCharPointer = reinterpret_cast<const signed char *>(result.data());
     DeserializeSignalPollResultFromPtr(signedCharPointer, result.size(), signalPollResult);
-    LOGI("HalDeviceManager GetP2pSignalInfo finish, currentRssi %{public}d, associatedFreq %{public}d,\
+    LOGD("HalDeviceManager GetP2pSignalInfo finish, currentRssi %{public}d, associatedFreq %{public}d,\
         txBitrate %{public}d, rxBitrate %{public}d, currentNoise %{public}d, currentSnr %{public}d,\
         currentChload %{public}d, currentUlDelay %{public}d, [currentTxBytes %{public}" PRIu64 "],\
         [currentRxBytes %{public}" PRIu64 "], currentTxFailed %{public}d, currentTxPackets %{public}d,\

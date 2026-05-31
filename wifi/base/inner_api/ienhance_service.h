@@ -604,10 +604,12 @@ public:
     /**
      * @Description set the enhance p2p signal poll info
      *
+     * @param needKeepAlgo true: keep congestion algo, false: stop congestion algo
      * @param info -signal info
      * @param p2pInterfaceName interface name
      */
-    virtual void SetEnhanceP2pSignalPollInfo(const WifiSignalPollInfo &info, const std::string p2pInterfaceName) = 0;
+    virtual void SetEnhanceP2pSignalPollInfo(bool needKeepAlgo, const WifiSignalPollInfo &info,
+        const std::string p2pInterfaceName) = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

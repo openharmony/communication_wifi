@@ -10,15 +10,15 @@ WiFi STA（Station）模式控制工具，提供启用/禁用 STA 模式和 WiFi
 - **sta-disable**: 禁用 WiFi STA 模式
 - **scan-start**: 启动 WiFi 扫描
 - **scan-list**: 列出扫描结果
+- **sta-connect**: 连接WiFi
 
 ## 依赖
 
 - 系统能力：`SystemCapability.Communication.WiFi.STA`
 - 权限：
-  - `ohos.permission.SET_WIFI_INFO`
-  - `ohos.permission.MANAGE_WIFI_CONNECTION`
-  - `ohos.permission.GET_WIFI_INFO`
-  - `ohos.permission.GET_WIFI_PEERS_MAC`
+  - `ohos.permission.cli.MANAGE_WIFI_TOGGLE`
+  - `ohos.permission.cli.MANAGE_WIFI_SCAN`
+  - `ohos.permission.cli.MANAGE_WIFI_CONNECT`
 
 ## 安装路径
 

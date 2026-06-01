@@ -10,11 +10,11 @@ ohos-wifiManager <command>
 
 | 命令 | 说明 | 权限 | 前置依赖 |
 |------|------|------|----------|
-| sta-enable | 启用 WiFi STA 模式 | SET_WIFI_INFO, MANAGE_WIFI_CONNECTION | 无 |
-| sta-disable | 禁用 WiFi STA 模式 | SET_WIFI_INFO, MANAGE_WIFI_CONNECTION | 无 |
-| scan-start | 启动 WiFi 扫描 | SET_WIFI_INFO | 无 |
-| scan-list | 列出扫描结果 | GET_WIFI_INFO, GET_WIFI_PEERS_MAC | 无 |
-
+| sta-enable | 启用 WiFi STA 模式 | ohos.permission.cli.MANAGE_WIFI_TOGGLE | 无 |
+| sta-disable | 禁用 WiFi STA 模式 | ohos.permission.cli.MANAGE_WIFI_TOGGLE | 无 |
+| scan-start | 启动 WiFi 扫描 | ohos.permission.cli.MANAGE_WIFI_SCAN | 无 |
+| scan-list | 列出扫描结果 | ohos.permission.cli.MANAGE_WIFI_SCAN | 无 |
+| sta-connect | 连接WiFi | ohos.permission.cli.MANAGE_WIFI_CONNECT | 无 |
 ## 示例
 
 ### 启用 WiFi STA 模式
@@ -39,6 +39,12 @@ ohos-wifiManager scan-start
 
 ```bash
 ohos-wifiManager scan-list
+```
+
+### 连接WiFi
+
+```bash
+ohos-wifiManager sta-connect --ssid <ssid> [--preSharedKey <preSharedKey>]
 ```
 
 ## 输出格式

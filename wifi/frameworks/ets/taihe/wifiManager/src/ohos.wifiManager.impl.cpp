@@ -381,14 +381,41 @@ void P2pCancelConnect()
     }
 }
 
-void ConnectToCandidateConfig(int32_t networkId)
+void ConnectToCandidateConfigByNetworkId(int32_t networkId)
 {
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
         return;
     }
-    bool isCandidate = true;
-    ErrCode ret = g_wifiDevicePtr->ConnectToNetwork(networkId, isCandidate);
+    ConnectSettings settings;
+    settings.networkId = networkId;
+    ErrCode ret = g_wifiDevicePtr->ConnectToCandidateConfig(settings);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+}
+ 
+void ConnectToCandidateConfigBySettings(const ::ohos::wifiManager::ConnectSettings &connectSettings)
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    WIFI_LOGI("ConnectToCandidateConfig networkId=%{public}d withUserAction=%{public}d "
+            "userActionTimeout=%{public}d addNetworkToSystem=%{public}d",
+            connectSettings.networkId, connectSettings.withUserAction, connectSettings.userActionTimeout,
+            connectSettings.addNetworkToSystem);
+    ConnectSettings settings;
+    settings.networkId = connectSettings.networkId;
+    settings.withUserAction = connectSettings.withUserAction;
+    settings.userActionTimeout = connectSettings.userActionTimeout;
+    settings.addNetworkToSystem = connectSettings.addNetworkToSystem;
+    if (connectSettings.userActionTimeout <= 0 || connectSettings.userActionTimeout > MAX_DIALOG_TIMEOUT) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->ConnectToCandidateConfig(settings);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
         return;

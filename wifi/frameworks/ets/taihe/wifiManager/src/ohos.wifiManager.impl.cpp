@@ -403,9 +403,9 @@ void ConnectToCandidateConfigBySettings(const ::ohos::wifiManager::ConnectSettin
         return;
     }
     WIFI_LOGI("ConnectToCandidateConfig networkId=%{public}d withUserAction=%{public}d "
-            "userActionTimeout=%{public}d addNetworkToSystem=%{public}d",
-            connectSettings.networkId, connectSettings.withUserAction, connectSettings.userActionTimeout,
-            connectSettings.addNetworkToSystem);
+        "userActionTimeout=%{public}d addNetworkToSystem=%{public}d",
+        connectSettings.networkId, connectSettings.withUserAction, connectSettings.userActionTimeout,
+        connectSettings.addNetworkToSystem);
     ConnectSettings settings;
     settings.networkId = connectSettings.networkId;
     settings.withUserAction = connectSettings.withUserAction;

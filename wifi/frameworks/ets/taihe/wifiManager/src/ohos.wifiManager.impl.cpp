@@ -983,8 +983,9 @@ void ConnectToCandidateConfigWithUserActionSync(int32_t networkId)
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
     }
 
-    bool isCandidate = true;
-    ret = g_wifiDevicePtr->ConnectToNetwork(networkId, isCandidate);
+    ConnectSettings settings;
+    settings.networkId = networkId;
+    ret = g_wifiDevicePtr->ConnectToCandidateConfig(settings);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
         return;

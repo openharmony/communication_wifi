@@ -58,6 +58,9 @@ bool AuthorizingNegotiationRequestState::ExecuteStateMsg(InternalMessagePtr msg)
         }
         case P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_TIME_OUT:
         case P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT: {
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+            p2pStateMachine.DealP2pPeerConnectUserReject();
+#endif
             HandleUserRejectOrTimeOut();
             break;
         }

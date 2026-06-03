@@ -55,6 +55,9 @@ public:
     ErrCode GetRptStationsList(std::vector<StationInfo> &result);
     void NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPincode);
     void NotifyWscDisplayConfirmResult();
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+    void NotifyUntrustInvitationResult(bool isAccept)
+#endif
     ErrCode SetMiracastSinkConfig(const std::string& config);
     ErrCode NotifyRemoteDie(int uid);
     ErrCode SetP2pHighPerf(bool isEnable);

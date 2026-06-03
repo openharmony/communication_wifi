@@ -346,6 +346,16 @@ public:
      */
     void NotifyWscDisplayConfirmResult() override;
 
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+    /**
+     * @Description Notify Untrust dialog result to p2p service
+     *
+     * @param isAccept if user stop projrction screen
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+     void NotifyUntrustInvitationResult(bool isAccept) override;
+#endif
+
     /**
      * @Description Set miracast sink config
      *

@@ -1103,21 +1103,25 @@ void NotificationEventSubscriber::OnReceiveDialogAcceptEvent(int dialogType,
         }
     }
 #ifdef FEATURE_P2P_SUPPORT
+    IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+    if (p2pService == nullptr) {
+        WIFI_LOGE("p2pService is null");
+        return;
+    }
     if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_PBC_DIALOG) ||
         dialogType == static_cast<int>(WifiDialogType::P2P_WSC_KEYPAD_DIALOG)) {
         std::string inputPinCode = eventData.GetWant().GetStringParam("inputPinCode");
         WIFI_LOGI("OnReceiveDialogAcceptEvent inputPinCode:%{private}s", inputPinCode.c_str());
-
-        IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
-        if (p2pService != nullptr) {
-            p2pService->NotifyWscDialogConfirmResult(true, inputPinCode);
-        }
+        p2pService->NotifyWscDialogConfirmResult(true, inputPinCode);
     } else if (dialogType == static_cast<int>(WifiDialogType::P2P_WSC_DISPLAY_DIALOG)) {
-        IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
-        if (p2pService != nullptr) {
-            p2pService->NotifyWscDisplayConfirmResult();
-        }
+        p2pService->NotifyWscDisplayConfirmResult();
     }
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+    if (dialogType == static_cast<int>(WifiDialogType::P2P_UNTRUST_INVITE_DIALOG)) {
+        WIFI_LOGI("OnReceiveNotification untrust dialog accept");
+        p2pService->NotifyUntrustInvitationResult(true);
+    }
+#endif
 #endif
 }
 
@@ -1161,6 +1165,15 @@ void NotificationEventSubscriber::OnReceiveDialogRejectEvent(int dialogType, boo
             p2pService->NotifyWscDialogConfirmResult(false, "");
         }
     }
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+    if (dialogType == static_cast<int>(WifiDialogType::P2P_UNTRUST_INVITE_DIALOG)) {
+        WIFI_LOGI("OnReceiveNotification untrust dialog reject");
+        IP2pService *p2pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
+        if (p2pService != nullptr) {
+            p2pService->NotifyUntrustInvitationResult(false);
+        }
+    }
+#endif
 #endif
 }
 

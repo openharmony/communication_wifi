@@ -165,6 +165,9 @@ ohos_unittest("wifi_p2p_test") {
 
   defines = [ "AP_INSTANCE_MAX_NUM=$wifi_feature_with_ap_num" ]
   defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+  if (wifi_feature_with_p2p_untrust_invitation) {
+    defines += [ "SUPPORT_P2P_UNTRUST_INVITATION" ]
+  }
   part_name = "wifi"
   subsystem_name = "communication"
 }

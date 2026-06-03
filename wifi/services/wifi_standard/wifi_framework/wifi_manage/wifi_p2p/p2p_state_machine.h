@@ -51,6 +51,9 @@ inline const int MAX_GROUP_NAME_LENGTH = 32;
 inline const int MAX_CLIENT_SIZE = 256;
 inline const int DISC_TIMEOUT_S = 120;
 inline const int WSC_DIALOG_SELECT_TIMEOUT = 30000;
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+inline const int DISALLOW_UNTRUST_INVITE_DURATION = 10 * 60 * 1000;
+#endif
 enum {
     P2P_GC,
     P2P_GO,
@@ -177,6 +180,14 @@ public:
     * @return origin flag
     */
     bool SetSignalAcquisitionSwitch(bool switchFlag);
+
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+    void DealP2pPeerConnectUserReject();
+
+    void AllowUntrustInvitation();
+
+    void DisallowUntrustInvitation();
+#endif
 
 private:
     /**
@@ -492,6 +503,9 @@ private:
     void SetClientInfo(HalP2pGroupConfig &wpaConfig, WifiP2pGroupInfo &grpBuf) const;
     void FilterInvalidGroup() const;
     void InitChipSupportSignalAcquisitionFlag();
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+    void PopupP2pUntrustInvitationDialog();
+#endif
 
 private:
     mutable std::mutex cbMapMutex;
@@ -531,6 +545,12 @@ private:
     int p2pSignalPollDelayTime_ = P2P_SIGNAL_POLL_DELAY;
     // initial: -1, in StartP2pSignalPollTimer method called, query chip type and modify this flag
     int chipSupportSignalAcquisitionFlag = -1;
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+    int64_t p2pRejectFirstTime_ = 0;
+    int p2pRejectCount_ = 0;
+    int64_t disallowUntrustInvitationTime_ = 0;
+    bool userDisallowUntrustInvitation_ = false;
+#endif
 public:
     std::vector<std::string> curClientList;
 };

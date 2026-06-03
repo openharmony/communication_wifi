@@ -441,6 +441,13 @@ void WifiMockP2pService::NotifyWscDisplayConfirmResult()
     return;
 }
 
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+void WifiMockP2pService::NotifyUntrustInvitationResult(bool isAccept)
+{
+    return;
+}
+#endif
+
 ErrCode WifiMockP2pService::SetMiracastSinkConfig(const std::string& config)
 {
     return WIFI_OPT_SUCCESS;

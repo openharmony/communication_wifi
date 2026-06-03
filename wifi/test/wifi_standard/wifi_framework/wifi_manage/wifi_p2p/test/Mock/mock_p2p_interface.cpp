@@ -243,6 +243,13 @@ void P2pInterface::NotifyWscDisplayConfirmResult()
     return;
 }
 
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+void P2pInterface::NotifyUntrustInvitationResult(bool isAccept)
+{
+    return;
+}
+#endif
+
 ErrCode P2pInterface::SetMiracastSinkConfig(const std::string& config)
 {
     return WIFI_OPT_SUCCESS;

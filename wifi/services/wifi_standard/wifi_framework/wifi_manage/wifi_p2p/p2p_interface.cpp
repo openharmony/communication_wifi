@@ -288,6 +288,13 @@ void P2pInterface::NotifyWscDialogConfirmResult(bool isAccept, const std::string
     p2pService.NotifyWscDialogConfirmResult(isAccept, inputPinCode);
 }
 
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+void P2pInterface::NotifyUntrustInvitationResult(bool isAccept)
+{
+    p2pService.NotifyUntrustInvitationResult(isAccept);
+}
+#endif
+
 void P2pInterface::NotifyWscDisplayConfirmResult()
 {
     p2pService.NotifyWscDisplayConfirmResult();

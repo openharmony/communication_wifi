@@ -319,6 +319,10 @@ enum class ProtectModeJs {
     WIFI_PROTECT_NO_HELD = 4,
 };
 
+enum class WifiCapabilityJs {
+    WIFI_AUTO_ENABLE = 0,
+};
+
 }  // namespace Wifi
 }  // namespace OHOS
 

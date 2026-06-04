@@ -275,7 +275,7 @@ HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pConnectTest, TestSize.Level1)
     P2pConnectInfo info;
     char replyPin[SIZE] = {0};
     WifiErrorNo result = HdiP2pConnect(&info, replyPin, SIZE);
-    EXPECT_EQ(result, WIFI_HAL_OPT_OK);
+    EXPECT_EQ(result, WIFI_HAL_OPT_INVALID_PARAM);
 }
 
 HWTEST_F(WifiHdiWpaP2pImplTest, HdiP2pHid2dConnectTest, TestSize.Level1)

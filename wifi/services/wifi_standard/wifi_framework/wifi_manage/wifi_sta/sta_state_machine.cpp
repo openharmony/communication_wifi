@@ -2498,10 +2498,14 @@ void StaStateMachine::ShowPortalNitification()
     isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
 #endif
     bool isHiLinkNetworkHomeAp = InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) || isHomeAp || isHomeRouter;
-    if (hasInternetEver && !isHiLinkNetworkHomeAp) {
-        WifiNotificationUtil::GetInstance().PublishWifiNotification(
-            WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
-            WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
+    WIFI_LOGI("ShowPortalNitification,isHiLinkNetworkHomeAp:%{public}d,hasInternetEver:%{public}d",
+        isHiLinkNetworkHomeAp, hasInternetEver);
+    if (hasInternetEver) {
+        if (!isHiLinkNetworkHomeAp) {
+            WifiNotificationUtil::GetInstance().PublishWifiNotification(
+                WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
+                WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
+        }
     } else {
         std::string bundle = WifiSettings::GetInstance().GetPackageName("SETTINGS");
         if (WifiAppStateAware::GetInstance().IsForegroundApp(bundle)) {

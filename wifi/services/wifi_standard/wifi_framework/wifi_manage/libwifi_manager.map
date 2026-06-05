@@ -285,6 +285,7 @@
         "OHOS::Wifi::WifiCertUtils::InstallCert(std::__h::vector<unsigned char, std::__h::allocator<unsigned char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
         "OHOS::Wifi::WifiConfigCenter::SetMacAddress(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
         "OHOS::Wifi::WifiSettings::GetRealMacAddress(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&, int)";
+        "OHOS::Wifi::WifiSettings::GetSpecialSsidList(std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>> &)";
         "OHOS::Wifi::WifiConfigCenter::GetMacAddress(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&, int)";
         "OHOS::Wifi::IsPskEncryption(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";

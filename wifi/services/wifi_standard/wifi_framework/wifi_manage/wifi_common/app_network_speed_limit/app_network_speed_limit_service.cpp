@@ -27,7 +27,7 @@
 #include "wifi_service_manager.h"
 #include "ienhance_service.h"
 #include "app_network_speed_limit_chr.h"
- #include "wifi_settings.h"
+#include "wifi_settings.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -425,12 +425,12 @@ void AppNetworkSpeedLimitService::SendLimitCmd2Drv(const int controlId, const in
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     std::vector<std::string> specialSsidList;
- 	WifiSettings::GetInstance().GetSpecialSsidList(specialSsidList);
+    WifiSettings::GetInstance().GetSpecialSsidList(specialSsidList);
     if (controlId == BG_LIMIT_CONTROL_ID_KEY_FG_APP && limitMode != BG_LIMIT_OFF
- 	    && std::find(specialSsidList.begin(), specialSsidList.end(), linkedInfo.ssid)
- 	    != specialSsidList.end()) {
- 	    m_bgLimitRecordMap[controlId] = BG_LIMIT_LEVEL_12;
- 	}
+        && std::find(specialSsidList.begin(), specialSsidList.end(), linkedInfo.ssid)
+        != specialSsidList.end()) {
+        m_bgLimitRecordMap[controlId] = BG_LIMIT_LEVEL_12;
+    }
     m_limitSpeedMode = GetBgLimitMaxMode();
     int64_t delayTime = 0;
     // Downshifting without delay, upshifting with delay.

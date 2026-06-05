@@ -3688,12 +3688,12 @@ bool StaStateMachine::CanArpReachable()
     std::string gateway = IpTools::ConvertIpv4Address(ipInfo.gateway);
     arpChecker.Start(ifName, macAddress, ipAddress, gateway);
     std::vector<std::string> specialSsidList;
- 	WifiSettings::GetInstance().GetSpecialSsidList(specialSsidList);
- 	int arpCheckTime = MAX_ARP_CHECK_TIME;
- 	if (std::find(specialSsidList.begin(), specialSsidList.end(), linkedInfo.ssid)
- 	    != specialSsidList.end()) {
- 	    arpCheckTime = MAX_ARP_CHECK_TIME_SPECIAL_SSID;
- 	}
+    WifiSettings::GetInstance().GetSpecialSsidList(specialSsidList);
+    int arpCheckTime = MAX_ARP_CHECK_TIME;
+    if (std::find(specialSsidList.begin(), specialSsidList.end(), linkedInfo.ssid)
+        != specialSsidList.end()) {
+        arpCheckTime = MAX_ARP_CHECK_TIME_SPECIAL_SSID;
+    }
     for (int i = 0; i < DEFAULT_NUM_ARP_PINGS; i++) {
         if (arpChecker.DoArpCheck(arpCheckTime, true, arpRtt)) {
             EnhanceWriteArpInfoHiSysEvent(arpRtt, 0);

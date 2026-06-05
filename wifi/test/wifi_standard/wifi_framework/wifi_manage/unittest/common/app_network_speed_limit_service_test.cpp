@@ -931,8 +931,8 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_NonSpecialWifi, TestS
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     std::vector<std::string> specialSsidList = {"juneyaoair", "CEAIR-WIFI"};
- 	EXPECT_CALL(WifiSettings::GetInstance(), GetSpecialSsidList(_))
- 	    .WillRepeatedly(DoAll(SetArgReferee<0>(specialSsidList), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSpecialSsidList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(specialSsidList), Return(0)));
     MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
 
     int controlId = BG_LIMIT_CONTROL_ID_KEY_FG_APP;
@@ -958,8 +958,8 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_SpecialWifi, TestSize
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     std::vector<std::string> specialSsidList = {"juneyaoair", "CEAIR-WIFI"};
- 	EXPECT_CALL(WifiSettings::GetInstance(), GetSpecialSsidList(_))
- 	    .WillRepeatedly(DoAll(SetArgReferee<0>(specialSsidList), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSpecialSsidList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(specialSsidList), Return(0)));
     MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
 
     int controlId = BG_LIMIT_CONTROL_ID_KEY_FG_APP;
@@ -985,8 +985,8 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_NotKeyFgAppControlId_
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     std::vector<std::string> specialSsidList = {"juneyaoair", "CEAIR-WIFI"};
- 	EXPECT_CALL(WifiSettings::GetInstance(), GetSpecialSsidList(_))
- 	    .WillRepeatedly(DoAll(SetArgReferee<0>(specialSsidList), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSpecialSsidList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(specialSsidList), Return(0)));
     MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
 
     int controlId = BG_LIMIT_CONTROL_ID_GAME;
@@ -1012,8 +1012,8 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_KeyFgAppWithLimitOff_
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
         .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
     std::vector<std::string> specialSsidList = {"juneyaoair", "CEAIR-WIFI"};
- 	EXPECT_CALL(WifiSettings::GetInstance(), GetSpecialSsidList(_))
- 	    .WillRepeatedly(DoAll(SetArgReferee<0>(specialSsidList), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSpecialSsidList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(specialSsidList), Return(0)));
     MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
 
     int controlId = BG_LIMIT_CONTROL_ID_KEY_FG_APP;

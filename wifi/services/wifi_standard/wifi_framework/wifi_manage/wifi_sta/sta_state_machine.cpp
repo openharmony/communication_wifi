@@ -2751,7 +2751,7 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     if (!isHiLinkNetworkHomeAp) {
         PublishPortalNitificationAndLogin();
     }
-    WIFI_LOGD("%{public}s, isHiLinkNetwork:%{public}d isHomeAp:%{public}d isHomeRouter:%{public}d keyMgmt:"
+    WIFI_LOGD("%{public}s,isHiLinkNetwork:%{public}d isHomeAp:%{public}d isHomeRouter:%{public}d keyMgmt:"
               "%{public}s,isHiLinkNetworkHomeAp:%{public}d ", __func__, linkedInfo.isHiLinkNetwork,
               isHomeAp, isHomeRouter, config.keyMgmt.c_str(), isHiLinkNetworkHomeAp);
     if (isHiLinkNetworkHomeAp && config.keyMgmt != KEY_MGMT_NONE) {

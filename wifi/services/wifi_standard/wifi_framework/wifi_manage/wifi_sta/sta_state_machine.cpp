@@ -2491,7 +2491,14 @@ void StaStateMachine::ShowPortalNitification()
     WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
     bool hasInternetEver =
         NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory);
-    if (hasInternetEver) {
+    bool isHomeAp = false;
+    bool isHomeRouter = false;
+#ifndef OHOS_ARCH_LITE
+    isHomeAp = WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid);
+    isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
+#endif
+    bool isHiLinkNetworkHomeAp = InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) || isHomeAp || isHomeRouter;
+    if (hasInternetEver && !isHiLinkNetworkHomeAp) {
         WifiNotificationUtil::GetInstance().PublishWifiNotification(
             WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
             WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
@@ -2738,6 +2745,10 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     UpdatePortalState(netState, updatePortalAuthTime);
+    /* The tv doesn't need to publish the portal login page when connecting to a Hilink router without internet. */
+    if (GetDeviceType() != ProductDeviceType::TV) {
+        PublishPortalNitificationAndLogin();
+    }
     bool isHomeAp = false;
     bool isHomeRouter = false;
 #ifndef OHOS_ARCH_LITE
@@ -2747,14 +2758,10 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
     EnhanceWriteIsInternetHiSysEvent(NO_NETWORK);
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, config, m_instId);
-    bool isHiLinkNetworkHomeAp = InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) || isHomeAp || isHomeRouter;
-    if (!isHiLinkNetworkHomeAp) {
-        PublishPortalNitificationAndLogin();
-    }
-    WIFI_LOGD("%{public}s,isHiLinkNetwork:%{public}d isHomeAp:%{public}d isHomeRouter:%{public}d keyMgmt:"
-              "%{public}s,isHiLinkNetworkHomeAp:%{public}d ", __func__, linkedInfo.isHiLinkNetwork,
-              isHomeAp, isHomeRouter, config.keyMgmt.c_str(), isHiLinkNetworkHomeAp);
-    if (isHiLinkNetworkHomeAp && config.keyMgmt != KEY_MGMT_NONE) {
+    WIFI_LOGD("%{public}s, isHiLinkNetwork : %{public}d isHomeAp : %{public}d isHomeRouter : %{public}d keyMgmt : "
+              "%{public}s", __func__, linkedInfo.isHiLinkNetwork, isHomeAp, isHomeRouter, config.keyMgmt.c_str());
+    if ((InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) || isHomeAp || isHomeRouter)
+        && config.keyMgmt != KEY_MGMT_NONE) {
         // Change the value of PORTAL in networkStatusHistory to NO_INTERNET
         WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
         NetworkStatusHistoryManager::ModifyAllHistoryRecord(wifiDeviceConfig.networkStatusHistory,
@@ -2770,6 +2777,9 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
             mIsWifiInternetCHRFlag = true;
         }
     } else {
+        if (GetDeviceType() == ProductDeviceType::TV) {
+            PublishPortalNitificationAndLogin();
+        }
         InsertOrUpdateNetworkStatusHistory(NetworkStatus::PORTAL, false);
         SaveLinkstate(ConnState::CONNECTED, DetailedState::CAPTIVE_PORTAL_CHECK);
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);

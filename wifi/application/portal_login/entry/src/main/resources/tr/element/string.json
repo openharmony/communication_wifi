@@ -9,7 +9,7 @@
         },
         {
             "name":"actions_menu_user_agent",
-            "value":"Tarayıcı kullanıcı aracısı seçimi",
+            "value":"Tarayıcı kullanıcı aracısı",
             "attr":{
                 "priority":"LT"
             }

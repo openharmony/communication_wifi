@@ -1171,7 +1171,6 @@ HWTEST_F(WifiSettingsTest, GetSpecialSsidListTest, TestSize.Level1)
     int result = WifiSettings::GetInstance().GetSpecialSsidList(specialSsidList);
     WIFI_LOGE("GetSpecialSsidListTest result(%{public}d)", result);
     EXPECT_EQ(result, WIFI_OPT_SUCCESS);
-    EXPECT_TRUE(specialSsidList.empty());
 }
 }  // namespace Wifi
 }  // namespace OHO

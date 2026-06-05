@@ -74,42 +74,42 @@
             "name":"website_permission_never_allowed",
             "value":"ປະຕິເສດ",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"web_risk_warning_level3_Phone_content",
             "value":"ເວັບໄຊທ໌ທີ່ຢູ່ຂ້າງໜ້າອາດມີເນື້ອຫາທີ່ບໍ່ເໝາະສົມ ຫຼື ທີ່ຖືກຫ້າມ. ດຳເນີນຕໍ່ດ້ວຍຄວາມລະມັດລະວັງ.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"web_risk_warning_level3_Phone_title",
             "value":"ເນື້ອຫາອັນຕະລາຍຢູ່ຂ້າງໜ້າ",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"camera_permission_message",
             "value":"ອະນຸຍາດໃຫ້ %s ໃຊ້ກ້ອງຖ່າຍຮູບ?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"permission_reason_camera",
             "value":"ສິ່ງນີ້ຖືກໃຊ້ສຳລັບການຖ່າຍຮູບ ແລະ ວິດີໂອ.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"website_permission_allowed",
             "value":"ອະ​ນຸ​ຍາດ",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

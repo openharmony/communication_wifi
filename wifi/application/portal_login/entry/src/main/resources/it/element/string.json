@@ -74,42 +74,42 @@
             "name":"website_permission_never_allowed",
             "value":"Nega",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"web_risk_warning_level3_Phone_content",
             "value":"Il sito in questione potrebbe includere contenuti inappropriati o proibiti. Procedi con cautela.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"web_risk_warning_level3_Phone_title",
             "value":"Accesso a contenuti dannosi",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"camera_permission_message",
             "value":"Vuoi consentire a %s di utilizzare la fotocamera?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"permission_reason_camera",
             "value":"Per scattare foto e riprendere video.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"website_permission_allowed",
             "value":"Consenti",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

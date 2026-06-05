@@ -47,6 +47,7 @@ public:
     virtual std::string GetPackageName(std::string tag) = 0;
     virtual int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config, int instId) = 0;
     virtual int GetPackageInfoByName(std::string name, std::vector<PackageInfo> &packageInfo) = 0;
+    virtual int GetSpecialSsidList(std::vector<std::string> &specialSsidList) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -66,6 +67,7 @@ public:
     MOCK_METHOD1(GetPackageName, std::string(std::string tag));
     MOCK_METHOD3(GetDeviceConfig, int(const int &networkId, WifiDeviceConfig &config, int instId));
     MOCK_METHOD2(GetPackageInfoByName, int(std::string name, std::vector<PackageInfo> &packageInfo));
+    MOCK_METHOD1(GetSpecialSsidList, int(std::vector<std::string> &specialSsidList));
 };
 } /* namespace Wifi */
 } /* namespace OHOS */

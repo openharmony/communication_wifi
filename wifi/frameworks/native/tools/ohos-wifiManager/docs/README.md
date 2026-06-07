@@ -11,6 +11,7 @@ WiFi STA（Station）模式控制工具，提供启用/禁用 STA 模式和 WiFi
 - **scan-start**: 启动 WiFi 扫描
 - **scan-list**: 列出扫描结果
 - **sta-connect**: 连接WiFi
+- **sta-getlinkedInfo**: 查看网络连接状态
 
 ## 依赖
 

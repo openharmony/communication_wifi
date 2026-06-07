@@ -169,6 +169,38 @@
               "errMsg": { "type": "string" }
           }
       }
+  },
+  "sta-getlinkedInfo": {
+      "description": "Get current WiFi linked information (SSID, BSSID, signal, frequency, band, link speed)",
+      "requirePermissions": [
+          "ohos.permission.cli.MANAGE_WIFI_SCAN"
+      ],
+      "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "required": []
+      },
+      "outputSchema": {
+          "type": "object",
+          "properties": {
+              "type": { "type": "string" },
+              "status": { "type": "string" },
+              "data": {
+                  "type": "object",
+                  "properties": {
+                      "ssid": { "type": "string" },
+                      "bssid": { "type": "string" },
+                      "rssi": { "type": "number" },
+                      "frequency": { "type": "number" },
+                      "band": { "type": "number" },
+                      "linkSpeed": { "type": "number" },
+                      "detailedState": { "type": "string" }
+                  }
+              },
+              "errCode": { "type": "string" },
+              "errMsg": { "type": "string" }
+          }
+      }
   }
   },
   "eventTypes": [],

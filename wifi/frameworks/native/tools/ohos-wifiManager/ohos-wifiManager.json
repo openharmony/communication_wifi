@@ -1,208 +1,208 @@
 {
-  "name": "ohos-wifiManager",
-  "version": "1.0.0",
-  "description": "WiFi STA mode control tool for enabling/disabling STA mode and scanning networks",
-  "executablePath": "/system/bin/cli_tool/executable/ohos-wifiManager",
-  "requirePermissions": [],
-  "hasSubCommand": true,
-  "inputSchema": {
-      "type": "object",
-      "properties": {}
-  },
-  "outputSchema": {
-      "type": "object",
-      "properties": {}
-  },
-  "subcommands": {
-  "sta-enable": {
-      "description": "Enable WiFi STA mode",
-      "requirePermissions": [
-          "ohos.permission.cli.MANAGE_WIFI_TOGGLE"
-      ],
-      "inputSchema": {
-          "type": "object",
-          "properties": {},
-          "required": []
-      },
-      "outputSchema": {
-          "type": "object",
-          "properties": {
-              "type": { "type": "string" },
-              "status": { "type": "string" },
-              "data": {
-                  "type": "object",
-                  "properties": {
-                      "message": { "type": "string" }
-                  }
-              },
-              "errCode": { "type": "string" },
-              "errMsg": { "type": "string" }
-          }
-      }
-  },
-  "sta-disable": {
-      "description": "Disable WiFi STA mode",
-      "requirePermissions": [
-          "ohos.permission.cli.MANAGE_WIFI_TOGGLE"
-      ],
-      "inputSchema": {
-          "type": "object",
-          "properties": {},
-          "required": []
-      },
-      "outputSchema": {
-          "type": "object",
-          "properties": {
-              "type": { "type": "string" },
-              "status": { "type": "string" },
-              "data": {
-                  "type": "object",
-                  "properties": {
-                      "message": { "type": "string" }
-                  }
-              },
-              "errCode": { "type": "string" },
-              "errMsg": { "type": "string" }
-          }
-      }
-  },
-  "scan-start": {
-      "description": "Start WiFi scan",
-      "requirePermissions": [
-          "ohos.permission.cli.MANAGE_WIFI_SCAN"
-      ],
-      "inputSchema": {
-          "type": "object",
-          "properties": {},
-          "required": []
-      },
-      "outputSchema": {
-          "type": "object",
-          "properties": {
-              "type": { "type": "string" },
-              "status": { "type": "string" },
-              "data": {
-                  "type": "object",
-                  "properties": {
-                      "message": { "type": "string" }
-                  }
-              },
-              "errCode": { "type": "string" },
-              "errMsg": { "type": "string" }
-          }
-      }
-  },
-  "scan-list": {
-      "description": "List WiFi scan results",
-      "requirePermissions": [
-          "ohos.permission.cli.MANAGE_WIFI_SCAN"
-      ],
-      "inputSchema": {
-          "type": "object",
-          "properties": {},
-          "required": []
-      },
-      "outputSchema": {
-          "type": "object",
-          "properties": {
-              "type": { "type": "string" },
-              "status": { "type": "string" },
-              "data": {
-                  "type": "object",
-                  "properties": {
-                      "networks": {
-                          "type": "array",
-                          "items": {
-                              "type": "object",
-                              "properties": {
-                                  "ssid": { "type": "string" },
-                                  "bssid": { "type": "string" },
-                                  "securityType": { "type": "number" },
-                                  "rssi": { "type": "number" },
-                                  "frequency": { "type": "number" }
-                              }
-                          }
-                      },
-                      "count": { "type": "number" }
-                  }
-              },
-              "errCode": { "type": "string" },
-              "errMsg": { "type": "string" }
-          }
-      }
-  },
-  "sta-connect": {
-      "description": "Connect to a specified WiFi network in STA mode. Supports open networks and WPA/WPA2/WPA3-PSK secured networks. The preSharedKey parameter is required for encrypted WiFi and optional for open WiFi.",
-      "requirePermissions": [
-          "ohos.permission.cli.MANAGE_WIFI_SCAN",
-          "ohos.permission.cli.MANAGE_WIFI_CONNECT"
-      ],
-      "inputSchema": {
-          "type": "object",
-          "properties": {
-              "ssid": { "type": "string" },
-              "preSharedKey": { "type": "string" }
-          },
-          "required": [
-              "ssid"
-          ]
-      },
-      "outputSchema": {
-          "type": "object",
-          "properties": {
-              "type": { "type": "string" },
-              "status": { "type": "string" },
-              "data": {
-                  "type": "object",
-                  "properties": {
-                      "ssid": {
-                          "type": "string",
-                          "description": "The SSID of the connected WiFi network"
-                      },
-                      "message": {
-                          "type": "string",
-                          "description": "Connection result message"
-                      }
-                  }
-              },
-              "errCode": { "type": "string" },
-              "errMsg": { "type": "string" }
-          }
-      }
-  },
-  "sta-getlinkedInfo": {
-      "description": "Get current WiFi linked information (SSID, BSSID, signal, frequency, band, link speed)",
-      "requirePermissions": [
-          "ohos.permission.cli.MANAGE_WIFI_SCAN"
-      ],
-      "inputSchema": {
-          "type": "object",
-          "properties": {},
-          "required": []
-      },
-      "outputSchema": {
-          "type": "object",
-          "properties": {
-              "type": { "type": "string" },
-              "status": { "type": "string" },
-              "data": {
-                  "type": "object",
-                  "properties": {
-                      "ssid": { "type": "string" },
-                      "bssid": { "type": "string" },
-                      "rssi": { "type": "number" },
-                      "frequency": { "type": "number" },
-                      "band": { "type": "number" },
-                      "linkSpeed": { "type": "number" },
-                      "detailedState": { "type": "string" }
-                  }
-              },
-              "errCode": { "type": "string" },
-              "errMsg": { "type": "string" }
-          }
-      }
-  }
-  },
-  "eventTypes": [],
-  "eventSchemas": {}
+    "name": "ohos-wifiManager",
+    "version": "1.0.0",
+    "description": "WiFi STA mode control tool for enabling/disabling STA mode and scanning networks",
+    "executablePath": "/system/bin/cli_tool/executable/ohos-wifiManager",
+    "requirePermissions": [],
+    "hasSubCommand": true,
+    "inputSchema": {
+        "type": "object",
+        "properties": {}
+    },
+    "outputSchema": {
+        "type": "object",
+        "properties": {}
+    },
+    "subcommands": {
+    "sta-enable": {
+        "description": "Enable WiFi STA mode",
+        "requirePermissions": [
+            "ohos.permission.cli.MANAGE_WIFI_TOGGLE"
+        ],
+        "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        },
+        "outputSchema": {
+            "type": "object",
+            "properties": {
+                "type": { "type": "string" },
+                "status": { "type": "string" },
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "message": { "type": "string" }
+                    }
+                },
+                "errCode": { "type": "string" },
+                "errMsg": { "type": "string" }
+            }
+        }
+    },
+    "sta-disable": {
+        "description": "Disable WiFi STA mode",
+        "requirePermissions": [
+            "ohos.permission.cli.MANAGE_WIFI_TOGGLE"
+        ],
+        "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        },
+        "outputSchema": {
+            "type": "object",
+            "properties": {
+                "type": { "type": "string" },
+                "status": { "type": "string" },
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "message": { "type": "string" }
+                    }
+                },
+                "errCode": { "type": "string" },
+                "errMsg": { "type": "string" }
+            }
+        }
+    },
+    "scan-start": {
+        "description": "Start WiFi scan",
+        "requirePermissions": [
+            "ohos.permission.cli.MANAGE_WIFI_SCAN"
+        ],
+        "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        },
+        "outputSchema": {
+            "type": "object",
+            "properties": {
+                "type": { "type": "string" },
+                "status": { "type": "string" },
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "message": { "type": "string" }
+                    }
+                },
+                "errCode": { "type": "string" },
+                "errMsg": { "type": "string" }
+            }
+        }
+    },
+    "scan-list": {
+        "description": "List WiFi scan results",
+        "requirePermissions": [
+            "ohos.permission.cli.MANAGE_WIFI_SCAN"
+        ],
+        "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        },
+        "outputSchema": {
+            "type": "object",
+            "properties": {
+                "type": { "type": "string" },
+                "status": { "type": "string" },
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "networks": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "ssid": { "type": "string" },
+                                    "bssid": { "type": "string" },
+                                    "securityType": { "type": "number" },
+                                    "rssi": { "type": "number" },
+                                    "frequency": { "type": "number" }
+                                }
+                            }
+                        },
+                        "count": { "type": "number" }
+                    }
+                },
+                "errCode": { "type": "string" },
+                "errMsg": { "type": "string" }
+            }
+        }
+    },
+    "sta-connect": {
+        "description": "Connect to a specified WiFi network in STA mode. Supports open networks and WPA/WPA2/WPA3-PSK secured networks. The preSharedKey parameter is required for encrypted WiFi and optional for open WiFi.",
+        "requirePermissions": [
+            "ohos.permission.cli.MANAGE_WIFI_SCAN",
+            "ohos.permission.cli.MANAGE_WIFI_CONNECT"
+        ],
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "ssid": { "type": "string" },
+                "preSharedKey": { "type": "string" }
+            },
+            "required": [
+                "ssid"
+            ]
+        },
+        "outputSchema": {
+            "type": "object",
+            "properties": {
+                "type": { "type": "string" },
+                "status": { "type": "string" },
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "ssid": {
+                            "type": "string",
+                            "description": "The SSID of the connected WiFi network"
+                        },
+                        "message": {
+                            "type": "string",
+                            "description": "Connection result message"
+                        }
+                    }
+                },
+                "errCode": { "type": "string" },
+                "errMsg": { "type": "string" }
+            }
+        }
+    },
+    "sta-getlinkedInfo": {
+        "description": "Get current WiFi linked information (SSID, BSSID, signal, frequency, band, link speed)",
+        "requirePermissions": [
+            "ohos.permission.cli.MANAGE_WIFI_SCAN"
+        ],
+        "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        },
+        "outputSchema": {
+            "type": "object",
+            "properties": {
+                "type": { "type": "string" },
+                "status": { "type": "string" },
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "ssid": { "type": "string" },
+                        "bssid": { "type": "string" },
+                        "rssi": { "type": "number" },
+                        "frequency": { "type": "number" },
+                        "band": { "type": "number" },
+                        "linkSpeed": { "type": "number" },
+                        "detailedState": { "type": "string" }
+                    }
+                },
+                "errCode": { "type": "string" },
+                "errMsg": { "type": "string" }
+            }
+        }
+    }
+    },
+    "eventTypes": [],
+    "eventSchemas": {}
 }

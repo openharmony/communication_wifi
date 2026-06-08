@@ -86,7 +86,7 @@
             "name":"web_risk_warning_level3_Phone_title",
             "value":"Harmful content ahead",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
@@ -100,28 +100,28 @@
             "name":"permission_reason_camera",
             "value":"This is used for taking photos and videos.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"camera_permission_message",
             "value":"Allow %s to use the camera?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"website_permission_never_allowed",
             "value":"Deny",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"website_permission_allowed",
             "value":"Allow",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

@@ -378,6 +378,27 @@ int CmdStaConnect(int argc, char** argv)
     return ExecuteWifiConnect(wifiDevice, tmpConfig);
 }
 
+std::string GetDetailedStateErr(OHOS::Wifi::DetailedState state)
+{
+    switch (state) {
+        case OHOS::Wifi::DetailedState::VERIFYING_POOR_LINK:
+            return "VerifyingPoorLink";
+        case OHOS::Wifi::DetailedState::PASSWORD_ERROR:
+            return "PasswordError";
+        case OHOS::Wifi::DetailedState::CONNECTION_REJECT:
+            return "ConnectionReject";
+        case OHOS::Wifi::DetailedState::CONNECTION_FULL:
+            return "ConnectionFull";
+        case OHOS::Wifi::DetailedState::CONNECTION_TIMEOUT:
+            return "ConnectionTimeout";
+        case OHOS::Wifi::DetailedState::OBTAINING_IPADDR_FAIL:
+            return "ObtainingIpaddrFail";
+        case OHOS::Wifi::DetailedState::INVALID:
+        default:
+            return "Invalid";
+        
+    }
+}
 std::string GetDetailedStateStr(OHOS::Wifi::DetailedState state)
 {
     switch (state) {
@@ -409,21 +430,9 @@ std::string GetDetailedStateStr(OHOS::Wifi::DetailedState state)
             return "Scanning";
         case OHOS::Wifi::DetailedState::SUSPENDED:
             return "Suspended";
-        case OHOS::Wifi::DetailedState::VERIFYING_POOR_LINK:
-            return "VerifyingPoorLink";
-        case OHOS::Wifi::DetailedState::PASSWORD_ERROR:
-            return "PasswordError";
-        case OHOS::Wifi::DetailedState::CONNECTION_REJECT:
-            return "ConnectionReject";
-        case OHOS::Wifi::DetailedState::CONNECTION_FULL:
-            return "ConnectionFull";
-        case OHOS::Wifi::DetailedState::CONNECTION_TIMEOUT:
-            return "ConnectionTimeout";
-        case OHOS::Wifi::DetailedState::OBTAINING_IPADDR_FAIL:
-            return "ObtainingIpaddrFail";
-        case OHOS::Wifi::DetailedState::INVALID:
         default:
-            return "Invalid";
+            return GetDetailedStateErr(state);
+        
     }
 }
 

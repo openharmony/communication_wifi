@@ -396,7 +396,6 @@ std::string GetDetailedStateErr(OHOS::Wifi::DetailedState state)
         case OHOS::Wifi::DetailedState::INVALID:
         default:
             return "Invalid";
-        
     }
 }
 std::string GetDetailedStateStr(OHOS::Wifi::DetailedState state)
@@ -432,7 +431,6 @@ std::string GetDetailedStateStr(OHOS::Wifi::DetailedState state)
             return "Suspended";
         default:
             return GetDetailedStateErr(state);
-        
     }
 }
 

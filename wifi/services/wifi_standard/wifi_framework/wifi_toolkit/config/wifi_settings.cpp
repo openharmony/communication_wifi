@@ -3037,5 +3037,12 @@ std::string WifiSettings::GetDefaultApSsid()
 #endif
     return ssid;
 }
+
+int WifiSettings::GetSpecialSsidList(std::vector<std::string> &specialSsidList)
+{
+    std::unique_lock<std::mutex> lock(mStaMutex);
+    specialSsidList = mSpecialSsidList;
+    return 0;
+}
 }  // namespace Wifi
 }  // namespace OHOS

@@ -27,6 +27,7 @@
 #include "wifi_service_manager.h"
 #include "ienhance_service.h"
 #include "app_network_speed_limit_chr.h"
+#include "wifi_settings.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -51,7 +52,6 @@ namespace {
     const int GAME_BOOST_DISABLE = 0;
     const int BOOST_UDP_TYPE = 17;
     constexpr int64_t LOW_LATENCY_EXIT_TIMEOUT = 3 * 60 * 1000;
-    const std::vector<std::string> SPECIAL_WIFI_SSID_LIST = {"juneyaoair", "CEAIR-WIFI"};
     // 5206: 云备份; 1009: 端云同步服务; 6666：后台系统升级
     const std::unordered_set<int> SA_UID_LIST = {5206, 1009, 6666};
 }
@@ -424,10 +424,11 @@ void AppNetworkSpeedLimitService::SendLimitCmd2Drv(const int controlId, const in
     }
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    std::vector<std::string> specialSsidList;
+    WifiSettings::GetInstance().GetSpecialSsidList(specialSsidList);
     if (controlId == BG_LIMIT_CONTROL_ID_KEY_FG_APP && limitMode != BG_LIMIT_OFF
-        && WifiConfigCenter::GetInstance().GetAirplaneModeState() == MODE_STATE_OPEN
-        && std::find(SPECIAL_WIFI_SSID_LIST.begin(), SPECIAL_WIFI_SSID_LIST.end(), linkedInfo.ssid)
-        != SPECIAL_WIFI_SSID_LIST.end()) {
+        && std::find(specialSsidList.begin(), specialSsidList.end(), linkedInfo.ssid)
+        != specialSsidList.end()) {
         m_bgLimitRecordMap[controlId] = BG_LIMIT_LEVEL_12;
     }
     m_limitSpeedMode = GetBgLimitMaxMode();

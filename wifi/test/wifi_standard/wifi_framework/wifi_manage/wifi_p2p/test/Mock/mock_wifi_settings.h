@@ -37,6 +37,7 @@ public:
     virtual int SetP2pVendorConfig(const P2pVendorConfig &config) = 0;
     virtual int GetP2pVendorConfig(P2pVendorConfig &config) = 0;
     virtual int GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups) = 0;
+    virtual int GetSpecialSsidList(std::vector<std::string> &specialSsidList) = 0;
 };
 
 class WifiSettings : public MockWifiSettings {
@@ -45,6 +46,7 @@ public:
     ~WifiSettings() = default;
     static WifiSettings &GetInstance(void);
     MOCK_METHOD1(GetWifiP2pGroupInfo, int(std::vector<WifiP2pGroupInfo> &groups));
+    MOCK_METHOD1(GetSpecialSsidList, int(std::vector<std::string> &specialSsidList));
     MOCK_METHOD1(SetP2pVendorConfig, int(const P2pVendorConfig &config));
     MOCK_METHOD1(GetP2pVendorConfig, int(P2pVendorConfig &config));
     MOCK_METHOD1(SetWifiP2pGroupInfo, int(const std::vector<WifiP2pGroupInfo> &groups));

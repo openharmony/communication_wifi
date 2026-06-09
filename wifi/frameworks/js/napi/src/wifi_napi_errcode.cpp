@@ -50,17 +50,30 @@ static std::map<int32_t, int32_t> errCodeMap = {
 };
 
 static std::map<int32_t, std::string> napiErrMsgMap {
-    { WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED, "Operation failed." },
-    { WifiNapiErrCode::WIFI_ERRCODE_WIFI_NOT_OPENED, "Wi-Fi STA disabled." },
-    { WifiNapiErrCode::WIFI_ERRCODE_PERMISSION_DENIED, "Permission denied." },
-    { WifiNapiErrCode::WIFI_ERRCODE_NON_SYSTEMAPP, "non-system application." },
-    { WifiNapiErrCode::WIFI_ERRCODE_INVALID_PARAM, "Parameter error." },
-    { WifiNapiErrCode::WIFI_ERRCODE_NOT_SUPPORTED, "Capability not supported." },
-    { WifiNapiErrCode::WIFI_ERRCODE_OPEN_FAIL_WHEN_CLOSING, "Operation failed because the service is being closed." },
-    { WifiNapiErrCode::WIFI_ERRCODE_CLOSE_FAIL_WHEN_OPENING, "Operation failed because the service is being opened." },
-    { WifiNapiErrCode::WIFI_ERRCODE_USER_DOES_NOT_RESPOND, "The user does not respond." },
-    { WifiNapiErrCode::WIFI_ERRCODE_USER_REFUSE_THE_ACTION, "The user refused the action." },
-    { WifiNapiErrCode::WIFI_ERRCODE_PARAM_VALIDATION_FAILED, "Parameter validation failed." },
+    { ErrCode::WIFI_OPT_FAILED, "Operation failed." },
+    { ErrCode::WIFI_OPT_NOT_SUPPORTED, "Capability not supported." },
+    { ErrCode::WIFI_OPT_INVALID_PARAM, "Parameter error." },
+    { ErrCode::WIFI_OPT_FORBID_AIRPLANE, "Flight mode is enabled." },
+    { ErrCode::WIFI_OPT_FORBID_POWSAVING, "Power saving mode is enabled." },
+    { ErrCode::WIFI_OPT_PERMISSION_DENIED, "Permission denied." },
+    { ErrCode::WIFI_OPT_NON_SYSTEMAPP, "non-system application." },
+    { ErrCode::WIFI_OPT_OPEN_FAIL_WHEN_CLOSING, "Operation failed because the service is being closed." },
+    { ErrCode::WIFI_OPT_OPEN_SUCC_WHEN_OPENED, "Operation failed because the service is being opened." },
+    { ErrCode::WIFI_OPT_CLOSE_FAIL_WHEN_OPENING, "Operation failed because the service is being opened." },
+    { ErrCode::WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED, "Operation failed because the service is being closed." },
+    { ErrCode::WIFI_OPT_STA_NOT_OPENED, "Wi-Fi STA disabled." },
+    { ErrCode::WIFI_OPT_SCAN_NOT_OPENED, "Scanning service is not enabled." },
+    { ErrCode::WIFI_OPT_AP_NOT_OPENED, "Ap service is not enabled." },
+    { ErrCode::WIFI_OPT_INVALID_CONFIG, "Configuration is invalid." },
+    { ErrCode::WIFI_OPT_P2P_NOT_OPENED, "Wi-Fi P2P disabled." },
+    { ErrCode::WIFI_OPT_P2P_MAC_NOT_FOUND, "P2P MAC address not found." },
+    { ErrCode::WIFI_OPT_P2P_ERR_MAC_FORMAT, "P2P MAC address format error." },
+    { ErrCode::WIFI_OPT_P2P_ERR_INTENT, "P2P Internal service exception." },
+    { ErrCode::WIFI_OPT_P2P_ERR_SIZE_NW_NAME, "P2P wrong parameter size." },
+    { ErrCode::WIFI_OPT_MOVING_FREEZE_CTRL, "moving freeze scanning control." },
+    { ErrCode::WIFI_OPT_USER_DOES_NOT_RESPOND, "The user does not respond." },
+    { ErrCode::WIFI_OPT_USER_REFUSE_THE_ACTION, "The user refused the action." },
+    { ErrCode::WIFI_OPT_INVALID_PARAM_NEW, "Parameter validation failed." },
 };
 
 static napi_value NapiGetUndefined(const napi_env &env)
@@ -91,12 +104,10 @@ static std::string GetNapiErrMsg(const napi_env &env, const int32_t errCode, int
         return "";
     }
 
-    int32_t napiErrCode = GetNapiErrCode(env, errCode);
-    auto iter = napiErrMsgMap.find(napiErrCode);
+    auto iter = napiErrMsgMap.find(errCode);
     if (iter != napiErrMsgMap.end()) {
         std::string errMessage = "BussinessError ";
-        napiErrCode = GetNapiErrCode(env, errCode, sysCap);
-        errMessage.append(std::to_string(napiErrCode)).append(": ").append(iter->second);
+        errMessage.append(std::to_string(errCode)).append(": ").append(iter->second);
         return errMessage;
     }
     return "Inner error.";

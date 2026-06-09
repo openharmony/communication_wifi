@@ -3437,7 +3437,7 @@ HWTEST_F(StaStateMachineTest, DealMloStateChangeTest, TestSize.Level1)
     pStaStateMachine->pLinkState->DealMloStateChange(msg);
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
-
+#ifndef OHOS_ARCH_LITE
 HWTEST_F(StaStateMachineTest, ShowPortalNitificationHiLinkNetworkTest, TestSize.Level1)
 {
     // Test hilink network with internet history - should skip timeout notification
@@ -3515,5 +3515,6 @@ HWTEST_F(StaStateMachineTest, ShowPortalNitificationHiLinkNoHistoryTest, TestSiz
     // Verify no crash and proper handling for hilink network without history
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
+#endif
 } // namespace Wifi
 } // namespace OHOS

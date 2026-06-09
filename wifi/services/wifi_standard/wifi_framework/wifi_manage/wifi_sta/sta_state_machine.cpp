@@ -2491,17 +2491,10 @@ void StaStateMachine::ShowPortalNitification()
     WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
     bool hasInternetEver =
         NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory);
-    bool isHomeAp = false;
-    bool isHomeRouter = false;
-#ifndef OHOS_ARCH_LITE
-    isHomeAp = WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid);
-    isHomeRouter = WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl);
-#endif
-    bool isHiLinkNetworkHomeAp = InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) || isHomeAp || isHomeRouter;
-    WIFI_LOGI("ShowPortalNitification,isHiLinkNetworkHomeAp:%{public}d,hasInternetEver:%{public}d",
-        isHiLinkNetworkHomeAp, hasInternetEver);
     if (hasInternetEver) {
-        if (!isHiLinkNetworkHomeAp) {
+        if (!(InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) ||
+            WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid) ||
+            WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl))) {
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
                 WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);

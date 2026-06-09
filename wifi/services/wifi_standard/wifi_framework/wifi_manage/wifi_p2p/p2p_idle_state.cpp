@@ -20,6 +20,8 @@
 #include "wifi_logger.h"
 #include "wifi_config_center.h"
 #include "p2p_chr_reporter.h"
+#include "wifi_global_func.h"
+#include "wifi_hid2d_msg.h"
 
 DEFINE_WIFILOG_P2P_LABEL("P2pIdleState");
 
@@ -165,9 +167,12 @@ bool P2pIdleState::RetryConnect(InternalMessagePtr msg) const
 
 bool P2pIdleState::ProcessCmdConnect(InternalMessagePtr msg) const
 {
-    WifiP2pConfigInternal config;
     retryConnectCnt = 0;
     p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_RETRY_CONNECT));
+    if (ProcessHid2dConnectWithZeroMac(msg)) {
+        return EXECUTED;
+    }
+    WifiP2pConfigInternal config;
     if (!msg->GetMessageObj(config)) {
         WIFI_LOGW("p2p connect Parameter error.");
         p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_INVALID_PARAM);
@@ -494,6 +499,44 @@ bool P2pIdleState::ProcessCmdDisableRandomMac(InternalMessagePtr msg) const
     const int setmode = msg->GetParam1();
     p2pStateMachine.HandlerDisableRandomMac(setmode);
     return EXECUTED;
+}
+
+bool P2pIdleState::ProcessHid2dConnectWithZeroMac(InternalMessagePtr msg) const
+{
+    WifiP2pConfigInternal config;
+    if (!msg->GetMessageObj(config)) {
+        WIFI_LOGW("p2p connect Parameter error.");
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_INVALID_PARAM);
+        return true;
+    }
+    p2pStateMachine.savedP2pConfig = config;
+
+    if (config.GetDeviceAddress() == "00:00:00:00:00:00" &&
+        config.GetGroupName().length() >= MIN_SSID_LEN &&
+        config.GetGroupName().length() <= MAX_SSID_LEN &&
+        config.GetPassphrase().length() >= MIN_PSK_LEN &&
+        config.GetPassphrase().length() <= MAX_PSK_LEN) {
+        WIFI_LOGI("Detect hid2d connect scenario: all zero mac with valid ssid and passphrase");
+        p2pStateMachine.StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::P2P_REMOVE_DEVICE));
+
+        Hid2dConnectConfig hid2dConfig;
+        hid2dConfig.SetSsid(config.GetGroupName());
+        hid2dConfig.SetPreSharedKey(config.GetPassphrase());
+        hid2dConfig.SetFrequency(0);
+        hid2dConfig.SetDhcpMode(DhcpMode::CONNECT_AP_DHCP);
+
+        if (WifiErrorNo::WIFI_HAL_OPT_OK != WifiP2PHalInterface::GetInstance().Hid2dConnect(hid2dConfig)) {
+            WIFI_LOGE("Hid2d Connection failed.");
+            p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_FAILED);
+        } else {
+            int callingUid = msg->GetParam1();
+            SharedLinkManager::SetGroupUid(callingUid);
+            hasConnect = true;
+            p2pStateMachine.BroadcastActionResult(P2pActionCallback::P2pConnect, ErrCode::WIFI_OPT_SUCCESS);
+        }
+        return true;
+    }
+    return false;
 }
 }  // namespace Wifi
 }  // namespace OHOS

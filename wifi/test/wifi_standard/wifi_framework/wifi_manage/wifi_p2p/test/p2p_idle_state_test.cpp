@@ -433,6 +433,76 @@ HWTEST_F(P2pIdleStateTest, RetryConnectTest2, TestSize.Level1)
     EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(msg));
 }
 
+HWTEST_F(P2pIdleStateTest, ProcessHid2dConnectWithZeroMac_ValidConfig, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT));
+    WifiP2pConfigInternal config;
+    config.SetDeviceAddress("00:00:00:00:00:00");
+    config.SetGroupName("test_ssid");
+    config.SetPassphrase("12345678");
+    msg->SetMessageObj(config);
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), Hid2dConnect(_))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(P2pIdleStateTest, ProcessHid2dConnectWithZeroMac_NonZeroMac, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT));
+    WifiP2pConfigInternal config;
+    config.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
+    config.SetGroupName("test_ssid");
+    config.SetPassphrase("12345678");
+    msg->SetMessageObj(config);
+    AddDeviceManager();
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), IsConfigUnusable(_)).WillOnce(Return(P2pConfigErrCode::SUCCESS));
+    EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(P2pIdleStateTest, ProcessHid2dConnectWithZeroMac_InvalidSsidLen, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT));
+    WifiP2pConfigInternal config;
+    config.SetDeviceAddress("00:00:00:00:00:00");
+    config.SetGroupName("");
+    config.SetPassphrase("12345678");
+    msg->SetMessageObj(config);
+    AddDeviceManager();
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), IsConfigUnusable(_)).WillOnce(Return(P2pConfigErrCode::SUCCESS));
+    EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(P2pIdleStateTest, ProcessHid2dConnectWithZeroMac_InvalidPskLen, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT));
+    WifiP2pConfigInternal config;
+    config.SetDeviceAddress("00:00:00:00:00:00");
+    config.SetGroupName("test_ssid");
+    config.SetPassphrase("1234567");
+    msg->SetMessageObj(config);
+    AddDeviceManager();
+    EXPECT_CALL(pMockP2pPendant->GetP2pStateMachine(), IsConfigUnusable(_)).WillOnce(Return(P2pConfigErrCode::SUCCESS));
+    EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(P2pIdleStateTest, ProcessHid2dConnectWithZeroMac_Hid2dConnectFailed, TestSize.Level1)
+{
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT));
+    WifiP2pConfigInternal config;
+    config.SetDeviceAddress("00:00:00:00:00:00");
+    config.SetGroupName("test_ssid");
+    config.SetPassphrase("12345678");
+    msg->SetMessageObj(config);
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), Hid2dConnect(_))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED));
+    EXPECT_TRUE(pP2pIdleState->ExecuteStateMsg(msg));
+}
+
 HWTEST_F(P2pIdleStateTest, ProcessP2pIfaceCreatedEvtTest, TestSize.Level1)
 {
     InternalMessagePtr msg = std::make_shared<InternalMessage>();

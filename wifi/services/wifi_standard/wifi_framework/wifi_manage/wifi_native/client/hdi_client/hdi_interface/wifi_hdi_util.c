@@ -476,8 +476,6 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         unsigned int hexStrLen = strlen(srcBuf + start);
         unsigned int hexBufSize = len / lenValue + 1;
         if (hexStrLen > hexBufSize) {
-            free(infoElemsTemp[infoElemsSize].content);
-            infoElemsTemp[infoElemsSize].content = NULL;
             break;
         }
         HexStringToString(srcBuf + start, infoElemsTemp[infoElemsSize].content);

@@ -3437,5 +3437,84 @@ HWTEST_F(StaStateMachineTest, DealMloStateChangeTest, TestSize.Level1)
     pStaStateMachine->pLinkState->DealMloStateChange(msg);
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
+#ifndef OHOS_ARCH_LITE
+HWTEST_F(StaStateMachineTest, ShowPortalNitificationHiLinkNetworkTest, TestSize.Level1)
+{
+    // Test hilink network with internet history - should skip timeout notification
+    WifiDeviceConfig wifiDeviceConfig;
+    wifiDeviceConfig.networkStatusHistory = 149; // Has internet history: 10010101
+    pStaStateMachine->linkedInfo.ssid = "HiLinkTest";
+    pStaStateMachine->linkedInfo.isHiLinkNetwork = 1;
+    pStaStateMachine->mPortalUrl = "http://hilink.test.com";
+    
+    pStaStateMachine->ShowPortalNitification();
+    
+    // Verify no crash and proper handling for hilink network
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, ShowPortalNitificationHomeRouterTest, TestSize.Level1)
+{
+    // Test home router with internet history - should skip timeout notification
+    WifiDeviceConfig wifiDeviceConfig;
+    wifiDeviceConfig.networkStatusHistory = 149; // Has internet history: 10010101
+    pStaStateMachine->linkedInfo.ssid = "HomeRouterTest";
+    pStaStateMachine->linkedInfo.isHiLinkNetwork = 0;
+    pStaStateMachine->linkedInfo.bssid = "AA:BB:CC:DD:EE:FF";
+    pStaStateMachine->mPortalUrl = "http://homerouter.test.com";
+    
+    pStaStateMachine->ShowPortalNitification();
+    
+    // Verify no crash and proper handling for home router
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, ShowPortalNitificationNormalNetworkTest, TestSize.Level1)
+{
+    // Test normal network with internet history - should show timeout notification
+    WifiDeviceConfig wifiDeviceConfig;
+    wifiDeviceConfig.networkStatusHistory = 149; // Has internet history: 10010101
+    pStaStateMachine->linkedInfo.ssid = "NormalNetworkTest";
+    pStaStateMachine->linkedInfo.isHiLinkNetwork = 0;
+    pStaStateMachine->linkedInfo.bssid = "11:22:33:44:55:66";
+    pStaStateMachine->mPortalUrl = "http://portal.test.com";
+    
+    pStaStateMachine->ShowPortalNitification();
+    
+    // Verify no crash and proper handling for normal network
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, ShowPortalNitificationNoInternetHistoryTest, TestSize.Level1)
+{
+    // Test network without internet history - should show portal found notification
+    WifiDeviceConfig wifiDeviceConfig;
+    wifiDeviceConfig.networkStatusHistory = 21; // No internet history: 010101
+    pStaStateMachine->linkedInfo.ssid = "NoHistoryTest";
+    pStaStateMachine->linkedInfo.isHiLinkNetwork = 0;
+    pStaStateMachine->linkedInfo.bssid = "AA:BB:CC:DD:EE:FF";
+    pStaStateMachine->mPortalUrl = "http://portal.test.com";
+    
+    pStaStateMachine->ShowPortalNitification();
+    
+    // Verify no crash and proper handling for network without internet history
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(StaStateMachineTest, ShowPortalNitificationHiLinkNoHistoryTest, TestSize.Level1)
+{
+    // Test hilink network without internet history - should show portal found notification
+    WifiDeviceConfig wifiDeviceConfig;
+    wifiDeviceConfig.networkStatusHistory = 21; // No internet history: 010101
+    pStaStateMachine->linkedInfo.ssid = "HiLinkNoHistoryTest";
+    pStaStateMachine->linkedInfo.isHiLinkNetwork = 1;
+    pStaStateMachine->mPortalUrl = "http://hilink.test.com";
+    
+    pStaStateMachine->ShowPortalNitification();
+    
+    // Verify no crash and proper handling for hilink network without history
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+#endif
 } // namespace Wifi
 } // namespace OHOS

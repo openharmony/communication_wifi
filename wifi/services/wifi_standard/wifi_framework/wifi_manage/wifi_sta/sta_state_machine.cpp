@@ -2494,9 +2494,13 @@ void StaStateMachine::ShowPortalNitification()
     bool hasInternetEver =
         NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory);
     if (hasInternetEver) {
-        WifiNotificationUtil::GetInstance().PublishWifiNotification(
-            WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
-            WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
+        if (!(InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) ||
+            WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid) ||
+            WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl))) {
+            WifiNotificationUtil::GetInstance().PublishWifiNotification(
+                WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
+                WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
+        }
     } else {
         std::string bundle = WifiSettings::GetInstance().GetPackageName("SETTINGS");
         if (WifiAppStateAware::GetInstance().IsForegroundApp(bundle)) {

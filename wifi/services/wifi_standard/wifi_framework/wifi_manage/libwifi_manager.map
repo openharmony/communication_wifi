@@ -203,6 +203,7 @@
         "OHOS::Wifi::WifiSettings::GetScanAlwaysState(int)";
         "OHOS::Wifi::WifiSettings::GetCanOpenStaWhenAirplaneMode(int)";
         "OHOS::Wifi::WifiSettings::GetRealMacAddress(std::string &, int)";
+        "OHOS::Wifi::WifiSettings::GetSpecialSsidList(std::vector<std::string> &)";
         "OHOS::Wifi::WifiSettings::SetDefaultFrequenciesByCountryBand(OHOS::Wifi::BandType, std::__h::vector<int, std::__h::allocator<int>>&, int)";
         "OHOS::Wifi::WifiSettings::SetScanOnlySwitchState(int const&, int)";
         "OHOS::Wifi::WifiSettings::GetScanOnlySwitchState(int)";
@@ -284,6 +285,7 @@
         "OHOS::Wifi::WifiCertUtils::InstallCert(std::__h::vector<unsigned char, std::__h::allocator<unsigned char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
         "OHOS::Wifi::WifiConfigCenter::SetMacAddress(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, int)";
         "OHOS::Wifi::WifiSettings::GetRealMacAddress(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&, int)";
+        "OHOS::Wifi::WifiSettings::GetSpecialSsidList(std::__h::vector<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>, std::__h::allocator<std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>>> &)";
         "OHOS::Wifi::WifiConfigCenter::GetMacAddress(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&, int)";
         "OHOS::Wifi::IsPskEncryption(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&)";
         "OHOS::Wifi::WifiRandomMacHelper::CalculateRandomMacForWifiDeviceConfig(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";

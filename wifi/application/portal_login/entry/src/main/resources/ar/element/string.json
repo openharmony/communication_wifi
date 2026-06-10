@@ -74,42 +74,42 @@
             "name":"website_permission_never_allowed",
             "value":"رفض",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"web_risk_warning_level3_Phone_content",
             "value":"قد يحتوي الموقع الذي تريد زيارته على محتوى غير لائق أو محظور. يُرجى المتابعة بحذر.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"web_risk_warning_level3_Phone_title",
             "value":"ربما تحتوي هذه الصفحة على محتوى ضار",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"camera_permission_message",
             "value":"هل تسمح لموقع \u202a%s\u202c بالوصول إلى الكاميرا؟",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"permission_reason_camera",
             "value":"يُستخدم هذا الإذن لالتقاط الصور وتصوير الفيديوهات.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"website_permission_allowed",
             "value":"سماح",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

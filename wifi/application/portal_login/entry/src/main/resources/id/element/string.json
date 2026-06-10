@@ -74,42 +74,42 @@
             "name":"website_permission_never_allowed",
             "value":"Tolak",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"web_risk_warning_level3_Phone_content",
             "value":"Situs yang akan dituju mungkin mengandung konten yang tidak pantas atau dilarang. Lanjutkan dengan hati-hati.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"web_risk_warning_level3_Phone_title",
             "value":"Akan ada konten berbahaya",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"camera_permission_message",
             "value":"Izinkan %s untuk menggunakan kamera?",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"permission_reason_camera",
             "value":"Ini digunakan untuk mengambil foto dan video.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"website_permission_allowed",
             "value":"Izinkan",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

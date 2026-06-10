@@ -16,6 +16,7 @@
 #include <cstdio>
 #include <chrono>
 #include <random>
+#include <algorithm>
 #include "sta_state_machine.h"
 #include "if_config.h"
 #include "ip_tools.h"
@@ -91,6 +92,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define TRANSFORMATION_TO_MBPS 10
 #define DEFAULT_NUM_ARP_PINGS 3
 #define MAX_ARP_CHECK_TIME 300
+#define MAX_ARP_CHECK_TIME_SPECIAL_SSID 1000
 #define NETWORK 1
 #define NO_NETWORK 0
 #define DISCONNECTED_NETWORK 2
@@ -2492,9 +2494,13 @@ void StaStateMachine::ShowPortalNitification()
     bool hasInternetEver =
         NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory);
     if (hasInternetEver) {
-        WifiNotificationUtil::GetInstance().PublishWifiNotification(
-            WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
-            WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
+        if (!(InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) ||
+            WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid) ||
+            WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl))) {
+            WifiNotificationUtil::GetInstance().PublishWifiNotification(
+                WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
+                WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
+        }
     } else {
         std::string bundle = WifiSettings::GetInstance().GetPackageName("SETTINGS");
         if (WifiAppStateAware::GetInstance().IsForegroundApp(bundle)) {
@@ -3685,8 +3691,15 @@ bool StaStateMachine::CanArpReachable()
     uint64_t arpRtt = 0;
     std::string gateway = IpTools::ConvertIpv4Address(ipInfo.gateway);
     arpChecker.Start(ifName, macAddress, ipAddress, gateway);
+    std::vector<std::string> specialSsidList;
+    WifiSettings::GetInstance().GetSpecialSsidList(specialSsidList);
+    int arpCheckTime = MAX_ARP_CHECK_TIME;
+    if (std::find(specialSsidList.begin(), specialSsidList.end(), linkedInfo.ssid)
+        != specialSsidList.end()) {
+        arpCheckTime = MAX_ARP_CHECK_TIME_SPECIAL_SSID;
+    }
     for (int i = 0; i < DEFAULT_NUM_ARP_PINGS; i++) {
-        if (arpChecker.DoArpCheck(MAX_ARP_CHECK_TIME, true, arpRtt)) {
+        if (arpChecker.DoArpCheck(arpCheckTime, true, arpRtt)) {
             EnhanceWriteArpInfoHiSysEvent(arpRtt, 0);
             return true;
         }

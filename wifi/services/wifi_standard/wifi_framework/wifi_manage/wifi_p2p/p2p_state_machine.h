@@ -189,6 +189,11 @@ public:
     void DisallowUntrustInvitation();
 #endif
 
+    /**
+    * @Description when p2p disconnected, stop congestion algo
+    */
+    void StopP2pCongestionAlgo();
+    
 private:
     /**
      * @Description Handle event of CMD_DEVICE_DISCOVERS

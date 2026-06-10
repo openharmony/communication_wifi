@@ -177,6 +177,7 @@ public:
     virtual std::vector<WifiDeviceConfig> RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const = 0;
     virtual void EncryptionWifiDeviceConfigOnBoot()= 0;
     virtual int GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups) = 0;
+    virtual int GetSpecialSsidList(std::vector<std::string> &specialSsidList) = 0;
     virtual std::map<int, WifiLinkedInfo> GetAllWifiLinkedInfo() = 0;
     virtual std::string GetConnectedBssid(int instId = 0) = 0;
     virtual int ReloadStaRandomMac() = 0;
@@ -370,6 +371,7 @@ public:
         std::vector<WifiDeviceConfig>(std::vector<WifiDeviceConfig> &configs));
     MOCK_METHOD0(EncryptionWifiDeviceConfigOnBoot, void());
     MOCK_METHOD1(GetWifiP2pGroupInfo, int(std::vector<WifiP2pGroupInfo> &groups));
+    MOCK_METHOD1(GetSpecialSsidList, int(std::vector<std::string> &specialSsidList));
     MOCK_METHOD0(GetAllWifiLinkedInfo, std::map<int, WifiLinkedInfo> ());
     MOCK_METHOD1(GetConnectedBssid, std::string (int instId));
     MOCK_METHOD0(ReloadStaRandomMac, int());

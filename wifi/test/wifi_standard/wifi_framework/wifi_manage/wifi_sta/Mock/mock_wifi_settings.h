@@ -87,6 +87,7 @@ public:
     virtual std::vector<WifiDeviceConfig> RemoveExcessDeviceConfigs(std::vector<WifiDeviceConfig> &configs) const = 0;
     virtual void EncryptionWifiDeviceConfigOnBoot()= 0;
     virtual int GetWifiP2pGroupInfo(std::vector<WifiP2pGroupInfo> &groups) = 0;
+    virtual int GetSpecialSsidList(std::vector<std::string> &specialSsidList) = 0;
     virtual std::string FuzzyBssid(const std::string bssid) = 0;
     virtual int GetBlockList(std::vector<StationInfo> &results, int id = 0) = 0;
     virtual int ManageBlockList(const StationInfo &info, int mode, int id = 0) = 0;
@@ -206,6 +207,7 @@ public:
         std::vector<WifiDeviceConfig>(std::vector<WifiDeviceConfig> &configs));
     MOCK_METHOD0(EncryptionWifiDeviceConfigOnBoot, void());
     MOCK_METHOD1(GetWifiP2pGroupInfo, int(std::vector<WifiP2pGroupInfo> &groups));
+    MOCK_METHOD1(GetSpecialSsidList, int(std::vector<std::string> &specialSsidList));
     MOCK_METHOD1(FuzzyBssid, std::string(const std::string bssid));
     MOCK_METHOD2(GetBlockList, int(std::vector<StationInfo> &results, int id));
     MOCK_METHOD3(ManageBlockList, int(const StationInfo &info, int mode, int id));

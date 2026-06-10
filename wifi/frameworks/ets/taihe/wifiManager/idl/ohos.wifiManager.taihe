@@ -413,7 +413,13 @@ function IsHotspotActive(): bool;
 function P2pConnect(config: WifiP2PConfig): void;
 function GetCandidateConfigs(): Array<WifiDeviceConfig>;
 function P2pCancelConnect(): void;
-function ConnectToCandidateConfig(networkId: i32): void;
+
+@overload("ConnectToCandidateConfig")
+function ConnectToCandidateConfigByNetworkId(networkId: i32);
+ 
+@overload("ConnectToCandidateConfig")
+function ConnectToCandidateConfigBySettings(connectSettings: ConnectSettings): void;
+
 function ConnectToCandidateConfigWithConnectSettings(connectSettings: ConnectSettings): void;
 function Reconnect(): void;
 function Reassociate(): void;

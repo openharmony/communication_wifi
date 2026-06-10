@@ -42,7 +42,7 @@ void GroupFormedState::GoInState()
 void GroupFormedState::GoOutState()
 {
     WIFI_LOGI("             GoOutState");
-    p2pStateMachine.StopP2pSignalPollTimer();
+    p2pStateMachine.StopP2pCongestionAlgo();
 }
 
 void GroupFormedState::Init()
@@ -311,6 +311,7 @@ bool GroupFormedState::ProcessConnectEvt(const InternalMessagePtr msg) const
     p2pStateMachine.BroadcastP2pPeersChanged();
     p2pStateMachine.BroadcastP2pConnectionChanged();
     p2pStateMachine.BroadcastP2pPeerJoinOrLeave(true, device.GetDeviceAddress());
+    p2pStateMachine.StartP2pSignalPollTimer();
     return EXECUTED;
 }
 

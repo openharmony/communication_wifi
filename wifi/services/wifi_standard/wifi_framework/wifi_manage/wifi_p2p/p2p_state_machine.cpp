@@ -62,6 +62,7 @@ const int P2P_REJECT_MAX_COUNT_LIMITED_TIME = 3 * 60 * 1000;
 const int P2P_REJECT_FIRST_TIME = 1;
 const int ONE_MINITE_UNIT = 60 * 1000;
 #endif
+constexpr int32_t CONGESTION_ALGO_5G_FREQUENCY = 5000;
 std::mutex P2pStateMachine::m_gcJoinmutex;
 
 DHCPTYPE P2pStateMachine::m_isNeedDhcp = DHCPTYPE::DHCP_P2P;
@@ -1549,6 +1550,8 @@ bool P2pStateMachine::GetP2pSignalPollInfo(WifiSignalPollInfo &signalInfo, std::
         WIFI_LOGI("GetP2pSignalPollInfo failed: %{public}d", ret);
         return false;
     }
+    signalInfo.frequency = groupInfo.GetFrequency();
+    WIFI_LOGD("p2p get freq: %{public}d", groupInfo.GetFrequency());
     signalInfo.timeStamp = GetCurrentTimeSeconds();
     return true;
 }
@@ -1578,18 +1581,21 @@ void P2pStateMachine::StartP2pSignalPollTimer()
  	 
 void P2pStateMachine::StopP2pSignalPollTimer()
 {
-    enableP2pSignalPoll_ = false;
     StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_GET_SIGNAL));
 }
  	 
 void P2pStateMachine::JudgeP2pSignalPoll(const WifiSignalPollInfo &signalInfo, const std::string p2pInterfaceName)
 {
-    if (pEnhanceService != nullptr) {
-        pEnhanceService->SetEnhanceP2pSignalPollInfo(signalInfo, p2pInterfaceName);
+    if (signalInfo.frequency < CONGESTION_ALGO_5G_FREQUENCY) {
+        WIFI_LOGW("p2p congestion algo only support 5g, now frequency is %{public}d", signalInfo.frequency);
+        return;
     }
     WifiP2pLinkedInfo p2pLinkedInfo;
     WifiConfigCenter::GetInstance().GetP2pInfo(p2pLinkedInfo);
     bool p2pConnected = p2pLinkedInfo.GetConnectState() != P2pConnectedState::P2P_DISCONNECTED;
+    if (pEnhanceService != nullptr) {
+        pEnhanceService->SetEnhanceP2pSignalPollInfo(p2pConnected, signalInfo, p2pInterfaceName);
+    }
     WIFI_LOGD("judge p2p signal collect flag, p2pConnected flag %{public}d, enableP2pSignalPoll flag %{public}d",
         p2pConnected, enableP2pSignalPoll_);
     if (enableP2pSignalPoll_ && p2pConnected) {
@@ -1676,5 +1682,16 @@ void P2pStateMachine::PopupP2pUntrustInvitationDialog()
         std::to_string(DISALLOW_UNTRUST_INVITE_DURATION / ONE_MINITE_UNIT));
 }
 #endif
+
+void P2pStateMachine::StopP2pCongestionAlgo()
+{
+    StopP2pSignalPollTimer();
+    if (pEnhanceService != nullptr) {
+        WIFI_LOGI("p2p is disconnected, stop congestion algo");
+        WifiSignalPollInfo signalInfo;
+        std::string p2pInterfaceName = "";
+        pEnhanceService->SetEnhanceP2pSignalPollInfo(false, signalInfo, p2pInterfaceName);
+    }
+}
 } // namespace Wifi
 } // namespace OHOS

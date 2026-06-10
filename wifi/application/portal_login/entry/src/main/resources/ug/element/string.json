@@ -74,42 +74,42 @@
             "name":"website_permission_never_allowed",
             "value":"چەكلەش",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"web_risk_warning_level3_Phone_content",
             "value":"بۇ توربەتتە بولمىغۇر/چەكلەنگەن مەزمۇن بولۇشى مۇمكىن، ئېھتىيات قىلىڭ.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"web_risk_warning_level3_Phone_title",
             "value":"توربەتتە خەۋپ بار",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"camera_permission_message",
             "value":"\u200f«%s» كامېرا ئىشلىتىدۇ، رۇخسەتمۇ؟",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"permission_reason_camera",
             "value":"بۇ ئىجازەت رەسىم تارتىش ۋە سىن ئېلىش ئۈچۈن ئىشلىتىلىدۇ.",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         },
         {
             "name":"website_permission_allowed",
             "value":"رۇخسەت",
             "attr":{
-                "priority":"translate"
+                "priority":"LT"
             }
         }
     ]

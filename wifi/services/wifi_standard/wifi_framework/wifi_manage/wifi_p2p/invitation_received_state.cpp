@@ -80,6 +80,9 @@ bool InvitationReceivedState::ExecuteStateMsg(InternalMessagePtr msg)
         case P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_TIME_OUT:
         case P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT: {
             WIFI_LOGI("User rejected invitation");
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+            p2pStateMachine.DealP2pPeerConnectUserReject();
+#endif
             p2pStateMachine.SwitchState(&p2pStateMachine.p2pIdleState);
             break;
         }

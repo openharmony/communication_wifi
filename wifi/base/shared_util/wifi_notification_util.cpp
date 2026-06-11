@@ -170,22 +170,23 @@ static void AddP2pParam(WifiDialogType type, std::string comInfo, cJSON *param)
                 WIFI_LOGE("AddP2pParam get pin code fail: %{private}s", comInfo.c_str());
             }
             break;
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+        case P2P_UNTRUST_INVITE_DIALOG:
+            cJSON_AddStringToObject(param, "untrustDuration", comInfo.c_str());
+            break;
+#endif
         default:
             break;
     }
 }
 
-void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo, int dialogTimeout, bool extFlag)
+bool WifiNotificationUtil::BuildDialogCmdData(WifiDialogType type, std::string comInfo,
+    int dialogTimeout, bool extFlag, std::string &cmdData)
 {
-    WIFI_LOGI("ShowDialog, type=%{public}d", static_cast<int32_t>(type));
-    AAFwk::Want want;
-    std::string bundleName = "com.ohos.sceneboard";
-    std::string abilityName = "com.ohos.sceneboard.systemdialog";
-    want.SetElementName(bundleName, abilityName);
     cJSON *param = cJSON_CreateObject();
     if (param == nullptr) {
         WIFI_LOGE("Failed to create cJSON object");
-        return;
+        return false;
     }
     cJSON_AddStringToObject(param, "ability.want.params.uiExtensionType", "sysDialog/common");
     cJSON_AddNumberToObject(param, "wifiDialogType", static_cast<int32_t>(type));
@@ -199,6 +200,7 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo, 
         case P2P_WSC_PBC_DIALOG:
         case P2P_WSC_KEYPAD_DIALOG:
         case P2P_WSC_DISPLAY_DIALOG:
+        case P2P_UNTRUST_INVITE_DIALOG:
             AddP2pParam(type, comInfo, param);
             break;
         case CANDIDATE_CONNECT:
@@ -213,11 +215,27 @@ void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo, 
     if (cjsonStr == nullptr) {
         WIFI_LOGE("Failed to print cJSON object");
         cJSON_Delete(param);
-        return;
+        return false;
     }
-    std::string cmdData(cjsonStr);
+    cmdData = cjsonStr;
     cJSON_free(cjsonStr);
     cJSON_Delete(param);
+    return true;
+}
+
+void WifiNotificationUtil::ShowDialog(WifiDialogType type, std::string comInfo, int dialogTimeout, bool extFlag)
+{
+    WIFI_LOGI("ShowDialog, type=%{public}d", static_cast<int32_t>(type));
+    AAFwk::Want want;
+    std::string bundleName = "com.ohos.sceneboard";
+    std::string abilityName = "com.ohos.sceneboard.systemdialog";
+    want.SetElementName(bundleName, abilityName);
+    std::string cmdData;
+    if (!BuildDialogCmdData(type, comInfo, dialogTimeout, extFlag, cmdData)) {
+        WIFI_LOGE("Build dialog command data failed");
+        return;
+    }
+
     sptr<UIExtensionAbilityConnection> connection(
         new (std::nothrow) UIExtensionAbilityConnection(cmdData, "com.ohos.locationdialog", "WifiUIExtAbility"));
     if (connection == nullptr) {

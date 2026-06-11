@@ -364,6 +364,16 @@ public:
      */
     virtual void NotifyWscDisplayConfirmResult() = 0;
 
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+    /**
+     * @Description Notify untrust dialog result to p2p service
+     *
+     * @param isAccept if user stop projection screen
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     */
+     virtual void NotifyUntrustInvitationResult(bool isAccept) = 0;
+#endif
+
     /**
      * @Description Set miracast sink config
      *

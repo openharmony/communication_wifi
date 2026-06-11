@@ -171,6 +171,7 @@ enum class P2P_STATE_MACHINE_CMD {
     P2P_CONNECT_FAILED,
     CMD_GET_SIGNAL, // get signal info
  	CMD_SCREEN_STATE_CHANGED, // screen state changed
+    UNTRUST_INVITATION_RESULT, // handle the result of the untrust invitation dialog
 };
 
 enum class DHCPTYPE {

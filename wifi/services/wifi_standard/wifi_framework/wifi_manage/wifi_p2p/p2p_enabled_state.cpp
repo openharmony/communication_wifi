@@ -66,6 +66,9 @@ void P2pEnabledState::GoInState()
 void P2pEnabledState::GoOutState()
 {
     WIFI_LOGI("             GoOutState");
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+    p2pStateMachine.AllowUntrustInvitation();
+#endif
 }
 
 void P2pEnabledState::Init()
@@ -137,6 +140,10 @@ void P2pEnabledState::InitProcessMsg()
         [this](const InternalMessagePtr msg) { return this->ProcessCmdGetSignal(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_SCREEN_STATE_CHANGED,
         [this](const InternalMessagePtr msg) { return this->ProcessScreenStateChangedEvent(msg); }));
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+    mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::UNTRUST_INVITATION_RESULT,
+        [this](InternalMessagePtr msg) { return this->ProcessUntrustInvitationDialogResult(msg); }));
+#endif
 }
 
 bool P2pEnabledState::ProcessCmdDisable(InternalMessagePtr msg) const
@@ -721,6 +728,19 @@ bool P2pEnabledState::ProcessSetMiracastSinkConfig(InternalMessagePtr msg) const
     WifiP2PHalInterface::GetInstance().SetMiracastSinkConfig(config);
     return EXECUTED;
 }
+
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+bool P2pEnabledState::ProcessUntrustInvitationDialogResult(InternalMessagePtr msg) const
+{
+    int accept = msg->GetParam1();
+    if (accept) {
+        p2pStateMachine.DisallowUntrustInvitation();
+    } else {
+        p2pStateMachine.AllowUntrustInvitation();
+    }
+    return EXECUTED;
+}
+#endif
 
 bool P2pEnabledState::ProcessSetP2pHighPerf(InternalMessagePtr msg) const
 {

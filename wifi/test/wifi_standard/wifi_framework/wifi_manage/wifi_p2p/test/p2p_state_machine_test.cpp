@@ -444,6 +444,22 @@ public:
     {
         return pP2pStateMachine->GetAllFreqsByBand(band, freqList);
     }
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+    void WarpDealP2pPeerConnectUserReject()
+    {
+        pP2pStateMachine->DisallowUntrustInvitation();
+        pP2pStateMachine->AllowUntrustInvitation();
+        pP2pStateMachine->DealP2pPeerConnectUserReject();
+        pP2pStateMachine->DealP2pPeerConnectUserReject();
+        pP2pStateMachine->DealP2pPeerConnectUserReject();
+        pP2pStateMachine->p2pRejectFirstTime_ = 0;
+        pP2pStateMachine->DealP2pPeerConnectUserReject();
+    }
+    void WarpP2pUntrustInvitationDialog()
+    {
+        pP2pStateMachine->PopupP2pUntrustInvitationDialog();
+    }
+#endif
 };
 
 HWTEST_F(P2pStateMachineTest, HandlerDiscoverPeers, TestSize.Level1)
@@ -1047,5 +1063,19 @@ HWTEST_F(P2pStateMachineTest, GetAllFreqsByBand3, TestSize.Level1)
     EXPECT_TRUE(GetAllFreqsByBand(GroupOwnerBand::GO_BAND_5GHZ, freqList));
     EXPECT_TRUE(std::find(freqList.begin(), freqList.end(), 5745) != freqList.end());
 }
+
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+HWTEST_F(P2pStateMachineTest, P2pPeerConnectUserRejectTest, TestSize.Level1)
+{
+    WarpDealP2pPeerConnectUserReject();
+    EXPECT_FALSE(g_errLog.find("P2pStateMachine") != std::string::npos);
+}
+
+HWTEST_F(P2pStateMachineTest, P2pUntrustInvitationDialogTest, TestSize.Level1)
+{
+    WarpP2pUntrustInvitationDialog();
+    EXPECT_FALSE(g_errLog.find("P2pStateMachine") != std::string::npos);
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

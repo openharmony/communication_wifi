@@ -56,6 +56,12 @@ const int ARP_TIMEOUT = 100;
 const int DEFAULT_TEMP_ID = -100;
 const std::string CARRY_DATA_MIRACAST = "1";
 const std::vector<int> FILTERED_FREQS = {2412, 2437, 2462};
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+const int P2P_REJECT_MAX_COUNT = 3;
+const int P2P_REJECT_MAX_COUNT_LIMITED_TIME = 3 * 60 * 1000;
+const int P2P_REJECT_FIRST_TIME = 1;
+const int ONE_MINITE_UNIT = 60 * 1000;
+#endif
 constexpr int32_t CONGESTION_ALGO_5G_FREQUENCY = 5000;
 std::mutex P2pStateMachine::m_gcJoinmutex;
 
@@ -742,7 +748,24 @@ void P2pStateMachine::NotifyUserProvDiscShowPinRequestMessage(const std::string 
 
 void P2pStateMachine::NotifyUserInvitationReceivedMessage()
 {
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+    int64_t intervalTime = GetCurrentTimeMilliSeconds() - disallowUntrustInvitationTime_;
+    WIFI_LOGI("%{public}s, userDisallowUntrustInvitation:%{public}d, intervalTime:%{public}" PRId64"",
+        __func__, userDisallowUntrustInvitation_, intervalTime);
+    if (userDisallowUntrustInvitation_ && (intervalTime >= DISALLOW_UNTRUST_INVITE_DURATION ||
+        intervalTime < 0)) {
+        p2pRejectCount_ = 0;
+        userDisallowUntrustInvitation_ = false;
+        disallowUntrustInvitationTime_ = 0;
+    }
+    if (p2pRejectCount_ >= P2P_REJECT_MAX_COUNT) {
+        WIFI_LOGI("p2pRejectCount=%{public}d, don't show dialog", p2pRejectCount_);
+        SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CANCEL_CONNECT));
+        return;
+    }
+#else
     WIFI_LOGI("P2pStateMachine::NotifyUserInvitationReceivedMessage  enter");
+#endif
     if (GetDeviceType() == ProductDeviceType::TV) {
 #ifndef OHOS_ARCH_LITE
         WakeUpScreenSaver();
@@ -1608,6 +1631,57 @@ void P2pStateMachine::InitChipSupportSignalAcquisitionFlag()
         }
     }
 }
+
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+void P2pStateMachine::DealP2pPeerConnectUserReject()
+{
+    p2pRejectCount_++;
+    WIFI_LOGI("p2pRejectCount=%{public}d", p2pRejectCount_);
+    // record the first time of p2p rejection
+    if (p2pRejectCount_ == P2P_REJECT_FIRST_TIME) {
+        p2pRejectFirstTime_ = GetCurrentTimeMilliSeconds();
+        WIFI_LOGI("p2pRejectFirstTime=%{public}" PRId64"", p2pRejectFirstTime_);
+    } else {
+        WIFI_LOGI("curTime-p2pRejectFirstTime=%{public}" PRId64"",
+            (GetCurrentTimeMilliSeconds() - p2pRejectFirstTime_));
+    }
+
+    // continuously reject 3 times in 3 minutes, pop up the p2p up the untrust invitation dialog
+    if (p2pRejectCount_ >= P2P_REJECT_MAX_COUNT) {
+        if ((GetCurrentTimeMilliSeconds() - p2pRejectFirstTime_) < P2P_REJECT_MAX_COUNT_LIMITED_TIME) {
+            PopupP2pUntrustInvitationDialog();
+        } else {
+            p2pRejectFirstTime_ = GetCurrentTimeMilliSeconds();
+            p2pRejectCount_ = P2P_REJECT_FIRST_TIME;
+            WIFI_LOGI("set p2pRejectCount as first time and reset p2pRejectFirstTime=%{public}" PRId64"",
+                p2pRejectFirstTime_);
+        }
+    }
+}
+
+void P2pStateMachine::AllowUntrustInvitation()
+{
+    WIFI_LOGI("Enter AllowUntrustInvitation");
+    p2pRejectCount_ = 0;
+}
+
+void P2pStateMachine::DisallowUntrustInvitation()
+{
+    WIFI_LOGI("Enter DisallowUntrustInvitation");
+    userDisallowUntrustInvitation_ = true;
+    disallowUntrustInvitationTime_ = GetCurrentTimeMilliSeconds();
+}
+
+void P2pStateMachine::PopupP2pUntrustInvitationDialog()
+{
+    WIFI_LOGI("Enter PopupP2pUntrustInvitationDialog");
+#ifndef OHOS_ARCH_LITE
+    WakeUpScreenSaver();
+#endif
+    WifiNotificationUtil::GetInstance().ShowDialog(WifiDialogType::P2P_UNTRUST_INVITE_DIALOG,
+        std::to_string(DISALLOW_UNTRUST_INVITE_DURATION / ONE_MINITE_UNIT));
+}
+#endif
 
 void P2pStateMachine::StopP2pCongestionAlgo()
 {

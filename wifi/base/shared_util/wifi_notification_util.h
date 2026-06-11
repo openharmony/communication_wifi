@@ -61,7 +61,8 @@ enum WifiDialogType {
     P2P_WSC_DISPLAY_DIALOG = 6,
     P2P_WSC_KEYPAD_DIALOG = 7,
     SETTINGS_AUTO_IDENTIFY_SAVE = 8,
-    SETTINGS_AUTO_IDENTIFY_SAVE_SINGLE = 9
+    SETTINGS_AUTO_IDENTIFY_SAVE_SINGLE = 9,
+    P2P_UNTRUST_INVITE_DIALOG = 10
 };
 
 class WifiNotificationUtil {
@@ -77,6 +78,9 @@ public:
     int32_t StartAbility(OHOS::AAFwk::Want& want);
 
     void ShowDialog(WifiDialogType type, std::string comInfo = "", int dialogTimeout = 10, bool extFlag = false);
+
+    bool BuildDialogCmdData(WifiDialogType type, std::string comInfo, int dialogTimeout, bool extFlag,
+        std::string &cmdData);
 
     void ShowSettingsDialog(WifiDialogType type, std::string settings);
 

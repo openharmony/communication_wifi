@@ -308,6 +308,10 @@ ohos_unittest("manager_unittest") {
     defines += [ "WIFI_FFRT_ENABLE" ]
   }
 
+  if (wifi_feature_with_p2p_untrust_invitation) {
+    defines += [ "SUPPORT_P2P_UNTRUST_INVITATION" ]
+  }
+
   part_name = "wifi"
   subsystem_name = "communication"
   testonly = true

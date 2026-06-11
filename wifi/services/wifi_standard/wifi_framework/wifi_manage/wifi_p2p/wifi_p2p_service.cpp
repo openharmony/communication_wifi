@@ -23,6 +23,7 @@
 #include "wifi_config_center.h"
 #include "wifi_country_code_manager.h"
 #include "wifi_p2p_hal_interface.h"
+#include "wifi_notification_util.h"
 #include "ap_define.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pService");
@@ -545,6 +546,14 @@ void WifiP2pService::NotifyWscDisplayConfirmResult()
     WIFI_LOGI("Notify WscDialogConfirm");
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_CONFIRM));
 }
+
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+void WifiP2pService::NotifyUntrustInvitationResult(bool isAccept)
+{
+    WIFI_LOGI("Notify untrust invitation result:%{public}d", isAccept);
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::UNTRUST_INVITATION_RESULT), isAccept);
+}
+#endif
 
 ErrCode WifiP2pService::SetMiracastSinkConfig(const std::string& config)
 {

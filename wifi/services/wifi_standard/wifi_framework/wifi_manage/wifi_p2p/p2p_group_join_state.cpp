@@ -65,6 +65,9 @@ bool P2pGroupJoinState::ExecuteStateMsg(InternalMessagePtr msg)
         }
         case P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT: {
             WIFI_LOGI("User(GO) rejected to join the group.");
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+            p2pStateMachine.DealP2pPeerConnectUserReject();
+#endif
             p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
             break;
         }

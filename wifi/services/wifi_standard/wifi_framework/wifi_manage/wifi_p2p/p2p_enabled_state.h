@@ -318,6 +318,16 @@ private:
      */
     virtual bool ProcessScreenStateChangedEvent(InternalMessagePtr msg) const;
 
+#ifdef SUPPORT_P2P_UNTRUST_INVITATION
+    /**
+     * @Description Process user select result of untrust invitation dialog result
+     *
+     * @param msg - Message body sent by the state machine
+     * @return - bool true:handle   false:not handle
+     */
+    virtual bool ProcessUntrustInvitationDialogResult(InternalMessagePtr msg) const;
+#endif
+
 private:
     void P2pConfigInitExt(bool &result);
 

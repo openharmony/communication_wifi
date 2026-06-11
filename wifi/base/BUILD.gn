@@ -139,6 +139,9 @@ if (defined(ohos_lite)) {
       external_deps += [ "battery_manager:batterysrv_client" ]
       defines += [ "HAS_BATTERY_MANAGER_PART" ]
     }
+    if (wifi_feature_with_p2p_untrust_invitation) {
+      defines += [ "SUPPORT_P2P_UNTRUST_INVITATION" ]
+    }
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc
     ldflags = memory_optimization_ldflags

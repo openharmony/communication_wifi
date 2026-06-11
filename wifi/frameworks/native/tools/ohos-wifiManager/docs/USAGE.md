@@ -49,7 +49,7 @@ ohos-wifiManager sta-connect --ssid <ssid> [--preSharedKey <preSharedKey>]
 
 ### 查看网络连接状态
 ```bash
-ohos-wifiManager sta-getlinkedInfo
+ohos-wifiManager sta-getLinkedInfo
 ```
 
 ## 输出格式

@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 {
-  "modelVersion": "6.0.0",
+  "hvigorVersion": "4.0.9",
   "dependencies": {
+    "@ohos/hvigor-ohos-plugin": "4.0.9"
   }
 }

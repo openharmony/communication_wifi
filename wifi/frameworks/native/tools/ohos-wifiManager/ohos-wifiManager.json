@@ -170,8 +170,8 @@
             }
         }
     },
-    "sta-getlinkedInfo": {
-        "description": "Get current WiFi linked information (SSID, BSSID, signal, frequency, band, link speed)",
+    "sta-getLinkedInfo": {
+        "description": "Get current WiFi linked information (SSID, BSSID, signal, frequency, link speed)",
         "requirePermissions": [
             "ohos.permission.cli.MANAGE_WIFI_SCAN"
         ],
@@ -192,7 +192,6 @@
                         "bssid": { "type": "string" },
                         "rssi": { "type": "number" },
                         "frequency": { "type": "number" },
-                        "band": { "type": "number" },
                         "linkSpeed": { "type": "number" },
                         "detailedState": { "type": "string" }
                     }

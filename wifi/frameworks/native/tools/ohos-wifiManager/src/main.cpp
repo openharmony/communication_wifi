@@ -454,7 +454,6 @@ int CmdStaGetLinkedInfo(int argc, char** argv)
     cJSON_AddStringToObject(data, "bssid", info.bssid.empty() ? "" : info.bssid.c_str());
     cJSON_AddNumberToObject(data, "rssi", info.rssi);
     cJSON_AddNumberToObject(data, "frequency", info.frequency);
-    cJSON_AddNumberToObject(data, "band", info.band);
     cJSON_AddNumberToObject(data, "linkSpeed", info.linkSpeed);
     std::string detailedState = GetDetailedStateStr(info.detailedState);
     cJSON_AddStringToObject(data, "detailedState", detailedState.c_str());

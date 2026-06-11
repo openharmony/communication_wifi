@@ -445,7 +445,11 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         infoElemsTemp = NULL;
         return;
     }
-    while (remainingLength > 1 && start < length) {
+    while (remainingLength > 1 && start < length && last < length) {
+        if (infoElemsSize >= MAX_INFO_ELEMS_SIZE) {
+            LOGE("GetInfoElems infoElemsSize exceeds limit");
+            break;
+        }
         if (srcBuf[start] == '[') {
             ++start;
             infoElemsTemp[infoElemsSize].id = (unsigned int)atoi(srcBuf + start);
@@ -469,6 +473,11 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         }
         ++start;
         srcBuf[last] = '\0';
+        unsigned int hexStrLen = strlen(srcBuf + start);
+        unsigned int hexBufSize = len / lenValue + 1;
+        if (hexStrLen > hexBufSize) {
+            break;
+        }
         HexStringToString(srcBuf + start, infoElemsTemp[infoElemsSize].content);
         if ((length - last) > lastLength) { // make sure there is no useless character
             last = last + 1;

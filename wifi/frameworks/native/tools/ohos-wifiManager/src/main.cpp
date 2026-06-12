@@ -378,6 +378,90 @@ int CmdStaConnect(int argc, char** argv)
     return ExecuteWifiConnect(wifiDevice, tmpConfig);
 }
 
+std::string GetDetailedStateErr(OHOS::Wifi::DetailedState state)
+{
+    switch (state) {
+        case OHOS::Wifi::DetailedState::VERIFYING_POOR_LINK:
+            return "VerifyingPoorLink";
+        case OHOS::Wifi::DetailedState::PASSWORD_ERROR:
+            return "PasswordError";
+        case OHOS::Wifi::DetailedState::CONNECTION_REJECT:
+            return "ConnectionReject";
+        case OHOS::Wifi::DetailedState::CONNECTION_FULL:
+            return "ConnectionFull";
+        case OHOS::Wifi::DetailedState::CONNECTION_TIMEOUT:
+            return "ConnectionTimeout";
+        case OHOS::Wifi::DetailedState::OBTAINING_IPADDR_FAIL:
+            return "ObtainingIpaddrFail";
+        case OHOS::Wifi::DetailedState::INVALID:
+        default:
+            return "Invalid";
+    }
+}
+std::string GetDetailedStateStr(OHOS::Wifi::DetailedState state)
+{
+    switch (state) {
+        case OHOS::Wifi::DetailedState::AUTHENTICATING:
+            return "Authenticating";
+        case OHOS::Wifi::DetailedState::BLOCKED:
+            return "Blocked";
+        case OHOS::Wifi::DetailedState::CAPTIVE_PORTAL_CHECK:
+            return "CaptivePortalCheck";
+        case OHOS::Wifi::DetailedState::CONNECTED:
+            return "Connected";
+        case OHOS::Wifi::DetailedState::CONNECTING:
+            return "Connecting";
+        case OHOS::Wifi::DetailedState::DISCONNECTED:
+            return "Disconnected";
+        case OHOS::Wifi::DetailedState::DISCONNECTING:
+            return "Disconnecting";
+        case OHOS::Wifi::DetailedState::FAILED:
+            return "Failed";
+        case OHOS::Wifi::DetailedState::IDLE:
+            return "Idle";
+        case OHOS::Wifi::DetailedState::OBTAINING_IPADDR:
+            return "ObtainingIpaddr";
+        case OHOS::Wifi::DetailedState::WORKING:
+            return "Working";
+        case OHOS::Wifi::DetailedState::NOTWORKING:
+            return "NotWorking";
+        case OHOS::Wifi::DetailedState::SCANNING:
+            return "Scanning";
+        case OHOS::Wifi::DetailedState::SUSPENDED:
+            return "Suspended";
+        default:
+            return GetDetailedStateErr(state);
+    }
+}
+
+int CmdStaGetLinkedInfo(int argc, char** argv)
+{
+    auto wifiDevice = GetWifiDevice();
+    if (wifiDevice == nullptr) {
+        OutputErrorJson("INTERNAL_ERROR", "Failed to get wifiDevice instance",
+                        "Please check if WiFi service is available");
+        return 1;
+    }
+
+    OHOS::Wifi::WifiLinkedInfo info;
+    OHOS::Wifi::ErrCode ret = wifiDevice->GetLinkedInfo(info);
+    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+        OutputErrorJson("WIFI_ERROR", "Failed to get WiFi linked info", "Ensure WiFi is enabled and connected");
+        return 1;
+    }
+    cJSON* data = cJSON_CreateObject();
+    cJSON_AddStringToObject(data, "ssid", info.ssid.empty() ? "" : info.ssid.c_str());
+    cJSON_AddStringToObject(data, "bssid", info.bssid.empty() ? "" : info.bssid.c_str());
+    cJSON_AddNumberToObject(data, "rssi", info.rssi);
+    cJSON_AddNumberToObject(data, "frequency", info.frequency);
+    cJSON_AddNumberToObject(data, "linkSpeed", info.linkSpeed);
+    std::string detailedState = GetDetailedStateStr(info.detailedState);
+    cJSON_AddStringToObject(data, "detailedState", detailedState.c_str());
+    OutputSuccessJson(data);
+    WIFI_LOGI("Get WiFi linked info successfully");
+    return 0;
+}
+
 int CmdHelp(int argc, char** argv)
 {
     WIFI_LOGI("help command called");
@@ -402,6 +486,7 @@ void InitCommands()
     g_commands["scan-start"] = {"scan-start", "Start WiFi scan", CmdScanStart};
     g_commands["scan-list"] = {"scan-list", "List scan results", CmdScanList};
     g_commands["sta-connect"] = {"sta-connect", "Start WiFi connect", CmdStaConnect};
+    g_commands["sta-getLinkedInfo"] = {"sta-getLinkedInfo", "Return linked info", CmdStaGetLinkedInfo};
     g_commands["--help"] = {"--help", "Show help information", CmdHelp};
 }
 

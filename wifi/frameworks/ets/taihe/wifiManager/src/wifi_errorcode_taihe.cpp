@@ -46,6 +46,9 @@ std::map<int32_t, int32_t> WifiIdlErrorCode::errCodeMap_ = {
     { ErrCode::WIFI_OPT_P2P_ERR_INTENT, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
     { ErrCode::WIFI_OPT_P2P_ERR_SIZE_NW_NAME, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
     { ErrCode::WIFI_OPT_MOVING_FREEZE_CTRL, WifiTaiheErrCode::WIFI_ERRCODE_OPERATION_FAILED },
+    { ErrCode::WIFI_OPT_USER_DOES_NOT_RESPOND, WifiTaiheErrCode::WIFI_ERRCODE_USER_DOES_NOT_RESPOND },
+    { ErrCode::WIFI_OPT_USER_REFUSE_THE_ACTION, WifiTaiheErrCode::WIFI_ERRCODE_USER_REFUSE_THE_ACTION },
+    { ErrCode::WIFI_OPT_INVALID_PARAM_NEW, WifiTaiheErrCode::WIFI_ERRCODE_PARAM_VALIDATION_FAILED },
 };
 
 std::map<int32_t, std::string> WifiIdlErrorCode::errMsgMap_ {
@@ -69,7 +72,10 @@ std::map<int32_t, std::string> WifiIdlErrorCode::errMsgMap_ {
     { ErrCode::WIFI_OPT_P2P_ERR_MAC_FORMAT, "P2P MAC address format error." },
     { ErrCode::WIFI_OPT_P2P_ERR_INTENT, "P2P Internal service exception." },
     { ErrCode::WIFI_OPT_P2P_ERR_SIZE_NW_NAME, "P2P wrong parameter size." },
-    { ErrCode::WIFI_OPT_MOVING_FREEZE_CTRL, "moving freeze scanning control" },
+    { ErrCode::WIFI_OPT_MOVING_FREEZE_CTRL, "moving freeze scanning control." },
+    { ErrCode::WIFI_OPT_USER_DOES_NOT_RESPOND, "The user does not respond." },
+    { ErrCode::WIFI_OPT_USER_REFUSE_THE_ACTION, "The user refused the action." },
+    { ErrCode::WIFI_OPT_INVALID_PARAM_NEW, "Parameter validation failed." },
 };
 
 int32_t WifiIdlErrorCode::GetErrCode(const int32_t errCodeIn, const int32_t sysCap = 0)

@@ -219,9 +219,12 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
 
     std::stringstream wifiDevicesInfo;
     for (auto &pair: wifiDeviceConfigs) {
-        if (wifiDevicesInfo.rdbuf() ->in_avail() != 0) {
-            wifiDevicesInfo << ",";
-        }
+        size_t index = static_cast<size_t>(pair.second);
+        if (index >= networkCandidates.size()) {
+        LOGE("wifiDeviceConfigs: Invalid index");
+        continue;
+    }
+        if (wifiDevicesInfo.rdbuf() ->in_avail() != 0) { wifiDevicesInfo << ","; }
         wifiDevicesInfo << "\"" << pair.first << "_" <<
             SsidAnonymize(networkCandidates.at(pair.second).wifiDeviceConfig.ssid) << "_" <<
             networkCandidates.at(pair.second).wifiDeviceConfig.keyMgmt << "\"";
@@ -229,15 +232,17 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
 
     std::stringstream wifiCandidateInfos;
     for (auto &pair: wifiCandidateConfigs) {
-        if (wifiCandidateInfos.rdbuf() ->in_avail() != 0) {
-            wifiCandidateInfos << ",";
-        }
+    size_t index = static_cast<size_t>(pair.second);
+    if (index >= networkCandidates.size()) {
+        LOGE("wifiCandidateConfigs: Invalid index");
+        continue;
+    }
+        if (wifiCandidateInfos.rdbuf() ->in_avail() != 0) { wifiCandidateInfos << ","; }
         wifiCandidateInfos << "\"" << pair.first << "_" <<
             SsidAnonymize(networkCandidates.at(pair.second).wifiDeviceConfig.ssid) << "\"";
     }
     if (!wifiCandidateConfigs.empty() || !wifiDeviceConfigs.empty()) {
-        WIFI_LOGI("Find savedNetworks in scanInfos: [%{public}s]\n"
-                  "Find suggestion networks in scanInfos: [%{public}s]",
+        WIFI_LOGI("Find savedNetworks in scanInfos [%{public}s]\n" "Find suggestion networks in scanInfos [%{public}s]",
             wifiDevicesInfo.str().c_str(),
             wifiCandidateInfos.str().c_str());
     }

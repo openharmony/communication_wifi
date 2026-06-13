@@ -90,6 +90,10 @@ if (defined(ohos_lite)) {
       defines += [ "PERMISSION_ALWAYS_GRANT" ]
     }
 
+    if (wifi_feature_with_bt_proxy_speed_limit) {
+      defines += [ "FEATURE_BT_PROXY_SPEED_LIMIT" ]
+    }
+
     configs -= [ "//build/lite/config:language_cpp" ]
     cflags_cc = [
       "-std=c++17",
@@ -293,6 +297,10 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_mdm_restricted_enable) {
       defines += [ "FEATURE_WIFI_MDM_RESTRICTED_SUPPORT" ]
+    }
+
+    if (wifi_feature_with_bt_proxy_speed_limit) {
+      defines += [ "FEATURE_BT_PROXY_SPEED_LIMIT" ]
     }
 
     cflags = memory_optimization_cflags

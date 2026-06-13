@@ -24,6 +24,8 @@
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "mock_wifi_sta_hal_interface.h"
+#include "net_all_capabilities.h"
+#include "net_supplier_info.h"
 
 using ::testing::_;
 using ::testing::DoAll;
@@ -1027,5 +1029,69 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, SendLimitCmd2Drv_KeyFgAppWithLimitOff_
     int mode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP];
     EXPECT_EQ(BG_LIMIT_OFF, mode);
 }
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, GetEffectiveLevel_OtherControlId_ReturnsOff, TestSize.Level1)
+{
+    int result = AppNetworkSpeedLimitService::GetInstance().GetEffectiveLevel(BG_LIMIT_CONTROL_ID_GAME);
+    EXPECT_EQ(BG_LIMIT_OFF, result);
+
+    result  = AppNetworkSpeedLimitService::GetInstance().GetEffectiveLevel(BG_LIMIT_CONTROL_ID_STREAM);
+    EXPECT_EQ(BG_LIMIT_OFF, result);
+
+    result  = AppNetworkSpeedLimitService::GetInstance().GetEffectiveLevel(BG_LIMIT_CONTROL_ID_TEMP);
+    EXPECT_EQ(BG_LIMIT_OFF, result);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, GetEffectiveLevel_KeyFgApp_ReturnsLevel3, TestSize.Level1)
+{
+#ifdef FEATURE_BT_PROXY_SPEED_LIMIT
+    AppNetworkSpeedLimitService::GetInstance().isBtProxyConnected_ = false;
+#endif
+    int result  = AppNetworkSpeedLimitService::GetInstance().GetEffectiveLevel(BG_LIMIT_CONTROL_ID_KEY_FG_APP);
+    EXPECT_EQ(BG_LIMIT_LEVEL_3, result);
+}
+
+#ifdef FEATURE_BT_PROXY_SPEED_LIMIT
+HWTEST_F(AppNetworkSpeedLimitServiceTest, GetEffectiveLevel_KeyFgApp_BtProxyConnected_ReturnsLevel7, TestSize.Level1)
+{
+    AppNetworkSpeedLimitService::GetInstance().isBtProxyConnected_ = true;
+    int result  = AppNetworkSpeedLimitService::GetInstance().GetEffectiveLevel(BG_LIMIT_CONTROL_ID_KEY_FG_APP);
+    EXPECT_EQ(BG_LIMIT_LEVEL_7, result);
+    AppNetworkSpeedLimitService::GetInstance().isBtProxyConnected_ = false;
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, BtProxyStateChangedAction_KeyFgAppOff_Skip, TestSize.Level1)
+{
+    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] = BG_LIMIT_OFF;
+    AppNetworkSpeedLimitService::GetInstance().isBtProxyConnected_ = true;
+    AppNetworkSpeedLimitService::GetInstance().BtProxyStateChangedAction();
+    sleep(1);
+    int mode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP];
+    EXPECT_EQ(BG_LIMIT_OFF, mode);
+}
+
+HWTEST_F(AppNetworkSpeedLimitServiceTest, BtProxyStateChangedAction_BtProxyConnected_EffectiveLevel7, TestSize.Level1)
+{
+    AppNetworkSpeedLimitService::GetInstance().isVpnConnected_ = false;
+    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap.clear();
+    AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] = BG_LIMIT_LEVEL_3;
+    AppNetworkSpeedLimitService::GetInstance().isBtProxyConnected_ = true;
+
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.ssid = "NormalWifi";
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+    std::vector<std::string> specialSsidList;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSpecialSsidList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(specialSsidList), Return(0)));
+    MockWifiStaHalInterface::GetInstance().SetRetResult(WIFI_HAL_OPT_OK);
+
+    AppNetworkSpeedLimitService::GetInstance().BtProxyStateChangedAction();
+    sleep(1);
+    int mode = AppNetworkSpeedLimitService::GetInstance().m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP];
+    EXPECT_EQ(BG_LIMIT_LEVEL_7, mode);
+    AppNetworkSpeedLimitService::GetInstance().isBtProxyConnected_ = false;
+}
+#endif
 } // namespace Wifi
 } // namespace OHOS

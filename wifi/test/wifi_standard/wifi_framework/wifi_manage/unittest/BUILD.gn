@@ -312,6 +312,10 @@ ohos_unittest("manager_unittest") {
     defines += [ "SUPPORT_P2P_UNTRUST_INVITATION" ]
   }
 
+  if (wifi_feature_with_bt_proxy_speed_limit) {
+    defines += [ "FEATURE_BT_PROXY_SPEED_LIMIT" ]
+  }
+
   part_name = "wifi"
   subsystem_name = "communication"
   testonly = true

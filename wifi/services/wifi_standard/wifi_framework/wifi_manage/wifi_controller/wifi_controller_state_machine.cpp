@@ -417,7 +417,6 @@ void WifiControllerMachine::MakeConcreteManager(ConcreteManagerRole role, int id
         WIFI_LOGE("InitConcreteManager failed");
         return;
     }
-    clientmode->InitConcreteManager();
     concreteManagers.AddManager(clientmode);
 }
 

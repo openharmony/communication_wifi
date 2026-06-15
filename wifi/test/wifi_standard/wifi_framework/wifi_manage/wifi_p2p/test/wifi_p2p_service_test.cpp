@@ -318,6 +318,14 @@ HWTEST_F(WifiP2pServiceTest, QueryP2pLocalDeviceTest001, TestSize.Level1)
     EXPECT_EQ(pWifiP2pService->QueryP2pLocalDevice(device), ErrCode::WIFI_OPT_SUCCESS);
 }
 
+HWTEST_F(WifiP2pServiceTest, QueryP2pLocalDeviceTest002, TestSize.Level1)
+{
+    WifiP2pDevice device;
+    device.SetDeviceAddress("00:00:00:00:00:00");
+    deviceManager.SetThisDevice(device);
+    EXPECT_EQ(pWifiP2pService->QueryP2pLocalDevice(device), ErrCode::WIFI_OPT_SUCCESS);
+}
+
 HWTEST_F(WifiP2pServiceTest, RegisterP2pServiceCallbacksTest001, TestSize.Level1)
 {
     IP2pServiceCallbacks callback;

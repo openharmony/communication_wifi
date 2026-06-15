@@ -314,8 +314,7 @@ void WifiScanImpl::GetScanInfoFromParcel(WifiScanInfo &info, MessageParcel &inPa
         size_t ieLen = inParcel.ReadUint32();
         ieLen = ieLen < maxIeLen ? ieLen : maxIeLen;
         elem.content.resize(ieLen);
-        for (size_t n = 0; n < ieLen; n++) {
-            elem.content[n] = static_cast<char>(inParcel.ReadInt32()); }
+        for (size_t n = 0; n < ieLen; n++) { elem.content[n] = static_cast<char>(inParcel.ReadInt32()); }
         info.infoElems.push_back(elem);
     }
     info.features = inParcel.ReadInt64();

@@ -342,10 +342,10 @@ ErrCode WifiP2pService::QueryP2pLocalDevice(WifiP2pDevice &device)
     device = deviceManager.GetThisDevice();
     if (device.GetDeviceAddress().empty() || device.GetDeviceAddress() == "00:00:00:00:00:00") {
         std::string deviceAddress;
-        if (WifiP2PHalInterface::GetInstance().GetDeviceAddress(deviceAddr) == WifiErrorNo::WIFI_HAL_OPT_OK) {
-            WIFI_LOGD("get address from hal is: [%{public}]",
-                MacAnonymize(device.GetDeviceAddress().c_str()));
-            deviceManager.GetThisDevice().SetDeviceAddress(deviceAddr);
+        if (WifiP2PHalInterface::GetInstance().GetDeviceAddress(deviceAddress) == WifiErrorNo::WIFI_HAL_OPT_OK) {
+            WIFI_LOGD("get address from hal is: [%{public}s]",
+                MacAnonymize(device.GetDeviceAddress()).c_str());
+            deviceManager.GetThisDevice().SetDeviceAddress(deviceAddress);
             device = deviceManager.GetThisDevice();
         }
     }

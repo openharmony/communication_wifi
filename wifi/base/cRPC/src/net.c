@@ -20,6 +20,7 @@
 #include <securec.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <limits.h>
 #include "common.h"
 #include "errno.h"
 #include "log.h"

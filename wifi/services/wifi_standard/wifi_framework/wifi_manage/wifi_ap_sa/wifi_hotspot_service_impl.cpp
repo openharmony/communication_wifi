@@ -199,7 +199,7 @@ ErrCode WifiHotspotServiceImpl::HostspotBandwidthConfig(HotspotConfig &config)
     int bandwidth = (unsignedDataRead & 0x00FF0000) >> 16;
     if (channel < 0 || channel > MAX_IPV4_VALUE || bandwidth < 0 || bandwidth > MAX_IPV4_VALUE) {
         return WIFI_OPT_INVALID_PARAM;
- 	}
+    }
     config.SetBandWidth(bandwidth);
     config.SetChannel(channel);
     if (config.GetSsid().empty() ||

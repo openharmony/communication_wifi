@@ -459,11 +459,6 @@ int32_t WifiScanServiceImpl::GetScanInfoList(std::vector<WifiScanInfo> &result, 
 #endif
 {
     WIFI_LOGI("GetScanInfoList, compatible:%{public}d", compatible);
-    int apiVersion = WifiPermissionUtils::GetApiVersion();
-    if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
-        WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetScanInfoList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

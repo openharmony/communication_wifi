@@ -19,12 +19,6 @@
 
 namespace OHOS {
 namespace Wifi {
-const int API_VERSION_9 = 9;
-const int API_VERSION_10 = 10;
-const int API_VERSION_11 = 11;
-const int API_VERSION_12 = 12;
-const int API_VERSION_INVALID = -1;
-
 class WifiPermissionUtils {
 public:
     static int VerifyManageEdmPolicyPermission();
@@ -43,7 +37,6 @@ public:
     static int VerifyGetWifiPeersMacPermissionEx(const int &pid, const int &uid, const int &tokenId);
     static int VerifyManageWifiHotspotExtPermission();
     static int VerifyEnterpriseWifiConnectionPermission();
-    static int GetApiVersion();
 };
 }  // namespace Wifi
 }  // namespace OHOS

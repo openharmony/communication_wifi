@@ -345,22 +345,9 @@ int32_t WifiHotspotServiceImpl::SetHotspotIdleTimeout(int time)
 
 ErrCode WifiHotspotServiceImpl::VerifyGetStationListPermission()
 {
-    int apiVersion = WifiPermissionUtils::GetApiVersion();
-    if (apiVersion < API_VERSION_9 && apiVersion != API_VERSION_INVALID) {
-        WIFI_LOGE("%{public}s The version %{public}d is too early to be supported", __func__, apiVersion);
-        return WIFI_OPT_PERMISSION_DENIED;
-    }
     if (!WifiAuthCenter::IsSystemAccess()) {
         WIFI_LOGE("GetStationList:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
-    }
-    if (apiVersion == API_VERSION_9) {
-#ifndef SUPPORT_RANDOM_MAC_ADDR
-        if (WifiPermissionUtils::VerifyGetScanInfosPermission() == PERMISSION_DENIED) {
-            WIFI_LOGE("GetStationList:VerifyGetScanInfosPermission PERMISSION_DENIED!");
-            return WIFI_OPT_PERMISSION_DENIED;
-        }
-#endif
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetStationList:VerifyGetWifiInfoPermission PERMISSION_DENIED!");

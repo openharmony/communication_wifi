@@ -184,6 +184,8 @@ private:
     virtual bool RetryConnect(InternalMessagePtr msg) const;
 
     virtual bool ProcessCmdDisableRandomMac(InternalMessagePtr msg) const;
+
+    virtual bool ProcessHid2dConnectWithZeroMac(InternalMessagePtr msg) const;
 private:
     using ProcessFun = std::function<bool(InternalMessagePtr)> const;
     std::map<P2P_STATE_MACHINE_CMD, ProcessFun> mProcessFunMap;

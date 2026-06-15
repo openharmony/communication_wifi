@@ -412,6 +412,7 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
         void SetFastReconnectState(bool isFastReconnect);
+        void HandleReconnTimeout(bool &ret);
 
     private:
         void GetGatewayMac(std::string &gatewayMac);

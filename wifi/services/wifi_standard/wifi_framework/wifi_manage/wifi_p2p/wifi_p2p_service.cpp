@@ -340,6 +340,15 @@ ErrCode WifiP2pService::QueryP2pLocalDevice(WifiP2pDevice &device)
     deviceManager.GetThisDevice().SetDeviceAddress(deviceAddr);
 #endif
     device = deviceManager.GetThisDevice();
+    if (device.GetDeviceAddress().empty() || device.GetDeviceAddress() == "00:00:00:00:00:00") {
+        std::string deviceAddress;
+        if (WifiP2PHalInterface::GetInstance().GetDeviceAddress(deviceAddr) == WifiErrorNo::WIFI_HAL_OPT_OK) {
+            WIFI_LOGD("get address from hal is: [%{public}]",
+                MacAnonymize(device.GetDeviceAddress().c_str()));
+            deviceManager.GetThisDevice().SetDeviceAddress(deviceAddr);
+            device = deviceManager.GetThisDevice();
+        }
+    }
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

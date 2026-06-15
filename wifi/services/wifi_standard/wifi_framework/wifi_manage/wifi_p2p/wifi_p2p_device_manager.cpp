@@ -249,5 +249,11 @@ const std::string WifiP2pDeviceManager::GetDeviceName(const std::string &deviceA
     WifiP2pDevice device = GetDevices(deviceAddress);
     return device.IsValid() ? device.GetDeviceName() : deviceAddress;
 }
+
+void WifiP2pDeviceManager::SetThisDevice(const WifiP2pDevice &device)
+{
+    std::unique_lock<std::mutex> lock(deviceMutex);
+    thisDevice = device;
+}
 }  // namespace Wifi
 }  // namespace OHOS

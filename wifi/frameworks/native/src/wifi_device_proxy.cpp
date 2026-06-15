@@ -28,7 +28,7 @@ namespace Wifi {
 constexpr int EDM_UID = 3057;
 constexpr int MAX_SIZE = 256;
 constexpr int MAX_MDM_RESTRICTED_SIZE = 200;
-int g_bigDataRecvLen = 0;
+std::atomic<int> g_bigDataRecvLen(0);
 constexpr int HUNDRED = 100;
 constexpr int MAX_PERIOD = 60000;
 static sptr<WifiDeviceCallBackStub> g_deviceCallBackStub = sptr<WifiDeviceCallBackStub>::MakeSptr();

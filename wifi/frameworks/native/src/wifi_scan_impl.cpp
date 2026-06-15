@@ -30,6 +30,8 @@ DEFINE_WIFILOG_SCAN_LABEL("WifiScanImpl");
 
 namespace OHOS {
 namespace Wifi {
+constexpr size_t maxIeSize = 256;
+constexpr size_t maxIeLen = 1024;
 #ifndef OHOS_ARCH_LITE
 const int SCAN_IDL_ERROR_OFFSET = 3300000;
 sptr<WifiScanCallbackStub> WifiScanImpl::g_wifiScanCallbackStub =
@@ -287,20 +289,23 @@ ErrCode WifiScanImpl::IsWifiClosedScan(bool &bOpen)
 #ifndef OHOS_ARCH_LITE
 void WifiScanImpl::GetScanInfoFromParcel(WifiScanInfo &info, MessageParcel &inParcel)
 {
-    size_t maxIeSize = 256;
-    size_t maxIeLen = 1024;
     info.bssid = inParcel.ReadString();
     info.ssid = inParcel.ReadString();
     info.bssidType = inParcel.ReadInt32();
     info.capabilities = inParcel.ReadString();
     info.frequency = inParcel.ReadInt32();
     info.band = inParcel.ReadInt32();
-    info.channelWidth = static_cast<WifiChannelWidth>(inParcel.ReadInt32());
+    int tmpChannelWidth = inParcel.ReadInt32();
+    if (tmpChannelWidth >= 0 && tmpChannelWidth < static_cast<int>(WifiChannelWidth::WIDTH_INVALID)) {
+        info.channelWidth = WifiChannelWidth(tmpChannelWidth);
+    } else { info.channelWidth = WifiChannelWidth::WIDTH_INVALID; }
     info.centerFrequency0 = inParcel.ReadInt32();
     info.centerFrequency1 = inParcel.ReadInt32();
     info.rssi = inParcel.ReadInt32();
-    info.securityType = static_cast<WifiSecurity>(inParcel.ReadInt32());
- 
+    int tmpSecurity = inParcel.ReadInt32();
+    if (tmpSecurity >= 0 && tmpSecurity <= static_cast<int>(WifiSecurity::PSK_SAE)) {
+        info.securityType = WifiSecurity(tmpSecurity);
+    } else { info.securityType = WifiSecurity::INVALID; }
     size_t numInfoElems = inParcel.ReadUint32();
     numInfoElems = numInfoElems < maxIeSize ? numInfoElems : maxIeSize;
     for (size_t m = 0; m < numInfoElems; m++) {
@@ -310,11 +315,9 @@ void WifiScanImpl::GetScanInfoFromParcel(WifiScanInfo &info, MessageParcel &inPa
         ieLen = ieLen < maxIeLen ? ieLen : maxIeLen;
         elem.content.resize(ieLen);
         for (size_t n = 0; n < ieLen; n++) {
-            elem.content[n] = static_cast<char>(inParcel.ReadInt32());
-        }
+            elem.content[n] = static_cast<char>(inParcel.ReadInt32()); }
         info.infoElems.push_back(elem);
     }
- 
     info.features = inParcel.ReadInt64();
     info.timestamp = inParcel.ReadInt64();
     info.wifiStandard = inParcel.ReadInt32();
@@ -323,9 +326,16 @@ void WifiScanImpl::GetScanInfoFromParcel(WifiScanInfo &info, MessageParcel &inPa
     info.disappearCount = inParcel.ReadInt32();
     info.isHiLinkNetwork = inParcel.ReadInt32();
     info.isHiLinkProNetwork = inParcel.ReadBool();
-    info.supportedWifiCategory = static_cast<WifiCategory>(inParcel.ReadInt32());
+    int tmpCategory = inParcel.ReadInt32();
+    if (tmpCategory >= static_cast<int>(WifiCategory::DEFAULT) &&
+        tmpCategory <= static_cast<int>(WifiCategory::WIFI7_PLUS)) {
+        info.supportedWifiCategory = WifiCategory(tmpCategory);
+    } else { info.supportedWifiCategory = WifiCategory::DEFAULT; }
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
-    info.riskType = static_cast<WifiRiskType>(inParcel.ReadInt32());
+    int tmpRiskType = inParcel.ReadInt32();
+    if (tmpRiskType >= 0 && tmpRiskType <= static_cast<int>(WifiRiskType::CLONE_ATTACK)) {
+        info.riskType = WifiRiskType(tmpRiskType);
+    } else { info.riskType = WifiRiskType::INVALID; }
 #endif
 }
  

@@ -209,7 +209,7 @@ static void DealFdEvents(RpcServer *server, int fd, unsigned int mask)
     if (mask & WRIT_EVENT) {
         DealFdWriteEvent(server, client);
     }
-    if (server->loop->fdMasks[fd].mask == NONE_EVENT) {
+    if (fd >= 0 && fd < MAX_SUPPORT_CLIENT_FD_SIZE && server->loop->fdMasks[fd].mask == NONE_EVENT) {
         close(fd);
         DeleteHashTable(server->clients, client);
         RemoveCallback(server, client);

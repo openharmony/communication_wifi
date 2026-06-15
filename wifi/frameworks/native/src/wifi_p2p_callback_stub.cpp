@@ -358,6 +358,10 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
         WIFI_LOGE("Config change size error: %{public}d", cfgLen);
         return;
     }
+    if (cfgLen > MAX_LEN) {
+        WIFI_LOGE("cfgLen size error!");
+        return;
+    }
 
     const char *dataBuffer = reinterpret_cast<const char *>(data.ReadBuffer(cfgLen));
     if (dataBuffer == nullptr) {
@@ -365,10 +369,7 @@ void WifiP2pCallbackStub::RemoteOnConfigChanged(uint32_t code, MessageParcel &da
         return;
     }
 
-    if (cfgLen > MAX_LEN) {
-        WIFI_LOGE("cfgLen size error!");
-        return;
-    }
+
     char* cfgData = new (std::nothrow) char[cfgLen];
     if (cfgData == nullptr) {
         WIFI_LOGE("new buffer error!");

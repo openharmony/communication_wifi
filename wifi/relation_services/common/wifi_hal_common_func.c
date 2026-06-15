@@ -148,6 +148,11 @@ int GetIfaceState(const char *ifaceName)
         close(sock);
         return state;
     }
+    if (if_nametoindex(ifaceName) == 0) {
+ 	    LOGE("GetIfaceState: invalid interface name: %{public}s", ifaceName);
+ 	    close(sock);
+ 	    return state;
+ 	}
     if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0) {
         LOGE("GetIfaceState: can not get interface state: %{public}s", ifaceName);
         close(sock);

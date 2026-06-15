@@ -267,6 +267,8 @@ bool P2pStateMachine::ReawakenPersistentGroup(WifiP2pConfigInternal &config) con
         }
 
         if (networkId >= 0) {
+            WifiP2PHalInterface::GetInstance().SetP2pConfigMethods(
+                std::string("virtual_push_button physical_display"));
             /**
              * If a persistent group that has been connected to the peer device exists,
              * the reinvoke process is triggered.

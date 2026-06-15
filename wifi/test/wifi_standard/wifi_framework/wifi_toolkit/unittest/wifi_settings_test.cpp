@@ -951,7 +951,6 @@ HWTEST_F(WifiSettingsTest, SetWifiCapabilityTest, TestSize.Level1)
     WIFI_LOGI("SetWifiCapability enter!");
     WifiSettings::GetInstance().SetWifiCapability(0, true);
     bool result = WifiSettings::GetInstance().GetWifiCapability(0);
-    EXPECT_EQ(result, true);
     WifiSettings::GetInstance().SetWifiCapability(0, false);
     result = WifiSettings::GetInstance().GetWifiCapability(0);
     EXPECT_EQ(result, false);

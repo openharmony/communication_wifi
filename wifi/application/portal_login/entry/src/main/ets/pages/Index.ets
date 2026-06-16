@@ -18,7 +18,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { i18n, resourceManager  } from '@kit.LocalizationKit';
 import { common, OpenLinkOptions, abilityAccessCtrl, Permissions } from '@kit.AbilityKit';
 import { BusinessError, emitter } from '@kit.BasicServicesKit';
-import { SymbolGlyphModifier, window } from '@kit.ArkUI';
+import { SymbolGlyphModifier, window, CustomContentDialog } from '@kit.ArkUI';
 import { wifiManager } from '@kit.ConnectivityKit';
 import { connection } from '@kit.NetworkKit';
 import { call } from '@kit.TelephonyKit';
@@ -105,6 +105,10 @@ struct Index {
   private deviceType: DeviceType = DeviceType.UNKNOWN;
   @State retryCount: number = 0;
   @State isActionBarVisible: boolean = true;
+  @State private promptMessage: string = '';
+  @State private promptResult: string = '';
+  @State private promptJsResult: JsResult | null = null;
+  private dialogController: CustomDialogController | null = null;
 
   @Builder
   ContextMenu() {
@@ -236,6 +240,19 @@ struct Index {
     .justifyContent(FlexAlign.Start)
     .alignItems(HorizontalAlign.Center)
     .padding({ left: '16vp', right: '16vp' })
+  }
+
+  @Builder
+  buildPromptContent(): void {
+    Column() {
+      Text(this.promptMessage)
+      TextInput()
+        .onChange((value) => {
+          this.promptResult = value;
+        })
+        .defaultFocus(true)
+    }
+    .width('100%')
   }
 
   build() {
@@ -560,6 +577,72 @@ struct Index {
               event.handler.handleCancel();
             }
           })
+        })
+        .onAlert((event) => {
+          if (event) {
+            this.getUIContext().showAlertDialog({
+              title: $r('app.string.dialog_title_tips', extractDomain(event.url)),
+              message: event.message,
+              primaryButton: {
+                value: $r('app.string.ok'),
+                action: () => {
+                  event.result.handleConfirm();
+                }
+              },
+              cancel: () => {
+                event.result.handleCancel();
+              }
+            })
+          }
+          return true;
+        })
+        .onConfirm((event) => {
+          if (event) {
+            this.getUIContext().showAlertDialog({
+              title: $r('app.string.dialog_title_tips', extractDomain(event.url)),
+              message: event.message,
+              primaryButton: {
+                value: $r('app.string.confirm_dialog_cancel'),
+                action: () => {
+                  event.result.handleCancel();
+                }
+              },
+              secondaryButton: {
+                value: $r('app.string.ok'),
+                action: () => {
+                  event.result.handleConfirm();
+                }
+              },
+              cancel: () => {
+                event.result.handleCancel();
+              }
+            })
+          }
+          return true;
+        })
+        .onConfirm((event) => {
+          if (event) {
+            this.getUIContext().showAlertDialog({
+              title: $r('app.string.dialog_title_tips', extractDomain(event.url)),
+              message: event.message,
+              primaryButton: {
+                value: $r('app.string.confirm_dialog_cancel'),
+                action: () => {
+                  event.result.handleCancel();
+                }
+              },
+              secondaryButton: {
+                value: $r('app.string.ok'),
+                action: () => {
+                  event.result.handleConfirm();
+                }
+              },
+              cancel: () => {
+                event.result.handleCancel();
+              }
+            })
+          }
+          return true;
         })
         .onFullScreenEnter((event) => {
           hilog.info(DOMAIN, TAG, '%{public}s', 'onFullScreenEnter.');

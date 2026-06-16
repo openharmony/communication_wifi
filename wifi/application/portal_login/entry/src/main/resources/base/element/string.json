@@ -123,6 +123,14 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"dialog_title_tips",
+            "value":"Message from %s:"
+        },
+        {
+            "name":"ok",
+            "value":"OK"
         }
     ]
 }

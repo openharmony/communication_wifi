@@ -111,6 +111,14 @@
             "attr":{
                 "priority":"translate"
             }
+        },
+        {
+            "name":"dialog_title_tips",
+            "value":"%s 提示"
+        },
+        {
+            "name":"ok",
+            "value":"确定"
         }
     ]
 }

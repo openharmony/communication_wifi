@@ -446,7 +446,7 @@ bool SelfCureStateMachine::ConnectedMonitorState::SetupSelfCureMonitor()
     WifiDeviceConfig config;
     if (pSelfCureStateMachine_->GetCurrentWifiDeviceConfig(config) == WIFI_OPT_SUCCESS) {
         configAuthType_ = pSelfCureStateMachine_->GetAuthType();
-        AssignIpMethod ipAssignment;
+        AssignIpMethod ipAssignment = AssignIpMethod::DHCP;
         pSelfCureStateMachine_->GetIpAssignment(ipAssignment);
         isUserSetStaticIpConfig_ = ipAssignment == AssignIpMethod::STATIC;
         pSelfCureStateMachine_->isInternetUnknown_ = NetworkStatusHistoryManager::IsEmptyNetworkStatusHistory(
@@ -841,7 +841,7 @@ void SelfCureStateMachine::InternetSelfCureState::GoInState()
         pSelfCureStateMachine_->GetNetworkStatusHistory());
     isPortalUnthenEver_ = NetworkStatusHistoryManager::IsPortalByHistory(
         pSelfCureStateMachine_->GetNetworkStatusHistory());
-    AssignIpMethod ipAssignment;
+    AssignIpMethod ipAssignment = AssignIpMethod::DHCP;
     pSelfCureStateMachine_->GetIpAssignment(ipAssignment);
     isUserSetStaticIpConfig_ = ipAssignment == AssignIpMethod::STATIC;
     lastHasInetTime_ = pSelfCureStateMachine_->GetLastHasInternetTime();

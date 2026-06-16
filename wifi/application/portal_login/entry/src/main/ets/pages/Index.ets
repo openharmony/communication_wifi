@@ -620,27 +620,42 @@ struct Index {
           }
           return true;
         })
-        .onConfirm((event) => {
+        .onPrompt((event) => {
           if (event) {
-            this.getUIContext().showAlertDialog({
-              title: $r('app.string.dialog_title_tips', extractDomain(event.url)),
-              message: event.message,
-              primaryButton: {
-                value: $r('app.string.confirm_dialog_cancel'),
-                action: () => {
-                  event.result.handleCancel();
-                }
-              },
-              secondaryButton: {
-                value: $r('app.string.ok'),
-                action: () => {
-                  event.result.handleConfirm();
-                }
-              },
-              cancel: () => {
-                event.result.handleCancel();
+            this.promptMessage = event.message;
+            this.promptResult = event.value;
+            this.promptJsResult = event.result;
+            this.dialogController = new CustomDialogController({
+              builder: CustomContentDialog({
+                primaryTitle: $r('app.string.dialog_title_tips', extractDomain(event.url)),
+                contentBuilder: () => {
+                  this.buildPromptContent();
+                },
+                buttons: [
+                  {
+                    value: $r('app.string.confirm_dialog_cancel'),
+                    action: () => {
+                      hilog.info(DOMAIN, TAG, 'onPrompt cancel button clicked');
+                      this.promptJsResult?.handleCancel();
+                      this.dialogController?.close();
+                    }
+                  },
+                  {
+                    value: $r('app.string.ok'),
+                    action: () => {
+                      hilog.info(DOMAIN, TAG, 'onPrompt confirm button clicked');
+                      this.promptJsResult?.handlePromptConfirm(this.promptResult);
+                      this.dialogController?.close();
+                    }
+                  }
+                ],
+              }),
+              onWillDismiss: () => {
+                this.promptJsResult?.handleCancel();
+                this.dialogController?.close();
               }
-            })
+            });
+            this.dialogController.open();
           }
           return true;
         })

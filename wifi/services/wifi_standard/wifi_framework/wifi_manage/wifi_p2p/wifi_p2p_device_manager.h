@@ -82,7 +82,7 @@ public:
      * @param device - device information to be set
      * @return - void
      */
-    virtual void SetThisDevice(const WifiP2pDevice &device); 
+    virtual void SetThisDevice(const WifiP2pDevice &device);
     /**
      * @Description - Updates the supplicant information of a P2P device based on the device address.
      * @param  devices - device that need to be updated

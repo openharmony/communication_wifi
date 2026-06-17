@@ -586,10 +586,12 @@ struct Index {
               primaryButton: {
                 value: $r('app.string.ok'),
                 action: () => {
+                  hilog.info(DOMAIN, TAG, 'onAlert primaryButton handleConfirm');
                   event.result.handleConfirm();
                 }
               },
               cancel: () => {
+                hilog.info(DOMAIN, TAG, 'onAlert handleCancel');
                 event.result.handleCancel();
               }
             })
@@ -604,16 +606,19 @@ struct Index {
               primaryButton: {
                 value: $r('app.string.confirm_dialog_cancel'),
                 action: () => {
+                  hilog.info(DOMAIN, TAG, 'onConfirm primaryButton handleCancel');
                   event.result.handleCancel();
                 }
               },
               secondaryButton: {
                 value: $r('app.string.ok'),
                 action: () => {
+                  hilog.info(DOMAIN, TAG, 'onConfirm secondaryButton handleConfirm');
                   event.result.handleConfirm();
                 }
               },
               cancel: () => {
+                hilog.info(DOMAIN, TAG, 'onConfirm handleConfirm');
                 event.result.handleCancel();
               }
             })
@@ -651,6 +656,7 @@ struct Index {
                 ],
               }),
               onWillDismiss: () => {
+                hilog.info(DOMAIN, TAG, 'onPrompt onWillDismiss handleCancel');
                 this.promptJsResult?.handleCancel();
                 this.dialogController?.close();
               }

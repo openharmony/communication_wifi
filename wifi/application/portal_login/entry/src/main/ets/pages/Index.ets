@@ -104,6 +104,7 @@ struct Index {
   @State timerCount: number = 10;
   private timerId: number = -1;
   private deviceType: DeviceType = DeviceType.UNKNOWN;
+  @State overviewMode: boolean = false;
   @State retryCount: number = 0;
   @State isActionBarVisible: boolean = true;
   @State private promptMessage: string = '';
@@ -355,7 +356,7 @@ struct Index {
         .fileAccess(false)
         .geolocationAccess(false)
         .domStorageAccess(true)
-        .overviewModeAccess(false)
+        .overviewModeAccess(this.overviewMode)
         .onPermissionRequest((event) => {
           if (event) {
             const permissionString: string[] = event.request.getAccessibleResource();
@@ -450,6 +451,8 @@ struct Index {
                                deviceTypeStr === 'PC' ? DeviceType.PC : DeviceType.UNKNOWN;
             }
             hilog.info(DOMAIN, TAG, 'deviceType:%{public}s', this.deviceType);
+            this.overviewMode = this.deviceType !== DeviceType.PHONE;
+            hilog.info(DOMAIN, TAG, 'overviewMode:%{public}s', this.overviewMode);
             this.harmonyUA = this.setUA(this.harmonyUARaw);
             this.selectedUA = this.harmonyUA;
             this.webviewController.setCustomUserAgent(this.selectedUA);

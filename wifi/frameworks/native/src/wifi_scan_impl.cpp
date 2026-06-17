@@ -337,8 +337,8 @@ void WifiScanImpl::GetScanInfoFromParcel(WifiScanInfo &info, MessageParcel &inPa
         static_cast<int>(WifiCategory::DEFAULT),
         static_cast<int>(WifiCategory::WIFI7_PLUS), WifiCategory::DEFAULT);
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
-    info.riskType = ReadValidEnumFromParcel(inParcel,
-        0, static_cast<int>(WifiRiskType::CLONE_ATTACK), WifiRiskType::INVALID);
+    info.riskType = ReadValidEnumFromParcel(inParcel, static_cast<int>(WifiRiskType::INVALID),
+        static_cast<int>(WifiRiskType::CLONE_ATTACK), WifiRiskType::INVALID);
 #endif
 }
  

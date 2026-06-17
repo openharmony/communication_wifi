@@ -18,7 +18,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 import { i18n, resourceManager  } from '@kit.LocalizationKit';
 import { common, OpenLinkOptions, abilityAccessCtrl, Permissions } from '@kit.AbilityKit';
 import { BusinessError, emitter } from '@kit.BasicServicesKit';
-import { SymbolGlyphModifier, window } from '@kit.ArkUI';
+import { SymbolGlyphModifier, window, CustomContentDialog } from '@kit.ArkUI';
 import { wifiManager } from '@kit.ConnectivityKit';
 import { connection } from '@kit.NetworkKit';
 import { call } from '@kit.TelephonyKit';
@@ -36,6 +36,7 @@ const DOMAIN = 0x01560;
 const TAG = 'Pages';
 const RETRY_CODE = 999;
 const MAX_RETRY = 3;
+const MAX_PROMPT_INPUT_LENGTH = 1000;
 
 enum DeviceType {
   PHONE = 'Phone',
@@ -105,6 +106,10 @@ struct Index {
   private deviceType: DeviceType = DeviceType.UNKNOWN;
   @State retryCount: number = 0;
   @State isActionBarVisible: boolean = true;
+  @State private promptMessage: string = '';
+  @State private promptResult: string = '';
+  @State private promptJsResult: JsResult | null = null;
+  private dialogController: CustomDialogController | null = null;
 
   @Builder
   ContextMenu() {
@@ -236,6 +241,19 @@ struct Index {
     .justifyContent(FlexAlign.Start)
     .alignItems(HorizontalAlign.Center)
     .padding({ left: '16vp', right: '16vp' })
+  }
+
+  @Builder
+  buildPromptContent(): void {
+    Column() {
+      Text(this.promptMessage)
+      TextInput()
+        .onChange((value) => {
+          this.promptResult = this.sanitizePromptInput(value);
+        })
+        .defaultFocus(true)
+    }
+    .width('100%')
   }
 
   build() {
@@ -561,6 +579,93 @@ struct Index {
             }
           })
         })
+        .onAlert((event) => {
+          if (event) {
+            this.getUIContext().showAlertDialog({
+              title: $r('app.string.dialog_title_tips', extractDomain(event.url)),
+              message: event.message,
+              primaryButton: {
+                value: $r('app.string.ok'),
+                action: () => {
+                  hilog.info(DOMAIN, TAG, 'onAlert primaryButton handleConfirm');
+                  event.result.handleConfirm();
+                }
+              },
+              cancel: () => {
+                hilog.info(DOMAIN, TAG, 'onAlert handleCancel');
+                event.result.handleCancel();
+              }
+            })
+          }
+          return true;
+        })
+        .onConfirm((event) => {
+          if (event) {
+            this.getUIContext().showAlertDialog({
+              title: $r('app.string.dialog_title_tips', extractDomain(event.url)),
+              message: event.message,
+              primaryButton: {
+                value: $r('app.string.confirm_dialog_cancel'),
+                action: () => {
+                  hilog.info(DOMAIN, TAG, 'onConfirm primaryButton handleCancel');
+                  event.result.handleCancel();
+                }
+              },
+              secondaryButton: {
+                value: $r('app.string.ok'),
+                action: () => {
+                  hilog.info(DOMAIN, TAG, 'onConfirm secondaryButton handleConfirm');
+                  event.result.handleConfirm();
+                }
+              },
+              cancel: () => {
+                hilog.info(DOMAIN, TAG, 'onConfirm handleConfirm');
+                event.result.handleCancel();
+              }
+            })
+          }
+          return true;
+        })
+        .onPrompt((event) => {
+          if (event) {
+            this.promptMessage = event.message;
+            this.promptResult = event.value;
+            this.promptJsResult = event.result;
+            this.dialogController = new CustomDialogController({
+              builder: CustomContentDialog({
+                primaryTitle: $r('app.string.dialog_title_tips', extractDomain(event.url)),
+                contentBuilder: () => {
+                  this.buildPromptContent();
+                },
+                buttons: [
+                  {
+                    value: $r('app.string.confirm_dialog_cancel'),
+                    action: () => {
+                      hilog.info(DOMAIN, TAG, 'onPrompt cancel button clicked');
+                      this.promptJsResult?.handleCancel();
+                      this.dialogController?.close();
+                    }
+                  },
+                  {
+                    value: $r('app.string.ok'),
+                    action: () => {
+                      hilog.info(DOMAIN, TAG, 'onPrompt confirm button clicked');
+                      this.promptJsResult?.handlePromptConfirm(this.promptResult);
+                      this.dialogController?.close();
+                    }
+                  }
+                ],
+              }),
+              onWillDismiss: () => {
+                hilog.info(DOMAIN, TAG, 'onPrompt onWillDismiss handleCancel');
+                this.promptJsResult?.handleCancel();
+                this.dialogController?.close();
+              }
+            });
+            this.dialogController.open();
+          }
+          return true;
+        })
         .onFullScreenEnter((event) => {
           hilog.info(DOMAIN, TAG, '%{public}s', 'onFullScreenEnter.');
           this.isActionBarVisible = false;
@@ -689,7 +794,29 @@ struct Index {
   onDidBuild() {
     hilog.info(DOMAIN, TAG, '%{public}s', 'Enter onDidBuild.');
     this.startCountdown();
-  } 
+  }
+
+  private sanitizePromptInput(input: string): string {
+    if (!input) {
+      return '';
+    }
+    
+    let sanitized = input;
+    
+    if (sanitized.length > MAX_PROMPT_INPUT_LENGTH) {
+      sanitized = sanitized.substring(0, MAX_PROMPT_INPUT_LENGTH);
+      hilog.warn(DOMAIN, TAG, 'Prompt input truncated to max length');
+    }
+    
+    sanitized = sanitized.replace(/<script[^>]*>.*?<\/script>/gi, '');
+    sanitized = sanitized.replace(/<iframe[^>]*>.*?<\/iframe>/gi, '');
+    sanitized = sanitized.replace(/javascript:/gi, '');
+    sanitized = sanitized.replace(/on\w+\s*=/gi, '');
+    if (sanitized.length != input.length) {
+      hilog.warn(DOMAIN, TAG, 'Prompt input sanitized');
+    }
+    return sanitized;
+  }
 
   aboutToAppear(): void {
     bindToNetById(this.context)

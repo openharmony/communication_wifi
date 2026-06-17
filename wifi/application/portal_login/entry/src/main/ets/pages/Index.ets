@@ -36,6 +36,7 @@ const DOMAIN = 0x01560;
 const TAG = 'Pages';
 const RETRY_CODE = 999;
 const MAX_RETRY = 3;
+const MAX_PROMPT_INPUT_LENGTH = 1000;
 
 enum DeviceType {
   PHONE = 'Phone',

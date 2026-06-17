@@ -30,8 +30,8 @@ DEFINE_WIFILOG_SCAN_LABEL("WifiScanImpl");
 
 namespace OHOS {
 namespace Wifi {
-constexpr size_t maxIeSize = 256;
-constexpr size_t maxIeLen = 1024;
+constexpr size_t MAX_IE_SIZE = 256;
+constexpr size_t MAX_IE_LEN = 1024;
 #ifndef OHOS_ARCH_LITE
 const int SCAN_IDL_ERROR_OFFSET = 3300000;
 sptr<WifiScanCallbackStub> WifiScanImpl::g_wifiScanCallbackStub =
@@ -307,12 +307,12 @@ void WifiScanImpl::GetScanInfoFromParcel(WifiScanInfo &info, MessageParcel &inPa
         info.securityType = WifiSecurity(tmpSecurity);
     } else { info.securityType = WifiSecurity::INVALID; }
     size_t numInfoElems = inParcel.ReadUint32();
-    numInfoElems = numInfoElems < maxIeSize ? numInfoElems : maxIeSize;
+    numInfoElems = numInfoElems < MAX_IE_SIZE ? numInfoElems : MAX_IE_SIZE;
     for (size_t m = 0; m < numInfoElems; m++) {
         WifiInfoElem elem;
         elem.id = inParcel.ReadUint32();
         size_t ieLen = inParcel.ReadUint32();
-        ieLen = ieLen < maxIeLen ? ieLen : maxIeLen;
+        ieLen = ieLen < MAX_IE_LEN ? ieLen : MAX_IE_LEN;
         elem.content.resize(ieLen);
         for (size_t n = 0; n < ieLen; n++) { elem.content[n] = static_cast<char>(inParcel.ReadInt32()); }
         info.infoElems.push_back(elem);

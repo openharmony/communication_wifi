@@ -317,7 +317,7 @@ int WifiDeviceCallBackStub::RemoteOnDeviceConfigChanged(uint32_t code, MessagePa
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int value = data.ReadInt32();
-    if (value >= 0 && value <= static_cast<int>(ConfigChange::CONFIG_REMOVE)) {
+    if (value >= ConfigChange::CONFIG_ADD && value <= static_cast<int>(ConfigChange::CONFIG_REMOVE)) {
         OnDeviceConfigChanged(ConfigChange(value));
     } else {
         WIFI_LOGE("Invalid ConfigChange value: %{public}d", value);

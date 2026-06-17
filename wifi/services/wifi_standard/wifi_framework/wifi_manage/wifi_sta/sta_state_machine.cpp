@@ -3621,19 +3621,7 @@ bool StaStateMachine::ApReconnectState::ExecuteStateMsg(InternalMessagePtr msg)
     bool ret = NOT_EXECUTED;
     switch (msg->GetMessageName()) {
         case CMD_AP_RECONN_TIMEOUT_CHECK:
-            ret = EXECUTED;
-#ifndef OHOS_ARCH_LITE
-            if (pStaStateMachine->enhanceService_ != nullptr) {
-                pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::NOTIFY_DELAY_DISCONNECTED,
-                    pStaStateMachine->m_instId);
-            }
-#endif
-#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
-            if (pStaStateMachine->reconnType_ == RECONNECT_TYPE_EHANCE_SWITCH) {
-                WifiProChr::GetInstance().RecordSwitchEnhanceConnTimeout();
-            }
-#endif
-            pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
+            HandleReconnTimeout(ret);
             break;
         case WIFI_SVR_CMD_STA_NETWORK_DISCONNECTION_EVENT:
         case WIFI_SVR_CMD_STA_DISCONNECT:
@@ -3665,6 +3653,25 @@ bool StaStateMachine::ApReconnectState::ExecuteStateMsg(InternalMessagePtr msg)
 void StaStateMachine::ApReconnectState::SetFastReconnectState(bool isFastReconnect)
 {
     isFastReconnect_ = isFastReconnect;
+}
+
+void StaStateMachine::ApReconnectState::HandleReconnTimeout(bool &ret)
+{
+    ret = EXECUTED;
+#ifndef OHOS_ARCH_LITE
+    if (pStaStateMachine->enhanceService_ != nullptr) {
+        pStaStateMachine->enhanceService_->GenelinkInterface(MultiLinkDefs::NOTIFY_DELAY_DISCONNECTED,
+            pStaStateMachine->m_instId);
+    }
+#endif
+#ifdef FEATURE_WIFI_ENHANCE_SWITCH_SUPPORT
+    if (pStaStateMachine->reconnType_ == RECONNECT_TYPE_EHANCE_SWITCH) {
+        WifiProChr::GetInstance().RecordSwitchEnhanceConnTimeout();
+    }
+#endif
+    WifiStaHalInterface::GetInstance().Disconnect(
+        WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId));
+    pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
 }
 
 bool StaStateMachine::CanArpReachable()

@@ -248,7 +248,7 @@ struct Index {
       Text(this.promptMessage)
       TextInput()
         .onChange((value) => {
-          this.promptResult = value;
+          this.promptResult = this.sanitizePromptInput(value);
         })
         .defaultFocus(true)
     }
@@ -787,7 +787,27 @@ struct Index {
   onDidBuild() {
     hilog.info(DOMAIN, TAG, '%{public}s', 'Enter onDidBuild.');
     this.startCountdown();
-  } 
+  }
+
+  private sanitizePromptInput(input: string): string {
+    if (!input) {
+      return '';
+    }
+    
+    let sanitized = input;
+    
+    if (sanitized.length > MAX_PROMPT_INPUT_LENGTH) {
+      sanitized = sanitized.substring(0, MAX_PROMPT_INPUT_LENGTH);
+      hilog.warn(DOMAIN, TAG, 'Prompt input truncated to max length');
+    }
+    
+    sanitized = sanitized.replace(/<script[^>]*>.*?<\/script>/gi, '');
+    sanitized = sanitized.replace(/<iframe[^>]*>.*?<\/iframe>/gi, '');
+    sanitized = sanitized.replace(/javascript:/gi, '');
+    sanitized = sanitized.replace(/on\w+\s*=/gi, '');
+    
+    return sanitized;
+  }
 
   aboutToAppear(): void {
     bindToNetById(this.context)

@@ -811,7 +811,9 @@ struct Index {
     sanitized = sanitized.replace(/<iframe[^>]*>.*?<\/iframe>/gi, '');
     sanitized = sanitized.replace(/javascript:/gi, '');
     sanitized = sanitized.replace(/on\w+\s*=/gi, '');
-    
+    if (sanitized.length != input.length) {
+      hilog.warn(DOMAIN, TAG, 'Prompt input sanitized');
+    }
     return sanitized;
   }
 

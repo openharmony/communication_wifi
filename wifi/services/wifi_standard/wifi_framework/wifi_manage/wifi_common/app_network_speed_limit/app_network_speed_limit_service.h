@@ -117,6 +117,10 @@ private:
     void ReportGameLatencyFeature(bool enabled, const std::string& featureName);
     void ReportGameSceneInfo(const WifiNetworkControlInfo &networkControlInfo);
     void RecordAppNetworkSpeedLimitServiceChr(const std::string &records);
+    int GetEffectiveLevel(int controlId) const;
+#ifdef FEATURE_BT_PROXY_SPEED_LIMIT
+    void BtProxyStateChangedAction();
+#endif
 
 private:
     StaServiceCallback m_staCallback;
@@ -145,6 +149,9 @@ private:
     std::atomic<uint32_t> activePowerScenes_{POWER_SCENE_NONE};
     std::atomic<bool> isFirstRtt_{false};
     std::mutex rttMutex_;
+#ifdef FEATURE_BT_PROXY_SPEED_LIMIT
+    std::atomic<bool> isBtProxyConnected_ = false;
+#endif
 };
 } // namespace Wifi
 } // namespace OHOS

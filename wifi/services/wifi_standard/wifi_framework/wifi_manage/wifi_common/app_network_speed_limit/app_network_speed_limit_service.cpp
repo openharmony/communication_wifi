@@ -45,6 +45,7 @@ namespace {
     const std::string HANDLE_PROCESS_CREATED_EVENT = "HandleProcessCreatedEvent";
     const std::string HANDLE_PROCESS_STATE_CHANGED_EVENT = "HandleProcessStateChangedEvent";
     const std::string LIMIT_SPEED = "LimitSpeed";
+    const std::string HANDLE_BT_PROXY_STATE_CHANGED = "HandleBtProxyStateChanged";
     const std::string RECEIVE_NETWORK_CONTROL = "ReceiveNetworkControlInfo";
     const std::string FEATURE_GAME_NO_SLEEP = "GameNoSleep";
     const std::string FEATURE_VPN_NO_LIMIT = "VpnNoLimit";
@@ -89,7 +90,8 @@ void AppNetworkSpeedLimitService::Init()
     m_asyncSendLimit = std::make_unique<WifiEventHandler>("StartSendLimitInfoThread");
     if (IsTopNLimitSpeedSceneInNow()) {
         WIFI_LOGI("%{public}s the current foreground application is TopN.", __FUNCTION__);
-        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, GetEffectiveLevel(BG_LIMIT_CONTROL_ID_KEY_FG_APP),
+            m_isHighPriorityTransmit);
     }
     WIFI_LOGD("AppNetworkSpeedLimitService initialization complete.");
 }
@@ -185,7 +187,9 @@ void AppNetworkSpeedLimitService::LimitSpeed(const int controlId, const int limi
     AsyncParamInfo asyncParamInfo;
     asyncParamInfo.funcName = __FUNCTION__;
     asyncParamInfo.controlId = controlId;
-    asyncParamInfo.limitMode = limitMode;
+    int firstJudgeLevel = GetEffectiveLevel(controlId);
+    int effectivelevel = firstJudgeLevel >= limitMode ? firstJudgeLevel : limitMode;
+    asyncParamInfo.limitMode = effectivelevel;
     AsyncLimitSpeed(asyncParamInfo);
 }
 
@@ -409,7 +413,13 @@ void AppNetworkSpeedLimitService::HandleRequest(const AsyncParamInfo &asyncParam
             UpdateAncoAppInfos(asyncParamInfo.networkControlInfo);
             UpdateNoSpeedLimitConfigs(asyncParamInfo.networkControlInfo);
         }
+#ifdef FEATURE_BT_PROXY_SPEED_LIMIT
+    } else if (asyncParamInfo.funcName == HANDLE_BT_PROXY_STATE_CHANGED) {
+        BtProxyStateChangedAction();
     }
+#else
+    }
+#endif
 }
 
 void AppNetworkSpeedLimitService::SendLimitCmd2Drv(const int controlId, const int limitMode, const int enable,
@@ -651,7 +661,8 @@ void AppNetworkSpeedLimitService::ForegroundAppChangedAction(const std::string &
     // don't distinguishing between WiFi and cellular links
     if (AppParser::GetInstance().IsKeyForegroundApp(bundleName)) {
         WIFI_LOGI("%{public}s top app speed limit is running, update background app list", __FUNCTION__);
-        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, GetEffectiveLevel(BG_LIMIT_CONTROL_ID_KEY_FG_APP),
+            m_isHighPriorityTransmit);
     } else if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
         WIFI_LOGI("%{public}s top app speed limit is turnning off, update background app list", __FUNCTION__);
         SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_OFF, m_isHighPriorityTransmit);
@@ -673,7 +684,8 @@ void AppNetworkSpeedLimitService::BackgroundAppChangedAction(const AsyncParamInf
             m_isHighPriorityTransmit);
     }
     if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
-        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, GetEffectiveLevel(BG_LIMIT_CONTROL_ID_KEY_FG_APP),
+            m_isHighPriorityTransmit);
     }
 }
 
@@ -692,7 +704,8 @@ void AppNetworkSpeedLimitService::ForegroundAppStateChangedAction(const AsyncPar
             m_isHighPriorityTransmit);
     }
     if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] != BG_LIMIT_OFF) {
-        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, BG_LIMIT_LEVEL_3, m_isHighPriorityTransmit);
+        SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, GetEffectiveLevel(BG_LIMIT_CONTROL_ID_KEY_FG_APP),
+            m_isHighPriorityTransmit);
     }
 }
 
@@ -799,6 +812,23 @@ void AppNetworkSpeedLimitService::HighPriorityTransmit(int uid, int protocol, in
 
 void AppNetworkSpeedLimitService::HandleNetworkConnectivityChange(int32_t bearType, int32_t code)
 {
+#ifdef FEATURE_BT_PROXY_SPEED_LIMIT
+    if (bearType == NetManagerStandard::NetBearType::BEARER_BLUETOOTH) {
+        bool currentBtState = (code == NetManagerStandard::NetConnState::NET_CONN_STATE_CONNECTED);
+        bool preBtState = isBtProxyConnected_.exchange(currentBtState);
+        WIFI_LOGD("BT-proxy status code is %{public}d, preBtState is %{public}d, currentBtState is %{public}d", code,
+            preBtState, currentBtState);
+        if (preBtState == currentBtState) {
+            WIFI_LOGD("BT-proxy connection state unchanged : %{public}d", currentBtState);
+            return;
+        }
+        AsyncParamInfo asyncParamInfo;
+        asyncParamInfo.funcName = HANDLE_BT_PROXY_STATE_CHANGED;
+        AsyncLimitSpeed(asyncParamInfo);
+        return;
+    }
+#endif
+
     // Only handle VPN network events
     if (bearType != NetManagerStandard::NetBearType::BEARER_VPN) {
         WIFI_LOGD("%{public}s Non-VPN network event, bearType: %{public}d, ignored",
@@ -932,5 +962,31 @@ void AppNetworkSpeedLimitService::ReportGameSceneInfo(const WifiNetworkControlIn
     }
     pEnhanceService->ReportGameSceneInfo(networkControlInfo);
 }
+int AppNetworkSpeedLimitService::GetEffectiveLevel(int controlId) const
+{
+    if (controlId == BG_LIMIT_CONTROL_ID_KEY_FG_APP) {
+#ifdef FEATURE_BT_PROXY_SPEED_LIMIT
+        if (isBtProxyConnected_) {
+            return BG_LIMIT_LEVEL_7;
+        }
+#endif
+        return BG_LIMIT_LEVEL_3;
+    }
+    return BG_LIMIT_OFF;
+}
+
+#ifdef FEATURE_BT_PROXY_SPEED_LIMIT
+void AppNetworkSpeedLimitService::BtProxyStateChangedAction()
+{
+    bool btProxyConnected = isBtProxyConnected_.load();
+    if (m_bgLimitRecordMap[BG_LIMIT_CONTROL_ID_KEY_FG_APP] == BG_LIMIT_OFF) {
+        WIFI_LOGD("BT-proxy state changed to %{public}d, but KEY_FG_APP is OFF, skip", btProxyConnected);
+        return;
+    }
+    int effectiveLevel = GetEffectiveLevel(BG_LIMIT_CONTROL_ID_KEY_FG_APP);
+    WIFI_LOGI("BT-proxy state changed to %{public}d, effectiveLevel=%{public}d", btProxyConnected, effectiveLevel);
+    SendLimitCmd2Drv(BG_LIMIT_CONTROL_ID_KEY_FG_APP, effectiveLevel, m_isHighPriorityTransmit);
+}
+#endif
 } // namespace Wifi
 } // namespace OHOS

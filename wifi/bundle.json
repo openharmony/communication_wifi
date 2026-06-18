@@ -81,7 +81,8 @@
             "wifi_feature_with_ipv6_selfcure",
             "wifi_feature_with_dynamic_adjust_wifi_power_save",
             "wifi_feature_pluggable_supported",
-            "wifi_feature_with_p2p_untrust_invitation"
+            "wifi_feature_with_p2p_untrust_invitation",
+            "wifi_feature_with_bt_proxy_speed_limit"
         ],
         "adapted_system_type": [
             "small",

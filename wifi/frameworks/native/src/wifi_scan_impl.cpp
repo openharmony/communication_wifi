@@ -336,7 +336,23 @@ ErrCode WifiScanImpl::ParseScanInfosFromAshmem(
         WIFI_LOGE("ParseDeviceConfigs ReadAshmem error");
         return WIFI_OPT_FAILED;
     }
- 
+
+    int ashmemSize = ashmem->GetAshmemSize();
+    int totalSize = 0;
+    for (size_t i = 0; i < allSize.size(); ++i) {
+        if (allSize[i] < 0 || allSize[i] > ashmemSize) {
+            WIFI_LOGE("Invalid allSize[%{public}zu]: %{public}d, ashmemSize: %{public}d", i, allSize[i], ashmemSize);
+            ashmem->UnmapAshmem();
+            return WIFI_OPT_FAILED;
+        }
+        totalSize += allSize[i];
+        if (totalSize > ashmemSize) {
+            WIFI_LOGE("AllSize sum exceeds ashmem size, ashmemSize: %{public}d", ashmemSize);
+            ashmem->UnmapAshmem();
+            return WIFI_OPT_FAILED;
+        }
+    }
+
     int offset = 0;
     for (size_t i = 0; i < allSize.size(); ++i) {
         const void *data = ashmem->ReadFromAshmem(allSize[i], offset);

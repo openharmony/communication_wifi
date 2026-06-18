@@ -929,15 +929,15 @@ void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pD
 
 void WifiInternalEventDispatcher::FreecfgInfo(CfgInfo* cfgInfo)
 {
-    if (cfgInfo && cfgInfo->data) {
+    if (cfgInfo == nullptr) {
+        return;
+    }
+    if (cfgInfo->data != nullptr) {
         delete[] cfgInfo->data;
         cfgInfo->data = nullptr;
-        delete cfgInfo;
-        cfgInfo = nullptr;
-    } else if (cfgInfo) {
-        delete cfgInfo;
-        cfgInfo = nullptr;
     }
+    delete cfgInfo;
+    cfgInfo = nullptr;
 }
 
 void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,

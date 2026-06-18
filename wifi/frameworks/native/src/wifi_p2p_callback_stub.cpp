@@ -343,6 +343,15 @@ void WifiP2pCallbackStub::RemoteOnP2pDiscoveryChanged(uint32_t code, MessageParc
 void WifiP2pCallbackStub::RemoteOnP2pActionResult(uint32_t code, MessageParcel &data, MessageParcel &reply)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int tmpAction = data.ReadInt32();
+    P2pActionCallback action;
+    if (tmpAction >= static_cast<int>(P2pActionCallback::DiscoverDevices) &&
+        tmpAction <= static_cast<int>(P2pActionCallback::UNKNOWN)) {
+        action = P2pActionCallback(tmpAction);
+    } else {
+        WIFI_LOGE("Invalid P2pActionCallback value: %{public}d", tmpAction);
+        action = P2pActionCallback::UNKNOWN;
+    }
     P2pActionCallback action = static_cast<P2pActionCallback>(data.ReadInt32());
     ErrCode errCode = static_cast<ErrCode>(data.ReadInt32());
     OnP2pActionResult(action, errCode);

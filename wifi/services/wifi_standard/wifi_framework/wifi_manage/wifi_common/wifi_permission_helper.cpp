@@ -38,7 +38,7 @@ int WifiPermissionHelper::VerifyPermission(const std::string &permissionName, co
     if (tokenId == 0) {
         callerToken = IPCSkeleton::GetCallingTokenID();
     } else {
-        callerToken = (Security::AccessToken::AccessTokenID)tokenId;
+        callerToken = static_cast<Security::AccessToken::AccessTokenID>(tokenId);
     }
 
     int result = Security::AccessToken::AccessTokenKit::VerifyAccessToken(callerToken, permissionName);

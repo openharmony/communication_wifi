@@ -20,6 +20,7 @@
 #include <securec.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <limits.h>
 #include "common.h"
 #include "errno.h"
 #include "log.h"
@@ -163,12 +164,21 @@ int CreateUnixServer(const char *path, int backlog)
 
 int ConnectUnixServer(const char *path)
 {
+    if (path == NULL) {
+        LOGE("ConnectUnixServer: path is NULL");
+        return -1;
+    }
+    char resolvedPath[PATH_MAX] = {0};
+    if (realpath(path, resolvedPath) == NULL) {
+        LOGE("ConnectUnixServer: invalid path");
+        return -1;
+    }
     struct sockaddr_un sockAddr;
     if (memset_s(&sockAddr, sizeof(sockAddr), 0, sizeof(sockAddr)) != EOK) {
         return -1;
     }
     sockAddr.sun_family = AF_LOCAL;
-    if (strncpy_s(sockAddr.sun_path, sizeof(sockAddr.sun_path), path, strlen(path)) != EOK) {
+    if (strncpy_s(sockAddr.sun_path, sizeof(sockAddr.sun_path), resolvedPath, strlen(resolvedPath)) != EOK) {
         return -1;
     }
     int sock = CreateSocket(AF_LOCAL);

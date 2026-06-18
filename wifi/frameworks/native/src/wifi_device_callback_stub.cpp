@@ -317,7 +317,13 @@ int WifiDeviceCallBackStub::RemoteOnDeviceConfigChanged(uint32_t code, MessagePa
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int value = data.ReadInt32();
-    OnDeviceConfigChanged(ConfigChange(value));
+    if (value >= static_cast<int>(ConfigChange::CONFIG_ADD) &&
+        value <= static_cast<int>(ConfigChange::CONFIG_REMOVE)) {
+        OnDeviceConfigChanged(ConfigChange(value));
+    } else {
+        WIFI_LOGE("Invalid ConfigChange value: %{public}d", value);
+        OnDeviceConfigChanged(ConfigChange::CONFIG_UPDATE);
+    }
     return 0;
 }
 
@@ -326,7 +332,13 @@ int WifiDeviceCallBackStub::RemoteOnCandidateApprovalStatusChanged(uint32_t code
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int status = data.ReadInt32();
-    OnCandidateApprovalStatusChanged(CandidateApprovalStatus(status));
+    if (status >= static_cast<int>(CandidateApprovalStatus::USER_ACCEPT) &&
+        status <= static_cast<int>(CandidateApprovalStatus::USER_NO_RESPOND)) {
+        OnCandidateApprovalStatusChanged(CandidateApprovalStatus(status));
+    } else {
+        WIFI_LOGE("Invalid CandidateApprovalStatus value: %{public}d", status);
+        OnCandidateApprovalStatusChanged(CandidateApprovalStatus::USER_NO_RESPOND);
+    }
     return 0;
 }
 }  // namespace Wifi

@@ -338,7 +338,7 @@ ErrCode WifiScanImpl::ParseScanInfosFromAshmem(
     }
 
     int ashmemSize = ashmem->GetAshmemSize();
-    int totalSize = 0;
+    int64_t totalSize = 0;
     for (size_t i = 0; i < allSize.size(); ++i) {
         if (allSize[i] < 0 || allSize[i] > ashmemSize) {
             WIFI_LOGE("Invalid allSize[%{public}zu]: %{public}d, ashmemSize: %{public}d", i, allSize[i], ashmemSize);

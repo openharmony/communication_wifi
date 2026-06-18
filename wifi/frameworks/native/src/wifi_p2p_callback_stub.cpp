@@ -352,7 +352,6 @@ void WifiP2pCallbackStub::RemoteOnP2pActionResult(uint32_t code, MessageParcel &
         WIFI_LOGE("Invalid P2pActionCallback value: %{public}d", tmpAction);
         action = P2pActionCallback::UNKNOWN;
     }
-    P2pActionCallback action = static_cast<P2pActionCallback>(data.ReadInt32());
     ErrCode errCode = static_cast<ErrCode>(data.ReadInt32());
     OnP2pActionResult(action, errCode);
 }

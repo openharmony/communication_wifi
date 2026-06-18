@@ -105,6 +105,7 @@ struct Index {
   private timerId: number = -1;
   private deviceType: DeviceType = DeviceType.UNKNOWN;
   @State overviewMode: boolean = false;
+  @State originalOverviewMode: boolean = false;
   @State retryCount: number = 0;
   @State isActionBarVisible: boolean = true;
   @State private promptMessage: string = '';
@@ -671,11 +672,14 @@ struct Index {
         })
         .onFullScreenEnter((event) => {
           hilog.info(DOMAIN, TAG, '%{public}s', 'onFullScreenEnter.');
+          this.originalOverviewMode = this.overviewMode;
+          this.overviewMode = true;
           this.isActionBarVisible = false;
           this.handleFullScreenChange();
         })
         .onFullScreenExit(() => {
           hilog.info(DOMAIN, TAG, '%{public}s', 'onFullScreenExit.');
+          this.overviewMode = this.originalOverviewMode;
           this.isActionBarVisible = true;
           this.handleFullScreenChange();
         })

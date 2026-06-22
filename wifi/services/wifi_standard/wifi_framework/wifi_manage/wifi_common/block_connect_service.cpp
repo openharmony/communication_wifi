@@ -33,6 +33,7 @@ constexpr int32_t MIN_BSSID_COUNT = 2;
 constexpr int32_t INVALID_RSSI = -200;
 constexpr int64_t TV_MAX_TIME = 8 * 1000 * 1000;
 constexpr int MAX_FAIL_COUNT = 3;
+constexpr int32_t HOLD_TO_PERM_WRONG_PASSWORD = 2;
 #endif
 
 BlockConnectService &BlockConnectService::GetInstance()
@@ -362,6 +363,39 @@ bool BlockConnectService::IsFrequentDisconnect(std::string bssid, int wpaReason,
         WIFI_LOGI("isFrequentDisconnect %{public}s %{public}d count %{public}d",
             MacAnonymize(bssid).c_str(), wpaReason, mLastConnectedApInfo.alreadyConnectedCount);
         mLastConnectedApInfo.alreadyConnectedCount = 1;
+        return true;
+    }
+    return false;
+}
+
+// Check if the given targetNetworkId is blocked due to wrong password
+bool BlockConnectService::IsWrongPassword(int targetNetworkId)
+{
+    // Implement the logic to check if the given targetNetworkId is blocked due to wrong password
+    // Return true if blocked due to wrong password, false otherwise
+    WifiDeviceConfig targetNetwork;
+    if (WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, targetNetwork)) {
+        WIFI_LOGE("Failed to get device config %{public}d", targetNetworkId);
+        return false;
+    }
+ 
+    if (targetNetwork.numAssociation == 0) {
+        return true;
+    }
+    return false;
+}
+
+// Check if the wrong password threshold has been reached for the given targetNetworkId
+bool BlockConnectService::IsEverConnectedWrongPwdThresholdReached(int targetNetworkId)
+{
+    WifiDeviceConfig targetNetwork;
+    if (WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, targetNetwork)) {
+        WIFI_LOGE("Failed to get device config %{public}d", targetNetworkId);
+        return false;
+    }
+    if (targetNetwork.networkSelectionStatus.networkSelectionDisableReason ==
+        DisabledReason::DISABLED_AUTHENTICATION_FAILURE &&
+        targetNetwork.networkSelectionStatus.networkDisableCount >= HOLD_TO_PERM_WRONG_PASSWORD) {
         return true;
     }
     return false;

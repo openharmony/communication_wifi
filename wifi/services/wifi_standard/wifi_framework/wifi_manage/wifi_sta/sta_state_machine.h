@@ -298,6 +298,8 @@ public:
         void DealWpaLinkAssocRejectFailEvent(InternalMessagePtr msg);
         void DealWpaLinkAuthTimeoutFailEvent(InternalMessagePtr msg);
         void DealWpaLinkFailEvent(InternalMessagePtr msg);
+        void HandlePasswdWrongReport(ConnReportReason reportReason,
+            DisabledReason disabledReason);
     private:
         StaStateMachine *pStaStateMachine;
     };

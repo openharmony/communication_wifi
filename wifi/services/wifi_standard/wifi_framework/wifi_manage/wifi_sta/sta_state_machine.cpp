@@ -1565,7 +1565,6 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent(InternalMe
                 DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
         }
     }
- 
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG,
         pStaStateMachine->linkedInfo);
     return;

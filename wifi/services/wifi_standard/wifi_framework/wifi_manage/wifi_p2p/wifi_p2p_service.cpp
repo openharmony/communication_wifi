@@ -332,14 +332,12 @@ ErrCode WifiP2pService::QueryP2pLocalDevice(WifiP2pDevice &device)
 {
     LOGI("QueryP2pLocalDevice");
     device = deviceManager.GetThisDevice();
-    if (device.GetDeviceAddress().empty() || device.GetDeviceAddress() == "00:00:00:00:00:00") {
-        std::string deviceAddress;
-        if (WifiP2PHalInterface::GetInstance().GetDeviceAddress(deviceAddress) == WifiErrorNo::WIFI_HAL_OPT_OK) {
-            WIFI_LOGI("get address from hal is: [%{public}s]",
-                MacAnonymize(device.GetDeviceAddress()).c_str());
-            deviceManager.GetThisDevice().SetDeviceAddress(deviceAddress);
-            device = deviceManager.GetThisDevice();
-        }
+    std::string deviceAddress;
+    if (WifiP2PHalInterface::GetInstance().GetDeviceAddress(deviceAddress) == WifiErrorNo::WIFI_HAL_OPT_OK) {
+        WIFI_LOGI("get address from hal is: [%{public}s]",
+            MacAnonymize(device.GetDeviceAddress()).c_str());
+        deviceManager.GetThisDevice().SetDeviceAddress(deviceAddress);
+        device = deviceManager.GetThisDevice();
     }
     return ErrCode::WIFI_OPT_SUCCESS;
 }

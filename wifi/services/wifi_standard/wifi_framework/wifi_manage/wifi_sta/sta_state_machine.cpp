@@ -663,6 +663,16 @@ void StaStateMachine::InitState::HandleNetworkConnectionEvent(InternalMessagePtr
         pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
         return;
     }
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+    if (pStaStateMachine->IsInsecureNetworkByBssid(bssid)) {
+        WIFI_LOGI("HandleNetworkConnection rejected: insecure network, keyMgmt=%{public}s, bssid=%{public}s, "
+            "ssid=%{public}s", deviceConfig.keyMgmt.c_str(), MacAnonymize(bssid).c_str(),
+            SsidAnonymize(deviceConfig.ssid).c_str());
+        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISABLED_INSECURE_NETWORK);
+        pStaStateMachine->StartDisConnectToNetwork();
+        return;
+    }
+#endif
     if (pStaStateMachine->CurrentIsRandomizedMac()) {
         WifiSettings::GetInstance().SetDeviceRandomizedMacSuccessEver(networkId);
     }
@@ -1788,6 +1798,14 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
         WIFI_LOGE("Bssid change not for ASSOC_COMPLETE, do nothing.");
         return;
     }
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+    if (pStaStateMachine->IsInsecureNetworkByBssid(bssid)) {
+        WIFI_LOGI("HandleStaBssidChanged rejected: insecure network, bssid=%{public}s", MacAnonymize(bssid).c_str());
+        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISABLED_INSECURE_NETWORK);
+        pStaStateMachine->StartDisConnectToNetwork();
+        return;
+    }
+#endif
     // do not switch to roaming state when it is not directed to roam by framework
     pStaStateMachine->linkedInfo.bssid = bssid;
     pStaStateMachine->UpdateHiLinkAttribute();
@@ -1847,6 +1865,12 @@ void StaStateMachine::ApLinkedState::DealStartRoamCmdInApLinkedState(InternalMes
     WIFI_LOGI("%{public}s current bssid:%{public}s, target bssid:%{public}s,", __FUNCTION__,
         MacAnonymize(pStaStateMachine->linkedInfo.bssid).c_str(),
         MacAnonymize(pStaStateMachine->targetRoamBssid).c_str());
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+    if (pStaStateMachine->IsInsecureNetworkByBssid(bssid)) {
+        WIFI_LOGI("DealStartRoamCmd rejected: insecure network, bssid=%{public}s, ", MacAnonymize(bssid).c_str());
+        return;
+    }
+#endif
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
     if (WifiStaHalInterface::GetInstance().SetBssid(WPA_DEFAULT_NETWORKID, pStaStateMachine->targetRoamBssid, ifaceName)
         != WIFI_HAL_OPT_OK) {
@@ -3754,6 +3778,16 @@ void StaStateMachine::AfterApLinkedprocess(std::string bssid)
     WifiConfigCenter::GetInstance().GetMacAddress(macAddr, m_instId);
     WifiSettings::GetInstance().GetRealMacAddress(realMacAddr, m_instId);
 
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+    if (pStaStateMachine->IsInsecureNetworkByBssid(bssid)) {
+        WIFI_LOGI("AfterApLinkedprocess rejected: insecure network, keyMgmt=%{public}s, bssid=%{public}s, "
+            "ssid=%{public}s", deviceConfig.keyMgmt.c_str(), MacAnonymize(apBssid).c_str(),
+            SsidAnonymize(deviceConfig.ssid).c_str());
+        SaveDiscReason(DisconnectedReason::DISABLED_INSECURE_NETWORK);
+        StartDisConnectToNetwork();
+        return;
+    }
+#endif
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     if (WhetherRestrictedByMdm(deviceConfig.ssid, deviceConfig.bssid, true)) {
         ReportMdmRestrictedEvent(deviceConfig.ssid, deviceConfig.bssid, "BLOCK_LIST");
@@ -4661,6 +4695,32 @@ ErrCode StaStateMachine::ConvertDeviceCfg(WifiDeviceConfig &config, std::string&
     return WIFI_OPT_SUCCESS;
 }
 
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+bool StaStateMachine::IsInsecureNetworkByBssid(const std::string &bssid)
+{
+    if (bssid.empty()) {
+        WIFI_LOGE("IsInsecureNetworkByBssid bssid is empty!");
+        return false;
+    }
+    std::vector<WifiScanInfo> scanResults;
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
+    for (const auto &scan : scanResults) {
+        if (strcasecmp(scan.bssid.c_str(), bssid.c_str()) == 0) {
+            WIFI_LOGI("IsInsecureNetworkByBssid Network capabilities=%{public}s", scan.capabilities.c_str());
+            if (scan.capabilities.find("WEP") != std::string::npos) {
+                return true;
+            }
+            if (scan.capabilities.find("WPA-PSK") != std::string::npos &&
+                scan.capabilities.find("WPA2-PSK") == std::string::npos) {
+                return true;
+            }
+            return false;
+        }
+    }
+    return false;
+}
+#endif
+
 void StaStateMachine::SaveDiscReason(DisconnectedReason discReason)
 {
     WifiConfigCenter::GetInstance().SaveDisconnectedReason(discReason, m_instId);
@@ -5448,6 +5508,16 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
     } else {
         WIFI_LOGI("SetBssid bssid=%{public}s", MacAnonymize(apBssid).c_str());
     }
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+    if (IsInsecureNetworkByBssid(apBssid)) {
+        WIFI_LOGI("StartConnectToNetwork rejected: insecure network, keyMgmt=%{public}s, bssid=%{public}s, "
+            "ssid=%{public}s", deviceConfig.keyMgmt.c_str(), MacAnonymize(apBssid).c_str(),
+            SsidAnonymize(deviceConfig.ssid).c_str());
+        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(networkId,
+            DisabledReason::DISABLED_INSECURE_NETWORK);
+        return WIFI_OPT_FAILED;
+    }
+#endif
     if (connTriggerMode != NETWORK_SELECTED_BY_FAST_RECONNECT &&
         connTriggerMode != NETWORK_SELECTED_BY_WIFIPRO_ENHANCE) {
         SetRandomMac(deviceConfig, apBssid);

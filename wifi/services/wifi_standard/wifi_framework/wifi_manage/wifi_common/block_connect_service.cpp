@@ -87,6 +87,8 @@ void BlockConnectService::InitBlockConnectPolicies()
          DisablePolicy(-1, 1, WifiDeviceConfigStatus::PERMEMANTLY_DISABLED)},
         {DisabledReason::DISABLED_DISASSOC_REASON,
          DisablePolicy(5 * 60 * 1000 * 1000, 5, WifiDeviceConfigStatus::DISABLED)},
+        {DisabledReason::DISABLED_INSECURE_NETWORK,
+         DisablePolicy(-1, 1, WifiDeviceConfigStatus::PERMEMANTLY_DISABLED)},
         {DisabledReason::USER_FORCE_DISCONNECT,
          DisablePolicy(static_cast<int64_t>(24) * 60 * 60 * 1000 * 1000, 1, WifiDeviceConfigStatus::DISABLED)}
     };

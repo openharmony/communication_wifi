@@ -235,7 +235,11 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_local_security_detect) {
       defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
     }
-    
+
+    if (wifi_feature_car_cockpit_supported) {
+        defines += [ "WIFI_FEATURE_CAR_COCKPIT_SUPPORTED" ]
+    }
+
     if (defined(global_parts_info) &&
         defined(global_parts_info.telephony_core_service) &&
         defined(global_parts_info.telephony_cellular_data)) {

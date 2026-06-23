@@ -2382,10 +2382,14 @@ void SelfCureStateMachine::ShouldTransToWifi7SelfCure(WifiLinkedInfo &info)
         auto iterBlackList = blackListCache.find(info.bssid);
         if (iterBlackList == blackListCache.end()) {
             WIFI_LOGI("start wifi7 with mld backoff");
-            SendMessage(WIFI_CURE_CMD_WIFI7_MLD_BACKOFF, info.bssid);
+            InternalMessagePtr msg = MessageManage::GetInstance().CreateMessage(WIFI_CURE_CMD_WIFI7_MLD_BACKOFF);
+            msg->AddStringMessageBody(info.bssid);
+            SendMessage(msg);
         } else if (iterBlackList->second.actionType == ACTION_TYPE_MLD) {
             WIFI_LOGI("start wifi7 without mld backoff");
-            SendMessage(WIFI_CURE_CMD_WIFI7_NON_MLD_BACKOFF, info.bssid);
+            InternalMessagePtr msg = MessageManage::GetInstance().CreateMessage(WIFI_CURE_CMD_WIFI7_NON_MLD_BACKOFF);
+            msg->AddStringMessageBody(info.bssid);
+            SendMessage(msg);
         } else if (iterBlackList->second.actionType == ACTION_TYPE_WIFI7
             && iterConnectFail->second.actionType == ACTION_TYPE_RECOVER_FAIL) {
             WIFI_LOGI("start wifi7 selfcure fail recover");

@@ -212,24 +212,40 @@ HWTEST_F(BlockConnectServiceTest, IsWrongPassword_ReturnsTrueWhenBlockedDueToWro
     EXPECT_EQ(result, false);
 }
 
-HWTEST_F(BlockConnectServiceTest, IsEverConnectedThresholdReached_ReturnsTrueWhenThresholdReached, TestSize.Level1)
+HWTEST_F(BlockConnectServiceTest, IsWrongPassword_NeverConnected_ReturnsTrue, TestSize.Level1)
 {
     int targetNetworkId = 1;
     WifiDeviceConfig config;
     WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
+    config.numAssociation = 0;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    bool result = BlockConnectService::GetInstance().IsWrongPassword(targetNetworkId);
+    EXPECT_EQ(result, true);
+}
+
+HWTEST_F(BlockConnectServiceTest, IsWrongPassword_ThresholdReached_ReturnsTrue, TestSize.Level1)
+{
+    int targetNetworkId = 1;
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
+    config.numAssociation = 1;
     config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_AUTHENTICATION_FAILURE;
     config.networkSelectionStatus.networkDisableCount = 2;
     WifiSettings::GetInstance().AddDeviceConfig(config);
-    bool result = BlockConnectService::GetInstance().IsEverConnectedThresholdReached(targetNetworkId);
+    bool result = BlockConnectService::GetInstance().IsWrongPassword(targetNetworkId);
     EXPECT_EQ(result, true);
-    config.networkSelectionStatus.networkDisableCount = 1;
+}
+
+HWTEST_F(BlockConnectServiceTest, IsWrongPassword_NotBlocked_ReturnsFalse, TestSize.Level1)
+{
+    int targetNetworkId = 1;
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
+    config.numAssociation = 1;
+    config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_UNKNOWN_REASON;
+    config.networkSelectionStatus.networkDisableCount = 0;
     WifiSettings::GetInstance().AddDeviceConfig(config);
-    result = BlockConnectService::GetInstance().IsEverConnectedThresholdReached(targetNetworkId);
-    EXPECT_EQ(result, false);
-    config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_DHCP_FAILURE;
-    config.networkSelectionStatus.networkDisableCount = 2;
-    WifiSettings::GetInstance().AddDeviceConfig(config);
-    result = BlockConnectService::GetInstance().IsEverConnectedThresholdReached(targetNetworkId);
+    bool result = BlockConnectService::GetInstance().IsWrongPassword(targetNetworkId);
     EXPECT_EQ(result, false);
 }
 

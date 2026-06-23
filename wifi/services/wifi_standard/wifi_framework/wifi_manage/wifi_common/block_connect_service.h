@@ -69,9 +69,6 @@ public:
 
     // Check if the given targetNetworkId is blocked due to wrong password
     bool IsWrongPassword(int targetNetworkId);
-    
-    // Check if the wrong password threshold has been reached for the given targetNetworkId
-    bool IsEverConnectedThresholdReached(int targetNetworkId);
 
     // Enable all networks by entering settings
     void OnReceiveSettingsEnterEvent(bool isEnter);

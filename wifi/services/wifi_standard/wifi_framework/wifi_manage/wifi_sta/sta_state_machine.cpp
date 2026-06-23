@@ -1540,8 +1540,6 @@ void StaStateMachine::ApLinkingState::HandlePasswdWrongReport(
 #ifdef WIFI_DATA_REPORT_ENABLE
     pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(reportReason, pStaStateMachine->targetNetworkId_);
 #endif
-    BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
-        pStaStateMachine->linkedInfo.bssid, disabledReason);
 #endif
 }
 
@@ -1557,13 +1555,11 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent(InternalMe
     if (BlockConnectService::GetInstance().IsWrongPassword(pStaStateMachine->targetNetworkId_)) {
         HandlePasswdWrongReport(ConnReportReason::CONN_WRONG_PASSWORD, DisabledReason::DISABLED_BY_WRONG_PASSWORD);
     } else {
-        if (BlockConnectService::GetInstance().IsEverConnectedThresholdReached(pStaStateMachine->targetNetworkId_)) {
-            HandlePasswdWrongReport(ConnReportReason::CONN_WRONG_PASSWORD, DisabledReason::DISABLED_BY_WRONG_PASSWORD);
-        } else {
-            HandlePasswdWrongReport(ConnReportReason::CONN_AUTHENTICATION_FAILURE,
-                DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
-        }
+        HandlePasswdWrongReport(ConnReportReason::CONN_AUTHENTICATION_FAILURE,
+            DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
     }
+    BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
+        pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG,
         pStaStateMachine->linkedInfo);
     return;

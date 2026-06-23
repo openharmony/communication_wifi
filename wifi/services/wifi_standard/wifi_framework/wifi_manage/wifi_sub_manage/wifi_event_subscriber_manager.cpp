@@ -1729,14 +1729,18 @@ void WifiFoldStateListener::OnFoldStatusChanged(Rosen::FoldStatus foldStatus)
         }
     }
 
-    if (foldAction_ != FOLD_ACTION_NOTIFY_DRV || (foldStatus != Rosen::FoldStatus::EXPAND &&
-        foldStatus != Rosen::FoldStatus::FOLDED)) {
+    if (foldAction_ != FOLD_ACTION_NOTIFY_DRV) {
         return;
     }
- 
+
+    auto currentStatus = (foldStatus == Rosen::FoldStatus::FOLDED ? foldStatus : Rosen::FoldStatus::EXPAND);
+    if (lastStatus_ != Rosen::FoldStatus::UNKNOWN && lastStatus_ == currentStatus) {
+        return;
+    }
     std::string ifName = "wlan0";
-    std::string cmdParam = (foldStatus == Rosen::FoldStatus::EXPAND ? "1" : "0");
+    std::string cmdParam = (foldStatus == Rosen::FoldStatus::FOLDED ? "0" : "1");
     int ret = WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_FOLD_STATUS, cmdParam);
+    lastStatus_ = (ret == 0 ? currentStatus : Rosen::FoldStatus::UNKNOWN);
     WIFI_LOGI("OnFoldStatusChanged, send cmd %{public}s ret %{public}d", cmdParam.c_str(), ret);
 }
 
@@ -1785,12 +1789,9 @@ void WifiEventSubscriberManager::SyncFoldStatus()
  
     auto foldStatus = Rosen::DisplayManagerLite::GetInstance().GetFoldStatus();
     WIFI_LOGI("SyncFoldStatus: current foldStatus %{public}d", static_cast<int>(foldStatus));
-    if (foldStatus != Rosen::FoldStatus::EXPAND && foldStatus != Rosen::FoldStatus::FOLDED) {
-        return;
-    }
  
     std::string ifName = "wlan0";
-    std::string cmdParam = (foldStatus == Rosen::FoldStatus::EXPAND ? "1" : "0");
+    std::string cmdParam = (foldStatus == Rosen::FoldStatus::FOLDED ? "0" : "1");
     int ret = WifiCmdClient::GetInstance().SendCmdToDriver(ifName, CMD_SET_FOLD_STATUS, cmdParam);
     WIFI_LOGI("SyncFoldStatus, send cmd %{public}s ret %{public}d", cmdParam.c_str(), ret);
 }

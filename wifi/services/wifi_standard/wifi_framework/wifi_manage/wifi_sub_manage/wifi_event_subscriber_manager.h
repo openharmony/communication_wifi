@@ -152,6 +152,7 @@ public:
     void OnFoldStatusChanged(Rosen::FoldStatus foldStatus) override;
 private:
     int foldAction_ { 0 };
+    Rosen::FoldStatus lastStatus_ { Rosen::FoldStatus::UNKNOWN };
 };
 
 class WifiDisplayStateListener : public Rosen::DisplayManagerLite::IDisplayListener {

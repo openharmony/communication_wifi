@@ -1557,8 +1557,7 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent(InternalMe
     if (BlockConnectService::GetInstance().IsWrongPassword(pStaStateMachine->targetNetworkId_)) {
         HandlePasswdWrongReport(ConnReportReason::CONN_WRONG_PASSWORD, DisabledReason::DISABLED_BY_WRONG_PASSWORD);
     } else {
-        if (BlockConnectService::GetInstance().IsEverConnectedWrongPwdThresholdReached
-                (pStaStateMachine->targetNetworkId_)) {
+        if (BlockConnectService::GetInstance().IsEverConnectedThresholdReached(pStaStateMachine->targetNetworkId_)) {
             HandlePasswdWrongReport(ConnReportReason::CONN_WRONG_PASSWORD, DisabledReason::DISABLED_BY_WRONG_PASSWORD);
         } else {
             HandlePasswdWrongReport(ConnReportReason::CONN_AUTHENTICATION_FAILURE,

@@ -386,7 +386,7 @@ bool BlockConnectService::IsWrongPassword(int targetNetworkId)
 }
 
 // Check if the wrong password threshold has been reached for the given targetNetworkId
-bool BlockConnectService::IsEverConnectedWrongPwdThresholdReached(int targetNetworkId)
+bool BlockConnectService::IsEverConnectedThresholdReached(int targetNetworkId)
 {
     WifiDeviceConfig targetNetwork;
     if (WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, targetNetwork)) {

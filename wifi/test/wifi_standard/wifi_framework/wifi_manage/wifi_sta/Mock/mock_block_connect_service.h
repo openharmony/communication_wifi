@@ -34,7 +34,7 @@ public:
     virtual bool EnableNetworkSelectStatus(int targetNetworkId) = 0;
     virtual bool IsFrequentDisconnect(std::string bssid, int wpaReason, int locallyGenerated) = 0;
     virtual bool IsWrongPassword(int targetNetworkId) = 0;
-    virtual bool IsEverConnectedWrongPwdThresholdReached(int targetNetworkId) = 0;
+    virtual bool IsEverConnectedThresholdReached(int targetNetworkId) = 0;
     virtual void OnReceiveSettingsEnterEvent(bool isEnter) = 0;
     virtual void DealStaStopped(int instId) = 0;
     virtual void NotifyWifiConnFailedInfo(int targetNetworkId, std::string bssid, DisabledReason disableReason) = 0;
@@ -59,7 +59,7 @@ public:
     MOCK_METHOD1(EnableNetworkSelectStatus, bool(int targetNetworkId));
     MOCK_METHOD3(IsFrequentDisconnect, bool(std::string bssid, int wpaReason, int locallyGenerated));
     MOCK_METHOD1(IsWrongPassword, bool(int targetNetworkId));
-    MOCK_METHOD1(IsEverConnectedWrongPwdThresholdReached, bool(int targetNetworkId));
+    MOCK_METHOD1(IsEverConnectedThresholdReached, bool(int targetNetworkId));
     MOCK_METHOD1(OnReceiveSettingsEnterEvent, void(bool isEnter));
     MOCK_METHOD1(DealStaStopped, void(int instId));
     MOCK_METHOD3(NotifyWifiConnFailedInfo, void(int targetNetworkId, std::string bssid, DisabledReason disableReason));

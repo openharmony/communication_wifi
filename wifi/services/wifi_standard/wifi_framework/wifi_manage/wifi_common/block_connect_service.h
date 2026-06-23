@@ -71,7 +71,7 @@ public:
     bool IsWrongPassword(int targetNetworkId);
     
     // Check if the wrong password threshold has been reached for the given targetNetworkId
-    bool IsEverConnectedWrongPwdThresholdReached(int targetNetworkId);
+    bool IsEverConnectedThresholdReached(int targetNetworkId);
 
     // Enable all networks by entering settings
     void OnReceiveSettingsEnterEvent(bool isEnter);

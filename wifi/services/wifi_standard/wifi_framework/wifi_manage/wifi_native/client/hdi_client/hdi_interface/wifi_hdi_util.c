@@ -474,7 +474,7 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         ++start;
         srcBuf[last] = '\0';
         unsigned int hexStrLen = strlen(srcBuf + start);
-        unsigned int hexBufSize = len / lenValue + 1;
+        unsigned int hexBufSize = (unsigned int)(len / lenValue + 1);
         if (hexStrLen > hexBufSize) {
             break;
         }

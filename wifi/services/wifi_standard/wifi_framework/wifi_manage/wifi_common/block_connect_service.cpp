@@ -26,6 +26,7 @@ constexpr int FREQUENT_DISCONNECT_COUNT = 5;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MAX = 10 * 60 * 1000 * 1000;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MID = 1 * 60 * 1000 * 1000;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MIN = 0.5 * 60 * 1000 * 1000;
+constexpr int32_t HOLD_TO_PERM_WRONG_PASSWORD = 2;
 #ifndef OHOS_ARCH_LITE
 constexpr int64_t TIMEOUT_CLEAR_SET = 4 * 60 * 1000;
 constexpr int32_t MIN_RSSI_LEVEL_3 = -75;
@@ -33,7 +34,6 @@ constexpr int32_t MIN_BSSID_COUNT = 2;
 constexpr int32_t INVALID_RSSI = -200;
 constexpr int64_t TV_MAX_TIME = 8 * 1000 * 1000;
 constexpr int MAX_FAIL_COUNT = 3;
-constexpr int32_t HOLD_TO_PERM_WRONG_PASSWORD = 2;
 #endif
 
 BlockConnectService &BlockConnectService::GetInstance()

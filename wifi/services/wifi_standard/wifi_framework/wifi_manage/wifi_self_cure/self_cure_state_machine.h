@@ -272,7 +272,7 @@ public:
         void Wifi6ReassocSelfcure();
     };
 
-class Wifi7SelfCureState : public State {
+    class Wifi7SelfCureState : public State {
     public:
         explicit Wifi7SelfCureState(SelfCureStateMachine *selfCureStateMachine);
         ~Wifi7SelfCureState() override;

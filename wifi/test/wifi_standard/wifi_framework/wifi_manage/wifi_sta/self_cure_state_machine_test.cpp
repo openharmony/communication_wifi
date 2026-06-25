@@ -307,15 +307,25 @@ public:
     void HandleWifi7WithoutMldBackoffTest()
     {
         LOGI("Enter HandleWifi7WithoutMldBackoffTest");
-        pSelfCureStateMachine_->HandleWifi7WithoutMldBackoff("");
-        pSelfCureStateMachine_->HandleWifi7WithoutMldBackoff(CURR_BSSID);
+        WifiLinkedInfo info;
+        info.bssid = "";
+        info.ssid = "";
+        pSelfCureStateMachine_->HandleWifi7WithoutMldBackoff(info);
+        info.bssid = CURR_BSSID;
+        info.ssid = "test_ssid";
+        pSelfCureStateMachine_->HandleWifi7WithoutMldBackoff(info);
     }
 
     void HandleWifi7MldBackoffTest()
     {
         LOGI("Enter HandleWifi7MldBackoffTest");
-        pSelfCureStateMachine_->HandleWifi7MldBackoff("");
-        pSelfCureStateMachine_->HandleWifi7MldBackoff(CURR_BSSID);
+        WifiLinkedInfo info;
+        info.bssid = "";
+        info.ssid = "";
+        pSelfCureStateMachine_->HandleWifi7MldBackoff(info);
+        info.bssid = CURR_BSSID;
+        info.ssid = "test_ssid";
+        pSelfCureStateMachine_->HandleWifi7MldBackoff(info);
     }
 
     void NeedWifi7SelfCureTest001()
@@ -363,7 +373,10 @@ public:
         msg->SetMessageName(WIFI_CURE_CMD_WIFI7_SELFCURE);
         pSelfCureStateMachine_->pWifi7SelfCureState_->ExecuteStateMsg(msg);
 
-        pSelfCureStateMachine_->pWifi7SelfCureState_->ExecuteWifi7ArpFailSelfCure();
+        WifiLinkedInfo info;
+        info.bssid = CURR_BSSID;
+        info.ssid = "test_ssid";
+        pSelfCureStateMachine_->pWifi7SelfCureState_->ExecuteWifi7ArpFailSelfCure(info);
     }
 
     void HandleNetworkConnectFailCountTest()
@@ -1503,13 +1516,11 @@ public:
     {
         LOGI("Enter GetWifi7SelfCureTypeTest");
         int type;
-        int connectFailTimes = 1;
         WifiLinkedInfo info;
         info.supportedWifiCategory = WifiCategory::WIFI7;
-        type = pSelfCureStateMachine_->GetWifi7SelfCureType(connectFailTimes, info);
-        connectFailTimes = SELF_CURE_WIFI7_CONNECT_FAIL_MAX_COUNT;
+        info.bssid = CURR_BSSID;
         info.rssi = MIN_VAL_LEVEL_4;
-        type = pSelfCureStateMachine_->GetWifi7SelfCureType(connectFailTimes, info);
+        type = pSelfCureStateMachine_->GetWifi7SelfCureType(info);
     }
 
     void ShouldTransToWifi7SelfCureTest()

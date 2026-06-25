@@ -333,7 +333,7 @@ ErrCode WifiP2pService::QueryP2pLocalDevice(WifiP2pDevice &device)
     LOGI("QueryP2pLocalDevice");
     device = deviceManager.GetThisDevice();
 #ifndef NON_SEPERATE_P2P
-    if (device.GetDeviceAddress().empty() || device.GetDeviceAddress() == "00:00:00:00:00:00") 
+    if (device.GetDeviceAddress().empty() || device.GetDeviceAddress() == "00:00:00:00:00:00")
 #endif
     {
         std::string deviceAddress;

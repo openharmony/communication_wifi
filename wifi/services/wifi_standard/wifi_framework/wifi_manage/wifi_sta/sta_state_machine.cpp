@@ -988,7 +988,7 @@ bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(int reason, const std
         WIFI_LOGI("self cure going, dont ignroe disconnect event");
         return false;
     }
-    if (!IsKidWatchDevice() && TryFastReconnect(reason, bssid, locallyGenerated)) {
+    if (GetDeviceType() != ProductDeviceType::WEARABLE && TryFastReconnect(reason, bssid, locallyGenerated)) {
         pStaStateMachine->pApReConnectState->SetFastReconnectState(true);
         pStaStateMachine->reconnType_ = RECONNECT_TYPE_FAST;
         return true;

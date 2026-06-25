@@ -699,15 +699,19 @@ bool SelfCureStateMachine::DisconnectedMonitorState::ExecuteStateMsg(InternalMes
             break;
         case WIFI_CURE_CMD_WIFI7_MLD_BACKOFF:
             ret = EXECUTED;
-            WifiLinkedInfo info;
-            msg->GetMessageObj(info);
-            pSelfCureStateMachine_->HandleWifi7MldBackoff(info);
+            {
+                WifiLinkedInfo info;
+                msg->GetMessageObj(info);
+                pSelfCureStateMachine_->HandleWifi7MldBackoff(info);
+            }
             break;
         case WIFI_CURE_CMD_WIFI7_NON_MLD_BACKOFF:
             ret = EXECUTED;
-            WifiLinkedInfo info;
-            msg->GetMessageObj(info);
-            pSelfCureStateMachine_->HandleWifi7WithoutMldBackoff(info);
+            {
+                WifiLinkedInfo info;
+                msg->GetMessageObj(info);
+                pSelfCureStateMachine_->HandleWifi7WithoutMldBackoff(info);
+            }
             break;
         case WIFI_CURE_CMD_WIFI7_BACKOFF_RECOVER:
             ret = EXECUTED;
@@ -2405,7 +2409,11 @@ void SelfCureStateMachine::ShouldTransToWifi7SelfCure(WifiLinkedInfo &info)
             InternalMessagePtr msg = MessageManage::GetInstance().CreateMessage(WIFI_CURE_CMD_WIFI7_NON_MLD_BACKOFF);
             msg->SetMessageObj(info);
             SendMessage(msg);
-        }
+        } else if (iterBlackList->second.actionType == ACTION_TYPE_WIFI7 &&
+            iterConnectFail->second.actionType == ACTION_TYPE_RECOVER_FAIL) { 
+            WIFI_LOGI("start wifi7 selfcure fail recover"); 
+            SendMessage(WIFI_CURE_CMD_WIFI7_BACKOFF_RECOVER, info); 
+         }
     } else {
         WIFI_LOGD("don't need to do wifi7 selfcure");
     }

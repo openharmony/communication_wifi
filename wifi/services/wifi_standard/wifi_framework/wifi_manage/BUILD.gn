@@ -89,10 +89,7 @@ if (defined(ohos_lite)) {
       "//foundation/systemabilitymgr/samgr_lite/samgr:samgr",
     ]
 
-    external_deps = [
-      "bounds_checking_function:libsec_shared",
-      "netmanager_base:net_stats_manager_if",
-    ]
+    external_deps = [ "bounds_checking_function:libsec_shared" ]
 
     defines = [
       "OHOS_ARCH_LITE",

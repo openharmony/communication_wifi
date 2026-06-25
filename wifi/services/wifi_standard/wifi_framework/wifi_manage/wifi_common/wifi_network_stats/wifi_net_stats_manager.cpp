@@ -196,6 +196,7 @@ void WifiNetStatsManager::LogNetStatsTraffic(NetStats netStats)
         }
     }
     WIFI_LOGI("%{public}s", allTrafficLog.c_str());
+
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService != nullptr) {
         pEnhanceService->UpdateNetStatsTraffic(netStats);

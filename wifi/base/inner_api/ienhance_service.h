@@ -15,12 +15,14 @@
 #ifndef OHOS_IENHANCE_SERVICE_H
 #define OHOS_IENHANCE_SERVICE_H
 
-#include <vector>
 #include "wifi_errcode.h"
 #include "wifi_scan_control_msg.h"
 #include "wifi_msg.h"
 #include "wifi_crowdsourced_data.h"
+#ifndef OHOS_ARCH_LITE
+#include <vector>
 #include "net_stats_info.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -60,7 +62,9 @@ using P2pEnhanceCallback = std::function<void(const std::string &, int32_t, int3
 using SensorEnhanceCallback = std::function<void(int)>;
 using MovementEnhanceCallback = std::function<void(int32_t movementType, int32_t movementValue)>;
 using GenelinkEnhanceCallback = std::function<void(int, int)>;
+#ifndef OHOS_ARCH_LITE
 using NetStats = std::vector<NetManagerStandard::NetStatsInfo>;
+#endif
 
 struct StaEnhanceCallback {
     GenelinkEnhanceCallback OnGenelinkEvent { nullptr };
@@ -604,6 +608,7 @@ public:
      */
     virtual WifiDeviceFeatures GetDeviceFeatures() = 0;
 
+#ifndef OHOS_ARCH_LITE
     /**
      * @Description Update network stats traffic info to enhance module
      *
@@ -611,6 +616,7 @@ public:
      * @return void
      */
     virtual void UpdateNetStatsTraffic(const NetStats& netStats) = 0;
+#endif
 
     /**
      * @Description set the enhance p2p signal poll info

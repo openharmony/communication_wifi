@@ -147,7 +147,6 @@ if (defined(ohos_lite)) {
       "init:libbegetutil",
       "samgr:samgr_proxy",
       "ipc:ipc_single",
-      "netmanager_base:net_stats_manager_if",
     ]
     part_name = "wifi"
     subsystem_name = "communication"

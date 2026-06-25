@@ -99,7 +99,6 @@ if (defined(ohos_lite)) {
       "init:libbegetutil",
       "libxml2:libxml2",
       "samgr:samgr_proxy",
-      "netmanager_base:net_stats_manager_if",
     ]
 
     configs -= [ "//build/lite/config:language_cpp" ]

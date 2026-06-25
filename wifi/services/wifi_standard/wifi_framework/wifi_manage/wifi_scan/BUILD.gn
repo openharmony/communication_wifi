@@ -135,7 +135,6 @@ if (defined(ohos_lite)) {
       "hisysevent:libhisysevent",
       "samgr:samgr_proxy",
       "ipc:ipc_single",
-      "netmanager_base:net_stats_manager_if",
     ]
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc

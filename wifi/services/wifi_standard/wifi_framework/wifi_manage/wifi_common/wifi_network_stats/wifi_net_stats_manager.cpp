@@ -20,8 +20,6 @@
 #include "wifi_system_timer.h"
 #include "wifi_logger.h"
 #include "wifi_chr_adapter.h"
-#include "wifi_service_manager.h"
-#include "ienhance_service.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -197,10 +195,6 @@ void WifiNetStatsManager::LogNetStatsTraffic(NetStats netStats)
     }
     WIFI_LOGI("%{public}s", allTrafficLog.c_str());
 
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService != nullptr) {
-        pEnhanceService->UpdateNetStatsTraffic(netStats);
-    }
     CheckAndReportSpeedTest(netStats);
 }
 

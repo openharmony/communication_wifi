@@ -18,6 +18,7 @@
 
 #include <condition_variable>
 #include <mutex>
+#include <set>
 #include "define.h"
 #include "wifi_log.h"
 #include "wifi_errcode.h"
@@ -40,6 +41,7 @@
 namespace OHOS {
 namespace Wifi {
 constexpr int CURRENT_RSSI_INIT = -200;
+constexpr int MIN_WIFI7_SELFCURE_RSSI = -80;
 constexpr int MAX_SELF_CURE_CNT_INVALID_IP = 3;
 constexpr int VEC_POS_0 = 0;
 constexpr int VEC_POS_1 = 1;
@@ -270,7 +272,7 @@ public:
         void Wifi6ReassocSelfcure();
     };
 
-    class Wifi7SelfCureState : public State {
+class Wifi7SelfCureState : public State {
     public:
         explicit Wifi7SelfCureState(SelfCureStateMachine *selfCureStateMachine);
         ~Wifi7SelfCureState() override;
@@ -279,7 +281,7 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
         void HandleWifi7ArpFailMsg();
-        void ExecuteWifi7ArpFailSelfCure();
+        void ExecuteWifi7ArpFailSelfCure(const WifiLinkedInfo &info);
         
     private:
         SelfCureStateMachine *pSelfCureStateMachine_;
@@ -364,8 +366,9 @@ private:
     bool IsNeedWifiReassocUseDeviceMac();
     bool IfP2pConnected();
     bool ShouldTransToWifi6SelfCure(InternalMessagePtr msg, std::string currConnectedBssid);
-    int GetWifi7SelfCureType(int connectFailTimes, WifiLinkedInfo &info);
+    int GetWifi7SelfCureType(WifiLinkedInfo &info);
     void ShouldTransToWifi7SelfCure(WifiLinkedInfo &info);
+    std::set<std::string> GetCandidateBssidsForBlacklist(const WifiLinkedInfo &info);
     void HandleWifiBlackListUpdateMsg();
     int GetScanRssi(std::string currentBssid, const std::vector<WifiScanInfo> scanResults);
     int GetCurrentRssi();
@@ -417,8 +420,8 @@ private:
     void RemoveAutoJoinBlockTime(const std::string& conditionName);
     void SetDeviceConfigForUpdateById(int networkId);
     void UpdateLastNetworkId(int uid, const std::string& ssid, const std::string& keyMgmt);
-    void HandleWifi7WithoutMldBackoff(const std::string &bssid);
-    void HandleWifi7MldBackoff(const std::string &bssid);
+    void HandleWifi7WithoutMldBackoff(const WifiLinkedInfo &info);
+    void HandleWifi7MldBackoff(const WifiLinkedInfo &info);
     
     /**
      * @brief Preserve Reset self-cure success information before history reset

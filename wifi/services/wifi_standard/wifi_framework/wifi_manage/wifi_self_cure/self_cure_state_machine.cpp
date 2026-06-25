@@ -16,6 +16,8 @@
 #include "self_cure_state_machine.h"
 #include <vector>
 #include <string>
+#include <set>
+#include <algorithm>
 #include "wifi_cmd_client.h"
 #include "wifi_logger.h"
 #include "mac_address.h"
@@ -697,11 +699,19 @@ bool SelfCureStateMachine::DisconnectedMonitorState::ExecuteStateMsg(InternalMes
             break;
         case WIFI_CURE_CMD_WIFI7_MLD_BACKOFF:
             ret = EXECUTED;
-            pSelfCureStateMachine_->HandleWifi7MldBackoff(msg->GetStringFromMessage());
+            {
+                WifiLinkedInfo info;
+                msg->GetMessageObj(info);
+                pSelfCureStateMachine_->HandleWifi7MldBackoff(info);
+            }
             break;
         case WIFI_CURE_CMD_WIFI7_NON_MLD_BACKOFF:
             ret = EXECUTED;
-            pSelfCureStateMachine_->HandleWifi7WithoutMldBackoff(msg->GetStringFromMessage());
+            {
+                WifiLinkedInfo info;
+                msg->GetMessageObj(info);
+                pSelfCureStateMachine_->HandleWifi7WithoutMldBackoff(info);
+            }
             break;
         case WIFI_CURE_CMD_WIFI7_BACKOFF_RECOVER:
             ret = EXECUTED;
@@ -1921,22 +1931,23 @@ bool SelfCureStateMachine::Wifi7SelfCureState::ExecuteStateMsg(InternalMessagePt
 
 void SelfCureStateMachine::Wifi7SelfCureState::HandleWifi7ArpFailMsg()
 {
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     if (pSelfCureStateMachine_->lastSignalLevel_ >= SigLevel::SIG_LEVEL_3 &&
         !pSelfCureStateMachine_->CanArpReachable()) {
-        ExecuteWifi7ArpFailSelfCure();
+        ExecuteWifi7ArpFailSelfCure(linkedInfo);
     }
     pSelfCureStateMachine_->SwitchState(pSelfCureStateMachine_->pConnectedMonitorState_);
 }
 
-void SelfCureStateMachine::Wifi7SelfCureState::ExecuteWifi7ArpFailSelfCure()
+void SelfCureStateMachine::Wifi7SelfCureState::ExecuteWifi7ArpFailSelfCure(const WifiLinkedInfo &info)
 {
-    std::string currentBssid = pSelfCureStateMachine_->GetCurrentBssid();
     std::map<std::string, WifiCategoryBlackListInfo> wifi7BlackListCache;
     WifiConfigCenter::GetInstance().GetWifiCategoryBlackListCache(EVENT_BE_BLA_LIST, wifi7BlackListCache);
-    auto iter = wifi7BlackListCache.find(currentBssid);
+    auto iter = wifi7BlackListCache.find(info.bssid);
     if (iter == wifi7BlackListCache.end()) {
         WIFI_LOGI("ExecuteWifi7ArpFailSelfCure start wifi7 mld back off");
-        pSelfCureStateMachine_->HandleWifi7MldBackoff(currentBssid);
+        pSelfCureStateMachine_->HandleWifi7MldBackoff(info);
         IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
         if (pStaService == nullptr) {
             WIFI_LOGE("ExecuteWifi7ArpFailSelfCure Get pStaService failed!");
@@ -1945,6 +1956,19 @@ void SelfCureStateMachine::Wifi7SelfCureState::ExecuteWifi7ArpFailSelfCure()
         if (pStaService->ReAssociate() != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("ExecuteWifi7ArpFailSelfCure ReAssociate failed.\n");
         }
+    } else if (iter->second.actionType == ACTION_TYPE_MLD) {
+        WIFI_LOGI("ExecuteWifi7ArpFailSelfCure start wifi7 non_mld back off");
+        pSelfCureStateMachine_->HandleWifi7WithoutMldBackoff(info);
+        IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+        if (pStaService == nullptr) {
+            WIFI_LOGE("ExecuteWifi7ArpFailSelfCure Get pStaService failed!");
+            return;
+        }
+        if (pStaService->ReAssociate() != WIFI_OPT_SUCCESS) {
+            WIFI_LOGE("ExecuteWifi7ArpFailSelfCure ReAssociate failed.\n");
+        }
+    } else if (iter->second.actionType == ACTION_TYPE_WIFI7) {
+        WIFI_LOGI("ExecuteWifi7ArpFailSelfCure already in wifi7 blacklist, do nothing");
     }
 }
 
@@ -2347,16 +2371,16 @@ bool SelfCureStateMachine::ShouldTransToWifi6SelfCure(InternalMessagePtr msg, st
     return false;
 }
 
-int SelfCureStateMachine::GetWifi7SelfCureType(int connectFailTimes, WifiLinkedInfo &info)
+int SelfCureStateMachine::GetWifi7SelfCureType(WifiLinkedInfo &info)
 {
     std::vector<WifiScanInfo> scanResults;
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
     int scanRssi = GetScanRssi(info.bssid, scanResults);
     WifiCategory wifiCategory = WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetWifiCategoryRecord(info.bssid);
-    WIFI_LOGI("GetWifi7SelfCureType scanRssi %{public}d, wifiCategory: %{public}d, connectFailTimes: %{public}d",
-        scanRssi, static_cast<int>(wifiCategory), connectFailTimes);
+    WIFI_LOGI("GetWifi7SelfCureType scanRssi %{public}d, wifiCategory: %{public}d",
+        scanRssi, static_cast<int>(wifiCategory));
     if ((wifiCategory == WifiCategory::WIFI7 || wifiCategory == WifiCategory::WIFI7_PLUS)
-        && connectFailTimes >= SELF_CURE_WIFI7_CONNECT_FAIL_MAX_COUNT && scanRssi >= MIN_VAL_LEVEL_3) {
+        && scanRssi >= MIN_WIFI7_SELFCURE_RSSI) {
         return WIFI7_SELFCURE_DISCONNECTED;
     }
     return WIFI7_NO_SELFCURE;
@@ -2368,14 +2392,7 @@ void SelfCureStateMachine::ShouldTransToWifi7SelfCure(WifiLinkedInfo &info)
     if (info.bssid.empty()) {
         return;
     }
-    std::map<std::string, WifiCategoryConnectFailInfo> connectFailListCache;
-    WifiConfigCenter::GetInstance().GetWifiConnectFailListCache(connectFailListCache);
-    auto iterConnectFail = connectFailListCache.find(info.bssid);
-    if (iterConnectFail == connectFailListCache.end()) {
-        WIFI_LOGE("no bssid in connectFailListCache");
-        return;
-    }
-    int wifi7SelfCureType = GetWifi7SelfCureType(iterConnectFail->second.connectFailTimes, info);
+    int wifi7SelfCureType = GetWifi7SelfCureType(info);
     if (wifi7SelfCureType == WIFI7_SELFCURE_DISCONNECTED) {
         std::map<std::string, WifiCategoryBlackListInfo> blackListCache;
         WifiConfigCenter::GetInstance().GetWifiCategoryBlackListCache(EVENT_BE_BLA_LIST, blackListCache);
@@ -2383,17 +2400,15 @@ void SelfCureStateMachine::ShouldTransToWifi7SelfCure(WifiLinkedInfo &info)
         if (iterBlackList == blackListCache.end()) {
             WIFI_LOGI("start wifi7 with mld backoff");
             InternalMessagePtr msg = MessageManage::GetInstance().CreateMessage(WIFI_CURE_CMD_WIFI7_MLD_BACKOFF);
-            msg->AddStringMessageBody(info.bssid);
+            msg->SetMessageObj(info);
             SendMessage(msg);
+        } else if (iterBlackList->second.actionType == ACTION_TYPE_WIFI7) {
+            WIFI_LOGI("already in wifi7 blacklist, do nothing");
         } else if (iterBlackList->second.actionType == ACTION_TYPE_MLD) {
             WIFI_LOGI("start wifi7 without mld backoff");
             InternalMessagePtr msg = MessageManage::GetInstance().CreateMessage(WIFI_CURE_CMD_WIFI7_NON_MLD_BACKOFF);
-            msg->AddStringMessageBody(info.bssid);
+            msg->SetMessageObj(info);
             SendMessage(msg);
-        } else if (iterBlackList->second.actionType == ACTION_TYPE_WIFI7
-            && iterConnectFail->second.actionType == ACTION_TYPE_RECOVER_FAIL) {
-            WIFI_LOGI("start wifi7 selfcure fail recover");
-            SendMessage(WIFI_CURE_CMD_WIFI7_BACKOFF_RECOVER, info);
         }
     } else {
         WIFI_LOGD("don't need to do wifi7 selfcure");
@@ -2418,6 +2433,44 @@ int SelfCureStateMachine::GetScanRssi(std::string currentBssid, const std::vecto
         }
     }
     return CURRENT_RSSI_INIT;
+}
+
+std::set<std::string> SelfCureStateMachine::GetCandidateBssidsForBlacklist(const WifiLinkedInfo &info)
+{
+    std::set<std::string> bssids;
+    bssids.insert(info.bssid);
+    if (info.ssid.empty()) {
+        WIFI_LOGE("%{public}s: ssid is empty.", __FUNCTION__);
+        return bssids;
+    }
+    std::vector<WifiScanInfo> scanResults;
+    WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanResults);
+    
+    std::vector<std::pair<std::string, int>> bssidRssiList;
+    for (const auto &scanInfo : scanResults) {
+        if (scanInfo.ssid == info.ssid && !scanInfo.bssid.empty() && scanInfo.rssi >= MIN_WIFI7_SELFCURE_RSSI) {
+            bssidRssiList.push_back({scanInfo.bssid, scanInfo.rssi});
+        }
+    }
+    
+    std::sort(bssidRssiList.begin(), bssidRssiList.end(),
+        [](const std::pair<std::string, int> &a, const std::pair<std::string, int> &b) {
+            return a.second > b.second;
+        });
+    
+    for (const auto &item : bssidRssiList) {
+        if (bssids.size() >= WIFI_MAX_BLA_LIST_NUM) {
+            WIFI_LOGI("GetCandidateBssidsForBlacklist: reached max blacklist size %{public}d", WIFI_MAX_BLA_LIST_NUM);
+            break;
+        }
+        bssids.insert(item.first);
+        WIFI_LOGI("GetCandidateBssidsForBlacklist: ssid %{public}s, bssid %{public}s, rssi %{public}d",
+            SsidAnonymize(info.ssid).c_str(), MacAnonymize(item.first).c_str(), item.second);
+    }
+    
+    WIFI_LOGI("GetCandidateBssidsForBlacklist: ssid %{public}s found %{public}zu bssids",
+        SsidAnonymize(info.ssid).c_str(), bssids.size());
+    return bssids;
 }
 
 int SelfCureStateMachine::GetCurrentRssi()
@@ -3260,36 +3313,40 @@ void SelfCureStateMachine::UpdateLastNetworkId(int uid, const std::string& ssid,
     WIFI_LOGI("%{public}s, update last networkId: %{public}d -> %{public}d", __func__, lastNetworkId, config.networkId);
 }
 
-void SelfCureStateMachine::HandleWifi7WithoutMldBackoff(const std::string &bssid)
+void SelfCureStateMachine::HandleWifi7WithoutMldBackoff(const WifiLinkedInfo &info)
 {
-    if (bssid.empty()) {
-        WIFI_LOGE("%{public}s: lastconnect bssid is empty.", __FUNCTION__);
+    if (info.bssid.empty()) {
+        WIFI_LOGE("%{public}s: bssid is empty.", __FUNCTION__);
         return;
     }
+    std::set<std::string> allBssids = GetCandidateBssidsForBlacklist(info);
     WifiCategoryBlackListInfo wifi7BlackListInfo(ACTION_TYPE_WIFI7, GetCurrentTimeMilliSeconds());
-    WifiConfigCenter::GetInstance().InsertWifiCategoryBlackListCache(EVENT_BE_BLA_LIST, bssid, wifi7BlackListInfo);
-    WIFI_LOGI("add %{public}s to wifi7 blalist.", MacAnonymize(bssid).c_str());
+    for (const auto &currBssid : allBssids) {
+        WifiConfigCenter::GetInstance().InsertWifiCategoryBlackListCache(EVENT_BE_BLA_LIST, currBssid, wifi7BlackListInfo);
+        WIFI_LOGI("add %{public}s to wifi7 non_mld blalist.", MacAnonymize(currBssid).c_str());
+        
+        WifiCategoryConnectFailInfo wifi7ConnectFailInfo(ACTION_TYPE_RECOVER_FAIL, 0, GetCurrentTimeMilliSeconds());
+        WifiConfigCenter::GetInstance().UpdateWifiConnectFailListCache(EVENT_BE_BLA_LIST, currBssid, wifi7ConnectFailInfo);
+    }
     SendBlaListToDriver(EVENT_BE_BLA_LIST);
-
-    WifiCategoryConnectFailInfo wifi7ConnectFailInfo(ACTION_TYPE_RECOVER_FAIL,
-        0, GetCurrentTimeMilliSeconds());
-    WifiConfigCenter::GetInstance().UpdateWifiConnectFailListCache(EVENT_BE_BLA_LIST, bssid, wifi7ConnectFailInfo);
 }
 
-void SelfCureStateMachine::HandleWifi7MldBackoff(const std::string &bssid)
+void SelfCureStateMachine::HandleWifi7MldBackoff(const WifiLinkedInfo &info)
 {
-    if (bssid.empty()) {
-        WIFI_LOGE("%{public}s: lastconnect bssid is empty.", __FUNCTION__);
+    if (info.bssid.empty()) {
+        WIFI_LOGE("%{public}s: bssid is empty.", __FUNCTION__);
         return;
     }
+    std::set<std::string> allBssids = GetCandidateBssidsForBlacklist(info);
     WifiCategoryBlackListInfo wifi7BlackListInfo(ACTION_TYPE_MLD, GetCurrentTimeMilliSeconds());
-    WifiConfigCenter::GetInstance().InsertWifiCategoryBlackListCache(EVENT_BE_BLA_LIST, bssid, wifi7BlackListInfo);
-    WIFI_LOGI("add %{public}s to wifi7 blalist.", MacAnonymize(bssid).c_str());
+    for (const auto &currBssid : allBssids) {
+        WifiConfigCenter::GetInstance().InsertWifiCategoryBlackListCache(EVENT_BE_BLA_LIST, currBssid, wifi7BlackListInfo);
+        WIFI_LOGI("add %{public}s to wifi7 mld blalist.", MacAnonymize(currBssid).c_str());
+        
+        WifiCategoryConnectFailInfo wifi7ConnectFailInfo(ACTION_TYPE_WIFI7, 0, GetCurrentTimeMilliSeconds());
+        WifiConfigCenter::GetInstance().UpdateWifiConnectFailListCache(EVENT_BE_BLA_LIST, currBssid, wifi7ConnectFailInfo);
+    }
     SendBlaListToDriver(EVENT_BE_BLA_LIST);
-
-    WifiCategoryConnectFailInfo wifi7ConnectFailInfo(ACTION_TYPE_WIFI7, 0,
-                                                    GetCurrentTimeMilliSeconds());
-    WifiConfigCenter::GetInstance().UpdateWifiConnectFailListCache(EVENT_BE_BLA_LIST, bssid, wifi7ConnectFailInfo);
 }
 } // namespace Wifi
 } // namespace OHOS

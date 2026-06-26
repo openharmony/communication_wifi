@@ -56,6 +56,7 @@
 #endif // OHOS_ARCH_LITE
 
 #include "wifi_channel_helper.h"
+#include "parameters.h"
 #ifndef OHOS_WIFI_STA_TEST
 #else
 #include "mock_dhcp_service.h"
@@ -2909,6 +2910,11 @@ void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
         || !WifiConfigCenter::GetInstance().IsAllowPopUp()
         || !WifiConfigCenter::GetInstance().IsAllowPcPopUp()) {
         WIFI_LOGI("factory version or device type no need to pop up diag");
+        return;
+    }
+    std::string noNeedPop = OHOS::system::GetParameter("mmi2.auto.flag", "");
+    if (noNeedPop == "1" || noNeedPop == "true") {
+        WIFI_LOGI("mmi2.auto.flag is set, no need to pop up dialog");
         return;
     }
     WifiLinkedInfo linkedInfo;

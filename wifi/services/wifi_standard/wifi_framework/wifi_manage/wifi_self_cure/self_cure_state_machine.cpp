@@ -1967,7 +1967,7 @@ void SelfCureStateMachine::Wifi7SelfCureState::ExecuteWifi7ArpFailSelfCure(const
             WIFI_LOGE("ExecuteWifi7ArpFailSelfCure ReAssociate failed.\n");
         }
     } else if (iter->second.actionType == ACTION_TYPE_WIFI7) {
-        WIFI_LOGI("ExecuteWifi7ArpFailSelfCure already in wifi7 blacklist, do nothing");
+        WIFI_LOGI("ExecuteWifi7ArpFailSelfCure do nothing");
     }
 }
 
@@ -2468,7 +2468,7 @@ std::set<std::string> SelfCureStateMachine::GetCandidateBssidsForBlacklist(const
     
     for (const auto &item : bssidRssiList) {
         if (bssids.size() >= WIFI_MAX_BLA_LIST_NUM) {
-            WIFI_LOGI("GetCandidateBssidsForBlacklist: reached max blacklist size %{public}d", WIFI_MAX_BLA_LIST_NUM);
+            WIFI_LOGI("GetCandidateBssidsForBlacklist: reached max size %{public}d", WIFI_MAX_BLA_LIST_NUM);
             break;
         }
         bssids.insert(item.first);

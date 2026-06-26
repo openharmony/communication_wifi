@@ -53,9 +53,13 @@ WifiTogglerManager::WifiTogglerManager()
     WIFI_LOGI("create WifiTogglerManager");
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     int32_t retryCnt = 1;
-    while (!HalDeviceManager::GetInstance().StartChipHdi() && retryCnt <= START_CHIP_HDI_RETRY_MAX_COUNT) {
+    while (HalDeviceManager::GetInstance().StartChipHdi()) {
         WIFI_LOGE("StartChipHdi fail retry count: %{public}d", retryCnt);
         retryCnt++;
+        if (retryCnt > START_CHIP_HDI_RETRY_MAX_COUNT) {
+            WIFI_LOGE("StartChipHdi fail");
+            return;
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(START_CHIP_HDI_RETRY_INTERVAL_MS));
     }
 #endif

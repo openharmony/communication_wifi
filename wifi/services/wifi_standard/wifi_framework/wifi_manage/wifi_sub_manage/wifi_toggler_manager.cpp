@@ -43,11 +43,21 @@ constexpr const char *IFACE_LINK_UP = "up";
 constexpr const char *IFACE_RUNNING = "running";
 #endif
 
+#ifdef HDI_CHIP_INTERFACE_SUPPORT
+constexpr int32_t START_CHIP_HDI_RETRY_MAX_COUNT = 5;
+constexpr int32_t START_CHIP_HDI_RETRY_INTERVAL_MS = 100;
+#endif
+
 WifiTogglerManager::WifiTogglerManager()
 {
     WIFI_LOGI("create WifiTogglerManager");
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
-    HalDeviceManager::GetInstance().StartChipHdi();
+    int32_t retryCnt = 1;
+    while (!HalDeviceManager::GetInstance().StartChipHdi() && retryCnt <= START_CHIP_HDI_RETRY_MAX_COUNT) {
+        WIFI_LOGE("StartChipHdi fail retry count: %{public}d", retryCnt);
+        retryCnt++;
+        std::this_thread::sleep_for(std::chrono::milliseconds(START_CHIP_HDI_RETRY_INTERVAL_MS));
+    }
 #endif
     InitConcreteCallback();
     InitSoftapCallback();

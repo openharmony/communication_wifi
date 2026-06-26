@@ -53,7 +53,7 @@ WifiTogglerManager::WifiTogglerManager()
     WIFI_LOGI("create WifiTogglerManager");
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
     int32_t retryCnt = 1;
-    while (HalDeviceManager::GetInstance().StartChipHdi()) {
+    while (!HalDeviceManager::GetInstance().StartChipHdi()) {
         WIFI_LOGE("StartChipHdi fail retry count: %{public}d", retryCnt);
         retryCnt++;
         if (retryCnt > START_CHIP_HDI_RETRY_MAX_COUNT) {

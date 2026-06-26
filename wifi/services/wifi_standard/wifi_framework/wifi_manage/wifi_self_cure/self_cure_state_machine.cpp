@@ -16,7 +16,6 @@
 #include "self_cure_state_machine.h"
 #include <vector>
 #include <string>
-#include <set>
 #include <algorithm>
 #include "wifi_cmd_client.h"
 #include "wifi_logger.h"
@@ -2402,18 +2401,23 @@ void SelfCureStateMachine::ShouldTransToWifi7SelfCure(WifiLinkedInfo &info)
             InternalMessagePtr msg = MessageManage::GetInstance().CreateMessage(WIFI_CURE_CMD_WIFI7_MLD_BACKOFF);
             msg->SetMessageObj(info);
             SendMessage(msg);
-        } else if (iterBlackList->second.actionType == ACTION_TYPE_WIFI7) {
-            WIFI_LOGI("already in wifi7 blacklist, do nothing");
         } else if (iterBlackList->second.actionType == ACTION_TYPE_MLD) {
             WIFI_LOGI("start wifi7 without mld backoff");
             InternalMessagePtr msg = MessageManage::GetInstance().CreateMessage(WIFI_CURE_CMD_WIFI7_NON_MLD_BACKOFF);
             msg->SetMessageObj(info);
             SendMessage(msg);
-        } else if (iterBlackList->second.actionType == ACTION_TYPE_WIFI7 &&
-            iterConnectFail->second.actionType == ACTION_TYPE_RECOVER_FAIL) { 
-            WIFI_LOGI("start wifi7 selfcure fail recover"); 
-            SendMessage(WIFI_CURE_CMD_WIFI7_BACKOFF_RECOVER, info); 
-         }
+        } else if (iterBlackList->second.actionType == ACTION_TYPE_WIFI7) {
+            std::map<std::string, WifiCategoryConnectFailInfo> connectFailListCache;
+            WifiConfigCenter::GetInstance().GetWifiConnectFailListCache(connectFailListCache);
+            auto iterConnectFail = connectFailListCache.find(info.bssid);
+            if (iterConnectFail == connectFailListCache.end()) {
+                return;
+            }
+            if (iterConnectFail->second.actionType == ACTION_TYPE_RECOVER_FAIL) {
+                WIFI_LOGI("start wifi7 selfcure fail recover");
+                SendMessage(WIFI_CURE_CMD_WIFI7_BACKOFF_RECOVER, info);
+            }
+        }
     } else {
         WIFI_LOGD("don't need to do wifi7 selfcure");
     }

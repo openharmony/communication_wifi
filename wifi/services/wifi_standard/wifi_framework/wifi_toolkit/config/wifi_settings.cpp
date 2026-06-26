@@ -1366,7 +1366,11 @@ void WifiSettings::ClearHotspotConfig()
     config.SetMaxConn(GetApMaxConnNum());
     config.SetBandWidth(AP_BANDWIDTH_DEFAULT);
     config.SetSsid(g_defaultApSsid.empty()? GetDefaultApSsid() : g_defaultApSsid);
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+    config.SetPreSharedKey(GeneratePasswordForCar(RANDOM_PASSWD_LEN));
+#else
     config.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
+#endif
     config.SetPasswdDefault(true);
     auto ret = mHotspotConfig.emplace(0, config);
     if (!ret.second) {
@@ -2216,7 +2220,11 @@ void WifiSettings::InitDefaultHotspotConfig()
     cfg.SetMaxConn(GetApMaxConnNum());
     cfg.SetBandWidth(AP_BANDWIDTH_DEFAULT);
     cfg.SetSsid(g_defaultApSsid.empty()? GetDefaultApSsid() : g_defaultApSsid);
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+    cfg.SetPreSharedKey(GeneratePasswordForCar(RANDOM_PASSWD_LEN));
+#else
     cfg.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
+#endif
     cfg.SetPasswdDefault(true);
     auto ret = mHotspotConfig.emplace(0, cfg);
     if (!ret.second) {

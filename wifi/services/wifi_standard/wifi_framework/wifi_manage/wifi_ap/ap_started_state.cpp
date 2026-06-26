@@ -166,7 +166,11 @@ bool ApStartedState::SetConfig(HotspotConfig &apConfig)
         std::string randomSsid = LOCAL_ONLY_SOFTAP_SSID_PREFIX +
             std::to_string(GetRandomInt(LOCAL_ONLY_SOFTAP_SSID_INIT_SUFFIX, LOCAL_ONLY_SOFTAP_SSID_END_SUFFIX));
         hotspotConfigTemp.SetSsid(randomSsid);
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+        hotspotConfigTemp.SetPreSharedKey(GeneratePasswordForCar(LOCAL_ONLY_SOFTAP_PWD_LEN));
+#else
         hotspotConfigTemp.SetPreSharedKey(GetRandomStr(LOCAL_ONLY_SOFTAP_PWD_LEN));
+#endif
         WifiConfigCenter::GetInstance().SetLocalOnlyHotspotConfig(hotspotConfigTemp);
         setSoftApConfigResult = WifiApHalInterface::GetInstance().SetSoftApConfig(ifName, hotspotConfigTemp, m_id);
         setApPasswdResult = WifiApHalInterface::GetInstance().SetApPasswd(

@@ -1048,6 +1048,7 @@ struct IpV6Info {
     uint32_t validLifeTime;
     uint32_t preferredLifeTime;
     uint32_t routerLifeTime;
+    uint8_t raFlags = 0;
     IpV6Info()
     {
         linkIpV6Address = "";
@@ -1064,6 +1065,7 @@ struct IpV6Info {
         validLifeTime = MAX_LIFETIME_S;
         preferredLifeTime = MAX_LIFETIME_S;
         routerLifeTime = MAX_LIFETIME_S;
+        raFlags = 0;
     }
 };
 

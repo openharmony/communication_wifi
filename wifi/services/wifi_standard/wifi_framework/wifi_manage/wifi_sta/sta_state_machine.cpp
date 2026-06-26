@@ -3883,6 +3883,7 @@ void StaStateMachine::DhcpResultNotify::SaveDhcpResult(DhcpResult *dest, DhcpRes
         WIFI_LOGE("SaveDhcpResult strOptVendor strcpy_s failed!");
         return;
     }
+    dest->raFlags = source->raFlags;
     WIFI_LOGI("SaveDhcpResult ok, ipType:%{public}d", dest->iptype);
     StaStateMachine::DhcpResultNotify::SaveDhcpResultExt(dest, source);
 }
@@ -4202,6 +4203,7 @@ void StaStateMachine::DhcpResultNotify::TryToSaveIpV6ResultExt(IpInfo &ipInfo, I
     if (ipv6Info.secondDns.length() > 0 && !IsIpv6AllZero(ipv6Info.secondDns)) {
         ipv6Info.dnsAddr.push_back(ipv6Info.secondDns);
     }
+    ipv6Info.raFlags = result->raFlags;
 }
 
 void StaStateMachine::DhcpResultNotify::TryToSaveIpV6Result(IpInfo &ipInfo, IpV6Info &ipv6Info, DhcpResult *result)

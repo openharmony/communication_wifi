@@ -360,6 +360,26 @@ HWTEST_F(WifiNetStatsManagerTest, ReportSpeedTestChr_ZeroDuration_HandlesDivisio
     EXPECT_EQ(WifiNetStatsManager::GetInstance().avgTxSpeed_, 0);
 }
 
+HWTEST_F(WifiNetStatsManagerTest, LogNetStatsTraffic_WithUpdateNetStatsTraffic, TestSize.Level1)
+{
+    WIFI_LOGI("LogNetStatsTraffic_WithUpdateNetStatsTraffic enter!");
+    NetStats netStats;
+    NetStatsInfo netStatsInfo;
+    netStatsInfo.uid_ = 123;
+    netStatsInfo.rxBytes_ = 1000;
+    netStatsInfo.txBytes_ = 2000;
+    netStatsInfo.rxPackets_ = 10;
+    netStatsInfo.txPackets_ = 20;
+    netStats.push_back(netStatsInfo);
+ 
+    WifiNetStatsManager::GetInstance().m_lastStatsMap = {};
+    WifiNetStatsManager::GetInstance().lastLogTime_ = 0;
+ 
+    WifiNetStatsManager::GetInstance().LogNetStatsTraffic(netStats);
+ 
+    EXPECT_NE(WifiNetStatsManager::GetInstance().lastLogTime_, 0);
+}
+
 HWTEST_F(WifiNetStatsManagerTest, LogNetStatsTraffic_WithSpeedTest_CallsCheckAndReport, TestSize.Level1)
 {
     WIFI_LOGI("LogNetStatsTraffic_WithSpeedTest_CallsCheckAndReport enter!");

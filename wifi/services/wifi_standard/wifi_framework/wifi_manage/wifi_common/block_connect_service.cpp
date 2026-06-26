@@ -26,6 +26,7 @@ constexpr int FREQUENT_DISCONNECT_COUNT = 5;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MAX = 10 * 60 * 1000 * 1000;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MID = 1 * 60 * 1000 * 1000;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MIN = 0.5 * 60 * 1000 * 1000;
+constexpr int32_t HOLD_TO_PERM_WRONG_PASSWORD = 2;
 #ifndef OHOS_ARCH_LITE
 constexpr int64_t TIMEOUT_CLEAR_SET = 4 * 60 * 1000;
 constexpr int32_t MIN_RSSI_LEVEL_3 = -75;
@@ -367,6 +368,28 @@ bool BlockConnectService::IsFrequentDisconnect(std::string bssid, int wpaReason,
     return false;
 }
 
+// Check if the given targetNetworkId is blocked due to wrong password
+bool BlockConnectService::IsWrongPassword(int targetNetworkId)
+{
+    // Implement the logic to check if the given targetNetworkId is blocked due to wrong password
+    // Return true if blocked due to wrong password, false otherwise
+    // Check if the wrong password threshold has been reached for the given targetNetworkId
+    WifiDeviceConfig targetNetwork;
+    if (WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, targetNetwork)) {
+        WIFI_LOGE("Failed to get device config %{public}d", targetNetworkId);
+        return false;
+    }
+    if (targetNetwork.numAssociation == 0) {
+        return true;
+    }
+    if (targetNetwork.networkSelectionStatus.networkSelectionDisableReason ==
+        DisabledReason::DISABLED_AUTHENTICATION_FAILURE &&
+        targetNetwork.networkSelectionStatus.networkDisableCount >= HOLD_TO_PERM_WRONG_PASSWORD) {
+        return true;
+    }
+    return false;
+}
+
 void BlockConnectService::EnableAllNetworksByEnteringSettings(std::vector<DisabledReason> enableReasons)
 {
     WIFI_LOGI("ENTER EnableAllNetworksByEnteringSettings");
@@ -447,8 +470,7 @@ void BlockConnectService::NotifyWifiConnFailedInfo(int targetNetworkId, std::str
     }
 
     if (disableReason == DisabledReason::DISABLED_ASSOCIATION_REJECTION
-        || disableReason == DisabledReason::DISABLED_AUTHENTICATION_FAILURE
-        || disableReason == DisabledReason::DISABLED_BY_WRONG_PASSWORD) {
+        || disableReason == DisabledReason::DISABLED_AUTHENTICATION_FAILURE) {
         std::lock_guard<std::mutex> lock(bssidMutex_);
         if (targetNetwork.ssid != curUnusableSsid_ ||
             !WifiSettings::GetInstance().InKeyMgmtBitset(targetNetwork, curUnusableKeyMgmt_)) {

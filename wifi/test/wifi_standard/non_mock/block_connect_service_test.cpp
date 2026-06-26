@@ -196,6 +196,59 @@ HWTEST_F(BlockConnectServiceTest, isFrequentDisconnect_ReturnsFalseWhenFrequentD
     EXPECT_EQ(result, true);
 }
 
+HWTEST_F(BlockConnectServiceTest, IsWrongPassword_ReturnsTrueWhenBlockedDueToWrongPassword, TestSize.Level1)
+{
+    // Test logic here
+    int targetNetworkId = 1;
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
+    config.numAssociation = 0;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    bool result = BlockConnectService::GetInstance().IsWrongPassword(targetNetworkId);
+    EXPECT_EQ(result, true);
+    config.numAssociation = 1;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    result = BlockConnectService::GetInstance().IsWrongPassword(targetNetworkId);
+    EXPECT_EQ(result, false);
+}
+
+HWTEST_F(BlockConnectServiceTest, IsWrongPassword_NeverConnected_ReturnsTrue, TestSize.Level1)
+{
+    int targetNetworkId = 1;
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
+    config.numAssociation = 0;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    bool result = BlockConnectService::GetInstance().IsWrongPassword(targetNetworkId);
+    EXPECT_EQ(result, true);
+}
+
+HWTEST_F(BlockConnectServiceTest, IsWrongPassword_ThresholdReached_ReturnsTrue, TestSize.Level1)
+{
+    int targetNetworkId = 1;
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
+    config.numAssociation = 1;
+    config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_AUTHENTICATION_FAILURE;
+    config.networkSelectionStatus.networkDisableCount = 2;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    bool result = BlockConnectService::GetInstance().IsWrongPassword(targetNetworkId);
+    EXPECT_EQ(result, true);
+}
+
+HWTEST_F(BlockConnectServiceTest, IsWrongPassword_NotBlocked_ReturnsFalse, TestSize.Level1)
+{
+    int targetNetworkId = 1;
+    WifiDeviceConfig config;
+    WifiSettings::GetInstance().GetDeviceConfig(targetNetworkId, config);
+    config.numAssociation = 1;
+    config.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_UNKNOWN_REASON;
+    config.networkSelectionStatus.networkDisableCount = 0;
+    WifiSettings::GetInstance().AddDeviceConfig(config);
+    bool result = BlockConnectService::GetInstance().IsWrongPassword(targetNetworkId);
+    EXPECT_EQ(result, false);
+}
+
 HWTEST_F(BlockConnectServiceTest, OnReceiveSettingsEnterEvent_EnablesAllNetworksWhenEnteringSettings, TestSize.Level1)
 {
     // Test logic here

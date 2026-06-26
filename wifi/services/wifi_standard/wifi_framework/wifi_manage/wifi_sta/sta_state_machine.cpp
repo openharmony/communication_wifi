@@ -1533,6 +1533,17 @@ void StaStateMachine::ApLinkingState::HandleStaBssidChangedEvent(InternalMessage
     }
 }
 
+void StaStateMachine::ApLinkingState::HandlePasswdWrongReport(
+    ConnReportReason reportReason, DisabledReason disabledReason)
+{
+    BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_, disabledReason);
+#ifndef OHOS_ARCH_LITE
+#ifdef WIFI_DATA_REPORT_ENABLE
+    pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(reportReason, pStaStateMachine->targetNetworkId_);
+#endif
+#endif
+}
+
 void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent(InternalMessagePtr msg)
 {
     std::string bssid = msg->GetStringFromMessage();
@@ -1542,18 +1553,14 @@ void StaStateMachine::ApLinkingState::DealWpaLinkPasswdWrongFailEvent(InternalMe
     }
     pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_WRONG_PWD);
     pStaStateMachine->SaveLinkstate(ConnState::DISCONNECTED, DetailedState::PASSWORD_ERROR);
-    BlockConnectService::GetInstance().UpdateNetworkSelectStatus(pStaStateMachine->targetNetworkId_,
-        DisabledReason::DISABLED_BY_WRONG_PASSWORD);
-#ifndef OHOS_ARCH_LITE
-#ifdef WIFI_DATA_REPORT_ENABLE
-    pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_WRONG_PASSWORD,
-        pStaStateMachine->targetNetworkId_);
-#endif
-#endif
-#ifndef OHOS_ARCH_LITE
+    if (BlockConnectService::GetInstance().IsWrongPassword(pStaStateMachine->targetNetworkId_)) {
+        HandlePasswdWrongReport(ConnReportReason::CONN_WRONG_PASSWORD, DisabledReason::DISABLED_BY_WRONG_PASSWORD);
+    } else {
+        HandlePasswdWrongReport(ConnReportReason::CONN_AUTHENTICATION_FAILURE,
+            DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
+    }
     BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
-        pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_BY_WRONG_PASSWORD);
-#endif
+        pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_AUTHENTICATION_FAILURE);
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_PASSWORD_WRONG,
         pStaStateMachine->linkedInfo);
     return;

@@ -395,7 +395,7 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
     }
 #endif
     int callingUid = GetCallingUid();
-    WIFI_LOGI("Uid %{public}d createGroup, network name is [%{public}s]", callingUid, config.GetGroupName().c_str());
+    WIFI_LOGI("Uid %{public}d createGroup", callingUid);
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -559,7 +559,6 @@ ErrCode WifiP2pServiceImpl::P2pConnect(const WifiP2pConfig &config)
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_CNT));
     CheckAndStopDualWifi();
     return pService->P2pConnect(updateConfig);
 }
@@ -1199,7 +1198,6 @@ ErrCode WifiP2pServiceImpl::Hid2dConnect(const Hid2dConnectConfig& config)
         return WIFI_OPT_STA_AND_P2P_MAC_SAME;
     }
     WifiConfigCenter::GetInstance().SetP2pBusinessType(P2pBusinessType::P2P_TYPE_HID2D);
-    WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::MAGICLINK_CNT));
     return pService->Hid2dConnect(config);
 }
 
@@ -1269,11 +1267,6 @@ ErrCode WifiP2pServiceImpl::Hid2dGetRecommendChannel(const RecommendChannelReque
     int channel = pService->GetP2pRecommendChannel();
     int freq = ChannelToFrequency(channel);
     WIFI_LOGI("Get recommended channel: %{public}d, freq: %{public}d", channel, freq);
-    if (channel == 0) {
-        WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::P2P_SUC_2G4_CNT));
-    } else {
-        WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::P2P_SUC_5G_CNT));
-    }
     response.centerFreq = freq;
     response.status = RecommendStatus::RS_SUCCESS;
     return WIFI_OPT_SUCCESS;

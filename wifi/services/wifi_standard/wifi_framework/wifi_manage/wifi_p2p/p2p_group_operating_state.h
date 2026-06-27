@@ -129,7 +129,7 @@ private:
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdRemoveGroup(const InternalMessagePtr msg, bool needCheckUid) const;
+    virtual bool ProcessCmdRemoveGroup(const InternalMessagePtr msg) const;
 
     /**
      * @Description Process the delete group command received by the state machine

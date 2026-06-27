@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -310,7 +309,7 @@ private:
      * @return - bool true:handle   false:not handle
      */
     virtual bool ProcessCmdGetSignal(InternalMessagePtr msg) const;
- 	 
+
     /**
      * @Description Process the screen state changed event recived by the state machine
      *

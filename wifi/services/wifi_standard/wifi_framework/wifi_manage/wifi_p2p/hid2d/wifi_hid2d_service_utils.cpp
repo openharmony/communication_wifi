@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +30,8 @@ std::shared_mutex g_ipPoolMutex;
 static std::mutex g_sharedLinkMutex;
 std::map<int, int> SharedLinkManager::sharedLinkCountMap;
 int SharedLinkManager::firstGroupUid = -1;
-#define DEFAULT_UID 0
+inline constexpr int DEFAULT_UID = 0;
+inline constexpr int LIMIT_UID_MAX = 10000;
 
 bool IpPool::InitIpPool(const std::string& serverIp)
 {
@@ -232,6 +232,18 @@ bool SharedLinkManager::CheckNeedRemoveGroup(int uid)
         return true;
     }
     return false;
+}
+
+bool SharedLinkManager::CanRemoveGroupByUid(int uid)
+{
+    std::unique_lock<std::mutex> lock(g_sharedLinkMutex);
+
+    if (sharedLinkCountMap.find(uid) != sharedLinkCountMap.end()) {
+        return true;
+    }
+
+    PrintMapInfo();
+    return true;
 }
 }  // namespace Wifi
 }  // namespace OHOS

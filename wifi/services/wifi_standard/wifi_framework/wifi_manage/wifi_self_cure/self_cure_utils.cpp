@@ -179,7 +179,12 @@ std::string SelfCureUtils::GetNextIpAddr(const std::string& gateway, const std::
         uint32_t randomNum = 0;
         int32_t fd = open("/dev/random", O_RDONLY); /* Obtain the random number by reading /dev/random */
         if (fd > 0) {
-            read(fd, &randomNum, sizeof(uint32_t));
+            ssize_t readRet = read(fd, &randomNum, sizeof(uint32_t));
+            if (readRet < 0) {
+                WIFI_LOGE("Failed to read from /dev/random, using fallback random value");
+                close(fd);
+                break;
+            }
         }
         close(fd);
         uint32_t rand = (randomNum > 0 ? randomNum : -randomNum) % 100;
@@ -195,9 +200,7 @@ std::string SelfCureUtils::GetNextIpAddr(const std::string& gateway, const std::
                 break;
             }
         }
-        if (newIp > 0 && !reduplicate) {
-            break;
-        }
+        if (newIp > 0 && !reduplicate) { break; }
     }
     if (newIp > 1 && newIp <= iMAX && getCnt < GET_NEXT_IP_MAC_CNT) {
         ipAddr[VEC_POS_3] = newIp;

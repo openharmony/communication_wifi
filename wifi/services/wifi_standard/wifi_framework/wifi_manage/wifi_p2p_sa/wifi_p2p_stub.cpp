@@ -1131,6 +1131,7 @@ bool WifiP2pStub::IsSingleCallback() const
 void WifiP2pStub::SetSingleCallback(const bool isSingleCallback)
 {
     mSingleCallback_ = true;
+}
 
 void WifiP2pStub::OnHid2dIsWideBandwidthSupported(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)

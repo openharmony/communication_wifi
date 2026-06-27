@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -312,7 +311,6 @@ bool P2pEnabledState::P2pConfigInitialization()
     WifiErrorNo retCode = WifiP2PHalInterface::GetInstance().SetP2pDeviceName(deviceName);
     if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
         WIFI_LOGE("Failed to set the device name.");
-        result = false;
     }
 
     retCode = WifiP2PHalInterface::GetInstance().SetP2pSsidPostfix(ssidPostfixName);
@@ -320,15 +318,10 @@ bool P2pEnabledState::P2pConfigInitialization()
         WIFI_LOGE("Failed to set the SSID prefix");
     }
 
-    std::string primaryDeviceType = deviceManager.GetThisDevice().GetPrimaryDeviceType();
-    if (!primaryDeviceType.empty()) {
-        retCode = WifiP2PHalInterface::GetInstance().SetP2pDeviceType(primaryDeviceType);
-        if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
-            WIFI_LOGE("Failed to set the device type.");
-            result = false;
-        }
-    } else {
-        WIFI_LOGE("Primary device type is empty!!!");
+    retCode = WifiP2PHalInterface::GetInstance().SetP2pDeviceType(PRIMARY_DEVICE_TYPE);
+    if (retCode == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
+        WIFI_LOGE("Failed to set the device type.");
+        result = false;
     }
 
     std::string secDeviceType = deviceManager.GetThisDevice().GetSecondaryDeviceType();
@@ -703,7 +696,7 @@ bool P2pEnabledState::ProcessCmdDecreaseSharedLink(InternalMessagePtr msg) const
     WIFI_LOGI("Uid %{public}d decreaseSharedLink", callingUid);
     SharedLinkManager::DecreaseSharedLink(callingUid);
     if (SharedLinkManager::GetSharedLinkCount() == 0) {
-        p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
+        p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP), 0);
     }
     return EXECUTED;
 }
@@ -783,7 +776,7 @@ bool P2pEnabledState::ProcessCmdGetSignal(InternalMessagePtr msg) const
     p2pStateMachine.DealP2pSignalPollResult();
     return EXECUTED;
 }
- 	 
+
 bool P2pEnabledState::ProcessScreenStateChangedEvent(InternalMessagePtr msg) const
 {
     if (msg == nullptr) {

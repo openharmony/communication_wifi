@@ -211,7 +211,7 @@ void P2pChrReporter::HandleP2pHid2dConn()
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_CNT));
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::MAGICLINK_CNT));
 }
- 	  
+
 void P2pChrReporter::HandleP2pNormalConn()
 {
     WifiP2pLinkedInfo p2pInfo;
@@ -222,7 +222,7 @@ void P2pChrReporter::HandleP2pNormalConn()
     currentConnIsHid2d_ = false;
     WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_CNT));
 }
- 	  
+
 void P2pChrReporter::UpdateConnectedInfo(const WifiP2pGroupInfo &group)
 {
     BandType p2pBand = TransformFreqToBand(group.GetFrequency());

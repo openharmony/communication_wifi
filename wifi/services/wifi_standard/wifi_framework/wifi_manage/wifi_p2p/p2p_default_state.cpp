@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -76,7 +75,7 @@ bool P2pDefaultState::ExecuteStateMsg(InternalMessagePtr msg)
             }
             int uid = msg->GetParam1();
             if (SharedLinkManager::CheckNeedRemoveGroup(uid)) {
-                p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
+                p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP), 0);
             }
             break;
         }

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,13 +56,13 @@ const int ARP_TIMEOUT = 100;
 const int DEFAULT_TEMP_ID = -100;
 const std::string CARRY_DATA_MIRACAST = "1";
 const std::vector<int> FILTERED_FREQS = {2412, 2437, 2462};
+constexpr int32_t CONGESTION_ALGO_5G_FREQUENCY = 5000;
 #ifdef SUPPORT_P2P_UNTRUST_INVITATION
 const int P2P_REJECT_MAX_COUNT = 3;
 const int P2P_REJECT_MAX_COUNT_LIMITED_TIME = 3 * 60 * 1000;
 const int P2P_REJECT_FIRST_TIME = 1;
 const int ONE_MINITE_UNIT = 60 * 1000;
 #endif
-constexpr int32_t CONGESTION_ALGO_5G_FREQUENCY = 5000;
 std::mutex P2pStateMachine::m_gcJoinmutex;
 
 DHCPTYPE P2pStateMachine::m_isNeedDhcp = DHCPTYPE::DHCP_P2P;
@@ -1121,22 +1120,36 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int retFreq = 0;
-    if (linkedInfo.connState == CONNECTED) {
-        auto it = std::find(freqList.begin(), freqList.end(), linkedInfo.frequency);
-        if (it != freqList.end()) {
-            retFreq = linkedInfo.frequency;
-            return retFreq;
+    do {
+        if (linkedInfo.connState == CONNECTED) {
+            if (pEnhanceService != nullptr && linkedInfo.frequency >= DFS_CHANNEL_MIN &&
+                linkedInfo.frequency <= DFS_CHANNEL_MAX && !pEnhanceService->DfsUsable()) {
+                break;
+            }
+            auto it = std::find(freqList.begin(), freqList.end(), linkedInfo.frequency);
+            if (it != freqList.end()) {
+                retFreq = linkedInfo.frequency;
+                return retFreq;
+            }
         }
+    } while(0);
+    return SelectAvailableFreqByBand(freqList, band);
+}
+
+int P2pStateMachine::SelectAvailableFreqByBand(const std::vector<int>& freqList, GroupOwnerBand band) const
+{
+    if (freqList.empty()) {
+        return 0;
     }
-    /* dfs channel need 1min cac detect, force filter dfs channel avoid peer not find group owner immediately */
-    WifiChannelHelper::GetInstance().FilterDfsFreq(freqList, true);
+    std::vector<int> tempFreqList = freqList;
+    WifiChannelHelper::GetInstance().FilterDfsFreq(tempFreqList, true);
     std::random_device rd;
-    int randomIndex = static_cast<int>(static_cast<size_t>(std::abs(static_cast<int>(rd()))) % freqList.size());
-    retFreq = freqList.at(randomIndex);
+    int randomIndex = static_cast<int>(static_cast<size_t>(std::abs(static_cast<int>(rd()))) % tempFreqList.size());
+    int retFreq = tempFreqList.at(randomIndex);
     if (band == GroupOwnerBand::GO_BAND_5GHZ) {
         return retFreq;
     }
-    int randomFreq = GetRandomSocialFreq(freqList);
+    int randomFreq = GetRandomSocialFreq(tempFreqList);
     if (randomFreq == 0) {
         WIFI_LOGE("Can not get 1 6 11 channel frequency");
         return retFreq;
@@ -1326,9 +1339,6 @@ void P2pStateMachine::SetClientInfo(HalP2pGroupConfig &wpaConfig, WifiP2pGroupIn
 void P2pStateMachine::UpdateGroupInfoToWpa() const
 {
     WIFI_LOGI("Start update group info to wpa");
-    /* 1) In the scenario of interface reuse, the configuration of sta may be deleted
-     * 2) Dont remove p2p networks of wpa_s in initial phase after device reboot
-     */
     FilterInvalidGroup();
     std::vector<WifiP2pGroupInfo> grpInfo = groupManager.GetGroups();
     if (grpInfo.size() > 0) {
@@ -1556,7 +1566,7 @@ bool P2pStateMachine::GetP2pSignalPollInfo(WifiSignalPollInfo &signalInfo, std::
     signalInfo.timeStamp = GetCurrentTimeSeconds();
     return true;
 }
- 	 
+
 void P2pStateMachine::DealP2pSignalPollResult()
 {
     WifiSignalPollInfo signalInfo;
@@ -1567,7 +1577,7 @@ void P2pStateMachine::DealP2pSignalPollResult()
     }
     JudgeP2pSignalPoll(signalInfo, p2pInterfaceName);
 }
- 	 
+
 void P2pStateMachine::StartP2pSignalPollTimer()
 {
     InitChipSupportSignalAcquisitionFlag();
@@ -1579,16 +1589,16 @@ void P2pStateMachine::StartP2pSignalPollTimer()
     StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_GET_SIGNAL));
     StartTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_GET_SIGNAL), p2pSignalPollDelayTime_, MsgLogLevel::LOG_D);
 }
- 	 
+
 void P2pStateMachine::StopP2pSignalPollTimer()
 {
     StopTimer(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_GET_SIGNAL));
 }
- 	 
+
 void P2pStateMachine::JudgeP2pSignalPoll(const WifiSignalPollInfo &signalInfo, const std::string p2pInterfaceName)
 {
     if (signalInfo.frequency < CONGESTION_ALGO_5G_FREQUENCY) {
-        WIFI_LOGW("p2p congestion algo only support 5g, now frequency is %{public}d", signalInfo.frequency);
+        WIFI_LOGD("p2p congestion algo only support 5g, now frequency is %{public}d", signalInfo.frequency);
         return;
     }
     WifiP2pLinkedInfo p2pLinkedInfo;
@@ -1605,15 +1615,15 @@ void P2pStateMachine::JudgeP2pSignalPoll(const WifiSignalPollInfo &signalInfo, c
             p2pSignalPollDelayTime_, MsgLogLevel::LOG_D);
     }
 }
- 	 
- 	 
+
+
 bool P2pStateMachine::SetSignalAcquisitionSwitch(bool switchFlag)
 {
     bool originFlag = enableP2pSignalPoll_;
     enableP2pSignalPoll_ = switchFlag;
     return originFlag;
 }
- 	 
+
 void P2pStateMachine::InitChipSupportSignalAcquisitionFlag()
 {
     if (chipSupportSignalAcquisitionFlag == -1) {
@@ -1630,6 +1640,17 @@ void P2pStateMachine::InitChipSupportSignalAcquisitionFlag()
             // already query, chip not support
             chipSupportSignalAcquisitionFlag = 0;
         }
+    }
+}
+
+void P2pStateMachine::StopP2pCongestionAlgo()
+{
+    StopP2pSignalPollTimer();
+    if (pEnhanceService != nullptr) {
+        WIFI_LOGI("p2p is disconnected, stop congestion algo");
+        WifiSignalPollInfo signalInfo;
+        std::string p2pInterfaceName = "";
+        pEnhanceService->SetEnhanceP2pSignalPollInfo(false, signalInfo, p2pInterfaceName);
     }
 }
 
@@ -1683,16 +1704,5 @@ void P2pStateMachine::PopupP2pUntrustInvitationDialog()
         std::to_string(DISALLOW_UNTRUST_INVITE_DURATION / ONE_MINITE_UNIT));
 }
 #endif
-
-void P2pStateMachine::StopP2pCongestionAlgo()
-{
-    StopP2pSignalPollTimer();
-    if (pEnhanceService != nullptr) {
-        WIFI_LOGI("p2p is disconnected, stop congestion algo");
-        WifiSignalPollInfo signalInfo;
-        std::string p2pInterfaceName = "";
-        pEnhanceService->SetEnhanceP2pSignalPollInfo(false, signalInfo, p2pInterfaceName);
-    }
-}
 } // namespace Wifi
 } // namespace OHOS

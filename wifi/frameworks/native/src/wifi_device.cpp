@@ -20,6 +20,9 @@
 
 DEFINE_WIFILOG_LABEL("WifiDevice");
 
+namespace OHOS {
+namespace Wifi {
+
 std::mutex g_instanceMutex;
 NO_SANITIZE("cfi") std::shared_ptr<WifiDevice> WifiDevice::GetInstance(int systemAbilityId, int instId)
 {

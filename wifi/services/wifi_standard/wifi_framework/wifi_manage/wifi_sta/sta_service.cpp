@@ -378,7 +378,7 @@ void StaService::UpdateEapConfig(const WifiDeviceConfig &config, WifiEapConfig &
     // identity: prefix + imsi + "@wlan.mnc" + mnc + ".mcc" + mcc + ".3gppnetwork.org"
     std::string identity = prefix + imsi + EAP_AUTH_WLAN_MNC + mnc +
         EAP_AUTH_WLAN_MCC + GetMcc(imsi) + EAP_AUTH_PERMANENT_SUFFIX;
-     LOGI("StaService::UpdateEapConfig, identity: %{private}s", identity.c_str());
+    LOGI("StaService::UpdateEapConfig, identity: %{private}s", identity.c_str());
     wifiEapConfig.identity = identity;
 }
 

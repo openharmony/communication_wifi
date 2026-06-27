@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -130,7 +129,7 @@ private:
      * @param msg - Message body sent by the state machine
      * @return - bool true:handle   false:not handle
      */
-    virtual bool ProcessCmdRemoveGroup(const InternalMessagePtr msg) const;
+    virtual bool ProcessCmdRemoveGroup(const InternalMessagePtr msg, bool needCheckUid) const;
 
     /**
      * @Description Process the delete group command received by the state machine
@@ -148,9 +147,9 @@ private:
 
     virtual bool ProcessCmdDisableTimeout(const InternalMessagePtr msg) const;
 
-    WifiErrorNo CreateGroupByConfig(int netId, const WifiP2pConfigInternal &config, int freq) const;
-
     void UpdateGroupOwnerInfo(WifiP2pGroupInfo &group, const std::string &goAddr) const;
+
+    WifiErrorNo CreateGroupByConfig(int netId, const WifiP2pConfigInternal &config, int freq) const;
 
     int GetGroupFreq(WifiP2pConfigInternal &config) const;
 private:

@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -367,7 +366,8 @@ public:
      * @Description Notify user accept result to p2p service
      *
      * @param isAccept if user accept to projection screen
-     * @param inputPinCode the pin code of user input
+     * @param inputPinCode pin code of user input
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     void NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPinCode) override;
 
@@ -375,15 +375,15 @@ public:
     /**
      * @Description Notify untrust dialog result to p2p service
      *
-     * @param isAccept if user stop projection screen
-     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     * @param isAccept if user disallow untrust invitation
      */
      void NotifyUntrustInvitationResult(bool isAccept) override;
 #endif
 
     /**
-     * @Description Notify the result of user click confirm when showing display dialog to p2p service
+     * @Description Notify user accept result to p2p service
      *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     void NotifyWscDisplayConfirmResult() override;
 
@@ -403,7 +403,7 @@ public:
      */
     virtual ErrCode NotifyRemoteDie(int uid) override;
 
-    /**
+     /**
      * @Description Set p2p high perf mode
      *
      * @param isEnable - enable high perf mode or not

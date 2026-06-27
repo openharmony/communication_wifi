@@ -1967,7 +1967,7 @@ void SelfCureStateMachine::Wifi7SelfCureState::ExecuteWifi7ArpFailSelfCure(const
             WIFI_LOGE("ExecuteWifi7ArpFailSelfCure ReAssociate failed.\n");
         }
     } else if (iter->second.actionType == ACTION_TYPE_WIFI7) {
-        WIFI_LOGI("ExecuteWifi7ArpFailSelfCure do nothing");
+        WIFI_LOGD("ExecuteWifi7ArpFailSelfCure do nothing");
     }
 }
 
@@ -2472,8 +2472,6 @@ std::set<std::string> SelfCureStateMachine::GetCandidateBssidsForBlacklist(const
             break;
         }
         bssids.insert(item.first);
-        WIFI_LOGI("GetCandidateBssidsForBlacklist: ssid %{public}s, bssid %{public}s, rssi %{public}d",
-            SsidAnonymize(info.ssid).c_str(), MacAnonymize(item.first).c_str(), item.second);
     }
     
     WIFI_LOGI("GetCandidateBssidsForBlacklist: ssid %{public}s found %{public}zu bssids",

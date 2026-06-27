@@ -46,6 +46,8 @@ void P2pIdleState::GoInState()
     SharedLinkManager::ClearSharedLinkCount();
     p2pStateMachine.UpdateGroupManager();
     p2pStateMachine.UpdatePersistentGroups();
+    WifiP2PHalInterface::GetInstance().SetP2pConfigMethods(
+        std::string("virtual_push_button physical_display keypad"));
     P2pChrReporter::GetInstance().ResetState();
 }
 

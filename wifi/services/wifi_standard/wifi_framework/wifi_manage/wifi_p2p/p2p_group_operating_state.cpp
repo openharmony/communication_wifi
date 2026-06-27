@@ -71,7 +71,7 @@ void P2pGroupOperatingState::Init()
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_P2P_DISABLE,
         [this](const InternalMessagePtr msg) { return this->ProcessCmdDisable(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP,
-        [this](const InternalMessagePtr msg) { return this->ProcessCmdRemoveGroup(msg, true); }));
+        [this](const InternalMessagePtr msg) { return this->ProcessCmdRemoveGroup(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_DELETE_GROUP,
         [this](const InternalMessagePtr msg) { return this->ProcessCmdDeleteGroup(msg); }));
     mProcessFunMap.insert(std::make_pair(P2P_STATE_MACHINE_CMD::CMD_HID2D_CREATE_GROUP,
@@ -318,19 +318,13 @@ bool P2pGroupOperatingState::ProcessCmdDisable(const InternalMessagePtr msg) con
     return EXECUTED;
 }
 
-bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessagePtr msg, bool needCheckUid) const
+bool P2pGroupOperatingState::ProcessCmdRemoveGroup(const InternalMessagePtr msg) const
 {
     /**
      * Removes a current setup group.
      */
     WIFI_LOGI("recv CMD: %{public}d", msg->GetMessageName());
-    if (needCheckUid) {
-        int uid = msg->GetParam1();
-        if (!SharedLinkManager::CanRemoveGroupByUid(uid)) {
-            p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_FAILED);
-            return EXECUTED;
-        }
-    }
+
     WifiP2pGroupInfo group = groupManager.GetCurrentGroup();
     auto dhcpFunc = [=]() {
         if (!groupManager.GetCurrentGroup().IsGroupOwner()) {
@@ -391,7 +385,7 @@ bool P2pGroupOperatingState::ProcessCmdDeleteGroup(const InternalMessagePtr msg)
      */
     if (currentGroup.GetP2pGroupStatus() == P2pGroupStatus::GS_STARTED) {
         if (group.GetNetworkId() == currentGroup.GetNetworkId() || group.GetNetworkId() == -1) {
-            ProcessCmdRemoveGroup(msg, false);
+            ProcessCmdRemoveGroup(msg);
         } else {
             p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
         }

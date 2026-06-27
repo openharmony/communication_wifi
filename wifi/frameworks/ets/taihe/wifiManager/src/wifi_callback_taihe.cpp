@@ -91,7 +91,9 @@ void WifiIdlDeviceEventCallback::OnWifiStateChanged(int state)
     WIFI_LOGI("OnWifiStateChanged event: %{public}d [0:DISABLING, 1:DISABLED, 2:ENABLING, 3:ENABLED]",
         state);
     for (auto callback : g_wifiStateChangeVec) {
-        (*callback)(state);
+        if (callback.has_value()) {
+            (*callback)(state);
+        }
     }
 }
 
@@ -101,7 +103,9 @@ void WifiIdlDeviceEventCallback::OnWifiConnectionChanged(int state, const WifiLi
     WIFI_LOGI("OnWifiConnectionChanged event: %{public}d [4:CONNECTED, 6:DISCONNECTED, 7:SPECIAL_CONNECT]",
         state);
     for (auto callback : g_wifiConnectionChangeVec) {
-        (*callback)(state);
+        if (callback.has_value()) {
+            (*callback)(state);
+        }
     }
 }
 
@@ -110,7 +114,9 @@ void WifiIdlDeviceEventCallback::OnWifiRssiChanged(int rssi)
     std::shared_lock<std::shared_mutex> guard(g_wifiRssiChangeLock);
     WIFI_LOGI("OnWifiRssiChanged event: %{public}d", rssi);
     for (auto callback : g_wifiRssiChangeVec) {
-        (*callback)(rssi);
+        if (callback.has_value()) {
+            (*callback)(rssi);
+        }
     }
 }
 
@@ -124,7 +130,9 @@ void WifiIdlDeviceEventCallback::OnStreamChanged(int direction)
     WIFI_LOGD("OnStreamChanged event: %{public}d [0:DATA_NONE, 1:DATA_IN, 2:DATA_OUT, 3:DATA_INOUT]",
         direction);
     for (auto callback : g_wifiStreamChangeVec) {
-        (*callback)(direction);
+        if (callback.has_value()) {
+            (*callback)(direction);
+        }
     }
 }
 
@@ -134,7 +142,9 @@ void WifiIdlDeviceEventCallback::OnDeviceConfigChanged(ConfigChange value)
     WIFI_LOGI("OnDeviceConfigChanged event: %{public}d", static_cast<int>(value));
     int result = static_cast<int>(value);
     for (auto callback : g_wifiDeviceConfigChangeVec) {
-        (*callback)(result);
+        if (callback.has_value()) {
+            (*callback)(result);
+        }
     }
 }
 
@@ -165,7 +175,9 @@ void WifiIdlHotspotEventCallback::OnHotspotStateChanged(int state)
     std::shared_lock<std::shared_mutex> guard(g_wifiHotspotStateChangeLock);
     WIFI_LOGI("Hotspot received state changed event: %{public}d", state);
     for (auto callback : g_wifiHotspotStateChangeVec) {
-        (*callback)(state);
+        if (callback.has_value()) {
+            (*callback)(state);
+        }
     }
 }
 
@@ -176,7 +188,9 @@ void WifiIdlHotspotEventCallback::OnHotspotStaJoin(const StationInfo &info)
     WIFI_LOGI("Hotspot received sta join event");
     ::ohos::wifiManager::StationInfo result = {info.bssid};
     for (auto callback : g_wifiHotspotStaJoinVec) {
-        (*callback)(result);
+        if (callback.has_value()) {
+            (*callback)(result);
+        }
     }
 }
 
@@ -187,10 +201,11 @@ void WifiIdlHotspotEventCallback::OnHotspotStaLeave(const StationInfo &info)
     WIFI_LOGI("Hotspot received sta leave event");
     ::ohos::wifiManager::StationInfo result = {info.bssid};
     for (auto callback : g_wifiHotspotStaLeaveVec) {
-        (*callback)(result);
+        if (callback.has_value()) {
+            (*callback)(result);
+        }
     }
 }
-
 OHOS::sptr<OHOS::IRemoteObject> WifiIdlHotspotEventCallback::AsObject()
 {
     return nullptr;
@@ -202,7 +217,9 @@ void WifiIdlP2pEventCallback::OnP2pStateChanged(int state)
     std::shared_lock<std::shared_mutex> guard(g_wifiP2pStateChangeLock);
     WIFI_LOGI("received p2p state changed event: %{public}d", state);
     for (auto callback : g_wifiP2pStateChangeVec) {
-        (*callback)(state);
+        if (callback.has_value()) {
+            (*callback)(state);
+        }
     }
 }
 
@@ -212,7 +229,9 @@ void WifiIdlP2pEventCallback::OnP2pPersistentGroupsChanged(void)
     WIFI_LOGI("received persistent group changed event");
     auto result = ::ohos::wifiManager::UndefinedType::make_undefined();
     for (auto callback : g_wifiP2pPersistentGroupChangeVec) {
-        (*callback)(result);
+        if (callback.has_value()) {
+            (*callback)(result);
+        }
     }
 }
 
@@ -231,7 +250,9 @@ void WifiIdlP2pEventCallback::OnP2pThisDeviceChanged(const WifiP2pDevice& device
     ::ohos::wifiManager::WifiP2pDevice result = {deviceName, deviceAddress, deviceAddressType,
         primaryDeviceType, deviceStatus, groupCapabilities};
     for (auto callback : g_wifiP2pDeviceChangeVec) {
-        (*callback)(result);
+        if (callback.has_value()) {
+            (*callback)(result);
+        }
     }
 }
 
@@ -257,7 +278,9 @@ void WifiIdlP2pEventCallback::OnP2pPeersChanged(const std::vector<WifiP2pDevice>
     ::taihe::array<::ohos::wifiManager::WifiP2pDevice> finalResult =
         ::taihe::array<::ohos::wifiManager::WifiP2pDevice>(taihe::copy_data_t{}, result.data(), result.size());
     for (auto callback : g_wifiP2pPeerDeviceChangeVec) {
-        (*callback)(result);
+        if (callback.has_value()) {
+            (*callback)(result);
+        }
     }
 }
 

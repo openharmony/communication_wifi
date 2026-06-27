@@ -40,7 +40,6 @@ DEFINE_WIFILOG_P2P_LABEL("WifiP2pServiceImpl");
 namespace OHOS {
 namespace Wifi {
 std::mutex WifiP2pServiceImpl::instanceLock;
-std::mutex WifiP2pServiceImpl::g_p2pMutex;
 sptr<WifiP2pServiceImpl> WifiP2pServiceImpl::instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiP2pServiceImpl::GetInstance().GetRefPtr());
 static constexpr int MIRACAST_CONFIG_MAX_LEN = 512;
@@ -58,7 +57,7 @@ sptr<WifiP2pServiceImpl> WifiP2pServiceImpl::GetInstance()
 }
 
 WifiP2pServiceImpl::WifiP2pServiceImpl()
-    : SystemAbility(WIFI_P2P_ABILITY_ID, true), mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
+    : SystemAbility(WIFI_P2P_ABILITY_ID, true), mPublishFlag_(false), mState(ServiceRunningState::STATE_NOT_START)
 {}
 
 WifiP2pServiceImpl::~WifiP2pServiceImpl()
@@ -92,20 +91,20 @@ void WifiP2pServiceImpl::OnStart()
 void WifiP2pServiceImpl::OnStop()
 {
     mState = ServiceRunningState::STATE_NOT_START;
-    mPublishFlag = false;
+    mPublishFlag_ = false;
     WIFI_LOGI("Stop p2p service!");
 }
 
 bool WifiP2pServiceImpl::Init()
 {
     std::lock_guard<std::mutex> lock(g_p2pMutex);
-    if (!mPublishFlag) {
+    if (!mPublishFlag_.load()) {
         bool ret = Publish(WifiP2pServiceImpl::GetInstance());
         if (!ret) {
             WIFI_LOGE("Failed to publish p2p service!");
             return false;
         }
-        mPublishFlag = true;
+        mPublishFlag_ = true;
     }
     return true;
 }
@@ -394,7 +393,7 @@ ErrCode WifiP2pServiceImpl::CreateGroup(const WifiP2pConfig &config)
     }
 #endif
     int callingUid = GetCallingUid();
-    WIFI_LOGI("Uid %{public}d createGroup, network name is [%{public}s]", callingUid, config.GetGroupName().c_str());
+    WIFI_LOGI("Uid %{public}d createGroup", callingUid);
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("CreateGroup:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

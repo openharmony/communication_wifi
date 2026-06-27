@@ -81,6 +81,9 @@ int WifiP2PDnsTxtRecord::RemoveData(const std::string &key)
 
     for (int index = 0; aDataStart < data.size(); ++index) {
         unsigned long aDataLength = data[aDataStart];
+        if (aDataStart + key.length() + 1 >= data.size()) {
+ 	             break;
+ 	    }
         if (key.length() <= aDataLength &&
             (key.length() == aDataLength || data[aDataStart + key.length() + 1] == '=')) {
             std::string tmp(dataStr, aDataStart + 1, key.length());

@@ -26,7 +26,7 @@ DEFINE_WIFILOG_P2P_LABEL("WifiP2pStub");
 
 namespace OHOS {
 namespace Wifi {
-WifiP2pStub::WifiP2pStub() : mSingleCallback(false)
+WifiP2pStub::WifiP2pStub() : mSingleCallback_(false)
 {
     InitHandleMap();
     deathRecipient_ = nullptr;
@@ -791,7 +791,7 @@ void WifiP2pStub::OnRegisterCallBack(uint32_t code, MessageParcel &data, Message
         }
         WIFI_LOGD("%{public}s, get pid: %{public}d, tokenId: %{private}d", __func__, pid, tokenId);
 
-        if (mSingleCallback) {
+        if (mSingleCallback_.load()) {
             ret = RegisterCallBack(callback_, event);
         } else {
             std::unique_lock<std::mutex> lock(deathRecipientMutex);
@@ -1125,13 +1125,12 @@ void WifiP2pStub::OnHid2dSetUpperScene(
 
 bool WifiP2pStub::IsSingleCallback() const
 {
-    return mSingleCallback;
+    return mSingleCallback_.load();
 }
 
 void WifiP2pStub::SetSingleCallback(const bool isSingleCallback)
 {
-    mSingleCallback = true;
-}
+    mSingleCallback_ = true;
 
 void WifiP2pStub::OnHid2dIsWideBandwidthSupported(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)

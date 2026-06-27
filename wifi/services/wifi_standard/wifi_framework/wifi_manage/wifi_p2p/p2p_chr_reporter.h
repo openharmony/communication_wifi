@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +19,7 @@
 #include <cstdint>
 #include <string>
 #include "p2p_macro.h"
+#include "wifi_p2p_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -85,6 +85,9 @@ public:
     void ProcessChrEvent(const std::string &notifyParam);
     void ReportP2pInterfaceStateChange(int state, int errCode, int minorCode);
     void UploadP2pChrErrEvent();
+    void HandleP2pHid2dConn();
+    void HandleP2pNormalConn();
+    void UpdateConnectedInfo(const WifiP2pGroupInfo &group);
 
 private:
     P2pChrReporter() {};
@@ -100,6 +103,7 @@ private:
     int lastP2pState_ = DEVICE_DISCOVERY;
     int lastErrCode_ = P2P_CHR_DEFAULT_REASON_CODE;
     int lastMinorCode_ = P2P_CHR_DEFAULT_REASON_CODE;
+    bool currentConnIsHid2d_ = false;
 };
 
 } // namespace Wifi

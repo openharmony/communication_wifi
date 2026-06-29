@@ -1132,7 +1132,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
                 return retFreq;
             }
         }
-    } while(0);
+    } while (0);
     return SelectAvailableFreqByBand(freqList, band);
 }
 

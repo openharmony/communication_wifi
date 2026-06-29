@@ -112,7 +112,7 @@ sptr<IRemoteObject> WifiDeviceMgrServiceImpl::GetWifiRemote(int instId)
     if (instId < 0) {
         WIFI_LOGE("Invalid instId");
         return nullptr;
- 	}
+    }
     std::lock_guard<std::mutex> lock(g_initMutex);
     auto iter = mWifiService.find(instId);
     if (iter != mWifiService.end()) {

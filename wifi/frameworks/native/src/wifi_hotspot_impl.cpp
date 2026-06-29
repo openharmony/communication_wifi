@@ -124,7 +124,7 @@ bool WifiHotspotImpl::GetWifiHotspotProxy()
         WIFI_LOGE("failed to load hotspot sa !");
         return false;
     }
-    if (!mRemoteDied && client_ != nullptr) {
+    if (!mRemoteDied.load() && client_ != nullptr) {
         return true;
     }
     sptr<ISystemAbilityManager> sa_mgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
@@ -369,7 +369,10 @@ ErrCode WifiHotspotImpl::GetSupportedFeatures(long &features)
 bool WifiHotspotImpl::IsFeatureSupported(long feature)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    RETURN_IF_FAIL(GetWifiHotspotProxy());
+    if (!GetWifiHotspotProxy()) {
+        WIFI_LOGI("'%{public}s' failed.", "GetWifiHotspotProxy()");
+        return false;
+    }
     int64_t featuresInt64 = 0;
     if (client_->GetSupportedFeatures(featuresInt64) != WIFI_OPT_SUCCESS) {
         return false;
@@ -415,11 +418,11 @@ ErrCode WifiHotspotImpl::SetPowerModel(const PowerModel& model)
 
 bool WifiHotspotImpl::IsRemoteDied(void)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (mRemoteDied) {
+    bool remoteDied = mRemoteDied.load();
+    if (remoteDied) {
         WIFI_LOGW("Remote service is died!");
     }
-    return mRemoteDied;
+    return remoteDied;
 }
 
 ErrCode WifiHotspotImpl::GetApIfaceName(std::string& ifaceName)

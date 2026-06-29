@@ -962,7 +962,7 @@ ErrCode WifiDeviceProxy::ConnectToCandidateConfig(ConnectSettings &connectSettin
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-         WIFI_LOGE("Write interface token error: ConnectToCandidateConfig");
+        WIFI_LOGE("Write interface token error: ConnectToCandidateConfig");
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);

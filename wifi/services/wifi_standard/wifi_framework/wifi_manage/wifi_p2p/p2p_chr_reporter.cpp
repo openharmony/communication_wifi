@@ -225,16 +225,10 @@ void P2pChrReporter::HandleP2pNormalConn()
 
 void P2pChrReporter::UpdateConnectedInfo(const WifiP2pGroupInfo &group)
 {
-    BandType p2pBand = TransformFreqToBand(group.GetFrequency());
-    if (p2pBand == BandType::BAND_2GHZ) {
-        WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::P2P_SUC_2G4_CNT));
-    } else {
-        WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::P2P_SUC_5G_CNT));
-    }
+    WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::P2P_SUC_5G_CNT));
     WifiLinkedInfo linkInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo, 0);
-    if (linkInfo.frequency != 0 && p2pBand == TransformFreqToBand(linkInfo.frequency)
-        && linkInfo.frequency != group.GetFrequency()) {
+    if (linkInfo.frequency != 0 && linkInfo.frequency != group.GetFrequency()) {
         WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::OWN_DBAC_CNT));
     }
     if (currentConnIsHid2d_) {

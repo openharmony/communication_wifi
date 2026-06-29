@@ -959,6 +959,7 @@ void WriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info)
     cJSON_AddNumberToObject(root, "IPV6_PREFERRED_LIFE_TIME", ipv6Info.preferredLifeTime);
     cJSON_AddNumberToObject(root, "IPV6_VALID_LIFE_TIME", ipv6Info.validLifeTime);
     cJSON_AddNumberToObject(root, "IPV6_ROUTE_LIFE_TIME", ipv6Info.routerLifeTime);
+    cJSON_AddNumberToObject(root, "IPV6_RA_FLAGS", ipv6Info.raFlags);
     std::string ipv6Address;
     for (const auto& pair : ipv6Info.IpAddrMap) {
         ipv6Address += Ipv6Anonymize(pair.first) + "|" + std::to_string(pair.second) + ";";

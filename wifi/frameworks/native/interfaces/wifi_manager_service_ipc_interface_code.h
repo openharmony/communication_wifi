@@ -106,11 +106,12 @@ enum class  DevInterfaceCode {
     /* WiFi Capability */
     WIFI_SVR_CMD_SET_WIFI_CAPABILITY = 0x1056, /* Set WiFi Capability */
     WIFI_SVR_CMD_GET_WIFI_CAPABILITY = 0x1057, /* Get WiFi Capability */
-
+    
     /* 5g Auto Identify Conn Feature */
     WIFI_SVR_CMD_5G_AUTO_IDENTIFY_CONN_FEATURE = 0x1058,
-
-    WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG = 0x1059,
+    
+    /* Connect to candidate config with ConnectSettings */
+ 	WIFI_SVR_CMD_CONNECT_TO_CANDIDATE_CONFIG = 0x1059,
 
     /* WiFi hardware detection */
     WIFI_SVR_CMD_IS_WLAN_SUPPORTED = 0X1060,

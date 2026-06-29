@@ -185,11 +185,11 @@ static void ReadLinkedInfo(IpcIo *reply, WifiLinkedInfo &info)
     (void)ReadInt32(reply, &info.snr);
     (void)ReadInt32(reply, &info.isDataRestricted);
     info.portalUrl = reinterpret_cast<char *>(ReadString(reply, &readLen));
- 
+
     int tmpState = 0;
     (void)ReadInt32(reply, &tmpState);
     if ((tmpState >= 0) && (tmpState <= static_cast<int>(SupplicantState::INVALID))) {
-        info.supplicantState = static_cast<SupplicantState>(tmpState);
+        info.supplicantState = reinterpret_cast<SupplicantState>(tmpState);
     } else {
         info.supplicantState = SupplicantState::INVALID;
     }
@@ -204,11 +204,11 @@ static void ReadLinkedInfo(IpcIo *reply, WifiLinkedInfo &info)
     (void)ReadInt32(reply, &info.wifiStandard);
     (void)ReadInt32(reply, &info.maxSupportedRxLinkSpeed);
     (void)ReadInt32(reply, &info.maxSupportedTxLinkSpeed);
- 
+
     int tmpChanWidth = static_cast<int>(WifiChannelWidth::WIDTH_INVALID);
     (void)ReadInt32(reply, &tmpChanWidth);
     if ((tmpChanWidth >= 0) && (tmpChanWidth <= static_cast<int>(WifiChannelWidth::WIDTH_INVALID))) {
-        info.channelWidth = static_cast<WifiChannelWidth>(tmpChanWidth);
+        info.channelWidth = reinterpret_cast<WifiChannelWidth>(tmpChanWidth);
     } else {
         info.channelWidth = WifiChannelWidth::WIDTH_INVALID;
     }
@@ -233,8 +233,8 @@ static int IpcCallback(void *owner, int code, IpcIo *reply)
             code, owner == nullptr, reply == nullptr);
         return ERR_FAILED;
     }
- 
-    struct IpcOwner *data = static_cast<struct IpcOwner *>(owner);
+
+    struct IpcOwner *data = reinterpret_cast<struct IpcOwner *>(owner);
     (void)ReadInt32(reply, &data->exception);
     (void)ReadInt32(reply, &data->retCode);
     if (data->exception != 0 || data->retCode != WIFI_OPT_SUCCESS || data->variable == nullptr) {
@@ -246,51 +246,51 @@ static int IpcCallback(void *owner, int code, IpcIo *reply)
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_UPDATE_DEVICE_CONFIG):
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_STATE):
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SIGNAL_LEVEL): {
-            (void)ReadInt32(reply, static_cast<int32_t *>(data->variable));
+            (void)ReadInt32(reply, reinterpret_cast<int32_t *>(data->variable));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_CONNECTED):
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_IS_WIFI_ACTIVE):
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_SET_LOW_LATENCY_MODE): {
-            (void)ReadBool(reply, static_cast<bool *>(data->variable));
+            (void)ReadBool(reply, reinterpret_cast<bool *>(data->variable));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_COUNTRY_CODE):
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DERVICE_MAC_ADD): {
             size_t readLen = 0;
-            *(static_cast<std::string *>(data->variable)) = reinterpret_cast<char *>(ReadString(reply, &readLen));
+            *(reinterpret_cast<std::string *>(data->variable)) = reinterpret_cast<char *>(ReadString(reply, &readLen));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SUPPORTED_FEATURES): {
             int64_t features = 0;
             ReadInt64(reply, &features);
-            *(static_cast<long *>(data->variable)) = features;
+            *(reinterpret_cast<long *>(data->variable)) = features;
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DEVICE_CONFIGS): {
-            ParseDeviceConfigs(reply, *(static_cast<std::vector<WifiDeviceConfig> *>(data->variable)));
+            ParseDeviceConfigs(reply, *(reinterpret_cast<std::vector<WifiDeviceConfig> *>(data->variable)));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_LINKED_INFO): {
-            ReadLinkedInfo(reply, *(static_cast<WifiLinkedInfo *>(data->variable)));
+            ReadLinkedInfo(reply, *(reinterpret_cast<WifiLinkedInfo *>(data->variable)));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_DHCP_INFO): {
-            ReadDhcpInfo(reply, *(static_cast<IpInfo *>(data->variable)));
+            ReadDhcpInfo(reply, *(reinterpret_cast<IpInfo *>(data->variable)));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_BANDTYPE_SUPPORTED): {
-            (void)ReadBool(reply, static_cast<bool *>(data->variable));
+            (void)ReadBool(reply, reinterpret_cast<bool *>(data->variable));
             break;
         }
         case static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_5G_CHANNELLIST): {
-            Parse5GChannels(reply, *(static_cast<std::vector<int> *>(data->variable)));
+            Parse5GChannels(reply, *(reinterpret_cast<std::vector<int> *>(data->variable)));
             break;
         }
         default:
             break;
     }
- 
+
     return ERR_NONE;
 }
 
@@ -1780,6 +1780,5 @@ ErrCode WifiDeviceProxy::GetWifiDetailState(WifiDetailState &state)
     }
     return ErrCode(owner.retCode);
 }
-
 }  // namespace Wifi
 }  // namespace OHOS

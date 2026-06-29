@@ -16,6 +16,7 @@
 #include "securec.h"
 #include "wifi_hdi_util.h"
 #include "wifi_common_def.h"
+#include <stdbool.h>
 
 #ifndef UT_TEST
 #include "wifi_log.h"
@@ -474,7 +475,7 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         ++start;
         srcBuf[last] = '\0';
         unsigned int hexStrLen = strlen(srcBuf + start);
-        unsigned int hexBufSize = (unsigned int)(len / lenValue + 1);
+        unsigned int hexBufSize = len / lenValue + 1;
         if (hexStrLen > hexBufSize) {
             break;
         }

@@ -81,8 +81,6 @@ public:
 
     ErrCode AllowAutoConnect(int32_t networkId, bool isAllowed) override;
 
-    void CheckAndHandleVapConflict();
-
     ErrCode ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout = DEFAULT_DIALOG_TIMEOUT) override;
 
     ErrCode ConnectToCandidateConfig(ConnectSettings &connectSettings) override;
@@ -160,7 +158,7 @@ public:
     ErrCode GetSignalLevel(const int &rssi, const int &band, int &level) override;
 
     ErrCode GetSupportedFeatures(long &features) override;
-
+    
     ErrCode IsFeatureSupported(long feature, bool &isSupported) override;
 
     ErrCode GetDeviceMacAddress(std::string &result) override;
@@ -261,8 +259,9 @@ private:
     ErrCode AnonymizeSensitiveFields(WifiDeviceConfig &config);
     bool IsDisableWifiProhibitedByEdm(void);
     void ReportWifiConfigStatus(WifiConfigReportType reportType);
+    void CheckAndHandleVapConflict();
 
-    private:
+private:
     static constexpr int MAX_PRESHAREDKEY_LEN = 63;
     static constexpr int MAX_HEX_LEN = 64;
     static constexpr int MIN_PSK_LEN = 8;
@@ -271,7 +270,6 @@ private:
     static constexpr int WEP_KEY_LEN2 = 13;
     static constexpr int WEP_KEY_LEN3 = 16;
     
-
 #ifdef OHOS_ARCH_LITE
     static std::mutex g_instanceLock;
     static std::shared_ptr<WifiDeviceServiceImpl> g_instance;

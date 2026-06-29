@@ -106,11 +106,11 @@ void NetworkBlockListManager::CleanAbnormalWifiBlocklist()
 
 bool NetworkBlockListManager::IsInAbnormalWifiBlocklist(const std::string &bssid)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (abnormalWifiBlockSet_.empty()) {
         return false;
     }
 
-    std::lock_guard<std::mutex> lock(mutex_);
     return abnormalWifiBlockSet_.find(bssid) != abnormalWifiBlockSet_.end();
 }
 

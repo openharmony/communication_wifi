@@ -686,6 +686,8 @@ private:
      */
     ErrCode StartConnectToNetwork(int networkId, const std::string &bssid, int connTriggerMode);
 
+    void SetAllowAutoConnectStatus(int32_t networkId, bool status);
+
     /**
      * @Description User select connect to network.
      *
@@ -1066,7 +1068,7 @@ private:
     void SyncDeviceEverConnectedState(bool hasNet);
 #endif // OHOS_ARCH_LITE
     bool IsNewConnectionInProgress();
-    void StopDhcp(bool isStopIpv4, bool isStopIpv6 = false);
+    void StopDhcp(bool isStopV4, bool isStopV6 = false);
     /**
      * @Description Replace empty dns
      */

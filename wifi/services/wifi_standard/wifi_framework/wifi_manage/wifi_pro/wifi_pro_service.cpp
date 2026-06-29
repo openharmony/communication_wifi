@@ -182,6 +182,10 @@ void WifiProService::HandleQoeReport(const NetworkLagType &networkLagType, const
             break;
     }
     InternalMessagePtr msg = pWifiProStateMachine_->CreateMessage(EVENT_QOE_REPORT);
+    if (msg == nullptr) {
+        WIFI_LOGE("%{public}s msg is null.", __FUNCTION__);
+        return;
+    }
     msg->SetMessageObj(networkLagInfo);
     msg->msgLogLevel_ = MsgLogLevel::LOG_D;
     pWifiProStateMachine_->SendMessage(msg);
@@ -193,6 +197,10 @@ void WifiProService::HandleWifiHalSignalInfoChange(const WifiSignalPollInfo &wif
         return;
     }
     InternalMessagePtr msg = pWifiProStateMachine_->CreateMessage(EVENT_SIGNAL_INFO_CHANGE);
+    if (msg == nullptr) {
+        WIFI_LOGE("%{public}s msg is null.", __FUNCTION__);
+        return;
+    }
     msg->SetMessageObj(wifiSignalPollInfo);
     msg->msgLogLevel_ = MsgLogLevel::LOG_D;
     pWifiProStateMachine_->SendMessage(msg);

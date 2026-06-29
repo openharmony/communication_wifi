@@ -112,11 +112,11 @@ private:
     std::mutex deathRecipientMutex;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_;
 #endif
+    std::mutex mThirdPartyScanLimitMutex_;
+    std::map<std::string, std::vector<int64_t>> callTimestampsMap_;
     int64_t queryScanMacInfoWhiteListTimeStamp_ = 0;
     std::string scanMacInfoWhiteListStr_;
     std::mutex wifiWhiteListMutex_;
-    std::mutex mThirdPartyScanLimitMutex_;
-    std::map<std::string, std::vector<int64_t>> callTimestampsMap_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

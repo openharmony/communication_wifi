@@ -30,6 +30,16 @@ enum ServiceRunningState {
     STATE_RUNNING
 };
 
+enum WifiSvcCmd {
+    CMD_UNKNOWN,
+    CMD_HELP,
+    CMD_ENABLE,
+    CMD_DISABLE,
+    CMD_SCAN,
+    CMD_CONNECT,
+    CMD_LIST_SCAN_RESULT
+};
+
 class WifiDeviceMgrServiceImpl : public SystemAbility, public WifiDeviceMgrStub {
     DECLARE_SYSTEM_ABILITY(WifiDeviceMgrServiceImpl);
 public:
@@ -43,6 +53,16 @@ public:
     int32_t Dump(int32_t fd, const std::vector<std::u16string>& args) override;
     std::map<int, sptr<IRemoteObject>>& GetDeviceServiceMgr();
     int32_t OnSvcCmd(int32_t fd, const std::vector<std::u16string>& args) override;
+
+private:
+    int32_t HandleHelpCmd(int32_t fd, std::string& info);
+    int32_t HandleEnableCmd(int32_t fd, std::string& info);
+    int32_t HandleDisableCmd(int32_t fd, std::string& info);
+    int32_t HandleScanCmd(int32_t fd, std::string& info);
+    WifiDeviceConfig SvcMakeConfig(const std::vector<std::u16string>& args);
+    int32_t HandleConnectCmd(int32_t fd, std::string& info,
+        const std::vector<std::u16string>& args);
+    int32_t HandleScanListCmd(int32_t fd, std::string& info);
 
 private:
     bool Init();

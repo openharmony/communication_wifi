@@ -207,7 +207,9 @@ void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStanda
 {
     if (netAgentEventHandler_) {
         netAgentEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo, m_instId = instId]() {
+            std::unique_lock<std::mutex> lock(netAgentMutex_);
             uint32_t& supplierIdNow = (m_instId == 0) ? supplierId : supplierIdForWlan1;
+            lock.unlock();
             if (supplierIdNow == INVALID_SUPPLIER_ID) {
                 WIFI_LOGI("Re-register when supplierId is abnormal.");
                 this->RegisterNetSupplier(m_instId);
@@ -424,7 +426,6 @@ void WifiNetAgent::SetNetLinkHostRouteInfo(sptr<NetManagerStandard::NetLinkInfo>
         hostRoute->destination_.address_ = IpTools::ConvertIpv4Address(wifiIpInfo.gateway);
         hostRoute->destination_.family_ = NetManagerStandard::INetAddr::IPV4;
         hostRoute->destination_.prefixlen_ = MAX_PREFIX_LEN;
-        hostRoute->gateway_.address_ = "0.0.0.0";
         netLinkInfo->routeList_.push_back(*hostRoute);
         WIFI_HILOG_COMM_INFO("SetNetLinkHostRouteInfo gateway:%{public}s",
             IpAnonymize(hostRoute->gateway_.address_).c_str());
@@ -501,6 +502,7 @@ void WifiNetAgent::InitWifiNetAgent(const WifiNetAgentCallbacks &wifiNetAgentCal
 void WifiNetAgent::ResetSupplierId(int instId)
 {
     WIFI_LOGI("%{public}s enter.instId = %{public}d", __func__, instId);
+    std::unique_lock<std::mutex> lock(netAgentMutex_);
     if (instId == 0) {
         supplierId = INVALID_SUPPLIER_ID;
     } else {
@@ -510,6 +512,7 @@ void WifiNetAgent::ResetSupplierId(int instId)
  
 uint32_t WifiNetAgent::GetSupplierId(int instId)
 {
+    std::unique_lock<std::mutex> lock(netAgentMutex_);
     return (instId == 0) ? supplierId : supplierIdForWlan1;
 }
 

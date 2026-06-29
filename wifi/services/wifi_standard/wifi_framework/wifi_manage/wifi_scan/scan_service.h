@@ -55,6 +55,7 @@ inline const int SYSTEM_SCAN_INTERVAL_30_SECOND = 30;
 inline const int SYSTEM_SCAN_INTERVAL_60_SECOND = 60;
 inline const int SYSTEM_SCAN_COUNT_3_TIMES = 3;
 inline const int DEFAULT_PNO_SCAN_INTERVAL = 300;
+inline const int FAST_PNO_SCAN_INTERVAL = 60;
 
 inline const int TONE_PER_SYM_11ABG = 48;
 inline const int TONE_PER_SYM_11N_20MHZ = 52;

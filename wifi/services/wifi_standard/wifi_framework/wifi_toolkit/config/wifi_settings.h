@@ -69,7 +69,7 @@ constexpr int HOTSPOT_NAME_MAX_LENGTH = 30;
 constexpr uint32_t COMPARE_MAC_OFFSET = 2;
 /* Plaintext string length */
 constexpr uint32_t COMPARE_MAC_LENGTH = 17 - 4;
-
+inline constexpr char WIFI_VARIABLE_PATH[] = "/system/etc/wifi/wifi_variable.cfg";
 inline constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config.conf";
 inline constexpr char BACKUP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/backup_config.conf";
 inline constexpr char HOTSPOT_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/hotspot_config.conf";
@@ -329,9 +329,9 @@ public:
 
     ErrCode Update5gAutoIdentifyConnFeatures(Wifi5gOperateType opType,
         Wifi5gFeatureType featureType, bool value, bool &result, int instId = 0);
- 
+
     ErrCode Get5gAutoIdentifyFeature(int featureType, bool &result, int instId = 0);
- 
+
     ErrCode Set5gAutoIdentifyFeature(int featureType, bool value, int instId = 0);
 
     int GetStaLastRunState(int instId = 0);
@@ -481,7 +481,6 @@ private:
 
     // COMMON
     std::mutex mWifiConfigMutex;
-    std::mutex mSyncWifiConfigMutex;
     std::mutex mPackageConfMutex;
     std::atomic<int> mApMaxConnNum;
     std::atomic<int> mMaxNumConfigs;

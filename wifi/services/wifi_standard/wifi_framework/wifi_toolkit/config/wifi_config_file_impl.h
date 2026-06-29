@@ -155,7 +155,9 @@ public:
         if (ret != content.length()) {
             LOGE("Temp config file: %{public}s, fwrite() failed!", tempFileName.c_str());
             (void)fclose(fp);
-            (void)remove(tempFileName.c_str());
+            if (remove(tempFileName.c_str()) != 0) {
+                LOGE("Warning: Failed to remove tempFile");
+            }
             return -1;
         }
         (void)fflush(fp);
@@ -164,7 +166,9 @@ public:
 
         if (rename(tempFileName.c_str(), mFileName.c_str()) != 0) {
             LOGE("Save config file: %{public}s, rename() failed!", mFileName.c_str());
-            (void)remove(tempFileName.c_str());
+            if (remove(tempFileName.c_str()) !=  0) {
+                LOGE("Warning: Rename failed to remove file");
+            }
             return -1;
         }
         return 0;

@@ -56,7 +56,6 @@
 #endif // OHOS_ARCH_LITE
 
 #include "wifi_channel_helper.h"
-#include "parameters.h"
 #ifndef OHOS_WIFI_STA_TEST
 #else
 #include "mock_dhcp_service.h"
@@ -780,19 +779,14 @@ bool StaStateMachine::InitState::NotAllowConnectToNetwork(int networkId, const s
         return false;
     }
 #endif
-    if (networkId == pStaStateMachine->targetNetworkId_) {
-        WIFI_LOGI("This network is connecting and does not need to be reconnected m_instId = %{public}d",
-            pStaStateMachine->m_instId);
-        return true;
-    }
     WifiDeviceConfig config;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, config, pStaStateMachine->m_instId) != 0) {
         WIFI_LOGE("GetDeviceConfig failed, networkId = %{public}d", networkId);
         return true;
     }
 
-    if (networkId == pStaStateMachine->linkedInfo.networkId && connTriggerMode != NETWORK_SELECTED_BY_SELFCURE &&
-        connTriggerMode != NETWORK_SELECTED_BY_MDM &&
+    if ((networkId == pStaStateMachine->linkedInfo.networkId || networkId == pStaStateMachine->targetNetworkId_) &&
+        connTriggerMode != NETWORK_SELECTED_BY_SELFCURE && connTriggerMode != NETWORK_SELECTED_BY_MDM &&
         pStaStateMachine->linkedInfo.connState != ConnState::DISCONNECTING) {
         WIFI_LOGI("This network is connected and does not need to be reconnected m_instId = %{public}d",
             pStaStateMachine->m_instId);
@@ -989,7 +983,7 @@ bool StaStateMachine::LinkState::NeedIgnoreDisconnectEvent(int reason, const std
         WIFI_LOGI("self cure going, dont ignroe disconnect event");
         return false;
     }
-    if (GetDeviceType() != ProductDeviceType::WEARABLE && TryFastReconnect(reason, bssid, locallyGenerated)) {
+    if (!IsKidWatchDevice() && TryFastReconnect(reason, bssid, locallyGenerated)) {
         pStaStateMachine->pApReConnectState->SetFastReconnectState(true);
         pStaStateMachine->reconnType_ = RECONNECT_TYPE_FAST;
         return true;
@@ -1909,30 +1903,30 @@ void StaStateMachine::ApLinkedState::DealWpaLinkFailEventInApLinked(InternalMess
         "isCurrentRoaming_=%{public}d", MacAnonymize(bssid).c_str(),
         MacAnonymize(pStaStateMachine->targetRoamBssid).c_str(), pStaStateMachine->isCurrentRoaming_);
     if (pStaStateMachine->isCurrentRoaming_ && bssid == pStaStateMachine->targetRoamBssid) {
-        switch (msg->GetMessageName()) {
-            case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT: {
-                pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
-                    RoamingResultType::TYPE_ROAMING_PASSWD_WRONG);
-                break;
+            switch (msg->GetMessageName()) {
+                case WIFI_SVR_CMD_STA_WPA_PASSWD_WRONG_EVENT: {
+                    pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
+                        RoamingResultType::TYPE_ROAMING_PASSWD_WRONG);
+                    break;
+                }
+                case WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT: {
+                    pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
+                        RoamingResultType::TYPE_ROAMING_FULL_CONNECT);
+                    break;
+                }
+                case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT: {
+                    pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
+                        RoamingResultType::TYPE_ROAMING_ASSOC_REJECT);
+                    break;
+                }
+                case WIFI_SVR_CMD_STA_WPA_AUTH_TIMEOUT_EVENT: {
+                    pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
+                        RoamingResultType::TYPE_ROAMING_ASSOC_REJECT);
+                    break;
+                }
+                default:
+                    break;
             }
-            case WIFI_SVR_CMD_STA_WPA_FULL_CONNECT_EVENT: {
-                pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
-                    RoamingResultType::TYPE_ROAMING_FULL_CONNECT);
-                break;
-            }
-            case WIFI_SVR_CMD_STA_WPA_ASSOC_REJECT_EVENT: {
-                pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
-                    RoamingResultType::TYPE_ROAMING_ASSOC_REJECT);
-                break;
-            }
-            case WIFI_SVR_CMD_STA_WPA_AUTH_TIMEOUT_EVENT: {
-                pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_ROAMING_FAIL,
-                    RoamingResultType::TYPE_ROAMING_ASSOC_REJECT);
-                break;
-            }
-            default:
-                break;
-        }
     }
     if (!pStaStateMachine->isCurrentRoaming_ ||  bssid == pStaStateMachine->targetRoamBssid) {
         pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
@@ -2919,11 +2913,6 @@ void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
         WIFI_LOGI("factory version or device type no need to pop up diag");
         return;
     }
-    std::string noNeedPop = OHOS::system::GetParameter("mmi2.auto.flag", "");
-    if (noNeedPop == "1" || noNeedPop == "true") {
-        WIFI_LOGI("mmi2.auto.flag is set, no need to pop up dialog");
-        return;
-    }
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     int networkId = linkedInfo.networkId;
@@ -3487,6 +3476,7 @@ bool StaStateMachine::ApRoamingState::HandleNetworkConnectionEvent(InternalMessa
     pStaStateMachine->StopTimer(static_cast<int>(CMD_AP_ROAMING_TIMEOUT_CHECK));
     pStaStateMachine->StopTimer(static_cast<int>(CMD_NETWORK_CONNECT_TIMEOUT));
     pStaStateMachine->AfterApLinkedprocess(bssid);
+
     if (!pStaStateMachine->CanArpReachable()) {
         WIFI_LOGI("Arp is not reachable");
         WriteWifiSelfcureHisysevent(static_cast<int>(WifiSelfcureType::ROAMING_ABNORMAL));

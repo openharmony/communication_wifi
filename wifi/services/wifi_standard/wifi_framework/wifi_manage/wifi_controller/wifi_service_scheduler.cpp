@@ -751,7 +751,7 @@ void WifiServiceScheduler::HandleWifiOpenFailedReport(WifiOprMidState staState)
     if (deviceType == ProductDeviceType::WEARABLE) {
         auto &controllerMachine = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
         if (controllerMachine != nullptr &&
-            controllerMachine->GetWifiStartFailCount() >= WIFI_OPEN_RETRY_MAX_COUNT - 1) {
+            controllerMachine->GetWifiStartFailCount() >= WIFI_WATCH_OPEN_RETRY_MAX_COUNT - 1) {
             needReport = true;
         } else {
             needReport = false;

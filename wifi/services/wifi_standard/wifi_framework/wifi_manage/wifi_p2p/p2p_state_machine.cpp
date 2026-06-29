@@ -1123,7 +1123,7 @@ int P2pStateMachine::GetAvailableFreqByBand(GroupOwnerBand band) const
     do {
         if (linkedInfo.connState == CONNECTED) {
             if (pEnhanceService != nullptr && linkedInfo.frequency >= DFS_CHANNEL_MIN &&
-                linkedInfo.frequency <= DFS_CHANNEL_MAX && !pEnhanceService->DfsUsable()) {
+                linkedInfo.frequency <= DFS_CHANNEL_MAX) {
                 break;
             }
             auto it = std::find(freqList.begin(), freqList.end(), linkedInfo.frequency);

@@ -430,7 +430,7 @@ bool P2pGroupOperatingState::ProcessCmdHid2dCreateGroup(const InternalMessagePtr
         } else {
             freq = freqEnhance;
         }
-        if (freq >= DFS_CHANNEL_MIN && freq <= DFS_CHANNEL_MAX && !enhanceService_->DfsUsable()) {
+        if (freq >= DFS_CHANNEL_MIN && freq <= DFS_CHANNEL_MAX) {
             freq = p2pStateMachine.GetAvailableFreqByBand(GroupOwnerBand::GO_BAND_5GHZ);
         }
     } while (0);

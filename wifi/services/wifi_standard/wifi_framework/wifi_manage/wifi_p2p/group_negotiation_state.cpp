@@ -21,6 +21,7 @@
 #include "wifi_hisysevent.h"
 #include "wifi_config_center.h"
 #include "p2p_chr_reporter.h"
+#include "wifi_hid2d_service_utils.h"
 
 DEFINE_WIFILOG_P2P_LABEL("GroupNegotiationState");
 
@@ -113,6 +114,7 @@ bool GroupNegotiationState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
 
     DoDhcpInGroupStart();
     SharedLinkManager::IncreaseSharedLink();
+    P2pChrReporter::GetInstance().UpdateConnectedInfo(group);
     if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");
     }
@@ -126,7 +128,7 @@ void GroupNegotiationState::DoDhcpInGroupStart(void) const
     if (groupManager.GetCurrentGroup().IsGroupOwner()) {
         if (!p2pStateMachine.StartDhcpServer()) {
             WIFI_LOGE("failed to startup Dhcp server.");
-            p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
+            p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP), 0);
         }
         if (WifiErrorNo::WIFI_HAL_OPT_OK !=
             WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(groupManager.GetCurrentGroup().GetInterface(), 0)) {
@@ -220,6 +222,11 @@ bool GroupNegotiationState::ProcessGroupRemovedEvt(InternalMessagePtr msg) const
 
 bool GroupNegotiationState::ProcessCmdRemoveGroup(InternalMessagePtr msg) const
 {
+    int uid = msg->GetParam1();
+    if (!SharedLinkManager::CanRemoveGroupByUid(uid)) {
+        p2pStateMachine.BroadcastActionResult(P2pActionCallback::RemoveGroup, WIFI_OPT_FAILED);
+        return EXECUTED;
+    }
     std::string ifName = p2pStateMachine.p2pDevIface;
     if (ifName.empty()) {
         WIFI_LOGE("invalid ifname on ProcessCmdRemoveGroup");

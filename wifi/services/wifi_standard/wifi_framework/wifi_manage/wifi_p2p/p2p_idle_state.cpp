@@ -251,7 +251,7 @@ bool P2pIdleState::ProcessCmdHid2dConnect(InternalMessagePtr msg) const
     int callingUid = msg->GetParam1();
     SharedLinkManager::SetGroupUid(callingUid);
     hasConnect = true;
-    P2pChrReporter::GetInstance().SetWpsSuccess(true);
+    P2pChrReporter::GetInstance().HandleP2pHid2dConn();
     return EXECUTED;
 }
 
@@ -332,8 +332,7 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
     hasConnect = false;
     WifiP2pGroupInfo group;
     msg->GetMessageObj(group);
-    WIFI_LOGI("P2P_EVENT_GROUP_STARTED create group interface name : %{private}s, network name : %{private}s, owner "
-              "address : %{private}s",
+    WIFI_LOGI("P2P_EVENT_GROUP_STARTED interface: %{private}s, network: %{private}s, go address: %{private}s",
         group.GetInterface().c_str(), group.GetGroupName().c_str(), group.GetOwner().GetDeviceAddress().c_str());
     if (group.IsPersistent()) {
         /**
@@ -359,16 +358,18 @@ bool P2pIdleState::ProcessGroupStartedEvt(InternalMessagePtr msg) const
         p2pStateMachine.groupManager.SetCurrentGroup(WifiMacAddrInfoType::P2P_CURRENT_GROUP_MACADDR_INFO, currGrp);
         if (!p2pStateMachine.StartDhcpServer()) {
             WIFI_LOGE("Failed to start dhcp server.");
-            p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
+            p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP), 0);
             return EXECUTED;
         }
     }
+
     SharedLinkManager::IncreaseSharedLink();
     if (WifiP2PHalInterface::GetInstance().SetP2pPowerSave(group.GetInterface(), true) != WIFI_HAL_OPT_OK) {
         WIFI_LOGE("SetP2pPowerSave() failed!");
     }
 
     p2pStateMachine.ChangeConnectedStatus(P2pConnectedState::P2P_CONNECTED);
+    P2pChrReporter::GetInstance().UpdateConnectedInfo(group);
     p2pStateMachine.StartP2pSignalPollTimer();
     p2pStateMachine.SwitchState(&p2pStateMachine.p2pGroupFormedState);
     return EXECUTED;

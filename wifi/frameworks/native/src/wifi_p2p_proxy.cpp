@@ -1957,7 +1957,7 @@ ErrCode WifiP2pProxy::Hid2dSetGroupType(GroupLiveType groupType)
     MessageParcel data;
     MessageParcel reply;
     if (!data.WriteInterfaceToken(GetDescriptor())) {
-        WIFI_LOGE("Write interface token error: %{public}s", __func__);
+        WIFI_LOGE("Hid2dSetGroupType Write interface token error: %{public}s", __func__);
         return WIFI_OPT_FAILED;
     }
     data.WriteInt32(0);

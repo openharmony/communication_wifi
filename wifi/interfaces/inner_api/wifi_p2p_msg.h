@@ -28,6 +28,8 @@ constexpr int WIFI_STR_MAC_LENGTH = 17;
 constexpr int MAX_PASSPHRASE_LENGTH = 127;
 constexpr int DEVICE_NAME_LENGTH = 32;
 constexpr int CREATE_GROUP_TIMEOUT = 5000;
+constexpr int DFS_CHANNEL_MIN = 5260;
+constexpr int DFS_CHANNEL_MAX = 5320;
 
 enum class P2pGroupStatus { GS_CREATING, GS_CREATED, GS_STARTED, GS_REMOVING, GS_INVALID };
 enum class P2pServiceStatus : unsigned char {
@@ -556,9 +558,10 @@ private:
     std::vector<std::string> mQueryList;
 };
 
+inline constexpr char PRIMARY_DEVICE_TYPE[] = "10-0050F204-5";
 class P2pVendorConfig {
 public:
-    P2pVendorConfig() : randomMacSupport(false), isAutoListen(false), primaryDeviceType("10-0050F204-5")
+    P2pVendorConfig() : randomMacSupport(false), isAutoListen(false), primaryDeviceType(PRIMARY_DEVICE_TYPE)
     {}
     ~P2pVendorConfig()
     {}

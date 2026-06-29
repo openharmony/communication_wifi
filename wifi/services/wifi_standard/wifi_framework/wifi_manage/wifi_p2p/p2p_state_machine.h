@@ -144,43 +144,48 @@ public:
 
     void SetEnhanceService(IEnhanceService* enhanceService);
 
-    /**
-    * @Description - get p2p link signal poll info
-    * @param  signalInfo - output signal information
-    * @param p2pInterfaceName p2p interface name
-    * @return true on success, false on failure
-    */
+    /* *
+     * @Description - get p2p link signal poll info
+     * @param  signalInfo - output signal information
+     * @param p2pInterfaceName p2p interface name
+     * @return true on success, false on failure
+     */
     bool GetP2pSignalPollInfo(WifiSignalPollInfo &signalInfo, std::string &p2pInterfaceName);
- 	 
-    /**
-    * @Description Process p2p signal poll result
-    */
+
+    /* *
+     * @Description Process p2p signal poll result
+     */
     void DealP2pSignalPollResult();
- 	 
-    /**
-    * @Description judge whether to enable p2p signal poll and start next timer
-    * @param signalInfo signalInfo
-    * @param p2pInterfaceName p2p interface name
-    */
+
+    /* *
+     * @Description judge whether to enable p2p signal poll and start next timer
+     * @param signalInfo signalInfo
+     * @param p2pInterfaceName p2p interface name
+     */
     virtual void JudgeP2pSignalPoll(const WifiSignalPollInfo &signalInfo, const std::string p2pInterfaceName);
- 	 
-    /**
-    * @Description start p2p signal poll timer
-    */
+
+    /* *
+     * @Description start p2p signal poll timer
+     */
     void StartP2pSignalPollTimer();
- 	 
-    /**
-    * @Description stop p2p signal poll timer
-    */
+
+    /* *
+     * @Description stop p2p signal poll timer
+     */
     void StopP2pSignalPollTimer();
- 	 
-    /**
-    * @Description set signal poll switch true:open false close
-    * @param switchFlag switchFlag
-    * @return origin flag
-    */
+
+    /* *
+     * @Description set signal poll switch true:open false close
+     * @param switchFlag switchFlag
+     * @return origin flag
+     */
     bool SetSignalAcquisitionSwitch(bool switchFlag);
 
+    /**
+    * @Description when p2p disconnected, stop congestion algo
+    */
+    void StopP2pCongestionAlgo();
+    
 #ifdef SUPPORT_P2P_UNTRUST_INVITATION
     void DealP2pPeerConnectUserReject();
 
@@ -189,11 +194,6 @@ public:
     void DisallowUntrustInvitation();
 #endif
 
-    /**
-    * @Description when p2p disconnected, stop congestion algo
-    */
-    void StopP2pCongestionAlgo();
-    
 private:
     /**
      * @Description Handle event of CMD_DEVICE_DISCOVERS
@@ -324,6 +324,14 @@ private:
      * @return int - a random available frequency
      */
     virtual int GetAvailableFreqByBand(GroupOwnerBand band) const;
+    /**
+     * @Description Select an available frequency from the frequency list.
+     *
+     * @param freqList - the frequency list to select from
+     * @param band - specified band
+     * @return int - a selected available frequency
+     */
+    virtual int SelectAvailableFreqByBand(const std::vector<int>& freqList, GroupOwnerBand band) const;
     /**
      * @Description Setting the group's configuration to WPA.
      *

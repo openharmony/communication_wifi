@@ -276,7 +276,6 @@ bool WifiP2pImpl::IsFeatureSupported(long feature)
         WIFI_LOGI("'%{public}s' failed.", "GetWifiP2pProxy()");
         return false;
     }
-    RETURN_IF_FAIL(GetWifiP2pProxy());
     long tmpFeatures = 0;
     if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
         return false;

@@ -668,7 +668,7 @@ void StaStateMachine::InitState::HandleNetworkConnectionEvent(InternalMessagePtr
         WIFI_LOGI("HandleNetworkConnection rejected: insecure network, keyMgmt=%{public}s, bssid=%{public}s, "
             "ssid=%{public}s", deviceConfig.keyMgmt.c_str(), MacAnonymize(bssid).c_str(),
             SsidAnonymize(deviceConfig.ssid).c_str());
-        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISABLED_INSECURE_NETWORK);
+        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_INSECURE_NETWORK);
         pStaStateMachine->StartDisConnectToNetwork();
         return;
     }
@@ -1801,7 +1801,7 @@ void StaStateMachine::ApLinkedState::HandleStaBssidChangedEvent(InternalMessageP
 #ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
     if (pStaStateMachine->IsInsecureNetworkByBssid(bssid)) {
         WIFI_LOGI("HandleStaBssidChanged rejected: insecure network, bssid=%{public}s", MacAnonymize(bssid).c_str());
-        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISABLED_INSECURE_NETWORK);
+        pStaStateMachine->SaveDiscReason(DisconnectedReason::DISC_REASON_INSECURE_NETWORK);
         pStaStateMachine->StartDisConnectToNetwork();
         return;
     }
@@ -3779,11 +3779,11 @@ void StaStateMachine::AfterApLinkedprocess(std::string bssid)
     WifiSettings::GetInstance().GetRealMacAddress(realMacAddr, m_instId);
 
 #ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
-    if (pStaStateMachine->IsInsecureNetworkByBssid(bssid)) {
+    if (IsInsecureNetworkByBssid(bssid)) {
         WIFI_LOGI("AfterApLinkedprocess rejected: insecure network, keyMgmt=%{public}s, bssid=%{public}s, "
-            "ssid=%{public}s", deviceConfig.keyMgmt.c_str(), MacAnonymize(apBssid).c_str(),
+            "ssid=%{public}s", deviceConfig.keyMgmt.c_str(), MacAnonymize(deviceConfig.bssid).c_str(),
             SsidAnonymize(deviceConfig.ssid).c_str());
-        SaveDiscReason(DisconnectedReason::DISABLED_INSECURE_NETWORK);
+        SaveDiscReason(DisconnectedReason::DISC_REASON_INSECURE_NETWORK);
         StartDisConnectToNetwork();
         return;
     }

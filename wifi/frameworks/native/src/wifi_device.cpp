@@ -21,23 +21,31 @@ DEFINE_WIFILOG_LABEL("WifiDevice");
 
 namespace OHOS {
 namespace Wifi {
+
+std::mutex g_instanceMutex;
 NO_SANITIZE("cfi") std::shared_ptr<WifiDevice> WifiDevice::GetInstance(int systemAbilityId, int instId)
 {
 #ifndef OHOS_ARCH_LITE
-    if (instId >= STA_INSTANCE_MAX_NUM) {
+    if (instId >= STA_INSTANCE_MAX_NUM || instId < 0) {
         WIFI_LOGE("the max obj id is %{public}d, current id is %{public}d", STA_INSTANCE_MAX_NUM, instId);
+        return nullptr;
+    }
+#else
+    if (instId != 0) {
+        WIFI_LOGE("the current id is %{public}d", instId);
         return nullptr;
     }
 #endif
 
-    static std::shared_ptr<WifiDeviceImpl> device = nullptr;
-    if (!device) {
-        device = std::make_shared<WifiDeviceImpl>();
+    static std::vector<std::shared_ptr<WifiDeviceImpl>> devices = {nullptr, nullptr};
+    std::lock_guard<std::mutex> lock(g_instanceMutex);
+    if (!devices[instId]) {
+        devices[instId] = std::make_shared<WifiDeviceImpl>();
     }
-    if (device && device->Init(systemAbilityId, instId)) {
-        return device;
+    if (devices[instId] && devices[instId]->Init(systemAbilityId, instId)) {
+        return devices[instId];
     } else {
-        WIFI_LOGE("new wifi device failed");
+        WIFI_LOGE("new wifi device failed.");
         return nullptr;
     }
 }

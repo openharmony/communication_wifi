@@ -22,6 +22,10 @@
 #include "wifi_internal_event_dispatcher.h"
 #include "wifi_logger.h"
 #include "wifi_msg.h"
+#include "wifi_global_func.h"
+#include "p2p_define.h"
+#include "wifi_config_center.h"
+#include "wifi_ap_msg.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -81,6 +85,7 @@ void P2pChrReporter::ReportErrCodeBeforeGroupFormationSucc(int state, int errCod
         }
         return;
     }
+    currentConnIsHid2d_ = false;
     ReportP2pConnectFailed(state, errCode, minorCode);
 }
 
@@ -141,6 +146,7 @@ void P2pChrReporter::ResetState()
     lastP2pState_ = DEVICE_DISCOVERY;
     lastErrCode_ = P2P_CHR_DEFAULT_REASON_CODE;
     lastMinorCode_ = P2P_CHR_DEFAULT_REASON_CODE;
+    currentConnIsHid2d_ = false;
 }
 
 void P2pChrReporter::ReportP2pConnectFailed(int state, int errCode, int minorCode)
@@ -197,6 +203,38 @@ void P2pChrReporter::OnP2pChrErrCodeReport(int errCode)
     cbMsg.msgCode = WIFI_CBK_MSG_P2P_CHR_ERRCODE_REPORT;
     cbMsg.errCode = errCode;
     WifiInternalEventDispatcher::GetInstance().AddBroadCastMsg(cbMsg);
+}
+
+void P2pChrReporter::HandleP2pHid2dConn()
+{
+    currentConnIsHid2d_ = true;
+    WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_CNT));
+    WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::MAGICLINK_CNT));
+}
+
+void P2pChrReporter::HandleP2pNormalConn()
+{
+    WifiP2pLinkedInfo p2pInfo;
+    WifiConfigCenter::GetInstance().GetP2pInfo(p2pInfo);
+    if (p2pInfo.GetConnectState() == P2pConnectedState::P2P_CONNECTED && p2pInfo.IsGroupOwner()) {
+        return;
+    }
+    currentConnIsHid2d_ = false;
+    WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_CNT));
+}
+
+void P2pChrReporter::UpdateConnectedInfo(const WifiP2pGroupInfo &group)
+{
+    WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::P2P_SUC_5G_CNT));
+    WifiLinkedInfo linkInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkInfo, 0);
+    if (linkInfo.frequency != 0 && linkInfo.frequency != group.GetFrequency()) {
+        WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::OWN_DBAC_CNT));
+    }
+    if (currentConnIsHid2d_) {
+        WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::MAGICLINK_SUCC_CNT));
+    }
+    WriteP2pKpiCountHiSysEvent(static_cast<int>(P2P_CHR_EVENT::CONN_SUC_CNT));
 }
 
 } // namespace Wifi

@@ -1213,7 +1213,17 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pAddService(const WifiP2pServiceInfo &info) c
     WifiErrorNo ret = WIFI_HAL_OPT_OK;
     HdiP2pServiceInfo servInfo = {0};
     std::vector<std::string> queryList = info.GetQueryList();
+    if (queryList.size() > HAL_P2P_MAX_QUERY_LIST_SIZE) {
+        LOGE("ReqP2pAddService queryList size %{public}zu exceeds limit %{public}d",
+            queryList.size(), HAL_P2P_MAX_QUERY_LIST_SIZE);
+        return WIFI_HAL_OPT_FAILED;
+    }
     for (auto iter = queryList.begin(); iter != queryList.end(); iter++) {
+        if (iter->length() > HAL_P2P_MAX_QUERY_STRING_LEN) {
+            LOGE("ReqP2pAddService query string length %{public}zu exceeds limit %{public}d",
+                iter->length(), HAL_P2P_MAX_QUERY_STRING_LEN);
+            return WIFI_HAL_OPT_FAILED;
+        }
         std::vector<std::string> vec;
         SplitString(*iter, " ", vec);
         if (vec.size() < HAL_P2P_SERVICE_TYPE_MIN_SIZE) {
@@ -1252,7 +1262,17 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRemoveService(const WifiP2pServiceInfo &info
     WifiErrorNo ret = WIFI_HAL_OPT_OK;
     HdiP2pServiceInfo servInfo = {0};
     std::vector<std::string> queryList = info.GetQueryList();
+    if (queryList.size() > HAL_P2P_MAX_QUERY_LIST_SIZE) {
+        LOGE("ReqP2pRemoveService queryList size %{public}zu exceeds limit %{public}d",
+            queryList.size(), HAL_P2P_MAX_QUERY_LIST_SIZE);
+        return WIFI_HAL_OPT_FAILED;
+    }
     for (auto iter = queryList.begin(); iter != queryList.end(); iter++) {
+        if (iter->length() > HAL_P2P_MAX_QUERY_STRING_LEN) {
+            LOGE("ReqP2pRemoveService query string length %{public}zu exceeds limit %{public}d",
+                iter->length(), HAL_P2P_MAX_QUERY_STRING_LEN);
+            return WIFI_HAL_OPT_FAILED;
+        }
         std::vector<std::string> vec;
         SplitString(*iter, " ", vec);
         if (vec.size() < HAL_P2P_SERVICE_TYPE_MIN_SIZE) {

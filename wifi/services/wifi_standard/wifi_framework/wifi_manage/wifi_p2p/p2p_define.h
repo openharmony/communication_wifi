@@ -183,8 +183,8 @@ enum class DHCPTYPE {
 
 enum class P2P_ERROR_RES {
     NEGO_FAILURE = 0,           // p2p go negotiation failure
-    FORMATION_FAILURE,      // p2p group formation failure
-    PROV_SCAN_FAILURE,       // prov scan failur
+    FORMATION_FAILURE,          // p2p group formation failure
+    PROV_SCAN_FAILURE,          // prov scan failur
     P2P_GROUP_REMOVE_FAILURE,
     P2P_DISCOVERY_FAILURE
 };
@@ -202,7 +202,11 @@ enum class P2P_CHR_EVENT {
     CONN_SUC_CNT,
     MAGICLINK_CNT,
     P2P_SUC_2G4_CNT,
-    P2P_SUC_5G_CNT
+    P2P_SUC_5G_CNT,
+    P2P_PEER_REJECT_CNT,
+    P2P_CANCEL_CONNECT_CNT,
+    MAGICLINK_SUCC_CNT,
+    OWN_DBAC_CNT
 };
 
 enum class P2P_CONNECT_FAIL {

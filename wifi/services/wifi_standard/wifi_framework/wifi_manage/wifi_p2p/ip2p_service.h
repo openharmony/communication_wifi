@@ -354,13 +354,15 @@ public:
      * @Description Notify user accept result to p2p service
      *
      * @param isAccept if user accept to projection screen
-     * @param inputPincode the pin code of user input
+     * @param inputPinCode if user accept to projection screen
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    virtual void NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPincode) = 0;
+    virtual void NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPinCode) = 0;
 
      /**
-     * @Description Notify the result of user click confirm when showing display dialog to p2p service
+     * @Description Notify user accept result to p2p service
      *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     virtual void NotifyWscDisplayConfirmResult() = 0;
 
@@ -368,8 +370,7 @@ public:
     /**
      * @Description Notify untrust dialog result to p2p service
      *
-     * @param isAccept if user stop projection screen
-     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     * @param isAccept if user disallow untrust invitation
      */
      virtual void NotifyUntrustInvitationResult(bool isAccept) = 0;
 #endif

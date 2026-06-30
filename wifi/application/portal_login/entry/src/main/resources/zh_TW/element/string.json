@@ -111,6 +111,20 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"ok",
+            "value":"確定",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dialog_title_tips",
+            "value":"%s 提示",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

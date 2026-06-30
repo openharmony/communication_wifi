@@ -111,6 +111,20 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"ok",
+            "value":"OK",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dialog_title_tips",
+            "value":"Pesan dari %s:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

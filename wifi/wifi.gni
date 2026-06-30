@@ -83,6 +83,7 @@ declare_args() {
   wifi_feature_pluggable_supported = false
   wifi_feature_with_p2p_untrust_invitation = false
   wifi_feature_with_bt_proxy_speed_limit = false
+  wifi_feature_car_cockpit_supported = false
 }
 
 memory_optimization_cflags = [

@@ -126,11 +126,17 @@
         },
         {
             "name":"dialog_title_tips",
-            "value":"Message from %s:"
+            "value":"Message from %s:",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"ok",
-            "value":"OK"
+            "value":"OK",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

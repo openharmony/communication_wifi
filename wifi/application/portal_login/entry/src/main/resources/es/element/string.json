@@ -111,6 +111,20 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"ok",
+            "value":"Aceptar",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dialog_title_tips",
+            "value":"Mensaje de %s:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

@@ -25,13 +25,14 @@
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_notification_util.h"
 #include "ap_define.h"
+#include "p2p_chr_reporter.h"
 
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pService");
 
 namespace OHOS {
 namespace Wifi {
-#define COUNTRY_CODE_JAPAN_L "jp"
-#define COUNTRY_CODE_JAPAN_C "JP"
+#define COUNTRY_CODE_JAPAN_L      "jp"
+#define COUNTRY_CODE_JAPAN_C      "JP"
 #define SOFT_BUS_UID 1024
 
 std::map<int, int> g_listenSa = {{SOFTBUS_SERVER_SA_ID, SOFT_BUS_UID},
@@ -197,14 +198,16 @@ ErrCode WifiP2pService::CreateGroup(const WifiP2pConfig &config)
     wps.SetWpsMethod(WpsMethod::WPS_METHOD_PBC);
     configInternal.SetWpsInfo(wps);
     const std::any info = configInternal;
+    P2pChrReporter::GetInstance().HandleP2pNormalConn();
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_FORM_GROUP), callingUid, 0, info);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiP2pService::RemoveGroup()
 {
-    WIFI_LOGI("RemoveGroup");
-    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP));
+    int callingUid = IPCSkeleton::GetCallingUid();
+    WIFI_LOGI("RemoveGroup, callingUid: %{public}d", callingUid);
+    p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_REMOVE_GROUP), callingUid);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
@@ -245,6 +248,7 @@ ErrCode WifiP2pService::P2pConnect(const WifiP2pConfig &config)
     p2pStateMachine.SetIsNeedDhcp(DHCPTYPE::DHCP_P2P);
     const std::any info = configInternal;
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_CONNECT), callingUid, 0, info);
+    P2pChrReporter::GetInstance().HandleP2pNormalConn();
 
     return ErrCode::WIFI_OPT_SUCCESS;
 }
@@ -266,8 +270,6 @@ ErrCode WifiP2pService::SetP2pDeviceName(const std::string &devName)
 
 ErrCode WifiP2pService::SetP2pWfdInfo(const WifiP2pWfdInfo &wfdInfo)
 {
-    WIFI_LOGD("enable = %{public}d device info = %{public}d port = %{public}d throughput = %{public}d\n",
-        wfdInfo.GetWfdEnabled(), wfdInfo.GetDeviceInfo(), wfdInfo.GetCtrlPort(), wfdInfo.GetMaxThroughput());
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_SET_WFD_INFO), wfdInfo);
     return ErrCode::WIFI_OPT_SUCCESS;
 }
@@ -332,15 +334,19 @@ ErrCode WifiP2pService::QueryP2pDevices(std::vector<WifiP2pDevice> &devices)
 ErrCode WifiP2pService::QueryP2pLocalDevice(WifiP2pDevice &device)
 {
     LOGI("QueryP2pLocalDevice");
-#ifdef NON_SEPERATE_P2P
-    std::string deviceAddr;
-    if (WifiP2PHalInterface::GetInstance().GetDeviceAddress(deviceAddr) == WifiErrorNo::WIFI_HAL_OPT_FAILED) {
-        WIFI_LOGE("Failed to get device address.");
-        return ErrCode::WIFI_OPT_FAILED;
-    }
-    deviceManager.GetThisDevice().SetDeviceAddress(deviceAddr);
-#endif
     device = deviceManager.GetThisDevice();
+#ifndef NON_SEPERATE_P2P
+    if (device.GetDeviceAddress().empty() || device.GetDeviceAddress() == "00:00:00:00:00:00")
+#endif
+    {
+        std::string deviceAddress;
+        if (WifiP2PHalInterface::GetInstance().GetDeviceAddress(deviceAddress) == WifiErrorNo::WIFI_HAL_OPT_OK) {
+            WIFI_LOGI("get address from hal is: [%{public}s]",
+                MacAnonymize(device.GetDeviceAddress()).c_str());
+            deviceManager.GetThisDevice().SetDeviceAddress(deviceAddress);
+            device = deviceManager.GetThisDevice();
+        }
+    }
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 
@@ -453,9 +459,10 @@ int WifiP2pService::GetP2pRecommendChannel(void)
     const int COMMON_USING_2G_CHANNEL = 6;
     std::string countryCode;
     WifiCountryCodeManager::GetInstance().GetWifiCountryCode(countryCode);
-    if (countryCode == COUNTRY_CODE_JAPAN_C || countryCode == COUNTRY_CODE_JAPAN_L) {
+    if (countryCode == COUNTRY_CODE_JAPAN_L || countryCode == COUNTRY_CODE_JAPAN_C) {
         return COMMON_USING_2G_CHANNEL;
     }
+
     int channel = 0; // 0 is invalid channel
     int COMMON_USING_5G_CHANNEL = 149;
     WifiLinkedInfo linkedInfo;
@@ -530,12 +537,12 @@ ErrCode WifiP2pService::SetGcIpAddress(const IpAddrInfo& ipInfo)
     return WIFI_OPT_SUCCESS;
 }
 
-void WifiP2pService::NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPincode)
+void WifiP2pService::NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPinCode)
 {
-    WIFI_LOGI("Notify user auth response:%{private}d, inputPincode:%{private}s", isAccept, inputPincode.c_str());
+    WIFI_LOGI("Notify user auth response:%{private}d, inputPinCode:%{private}s", isAccept, inputPinCode.c_str());
     if (isAccept) {
         p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::INTERNAL_CONN_USER_ACCEPT),
-            inputPincode);
+            inputPinCode);
     } else {
         p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::PEER_CONNECTION_USER_REJECT));
     }

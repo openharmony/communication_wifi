@@ -251,6 +251,9 @@ enum class DisconnectedReason {
     /* Connect mdm blocklist or  wifi is fail*/
     DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL = 5,
 
+    /* Prohibit connection to insecure networks */
+    DISC_REASON_INSECURE_NETWORK = 6,
+
     /* Connect fail reason max value, add new reason before this*/
     DISC_REASON_MAX_VALUE
 };
@@ -708,7 +711,8 @@ enum class DisabledReason {
     DISABLED_DISASSOC_REASON = 15,
     DISABLED_MDM_RESTRICTED = 16,
     USER_FORCE_DISCONNECT = 17,
-    NETWORK_SELECTION_DISABLED_MAX = 18
+    DISABLED_INSECURE_NETWORK = 18,
+    NETWORK_SELECTION_DISABLED_MAX = 19
 };
 
 struct NetworkSelectionStatus {
@@ -1048,6 +1052,7 @@ struct IpV6Info {
     uint32_t validLifeTime;
     uint32_t preferredLifeTime;
     uint32_t routerLifeTime;
+    uint8_t raFlags = 0;
     IpV6Info()
     {
         linkIpV6Address = "";
@@ -1064,6 +1069,7 @@ struct IpV6Info {
         validLifeTime = MAX_LIFETIME_S;
         preferredLifeTime = MAX_LIFETIME_S;
         routerLifeTime = MAX_LIFETIME_S;
+        raFlags = 0;
     }
 };
 

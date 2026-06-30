@@ -111,6 +111,20 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"ok",
+            "value":"ตกลง",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dialog_title_tips",
+            "value":"ข้อความจาก %s:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

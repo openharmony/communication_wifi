@@ -336,13 +336,14 @@ public:
      * @Description Notify user accept result to p2p service
      *
      * @param isAccept if user accept to projection screen
-     * @param inputPincode the pin code of user input
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
-    void NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPincode) override;
+    void NotifyWscDialogConfirmResult(bool isAccept, const std::string& inputPinCode) override;
 
     /**
      * @Description Notify user accept result to p2p service
      *
+     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
      */
     void NotifyWscDisplayConfirmResult() override;
 
@@ -350,8 +351,7 @@ public:
     /**
      * @Description Notify Untrust dialog result to p2p service
      *
-     * @param isAccept if user stop projrction screen
-     * @return success: WIFI_OPT_SUCCESS, failed: WIFI_OPT_FAILED
+     * @param isAccept if user disallow untrust invitation
      */
      void NotifyUntrustInvitationResult(bool isAccept) override;
 #endif

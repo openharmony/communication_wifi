@@ -147,9 +147,9 @@ private:
 
     virtual bool ProcessCmdDisableTimeout(const InternalMessagePtr msg) const;
 
-    WifiErrorNo CreateGroupByConfig(int netId, const WifiP2pConfigInternal &config, int freq) const;
-
     void UpdateGroupOwnerInfo(WifiP2pGroupInfo &group, const std::string &goAddr) const;
+
+    WifiErrorNo CreateGroupByConfig(int netId, const WifiP2pConfigInternal &config, int freq) const;
 
     int GetGroupFreq(WifiP2pConfigInternal &config) const;
 private:

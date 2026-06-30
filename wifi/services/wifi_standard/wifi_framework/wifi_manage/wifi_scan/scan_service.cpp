@@ -2359,7 +2359,7 @@ void ScanService::CheckNeedFastScan(std::vector<int> &scanFreqs)
         std::unique_lock<std::mutex> lock(scanControlInfoMutex);
         scanCount = systemScanIntervalMode.scanIntervalMode.count;
     }
-    if (scanCount == 1 && scanFreqs.empty() == 0 &&
+    if (scanCount == 1 && scanFreqs.empty() &&
         WifiConfigCenter::GetInstance().IsNeedFastScan()) {
         WifiConfigCenter::GetInstance().SetFastScan(false);
         GetSavedNetworkFreq(scanFreqs);

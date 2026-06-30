@@ -662,6 +662,15 @@ private:
      */
     ErrCode ConvertDeviceCfg(WifiDeviceConfig &config, std::string& apBssid, std::string& ifaceName);
 
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+    /**
+     * @Description  Whether the network is insecure.
+     *
+     * @param bssid - BSSID of the target network.
+     */
+    bool IsInsecureNetworkByBssid(const std::string &bssid);
+#endif
+
     /**
      * @Description  Save the current connected state into WifiLinkedInfo.
      *

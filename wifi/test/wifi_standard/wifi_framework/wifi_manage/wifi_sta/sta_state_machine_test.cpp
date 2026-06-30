@@ -3516,5 +3516,438 @@ HWTEST_F(StaStateMachineTest, ShowPortalNitificationHiLinkNoHistoryTest, TestSiz
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 #endif
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+/* --------------------------- Test Case Data --------------------------- */
+
+static const std::string WPA1_BSSID = "aa:bb:cc:dd:ee:01";
+static const std::string WPA2_BSSID = "aa:bb:cc:dd:ee:02";
+static const std::string MIXED_BSSID = "aa:bb:cc:dd:ee:03";
+static const std::string OPEN_BSSID = "aa:bb:cc:dd:ee:04";
+static const std::string WEP_BSSID = "aa:bb:cc:dd:ee:05";
+static const std::string UNKNOWN_BSSID = "aa:bb:cc:dd:ee:ff";
+static const std::string TEST_SSID = "TestNetwork";
+
+/* --------------------------- Helper: Build Scan Results --------------------------- */
+
+static std::vector<WifiScanInfo> BuildScanResultsWithWpa1()
+{
+    std::vector<WifiScanInfo> results;
+    WifiScanInfo info;
+    info.bssid = WPA1_BSSID;
+    info.ssid = TEST_SSID;
+    info.capabilities = "[WPA-PSK-CCMP][TKIP]";
+    results.push_back(info);
+    return results;
+}
+
+static std::vector<WifiScanInfo> BuildScanResultsWithWpa2()
+{
+    std::vector<WifiScanInfo> results;
+    WifiScanInfo info;
+    info.bssid = WPA2_BSSID;
+    info.ssid = TEST_SSID;
+    info.capabilities = "[WPA2-PSK-CCMP]";
+    results.push_back(info);
+    return results;
+}
+
+static std::vector<WifiScanInfo> BuildScanResultsWithMixedWpa()
+{
+    std::vector<WifiScanInfo> results;
+    WifiScanInfo info;
+    info.bssid = MIXED_BSSID;
+    info.ssid = TEST_SSID;
+    info.capabilities = "[WPA-PSK-CCMP][WPA2-PSK-CCMP]";
+    results.push_back(info);
+    return results;
+}
+
+static std::vector<WifiScanInfo> BuildScanResultsWithOpen()
+{
+    std::vector<WifiScanInfo> results;
+    WifiScanInfo info;
+    info.bssid = OPEN_BSSID;
+    info.ssid = TEST_SSID;
+    info.capabilities = "[ESS]";
+    results.push_back(info);
+    return results;
+}
+
+static std::vector<WifiScanInfo> BuildScanResultsWithWep()
+{
+    std::vector<WifiScanInfo> results;
+    WifiScanInfo info;
+    info.bssid = WEP_BSSID;
+    info.ssid = TEST_SSID;
+    info.capabilities = "[WEP]";
+    results.push_back(info);
+    return results;
+}
+
+static std::vector<WifiScanInfo> BuildScanResultsEmpty()
+{
+    return {};
+}
+
+/* --------------------------- Insecure Network Interception UT --------------------------- */
+
+class InsecureNetworkInterceptionTest : public StaStateMachineTest {
+    void SetUp() override
+    {
+        StaStateMachineTest::SetUp();
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(testing::AtLeast(0));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveIpInfo(_, _)).Times(testing::AtLeast(0));
+    }
+};
+
+/* --------------------------- Test 1: IsInsecureNetworkByBssid --------------------------- */
+
+HWTEST_F(InsecureNetworkInterceptionTest, IsInsecureNetworkByBssid_BssidNotFound, TestSize.Level1)
+{
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_)).Times(testing::AtLeast(1));
+    std::vector<WifiScanInfo> emptyResults;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(emptyResults), Return(0)));
+    EXPECT_FALSE(pStaStateMachine->IsInsecureNetworkByBssid(UNKNOWN_BSSID));
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, IsInsecureNetworkByBssid_Wpa1, TestSize.Level1)
+{
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWpa1();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    EXPECT_TRUE(pStaStateMachine->IsInsecureNetworkByBssid(WPA1_BSSID));
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, IsInsecureNetworkByBssid_Wpa2, TestSize.Level1)
+{
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWpa2();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    EXPECT_FALSE(pStaStateMachine->IsInsecureNetworkByBssid(WPA2_BSSID));
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, IsInsecureNetworkByBssid_MixedWpa, TestSize.Level1)
+{
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithMixedWpa();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    EXPECT_FALSE(pStaStateMachine->IsInsecureNetworkByBssid(MIXED_BSSID));
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, IsInsecureNetworkByBssid_Open, TestSize.Level1)
+{
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithOpen();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    EXPECT_FALSE(pStaStateMachine->IsInsecureNetworkByBssid(OPEN_BSSID));
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, IsInsecureNetworkByBssid_Wep, TestSize.Level1)
+{
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWep();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    EXPECT_TRUE(pStaStateMachine->IsInsecureNetworkByBssid(WEP_BSSID));
+}
+
+/* --------------------------- Test 2: HandleStaBssidChangedEvent - Insecure Roam --------------------------- */
+
+HWTEST_F(InsecureNetworkInterceptionTest, HandleStaBssidChangedEvent_ReasonNotAssocComplete, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
+    msg->AddStringMessageBody("DISASSOC");
+    msg->AddStringMessageBody(WPA2_BSSID);
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(0);
+    EXPECT_TRUE(pStaStateMachine->pApLinkedState->HandleStaBssidChangedEvent(msg));
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, HandleStaBssidChangedEvent_Wpa2AssocComplete, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWpa2();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(1));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect(_)).Times(0);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
+    msg->AddStringMessageBody("ASSOC_COMPLETE");
+    msg->AddStringMessageBody(WPA2_BSSID);
+    EXPECT_TRUE(pStaStateMachine->pApLinkedState->HandleStaBssidChangedEvent(msg));
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, HandleStaBssidChangedEvent_InsecureWpa1AssocComplete, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWpa1();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "WPA-PSK";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect(_)).Times(1);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
+    msg->AddStringMessageBody("ASSOC_COMPLETE");
+    msg->AddStringMessageBody(WPA1_BSSID);
+    EXPECT_TRUE(pStaStateMachine->pApLinkedState->HandleStaBssidChangedEvent(msg));
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, HandleStaBssidChangedEvent_InsecureWepAssocComplete, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWep();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "WEP";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect(_)).Times(1);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(WIFI_SVR_CMD_STA_BSSID_CHANGED_EVENT);
+    msg->AddStringMessageBody("ASSOC_COMPLETE");
+    msg->AddStringMessageBody(WEP_BSSID);
+    EXPECT_TRUE(pStaStateMachine->pApLinkedState->HandleStaBssidChangedEvent(msg));
+}
+
+/* --------------------------- Test 3: HandleNetworkConnectionEvent - Insecure Network --------------------------- */
+
+HWTEST_F(InsecureNetworkInterceptionTest, HandleNetworkConnectionEvent_InsecureWpa1, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWpa1();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "WPA-PSK";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect(_)).Times(1);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT);
+    msg->AddStringMessageBody("ASSOC_COMPLETE");
+    msg->AddStringMessageBody(WPA1_BSSID);
+    EXPECT_TRUE(pStaStateMachine->pApLinkedState->HandleNetworkConnectionEvent(msg));
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, HandleNetworkConnectionEvent_Wpa2, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWpa2();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "WPA-PSK";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect(_)).Times(1);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT);
+    msg->AddStringMessageBody("ASSOC_COMPLETE");
+    msg->AddStringMessageBody(WPA2_BSSID);
+    EXPECT_TRUE(pStaStateMachine->pApLinkedState->HandleNetworkConnectionEvent(msg));
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, HandleNetworkConnectionEvent_InsecureWep, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWep();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "WEP";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect(_)).Times(1);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(WIFI_SVR_CMD_STA_NETWORK_CONNECTION_EVENT);
+    msg->AddStringMessageBody("ASSOC_COMPLETE");
+    msg->AddStringMessageBody(WEP_BSSID);
+    EXPECT_TRUE(pStaStateMachine->pApLinkedState->HandleNetworkConnectionEvent(msg));
+}
+
+/* --------------------------- Test 4: DealStartRoamCmdInApLinkedState - Insecure Target --------------------------- */
+
+HWTEST_F(InsecureNetworkInterceptionTest, DealStartRoamCmdInApLinkedState_InsecureWpa1, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWpa1();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "WPA-PSK";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetBssid(_, _, _)).Times(0);
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reassociate(_)).Times(0);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(WIFI_SVR_COM_STA_START_ROAM);
+    msg->AddStringMessageBody(WPA1_BSSID);
+    pStaStateMachine->pApLinkedState->DealStartRoamCmdInApLinkedState(msg)
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, DealStartRoamCmdInApLinkedState_Wpa2, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWpa2();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "WPA-PSK";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetBssid(_, _, _)).Times(0);
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reassociate(_)).Times(0);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(WIFI_SVR_COM_STA_START_ROAM);
+    msg->AddStringMessageBody(WPA2_BSSID);
+    pStaStateMachine->pApLinkedState->DealStartRoamCmdInApLinkedState(msg)
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, DealStartRoamCmdInApLinkedState_InsecureWep, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWep();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "WEP";
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetBssid(_, _, _)).Times(0);
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), Reassociate(_)).Times(0);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(WIFI_SVR_COM_STA_START_ROAM);
+    msg->AddStringMessageBody(WEP_BSSID);
+    pStaStateMachine->pApLinkedState->DealStartRoamCmdInApLinkedState(msg)
+}
+
+/* --------------------------- Test 5: AfterApLinkedprocess - Insecure Bssid --------------------------- */
+
+HWTEST_F(InsecureNetworkInterceptionTest, DealStartRoamCmdInApLinkedState_InsecureWpa1, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWpa1();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "WPA-PSK";
+    config.bssid = WPA1_BSSID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetBssid(_, _, _)).Times(1);
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect(_)).Times(1);
+    pStaStateMachine->AfterApLinkedprocess(WPA1_BSSID)
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, DealStartRoamCmdInApLinkedState_Wpa2, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWpa2();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "WPA-PSK";
+    config.bssid = WPA2_BSSID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetBssid(_, _, _)).Times(1);
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect(_)).Times(1);
+    pStaStateMachine->AfterApLinkedprocess(WPA2_BSSID)
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, DealStartRoamCmdInApLinkedState_InsecureWep, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWep();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "Wep";
+    config.bssid = WEP_BSSID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), AddDeviceConfig(_)).Times(AtLeast(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), SetBssid(_, _, _)).Times(1);
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), Disconnect(_)).Times(1);
+    pStaStateMachine->AfterApLinkedprocess(WEP_BSSID)
+}
+
+/* --------------------------- Test 6: StartConnectToNetwork - Insecure Network Rejection --------------------------- */
+
+HWTEST_F(InsecureNetworkInterceptionTest, StartConnectToNetwork_InsecureWap1, TestSize.Level1)
+{
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWpa1();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "WPA-PSK";
+    config.ssid = TEST_SSID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(BlockConnectService::GetInstance(), UpdateNetworkSelectStatus(
+        _, DisabledReason::DISABLED_INSECURE_NETWORK)).Times(1);
+    EXPECT_EQ(WIFI_OPT_FAILED,
+        pStaStateMachine->StartConnectToNetwork(1, WPA1_BSSID, NETWORK_SELECTED_BY_USER));
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, StartConnectToNetwork_InsecureWep, TestSize.Level1)
+{
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWep();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "WEP";
+    config.ssid = TEST_SSID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(BlockConnectService::GetInstance(), UpdateNetworkSelectStatus(
+        _, DisabledReason::DISABLED_INSECURE_NETWORK)).Times(1);
+    EXPECT_EQ(WIFI_OPT_FAILED,
+        pStaStateMachine->StartConnectToNetwork(1, WEP_BSSID, NETWORK_SELECTED_BY_USER));
+}
+
+HWTEST_F(InsecureNetworkInterceptionTest, StartConnectToNetwork_Wpa2, TestSize.Level1)
+{
+    std::vector<WifiScanInfo> scanResults = BuildScanResultsWithWpa2();
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetScanInfoList(_))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(scanResults), Return(0)));
+    WifiDeviceConfig config;
+    config.networkId = 1;
+    config.keyMgmt = "WPA-PSK";
+    config.ssid = TEST_SSID;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_CALL(BlockConnectService::GetInstance(), UpdateNetworkSelectStatus(_, _)).Times(0);
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), ClearDeviceConfig(_)).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), GetNextNetworkId(_, _)).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
+    EXPECT_CALL(WifiStaHalInterface::GetInstance(), Connect(_, _)).WillRepeatedly(Return(WIFI_HAL_OPT_OK));
+    EXPECT_EQ(WIFI_OPT_SUCCESS,
+        pStaStateMachine->StartConnectToNetwork(1, WPA2_BSSID, NETWORK_SELECTED_BY_USER));
+}
+#endif
 } // namespace Wifi
 } // namespace OHOS

@@ -251,6 +251,9 @@ enum class DisconnectedReason {
     /* Connect mdm blocklist or  wifi is fail*/
     DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL = 5,
 
+    /* Prohibit connection to insecure networks */
+    DISC_REASON_INSECURE_NETWORK = 6,
+
     /* Connect fail reason max value, add new reason before this*/
     DISC_REASON_MAX_VALUE
 };
@@ -708,7 +711,8 @@ enum class DisabledReason {
     DISABLED_DISASSOC_REASON = 15,
     DISABLED_MDM_RESTRICTED = 16,
     USER_FORCE_DISCONNECT = 17,
-    NETWORK_SELECTION_DISABLED_MAX = 18
+    DISABLED_INSECURE_NETWORK = 18,
+    NETWORK_SELECTION_DISABLED_MAX = 19
 };
 
 struct NetworkSelectionStatus {

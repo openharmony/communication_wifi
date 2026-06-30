@@ -124,6 +124,9 @@ typedef enum {
     /* Connect mdm blocklist wifi is fail*/
     DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL = 5,
 
+    /* Prohibit connection to insecure networks */
+    DISC_REASON_INSECURE_NETWORK = 6,
+
     /* Connect fail reason max value, add new reason before this*/
     DISC_REASON_MAX_VALUE
 } DisconnectedReason;

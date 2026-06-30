@@ -75,6 +75,14 @@
         {
             "name":"website_permission_allowed",
             "value":"[TS_1200075]_Allow"
+        },
+        {
+            "name":"ok",
+            "value":"[TS_1223744]_OK"
+        },
+        {
+            "name":"dialog_title_tips",
+            "value":"[TS_1223743]_Message from %s:"
         }
     ]
 }

@@ -111,6 +111,20 @@
             "attr":{
                 "priority":"LT"
             }
+        },
+        {
+            "name":"ok",
+            "value":"확인",
+            "attr":{
+                "priority":"translate"
+            }
+        },
+        {
+            "name":"dialog_title_tips",
+            "value":"%s의 메시지:",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

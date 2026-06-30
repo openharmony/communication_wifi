@@ -114,11 +114,17 @@
         },
         {
             "name":"dialog_title_tips",
-            "value":"%s 提示"
+            "value":"%s 提示",
+            "attr":{
+                "priority":"translate"
+            }
         },
         {
             "name":"ok",
-            "value":"确定"
+            "value":"确定",
+            "attr":{
+                "priority":"translate"
+            }
         }
     ]
 }

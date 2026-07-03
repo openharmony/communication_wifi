@@ -42,6 +42,7 @@ enum DeviceType {
   PHONE = 'Phone',
   TABLET = 'Tablet',
   PC = 'PC',
+  WEARABLE = 'Wearable',
   UNKNOWN = 'Unknown'
 }
 
@@ -444,12 +445,14 @@ struct Index {
         .onControllerAttached(() => {
           try {
             this.harmonyUARaw = this.webviewController.getUserAgent();
-            const match = this.harmonyUARaw.match(/(Phone|Tablet|PC)/i);
+            const match = this.harmonyUARaw.match(/(Phone|Tablet|PC|Wearable)/i);
             if (match) {
               const deviceTypeStr = match[1];
               this.deviceType = deviceTypeStr === 'Phone' ? DeviceType.PHONE :
                                deviceTypeStr === 'Tablet' ? DeviceType.TABLET :
-                               deviceTypeStr === 'PC' ? DeviceType.PC : DeviceType.UNKNOWN;
+                               deviceTypeStr === 'PC' ? DeviceType.PC :
+                               deviceTypeStr === 'Wearable' ? DeviceType.WEARABLE :
+                               DeviceType.UNKNOWN;
             }
             hilog.info(DOMAIN, TAG, 'deviceType:%{public}s', this.deviceType);
             this.overviewMode = this.deviceType !== DeviceType.PHONE;

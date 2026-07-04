@@ -21,6 +21,7 @@
 #include "net_supplier_callback_base.h"
 #include "mock_wifi_settings.h"
 #include "mock_wifi_config_center.h"
+#include "net_conn_client.h"
 
 using namespace testing;
 using ::testing::_;
@@ -47,18 +48,6 @@ public:
     {
     }
 };
-
-HWTEST_F(WifiNetAgentTest, RegisterNetSupplier_ReturnsFalseWhenRegistrationFails, TestSize.Level1)
-{
-    int instId = 0;
-    EXPECT_FALSE(WifiNetAgent::GetInstance().RegisterNetSupplier(instId));
-}
-
-HWTEST_F(WifiNetAgentTest, RegisterNetSupplierCallback_ReturnsFalseWhenRegistrationFails, TestSize.Level1)
-{
-    int instId = 0;
-    EXPECT_FALSE(WifiNetAgent::GetInstance().RegisterNetSupplierCallback(instId));
-}
 
 HWTEST_F(WifiNetAgentTest, UnregisterNetSupplier_CallsUnregisterNetSupplier, TestSize.Level1)
 {

@@ -181,7 +181,6 @@ bool WifiP2pServiceResponseList::ParseTlvs2RespList(const std::vector<unsigned c
     while (leftLength > 0 && CheckTlvBounds(tlvList, pos)) {
         unsigned short length = static_cast<unsigned short>(tlvList[pos]) +
             (static_cast<unsigned short>(tlvList[pos + 1]) << CHAR_BIT);
-        unsigned short length = tlvList[pos] + (tlvList[pos + 1] << CHAR_BIT);
         unsigned short dataLength = length - PROTOCOL_SIZE - TRANSACTION_ID_SIZE - SERVICE_STATUS_SIZE;
         int type = tlvList[pos + SERVICE_TLV_LENGTH_SIZE];
         unsigned char transId = tlvList[pos + SERVICE_TLV_LENGTH_SIZE + PROTOCOL_SIZE];

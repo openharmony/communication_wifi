@@ -263,8 +263,6 @@ HWTEST_F(WifiManagerTest, AutoStopP2pService_002, TestSize.Level1)
 HWTEST_F(WifiManagerTest, StartUnloadP2PSaTimerTest, TestSize.Level1)
 {
     WIFI_LOGI("StartUnloadP2PSaTimerTest enter!");
-    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiMidState(_))
-        .WillOnce(DoAll(Return(WifiOprMidState::CLOSED)));
     wifiManager.wifiP2pManager->StartUnloadP2PSaTimer();
 }
 

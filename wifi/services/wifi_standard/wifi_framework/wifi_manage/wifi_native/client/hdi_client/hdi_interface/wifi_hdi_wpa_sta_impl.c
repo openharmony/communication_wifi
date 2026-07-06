@@ -566,8 +566,8 @@ static bool GetScanData(unsigned char *resultBuff, ScanInfo *results, int *size)
         token = strtok_r(NULL, "\n", &savedPtr);
         j++;
     }
-	*size = j;
-	return true;
+    *size = j;
+    return true;
 }
 
 ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
@@ -606,7 +606,7 @@ ScanInfo *HdiWpaStaGetScanInfos(int *size, const char *ifaceName)
 
     if (GetScanData(resultBuff, results, size) == false) {
         goto EXIT;
-	}
+    }
 
     free(resultBuff);
     resultBuff = NULL;

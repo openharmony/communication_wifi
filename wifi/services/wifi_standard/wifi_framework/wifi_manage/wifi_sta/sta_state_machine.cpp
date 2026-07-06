@@ -743,7 +743,6 @@ void StaStateMachine::InitState::DealHiddenSsidConnectMiss(int networkId)
     WifiLinkedInfo linkInfo = pStaStateMachine->linkedInfo;
     linkInfo.networkId = networkId;
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_MISS_MATCH, linkInfo);
-    WifiSettings::GetInstance().SetUserConnectChoice(networkId);
 }
 
 void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
@@ -757,6 +756,10 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
     int connTriggerMode = msg->GetParam2();
     auto bssid = msg->GetStringFromMessage();
     pStaStateMachine->linkedInfo.connTriggerMode = connTriggerMode;
+    if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
+        BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
+        WifiSettings::GetInstance().SetUserConnectChoice(networkId);
+    }
 
     if (NotAllowConnectToNetwork(networkId, bssid, connTriggerMode)) {
         return;
@@ -5491,11 +5494,9 @@ ErrCode StaStateMachine::StartConnectToNetwork(int networkId, const std::string 
         return WIFI_OPT_FAILED;
     }
     if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
-        BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
 #ifdef WIFI_SECURITY_DETECT_ENABLE
         WifiSecurityDetect::GetInstance().SetChangeNetworkid(networkId);
 #endif
-        WifiSettings::GetInstance().SetUserConnectChoice(networkId);
     }
     WifiDeviceConfig deviceConfig;
     if (WifiSettings::GetInstance().GetDeviceConfig(networkId, deviceConfig, m_instId) != 0) {

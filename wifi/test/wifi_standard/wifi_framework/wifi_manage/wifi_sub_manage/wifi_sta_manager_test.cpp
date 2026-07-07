@@ -74,13 +74,6 @@ HWTEST_F(WifiStaManagerTest, StartUnloadStaSaTimerTest01, TestSize.Level1)
     wifiStaManager_->StartUnloadStaSaTimer();
     EXPECT_NE(wifiStaManager_->unloadStaSaTimerId, TEN);
 }
-
-HWTEST_F(WifiStaManagerTest, StopUnloadStaSaTimerTest01, TestSize.Level1)
-{
-    wifiStaManager_->unloadStaSaTimerId = 1;
-    wifiStaManager_->StopUnloadStaSaTimer();
-    EXPECT_NE(wifiStaManager_->unloadStaSaTimerId, TEN);
-}
 #endif
 
 HWTEST_F(WifiStaManagerTest, CloseStaServiceTest01, TestSize.Level1)

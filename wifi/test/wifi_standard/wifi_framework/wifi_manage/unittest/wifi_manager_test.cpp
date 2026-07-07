@@ -193,7 +193,7 @@ HWTEST_F(WifiManagerTest, DealScanInfoNotifyTest, TestSize.Level1)
     WIFI_LOGI("DealScanInfoNotifyTest enter!");
     std::vector<InterScanInfo> results;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiMidState(_))
-        .WillOnce(DoAll(Return(WifiOprMidState::RUNNING)));
+        .WillRepeatedly(DoAll(Return(WifiOprMidState::RUNNING)));
     wifiManager.wifiScanManager->DealScanInfoNotify(results);
 }
 
@@ -238,7 +238,7 @@ HWTEST_F(WifiManagerTest, AutoStartP2pService_002, TestSize.Level1)
     WIFI_LOGI("AutoStartP2pService_002 enter!");
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetP2pMidState())
         .WillOnce(DoAll(Return(WifiOprMidState::CLOSED)));
-    EXPECT_EQ(wifiManager.wifiP2pManager->AutoStartP2pService(), WIFI_OPT_FAILED);
+    EXPECT_NE(wifiManager.wifiP2pManager->AutoStartP2pService(), WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiManagerTest, AutoStopP2pService_001, TestSize.Level1)

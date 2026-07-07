@@ -74,7 +74,12 @@ declare_args() {
   wifi_hiappevent_enable = false
   if (defined(global_parts_info) &&
       defined(global_parts_info.hiviewdfx_hiappevent)) {
-    wifi_hiappevent_enable = true
+    wifi_hiappevent_enable = false
+  }
+  wifi_feature_support_api_metrics = false
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.hiviewdfx_api_metrics)) {
+    wifi_feature_support_api_metrics = true
   }
   wifi_feature_auto_enable_support = false
   wifi_feature_with_ipv6_selfcure = true

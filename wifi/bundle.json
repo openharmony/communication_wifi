@@ -96,6 +96,7 @@
                 "ability_base",
                 "ability_runtime",
                 "access_token",
+                "api_metrics",
                 "battery_manager",
                 "bundle_framework",
                 "c_utils",

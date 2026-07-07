@@ -23,6 +23,10 @@
 #include "wifi_timer.h"
 #include "wifi_msg.h"
 
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+#include "histogram_plugin_macros.h"
+#endif
+
 // Number of DNS
 #define DNS_NUM 2
 // Length of DNS
@@ -47,6 +51,9 @@ NO_SANITIZE("cfi") napi_value EnableWifi(napi_env env, napi_callback_info info)
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->EnableWifi();
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.enableWifi.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
@@ -55,6 +62,9 @@ NO_SANITIZE("cfi") napi_value DisableWifi(napi_env env, napi_callback_info info)
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->DisableWifi();
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.disableWifi.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
@@ -101,6 +111,9 @@ NO_SANITIZE("cfi") napi_value StartScan(napi_env env, napi_callback_info info)
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     bool compatible = false;
     ErrCode ret = wifiScanPtr->Scan(compatible);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.startScan.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
@@ -704,6 +717,9 @@ NO_SANITIZE("cfi") napi_value AddDeviceConfig(napi_env env, napi_callback_info i
         ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId, context->isCandidate);
         if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) { context->networkId = -1; }
         context->errorCode = ret;
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+        HISTOGRAM_BOOLEAN("connectivityKit.addCandidateConfig.ErrCode", ret);
+#endif
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
@@ -761,6 +777,9 @@ NO_SANITIZE("cfi") napi_value AddUntrustedConfig(napi_env env, napi_callback_inf
         ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId, context->isCandidate);
         if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) { context->networkId = -1; }
         context->errorCode = ret;
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+        HISTOGRAM_BOOLEAN("connectivityKit.addDeviceConfig.ErrCode", ret);
+#endif
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
@@ -869,6 +888,9 @@ NO_SANITIZE("cfi") napi_value AddCandidateConfig(napi_env env, napi_callback_inf
         ErrCode ret = wifiDevicePtr->AddDeviceConfig(*context->config, context->networkId, context->isCandidate);
         if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) { context->networkId = -1; }
         context->errorCode = ret;
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+        HISTOGRAM_BOOLEAN("connectivityKit.addCandidateConfig.ErrCode", ret);
+#endif
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
@@ -909,6 +931,9 @@ NO_SANITIZE("cfi") napi_value RemoveCandidateConfig(napi_env env, napi_callback_
     asyncContext->executeFunc = [&](void* data) -> void {
         DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
         context->errorCode = wifiDevicePtr->RemoveCandidateConfig(context->networkId);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+        HISTOGRAM_BOOLEAN("connectivityKit.removeCandidateConfig.ErrCode", context->errorCode);
+#endif
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
@@ -1068,6 +1093,9 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callba
         napi_get_value_int32(env, argv[0], &networkId);
         connectSettings.networkId = networkId;
         ret = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+        HISTOGRAM_BOOLEAN("connectivityKit.connectToCandidateConfig.ErrCode", ret);
+#endif
         WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     } else if (valueType == napi_object) {
         GetJsObjToConnectSettings(env, argv[0], connectSettings);
@@ -1082,6 +1110,9 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callba
             return ConnectToCandidateWithUserActionAsync(env, connectSettings, argc, argv);
         }
         ret = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+        HISTOGRAM_BOOLEAN("connectivityKit.connectToCandidateConfig.ErrCode", ret);
+#endif
         WIFI_NAPI_RETURN_NUM_CODE(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     } else {
         WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
@@ -1107,6 +1138,9 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfigWithUserAction(napi_env en
     napi_get_value_int32(env, argv[0], &networkId);
     ConnectSettings connectSettings;
     connectSettings.networkId = networkId;
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.connectToCandidateConfigWithUserAction.ErrCode", 1);
+#endif
     return ConnectToCandidateWithUserActionAsync(env, connectSettings, argc, argv);
 }
 
@@ -1129,6 +1163,9 @@ NO_SANITIZE("cfi") napi_value ConnectToNetwork(napi_env env, napi_callback_info 
 
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->ConnectToNetwork(networkId, isCandidate);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.connectToNetwork.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
@@ -1166,6 +1203,9 @@ NO_SANITIZE("cfi") napi_value IsConnected(napi_env env, napi_callback_info info)
         WIFI_LOGE("IsConnected return error: %{public}d", ret);
         WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.isConnected.ErrCode", ret);
+#endif
     napi_value result;
     napi_get_boolean(env, isConnected, &result);
     return result;
@@ -1176,6 +1216,9 @@ NO_SANITIZE("cfi") napi_value Disconnect(napi_env env, napi_callback_info info)
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     ErrCode ret = wifiDevicePtr->Disconnect();
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.disconnect.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
@@ -1266,6 +1309,9 @@ NO_SANITIZE("cfi") napi_value GetIpInfo(napi_env env, napi_callback_info info)
         WIFI_LOGE("Get ip info fail: %{public}d", ret);
     }
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getIpInfo.ErrCode", ret);
+#endif
     IpInfoToJsObj(env, ipInfo, result);
     return result;
 }
@@ -1282,6 +1328,9 @@ NO_SANITIZE("cfi") napi_value GetIpv6Info(napi_env env, napi_callback_info info)
         WIFI_LOGE("Get ip info fail: %{public}d", ret);
     }
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getIpv6Info.ErrCode", ret);
+#endif
     IpV6InfoToJsObj(env, ipInfo, result);
     return result;
 }
@@ -1340,6 +1389,9 @@ NO_SANITIZE("cfi") napi_value GetLinkedInfo(napi_env env, napi_callback_info inf
         LinkedInfoAsyncContext *context = static_cast<LinkedInfoAsyncContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiDevicePtr->GetLinkedInfo");
         context->errorCode = wifiDevicePtr->GetLinkedInfo(context->linkedInfo);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+        HISTOGRAM_BOOLEAN("connectivityKit.getLinkedInfo.ErrCode", context->errorCode);
+#endif
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
@@ -1369,6 +1421,9 @@ NO_SANITIZE("cfi") napi_value GetLinkedInfoSync(napi_env env, napi_callback_info
         WIFI_LOGE("Get SyncGetLinkedInfo value fail:%{public}d", ret);
         WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getLinkedInfoSync.ErrCode", ret);
+#endif
     napi_value result;
     napi_create_object(env, &result);
     LinkedInfoToJs(env, linkedInfo, result);
@@ -1385,6 +1440,9 @@ NO_SANITIZE("cfi") napi_value GetMultiLinkedInfo(napi_env env, napi_callback_inf
         WIFI_LOGE("GetMultiLinkedInfo value fail:%{public}d", ret);
         WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getMultiLinkedInfo.ErrCode", ret);
+#endif
     WIFI_LOGI("%{public}s get multi linkedInfo size: %{public}zu", __FUNCTION__, wifiMultiLinkedInfo.size());
     napi_value arrayResult;
     napi_create_array_with_length(env, wifiMultiLinkedInfo.size(), &arrayResult);
@@ -1447,6 +1505,9 @@ NO_SANITIZE("cfi") napi_value RemoveDevice(napi_env env, napi_callback_info info
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     ErrCode ret = wifiDevicePtr->RemoveDevice(networkId);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.removeDevice.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
@@ -1527,6 +1588,9 @@ NO_SANITIZE("cfi") napi_value GetCountryCode(napi_env env, napi_callback_info in
         WIFI_LOGE("Get countryCode fail: %{public}d", ret);
     }
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getCountryCode.ErrCode", ret);
+#endif
     napi_value cc;
     napi_create_string_utf8(env, countryCode.c_str(), NAPI_AUTO_LENGTH, &cc);
     return cc;
@@ -1795,6 +1859,9 @@ NO_SANITIZE("cfi") napi_value GetDeviceConfigs(napi_env env, napi_callback_info 
     }
 
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getDeviceConfigs.ErrCode", ret);
+#endif
     WIFI_LOGI("Get device configs size: %{public}zu", vecDeviceConfigs.size());
     napi_value arrayResult;
     napi_create_array_with_length(env, vecDeviceConfigs.size(), &arrayResult);
@@ -1918,7 +1985,9 @@ NO_SANITIZE("cfi") napi_value IsFeatureSupported(napi_env env, napi_callback_inf
         WIFI_LOGE("Get supported features fail: %{public}d", ret);
         WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
     }
-
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.isFeatureSupported.ErrCode", ret);
+#endif
     napi_value result;
     napi_get_boolean(env, isSupported, &result);
     return result;
@@ -1933,7 +2002,9 @@ NO_SANITIZE("cfi") napi_value GetDeviceMacAddress(napi_env env, napi_callback_in
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get mac address fail: %{public}d", ret);
     }
-
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getDeviceMacAddress.ErrCode", ret);
+#endif
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     napi_value addr;
     napi_create_string_utf8(env, macAddr.c_str(), NAPI_AUTO_LENGTH, &addr);
@@ -1970,6 +2041,9 @@ NO_SANITIZE("cfi") napi_value IsBandTypeSupported(napi_env env, napi_callback_in
         WIFI_LOGE("Get band type supported fail: %{public}d", ret);
         WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.isBandTypeSupported.ErrCode", ret);
+#endif
     napi_value result;
     napi_get_boolean(env, supported, &result);
     return result;

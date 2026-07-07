@@ -72,6 +72,10 @@ ohos_shared_library("wifi") {
     "napi:ace_napi",
     "samgr:samgr_proxy",
   ]
+  if (wifi_feature_support_api_metrics) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines += [ "WIFI_FEATURE_SUPPORT_API_METRICS" ]
+  }
   if (wifi_hiappevent_enable) {
     external_deps += [ "hiappevent:hiappevent_innerapi" ]
     defines += [ "WIFI_HIAPPEVENT_ENABLE" ]
@@ -134,6 +138,11 @@ ohos_shared_library("wifiext") {
 
   if (wifi_feature_with_random_mac_addr) {
     defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+  }
+
+  if (wifi_feature_support_api_metrics) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines += [ "WIFI_FEATURE_SUPPORT_API_METRICS" ]
   }
 
   if (wifi_hiappevent_enable) {
@@ -207,6 +216,11 @@ ohos_shared_library("wifimanager") {
     "samgr:samgr_proxy",
   ]
 
+  if (wifi_feature_support_api_metrics) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines += [ "WIFI_FEATURE_SUPPORT_API_METRICS" ]
+  }
+
   if (wifi_hiappevent_enable) {
     external_deps += [ "hiappevent:hiappevent_innerapi" ]
     defines += [ "WIFI_HIAPPEVENT_ENABLE" ]
@@ -268,6 +282,11 @@ ohos_shared_library("wifimanagerext") {
     "samgr:samgr_proxy",
     "ipc:ipc_single",
   ]
+
+  if (wifi_feature_support_api_metrics) {
+    external_deps += [ "api_metrics:histogrammanager" ]
+    defines += [ "WIFI_FEATURE_SUPPORT_API_METRICS" ]
+  }
 
   if (wifi_hiappevent_enable) {
     external_deps += [ "hiappevent:hiappevent_innerapi" ]

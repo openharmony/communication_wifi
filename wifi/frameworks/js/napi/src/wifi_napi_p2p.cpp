@@ -16,6 +16,9 @@
 #include "wifi_napi_p2p.h"
 #include "wifi_logger.h"
 #include "wifi_napi_errcode.h"
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+#include "histogram_plugin_macros.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -125,6 +128,9 @@ NO_SANITIZE("cfi") napi_value GetCurrentGroup(napi_env env, napi_callback_info i
         P2pGroupInfoAsyncContext *context = static_cast<P2pGroupInfoAsyncContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiP2pPtr->GetCurrentGroup");
         context->errorCode = wifiP2pPtr->GetCurrentGroup(context->groupInfo);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+        HISTOGRAM_BOOLEAN("connectivityKit.getCurrentGroup.ErrCode", context->errorCode);
+#endif
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
@@ -159,6 +165,9 @@ NO_SANITIZE("cfi") napi_value GetP2pGroups(napi_env env, napi_callback_info info
         P2pGroupInfoListAsyncContext *context = static_cast<P2pGroupInfoListAsyncContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiP2pPtr->QueryP2pGroups");
         context->errorCode = wifiP2pPtr->QueryP2pGroups(context->vecGroupInfoList);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+        HISTOGRAM_BOOLEAN("connectivityKit.getP2pGroups.ErrCode", context->errorCode);
+#endif
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
@@ -193,6 +202,9 @@ NO_SANITIZE("cfi") napi_value DeletePersistentGroup(napi_env env, napi_callback_
     napi_get_value_int32(env, argv[0], &netId);
     groupInfo.SetNetworkId(netId);
     ErrCode ret = wifiP2pPtr->DeleteGroup(groupInfo);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.deletePersistentGroup.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
@@ -202,6 +214,9 @@ NO_SANITIZE("cfi") napi_value StartDiscoverDevices(napi_env env, napi_callback_i
     WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     ErrCode ret = wifiP2pPtr->DiscoverDevices();
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.startDiscoverDevices.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
@@ -211,6 +226,9 @@ NO_SANITIZE("cfi") napi_value StopDiscoverDevices(napi_env env, napi_callback_in
     WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     ErrCode ret = wifiP2pPtr->StopDiscoverDevices();
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.stopDiscoverDevices.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
@@ -231,6 +249,9 @@ NO_SANITIZE("cfi") napi_value GetP2pDevices(napi_env env, napi_callback_info inf
         QueryP2pDeviceAsyncContext *context = static_cast<QueryP2pDeviceAsyncContext *>(data);
         context->errorCode = wifiP2pPtr->QueryP2pDevices(context->vecP2pDevices);
         WIFI_LOGI("GetP2pDeviceList, size: %{public}zu", context->vecP2pDevices.size());
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+        HISTOGRAM_BOOLEAN("connectivityKit.getP2pPeerDevices.ErrCode", context->errorCode);
+#endif
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
@@ -265,6 +286,9 @@ NO_SANITIZE("cfi") napi_value GetP2pLocalDevice(napi_env env, napi_callback_info
         P2pLocalDeviceAsyncContext *context = static_cast<P2pLocalDeviceAsyncContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiP2pPtr->QueryP2pLocalDevice");
         context->errorCode = wifiP2pPtr->QueryP2pLocalDevice(context->deviceInfo);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+        HISTOGRAM_BOOLEAN("connectivityKit.getP2pLocalDevice.ErrCode", context->errorCode);
+#endif
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {
@@ -299,6 +323,9 @@ NO_SANITIZE("cfi") napi_value SetDeviceName(napi_env env, napi_callback_info inf
     size_t typeLen = 0;
     napi_get_value_string_utf8(env, argv[0], name, sizeof(name), &typeLen);
     ErrCode ret = wifiP2pPtr->SetP2pDeviceName(name);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.setDeviceName.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
@@ -348,6 +375,9 @@ NO_SANITIZE("cfi") napi_value P2pConnect(napi_env env, napi_callback_info info)
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Connect to device fail: %{public}d", ret);
     }
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.p2pConnect.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
@@ -356,6 +386,9 @@ napi_value P2pCancelConnect(napi_env env, napi_callback_info info)
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
     ErrCode ret = wifiP2pPtr->P2pCancelConnect();
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.p2pCancelConnect.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
@@ -375,6 +408,9 @@ NO_SANITIZE("cfi") napi_value CreateGroup(napi_env env, napi_callback_info info)
     WifiP2pConfig config;
     JsObjToP2pConfig(env, argv[0], config);
     ErrCode ret = wifiP2pPtr->CreateGroup(config);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.createGroup.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
@@ -383,6 +419,9 @@ NO_SANITIZE("cfi") napi_value RemoveGroup(napi_env env, napi_callback_info info)
     TRACE_FUNC_CALL;
     WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
     ErrCode ret = wifiP2pPtr->RemoveGroup();
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.removeGroup.ErrCode", ret);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
@@ -411,6 +450,9 @@ NO_SANITIZE("cfi") napi_value GetP2pLinkedInfo(napi_env env, napi_callback_info 
         P2pLinkedInfoAsyncContext *context = static_cast<P2pLinkedInfoAsyncContext *>(data);
         TRACE_FUNC_CALL_NAME("wifiP2pPtr->QueryP2pLinkedInfo");
         context->errorCode = wifiP2pPtr->QueryP2pLinkedInfo(context->linkedInfo);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+        HISTOGRAM_BOOLEAN("connectivityKit.getP2pLinkedInfo.ErrCode", context->errorCode);
+#endif
     };
 
     asyncContext->completeFunc = [&](void* data) -> void {

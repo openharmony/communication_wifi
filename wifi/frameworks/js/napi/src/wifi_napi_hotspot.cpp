@@ -64,10 +64,10 @@ NO_SANITIZE("cfi") napi_value IsHotspotActive(napi_env env, napi_callback_info i
     WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
     bool isActive = false;
     ErrCode ret = wifiHotspotPtr->IsHotspotActive(isActive);
-    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
 #ifdef WIFI_FEATURE_SUPPORT_API_METRICS
     HISTOGRAM_BOOLEAN("connectivityKit.isHotspotActive.ErrCode", ret);
 #endif
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
     napi_value result;
     napi_get_boolean(env, isActive, &result);
     return result;

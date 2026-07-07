@@ -114,14 +114,6 @@ public:
     * @return return true networkStatusHistory has 10 records all NO_INTERNET
     */
     static bool IsAllNoInternetHistory(const NetworkCandidate &networkCandidate);
-
-    /**
-    * check if the network has all NO_INTERNET history.
-    *
-    * @param networkCandidate candidate network.
-    * @return return true networkStatusHistory has 10 records all NO_INTERNET
-    */
-    static bool IsAllNoInternetHistory(const NetworkCandidate &networkCandidate);
 };
 }
 #endif

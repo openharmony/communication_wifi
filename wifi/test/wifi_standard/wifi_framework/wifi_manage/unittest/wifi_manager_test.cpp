@@ -193,7 +193,7 @@ HWTEST_F(WifiManagerTest, DealScanInfoNotifyTest, TestSize.Level1)
     WIFI_LOGI("DealScanInfoNotifyTest enter!");
     std::vector<InterScanInfo> results;
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiMidState(_))
-        .WillOnce(DoAll(Return(WifiOprMidState::RUNNING)));
+        .WillRepeatedly(DoAll(Return(WifiOprMidState::RUNNING)));
     wifiManager.wifiScanManager->DealScanInfoNotify(results);
 }
 

@@ -88,6 +88,14 @@ protected:
     bool Filter(NetworkCandidate &networkCandidate) override;
 };
 
+class AllNoInternetHistoryNetworkSelector final: public SimpleFilterNetworkSelector {
+public:
+    AllNoInternetHistoryNetworkSelector();
+protected:
+    bool Nominate(NetworkCandidate &networkCandidate) override;
+    bool Filter(NetworkCandidate &networkCandidate) override;
+};
+
 class HasInternetNetworkSelector final: public SimpleFilterNetworkSelector {
 public:
     HasInternetNetworkSelector();

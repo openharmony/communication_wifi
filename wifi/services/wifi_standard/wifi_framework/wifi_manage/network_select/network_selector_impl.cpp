@@ -180,6 +180,7 @@ SavedNetworkTracker::SavedNetworkTracker() : CompositeNetworkSelector("savedNetw
     }
 #endif
     auto blackListNetworkSelector = make_shared<BlackListNetworkSelector>();
+    auto allNoInternetHistoryNetworkSelector = make_shared<AllNoInternetHistoryNetworkSelector>();
     auto hasInternetNetworkSelector = make_shared<HasInternetNetworkSelector>();
     auto recoveryNetworkSelector = make_shared<RecoveryNetworkSelector>();
     auto portalNetworkSelector = make_shared<PortalNetworkSelector>();
@@ -190,6 +191,7 @@ SavedNetworkTracker::SavedNetworkTracker() : CompositeNetworkSelector("savedNetw
     andFilter->AddFilter(custNetPreferredNetworkSelector);
 #endif
     andFilter->AddFilter(blackListNetworkSelector);
+    andFilter->AddFilter(allNoInternetHistoryNetworkSelector);
     andFilter->AddFilter(hasInternetNetworkSelector);
     andFilter->AddFilter(recoveryNetworkSelector);
     andFilter->AddFilter(portalNetworkSelector);
@@ -209,6 +211,7 @@ SavedNetworkTracker::SavedNetworkTracker() : CompositeNetworkSelector("savedNetw
     AddSubNetworkSelector(portalNetworkSelector);
     AddSubNetworkSelector(noInternetNetworkSelector);
     AddSubNetworkSelector(blackListNetworkSelector);
+    AddSubNetworkSelector(allNoInternetHistoryNetworkSelector);
 }
 
 bool SavedNetworkTracker::Nominate(NetworkCandidate &networkCandidate)
@@ -269,6 +272,31 @@ bool BlackListNetworkSelector::Nominate(NetworkCandidate &networkCandidate)
 }
 
 bool BlackListNetworkSelector::Filter(NetworkCandidate &networkCandidate)
+{
+    return !TryNominate(networkCandidate);
+}
+
+AllNoInternetHistoryNetworkSelector::AllNoInternetHistoryNetworkSelector()
+    : SimpleFilterNetworkSelector("allNoInternetHistoryNetworkSelector")
+{
+    SetWifiFilter(make_shared<WifiFunctionFilterAdapter>(
+        NetworkSelectionUtils::IsAllNoInternetHistory, "allNoInternetHistory"));
+    auto comparator = make_shared<WifiScorerComparator>(m_networkSelectorName);
+    comparator->AddScorer(make_shared<RssiScorer>());
+    SetWifiComparator(comparator);
+}
+ 
+bool AllNoInternetHistoryNetworkSelector::Nominate(NetworkCandidate &networkCandidate)
+{
+    if (!networkCandidates.empty()) {
+        networkCandidates.at(0) = &networkCandidate;
+    } else {
+        networkCandidates.emplace_back(&networkCandidate);
+    }
+    return true;
+}
+ 
+bool AllNoInternetHistoryNetworkSelector::Filter(NetworkCandidate &networkCandidate)
 {
     return !TryNominate(networkCandidate);
 }

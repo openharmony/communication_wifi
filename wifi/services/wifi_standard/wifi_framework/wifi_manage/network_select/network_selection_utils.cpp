@@ -146,4 +146,13 @@ bool NetworkSelectionUtils::IsSameFreqAsP2p(const NetworkCandidate &networkCandi
     }
     return false;
 }
+
+bool NetworkSelectionUtils::IsAllNoInternetHistory(const NetworkCandidate &networkCandidate)
+{
+    if (WifiConfigCenter::GetInstance().GetDeviceType() != ProductDeviceType::PC) {
+        return false;
+    }
+    return NetworkStatusHistoryManager::IsAllNoInternetByHistory(
+        networkCandidate.wifiDeviceConfig.networkStatusHistory);
+}
 }

@@ -942,7 +942,8 @@ HWTEST_F(NetworkSelectionTest, TestAllNoInternetHistoryOnNonPC, TestSize.Level1)
  
     NetworkSelectionManager selectionManager;
     std::string failReason;
-    EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT, scanInfos, failReason));
+    EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult,
+        NetworkSelectType::AUTO_CONNECT, scanInfos, failReason));
     EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, 0);
 }
 }

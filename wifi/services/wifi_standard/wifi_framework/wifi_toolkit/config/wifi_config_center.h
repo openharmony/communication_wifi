@@ -25,6 +25,7 @@
 #include "wifi_internal_msg.h"
 #include "wifi_settings.h"
 #include "wifi_scan_config.h"
+#include "hid2d_service_registry.h"
 #ifndef STA_INSTANCE_MAX_NUM
 #define STA_INSTANCE_MAX_NUM 2
 #endif

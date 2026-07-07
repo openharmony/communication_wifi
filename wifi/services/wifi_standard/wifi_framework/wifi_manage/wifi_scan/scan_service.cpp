@@ -19,6 +19,7 @@
 #include "wifi_internal_msg.h"
 #include "wifi_logger.h"
 #include "wifi_config_center.h"
+#include "hid2d_service_registry.h"
 #include "wifi_channel_helper.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"

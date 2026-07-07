@@ -20,6 +20,7 @@
 #include "wifi_config_center.h"
 #include "wifi_logger.h"
 #include "wifi_global_func.h"
+#include "hid2d_service_registry.h"
 #include "wifi_system_timer.h"
 #include "common_event_support.h"
 #include "wifi_datashare_utils.h"

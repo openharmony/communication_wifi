@@ -18,6 +18,7 @@
 #include "wifi_logger.h"
 #include "wifi_common_util.h"
 #include "wifi_global_func.h"
+#include "hid2d_service_registry.h"
 #include "wifi_randommac_helper.h"
 #ifndef OHOS_ARCH_LITE
 #include "display_info.h"

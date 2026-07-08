@@ -22,7 +22,7 @@ if (defined(ohos_lite)) {
 
 local_base_sources = [
   "config/wifi_config_center.cpp",
-  "config/hid2d_service_registry.h",
+  "config/hid2d_service_registry.cpp",
   "config/wifi_config_file_spec.cpp",
   "config/wifi_scan_config.cpp",
   "config/wifi_settings.cpp",

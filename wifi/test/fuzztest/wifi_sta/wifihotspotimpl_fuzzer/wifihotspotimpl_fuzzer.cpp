@@ -164,14 +164,10 @@ void IsValidHotspotConfigFuzzTest(const uint8_t* data, size_t size)
 
 void WifiHotspotMgrServiceImplFuzzTest(const uint8_t* data, size_t size)
 {
-    string extension = FDP.ConsumeBytesAsString(NUM_BYTES);
-    int id = FDP.ConsumeIntegral<int>();
-    int32_t fd = FDP.ConsumeIntegral<int32_t>();
+    int id = FDP->ConsumeIntegral<int>();
+    int32_t fd = FDP->ConsumeIntegral<int32_t>();
     const std::vector<std::u16string> args;
     sptr<IRemoteObject> remote;
-    MessageParcel data;
-    MessageParcel reply;
-    pWifiHotspotMgrServiceImpl->OnExtension(extension, data, reply);
     pWifiHotspotMgrServiceImpl->OnStart();
     pWifiHotspotMgrServiceImpl->OnStop();
     pWifiHotspotMgrServiceImpl->Init();

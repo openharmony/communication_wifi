@@ -481,14 +481,11 @@ void WifiEventSubscriberManager::InitSubscribeListener()
     SubscribeSystemAbility(APP_MGR_SERVICE_ID);
     SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID);
     SubscribeSystemAbility(COMM_ETHERNET_MANAGER_SYS_ABILITY_ID);
-    SubscribeSystemAbility(SOFTBUS_SERVER_SA_ID);
-    SubscribeSystemAbility(CAST_ENGINE_SA_ID);
-    SubscribeSystemAbility(MIRACAST_SERVICE_SA_ID);
-    SubscribeSystemAbility(SHARE_SERVICE_ID);
-    SubscribeSystemAbility(MOUSE_CROSS_SERVICE_ID);
-    SubscribeSystemAbility(HICAR_SERVICE_SA_ID);
-    SubscribeSystemAbility(GAMESERVICE_SA_ID);
-    SubscribeSystemAbility(SUBSYS_WEARABLE_SYS_ABILITY_ID_BEGIN);
+    for (const auto& entry : GetHid2dServiceRegistry()) {
+        if (entry.systemAbilityId != 0) {
+            SubscribeSystemAbility(entry.systemAbilityId);
+        }
+    }
 }
 
 int WifiEventSubscriberManager::GetLastStaStateByDatashare()

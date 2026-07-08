@@ -910,13 +910,9 @@ void WifiConfigCenter::ClearLocalHid2dInfo(int uid)
     if (uid != 0) {
         mHid2dUpperScenePair.insert_or_assign(uid, scene);
     } else {
-        mHid2dUpperScenePair.insert_or_assign(SOFT_BUS_SERVICE_UID, scene);
-        mHid2dUpperScenePair.insert_or_assign(CAST_ENGINE_SERVICE_UID, scene);
-        mHid2dUpperScenePair.insert_or_assign(MIRACAST_SERVICE_UID, scene);
-        mHid2dUpperScenePair.insert_or_assign(SHARE_SERVICE_UID, scene);
-        mHid2dUpperScenePair.insert_or_assign(MOUSE_CROSS_SERVICE_UID, scene);
-        mHid2dUpperScenePair.insert_or_assign(GAMESERVICE_SA_UID, scene);
-        mHid2dUpperScenePair.insert_or_assign(WATCH_SERVICE_UID, scene);
+        for (int serviceUid : GetAllHid2dServiceUids()) {
+            mHid2dUpperScenePair.insert_or_assign(serviceUid, scene);
+        }
         SetHid2dSceneLastSetTime(0);
     }
 }

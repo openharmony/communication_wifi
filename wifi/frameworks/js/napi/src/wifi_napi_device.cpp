@@ -889,7 +889,7 @@ NO_SANITIZE("cfi") napi_value AddCandidateConfig(napi_env env, napi_callback_inf
         if (context->networkId < 0 || ret != WIFI_OPT_SUCCESS) { context->networkId = -1; }
         context->errorCode = ret;
 #ifdef WIFI_FEATURE_SUPPORT_API_METRICS
-        HISTOGRAM_BOOLEAN("connectivityKit.addCandidateConfig.ErrCode", ret == WIFI_OPT_SUCCESSt);
+        HISTOGRAM_BOOLEAN("connectivityKit.addCandidateConfig.ErrCode", ret == WIFI_OPT_SUCCESS);
 #endif
     };
 

@@ -274,41 +274,6 @@ void WifiEventSubscriberManager::HandleDistributedKvDataServiceChange(bool add)
     }
 }
 
-void WifiEventSubscriberManager::HandleCastServiceChange(bool add)
-{
-    if (!add) {
-        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(CAST_ENGINE_SERVICE_UID);
-    }
-}
-
-void WifiEventSubscriberManager::HandleShareServiceChange(bool add)
-{
-    if (!add) {
-        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(SHARE_SERVICE_UID);
-    }
-}
-
-void WifiEventSubscriberManager::HandleMouseCrossServiceChange(bool add)
-{
-    if (!add) {
-        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(MOUSE_CROSS_SERVICE_UID);
-    }
-}
-
-void WifiEventSubscriberManager::HandleGameServiceChange(bool add)
-{
-    if (!add) {
-        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(GAMESERVICE_SA_UID);
-    }
-}
-
-void WifiEventSubscriberManager::HandleWatchServiceChange(bool add)
-{
-    if (!add) {
-        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(WATCH_SERVICE_UID);
-    }
-}
-
 #ifdef FEATURE_P2P_SUPPORT
 void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bool add)
 {
@@ -321,12 +286,6 @@ void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bo
     }
     if (systemAbilityId == MIRACAST_SERVICE_SA_ID) {
         WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(MIRACAST_SERVICE_UID);
-    }
-    if (systemAbilityId == HICAR_SERVICE_SA_ID) {
-        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(HICAR_SERVICE_UID);
-    }
-    if (systemAbilityId == SUBSYS_WEARABLE_SYS_ABILITY_ID_BEGIN) {
-        WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(WATCH_SERVICE_UID);
     }
     IP2pService *pService = WifiServiceManager::GetInstance().GetP2pServiceInst();
     if (pService == nullptr) {
@@ -357,25 +316,16 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             HandleP2pBusinessChange(systemAbilityId, add);
             break;
 #endif
-        case CAST_ENGINE_SA_ID:
-            HandleCastServiceChange(add);
-            break;
-        case SHARE_SERVICE_ID:
-            HandleShareServiceChange(add);
-            break;
-        case MOUSE_CROSS_SERVICE_ID:
-            HandleMouseCrossServiceChange(add);
-            break;
-        case GAMESERVICE_SA_ID:
-            HandleGameServiceChange(add);
-            break;
-        case SUBSYS_WEARABLE_SYS_ABILITY_ID_BEGIN:
-            HandleWatchServiceChange(add);
-            break;
         case COMM_ETHERNET_MANAGER_SYS_ABILITY_ID:
             HandleEthernetServiceChange(systemAbilityId, add);
             break;
         default:
+            const Hid2dServiceEntry* entry = FindServiceBySaId(systemAbilityId);
+            if (entry != nullptr && !add) {
+                WIFI_LOGI("%{public}s, clearing hid2d info for service %{public}s",
+                    __FUNCTION__, entry->serviceName.c_str());
+                WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(entry->uid);
+            }
             break;
     }
 }

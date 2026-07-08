@@ -166,5 +166,12 @@ void NetworkStatusHistoryManager::ModifyAllHistoryRecord(unsigned int &networkSt
     networkStatusHistory = newNetworkStatusHistory;
     WIFI_LOGI("%{public}s, new networkStatusHistory=%{public}d", __func__, newNetworkStatusHistory);
 }
+
+bool NetworkStatusHistoryManager::IsAllNoInternetByHistory(uint32_t networkStatusHistory)
+{
+    int counts[NETWORK_STATUS_NUM] = {0};
+    CountNetworkStatus(networkStatusHistory, counts);
+    return counts[static_cast<int>(NetworkStatus::NO_INTERNET)] == MAX_HISTORY_RECORD_NUM;
+}
 }
 }

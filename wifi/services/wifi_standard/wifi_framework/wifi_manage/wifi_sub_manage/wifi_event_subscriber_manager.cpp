@@ -1033,7 +1033,7 @@ void NotificationEventSubscriber::OnReceiveBackPortalEvent(int networkid)
         if (linkedInfo.connState != ConnState::DISCONNECTED && linkedInfo.connState != ConnState::DISCONNECTING) {
             pService->StartPortalCertification();
         } else {
-             pService->ConnectToNetwork(networkid, SelectedType::NETWORK_SELECTED_BY_USER);
+            pService->ConnectToNetwork(networkid, SelectedType::NETWORK_SELECTED_BY_USER);
         }
     }
 }

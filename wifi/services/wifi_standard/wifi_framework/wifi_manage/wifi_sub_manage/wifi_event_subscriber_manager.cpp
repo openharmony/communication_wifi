@@ -281,7 +281,7 @@ void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bo
     if (add) {
         return;
     }
-    if (systemAbilityId == SOFTBUS_SERVER_SA_ID) {
+    if (systemAbilityId == SOFT_BUS_SERVER_SA_ID) {
         WifiConfigCenter::GetInstance().ClearLocalHid2dInfo(SOFT_BUS_SERVICE_UID);
     }
     if (systemAbilityId == MIRACAST_SERVICE_SA_ID) {
@@ -311,7 +311,7 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
             HandleDistributedKvDataServiceChange(add);
             break;
 #ifdef FEATURE_P2P_SUPPORT
-        case SOFTBUS_SERVER_SA_ID:
+        case SOFT_BUS_SERVER_SA_ID:
         case MIRACAST_SERVICE_SA_ID:
             HandleP2pBusinessChange(systemAbilityId, add);
             break;

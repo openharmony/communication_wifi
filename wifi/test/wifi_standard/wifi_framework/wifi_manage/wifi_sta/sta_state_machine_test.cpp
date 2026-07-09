@@ -936,6 +936,7 @@ public:
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetIpInfo(_, _)).Times(AtLeast(1));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), SaveLinkedInfo(_, _)).Times(TWO);
         pStaStateMachine->linkedInfo.connState = ConnState::CONNECTED;
+        pStaStateMachine->linkedInfo.connTriggerMode = NETWORK_SELECTED_BY_BACKGROUND_PORTAL;
         pStaStateMachine->HandleNetCheckResult(SystemNetWorkState::NETWORK_IS_WORKING, "");
     }
 

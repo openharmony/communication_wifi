@@ -995,8 +995,14 @@ void NotificationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEve
     WIFI_LOGI("OnReceiveNotificationEvent action[%{public}s]", action.c_str());
     if (action == WIFI_EVENT_TAP_NOTIFICATION) {
         int notificationId = eventData.GetWant().GetIntParam("notificationId", 0);
+        bool backPortalConnect = eventData.GetWant().GetBoolParam("backPortalConnect", 0);
+        int networkid = eventData.GetWant().GetIntParam("networkid", 0);
         WIFI_LOGI("notificationId[%{public}d]", notificationId);
-        OnReceiveNotificationEvent(notificationId);
+        if (!backPortalConnect) {
+            OnReceiveNotificationEvent(notificationId);
+        } else {
+            OnReceiveBackPortalEvent(networkid);
+        }
     } else if (action == WIFI_EVENT_TAP_DONT_SHOW_AGAIN) {
         int notificationId = eventData.GetWant().GetIntParam("notificationId", 0);
         WIFI_LOGI("notificationId[%{public}d]", notificationId);
@@ -1015,6 +1021,22 @@ void NotificationEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEve
     } else {
         int dialogType = eventData.GetWant().GetIntParam("dialogType", 0);
         WIFI_LOGI("dialogType[%{public}d]", dialogType);
+    }
+}
+
+void NotificationEventSubscriber::OnReceiveBackPortalEvent(int networkid)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
+        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
+        if (pService != nullptr) {
+            if (linkedInfo.connState != ConnState::DISCONNECTED && linkedInfo.connState != ConnState::DISCONNECTING) {
+                pService->StartPortalCertification();
+            } else {
+                pService->ConnectToNetwork(networkid, SelectedType::NETWORK_SELECTED_BY_USER);
+            }
+        }
     }
 }
 
@@ -1611,6 +1633,14 @@ void SettingsEnterSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &ev
     if (action == ENTER_SETTINGS) {
         WifiConfigCenter::GetInstance().SetWlanPage(isSettingsEnter);
         if (isSettingsEnter) {
+            WifiLinkedInfo linkedInfo;
+            WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+            if (linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_BACKGROUND_PORTAL) {
+                IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(INSTID_WLAN0);
+                if (pService != nullptr) {
+                    pService->Disconnect();
+                }
+            }
             BlockConnectService::GetInstance().OnReceiveSettingsEnterEvent(isSettingsEnter);
             IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
             if (pEnhanceService != nullptr) {

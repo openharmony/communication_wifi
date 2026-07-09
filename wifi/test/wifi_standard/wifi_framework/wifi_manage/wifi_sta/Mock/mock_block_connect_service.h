@@ -26,7 +26,7 @@ class MockBlockConnectService {
 public:
     virtual ~MockBlockConnectService() = default;
     virtual bool ShouldAutoConnect(const WifiDeviceConfig &config) = 0;
-    virtual bool UpdateAllNetworkSelectStatus() = 0;
+    virtual bool UpdateAllNetworkSelectStatus(const std::vector<InterScanInfo> &scanInfos) = 0;
     virtual bool UpdateNetworkSelectStatusForWpa(int targetNetworkId, DisabledReason disableReason,
                                                  int wpaReason) = 0;
     virtual bool UpdateNetworkSelectStatus(int targetNetworkId, DisabledReason disableReason,
@@ -42,6 +42,8 @@ public:
     virtual bool UpdateNetworkSelectStatusForMdmRestrictedList() = 0;
     virtual bool ClearBlockConnectForMdmRestrictedList() = 0;
     virtual void ReleaseDhcpFailBssidSet() = 0;
+    virtual void CheckPortalAuthTimeoutClear(WifiDeviceConfig &config,
+        const std::vector<InterScanInfo> &scanInfos) = 0;
 };
  
 class BlockConnectService : public MockBlockConnectService {
@@ -50,7 +52,7 @@ public:
     static BlockConnectService &GetInstance(void);
 
     MOCK_METHOD1(ShouldAutoConnect, bool(const WifiDeviceConfig &config));
-    MOCK_METHOD0(UpdateAllNetworkSelectStatus, bool());
+    MOCK_METHOD1(UpdateAllNetworkSelectStatus, bool(const std::vector<InterScanInfo> &scanInfos));
     MOCK_METHOD3(UpdateNetworkSelectStatusForWpa, bool(int targetNetworkId, DisabledReason disableReason,
                                                        int wpaReason));
     MOCK_METHOD3(UpdateNetworkSelectStatus, bool(int targetNetworkId, DisabledReason disableReason,
@@ -66,6 +68,8 @@ public:
     MOCK_METHOD0(ClearBlockConnectForMdmRestrictedList, bool());
     MOCK_METHOD0(UpdateNetworkSelectStatusForMdmRestrictedList, bool());
     MOCK_METHOD0(ReleaseDhcpFailBssidSet, void());
+    MOCK_METHOD2(CheckPortalAuthTimeoutClear, void(WifiDeviceConfig &config,
+        const std::vector<InterScanInfo> &scanInfos));
 };
 }  // namespace OHOS
 }  // namespace Wifi

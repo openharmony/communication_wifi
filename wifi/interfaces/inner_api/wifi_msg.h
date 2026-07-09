@@ -712,7 +712,8 @@ enum class DisabledReason {
     DISABLED_MDM_RESTRICTED = 16,
     USER_FORCE_DISCONNECT = 17,
     DISABLED_INSECURE_NETWORK = 18,
-    NETWORK_SELECTION_DISABLED_MAX = 19
+    NETWORK_SELECTION_DISABLED_MAX = 19,
+    DISABLED_PORTAL_AUTH_TIMEOUT = 20
 };
 
 struct NetworkSelectionStatus {
@@ -744,6 +745,13 @@ struct NetworkSelectionStatus {
      * Rssi of the network when it is selected by user last time.  Used to compare with current Rssi to decide
      */
     int rssi;
+
+    /**
+     * This parameter represents the cumulative number of times a blacklisted network 
+     * (blocked due to background detection) fails to be detected. 
+     * If this count is greater than or equal to the threshold, the network is removed from the blacklist.
+     */
+    int portalAuthClearCount;
     NetworkSelectionStatus()
     {
         status = WifiDeviceConfigStatus::ENABLED;
@@ -754,6 +762,7 @@ struct NetworkSelectionStatus {
         connectChoiceTimestamp = INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP;
         seenInLastQualifiedNetworkSelection = false;
         rssi = DEFAULT_CONNECT_RSSI;
+        portalAuthClearCount = 0;
     }
 };
 

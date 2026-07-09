@@ -135,6 +135,17 @@ HWTEST_F(WifiStaManagerTest, DealStaConnChangedTest01, TestSize.Level1)
     EXPECT_NE(wifiStaManager_->unloadStaSaTimerId, TEN);
 }
 
+HWTEST_F(WifiStaManagerTest, DealStaConnChangedTest02, TestSize.Level1)
+{
+    OperateResState state = OperateResState::CONNECT_AP_CONNECTED;
+    WifiLinkedInfo info;
+    info.connState = ConnState::DISCONNECTED;
+    int instId = 1;
+    info.connTriggerMode = NETWORK_SELECTED_BY_AUTO;
+    wifiStaManager_->DealStaConnChanged(state, info, instId);
+    EXPECT_NE(wifiStaManager_->unloadStaSaTimerId, TEN);
+}
+
 HWTEST_F(WifiStaManagerTest, DealSignalPollReportTest01, TestSize.Level1)
 {
     std::string bssid = "11:22:33:44:55:66";

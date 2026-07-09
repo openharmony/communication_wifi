@@ -13,6 +13,7 @@
 * limitations under the License.
 */
 #include "block_connect_service.h"
+#include "wifi_notification_util.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_config_center.h"
 #include "wifi_system_timer.h"
@@ -91,7 +92,9 @@ void BlockConnectService::InitBlockConnectPolicies()
         {DisabledReason::DISABLED_INSECURE_NETWORK,
          DisablePolicy(-1, 1, WifiDeviceConfigStatus::PERMEMANTLY_DISABLED)},
         {DisabledReason::USER_FORCE_DISCONNECT,
-         DisablePolicy(static_cast<int64_t>(24) * 60 * 60 * 1000 * 1000, 1, WifiDeviceConfigStatus::DISABLED)}
+         DisablePolicy(static_cast<int64_t>(24) * 60 * 60 * 1000 * 1000, 1, WifiDeviceConfigStatus::DISABLED)},
+        {DisabledReason::DISABLED_PORTAL_AUTH_TIMEOUT,
+         DisablePolicy(-1, 1, WifiDeviceConfigStatus::PERMEMANTLY_DISABLED)}
     };
 }
 
@@ -133,7 +136,7 @@ bool BlockConnectService::ShouldAutoConnect(const WifiDeviceConfig &config)
 }
 
 // Update the selection status of all saved networks and check if disabled networks have expired
-bool BlockConnectService::UpdateAllNetworkSelectStatus()
+bool BlockConnectService::UpdateAllNetworkSelectStatus(const std::vector<InterScanInfo> &scanInfos)
 {
     WIFI_LOGD("ENTER updateAllNetworkSelectStatus");
     // Implement the logic to update the selection status of all saved networks
@@ -175,6 +178,9 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus()
             WIFI_LOGI("NetworkId %{public}d blockDuration expired, auto enabled.", config.networkId);
         }
         LogDisabledConfig(config);
+        if (!scanInfos.empty()) {
+            CheckPortalAuthTimeoutClear(config, scanInfos);
+        }
     }
     return true;
 }
@@ -194,6 +200,7 @@ bool BlockConnectService::EnableNetworkSelectStatus(int targetNetworkId)
     targetNetwork.networkSelectionStatus.networkSelectionDisableReason = DisabledReason::DISABLED_NONE;
     targetNetwork.networkSelectionStatus.networkDisableTimeStamp = -1;
     targetNetwork.networkSelectionStatus.networkDisableCount = 0;
+    targetNetwork.networkSelectionStatus.portalAuthClearCount = 0;
     targetNetwork.blockDuration = -1;
     WifiSettings::GetInstance().AddDeviceConfig(targetNetwork);
     WIFI_LOGI("EnableNetworkSelectStatus %{public}d %{public}s enabled",
@@ -318,6 +325,9 @@ bool BlockConnectService::UpdateNetworkSelectStatus(int targetNetworkId, Disable
     if (targetNetwork.networkSelectionStatus.networkDisableCount >= disablePolicy.disableCount) {
         targetNetwork.networkSelectionStatus.status = disablePolicy.disableStatus;
         targetNetwork.networkSelectionStatus.networkSelectionDisableReason = disableReason;
+        if (disableReason == DisabledReason::DISABLED_PORTAL_AUTH_TIMEOUT) {
+            targetNetwork.networkSelectionStatus.portalAuthClearCount = 0;
+        }
     }
     targetNetwork.networkSelectionStatus.networkDisableTimeStamp = timestamp;
     targetNetwork.blockDuration = blockDuration;
@@ -424,6 +434,7 @@ void BlockConnectService::OnReceiveSettingsEnterEvent(bool isEnter)
             DisabledReason::DISABLED_ASSOCIATION_REJECTION,
             DisabledReason::DISABLED_DHCP_FAILURE,
             DisabledReason::DISABLED_CONSECUTIVE_FAILURES,
+            DisabledReason::DISABLED_PORTAL_AUTH_TIMEOUT,
         };
         EnableAllNetworksByEnteringSettings(enableReasons);
 #ifndef OHOS_ARCH_LITE
@@ -605,5 +616,35 @@ void BlockConnectService::CheckNeedChangePolicy(void)
     }
 }
 #endif
+
+void BlockConnectService::CheckPortalAuthTimeoutClear(WifiDeviceConfig &config,
+    const std::vector<InterScanInfo> &scanInfos)
+{
+    if (config.networkSelectionStatus.networkSelectionDisableReason !=
+        DisabledReason::DISABLED_PORTAL_AUTH_TIMEOUT) {
+        return;
+    }
+    int networkId = config.networkId;
+    bool apFound = false;
+    for (const auto &scan : scanInfos) {
+        if (config.bssid == scan.bssid) {
+            apFound = true;
+            break;
+        }
+    }
+    if (!apFound) {
+        config.networkSelectionStatus.portalAuthClearCount++;
+        WIFI_LOGD("Portal auth block: AP not found, counter=%{public}d, networkId=%{public}d",
+            config.networkSelectionStatus.portalAuthClearCount, networkId);
+        if (config.networkSelectionStatus.portalAuthClearCount >= MAX_CHECK_COUNT) {
+            EnableNetworkSelectStatus(networkId);
+            WifiNotificationUtil::GetInstance().CancelWifiNotification(
+                WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
+            WIFI_LOGI("Portal auth block: auto cleared after 3 scans, networkId=%{public}d", networkId);
+        }
+    } else {
+        config.networkSelectionStatus.portalAuthClearCount = 0;
+    }
+}
 }
 }

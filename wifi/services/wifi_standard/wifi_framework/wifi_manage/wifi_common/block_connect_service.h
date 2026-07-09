@@ -52,7 +52,9 @@ public:
     bool ShouldAutoConnect(const WifiDeviceConfig& config);
     
     // Update the selection status of all saved networks and check if disabled networks have expired
-    bool UpdateAllNetworkSelectStatus();
+    // Added: An overload that takes scan information to check whether the APs of
+    // of networks blacklisted due to Portal authentication timeout have disappeared
+    bool UpdateAllNetworkSelectStatus(const std::vector<InterScanInfo> &scanInfos = {});
     
     // Enable the selection status of a target network
     bool EnableNetworkSelectStatus(int targetNetworkId);
@@ -93,6 +95,13 @@ public:
 
     // release all dhcp fail bssid
     void ReleaseDhcpFailBssidSet();
+
+    /**
+    * This function indicates the cumulative number of times a network blacklisted 
+    * due to background detection fails to be scanned. 
+    * If this count is greater than or equal to the threshold, the network is removed from the blacklist.
+    */
+    void CheckPortalAuthTimeoutClear(WifiDeviceConfig &config, const std::vector<InterScanInfo> &scanInfos);
 #endif
 private:
     DisablePolicy CalculateDisablePolicy(DisabledReason disableReason);

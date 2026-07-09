@@ -23,6 +23,7 @@
 #include "wifi_global_func.h"
 #include "wifi_battery_utils.h"
 #include "wifi_service_scheduler.h"
+#include "wifi_notification_util.h"
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
 #endif
@@ -693,6 +694,9 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
     if (pWifiControllerMachine->ShouldDisableWifi(msg)) {
         pWifiControllerMachine->multiStaManagers.StopAllManagers();
         pWifiControllerMachine->concreteManagers.StopAllManagers();
+        if (id == INSTID_WLAN0) {
+            WifiNotificationUtil::GetInstance().CancelWifiNotification(WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
+        }
         return;
     }
 #ifdef FEATURE_AP_SUPPORT

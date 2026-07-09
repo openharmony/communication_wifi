@@ -418,7 +418,7 @@ function P2pConnect(config: WifiP2PConfig): void;
 function GetCandidateConfigs(): Array<WifiDeviceConfig>;
 function P2pCancelConnect(): void;
 
-@overload("connectToCandidateConfig")
+@rename("connectToCandidateConfig")
 function ConnectToCandidateConfigByNetworkId(networkId: i32);
  
 @gen_promise("connectToCandidateConfig")

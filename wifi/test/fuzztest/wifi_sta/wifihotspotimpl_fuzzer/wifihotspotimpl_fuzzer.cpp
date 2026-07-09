@@ -162,6 +162,19 @@ void IsValidHotspotConfigFuzzTest(const uint8_t* data, size_t size)
     pWifiHotspotServiceImpl->IsValidHotspotConfig(cfg, cfgFromCenter, bandsFromCenter);
 }
 
+void WifiHotspotMgrServiceImplFuzzTest(const uint8_t* data, size_t size)
+{
+    int id = FDP->ConsumeIntegral<int>();
+    int32_t fd = FDP->ConsumeIntegral<int32_t>();
+    const std::vector<std::u16string> args;
+    sptr<IRemoteObject> remote;
+    pWifiHotspotMgrServiceImpl->OnStart();
+    pWifiHotspotMgrServiceImpl->OnStop();
+    pWifiHotspotMgrServiceImpl->Init();
+    pWifiHotspotMgrServiceImpl->GetWifiRemote(id, remote);
+    pWifiHotspotMgrServiceImpl->Dump(fd, args);
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {

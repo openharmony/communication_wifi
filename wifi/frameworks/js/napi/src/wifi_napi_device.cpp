@@ -1132,7 +1132,7 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callba
         asyncContext->completeFunc = [&](void* data) -> void {
             DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
             napi_get_boolean(context->env, (context->errorCode == WIFI_OPT_SUCCESS), &context->result);
-            WIFI_LOGI("Push connect candidate config result to client");
+            WIFI_LOGI("push connect candidate config result to client");
         };
         asyncContext->sysCap = SYSCAP_WIFI_STA;
         return DoAsyncWork(env, asyncContext, argc, argv, 1);

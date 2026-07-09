@@ -36,6 +36,7 @@
 #define CAST_ENGINE_SA_ID 65546
 #define SHARE_SERVICE_ID 2902
 #define MOUSE_CROSS_SERVICE_ID 65569
+#define WEARABLE_SERVICE_SA_ID 4300
 
 namespace OHOS {
 namespace Wifi {

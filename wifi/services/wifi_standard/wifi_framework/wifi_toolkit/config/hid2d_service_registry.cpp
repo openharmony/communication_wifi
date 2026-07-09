@@ -21,7 +21,7 @@ namespace Wifi {
 namespace {
  
 const std::vector<Hid2dServiceEntry> g_hid2dServiceRegistry = {
-    {SOFT_BUS_SERVICE_UID, "SoftBus", ScanLimitType::HID2D_SOFTBUS, SOFTBUS_SERVER_SA_ID, true},
+    {SOFT_BUS_SERVICE_UID, "SoftBus", ScanLimitType::HID2D_SOFTBUS, SOFT_BUS_SERVER_SA_ID, true},
     {CAST_ENGINE_SERVICE_UID, "Cast", ScanLimitType::HID2D_CAST, CAST_ENGINE_SA_ID, true},
     {MIRACAST_SERVICE_UID, "Miracast", ScanLimitType::HID2D_MIRACAST, MIRACAST_SERVICE_SA_ID, true},
     {SHARE_SERVICE_UID, "Share", ScanLimitType::HID2D_SHARE, SHARE_SERVICE_ID, false},

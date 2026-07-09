@@ -72,7 +72,7 @@ public:
     void PublishWifiNotification(WifiNotificationId notificationId, std::string& ssid, WifiNotificationStatus status);
 
     void PublishWifiNotification(WifiNotificationId notificationId, std::string& ssid, WifiNotificationStatus status,
-        bool backPortalConnect, int networkid);
+        bool backPortalConnect, int networkId);
 
     void CancelWifiNotification(WifiNotificationId notificationId);
 

@@ -45,7 +45,7 @@ void WifiNotificationUtil::PublishWifiNotification(WifiNotificationId notificati
 }
  
 void WifiNotificationUtil::PublishWifiNotification(WifiNotificationId notificationId, std::string& ssid,
-    WifiNotificationStatus status, bool backPortalConnect, int networkid)
+    WifiNotificationStatus status, bool backPortalConnect, int networkId)
 {
     WIFI_LOGI("Publishing wifi notification, id [%{public}d]", static_cast<int>(notificationId));
     AAFwk::Want want;
@@ -55,7 +55,7 @@ void WifiNotificationUtil::PublishWifiNotification(WifiNotificationId notificati
     want.SetParam("status", status);
     want.SetParam("ssid", ssid);
     want.SetParam("backPortalConnect", backPortalConnect);
-    want.SetParam("networkid", networkid);
+    want.SetParam("networkId", networkId);
     auto result = StartAbility(want);
     switch (notificationId) {
         case WIFI_PORTAL_NOTIFICATION_ID:

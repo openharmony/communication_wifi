@@ -646,5 +646,6 @@ void BlockConnectService::CheckPortalAuthTimeoutClear(WifiDeviceConfig &config,
         config.networkSelectionStatus.portalAuthClearCount = 0;
     }
 }
+
 }
 }

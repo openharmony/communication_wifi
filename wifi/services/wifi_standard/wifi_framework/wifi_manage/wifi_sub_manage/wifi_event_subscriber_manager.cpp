@@ -1028,14 +1028,12 @@ void NotificationEventSubscriber::OnReceiveBackPortalEvent(int networkid)
 {
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
-        IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(i);
-        if (pService != nullptr) {
-            if (linkedInfo.connState != ConnState::DISCONNECTED && linkedInfo.connState != ConnState::DISCONNECTING) {
-                pService->StartPortalCertification();
-            } else {
-                pService->ConnectToNetwork(networkid, SelectedType::NETWORK_SELECTED_BY_USER);
-            }
+    IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+    if (pService != nullptr) {
+        if (linkedInfo.connState != ConnState::DISCONNECTED && linkedInfo.connState != ConnState::DISCONNECTING) {
+            pService->StartPortalCertification();
+        } else {
+             pService->ConnectToNetwork(networkid, SelectedType::NETWORK_SELECTED_BY_USER);
         }
     }
 }

@@ -747,9 +747,9 @@ struct NetworkSelectionStatus {
     int rssi;
 
     /**
-     * This parameter represents the cumulative number of times a blacklisted network 
-     * (blocked due to background detection) fails to be detected. 
-     * If this count is greater than or equal to the threshold, the network is removed from the blacklist.
+     * This parameter represents the cumulative number of times a disable network
+     * (blocked due to background detection) fails to be detected.
+     * If this count is greater than or equal to the threshold, the network is removed from the disable.
      */
     int portalAuthClearCount;
     NetworkSelectionStatus()

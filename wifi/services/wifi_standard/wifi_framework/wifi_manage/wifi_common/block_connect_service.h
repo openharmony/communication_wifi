@@ -97,9 +97,9 @@ public:
     void ReleaseDhcpFailBssidSet();
 
     /**
-    * This function indicates the cumulative number of times a network blacklisted 
-    * due to background detection fails to be scanned. 
-    * If this count is greater than or equal to the threshold, the network is removed from the blacklist.
+    * This function indicates the cumulative number of times a network disabled
+    * due to background detection fails to be scanned.
+    * If this count is greater than or equal to the threshold, the network is removed from the disabled.
     */
     void CheckPortalAuthTimeoutClear(WifiDeviceConfig &config, const std::vector<InterScanInfo> &scanInfos);
 #endif

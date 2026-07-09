@@ -3336,8 +3336,7 @@ void StaStateMachine::LinkedState::NetDetectionNotify(InternalMessagePtr msg)
     WIFI_HILOG_COMM_INFO("netdetection, netstate:%{public}d url:%{private}s\n", netstate, url.c_str());
     if (pStaStateMachine->linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_BACKGROUND_PORTAL) {
         CheckBackgroundNetDetection(netstate, url);
-    }
-    else {
+    } else {
         UpdateNetDetectHistory(netstate);
         pStaStateMachine->HandleNetCheckResult(netstate, url);
     }
@@ -6648,7 +6647,7 @@ void StaStateMachine::DisConnectBackgroundNetwork()
 {
     if (linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_BACKGROUND_PORTAL) {
         BlockConnectService::GetInstance().UpdateNetworkSelectStatus(linkedInfo.networkId,
- 	        DisabledReason::DISABLED_PORTAL_AUTH_TIMEOUT);
+            DisabledReason::DISABLED_PORTAL_AUTH_TIMEOUT);
         StartDisConnectToNetwork();
         SwitchState(pSeparatedState);
     }

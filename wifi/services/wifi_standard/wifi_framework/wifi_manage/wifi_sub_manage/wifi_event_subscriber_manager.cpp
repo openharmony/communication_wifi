@@ -1632,20 +1632,25 @@ void SettingsEnterSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &ev
         action.c_str(), isSettingsEnter);
     if (action == ENTER_SETTINGS) {
         WifiConfigCenter::GetInstance().SetWlanPage(isSettingsEnter);
-        if (isSettingsEnter) {
-            WifiLinkedInfo linkedInfo;
-            WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-            if (linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_BACKGROUND_PORTAL) {
-                IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(INSTID_WLAN0);
-                if (pService != nullptr) {
-                    pService->Disconnect();
-                }
+        HandleSettingsEnter();
+    }
+}
+
+void SettingsEnterSubscriber::HandleSettingsEnter(bool isSettingsEnter)
+{
+    if (isSettingsEnter) {
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+        if (linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_BACKGROUND_PORTAL) {
+            IStaService *pService = WifiServiceManager::GetInstance().GetStaServiceInst(INSTID_WLAN0);
+            if (pService != nullptr) {
+                pService->Disconnect();
             }
-            BlockConnectService::GetInstance().OnReceiveSettingsEnterEvent(isSettingsEnter);
-            IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-            if (pEnhanceService != nullptr) {
-                pEnhanceService->OnSettingsWlanEnterReceive();
-            }
+        }
+        BlockConnectService::GetInstance().OnReceiveSettingsEnterEvent(isSettingsEnter);
+        IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+        if (pEnhanceService != nullptr) {
+            pEnhanceService->OnSettingsWlanEnterReceive();
         }
     }
 }

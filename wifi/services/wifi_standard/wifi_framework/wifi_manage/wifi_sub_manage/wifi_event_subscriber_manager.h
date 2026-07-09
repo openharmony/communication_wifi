@@ -137,6 +137,7 @@ public:
     explicit SettingsEnterSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
     ~SettingsEnterSubscriber() = default;
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+    void HandleSettingsEnter(bool isSettingsEnter);
 };
 
 class DataShareReadySubscriber : public OHOS::EventFwk::CommonEventSubscriber {

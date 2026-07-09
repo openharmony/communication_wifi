@@ -418,10 +418,10 @@ function P2pConnect(config: WifiP2PConfig): void;
 function GetCandidateConfigs(): Array<WifiDeviceConfig>;
 function P2pCancelConnect(): void;
 
-@overload("ConnectToCandidateConfig")
+@overload("connectToCandidateConfig")
 function ConnectToCandidateConfigByNetworkId(networkId: i32);
  
-@gen_promise("ConnectToCandidateConfig")
+@gen_promise("connectToCandidateConfig")
 function ConnectToCandidateConfigBySettings(connectSettings: ConnectSettings): void;
 function Reconnect(): void;
 function Reassociate(): void;

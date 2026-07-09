@@ -112,6 +112,14 @@ public:
     static void ModifyAllHistoryRecord(unsigned int &networkStatusHistory,
         NetworkStatus oldStatus, NetworkStatus newStatus);
 
+    /**
+     * determine whether all network status records are NO_INTERNET and the count is max
+     *
+     * @param networkStatusHistory historical network status records
+     * @return true if all records are NO_INTERNET and count equals MAX_HISTORY_RECORD_NUM
+     */
+    static bool IsAllNoInternetByHistory(uint32_t networkStatusHistory);
+
 private:
     /* the num of enum class NetworkStatus values */
     constexpr static int NETWORK_STATUS_NUM = 4;
@@ -143,6 +151,11 @@ private:
      * number of bits occupied by each record
      */
     constexpr static int ITEM_BIT_NUM = 2;
+
+    /*!
+    * the max num of network status records
+    */
+    constexpr static int MAX_HISTORY_RECORD_NUM = 10;
 };
 }
 }

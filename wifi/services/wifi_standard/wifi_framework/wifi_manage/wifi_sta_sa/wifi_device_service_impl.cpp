@@ -2935,6 +2935,10 @@ ErrCode WifiDeviceServiceImpl::SetWifiCapability(int capability, bool enable)
 ErrCode WifiDeviceServiceImpl::GetWifiCapability(int capability, bool &enabled)
 {
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetWifiCapability:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetWifiCapability:VerifyGetWifiInfoPermission() PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;

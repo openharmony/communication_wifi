@@ -1630,7 +1630,7 @@ void SettingsEnterSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &ev
         action.c_str(), isSettingsEnter);
     if (action == ENTER_SETTINGS) {
         WifiConfigCenter::GetInstance().SetWlanPage(isSettingsEnter);
-        HandleSettingsEnter();
+        HandleSettingsEnter(isSettingsEnter);
     }
 }
 

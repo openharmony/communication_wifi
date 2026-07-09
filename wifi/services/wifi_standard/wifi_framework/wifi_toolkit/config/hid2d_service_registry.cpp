@@ -27,7 +27,7 @@ const std::vector<Hid2dServiceEntry> g_hid2dServiceRegistry = {
     {SHARE_SERVICE_UID, "Share", ScanLimitType::HID2D_SHARE, SHARE_SERVICE_ID, false},
     {MOUSE_CROSS_SERVICE_UID, "MouseCross", ScanLimitType::HID2D_CROSS, MOUSE_CROSS_SERVICE_ID, false},
     {GAMESERVICE_SA_UID, "Game", ScanLimitType::HID2D_GAME, GAMESERVICE_SA_ID, false},
-    {WATCH_SERVICE_UID, "Watch", ScanLimitType::HID2D_WATCH, SUBSYS_WEARABLE_SYS_ABILITY_ID_BEGIN, false},
+    {WATCH_SERVICE_UID, "Watch", ScanLimitType::HID2D_WATCH, WEARABLE_SERVICE_SA_ID, false},
     {HICAR_SERVICE_UID, "HiCar", ScanLimitType::HID2D_SOFTBUS, HICAR_SERVICE_SA_ID, true},
 };
  

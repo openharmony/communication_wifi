@@ -19,7 +19,6 @@
 #include <string>
 #include <vector>
 #include "wifi_scan_control_msg.h"
-#include "system_ability_definition.h"
  
 #define SOFT_BUS_SERVICE_UID 1024
 #define CAST_ENGINE_SERVICE_UID 5526

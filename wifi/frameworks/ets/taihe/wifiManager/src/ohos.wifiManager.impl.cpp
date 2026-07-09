@@ -423,29 +423,6 @@ void ConnectToCandidateConfigBySettings(const ::ohos::wifiManager::ConnectSettin
     }
 }
 
-void ConnectToCandidateConfigWithConnectSettings(const ::ohos::wifiManager::ConnectSettings &connectSettings)
-{
-    if (g_wifiDevicePtr == nullptr) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-        return;
-    }
-    ConnectSettings settings;
-    int defaultTimeout = DEFAULT_DIALOG_TIMEOUT;
-    settings.networkId = connectSettings.networkId;
-    settings.withUserAction = connectSettings.withUserAction.value_or(false);
-    settings.userActionTimeout = connectSettings.userActionTimeout.value_or(std::move(defaultTimeout));
-    settings.addNetworkToSystem = connectSettings.addNetworkToSystem.value_or(false);
-    if (settings.userActionTimeout <= 0 || settings.userActionTimeout > MAX_DIALOG_TIMEOUT) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
-        return;
-    }
-    ErrCode ret = g_wifiDevicePtr->ConnectToCandidateConfig(settings);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
-        return;
-    }
-}
-
 void Reconnect()
 {
     if (g_wifiDevicePtr == nullptr) {
@@ -1829,7 +1806,6 @@ TH_EXPORT_CPP_API_GetCandidateConfigs(GetCandidateConfigs);
 TH_EXPORT_CPP_API_P2pCancelConnect(P2pCancelConnect);
 TH_EXPORT_CPP_API_ConnectToCandidateConfigByNetworkId(ConnectToCandidateConfigByNetworkId);
 TH_EXPORT_CPP_API_ConnectToCandidateConfigBySettings(ConnectToCandidateConfigBySettings);
-TH_EXPORT_CPP_API_ConnectToCandidateConfigWithConnectSettings(ConnectToCandidateConfigWithConnectSettings);
 TH_EXPORT_CPP_API_Reconnect(Reconnect);
 TH_EXPORT_CPP_API_Reassociate(Reassociate);
 TH_EXPORT_CPP_API_ConnectToDevice(ConnectToDevice);

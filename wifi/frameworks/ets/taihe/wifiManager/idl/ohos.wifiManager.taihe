@@ -421,10 +421,8 @@ function P2pCancelConnect(): void;
 @overload("ConnectToCandidateConfig")
 function ConnectToCandidateConfigByNetworkId(networkId: i32);
  
-@overload("ConnectToCandidateConfig")
+@gen_promise("ConnectToCandidateConfig")
 function ConnectToCandidateConfigBySettings(connectSettings: ConnectSettings): void;
-
-function ConnectToCandidateConfigWithConnectSettings(connectSettings: ConnectSettings): void;
 function Reconnect(): void;
 function Reassociate(): void;
 function ConnectToDevice(config: WifiDeviceConfig): void;

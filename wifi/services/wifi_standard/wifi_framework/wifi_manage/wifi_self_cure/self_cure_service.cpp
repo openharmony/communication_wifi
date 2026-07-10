@@ -98,7 +98,8 @@ void SelfCureService::HandleStaConnChanged(OperateResState state, const WifiLink
         isTxRxGoodButNoInternet_ = false;
         pSelfCureStateMachine->SetHttpMonitorStatus(false);
         pSelfCureStateMachine->SendMessage(WIFI_CURE_NOTIFY_NETWORK_DISCONNECTED_RCVD, info);
-        if (lastState == OperateResState::CONNECT_OBTAINING_IP) {
+        if (lastState == OperateResState::CONNECT_OBTAINING_IP ||
+            lastState == OperateResState::CONNECT_ASSOCIATED) {
             pSelfCureStateMachine->SendMessage(WIFI_CURE_CMD_WIFI7_DISCONNECT_COUNT, lastWifiLinkedInfo);
         }
         IpQosMonitor::GetInstance().ResetTxRxProperty();

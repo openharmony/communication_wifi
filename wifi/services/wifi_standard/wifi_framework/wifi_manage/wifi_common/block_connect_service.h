@@ -19,6 +19,7 @@
 #include "wifi_settings.h"
 #include "wifi_common_util.h"
 #include "wifi_msg.h"
+#include "wifi_notification_util.h"
 namespace OHOS {
 namespace Wifi {
 struct LastConnectedApInfo {

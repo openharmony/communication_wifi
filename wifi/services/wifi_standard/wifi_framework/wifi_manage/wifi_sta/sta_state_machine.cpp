@@ -442,6 +442,9 @@ ErrCode StaStateMachine::ClosedState::GetRealMacAddressFromOemInfo()
     }
     wifiOemMac_ = mac;
     WifiConfigCenter::GetInstance().SetMacAddress(mac, pStaStateMachine->m_instId);
+
+    // Refresh persisted real MAC whenever current detected MAC differs,
+    // including the case where HAL reports a new MAC after module replacement.
     if (realMacAddressWlan0.empty() || realMacAddressWlan0 != mac) {
         WifiSettings::GetInstance().SetRealMacAddress(mac, pStaStateMachine->m_instId);
     }

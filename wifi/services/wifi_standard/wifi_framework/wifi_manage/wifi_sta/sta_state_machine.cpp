@@ -444,8 +444,7 @@ ErrCode StaStateMachine::ClosedState::GetRealMacAddressFromOemInfo()
     }
     wifiOemMac_ = mac;
     WifiConfigCenter::GetInstance().SetMacAddress(mac, pStaStateMachine->m_instId);
-    if ((!isFromHal && (realMacAddressWlan0.empty() || realMacAddressWlan0 != mac)) ||
-        (isFromHal && realMacAddressWlan0.empty())) {
+    if (realMacAddressWlan0.empty() || realMacAddressWlan0 != mac) {
         WifiSettings::GetInstance().SetRealMacAddress(mac, pStaStateMachine->m_instId);
     }
     return WIFI_OPT_SUCCESS;

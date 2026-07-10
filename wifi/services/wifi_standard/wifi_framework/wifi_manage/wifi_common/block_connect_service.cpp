@@ -13,6 +13,7 @@
 * limitations under the License.
 */
 #include "block_connect_service.h"
+#include "wifi_notification_util.h"
 #ifndef OHOS_ARCH_LITE
 #include "wifi_config_center.h"
 #include "wifi_system_timer.h"

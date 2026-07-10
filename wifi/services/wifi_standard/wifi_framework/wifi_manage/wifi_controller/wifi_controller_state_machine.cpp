@@ -23,6 +23,7 @@
 #include "wifi_global_func.h"
 #include "wifi_battery_utils.h"
 #include "wifi_service_scheduler.h"
+#include "wifi_notification_util.h"
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
 #include "hal_device_manage.h"
 #endif

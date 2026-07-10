@@ -25,7 +25,6 @@
 #include "wifi_controller_managers_template.h"
 #include "concrete_clientmode_manager.h"
 #include "multi_sta_manager.h"
-#include "wifi_notification_util.h"
 #ifdef FEATURE_AP_SUPPORT
 #include "softap_manager.h"
 #include "wifi_ap_msg.h"

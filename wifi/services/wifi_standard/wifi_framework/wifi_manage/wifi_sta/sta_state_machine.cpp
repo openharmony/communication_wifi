@@ -432,7 +432,6 @@ ErrCode StaStateMachine::ClosedState::GetRealMacAddressFromOemInfo()
         return WIFI_OPT_SUCCESS;
     }
  
-    bool isFromHal = false;
     std::string ifaceName = WifiConfigCenter::GetInstance().GetStaIfaceName(pStaStateMachine->m_instId);
     std::string mac = wifiOemMac_ == ""? GetWifiOeminfoMac() : wifiOemMac_;
     if (mac.empty()) {
@@ -440,7 +439,6 @@ ErrCode StaStateMachine::ClosedState::GetRealMacAddressFromOemInfo()
         if ((WifiStaHalInterface::GetInstance().GetStaDeviceMacAddress(mac, ifaceName)) != WIFI_HAL_OPT_OK) {
             WIFI_LOGE("GetStaDeviceMacAddress from hal failed!");
         }
-        isFromHal = true;
     }
     wifiOemMac_ = mac;
     WifiConfigCenter::GetInstance().SetMacAddress(mac, pStaStateMachine->m_instId);

@@ -535,6 +535,11 @@ if (defined(ohos_lite)) {
       "FEATURE_AP_SUPPORT",
       "FEATURE_STA_SUPPORT",
     ]
+
+    if (wifi_feature_with_p2p_untrust_invitation) {
+      defines += [ "SUPPORT_P2P_UNTRUST_INVITATION" ]
+    }
+
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }

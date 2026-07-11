@@ -323,7 +323,7 @@
         "OHOS::Wifi::WifiManager::GetWifiEventSubscriberManager()";
         "OHOS::Wifi::WifiManager::GetWifiMultiVapManager()";
         "OHOS::Wifi::WifiManager::GetRptInterface(int)";
-        "OHOS::Wifi::WifiManager::InstallPacketFilterProgram(int, int)";
+        "OHOS::Wifi::WifiManager::InstallPacketFilterProgram(OHOS::Wifi::HpfFilterData&, int)";
         "OHOS::Wifi::WifiManager::OnNativeProcessStatusChange(int)";
         "OHOS::Wifi::WifiManager::StopGetCacResultAndLocalCac(int)";
         "OHOS::Wifi::WifiManager::GetCacRadarDetectionStatus()";

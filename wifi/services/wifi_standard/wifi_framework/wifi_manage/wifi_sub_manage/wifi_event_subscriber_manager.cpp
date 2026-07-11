@@ -739,7 +739,9 @@ void CesEventSubscriber::OnReceiveScreenEvent(const OHOS::EventFwk::CommonEventD
         if (pService != nullptr) {
             pService->OnScreenStateChanged(screenStateNew);
 #ifdef FEATURE_HPF_SUPPORT
-            WifiManager::GetInstance().InstallPacketFilterProgram(screenStateNew, i);
+            HpfFilterData filterData;
+            filterData.eventCode = screenStateNew;
+            WifiManager::GetInstance().InstallPacketFilterProgram(filterData, i);
 #endif
         }
         IScanService *pScanService = WifiServiceManager::GetInstance().GetScanServiceInst(i);
@@ -891,9 +893,10 @@ void CesEventSubscriber::OnReceiveForceSleepEvent(const OHOS::EventFwk::CommonEv
  
     int modeState = (action == OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_ENTER_FORCE_SLEEP) ?
         MODE_STATE_ENTER_FORCESLEEP : MODE_STATE_EXIT_FORCESLEEP;
- 
+    HpfFilterData filterData;
+    filterData.eventCode = modeState;
     for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
-        WifiManager::GetInstance().InstallPacketFilterProgram(modeState, i);
+        WifiManager::GetInstance().InstallPacketFilterProgram(filterData, i);
     }
 #endif
 }
@@ -1246,8 +1249,11 @@ void PowermgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventDa
 #ifdef FEATURE_HPF_SUPPORT
     if (action == COMMON_EVENT_POWER_MANAGER_STATE_CHANGED) {
         WIFI_LOGI("Receive power manager state Event: %{public}d", eventData.GetCode());
+        HpfFilterData filterData;
+        filterData.eventCode = eventData.GetCode();
+        filterData.eventData = eventData.GetData();
         for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
-            WifiManager::GetInstance().InstallPacketFilterProgram(eventData.GetCode(), i);
+            WifiManager::GetInstance().InstallPacketFilterProgram(filterData, i);
         }
     }
 #endif

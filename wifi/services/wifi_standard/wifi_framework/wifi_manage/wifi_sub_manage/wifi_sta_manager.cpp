@@ -431,7 +431,9 @@ void WifiStaManager::InstallHpfAndSetSuspendMode(int instId)
     // Must first set the SuspendMode before deploying the filtering rules for the set rules to take effect.
     // If the order is reversed, SuspendMode will not take effect.
 #ifdef FEATURE_HPF_SUPPORT
-    WifiManager::GetInstance().InstallPacketFilterProgram(screenState, instId);
+    HpfFilterData filterData;
+    filterData.eventCode = screenState;
+    WifiManager::GetInstance().InstallPacketFilterProgram(filterData, instId);
 #endif
     if (instId == INSTID_WLAN0) {
         WifiSupplicantHalInterface::GetInstance().WpaSetSuspendMode(screenState == MODE_STATE_CLOSE);

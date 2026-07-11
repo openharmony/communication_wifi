@@ -1301,6 +1301,15 @@ struct WifiDeviceFeatures {
     bool isZeroWaitDfsSupport { false };
     bool supportP2pSignalAcquisition {false};
 };
+
+struct HpfFilterData {
+    unsigned int ipAddr {0};
+    int netMaskLen {0};
+    const unsigned char *macAddr {nullptr};
+    int macLen {0};
+    int eventCode {-1};
+    std::string eventData {};
+};
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

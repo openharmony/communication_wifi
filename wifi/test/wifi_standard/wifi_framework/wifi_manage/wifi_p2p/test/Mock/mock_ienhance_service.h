@@ -25,7 +25,7 @@ public:
     MOCK_METHOD0(UnInit, ErrCode());
     MOCK_METHOD0(AllowScanBySchedStrategy, bool());
     MOCK_METHOD1(SetEnhanceParam, ErrCode(int64_t));
-    MOCK_METHOD5(InstallFilterProgram, ErrCode(unsigned int, int, const unsigned char *, int, int));
+    MOCK_METHOD1(InstallFilterProgram, ErrCode(const HpfFilterData &));
     MOCK_METHOD3(GetWifiCategory, WifiCategory(std::vector<WifiInfoElem>, int, int));
     MOCK_METHOD1(SetLowTxPower, ErrCode(const WifiLowPowerParam));
     MOCK_METHOD1(NotifyInternetState, void(const int));

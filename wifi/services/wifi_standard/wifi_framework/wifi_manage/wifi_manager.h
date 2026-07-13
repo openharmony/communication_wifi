@@ -147,7 +147,7 @@ public:
     std::unique_ptr<WifiMultiVapManager>& GetWifiMultiVapManager();
 #endif
 #ifdef FEATURE_HPF_SUPPORT
-    void InstallPacketFilterProgram(int screenState, int instId);
+    void InstallPacketFilterProgram(HpfFilterData &filterData, int instId);
 #endif
     void OnNativeProcessStatusChange(int status);
     void StopGetCacResultAndLocalCac(int reason);

@@ -439,13 +439,13 @@ std::unique_ptr<WifiMultiVapManager>& WifiManager::GetWifiMultiVapManager()
 #endif
 
 #ifdef FEATURE_HPF_SUPPORT
-void WifiManager::InstallPacketFilterProgram(int event, int instId)
+void WifiManager::InstallPacketFilterProgram(HpfFilterData &filterData, int instId)
 {
     if (instId == INSTID_WLAN1) {
         WIFI_LOGD("instdId: %{public}d, %{public}s only support filter wlan0", instId, __FUNCTION__);
         return;
     }
-    WIFI_LOGD("%{public}s enter event: %{public}d, instId: %{public}d", __FUNCTION__, event, instId);
+    WIFI_LOGD("%{public}s enter event: %{public}d, instId: %{public}d", __FUNCTION__, filterData.eventCode, instId);
     IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
     if (pEnhanceService == nullptr) {
         WIFI_LOGW("%{public}s pEnhanceService is nullptr", __FUNCTION__);
@@ -475,8 +475,10 @@ void WifiManager::InstallPacketFilterProgram(int event, int instId)
     WIFI_LOGD("%{public}s get ip info ipaddrStr: %{public}s, ipMaskStr: %{public}s, netMaskLen: %{public}d",
         __FUNCTION__,
         OHOS::Wifi::MacAnonymize(ipAddrStr).c_str(), OHOS::Wifi::MacAnonymize(ipMaskStr).c_str(), netMaskLen);
-    if (pEnhanceService->InstallFilterProgram(
-        ipInfo.ipAddress, netMaskLen, macAddr, WIFI_MAC_LEN, event) != WIFI_OPT_SUCCESS) {
+    filterData.ipAddr = ipInfo.ipAddress;
+    filterData.netMaskLen = netMaskLen;
+    filterData.macAddr.assign(macAddr, macAddr + WIFI_MAC_LEN);
+    if (pEnhanceService->InstallFilterProgram(filterData) != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("%{public}s InstallFilterProgram fail", __FUNCTION__);
         return;
     }

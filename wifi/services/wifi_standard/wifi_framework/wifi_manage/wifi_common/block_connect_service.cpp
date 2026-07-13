@@ -35,6 +35,7 @@ constexpr int32_t MIN_BSSID_COUNT = 2;
 constexpr int32_t INVALID_RSSI = -200;
 constexpr int64_t TV_MAX_TIME = 8 * 1000 * 1000;
 constexpr int MAX_FAIL_COUNT = 3;
+constexpr int MAX_CHECK_COUNT = 3;
 #endif
 
 BlockConnectService &BlockConnectService::GetInstance()

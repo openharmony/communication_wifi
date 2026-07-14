@@ -97,7 +97,6 @@ public:
     // release all dhcp fail bssid
     void ReleaseDhcpFailBssidSet();
 
-    
     /**
     * This function indicates the cumulative number of times a network disabled
     * due to background detection fails to be scanned.

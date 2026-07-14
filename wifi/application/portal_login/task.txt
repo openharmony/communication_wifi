@@ -1,3 +1,0 @@
-任务：修复onSslErrorEvent多次弹框问题
-问题描述：当遇到页面多个子资源的SSL证书都过期的时候，会多次出发onSslErrorEvent事件，导致在加载页面时候弹出多个弹框，需要修改onSslErrorEvent的弹框处理逻辑，只弹一次框，处理页面里所有的资源是否加载。
-onSslErrorEvent接口说明信息：https://developer.huawei.com/consumer/cn/doc/harmonyos-references/arkts-basic-components-web-events#onsslerrorevent12

@@ -603,7 +603,6 @@ struct Index {
                 });
                 this.sslErrorHandlers = [];
                 this.isSslDialogShowing = false;
-                this.sslUserDecision = -1;
               }
             },
             secondaryButton: {
@@ -617,7 +616,6 @@ struct Index {
                 });
                 this.sslErrorHandlers = [];
                 this.isSslDialogShowing = false;
-                this.sslUserDecision = -1;
               }
             },
             cancel: () => {
@@ -631,7 +629,6 @@ struct Index {
               });
               this.sslErrorHandlers = [];
               this.isSslDialogShowing = false;
-              this.sslUserDecision = -1;
             }
           })
         })

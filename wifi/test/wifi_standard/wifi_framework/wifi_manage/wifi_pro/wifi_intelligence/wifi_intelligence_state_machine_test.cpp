@@ -176,7 +176,7 @@ HWTEST_F(WifiIntelligenceStateMachineTest, DefaultState_ExecuteStateMsg_ConnectS
     EXPECT_TRUE(result);
 }
 
-HWTEST_F(WifiIntelligenceStateMachineTest, DefaultState_ExecuteStateMsg_ConnectStateChanged_Disconnected, TestSize.Level1)
+HWTEST_F(WifiIntelligenceStateMachineTest, DefaultState_ExecuteStateMsg_ConnectStateChanged_DCN, TestSize.Level1)
 {
     auto msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(EVENT_WIFI_CONNECT_STATE_CHANGED);
@@ -221,7 +221,7 @@ HWTEST_F(WifiIntelligenceStateMachineTest, DefaultState_ExecuteStateMsg_Configur
     EXPECT_TRUE(result);
 }
 
-HWTEST_F(WifiIntelligenceStateMachineTest, DefaultState_ExecuteStateMsg_ConfigurationChanged_RemoveBySsid, TestSize.Level1)
+HWTEST_F(WifiIntelligenceStateMachineTest, DefaultState_ExecuteStateMsg_ConfigurationChanged1, TestSize.Level1)
 {
     auto msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(EVENT_CONFIGURATION_CHANGED);
@@ -236,7 +236,7 @@ HWTEST_F(WifiIntelligenceStateMachineTest, DefaultState_ExecuteStateMsg_Configur
     EXPECT_TRUE(result);
 }
 
-HWTEST_F(WifiIntelligenceStateMachineTest, DefaultState_ExecuteStateMsg_ConfigurationChanged_RemoveByBssid, TestSize.Level1)
+HWTEST_F(WifiIntelligenceStateMachineTest, DefaultState_ExecuteStateMsg_ConfigurationChanged2, TestSize.Level1)
 {
     auto msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(EVENT_CONFIGURATION_CHANGED);
@@ -353,7 +353,7 @@ HWTEST_F(WifiIntelligenceStateMachineTest, DisabledState_ExecuteStateMsg_WifiDis
     EXPECT_TRUE(result);
 }
 
-HWTEST_F(WifiIntelligenceStateMachineTest, DisabledState_ExecuteStateMsg_ConnectStateChanged_Disconnected, TestSize.Level1)
+HWTEST_F(WifiIntelligenceStateMachineTest, DisabledState_ExecuteStateMsg_ConnectStateChanged_DCN, TestSize.Level1)
 {
     auto msg = std::make_shared<InternalMessage>();
     msg->SetMessageName(EVENT_WIFI_CONNECT_STATE_CHANGED);
@@ -562,7 +562,7 @@ HWTEST_F(WifiIntelligenceStateMachineTest, ConnectedState_HandleWifiInternetChan
     connectedState_->HandleWifiInternetChangeRes(msg);
 }
 
-HWTEST_F(WifiIntelligenceStateMachineTest, ConnectedState_HandleWifiInternetChangeRes_NetworkEnabled_IsPortal, TestSize.Level1)
+HWTEST_F(WifiIntelligenceStateMachineTest, ConnectedState_HandleWifiInternetChangeRes_NetworkEnabled1, TestSize.Level1)
 {
     auto msg = std::make_shared<InternalMessage>();
     msg->SetParam1(static_cast<int32_t>(OperateResState::CONNECT_NETWORK_ENABLED));
@@ -581,7 +581,7 @@ HWTEST_F(WifiIntelligenceStateMachineTest, ConnectedState_HandleWifiInternetChan
     connectedState_->HandleWifiInternetChangeRes(msg);
 }
 
-HWTEST_F(WifiIntelligenceStateMachineTest, ConnectedState_HandleWifiInternetChangeRes_NetworkEnabled_NotPortal, TestSize.Level1)
+HWTEST_F(WifiIntelligenceStateMachineTest, ConnectedState_HandleWifiInternetChangeRes_NetworkEnabled2, TestSize.Level1)
 {
     auto msg = std::make_shared<InternalMessage>();
     msg->SetParam1(static_cast<int32_t>(OperateResState::CONNECT_NETWORK_ENABLED));
@@ -949,7 +949,7 @@ HWTEST_F(WifiIntelligenceStateMachineTest, DisabledState_HandleWifiOpen_Satellit
     disabledState_->HandleWifiOpen(msg);
 }
 
-HWTEST_F(WifiIntelligenceStateMachineTest, DisabledState_ExecuteStateMsg_ConfigurationChanged_Landscape, TestSize.Level1)
+HWTEST_F(WifiIntelligenceStateMachineTest, DisabledState_ExecuteStateMsg_ConfigurationChanged, TestSize.Level1)
 {
     EXPECT_CALL(WifiConfigCenter::GetInstance(), IsScreenLandscape())
         .WillRepeatedly(Return(true));

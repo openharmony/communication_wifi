@@ -473,11 +473,6 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         }
         ++start;
         srcBuf[last] = '\0';
-        unsigned int hexStrLen = strlen(srcBuf + start);
-        unsigned int hexBufSize = (unsigned int)(len / lenValue + 1);
-        if (hexStrLen < hexBufSize) {
-            break;
-        }
         HexStringToString(srcBuf + start, infoElemsTemp[infoElemsSize].content);
         if ((length - last) > lastLength) { // make sure there is no useless character
             last = last + 1;

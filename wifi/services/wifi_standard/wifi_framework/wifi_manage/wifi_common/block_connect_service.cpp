@@ -183,8 +183,8 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus(const std::vector<InterSc
         if (!scanInfos.empty()) {
             CheckPortalAuthTimeoutClear(config, scanInfos);
         }
-    }
 #endif
+    }
     return true;
 }
 

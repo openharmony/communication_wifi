@@ -699,8 +699,8 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
             WifiNotificationUtil::GetInstance().CancelWifiNotification(WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
         }
         return;
-    }
 #endif
+    }
 #ifdef FEATURE_AP_SUPPORT
     if (pWifiControllerMachine->IsEnableScanOnlyOnHotspot() &&
         WifiConfigCenter::GetInstance().GetSoftapToggledState() &&

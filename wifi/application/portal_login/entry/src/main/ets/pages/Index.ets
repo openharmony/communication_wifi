@@ -37,6 +37,7 @@ const TAG = 'Pages';
 const RETRY_CODE = 999;
 const MAX_RETRY = 3;
 const MAX_PROMPT_INPUT_LENGTH = 1000;
+const MAX_SSL_HANDLERS = 50;
 
 enum DeviceType {
   PHONE = 'Phone',
@@ -113,6 +114,9 @@ struct Index {
   @State private promptResult: string = '';
   @State private promptJsResult: JsResult | null = null;
   private dialogController: CustomDialogController | null = null;
+  private isSslDialogShowing: boolean = false;
+  private sslErrorHandlers: SslErrorHandler[] = [];
+  private sslUserDecision: number = -1;
 
   @Builder
   ContextMenu() {
@@ -468,6 +472,13 @@ struct Index {
         .onPageBegin(() => {
           updateFinalUrl(this.webUrl);
           this.loadProgress = 0;
+          if (this.isSslDialogShowing) {
+            this.sslErrorHandlers.forEach((handler) => {
+              handler.handleCancel();
+            });
+          }
+          this.sslUserDecision = -1;
+          this.sslErrorHandlers = [];
           if (this.selectedUA === this.harmonyUA) {
             this.harmonyUA = this.setUA(this.harmonyUARaw);
             this.selectedUA = this.harmonyUA;
@@ -562,6 +573,23 @@ struct Index {
         .onSslErrorEvent((event) => {
           updateOnSslErrorEvent(event.error);
           hilog.info(DOMAIN, TAG, 'SSL Error:' + event.error);
+          if (this.sslUserDecision === 1) {
+            event.handler.handleConfirm();
+            return;
+          } else if (this.sslUserDecision === 0) {
+            event.handler.handleCancel();
+            return;
+          }
+          if (this.sslErrorHandlers.length >= MAX_SSL_HANDLERS) {
+            hilog.warn(DOMAIN, TAG, 'SSL handlers reached max limit, auto-cancel. length:' + this.sslErrorHandlers.length);
+            event.handler.handleCancel();
+            return;
+          }
+          this.sslErrorHandlers.push(event.handler);
+          if (this.isSslDialogShowing) {
+            return;
+          }
+          this.isSslDialogShowing = true;
           AlertDialog.show({
             title: $r('app.string.continue_visit'),
             message: $r('app.string.ssl_normal_error_msg'),
@@ -569,7 +597,13 @@ struct Index {
               value: $r('app.string.confirm_dialog_cancel'),
               action: () => {
                 hilog.info(DOMAIN, TAG, 'primaryButton handleCancel');
-                event.handler.handleCancel();
+                this.sslUserDecision = 0;
+                this.sslErrorHandlers.forEach((handler) => {
+                  handler.handleCancel();
+                });
+                this.sslErrorHandlers = [];
+                this.isSslDialogShowing = false;
+                this.sslUserDecision = -1;
               }
             },
             secondaryButton: {
@@ -577,12 +611,27 @@ struct Index {
               fontColor: $r('sys.color.warning'),
               action: () => {
                 hilog.info(DOMAIN, TAG, 'secondaryButton handleConfirm');
-                event.handler.handleConfirm();
+                this.sslUserDecision = 1;
+                this.sslErrorHandlers.forEach((handler) => {
+                  handler.handleConfirm();
+                });
+                this.sslErrorHandlers = [];
+                this.isSslDialogShowing = false;
+                this.sslUserDecision = -1;
               }
             },
             cancel: () => {
-              hilog.info(DOMAIN, TAG, 'cancel handleConfirm');
-              event.handler.handleCancel();
+              hilog.info(DOMAIN, TAG, 'cancel handleCancel');
+              if (!this.isSslDialogShowing) {
+                return;
+              }
+              this.sslUserDecision = 0;
+              this.sslErrorHandlers.forEach((handler) => {
+                handler.handleCancel();
+              });
+              this.sslErrorHandlers = [];
+              this.isSslDialogShowing = false;
+              this.sslUserDecision = -1;
             }
           })
         })

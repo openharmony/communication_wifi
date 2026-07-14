@@ -2547,7 +2547,8 @@ void StaStateMachine::ShowPortalNitification()
             WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl))) {
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
-                WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
+                WifiNotificationStatus::WIFI_PORTAL_TIMEOUT, isBackgroundPortal,
+                    linkedInfo.networkId);
         }
     } else {
         std::string bundle = WifiSettings::GetInstance().GetPackageName("SETTINGS");

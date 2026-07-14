@@ -2560,7 +2560,7 @@ void StaStateMachine::ShowPortalNitification()
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
                 WifiNotificationStatus::WIFI_PORTAL_FOUND, isBackgroundPortal,
-                     linkedInfo.networkId);
+                    linkedInfo.networkId);
         }
     }
 }

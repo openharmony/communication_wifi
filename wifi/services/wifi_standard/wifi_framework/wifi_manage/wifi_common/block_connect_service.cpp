@@ -13,8 +13,8 @@
 * limitations under the License.
 */
 #include "block_connect_service.h"
-#include "wifi_notification_util.h"
 #ifndef OHOS_ARCH_LITE
+#include "wifi_notification_util.h"
 #include "wifi_config_center.h"
 #include "wifi_system_timer.h"
 #include "wifi_global_func.h"
@@ -28,7 +28,6 @@ constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MAX = 10 * 60 * 1000 * 1000;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MID = 1 * 60 * 1000 * 1000;
 constexpr int64_t FREQUENT_DISCONNECT_TIME_INTERVAL_MIN = 0.5 * 60 * 1000 * 1000;
 constexpr int32_t HOLD_TO_PERM_WRONG_PASSWORD = 2;
-constexpr int MAX_CHECK_COUNT = 3;
 #ifndef OHOS_ARCH_LITE
 constexpr int64_t TIMEOUT_CLEAR_SET = 4 * 60 * 1000;
 constexpr int32_t MIN_RSSI_LEVEL_3 = -75;
@@ -36,6 +35,7 @@ constexpr int32_t MIN_BSSID_COUNT = 2;
 constexpr int32_t INVALID_RSSI = -200;
 constexpr int64_t TV_MAX_TIME = 8 * 1000 * 1000;
 constexpr int MAX_FAIL_COUNT = 3;
+constexpr int MAX_CHECK_COUNT = 3;
 #endif
 
 BlockConnectService &BlockConnectService::GetInstance()
@@ -179,10 +179,12 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus(const std::vector<InterSc
             WIFI_LOGI("NetworkId %{public}d blockDuration expired, auto enabled.", config.networkId);
         }
         LogDisabledConfig(config);
+#ifndef OHOS_ARCH_LITE
         if (!scanInfos.empty()) {
             CheckPortalAuthTimeoutClear(config, scanInfos);
         }
     }
+#endif
     return true;
 }
 
@@ -463,36 +465,6 @@ void BlockConnectService::LogDisabledConfig(const WifiDeviceConfig &config)
     }
 }
 
-void BlockConnectService::CheckPortalAuthTimeoutClear(WifiDeviceConfig &config,
-    const std::vector<InterScanInfo> &scanInfos)
-{
-    if (config.networkSelectionStatus.networkSelectionDisableReason !=
-        DisabledReason::DISABLED_PORTAL_AUTH_TIMEOUT) {
-        return;
-    }
-    int networkId = config.networkId;
-    bool apFound = false;
-    for (const auto &scan : scanInfos) {
-        if (config.bssid == scan.bssid) {
-            apFound = true;
-            break;
-        }
-    }
-    if (!apFound) {
-        config.networkSelectionStatus.portalAuthClearCount++;
-        WIFI_LOGD("Portal auth block: AP not found, counter=%{public}d, networkId=%{public}d",
-            config.networkSelectionStatus.portalAuthClearCount, networkId);
-        if (config.networkSelectionStatus.portalAuthClearCount >= MAX_CHECK_COUNT) {
-            EnableNetworkSelectStatus(networkId);
-            WifiNotificationUtil::GetInstance().CancelWifiNotification(
-                WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
-            WIFI_LOGI("Portal auth block: auto cleared after 3 scans, networkId=%{public}d", networkId);
-        }
-    } else {
-        config.networkSelectionStatus.portalAuthClearCount = 0;
-    }
-}
-
 #ifndef OHOS_ARCH_LITE
 void BlockConnectService::DealStaStopped(int instId)
 {
@@ -547,6 +519,36 @@ void BlockConnectService::NotifyWifiConnFailedInfo(int targetNetworkId, std::str
                 MacAnonymize(bssid).c_str(), static_cast<int32_t>(disableReason));
             dhcpFailBssids_.insert(bssid);
         }
+    }
+}
+
+void BlockConnectService::CheckPortalAuthTimeoutClear(WifiDeviceConfig &config,
+    const std::vector<InterScanInfo> &scanInfos)
+{
+    if (config.networkSelectionStatus.networkSelectionDisableReason !=
+        DisabledReason::DISABLED_PORTAL_AUTH_TIMEOUT) {
+        return;
+    }
+    int networkId = config.networkId;
+    bool apFound = false;
+    for (const auto &scan : scanInfos) {
+        if (config.bssid == scan.bssid) {
+            apFound = true;
+            break;
+        }
+    }
+    if (!apFound) {
+        config.networkSelectionStatus.portalAuthClearCount++;
+        WIFI_LOGD("Portal auth block: AP not found, counter=%{public}d, networkId=%{public}d",
+            config.networkSelectionStatus.portalAuthClearCount, networkId);
+        if (config.networkSelectionStatus.portalAuthClearCount >= MAX_CHECK_COUNT) {
+            EnableNetworkSelectStatus(networkId);
+            WifiNotificationUtil::GetInstance().CancelWifiNotification(
+                WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
+            WIFI_LOGI("Portal auth block: auto cleared after 3 scans, networkId=%{public}d", networkId);
+        }
+    } else {
+        config.networkSelectionStatus.portalAuthClearCount = 0;
     }
 }
 

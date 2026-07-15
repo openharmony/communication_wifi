@@ -1896,3 +1896,115 @@ export const APITESTCATALOG_PART19: ApiTestCase[] = [
     buildParams([
       ["devName", "ComboTest"]
     ]),
+    [
+      "enableWifi",
+      "isOpenSoftApAllowed",
+      "isHotspotDualBandSupported",
+      "getHotspotBlockList"
+    ],
+    "WIFI_ON",
+    "any",
+    "none",
+    true,
+    "combo flow#12 var#5 -> getHotspotBlockList"
+  ),
+  makeApiTestCase(
+    "WF_CB_01896",
+    "wifi",
+    "getHotspotBlockList",
+    "combo",
+    buildParams([
+      ["id", 0]
+    ]),
+    [
+      "enableWifi",
+      "isOpenSoftApAllowed",
+      "isHotspotDualBandSupported",
+      "getHotspotBlockList"
+    ],
+    "WIFI_ON",
+    "any",
+    "none",
+    true,
+    "combo flow#12 var#6 -> getHotspotBlockList"
+  ),
+  makeApiTestCase(
+    "WF_CB_01897",
+    "wifi",
+    "getHotspotBlockList",
+    "combo",
+    buildParams([
+      ["blockDuration", 60]
+    ]),
+    [
+      "enableWifi",
+      "isOpenSoftApAllowed",
+      "isHotspotDualBandSupported",
+      "getHotspotBlockList"
+    ],
+    "WIFI_ON",
+    "any",
+    "none",
+    true,
+    "combo flow#12 var#7 -> getHotspotBlockList"
+  ),
+  makeApiTestCase(
+    "WF_CB_01898",
+    "wifi",
+    "isHotspotActive",
+    "combo",
+    buildParams([]),
+    [
+      "enableWifi",
+      "isMeteredHotspot",
+      "getHotspotConfig",
+      "isHotspotActive"
+    ],
+    "WIFI_ON",
+    "any",
+    "none",
+    true,
+    "combo flow#13 var#0 -> isHotspotActive"
+  ),
+  makeApiTestCase(
+    "WF_CB_01899",
+    "wifi",
+    "isHotspotActive",
+    "combo",
+    buildParams([
+      ["netId", 0]
+    ]),
+    [
+      "enableWifi",
+      "isMeteredHotspot",
+      "getHotspotConfig",
+      "isHotspotActive"
+    ],
+    "WIFI_ON",
+    "any",
+    "none",
+    true,
+    "combo flow#13 var#1 -> isHotspotActive"
+  ),
+  makeApiTestCase(
+    "WF_CB_01900",
+    "wifi",
+    "isHotspotActive",
+    "combo",
+    buildParams([
+      ["rssi", -50],
+      ["band", 1]
+    ]),
+    [
+      "enableWifi",
+      "isMeteredHotspot",
+      "getHotspotConfig",
+      "isHotspotActive"
+    ],
+    "WIFI_ON",
+    "any",
+    "none",
+    true,
+    "combo flow#13 var#2 -> isHotspotActive"
+  ),
+];

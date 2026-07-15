@@ -12,8 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import abilityTest from './Ability.test'
 
-export default function testsuite() {
-  abilityTest()
+import abilityTest from './Ability.test';
+import apiCoverageTest from './api/ApiCoverageSuite.test';
+
+export default function testsuite(): void {
+  abilityTest();
+  apiCoverageTest();
 }

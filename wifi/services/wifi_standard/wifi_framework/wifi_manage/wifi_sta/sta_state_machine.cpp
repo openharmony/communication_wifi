@@ -98,6 +98,7 @@ static bool IsRandomMac(const std::string& mac)
     }
     return (firstByte & RANDOM_MAC_LOCAT_BIT) != 0;
 }
+}
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define ANY_BSSID "any"
 #define PORTAL_ACTION "ohos.want.action.awc"

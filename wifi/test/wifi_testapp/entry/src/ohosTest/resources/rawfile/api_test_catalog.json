@@ -15182,3 +15182,1901 @@
 "comboSteps": [],
 "precond": "WIFI_ON",
 "expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=0 sec=8 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01027",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_open",
+"securityType": 8,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=0 sec=8 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01028",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_open",
+"securityType": 8,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=0 sec=8 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01029",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_open",
+"securityType": 8,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=0 sec=8 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01030",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_open",
+"securityType": 9,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=0 sec=9 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01031",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_open",
+"securityType": 9,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=0 sec=9 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01032",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_open",
+"securityType": 9,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=0 sec=9 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01033",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_open",
+"securityType": 9,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=0 sec=9 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01034",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_open",
+"securityType": 9,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=0 sec=9 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01035",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_open",
+"securityType": 9,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=0 sec=9 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01036",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 0,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=0 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01037",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 0,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=0 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01038",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 0,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=0 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01039",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 0,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=0 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01040",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 0,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=0 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01041",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 0,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=0 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01042",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 1,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=1 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01043",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 1,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=1 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01044",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 1,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=1 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01045",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 1,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=1 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01046",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 1,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=1 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01047",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 1,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=1 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01048",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 2,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=2 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01049",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 2,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=2 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01050",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 2,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=2 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01051",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 2,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=2 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01052",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 2,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=2 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01053",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 2,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=2 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01054",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 3,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=3 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01055",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 3,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=3 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01056",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 3,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=3 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01057",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 3,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=3 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01058",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 3,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=3 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01059",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 3,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=3 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01060",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 4,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=4 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01061",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 4,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=4 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01062",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 4,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=4 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01063",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 4,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=4 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01064",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 4,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=4 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01065",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 4,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=4 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01066",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 5,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=5 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01067",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 5,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=5 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01068",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 5,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=5 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01069",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 5,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=5 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01070",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 5,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=5 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01071",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 5,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=5 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01072",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 6,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=6 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01073",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 6,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=6 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01074",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 6,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=6 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01075",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 6,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=6 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01076",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 6,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=6 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01077",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 6,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=6 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01078",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 7,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=7 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01079",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 7,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=7 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01080",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 7,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=7 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01081",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 7,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=7 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01082",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 7,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=7 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01083",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 7,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=7 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01084",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 8,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=8 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01085",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 8,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=8 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01086",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 8,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=8 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01087",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 8,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=8 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01088",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 8,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=8 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01089",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 8,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=8 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01090",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 9,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=9 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01091",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 9,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=9 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01092",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 9,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=9 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01093",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 9,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=9 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01094",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 9,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=9 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01095",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_ssid_wpa2",
+"securityType": 9,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=1 sec=9 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01096",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 0,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=0 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01097",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 0,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=0 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01098",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 0,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=0 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01099",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 0,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=0 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01100",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 0,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=0 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01101",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 0,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=0 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01102",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 1,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=1 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01103",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 1,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=1 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01104",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 1,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=1 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01105",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 1,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=1 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01106",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 1,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=1 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01107",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 1,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=1 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01108",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 2,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=2 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01109",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 2,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=2 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01110",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 2,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=2 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01111",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 2,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=2 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01112",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 2,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=2 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01113",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 2,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=2 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01114",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 3,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=3 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01115",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 3,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=3 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01116",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 3,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=3 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01117",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 3,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=3 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01118",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 3,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=3 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01119",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 3,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=3 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01120",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 4,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=4 ip=0 hidden=True"
+},
+{
+"id": "WM_DC_01121",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 4,
+"ipType": 0,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=4 ip=0 hidden=False"
+},
+{
+"id": "WM_DC_01122",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 4,
+"ipType": 1,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=4 ip=1 hidden=True"
+},
+{
+"id": "WM_DC_01123",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 4,
+"ipType": 1,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=4 ip=1 hidden=False"
+},
+{
+"id": "WM_DC_01124",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 4,
+"ipType": 2,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=4 ip=2 hidden=True"
+},
+{
+"id": "WM_DC_01125",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 4,
+"ipType": 2,
+"isHiddenSsid": false,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig ssid=2 sec=4 ip=2 hidden=False"
+},
+{
+"id": "WM_DC_01126",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"ssid": "ut_hidden",
+"securityType": 5,
+"ipType": 0,
+"isHiddenSsid": true,
+"preSharedKey": "12345678"
+},
+"comboSteps": [],

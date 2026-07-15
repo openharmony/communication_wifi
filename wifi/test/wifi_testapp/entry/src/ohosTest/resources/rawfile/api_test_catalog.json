@@ -20876,3 +20876,1901 @@
 "precond": "P2P_IDLE",
 "expectType": "void",
 "expectAssert": "none",
+"allowError": true,
+"desc": "event p2pStateChange unregister under P2P_IDLE"
+},
+{
+"id": "WM_E_01341",
+"module": "wifiManager",
+"api": "on_p2pStateChange",
+"category": "condition",
+"params": {
+"event": "p2pStateChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pStateChange unregister under P2P_DISCOVERING"
+},
+{
+"id": "WM_E_01342",
+"module": "wifiManager",
+"api": "on_p2pConnectionChange",
+"category": "condition",
+"params": {
+"event": "p2pConnectionChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pConnectionChange register under WIFI_ON"
+},
+{
+"id": "WM_E_01343",
+"module": "wifiManager",
+"api": "on_p2pConnectionChange",
+"category": "condition",
+"params": {
+"event": "p2pConnectionChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pConnectionChange register under HOTSPOT_ON"
+},
+{
+"id": "WM_E_01344",
+"module": "wifiManager",
+"api": "on_p2pConnectionChange",
+"category": "condition",
+"params": {
+"event": "p2pConnectionChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pConnectionChange register under P2P_IDLE"
+},
+{
+"id": "WM_E_01345",
+"module": "wifiManager",
+"api": "on_p2pConnectionChange",
+"category": "condition",
+"params": {
+"event": "p2pConnectionChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pConnectionChange register under P2P_DISCOVERING"
+},
+{
+"id": "WM_E_01346",
+"module": "wifiManager",
+"api": "on_p2pConnectionChange",
+"category": "condition",
+"params": {
+"event": "p2pConnectionChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pConnectionChange unregister under WIFI_ON"
+},
+{
+"id": "WM_E_01347",
+"module": "wifiManager",
+"api": "on_p2pConnectionChange",
+"category": "condition",
+"params": {
+"event": "p2pConnectionChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pConnectionChange unregister under HOTSPOT_ON"
+},
+{
+"id": "WM_E_01348",
+"module": "wifiManager",
+"api": "on_p2pConnectionChange",
+"category": "condition",
+"params": {
+"event": "p2pConnectionChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pConnectionChange unregister under P2P_IDLE"
+},
+{
+"id": "WM_E_01349",
+"module": "wifiManager",
+"api": "on_p2pConnectionChange",
+"category": "condition",
+"params": {
+"event": "p2pConnectionChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pConnectionChange unregister under P2P_DISCOVERING"
+},
+{
+"id": "WM_E_01350",
+"module": "wifiManager",
+"api": "on_p2pDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pDeviceChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDeviceChange register under WIFI_ON"
+},
+{
+"id": "WM_E_01351",
+"module": "wifiManager",
+"api": "on_p2pDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pDeviceChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDeviceChange register under HOTSPOT_ON"
+},
+{
+"id": "WM_E_01352",
+"module": "wifiManager",
+"api": "on_p2pDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pDeviceChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDeviceChange register under P2P_IDLE"
+},
+{
+"id": "WM_E_01353",
+"module": "wifiManager",
+"api": "on_p2pDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pDeviceChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDeviceChange register under P2P_DISCOVERING"
+},
+{
+"id": "WM_E_01354",
+"module": "wifiManager",
+"api": "on_p2pDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pDeviceChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDeviceChange unregister under WIFI_ON"
+},
+{
+"id": "WM_E_01355",
+"module": "wifiManager",
+"api": "on_p2pDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pDeviceChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDeviceChange unregister under HOTSPOT_ON"
+},
+{
+"id": "WM_E_01356",
+"module": "wifiManager",
+"api": "on_p2pDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pDeviceChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDeviceChange unregister under P2P_IDLE"
+},
+{
+"id": "WM_E_01357",
+"module": "wifiManager",
+"api": "on_p2pDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pDeviceChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDeviceChange unregister under P2P_DISCOVERING"
+},
+{
+"id": "WM_E_01358",
+"module": "wifiManager",
+"api": "on_p2pPeerDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pPeerDeviceChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPeerDeviceChange register under WIFI_ON"
+},
+{
+"id": "WM_E_01359",
+"module": "wifiManager",
+"api": "on_p2pPeerDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pPeerDeviceChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPeerDeviceChange register under HOTSPOT_ON"
+},
+{
+"id": "WM_E_01360",
+"module": "wifiManager",
+"api": "on_p2pPeerDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pPeerDeviceChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPeerDeviceChange register under P2P_IDLE"
+},
+{
+"id": "WM_E_01361",
+"module": "wifiManager",
+"api": "on_p2pPeerDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pPeerDeviceChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPeerDeviceChange register under P2P_DISCOVERING"
+},
+{
+"id": "WM_E_01362",
+"module": "wifiManager",
+"api": "on_p2pPeerDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pPeerDeviceChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPeerDeviceChange unregister under WIFI_ON"
+},
+{
+"id": "WM_E_01363",
+"module": "wifiManager",
+"api": "on_p2pPeerDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pPeerDeviceChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPeerDeviceChange unregister under HOTSPOT_ON"
+},
+{
+"id": "WM_E_01364",
+"module": "wifiManager",
+"api": "on_p2pPeerDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pPeerDeviceChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPeerDeviceChange unregister under P2P_IDLE"
+},
+{
+"id": "WM_E_01365",
+"module": "wifiManager",
+"api": "on_p2pPeerDeviceChange",
+"category": "condition",
+"params": {
+"event": "p2pPeerDeviceChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPeerDeviceChange unregister under P2P_DISCOVERING"
+},
+{
+"id": "WM_E_01366",
+"module": "wifiManager",
+"api": "on_p2pPersistentGroupChange",
+"category": "condition",
+"params": {
+"event": "p2pPersistentGroupChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPersistentGroupChange register under WIFI_ON"
+},
+{
+"id": "WM_E_01367",
+"module": "wifiManager",
+"api": "on_p2pPersistentGroupChange",
+"category": "condition",
+"params": {
+"event": "p2pPersistentGroupChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPersistentGroupChange register under HOTSPOT_ON"
+},
+{
+"id": "WM_E_01368",
+"module": "wifiManager",
+"api": "on_p2pPersistentGroupChange",
+"category": "condition",
+"params": {
+"event": "p2pPersistentGroupChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPersistentGroupChange register under P2P_IDLE"
+},
+{
+"id": "WM_E_01369",
+"module": "wifiManager",
+"api": "on_p2pPersistentGroupChange",
+"category": "condition",
+"params": {
+"event": "p2pPersistentGroupChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPersistentGroupChange register under P2P_DISCOVERING"
+},
+{
+"id": "WM_E_01370",
+"module": "wifiManager",
+"api": "on_p2pPersistentGroupChange",
+"category": "condition",
+"params": {
+"event": "p2pPersistentGroupChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPersistentGroupChange unregister under WIFI_ON"
+},
+{
+"id": "WM_E_01371",
+"module": "wifiManager",
+"api": "on_p2pPersistentGroupChange",
+"category": "condition",
+"params": {
+"event": "p2pPersistentGroupChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPersistentGroupChange unregister under HOTSPOT_ON"
+},
+{
+"id": "WM_E_01372",
+"module": "wifiManager",
+"api": "on_p2pPersistentGroupChange",
+"category": "condition",
+"params": {
+"event": "p2pPersistentGroupChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPersistentGroupChange unregister under P2P_IDLE"
+},
+{
+"id": "WM_E_01373",
+"module": "wifiManager",
+"api": "on_p2pPersistentGroupChange",
+"category": "condition",
+"params": {
+"event": "p2pPersistentGroupChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pPersistentGroupChange unregister under P2P_DISCOVERING"
+},
+{
+"id": "WM_E_01374",
+"module": "wifiManager",
+"api": "on_p2pDiscoveryChange",
+"category": "condition",
+"params": {
+"event": "p2pDiscoveryChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDiscoveryChange register under WIFI_ON"
+},
+{
+"id": "WM_E_01375",
+"module": "wifiManager",
+"api": "on_p2pDiscoveryChange",
+"category": "condition",
+"params": {
+"event": "p2pDiscoveryChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDiscoveryChange register under HOTSPOT_ON"
+},
+{
+"id": "WM_E_01376",
+"module": "wifiManager",
+"api": "on_p2pDiscoveryChange",
+"category": "condition",
+"params": {
+"event": "p2pDiscoveryChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDiscoveryChange register under P2P_IDLE"
+},
+{
+"id": "WM_E_01377",
+"module": "wifiManager",
+"api": "on_p2pDiscoveryChange",
+"category": "condition",
+"params": {
+"event": "p2pDiscoveryChange",
+"action": "register"
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDiscoveryChange register under P2P_DISCOVERING"
+},
+{
+"id": "WM_E_01378",
+"module": "wifiManager",
+"api": "on_p2pDiscoveryChange",
+"category": "condition",
+"params": {
+"event": "p2pDiscoveryChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDiscoveryChange unregister under WIFI_ON"
+},
+{
+"id": "WM_E_01379",
+"module": "wifiManager",
+"api": "on_p2pDiscoveryChange",
+"category": "condition",
+"params": {
+"event": "p2pDiscoveryChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDiscoveryChange unregister under HOTSPOT_ON"
+},
+{
+"id": "WM_E_01380",
+"module": "wifiManager",
+"api": "on_p2pDiscoveryChange",
+"category": "condition",
+"params": {
+"event": "p2pDiscoveryChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDiscoveryChange unregister under P2P_IDLE"
+},
+{
+"id": "WM_E_01381",
+"module": "wifiManager",
+"api": "on_p2pDiscoveryChange",
+"category": "condition",
+"params": {
+"event": "p2pDiscoveryChange",
+"action": "unregister"
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "event p2pDiscoveryChange unregister under P2P_DISCOVERING"
+},
+{
+"id": "WM_PC_01382",
+"module": "wifiManager",
+"api": "getScanResults",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getScanResults invokeMode=promise"
+},
+{
+"id": "WM_PC_01383",
+"module": "wifiManager",
+"api": "getScanResults",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getScanResults invokeMode=promise"
+},
+{
+"id": "WM_PC_01384",
+"module": "wifiManager",
+"api": "getScanResults",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getScanResults invokeMode=callback"
+},
+{
+"id": "WM_PC_01385",
+"module": "wifiManager",
+"api": "getScanResults",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getScanResults invokeMode=callback"
+},
+{
+"id": "WM_PC_01386",
+"module": "wifiManager",
+"api": "getScanResults",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getScanResults invokeMode=sync"
+},
+{
+"id": "WM_PC_01387",
+"module": "wifiManager",
+"api": "getScanResults",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getScanResults invokeMode=sync"
+},
+{
+"id": "WM_PC_01388",
+"module": "wifiManager",
+"api": "getLinkedInfo",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getLinkedInfo invokeMode=promise"
+},
+{
+"id": "WM_PC_01389",
+"module": "wifiManager",
+"api": "getLinkedInfo",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getLinkedInfo invokeMode=promise"
+},
+{
+"id": "WM_PC_01390",
+"module": "wifiManager",
+"api": "getLinkedInfo",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getLinkedInfo invokeMode=callback"
+},
+{
+"id": "WM_PC_01391",
+"module": "wifiManager",
+"api": "getLinkedInfo",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getLinkedInfo invokeMode=callback"
+},
+{
+"id": "WM_PC_01392",
+"module": "wifiManager",
+"api": "getLinkedInfo",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getLinkedInfo invokeMode=sync"
+},
+{
+"id": "WM_PC_01393",
+"module": "wifiManager",
+"api": "getLinkedInfo",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getLinkedInfo invokeMode=sync"
+},
+{
+"id": "WM_PC_01394",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig invokeMode=promise"
+},
+{
+"id": "WM_PC_01395",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig invokeMode=promise"
+},
+{
+"id": "WM_PC_01396",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig invokeMode=callback"
+},
+{
+"id": "WM_PC_01397",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig invokeMode=callback"
+},
+{
+"id": "WM_PC_01398",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig invokeMode=sync"
+},
+{
+"id": "WM_PC_01399",
+"module": "wifiManager",
+"api": "addDeviceConfig",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addDeviceConfig invokeMode=sync"
+},
+{
+"id": "WM_PC_01400",
+"module": "wifiManager",
+"api": "addCandidateConfig",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addCandidateConfig invokeMode=promise"
+},
+{
+"id": "WM_PC_01401",
+"module": "wifiManager",
+"api": "addCandidateConfig",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addCandidateConfig invokeMode=promise"
+},
+{
+"id": "WM_PC_01402",
+"module": "wifiManager",
+"api": "addCandidateConfig",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addCandidateConfig invokeMode=callback"
+},
+{
+"id": "WM_PC_01403",
+"module": "wifiManager",
+"api": "addCandidateConfig",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addCandidateConfig invokeMode=callback"
+},
+{
+"id": "WM_PC_01404",
+"module": "wifiManager",
+"api": "addCandidateConfig",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addCandidateConfig invokeMode=sync"
+},
+{
+"id": "WM_PC_01405",
+"module": "wifiManager",
+"api": "addCandidateConfig",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "addCandidateConfig invokeMode=sync"
+},
+{
+"id": "WM_PC_01406",
+"module": "wifiManager",
+"api": "removeCandidateConfig",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "removeCandidateConfig invokeMode=promise"
+},
+{
+"id": "WM_PC_01407",
+"module": "wifiManager",
+"api": "removeCandidateConfig",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "removeCandidateConfig invokeMode=promise"
+},
+{
+"id": "WM_PC_01408",
+"module": "wifiManager",
+"api": "removeCandidateConfig",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "removeCandidateConfig invokeMode=callback"
+},
+{
+"id": "WM_PC_01409",
+"module": "wifiManager",
+"api": "removeCandidateConfig",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "removeCandidateConfig invokeMode=callback"
+},
+{
+"id": "WM_PC_01410",
+"module": "wifiManager",
+"api": "removeCandidateConfig",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "removeCandidateConfig invokeMode=sync"
+},
+{
+"id": "WM_PC_01411",
+"module": "wifiManager",
+"api": "removeCandidateConfig",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "removeCandidateConfig invokeMode=sync"
+},
+{
+"id": "WM_PC_01412",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pLinkedInfo invokeMode=promise"
+},
+{
+"id": "WM_PC_01413",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pLinkedInfo invokeMode=promise"
+},
+{
+"id": "WM_PC_01414",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pLinkedInfo invokeMode=callback"
+},
+{
+"id": "WM_PC_01415",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pLinkedInfo invokeMode=callback"
+},
+{
+"id": "WM_PC_01416",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pLinkedInfo invokeMode=sync"
+},
+{
+"id": "WM_PC_01417",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pLinkedInfo invokeMode=sync"
+},
+{
+"id": "WM_PC_01418",
+"module": "wifiManager",
+"api": "getCurrentGroup",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getCurrentGroup invokeMode=promise"
+},
+{
+"id": "WM_PC_01419",
+"module": "wifiManager",
+"api": "getCurrentGroup",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getCurrentGroup invokeMode=promise"
+},
+{
+"id": "WM_PC_01420",
+"module": "wifiManager",
+"api": "getCurrentGroup",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getCurrentGroup invokeMode=callback"
+},
+{
+"id": "WM_PC_01421",
+"module": "wifiManager",
+"api": "getCurrentGroup",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getCurrentGroup invokeMode=callback"
+},
+{
+"id": "WM_PC_01422",
+"module": "wifiManager",
+"api": "getCurrentGroup",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getCurrentGroup invokeMode=sync"
+},
+{
+"id": "WM_PC_01423",
+"module": "wifiManager",
+"api": "getCurrentGroup",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getCurrentGroup invokeMode=sync"
+},
+{
+"id": "WM_PC_01424",
+"module": "wifiManager",
+"api": "getP2pPeerDevices",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pPeerDevices invokeMode=promise"
+},
+{
+"id": "WM_PC_01425",
+"module": "wifiManager",
+"api": "getP2pPeerDevices",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pPeerDevices invokeMode=promise"
+},
+{
+"id": "WM_PC_01426",
+"module": "wifiManager",
+"api": "getP2pPeerDevices",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pPeerDevices invokeMode=callback"
+},
+{
+"id": "WM_PC_01427",
+"module": "wifiManager",
+"api": "getP2pPeerDevices",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pPeerDevices invokeMode=callback"
+},
+{
+"id": "WM_PC_01428",
+"module": "wifiManager",
+"api": "getP2pPeerDevices",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pPeerDevices invokeMode=sync"
+},
+{
+"id": "WM_PC_01429",
+"module": "wifiManager",
+"api": "getP2pPeerDevices",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pPeerDevices invokeMode=sync"
+},
+{
+"id": "WM_PC_01430",
+"module": "wifiManager",
+"api": "getP2pLocalDevice",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pLocalDevice invokeMode=promise"
+},
+{
+"id": "WM_PC_01431",
+"module": "wifiManager",
+"api": "getP2pLocalDevice",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pLocalDevice invokeMode=promise"
+},
+{
+"id": "WM_PC_01432",
+"module": "wifiManager",
+"api": "getP2pLocalDevice",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pLocalDevice invokeMode=callback"
+},
+{
+"id": "WM_PC_01433",
+"module": "wifiManager",
+"api": "getP2pLocalDevice",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pLocalDevice invokeMode=callback"
+},
+{
+"id": "WM_PC_01434",
+"module": "wifiManager",
+"api": "getP2pLocalDevice",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pLocalDevice invokeMode=sync"
+},
+{
+"id": "WM_PC_01435",
+"module": "wifiManager",
+"api": "getP2pLocalDevice",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pLocalDevice invokeMode=sync"
+},
+{
+"id": "WM_PC_01436",
+"module": "wifiManager",
+"api": "getP2pGroups",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pGroups invokeMode=promise"
+},
+{
+"id": "WM_PC_01437",
+"module": "wifiManager",
+"api": "getP2pGroups",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pGroups invokeMode=promise"
+},
+{
+"id": "WM_PC_01438",
+"module": "wifiManager",
+"api": "getP2pGroups",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pGroups invokeMode=callback"
+},
+{
+"id": "WM_PC_01439",
+"module": "wifiManager",
+"api": "getP2pGroups",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pGroups invokeMode=callback"
+},
+{
+"id": "WM_PC_01440",
+"module": "wifiManager",
+"api": "getP2pGroups",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pGroups invokeMode=sync"
+},
+{
+"id": "WM_PC_01441",
+"module": "wifiManager",
+"api": "getP2pGroups",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "getP2pGroups invokeMode=sync"
+},
+{
+"id": "WM_PC_01442",
+"module": "wifiManager",
+"api": "connectToCandidateConfigWithUserAction",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "connectToCandidateConfigWithUserAction invokeMode=promise"
+},
+{
+"id": "WM_PC_01443",
+"module": "wifiManager",
+"api": "connectToCandidateConfigWithUserAction",
+"category": "param",
+"params": {
+"invokeMode": "promise",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "connectToCandidateConfigWithUserAction invokeMode=promise"
+},
+{
+"id": "WM_PC_01444",
+"module": "wifiManager",
+"api": "connectToCandidateConfigWithUserAction",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "connectToCandidateConfigWithUserAction invokeMode=callback"
+},
+{
+"id": "WM_PC_01445",
+"module": "wifiManager",
+"api": "connectToCandidateConfigWithUserAction",
+"category": "param",
+"params": {
+"invokeMode": "callback",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "connectToCandidateConfigWithUserAction invokeMode=callback"
+},
+{
+"id": "WM_PC_01446",
+"module": "wifiManager",
+"api": "connectToCandidateConfigWithUserAction",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "connectToCandidateConfigWithUserAction invokeMode=sync"
+},
+{
+"id": "WM_PC_01447",
+"module": "wifiManager",
+"api": "connectToCandidateConfigWithUserAction",
+"category": "param",
+"params": {
+"invokeMode": "sync",
+"netId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "connectToCandidateConfigWithUserAction invokeMode=sync"
+},
+{
+"id": "WM_X_01448",
+"module": "wifiManager",
+"api": "updateNetwork",
+"category": "param",
+"params": {
+"securityType": 0,
+"ipType": 0,
+"ssid": "ut_update"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "updateNetwork sec=0 ip=0"
+},
+{
+"id": "WM_X_01449",
+"module": "wifiManager",
+"api": "updateNetwork",
+"category": "param",
+"params": {
+"securityType": 0,
+"ipType": 1,
+"ssid": "ut_update"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "updateNetwork sec=0 ip=1"
+},
+{
+"id": "WM_X_01450",
+"module": "wifiManager",
+"api": "updateNetwork",
+"category": "param",
+"params": {
+"securityType": 0,
+"ipType": 2,
+"ssid": "ut_update"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "updateNetwork sec=0 ip=2"
+},
+{
+"id": "WM_X_01451",
+"module": "wifiManager",
+"api": "updateNetwork",
+"category": "param",
+"params": {
+"securityType": 1,
+"ipType": 0,
+"ssid": "ut_update"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "updateNetwork sec=1 ip=0"
+},
+{
+"id": "WM_X_01452",
+"module": "wifiManager",
+"api": "updateNetwork",
+"category": "param",
+"params": {
+"securityType": 1,
+"ipType": 1,
+"ssid": "ut_update"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "updateNetwork sec=1 ip=1"
+},
+{
+"id": "WM_X_01453",
+"module": "wifiManager",
+"api": "updateNetwork",
+"category": "param",
+"params": {
+"securityType": 1,
+"ipType": 2,
+"ssid": "ut_update"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "updateNetwork sec=1 ip=2"
+},
+{
+"id": "WM_X_01454",
+"module": "wifiManager",
+"api": "updateNetwork",
+"category": "param",
+"params": {
+"securityType": 2,
+"ipType": 0,
+"ssid": "ut_update"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "updateNetwork sec=2 ip=0"
+},
+{
+"id": "WM_X_01455",
+"module": "wifiManager",
+"api": "updateNetwork",
+"category": "param",
+"params": {
+"securityType": 2,
+"ipType": 1,
+"ssid": "ut_update"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "updateNetwork sec=2 ip=1"
+},
+{
+"id": "WM_X_01456",
+"module": "wifiManager",
+"api": "updateNetwork",
+"category": "param",
+"params": {
+"securityType": 2,
+"ipType": 2,
+"ssid": "ut_update"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "updateNetwork sec=2 ip=2"
+},
+{
+"id": "WM_X_01457",
+"module": "wifiManager",
+"api": "updateNetwork",
+"category": "param",
+"params": {
+"securityType": 3,
+"ipType": 0,
+"ssid": "ut_update"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "updateNetwork sec=3 ip=0"
+},
+{
+"id": "WM_X_01458",
+"module": "wifiManager",
+"api": "updateNetwork",
+"category": "param",
+"params": {
+"securityType": 3,
+"ipType": 1,
+"ssid": "ut_update"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",

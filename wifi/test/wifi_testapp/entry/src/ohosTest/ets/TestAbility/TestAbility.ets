@@ -17,45 +17,115 @@ import hilog from '@ohos.hilog';
 import { Hypium } from '@ohos/hypium';
 import testsuite from '../test/List.test';
 import window from '@ohos.window';
+import UIAbility from '@ohos.app.ability.UIAbility';
+import AbilityDelegatorRegistry from '@ohos.app.ability.abilityDelegatorRegistry';
+import Want from '@ohos.app.ability.Want';
+import AbilityConstant from '@ohos.app.ability.AbilityConstant';
+import abilityAccessCtrl, { Permissions } from '@ohos.abilityAccessCtrl';
+
+/** 用户授权类权限：跑用例前尽量补齐（可配合 atm perm grant） */
+const USER_GRANT_PERMISSIONS: Array<Permissions> = [
+  'ohos.permission.LOCATION',
+  'ohos.permission.APPROXIMATELY_LOCATION',
+  'ohos.permission.LOCATION_IN_BACKGROUND',
+  'ohos.permission.DISTRIBUTED_DATASYNC',
+];
 
 export default class TestAbility extends UIAbility {
-    onCreate(want, launchParam) {
-        hilog.info(0x0000, 'testTag', '%{public}s', 'TestAbility onCreate');
-        hilog.info(0x0000, 'testTag', '%{public}s', 'want param:' + JSON.stringify(want) ?? '');
-        hilog.info(0x0000, 'testTag', '%{public}s', 'launchParam:'+ JSON.stringify(launchParam) ?? '');
-        let abilityDelegator: any
-        abilityDelegator = AbilityDelegatorRegistry.getAbilityDelegator()
-        let abilityDelegatorArguments: any
-        abilityDelegatorArguments = AbilityDelegatorRegistry.getArguments()
-        hilog.info(0x0000, 'testTag', '%{public}s', 'start run testcase!!!');
-        Hypium.hypiumTest(abilityDelegator, abilityDelegatorArguments, testsuite)
-    }
+  onCreate(want: Want, launchParam: AbilityConstant.LaunchParam) {
+    hilog.info(0x0000, 'testTag', '%{public}s', 'TestAbility onCreate');
+    hilog.info(
+      0x0000,
+      'testTag',
+      '%{public}s',
+      'want param:' + JSON.stringify(want) ?? ''
+    );
+    hilog.info(
+      0x0000,
+      'testTag',
+      '%{public}s',
+      'launchParam:' + JSON.stringify(launchParam) ?? ''
+    );
+    this.requestPermissionsThenRunTests();
+  }
 
-    onDestroy() {
-        hilog.info(0x0000, 'testTag', '%{public}s', 'TestAbility onDestroy');
+  private async requestPermissionsThenRunTests(): Promise<void> {
+    try {
+      const atManager = abilityAccessCtrl.createAtManager();
+      const result = await atManager.requestPermissionsFromUser(
+        this.context,
+        USER_GRANT_PERMISSIONS
+      );
+      hilog.info(
+        0x0000,
+        'testTag',
+        'permission grant result=%{public}s',
+        JSON.stringify(result) ?? ''
+      );
+    } catch (err) {
+      hilog.error(
+        0x0000,
+        'testTag',
+        'requestPermissionsFromUser failed: %{public}s',
+        JSON.stringify(err) ?? ''
+      );
     }
+    const abilityDelegator =
+      AbilityDelegatorRegistry.getAbilityDelegator();
+    const abilityDelegatorArguments =
+      AbilityDelegatorRegistry.getArguments();
+    hilog.info(0x0000, 'testTag', '%{public}s', 'start run testcase!!!');
+    Hypium.hypiumTest(
+      abilityDelegator,
+      abilityDelegatorArguments,
+      testsuite
+    );
+  }
 
-    onWindowStageCreate(windowStage: window.WindowStage) {
-        hilog.info(0x0000, 'testTag', '%{public}s', 'TestAbility onWindowStageCreate');
-        windowStage.loadContent('testability/pages/index', (err, data) => {
-            if (err.code) {
-                hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
-                return;
-            }
-            hilog.info(0x0000, 'testTag', 'Succeeded in loading the content. Data: %{public}s',
-                JSON.stringify(data) ?? '');
-        });
-    }
+  onDestroy() {
+    hilog.info(0x0000, 'testTag', '%{public}s', 'TestAbility onDestroy');
+  }
 
-    onWindowStageDestroy() {
-        hilog.info(0x0000, 'testTag', '%{public}s', 'TestAbility onWindowStageDestroy');
-    }
+  onWindowStageCreate(windowStage: window.WindowStage) {
+    hilog.info(
+      0x0000,
+      'testTag',
+      '%{public}s',
+      'TestAbility onWindowStageCreate'
+    );
+    windowStage.loadContent('TestAbility/pages/index', (err, data) => {
+      if (err.code) {
+        hilog.error(
+          0x0000,
+          'testTag',
+          'Failed to load content: %{public}s',
+          JSON.stringify(err) ?? ''
+        );
+        return;
+      }
+      hilog.info(
+        0x0000,
+        'testTag',
+        'load content ok: %{public}s',
+        JSON.stringify(data) ?? ''
+      );
+    });
+  }
 
-    onForeground() {
-        hilog.info(0x0000, 'testTag', '%{public}s', 'TestAbility onForeground');
-    }
+  onWindowStageDestroy() {
+    hilog.info(
+      0x0000,
+      'testTag',
+      '%{public}s',
+      'TestAbility onWindowStageDestroy'
+    );
+  }
 
-    onBackground() {
-        hilog.info(0x0000, 'testTag', '%{public}s', 'TestAbility onBackground');
-    }
+  onForeground() {
+    hilog.info(0x0000, 'testTag', '%{public}s', 'TestAbility onForeground');
+  }
+
+  onBackground() {
+    hilog.info(0x0000, 'testTag', '%{public}s', 'TestAbility onBackground');
+  }
 }

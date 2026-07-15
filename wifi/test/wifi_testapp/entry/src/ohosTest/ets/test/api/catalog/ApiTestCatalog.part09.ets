@@ -1896,3 +1896,117 @@ export const APITESTCATALOG_PART09: ApiTestCase[] = [
     "disableHotspot",
     "combo",
     buildParams([
+      ["blockDuration", 60]
+    ]),
+    [
+      "enableWifi",
+      "enableHotspot",
+      "getStations",
+      "disableHotspot"
+    ],
+    "WIFI_ON",
+    "any",
+    "none",
+    true,
+    "combo flow#11 var#7 -> disableHotspot"
+  ),
+  makeApiTestCase(
+    "WM_CB_00896",
+    "wifiManager",
+    "getHotspotBlockList",
+    "combo",
+    buildParams([]),
+    [
+      "enableWifi",
+      "isOpenSoftApAllowed",
+      "isHotspotDualBandSupported",
+      "getHotspotBlockList"
+    ],
+    "WIFI_ON",
+    "any",
+    "none",
+    true,
+    "combo flow#12 var#0 -> getHotspotBlockList"
+  ),
+  makeApiTestCase(
+    "WM_CB_00897",
+    "wifiManager",
+    "getHotspotBlockList",
+    "combo",
+    buildParams([
+      ["netId", 0]
+    ]),
+    [
+      "enableWifi",
+      "isOpenSoftApAllowed",
+      "isHotspotDualBandSupported",
+      "getHotspotBlockList"
+    ],
+    "WIFI_ON",
+    "any",
+    "none",
+    true,
+    "combo flow#12 var#1 -> getHotspotBlockList"
+  ),
+  makeApiTestCase(
+    "WM_CB_00898",
+    "wifiManager",
+    "getHotspotBlockList",
+    "combo",
+    buildParams([
+      ["rssi", -50],
+      ["band", 1]
+    ]),
+    [
+      "enableWifi",
+      "isOpenSoftApAllowed",
+      "isHotspotDualBandSupported",
+      "getHotspotBlockList"
+    ],
+    "WIFI_ON",
+    "any",
+    "none",
+    true,
+    "combo flow#12 var#2 -> getHotspotBlockList"
+  ),
+  makeApiTestCase(
+    "WM_CB_00899",
+    "wifiManager",
+    "getHotspotBlockList",
+    "combo",
+    buildParams([
+      ["featureId", 1]
+    ]),
+    [
+      "enableWifi",
+      "isOpenSoftApAllowed",
+      "isHotspotDualBandSupported",
+      "getHotspotBlockList"
+    ],
+    "WIFI_ON",
+    "any",
+    "none",
+    true,
+    "combo flow#12 var#3 -> getHotspotBlockList"
+  ),
+  makeApiTestCase(
+    "WM_CB_00900",
+    "wifiManager",
+    "getHotspotBlockList",
+    "combo",
+    buildParams([
+      ["allowed", true]
+    ]),
+    [
+      "enableWifi",
+      "isOpenSoftApAllowed",
+      "isHotspotDualBandSupported",
+      "getHotspotBlockList"
+    ],
+    "WIFI_ON",
+    "any",
+    "none",
+    true,
+    "combo flow#12 var#4 -> getHotspotBlockList"
+  ),
+];

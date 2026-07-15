@@ -75,6 +75,7 @@ static std::map<int32_t, std::string> napiErrMsgMap {
     { ErrCode::WIFI_OPT_USER_DOES_NOT_RESPOND, "The user does not respond." },
     { ErrCode::WIFI_OPT_USER_REFUSE_THE_ACTION, "The user refused the action." },
     { ErrCode::WIFI_OPT_INVALID_PARAM_NEW, "Parameter validation failed." },
+    { ErrCode::WIFI_OPT_CONFIG_COUNT_EXCEED_LIMIT, "Config count exceed limit." },
 };
 
 static napi_value NapiGetUndefined(const napi_env &env)

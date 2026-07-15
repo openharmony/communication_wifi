@@ -11386,3 +11386,1901 @@
 "getLinkedInfoSync",
 "isConnected",
 "getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#1 -> getDisconnectedReason"
+},
+{
+"id": "WM_CB_00834",
+"module": "wifiManager",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#2 -> getDisconnectedReason"
+},
+{
+"id": "WM_CB_00835",
+"module": "wifiManager",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#3 -> getDisconnectedReason"
+},
+{
+"id": "WM_CB_00836",
+"module": "wifiManager",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#4 -> getDisconnectedReason"
+},
+{
+"id": "WM_CB_00837",
+"module": "wifiManager",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#5 -> getDisconnectedReason"
+},
+{
+"id": "WM_CB_00838",
+"module": "wifiManager",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#6 -> getDisconnectedReason"
+},
+{
+"id": "WM_CB_00839",
+"module": "wifiManager",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#7 -> getDisconnectedReason"
+},
+{
+"id": "WM_CB_00840",
+"module": "wifiManager",
+"api": "getScanAlwaysAllowed",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"getCandidateConfigs",
+"getDeviceConfigs",
+"getScanAlwaysAllowed"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#5 var#0 -> getScanAlwaysAllowed"
+},
+{
+"id": "WM_CB_00841",
+"module": "wifiManager",
+"api": "getScanAlwaysAllowed",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"getCandidateConfigs",
+"getDeviceConfigs",
+"getScanAlwaysAllowed"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#5 var#1 -> getScanAlwaysAllowed"
+},
+{
+"id": "WM_CB_00842",
+"module": "wifiManager",
+"api": "getScanAlwaysAllowed",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"getCandidateConfigs",
+"getDeviceConfigs",
+"getScanAlwaysAllowed"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#5 var#2 -> getScanAlwaysAllowed"
+},
+{
+"id": "WM_CB_00843",
+"module": "wifiManager",
+"api": "getScanAlwaysAllowed",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"getCandidateConfigs",
+"getDeviceConfigs",
+"getScanAlwaysAllowed"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#5 var#3 -> getScanAlwaysAllowed"
+},
+{
+"id": "WM_CB_00844",
+"module": "wifiManager",
+"api": "getScanAlwaysAllowed",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"getCandidateConfigs",
+"getDeviceConfigs",
+"getScanAlwaysAllowed"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#5 var#4 -> getScanAlwaysAllowed"
+},
+{
+"id": "WM_CB_00845",
+"module": "wifiManager",
+"api": "getScanAlwaysAllowed",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"getCandidateConfigs",
+"getDeviceConfigs",
+"getScanAlwaysAllowed"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#5 var#5 -> getScanAlwaysAllowed"
+},
+{
+"id": "WM_CB_00846",
+"module": "wifiManager",
+"api": "getScanAlwaysAllowed",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"getCandidateConfigs",
+"getDeviceConfigs",
+"getScanAlwaysAllowed"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#5 var#6 -> getScanAlwaysAllowed"
+},
+{
+"id": "WM_CB_00847",
+"module": "wifiManager",
+"api": "getScanAlwaysAllowed",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"getCandidateConfigs",
+"getDeviceConfigs",
+"getScanAlwaysAllowed"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#5 var#7 -> getScanAlwaysAllowed"
+},
+{
+"id": "WM_CB_00848",
+"module": "wifiManager",
+"api": "startScan",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"setScanAlwaysAllowed",
+"getScanAlwaysAllowed",
+"startScan"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#6 var#0 -> startScan"
+},
+{
+"id": "WM_CB_00849",
+"module": "wifiManager",
+"api": "startScan",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"setScanAlwaysAllowed",
+"getScanAlwaysAllowed",
+"startScan"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#6 var#1 -> startScan"
+},
+{
+"id": "WM_CB_00850",
+"module": "wifiManager",
+"api": "startScan",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"setScanAlwaysAllowed",
+"getScanAlwaysAllowed",
+"startScan"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#6 var#2 -> startScan"
+},
+{
+"id": "WM_CB_00851",
+"module": "wifiManager",
+"api": "startScan",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"setScanAlwaysAllowed",
+"getScanAlwaysAllowed",
+"startScan"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#6 var#3 -> startScan"
+},
+{
+"id": "WM_CB_00852",
+"module": "wifiManager",
+"api": "startScan",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"setScanAlwaysAllowed",
+"getScanAlwaysAllowed",
+"startScan"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#6 var#4 -> startScan"
+},
+{
+"id": "WM_CB_00853",
+"module": "wifiManager",
+"api": "startScan",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"setScanAlwaysAllowed",
+"getScanAlwaysAllowed",
+"startScan"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#6 var#5 -> startScan"
+},
+{
+"id": "WM_CB_00854",
+"module": "wifiManager",
+"api": "startScan",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"setScanAlwaysAllowed",
+"getScanAlwaysAllowed",
+"startScan"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#6 var#6 -> startScan"
+},
+{
+"id": "WM_CB_00855",
+"module": "wifiManager",
+"api": "startScan",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"setScanAlwaysAllowed",
+"getScanAlwaysAllowed",
+"startScan"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#6 var#7 -> startScan"
+},
+{
+"id": "WM_CB_00856",
+"module": "wifiManager",
+"api": "getSignalLevel",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"getMultiLinkedInfo",
+"getLinkedInfoSync",
+"getSignalLevel"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#7 var#0 -> getSignalLevel"
+},
+{
+"id": "WM_CB_00857",
+"module": "wifiManager",
+"api": "getSignalLevel",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"getMultiLinkedInfo",
+"getLinkedInfoSync",
+"getSignalLevel"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#7 var#1 -> getSignalLevel"
+},
+{
+"id": "WM_CB_00858",
+"module": "wifiManager",
+"api": "getSignalLevel",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"getMultiLinkedInfo",
+"getLinkedInfoSync",
+"getSignalLevel"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#7 var#2 -> getSignalLevel"
+},
+{
+"id": "WM_CB_00859",
+"module": "wifiManager",
+"api": "getSignalLevel",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"getMultiLinkedInfo",
+"getLinkedInfoSync",
+"getSignalLevel"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#7 var#3 -> getSignalLevel"
+},
+{
+"id": "WM_CB_00860",
+"module": "wifiManager",
+"api": "getSignalLevel",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"getMultiLinkedInfo",
+"getLinkedInfoSync",
+"getSignalLevel"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#7 var#4 -> getSignalLevel"
+},
+{
+"id": "WM_CB_00861",
+"module": "wifiManager",
+"api": "getSignalLevel",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"getMultiLinkedInfo",
+"getLinkedInfoSync",
+"getSignalLevel"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#7 var#5 -> getSignalLevel"
+},
+{
+"id": "WM_CB_00862",
+"module": "wifiManager",
+"api": "getSignalLevel",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"getMultiLinkedInfo",
+"getLinkedInfoSync",
+"getSignalLevel"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#7 var#6 -> getSignalLevel"
+},
+{
+"id": "WM_CB_00863",
+"module": "wifiManager",
+"api": "getSignalLevel",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"getMultiLinkedInfo",
+"getLinkedInfoSync",
+"getSignalLevel"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#7 var#7 -> getSignalLevel"
+},
+{
+"id": "WM_CB_00864",
+"module": "wifiManager",
+"api": "isBandTypeSupported",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"isRandomMacDisabled",
+"get5GChannelList",
+"isBandTypeSupported"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#8 var#0 -> isBandTypeSupported"
+},
+{
+"id": "WM_CB_00865",
+"module": "wifiManager",
+"api": "isBandTypeSupported",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"isRandomMacDisabled",
+"get5GChannelList",
+"isBandTypeSupported"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#8 var#1 -> isBandTypeSupported"
+},
+{
+"id": "WM_CB_00866",
+"module": "wifiManager",
+"api": "isBandTypeSupported",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"isRandomMacDisabled",
+"get5GChannelList",
+"isBandTypeSupported"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#8 var#2 -> isBandTypeSupported"
+},
+{
+"id": "WM_CB_00867",
+"module": "wifiManager",
+"api": "isBandTypeSupported",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"isRandomMacDisabled",
+"get5GChannelList",
+"isBandTypeSupported"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#8 var#3 -> isBandTypeSupported"
+},
+{
+"id": "WM_CB_00868",
+"module": "wifiManager",
+"api": "isBandTypeSupported",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"isRandomMacDisabled",
+"get5GChannelList",
+"isBandTypeSupported"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#8 var#4 -> isBandTypeSupported"
+},
+{
+"id": "WM_CB_00869",
+"module": "wifiManager",
+"api": "isBandTypeSupported",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"isRandomMacDisabled",
+"get5GChannelList",
+"isBandTypeSupported"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#8 var#5 -> isBandTypeSupported"
+},
+{
+"id": "WM_CB_00870",
+"module": "wifiManager",
+"api": "isBandTypeSupported",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"isRandomMacDisabled",
+"get5GChannelList",
+"isBandTypeSupported"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#8 var#6 -> isBandTypeSupported"
+},
+{
+"id": "WM_CB_00871",
+"module": "wifiManager",
+"api": "isBandTypeSupported",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"isRandomMacDisabled",
+"get5GChannelList",
+"isBandTypeSupported"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#8 var#7 -> isBandTypeSupported"
+},
+{
+"id": "WM_CB_00872",
+"module": "wifiManager",
+"api": "isWifiActive",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"startWifiDetection",
+"getWifiDetailState",
+"isWifiActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#9 var#0 -> isWifiActive"
+},
+{
+"id": "WM_CB_00873",
+"module": "wifiManager",
+"api": "isWifiActive",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"startWifiDetection",
+"getWifiDetailState",
+"isWifiActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#9 var#1 -> isWifiActive"
+},
+{
+"id": "WM_CB_00874",
+"module": "wifiManager",
+"api": "isWifiActive",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"startWifiDetection",
+"getWifiDetailState",
+"isWifiActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#9 var#2 -> isWifiActive"
+},
+{
+"id": "WM_CB_00875",
+"module": "wifiManager",
+"api": "isWifiActive",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"startWifiDetection",
+"getWifiDetailState",
+"isWifiActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#9 var#3 -> isWifiActive"
+},
+{
+"id": "WM_CB_00876",
+"module": "wifiManager",
+"api": "isWifiActive",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"startWifiDetection",
+"getWifiDetailState",
+"isWifiActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#9 var#4 -> isWifiActive"
+},
+{
+"id": "WM_CB_00877",
+"module": "wifiManager",
+"api": "isWifiActive",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"startWifiDetection",
+"getWifiDetailState",
+"isWifiActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#9 var#5 -> isWifiActive"
+},
+{
+"id": "WM_CB_00878",
+"module": "wifiManager",
+"api": "isWifiActive",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"startWifiDetection",
+"getWifiDetailState",
+"isWifiActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#9 var#6 -> isWifiActive"
+},
+{
+"id": "WM_CB_00879",
+"module": "wifiManager",
+"api": "isWifiActive",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"startWifiDetection",
+"getWifiDetailState",
+"isWifiActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#9 var#7 -> isWifiActive"
+},
+{
+"id": "WM_CB_00880",
+"module": "wifiManager",
+"api": "getHotspotConfig",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"isHotspotActive",
+"getHotspotConfig"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#10 var#0 -> getHotspotConfig"
+},
+{
+"id": "WM_CB_00881",
+"module": "wifiManager",
+"api": "getHotspotConfig",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"isHotspotActive",
+"getHotspotConfig"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#10 var#1 -> getHotspotConfig"
+},
+{
+"id": "WM_CB_00882",
+"module": "wifiManager",
+"api": "getHotspotConfig",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"isHotspotActive",
+"getHotspotConfig"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#10 var#2 -> getHotspotConfig"
+},
+{
+"id": "WM_CB_00883",
+"module": "wifiManager",
+"api": "getHotspotConfig",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"isHotspotActive",
+"getHotspotConfig"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#10 var#3 -> getHotspotConfig"
+},
+{
+"id": "WM_CB_00884",
+"module": "wifiManager",
+"api": "getHotspotConfig",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"isHotspotActive",
+"getHotspotConfig"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#10 var#4 -> getHotspotConfig"
+},
+{
+"id": "WM_CB_00885",
+"module": "wifiManager",
+"api": "getHotspotConfig",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"isHotspotActive",
+"getHotspotConfig"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#10 var#5 -> getHotspotConfig"
+},
+{
+"id": "WM_CB_00886",
+"module": "wifiManager",
+"api": "getHotspotConfig",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"isHotspotActive",
+"getHotspotConfig"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#10 var#6 -> getHotspotConfig"
+},
+{
+"id": "WM_CB_00887",
+"module": "wifiManager",
+"api": "getHotspotConfig",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"isHotspotActive",
+"getHotspotConfig"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#10 var#7 -> getHotspotConfig"
+},
+{
+"id": "WM_CB_00888",
+"module": "wifiManager",
+"api": "disableHotspot",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"getStations",
+"disableHotspot"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#11 var#0 -> disableHotspot"
+},
+{
+"id": "WM_CB_00889",
+"module": "wifiManager",
+"api": "disableHotspot",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"getStations",
+"disableHotspot"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#11 var#1 -> disableHotspot"
+},
+{
+"id": "WM_CB_00890",
+"module": "wifiManager",
+"api": "disableHotspot",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"getStations",
+"disableHotspot"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#11 var#2 -> disableHotspot"
+},
+{
+"id": "WM_CB_00891",
+"module": "wifiManager",
+"api": "disableHotspot",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"getStations",
+"disableHotspot"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#11 var#3 -> disableHotspot"
+},
+{
+"id": "WM_CB_00892",
+"module": "wifiManager",
+"api": "disableHotspot",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"getStations",
+"disableHotspot"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#11 var#4 -> disableHotspot"
+},
+{
+"id": "WM_CB_00893",
+"module": "wifiManager",
+"api": "disableHotspot",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"getStations",
+"disableHotspot"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#11 var#5 -> disableHotspot"
+},
+{
+"id": "WM_CB_00894",
+"module": "wifiManager",
+"api": "disableHotspot",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"getStations",
+"disableHotspot"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#11 var#6 -> disableHotspot"
+},
+{
+"id": "WM_CB_00895",
+"module": "wifiManager",
+"api": "disableHotspot",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"enableHotspot",
+"getStations",
+"disableHotspot"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#11 var#7 -> disableHotspot"
+},
+{
+"id": "WM_CB_00896",
+"module": "wifiManager",
+"api": "getHotspotBlockList",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"isOpenSoftApAllowed",
+"isHotspotDualBandSupported",
+"getHotspotBlockList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#12 var#0 -> getHotspotBlockList"
+},
+{
+"id": "WM_CB_00897",
+"module": "wifiManager",
+"api": "getHotspotBlockList",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"isOpenSoftApAllowed",
+"isHotspotDualBandSupported",
+"getHotspotBlockList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#12 var#1 -> getHotspotBlockList"
+},
+{
+"id": "WM_CB_00898",
+"module": "wifiManager",
+"api": "getHotspotBlockList",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"isOpenSoftApAllowed",
+"isHotspotDualBandSupported",
+"getHotspotBlockList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#12 var#2 -> getHotspotBlockList"
+},
+{
+"id": "WM_CB_00899",
+"module": "wifiManager",
+"api": "getHotspotBlockList",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"isOpenSoftApAllowed",
+"isHotspotDualBandSupported",
+"getHotspotBlockList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#12 var#3 -> getHotspotBlockList"
+},
+{
+"id": "WM_CB_00900",
+"module": "wifiManager",
+"api": "getHotspotBlockList",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"isOpenSoftApAllowed",
+"isHotspotDualBandSupported",
+"getHotspotBlockList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#12 var#4 -> getHotspotBlockList"
+},
+{
+"id": "WM_CB_00901",
+"module": "wifiManager",
+"api": "getHotspotBlockList",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"isOpenSoftApAllowed",
+"isHotspotDualBandSupported",
+"getHotspotBlockList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#12 var#5 -> getHotspotBlockList"
+},
+{
+"id": "WM_CB_00902",
+"module": "wifiManager",
+"api": "getHotspotBlockList",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"isOpenSoftApAllowed",
+"isHotspotDualBandSupported",
+"getHotspotBlockList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#12 var#6 -> getHotspotBlockList"
+},
+{
+"id": "WM_CB_00903",
+"module": "wifiManager",
+"api": "getHotspotBlockList",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"isOpenSoftApAllowed",
+"isHotspotDualBandSupported",
+"getHotspotBlockList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#12 var#7 -> getHotspotBlockList"
+},
+{
+"id": "WM_CB_00904",
+"module": "wifiManager",
+"api": "isHotspotActive",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"isMeteredHotspot",
+"getHotspotConfig",
+"isHotspotActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#13 var#0 -> isHotspotActive"
+},
+{
+"id": "WM_CB_00905",
+"module": "wifiManager",
+"api": "isHotspotActive",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"isMeteredHotspot",
+"getHotspotConfig",
+"isHotspotActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#13 var#1 -> isHotspotActive"
+},
+{
+"id": "WM_CB_00906",
+"module": "wifiManager",
+"api": "isHotspotActive",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"isMeteredHotspot",
+"getHotspotConfig",
+"isHotspotActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#13 var#2 -> isHotspotActive"
+},
+{
+"id": "WM_CB_00907",
+"module": "wifiManager",
+"api": "isHotspotActive",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"isMeteredHotspot",
+"getHotspotConfig",
+"isHotspotActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#13 var#3 -> isHotspotActive"
+},
+{
+"id": "WM_CB_00908",
+"module": "wifiManager",
+"api": "isHotspotActive",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"isMeteredHotspot",
+"getHotspotConfig",
+"isHotspotActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#13 var#4 -> isHotspotActive"
+},
+{
+"id": "WM_CB_00909",
+"module": "wifiManager",
+"api": "isHotspotActive",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"isMeteredHotspot",
+"getHotspotConfig",
+"isHotspotActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#13 var#5 -> isHotspotActive"
+},
+{
+"id": "WM_CB_00910",
+"module": "wifiManager",
+"api": "isHotspotActive",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"isMeteredHotspot",
+"getHotspotConfig",
+"isHotspotActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#13 var#6 -> isHotspotActive"
+},
+{
+"id": "WM_CB_00911",
+"module": "wifiManager",
+"api": "isHotspotActive",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"isMeteredHotspot",
+"getHotspotConfig",
+"isHotspotActive"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#13 var#7 -> isHotspotActive"
+},
+{
+"id": "WM_CB_00912",
+"module": "wifiManager",
+"api": "stopDiscoverDevices",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"startDiscoverDevices",
+"getP2pPeerDevices",
+"stopDiscoverDevices"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#14 var#0 -> stopDiscoverDevices"
+},
+{
+"id": "WM_CB_00913",
+"module": "wifiManager",
+"api": "stopDiscoverDevices",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"startDiscoverDevices",
+"getP2pPeerDevices",
+"stopDiscoverDevices"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#14 var#1 -> stopDiscoverDevices"
+},
+{
+"id": "WM_CB_00914",
+"module": "wifiManager",
+"api": "stopDiscoverDevices",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"startDiscoverDevices",
+"getP2pPeerDevices",
+"stopDiscoverDevices"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#14 var#2 -> stopDiscoverDevices"
+},
+{
+"id": "WM_CB_00915",
+"module": "wifiManager",
+"api": "stopDiscoverDevices",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"startDiscoverDevices",
+"getP2pPeerDevices",
+"stopDiscoverDevices"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#14 var#3 -> stopDiscoverDevices"
+},
+{
+"id": "WM_CB_00916",
+"module": "wifiManager",
+"api": "stopDiscoverDevices",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"startDiscoverDevices",
+"getP2pPeerDevices",
+"stopDiscoverDevices"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#14 var#4 -> stopDiscoverDevices"
+},
+{
+"id": "WM_CB_00917",
+"module": "wifiManager",
+"api": "stopDiscoverDevices",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"startDiscoverDevices",
+"getP2pPeerDevices",
+"stopDiscoverDevices"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#14 var#5 -> stopDiscoverDevices"
+},
+{
+"id": "WM_CB_00918",
+"module": "wifiManager",
+"api": "stopDiscoverDevices",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"startDiscoverDevices",
+"getP2pPeerDevices",
+"stopDiscoverDevices"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#14 var#6 -> stopDiscoverDevices"
+},
+{
+"id": "WM_CB_00919",
+"module": "wifiManager",
+"api": "stopDiscoverDevices",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"startDiscoverDevices",
+"getP2pPeerDevices",
+"stopDiscoverDevices"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#14 var#7 -> stopDiscoverDevices"
+},
+{
+"id": "WM_CB_00920",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"getP2pLocalDevice",
+"getP2pGroups",
+"getP2pLinkedInfo"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#15 var#0 -> getP2pLinkedInfo"
+},
+{
+"id": "WM_CB_00921",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"getP2pLocalDevice",
+"getP2pGroups",
+"getP2pLinkedInfo"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#15 var#1 -> getP2pLinkedInfo"
+},
+{
+"id": "WM_CB_00922",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"getP2pLocalDevice",
+"getP2pGroups",
+"getP2pLinkedInfo"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#15 var#2 -> getP2pLinkedInfo"
+},
+{
+"id": "WM_CB_00923",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"getP2pLocalDevice",
+"getP2pGroups",
+"getP2pLinkedInfo"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#15 var#3 -> getP2pLinkedInfo"
+},
+{
+"id": "WM_CB_00924",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"getP2pLocalDevice",
+"getP2pGroups",
+"getP2pLinkedInfo"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#15 var#4 -> getP2pLinkedInfo"
+},
+{
+"id": "WM_CB_00925",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"getP2pLocalDevice",
+"getP2pGroups",
+"getP2pLinkedInfo"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#15 var#5 -> getP2pLinkedInfo"
+},
+{
+"id": "WM_CB_00926",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"getP2pLocalDevice",
+"getP2pGroups",
+"getP2pLinkedInfo"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#15 var#6 -> getP2pLinkedInfo"
+},
+{
+"id": "WM_CB_00927",
+"module": "wifiManager",
+"api": "getP2pLinkedInfo",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"getP2pLocalDevice",
+"getP2pGroups",
+"getP2pLinkedInfo"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#15 var#7 -> getP2pLinkedInfo"
+},
+{
+"id": "WM_CB_00928",
+"module": "wifiManager",
+"api": "getCurrentGroup",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"setDeviceName",
+"getP2pLocalDevice",
+"getCurrentGroup"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#16 var#0 -> getCurrentGroup"
+},
+{
+"id": "WM_CB_00929",
+"module": "wifiManager",

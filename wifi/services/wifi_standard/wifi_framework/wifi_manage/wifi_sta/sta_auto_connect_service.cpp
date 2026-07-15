@@ -131,7 +131,7 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     if (!AllowAutoSelectDevice(info) || !IsAllowAutoJoin()) {
         return;
     }
-    BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
+    BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus(scanInfos);
     NetworkSelectionResult networkSelectionResult;
     std::string failReason = "";
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT,
@@ -222,6 +222,7 @@ void StaAutoConnectService::ConnectNetwork(NetworkSelectionResult &networkSelect
     message->SetParam1(networkId);
     message->SetParam2(selectedType);
     message->AddStringMessageBody(bssid);
+    message->AddIntMessageBody(static_cast<int>(networkSelectionResult.wifiDeviceConfig.isPortal));
     pStaStateMachine->SendMessage(message);
 }
 

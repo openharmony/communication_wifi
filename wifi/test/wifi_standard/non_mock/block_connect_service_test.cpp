@@ -18,6 +18,7 @@
 #include "wifi_log.h"
 #include "wifi_logger.h"
 #include "block_connect_service.h"
+#include "wifi_notification_util.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -64,6 +65,128 @@ HWTEST_F(BlockConnectServiceTest, updateAllNetworkSelectStatus_ReturnsTrueWhenSu
     // Test logic here
     bool result = BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus();
     EXPECT_EQ(result, true);
+}
+
+HWTEST_F(BlockConnectServiceTest, updateAllNetworkSelectStatus_ReturnsTrueWhenSuccessful002, TestSize.Level1)
+{
+    // Test logic here
+    std::vector<InterScanInfo> scanInfos;
+    auto linkedInfo = std::make_shared<WifiLinkedInfo>();
+    linkedInfo->bssid = "11:22:33:44:55:66";
+    linkedInfo->ssid = "current_ap";
+    linkedInfo->rssi = -60;
+    linkedInfo->band = 1; // 2.4G
+
+    InterScanInfo currentScan;
+    currentScan.bssid = linkedInfo->bssid;
+    currentScan.ssid = linkedInfo->ssid;
+    currentScan.rssi = linkedInfo->rssi;
+    currentScan.band = 1; // 2.4G
+    scanInfos.push_back(currentScan);
+    bool result = BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus(scanInfos);
+    EXPECT_EQ(result, true);
+}
+
+HWTEST_F(BlockConnectServiceTest, CheckPortalAuthTimeoutClear001, TestSize.Level1)
+{
+    // Test logic here
+    std::vector<InterScanInfo> scanInfos;
+    auto linkedInfo = std::make_shared<WifiLinkedInfo>();
+    linkedInfo->bssid = "11:22:33:44:55:66";
+    linkedInfo->ssid = "current_ap";
+    linkedInfo->rssi = -60;
+    linkedInfo->band = 1; // 2.4G
+
+    InterScanInfo currentScan;
+    currentScan.bssid = linkedInfo->bssid;
+    currentScan.ssid = linkedInfo->ssid;
+    currentScan.rssi = linkedInfo->rssi;
+    currentScan.band = 1; // 2.4G
+    scanInfos.push_back(currentScan);
+    WifiDeviceConfig config;
+    config.ssid = linkedInfo->ssid;
+    config.bssid = linkedInfo->bssid;
+    config.networkSelectionStatus.networkSelectionDisableReason =
+        DisabledReason::DISABLED_PORTAL_AUTH_TIMEOUT;
+    BlockConnectService::GetInstance().CheckPortalAuthTimeoutClear(config, scanInfos);
+    EXPECT_EQ(config.networkSelectionStatus.portalAuthClearCount, 0);
+}
+
+HWTEST_F(BlockConnectServiceTest, CheckPortalAuthTimeoutClear002, TestSize.Level1)
+{
+    // Test logic here
+    std::vector<InterScanInfo> scanInfos;
+    auto linkedInfo = std::make_shared<WifiLinkedInfo>();
+    linkedInfo->bssid = "11:22:33:44:55:66";
+    linkedInfo->ssid = "current_ap";
+    linkedInfo->rssi = -60;
+    linkedInfo->band = 1; // 2.4G
+
+    InterScanInfo currentScan;
+    currentScan.bssid = linkedInfo->bssid;
+    currentScan.ssid = linkedInfo->ssid;
+    currentScan.rssi = linkedInfo->rssi;
+    currentScan.band = 1; // 2.4G
+    scanInfos.push_back(currentScan);
+    WifiDeviceConfig config;
+    config.ssid = linkedInfo->ssid;
+    config.bssid = linkedInfo->bssid;
+    config.networkSelectionStatus.networkSelectionDisableReason =
+        DisabledReason::DISABLED_ASSOCIATION_REJECTION;
+    BlockConnectService::GetInstance().CheckPortalAuthTimeoutClear(config, scanInfos);
+    EXPECT_EQ(config.networkSelectionStatus.portalAuthClearCount, 0);
+}
+
+HWTEST_F(BlockConnectServiceTest, CheckPortalAuthTimeoutClear003, TestSize.Level1)
+{
+    // Test logic here
+    std::vector<InterScanInfo> scanInfos;
+    auto linkedInfo = std::make_shared<WifiLinkedInfo>();
+    linkedInfo->bssid = "11:22:33:44:55:66";
+    linkedInfo->ssid = "current_ap";
+    linkedInfo->rssi = -60;
+    linkedInfo->band = 1; // 2.4G
+
+    InterScanInfo currentScan;
+    currentScan.bssid = linkedInfo->bssid;
+    currentScan.ssid = linkedInfo->ssid;
+    currentScan.rssi = linkedInfo->rssi;
+    currentScan.band = 1; // 2.4G
+    scanInfos.push_back(currentScan);
+    WifiDeviceConfig config;
+    config.ssid = linkedInfo->ssid;
+    config.bssid = "11:22:33:44:66:66";
+    config.networkSelectionStatus.networkSelectionDisableReason =
+        DisabledReason::DISABLED_PORTAL_AUTH_TIMEOUT;
+    config.networkSelectionStatus.portalAuthClearCount = 3;
+    BlockConnectService::GetInstance().CheckPortalAuthTimeoutClear(config, scanInfos);
+    EXPECT_EQ(config.networkSelectionStatus.portalAuthClearCount, 0);
+}
+
+HWTEST_F(BlockConnectServiceTest, CheckPortalAuthTimeoutClear004, TestSize.Level1)
+{
+    // Test logic here
+    std::vector<InterScanInfo> scanInfos;
+    auto linkedInfo = std::make_shared<WifiLinkedInfo>();
+    linkedInfo->bssid = "11:22:33:44:55:66";
+    linkedInfo->ssid = "current_ap";
+    linkedInfo->rssi = -60;
+    linkedInfo->band = 1; // 2.4G
+
+    InterScanInfo currentScan;
+    currentScan.bssid = linkedInfo->bssid;
+    currentScan.ssid = linkedInfo->ssid;
+    currentScan.rssi = linkedInfo->rssi;
+    currentScan.band = 1; // 2.4G
+    scanInfos.push_back(currentScan);
+    WifiDeviceConfig config;
+    config.ssid = linkedInfo->ssid;
+    config.bssid = "11:22:33:44:66:66";
+    config.networkSelectionStatus.networkSelectionDisableReason =
+        DisabledReason::DISABLED_PORTAL_AUTH_TIMEOUT;
+    config.networkSelectionStatus.portalAuthClearCount = 3;
+    BlockConnectService::GetInstance().CheckPortalAuthTimeoutClear(config, scanInfos);
+    EXPECT_EQ(config.networkSelectionStatus.portalAuthClearCount, 1);
 }
 
 HWTEST_F(BlockConnectServiceTest, EnableNetworkSelectStatus_ReturnsTrueWhenSuccessful, TestSize.Level1)

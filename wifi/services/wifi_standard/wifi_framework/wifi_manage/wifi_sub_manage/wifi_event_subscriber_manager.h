@@ -86,6 +86,7 @@ public:
     void OnReceiveWlanKeepConnected(const OHOS::EventFwk::CommonEventData &eventData);
 private:
     void OnReceiveNotificationEvent(int notificationId);
+    void OnReceiveBackPortalEvent(int networkid);
     void OnReceiveDontShowEvent(int notificationId);
     void HandleCandidateConnect(const OHOS::EventFwk::CommonEventData &eventData);
     void OnReceiveDialogAcceptEvent(int dialogType, const OHOS::EventFwk::CommonEventData &eventData);
@@ -136,6 +137,7 @@ public:
     explicit SettingsEnterSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
     ~SettingsEnterSubscriber() = default;
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &eventData) override;
+    void HandleSettingsEnter(bool isSettingsEnter);
 };
 
 class DataShareReadySubscriber : public OHOS::EventFwk::CommonEventSubscriber {

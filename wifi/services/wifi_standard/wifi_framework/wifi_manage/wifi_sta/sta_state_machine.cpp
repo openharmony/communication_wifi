@@ -138,6 +138,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 
 constexpr int32_t MAX_NO_INTERNET_CNT = 3;
 constexpr uint32_t PKT_DIR_RPT_CNT = 3;
+constexpr uint32_t DETECT_COUNT = 2;
 constexpr int64_t ROAM_SCAN_MAX_AGE_US = 20 * 1000 * 1000;  // 20s
 
 const std::map<int, int> wpa3FailreasonMap {
@@ -752,18 +753,28 @@ void StaStateMachine::InitState::StartConnectEvent(InternalMessagePtr msg)
         WIFI_LOGE("msg is null.\n");
         return;
     }
+    std::string bundle = WifiSettings::GetInstance().GetPackageName("SETTINGS");
     int networkId = msg->GetParam1();
     int connTriggerMode = msg->GetParam2();
+    bool isPortal = static_cast<bool>(msg->GetIntFromMessage());
     auto bssid = msg->GetStringFromMessage();
     pStaStateMachine->linkedInfo.connTriggerMode = connTriggerMode;
     if (connTriggerMode == NETWORK_SELECTED_BY_USER) {
         BlockConnectService::GetInstance().EnableNetworkSelectStatus(networkId);
         WifiSettings::GetInstance().SetUserConnectChoice(networkId);
     }
+    
+    if (connTriggerMode == NETWORK_SELECTED_BY_AUTO && !WifiAppStateAware::GetInstance().IsForegroundApp(bundle)
+        && isPortal) {
+        connTriggerMode = NETWORK_SELECTED_BY_BACKGROUND_PORTAL;
+        pStaStateMachine->linkedInfo.connTriggerMode = connTriggerMode;
+        WIFI_LOGI("Background portal connect, connTriggerMode changed to %{public}d", connTriggerMode);
+    }
 
     if (NotAllowConnectToNetwork(networkId, bssid, connTriggerMode)) {
         return;
     }
+
 #ifndef OHOS_ARCH_LITE
     if (pStaStateMachine->m_instId == INSTID_WLAN0 && connTriggerMode != NETWORK_SELECTED_BY_GENELINK &&
         pStaStateMachine->enhanceService_ != nullptr) {
@@ -1112,6 +1123,7 @@ void StaStateMachine::LinkState::DealDisconnectEventInLinkState(InternalMessageP
         pStaStateMachine->SwitchState(pStaStateMachine->pSeparatedState);
     } else { //connecting to another network while already connected
         pStaStateMachine->mPortalUrl = "";
+        pStaStateMachine->pLinkedState->backgroundcount_ = 0;
         pStaStateMachine->StopDhcp(true, true);
         // Update net supplier info to disable network
 #ifndef OHOS_ARCH_LITE
@@ -2526,19 +2538,21 @@ void StaStateMachine::SetPortalBrowserFlag(bool flag)
 void StaStateMachine::ShowPortalNitification()
 {
     WifiDeviceConfig wifiDeviceConfig = getCurrentWifiDeviceConfig();
+    bool isBackgroundPortal = (linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_BACKGROUND_PORTAL);
     bool hasInternetEver =
         NetworkStatusHistoryManager::HasInternetEverByHistory(wifiDeviceConfig.networkStatusHistory);
-    if (hasInternetEver) {
+    if (hasInternetEver && !isBackgroundPortal) {
         if (!(InternalHiLinkNetworkToBool(linkedInfo.isHiLinkNetwork) ||
             WifiHistoryRecordManager::GetInstance().IsHomeAp(linkedInfo.bssid) ||
             WifiHistoryRecordManager::GetInstance().IsHomeRouter(mPortalUrl))) {
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
-                WifiNotificationStatus::WIFI_PORTAL_TIMEOUT);
+                WifiNotificationStatus::WIFI_PORTAL_TIMEOUT, isBackgroundPortal,
+                    linkedInfo.networkId);
         }
     } else {
         std::string bundle = WifiSettings::GetInstance().GetPackageName("SETTINGS");
-        if (WifiAppStateAware::GetInstance().IsForegroundApp(bundle)) {
+        if (WifiAppStateAware::GetInstance().IsForegroundApp(bundle) && !isBackgroundPortal) {
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
                 WifiNotificationStatus::WIFI_PORTAL_CONNECTED);
@@ -2546,7 +2560,8 @@ void StaStateMachine::ShowPortalNitification()
         } else {
             WifiNotificationUtil::GetInstance().PublishWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, linkedInfo.ssid,
-                WifiNotificationStatus::WIFI_PORTAL_FOUND);
+                WifiNotificationStatus::WIFI_PORTAL_FOUND, isBackgroundPortal,
+                    linkedInfo.networkId);
         }
     }
 }
@@ -2761,6 +2776,10 @@ void StaStateMachine::HandleNetCheckResultIsWorking(SystemNetWorkState netState,
         StartDetectTimer(DETECT_TYPE_PERIODIC);
     }
     mPortalUrl = "";
+    if (linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_BACKGROUND_PORTAL) {
+        linkedInfo.connTriggerMode = NETWORK_SELECTED_BY_AUTO;
+        InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
+    }
 #ifndef OHOS_ARCH_LITE
     UpdateAcceptUnvalidatedState();
     WifiNotificationUtil::GetInstance().CancelWifiNotification(
@@ -2819,6 +2838,7 @@ void StaStateMachine::HandleNetCheckResultIsPortal(SystemNetWorkState netState, 
         InvokeOnStaConnChanged(OperateResState::CONNECT_CHECK_PORTAL, linkedInfo);
     }
     lastCheckNetState_ = OperateResState::CONNECT_CHECK_PORTAL;
+    DisConnectBackgroundNetwork();
 }
 
 void StaStateMachine::HandleNetCheckResultIsNotWorking(SystemNetWorkState netState)
@@ -2837,11 +2857,13 @@ void StaStateMachine::HandleNetCheckResultIsNotWorking(SystemNetWorkState netSta
 // if wifipro is open, wifipro will notify selfcure no internet, if not, sta should notify
 #ifndef FEATURE_WIFI_PRO_SUPPORT
 #ifdef FEATURE_SELF_CURE_SUPPORT
-    if (selfCureService_ != nullptr) {
+    if (selfCureService_ != nullptr && linkedInfo.connTriggerMode !=
+        NETWORK_SELECTED_BY_BACKGROUND_PORTAL) {
         selfCureService_->NotifyInternetFailureDetected(false);
     }
 #endif
 #endif
+    DisConnectBackgroundNetwork();
 }
 
 void StaStateMachine::PublishPortalNitificationAndLogin()
@@ -3270,21 +3292,58 @@ void StaStateMachine::LinkedState::UpdateExpandOffset()
     }
     isExpandUpdateRssi_ = true;
 }
+
+void StaStateMachine::LinkedState::CheckBackgroundNetDetection(SystemNetWorkState netState,
+    const std::string &portalUrl)
+{
+    OperateResState curCheckNetState = OperateResState::CONNECT_NETWORK_NORELATED;
+    switch (netState) {
+        case SystemNetWorkState::NETWORK_NOTWORKING:
+            curCheckNetState = OperateResState::CONNECT_NETWORK_DISABLED;
+            break;
+        case SystemNetWorkState::NETWORK_IS_WORKING:
+            curCheckNetState = OperateResState::CONNECT_NETWORK_ENABLED;
+            break;
+        case SystemNetWorkState::NETWORK_IS_PORTAL:
+            curCheckNetState = OperateResState::CONNECT_CHECK_PORTAL;
+            break;
+        default:
+            break;
+    }
+    if (pStaStateMachine->lastCheckNetState_ == curCheckNetState) {
+        backgroundcount_++;
+    } else {
+        pStaStateMachine->lastCheckNetState_ = curCheckNetState;
+        backgroundcount_ = 0;
+    }
+    if (backgroundcount_ < DETECT_COUNT) {
+        pStaStateMachine->StartDetectTimer(DETECT_TYPE_CHECK_PORTAL_EXPERIED);
+    } else {
+        UpdateNetDetectHistory(netState);
+        pStaStateMachine->lastCheckNetState_ = OperateResState::CONNECT_NETWORK_NORELATED;
+        pStaStateMachine->HandleNetCheckResult(netState, portalUrl);
+    }
+}
+
 void StaStateMachine::LinkedState::NetDetectionNotify(InternalMessagePtr msg)
 {
     if (msg == nullptr) {
         WIFI_LOGE("msg is nullptr.");
         return;
     }
-
+ 
     SystemNetWorkState netstate = static_cast<SystemNetWorkState>(msg->GetParam1());
     std::string url;
     if (!msg->GetMessageObj(url)) {
         WIFI_LOGW("Failed to obtain portal url.");
     }
     WIFI_HILOG_COMM_INFO("netdetection, netstate:%{public}d url:%{private}s\n", netstate, url.c_str());
-    UpdateNetDetectHistory(netstate);
-    pStaStateMachine->HandleNetCheckResult(netstate, url);
+    if (pStaStateMachine->linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_BACKGROUND_PORTAL) {
+        CheckBackgroundNetDetection(netstate, url);
+    } else {
+        UpdateNetDetectHistory(netstate);
+        pStaStateMachine->HandleNetCheckResult(netstate, url);
+    }
 }
 
 void StaStateMachine::LinkedState::UpdateNetDetectHistory(EnumNetWorkState networkState)
@@ -6586,6 +6645,17 @@ void StaStateMachine::NotifyWifiDisconnectReason(const int reason, const int sub
     if (enhanceService_ != nullptr) {
         enhanceService_->NotifyWifiDisconnectReason(reason, subReason);
     }
+}
+
+void StaStateMachine::DisConnectBackgroundNetwork()
+{
+    if (linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_BACKGROUND_PORTAL) {
+        BlockConnectService::GetInstance().UpdateNetworkSelectStatus(linkedInfo.networkId,
+            DisabledReason::DISABLED_PORTAL_AUTH_TIMEOUT);
+        StartDisConnectToNetwork();
+        SwitchState(pSeparatedState);
+    }
+    return;
 }
 } // namespace Wifi
 } // namespace OHOS

@@ -334,7 +334,8 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
     }
     bool isConnected = (info.connState == CONNECTED) ? true : false;
     WifiProtectManager::GetInstance().UpdateWifiClientConnected(isConnected);
-    if (state == OperateResState::DISCONNECT_DISCONNECTED) {
+    if (state == OperateResState::DISCONNECT_DISCONNECTED && info.connTriggerMode !=
+        NETWORK_SELECTED_BY_BACKGROUND_PORTAL) {
         if (instId == INSTID_WLAN0) {
             WifiNotificationUtil::GetInstance().CancelWifiNotification(WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
         }

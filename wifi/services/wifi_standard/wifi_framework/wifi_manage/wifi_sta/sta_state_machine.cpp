@@ -93,7 +93,9 @@ static bool IsRandomMac(const std::string& mac)
         return false;
     }
     unsigned char firstByte = 0;
-    sscanf_s(mac.substr(0, MAC_STRING_MIN_LEN).c_str(), "0x02x", &firstByte);
+    if (sscanf_s(mac.substr(0, MAC_STRING_MIN_LEN).c_str(), "%02x", &firstByte) < 0) {
+        return false;
+    }
     return (firstByte & RANDOM_MAC_LOCAT_BIT) != 0;
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");

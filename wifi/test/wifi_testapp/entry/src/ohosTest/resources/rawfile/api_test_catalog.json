@@ -30366,3 +30366,1298 @@
 "params": {
 "rssi": -50,
 "band": 1
+},
+"comboSteps": [
+"enableWifi",
+"p2pCancelConnect",
+"removeGroup",
+"deletePersistentGroup"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#17 var#2 -> deletePersistentGroup"
+},
+{
+"id": "WF_CB_01933",
+"module": "wifi",
+"api": "deletePersistentGroup",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"p2pCancelConnect",
+"removeGroup",
+"deletePersistentGroup"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#17 var#3 -> deletePersistentGroup"
+},
+{
+"id": "WF_CB_01934",
+"module": "wifi",
+"api": "deletePersistentGroup",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"p2pCancelConnect",
+"removeGroup",
+"deletePersistentGroup"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#17 var#4 -> deletePersistentGroup"
+},
+{
+"id": "WF_CB_01935",
+"module": "wifi",
+"api": "deletePersistentGroup",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"p2pCancelConnect",
+"removeGroup",
+"deletePersistentGroup"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#17 var#5 -> deletePersistentGroup"
+},
+{
+"id": "WF_CB_01936",
+"module": "wifi",
+"api": "deletePersistentGroup",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"p2pCancelConnect",
+"removeGroup",
+"deletePersistentGroup"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#17 var#6 -> deletePersistentGroup"
+},
+{
+"id": "WF_CB_01937",
+"module": "wifi",
+"api": "deletePersistentGroup",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"p2pCancelConnect",
+"removeGroup",
+"deletePersistentGroup"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#17 var#7 -> deletePersistentGroup"
+},
+{
+"id": "WF_CB_01938",
+"module": "wifi",
+"api": "disableWifi",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"disableWifi",
+"enableWifi",
+"scan",
+"disableWifi"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#18 var#0 -> disableWifi"
+},
+{
+"id": "WF_CB_01939",
+"module": "wifi",
+"api": "disableWifi",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"disableWifi",
+"enableWifi",
+"scan",
+"disableWifi"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#18 var#1 -> disableWifi"
+},
+{
+"id": "WF_CB_01940",
+"module": "wifi",
+"api": "disableWifi",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"disableWifi",
+"enableWifi",
+"scan",
+"disableWifi"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#18 var#2 -> disableWifi"
+},
+{
+"id": "WF_CB_01941",
+"module": "wifi",
+"api": "disableWifi",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"disableWifi",
+"enableWifi",
+"scan",
+"disableWifi"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#18 var#3 -> disableWifi"
+},
+{
+"id": "WF_CB_01942",
+"module": "wifi",
+"api": "disableWifi",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"disableWifi",
+"enableWifi",
+"scan",
+"disableWifi"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#18 var#4 -> disableWifi"
+},
+{
+"id": "WF_CB_01943",
+"module": "wifi",
+"api": "disableWifi",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"disableWifi",
+"enableWifi",
+"scan",
+"disableWifi"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#18 var#5 -> disableWifi"
+},
+{
+"id": "WF_CB_01944",
+"module": "wifi",
+"api": "disableWifi",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"disableWifi",
+"enableWifi",
+"scan",
+"disableWifi"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#18 var#6 -> disableWifi"
+},
+{
+"id": "WF_CB_01945",
+"module": "wifi",
+"api": "disableWifi",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"disableWifi",
+"enableWifi",
+"scan",
+"disableWifi"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#18 var#7 -> disableWifi"
+},
+{
+"id": "WF_CB_01946",
+"module": "wifi",
+"api": "reassociate",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"disconnect",
+"reconnect",
+"reassociate"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#19 var#0 -> reassociate"
+},
+{
+"id": "WF_CB_01947",
+"module": "wifi",
+"api": "reassociate",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"disconnect",
+"reconnect",
+"reassociate"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#19 var#1 -> reassociate"
+},
+{
+"id": "WF_CB_01948",
+"module": "wifi",
+"api": "reassociate",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"disconnect",
+"reconnect",
+"reassociate"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#19 var#2 -> reassociate"
+},
+{
+"id": "WF_CB_01949",
+"module": "wifi",
+"api": "reassociate",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"disconnect",
+"reconnect",
+"reassociate"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#19 var#3 -> reassociate"
+},
+{
+"id": "WF_CB_01950",
+"module": "wifi",
+"api": "reassociate",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"disconnect",
+"reconnect",
+"reassociate"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#19 var#4 -> reassociate"
+},
+{
+"id": "WF_CB_01951",
+"module": "wifi",
+"api": "reassociate",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"disconnect",
+"reconnect",
+"reassociate"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#19 var#5 -> reassociate"
+},
+{
+"id": "WF_CB_01952",
+"module": "wifi",
+"api": "reassociate",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"disconnect",
+"reconnect",
+"reassociate"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#19 var#6 -> reassociate"
+},
+{
+"id": "WF_CB_01953",
+"module": "wifi",
+"api": "reassociate",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"disconnect",
+"reconnect",
+"reassociate"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#19 var#7 -> reassociate"
+},
+{
+"id": "WF_CB_01954",
+"module": "wifi",
+"api": "removeDevice",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"allowAutoConnect",
+"disableNetwork",
+"removeDevice"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#20 var#0 -> removeDevice"
+},
+{
+"id": "WF_CB_01955",
+"module": "wifi",
+"api": "removeDevice",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"allowAutoConnect",
+"disableNetwork",
+"removeDevice"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#20 var#1 -> removeDevice"
+},
+{
+"id": "WF_CB_01956",
+"module": "wifi",
+"api": "removeDevice",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"allowAutoConnect",
+"disableNetwork",
+"removeDevice"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#20 var#2 -> removeDevice"
+},
+{
+"id": "WF_CB_01957",
+"module": "wifi",
+"api": "removeDevice",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"allowAutoConnect",
+"disableNetwork",
+"removeDevice"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#20 var#3 -> removeDevice"
+},
+{
+"id": "WF_CB_01958",
+"module": "wifi",
+"api": "removeDevice",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"allowAutoConnect",
+"disableNetwork",
+"removeDevice"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#20 var#4 -> removeDevice"
+},
+{
+"id": "WF_CB_01959",
+"module": "wifi",
+"api": "removeDevice",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"allowAutoConnect",
+"disableNetwork",
+"removeDevice"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#20 var#5 -> removeDevice"
+},
+{
+"id": "WF_CB_01960",
+"module": "wifi",
+"api": "removeDevice",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"allowAutoConnect",
+"disableNetwork",
+"removeDevice"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#20 var#6 -> removeDevice"
+},
+{
+"id": "WF_CB_01961",
+"module": "wifi",
+"api": "removeDevice",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"allowAutoConnect",
+"disableNetwork",
+"removeDevice"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#20 var#7 -> removeDevice"
+},
+{
+"id": "WF_CB_01962",
+"module": "wifi",
+"api": "removeAllNetwork",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"connectToNetwork",
+"disconnect",
+"removeAllNetwork"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#21 var#0 -> removeAllNetwork"
+},
+{
+"id": "WF_CB_01963",
+"module": "wifi",
+"api": "removeAllNetwork",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"connectToNetwork",
+"disconnect",
+"removeAllNetwork"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#21 var#1 -> removeAllNetwork"
+},
+{
+"id": "WF_CB_01964",
+"module": "wifi",
+"api": "removeAllNetwork",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"connectToNetwork",
+"disconnect",
+"removeAllNetwork"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#21 var#2 -> removeAllNetwork"
+},
+{
+"id": "WF_CB_01965",
+"module": "wifi",
+"api": "removeAllNetwork",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"connectToNetwork",
+"disconnect",
+"removeAllNetwork"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#21 var#3 -> removeAllNetwork"
+},
+{
+"id": "WF_CB_01966",
+"module": "wifi",
+"api": "removeAllNetwork",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"connectToNetwork",
+"disconnect",
+"removeAllNetwork"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#21 var#4 -> removeAllNetwork"
+},
+{
+"id": "WF_CB_01967",
+"module": "wifi",
+"api": "removeAllNetwork",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"connectToNetwork",
+"disconnect",
+"removeAllNetwork"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#21 var#5 -> removeAllNetwork"
+},
+{
+"id": "WF_CB_01968",
+"module": "wifi",
+"api": "removeAllNetwork",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"connectToNetwork",
+"disconnect",
+"removeAllNetwork"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#21 var#6 -> removeAllNetwork"
+},
+{
+"id": "WF_CB_01969",
+"module": "wifi",
+"api": "removeAllNetwork",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"connectToNetwork",
+"disconnect",
+"removeAllNetwork"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#21 var#7 -> removeAllNetwork"
+},
+{
+"id": "LE_P_01970",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "param",
+"params": {
+"name": "ut_srv_1"
+},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": false,
+"desc": "linkEnhance.createServer param#0 precond=ANY"
+},
+{
+"id": "LE_P_01971",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "param",
+"params": {
+"name": "ut_srv_2"
+},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": false,
+"desc": "linkEnhance.createServer param#1 precond=ANY"
+},
+{
+"id": "LE_P_01972",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "param",
+"params": {
+"name": "ut_srv_3"
+},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": false,
+"desc": "linkEnhance.createServer param#2 precond=ANY"
+},
+{
+"id": "LE_P_01973",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "param",
+"params": {
+"deviceId": "",
+"name": "ut_conn"
+},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection param#0 precond=ANY"
+},
+{
+"id": "LE_P_01974",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "param",
+"params": {
+"deviceId": "",
+"name": "ut_link"
+},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection param#1 precond=ANY"
+},
+{
+"id": "LE_P_01975",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "param",
+"params": {
+"deviceId": "local",
+"name": "ut_conn"
+},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection param#2 precond=ANY"
+},
+{
+"id": "LE_P_01976",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "param",
+"params": {
+"deviceId": "local",
+"name": "ut_link"
+},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection param#3 precond=ANY"
+},
+{
+"id": "LE_P_01977",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "param",
+"params": {
+"deviceId": "peer0",
+"name": "ut_conn"
+},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection param#4 precond=ANY"
+},
+{
+"id": "LE_P_01978",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "param",
+"params": {
+"deviceId": "peer0",
+"name": "ut_link"
+},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection param#5 precond=ANY"
+},
+{
+"id": "LE_R_01979",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "return",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer return_type_check variant=0 expect=object"
+},
+{
+"id": "LE_R_01980",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "return",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer return_type_check variant=1 expect=object"
+},
+{
+"id": "LE_R_01981",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "return",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer return_type_check variant=2 expect=object"
+},
+{
+"id": "LE_R_01982",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "return",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer return_type_check variant=3 expect=object"
+},
+{
+"id": "LE_R_01983",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "return",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer return_type_check variant=4 expect=object"
+},
+{
+"id": "LE_R_01984",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "return",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer return_type_check variant=5 expect=object"
+},
+{
+"id": "LE_R_01985",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "return",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection return_type_check variant=0 expect=object"
+},
+{
+"id": "LE_R_01986",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "return",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection return_type_check variant=1 expect=object"
+},
+{
+"id": "LE_R_01987",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "return",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection return_type_check variant=2 expect=object"
+},
+{
+"id": "LE_R_01988",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "return",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection return_type_check variant=3 expect=object"
+},
+{
+"id": "LE_R_01989",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "return",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection return_type_check variant=4 expect=object"
+},
+{
+"id": "LE_R_01990",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "return",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection return_type_check variant=5 expect=object"
+},
+{
+"id": "LE_C_01991",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "condition",
+"params": {
+"name": "ut_srv_1"
+},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer condition=ANY"
+},
+{
+"id": "LE_C_01992",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "condition",
+"params": {
+"name": "ut_srv_1"
+},
+"comboSteps": [],
+"precond": "WIFI_OFF",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer condition=WIFI_OFF"
+},
+{
+"id": "LE_C_01993",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "condition",
+"params": {
+"name": "ut_srv_1"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer condition=WIFI_ON"
+},
+{
+"id": "LE_C_01994",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "condition",
+"params": {
+"name": "ut_srv_1"
+},
+"comboSteps": [],
+"precond": "WIFI_ON_SCAN",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer condition=WIFI_ON_SCAN"
+},
+{
+"id": "LE_C_01995",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "condition",
+"params": {
+"name": "ut_srv_1"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_OFF",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer condition=HOTSPOT_OFF"
+},
+{
+"id": "LE_C_01996",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "condition",
+"params": {
+"name": "ut_srv_1"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer condition=HOTSPOT_ON"
+},
+{
+"id": "LE_C_01997",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "condition",
+"params": {
+"name": "ut_srv_1"
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer condition=P2P_IDLE"
+},
+{
+"id": "LE_C_01998",
+"module": "linkEnhance",
+"api": "createServer",
+"category": "condition",
+"params": {
+"name": "ut_srv_1"
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createServer condition=P2P_DISCOVERING"
+},
+{
+"id": "LE_C_01999",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "condition",
+"params": {
+"deviceId": "",
+"name": "ut_conn"
+},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection condition=ANY"
+},
+{
+"id": "LE_C_02000",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "condition",
+"params": {
+"deviceId": "",
+"name": "ut_conn"
+},
+"comboSteps": [],
+"precond": "WIFI_OFF",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection condition=WIFI_OFF"
+},
+{
+"id": "LE_C_02001",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "condition",
+"params": {
+"deviceId": "",
+"name": "ut_conn"
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection condition=WIFI_ON"
+},
+{
+"id": "LE_C_02002",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "condition",
+"params": {
+"deviceId": "",
+"name": "ut_conn"
+},
+"comboSteps": [],
+"precond": "WIFI_ON_SCAN",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection condition=WIFI_ON_SCAN"
+},
+{
+"id": "LE_C_02003",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "condition",
+"params": {
+"deviceId": "",
+"name": "ut_conn"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_OFF",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection condition=HOTSPOT_OFF"
+},
+{
+"id": "LE_C_02004",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "condition",
+"params": {
+"deviceId": "",
+"name": "ut_conn"
+},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection condition=HOTSPOT_ON"
+},
+{
+"id": "LE_C_02005",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "condition",
+"params": {
+"deviceId": "",
+"name": "ut_conn"
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection condition=P2P_IDLE"
+},
+{
+"id": "LE_C_02006",
+"module": "linkEnhance",
+"api": "createConnection",
+"category": "condition",
+"params": {
+"deviceId": "",
+"name": "ut_conn"
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "linkEnhance.createConnection condition=P2P_DISCOVERING"
+}
+]

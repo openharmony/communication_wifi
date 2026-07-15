@@ -139,7 +139,8 @@
                 "icu",
                 "window_manager",
                 "security_guard",
-                "state_registry"
+                "state_registry",
+                "taihe_ffi_gen"
             ],
             "third_party": [
                 "googletest",

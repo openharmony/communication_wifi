@@ -26570,3 +26570,1901 @@
 "comboSteps": [],
 "precond": "ANY",
 "expectType": "string",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getCountryCode condition=ANY"
+},
+{
+"id": "WF_C_01715",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_OFF",
+"expectType": "string",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getCountryCode condition=WIFI_OFF"
+},
+{
+"id": "WF_C_01716",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "string",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getCountryCode condition=WIFI_ON"
+},
+{
+"id": "WF_C_01717",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON_SCAN",
+"expectType": "string",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getCountryCode condition=WIFI_ON_SCAN"
+},
+{
+"id": "WF_C_01718",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_OFF",
+"expectType": "string",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getCountryCode condition=HOTSPOT_OFF"
+},
+{
+"id": "WF_C_01719",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "string",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getCountryCode condition=HOTSPOT_ON"
+},
+{
+"id": "WF_C_01720",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "string",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getCountryCode condition=P2P_IDLE"
+},
+{
+"id": "WF_C_01721",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "string",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getCountryCode condition=P2P_DISCOVERING"
+},
+{
+"id": "WF_C_01722",
+"module": "wifi",
+"api": "getSupportedFeatures",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getSupportedFeatures condition=ANY"
+},
+{
+"id": "WF_C_01723",
+"module": "wifi",
+"api": "getSupportedFeatures",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_OFF",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getSupportedFeatures condition=WIFI_OFF"
+},
+{
+"id": "WF_C_01724",
+"module": "wifi",
+"api": "getSupportedFeatures",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getSupportedFeatures condition=WIFI_ON"
+},
+{
+"id": "WF_C_01725",
+"module": "wifi",
+"api": "getSupportedFeatures",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON_SCAN",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getSupportedFeatures condition=WIFI_ON_SCAN"
+},
+{
+"id": "WF_C_01726",
+"module": "wifi",
+"api": "getSupportedFeatures",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_OFF",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getSupportedFeatures condition=HOTSPOT_OFF"
+},
+{
+"id": "WF_C_01727",
+"module": "wifi",
+"api": "getSupportedFeatures",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getSupportedFeatures condition=HOTSPOT_ON"
+},
+{
+"id": "WF_C_01728",
+"module": "wifi",
+"api": "getSupportedFeatures",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getSupportedFeatures condition=P2P_IDLE"
+},
+{
+"id": "WF_C_01729",
+"module": "wifi",
+"api": "getSupportedFeatures",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "number",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getSupportedFeatures condition=P2P_DISCOVERING"
+},
+{
+"id": "WF_C_01730",
+"module": "wifi",
+"api": "isFeatureSupported",
+"category": "condition",
+"params": {
+"featureId": 0
+},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isFeatureSupported condition=ANY"
+},
+{
+"id": "WF_C_01731",
+"module": "wifi",
+"api": "isFeatureSupported",
+"category": "condition",
+"params": {
+"featureId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_OFF",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isFeatureSupported condition=WIFI_OFF"
+},
+{
+"id": "WF_C_01732",
+"module": "wifi",
+"api": "isFeatureSupported",
+"category": "condition",
+"params": {
+"featureId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isFeatureSupported condition=WIFI_ON"
+},
+{
+"id": "WF_C_01733",
+"module": "wifi",
+"api": "isFeatureSupported",
+"category": "condition",
+"params": {
+"featureId": 0
+},
+"comboSteps": [],
+"precond": "WIFI_ON_SCAN",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isFeatureSupported condition=WIFI_ON_SCAN"
+},
+{
+"id": "WF_C_01734",
+"module": "wifi",
+"api": "isFeatureSupported",
+"category": "condition",
+"params": {
+"featureId": 0
+},
+"comboSteps": [],
+"precond": "HOTSPOT_OFF",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isFeatureSupported condition=HOTSPOT_OFF"
+},
+{
+"id": "WF_C_01735",
+"module": "wifi",
+"api": "isFeatureSupported",
+"category": "condition",
+"params": {
+"featureId": 0
+},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isFeatureSupported condition=HOTSPOT_ON"
+},
+{
+"id": "WF_C_01736",
+"module": "wifi",
+"api": "isFeatureSupported",
+"category": "condition",
+"params": {
+"featureId": 0
+},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isFeatureSupported condition=P2P_IDLE"
+},
+{
+"id": "WF_C_01737",
+"module": "wifi",
+"api": "isFeatureSupported",
+"category": "condition",
+"params": {
+"featureId": 0
+},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isFeatureSupported condition=P2P_DISCOVERING"
+},
+{
+"id": "WF_C_01738",
+"module": "wifi",
+"api": "enableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.enableHotspot condition=ANY"
+},
+{
+"id": "WF_C_01739",
+"module": "wifi",
+"api": "enableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_OFF",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.enableHotspot condition=WIFI_OFF"
+},
+{
+"id": "WF_C_01740",
+"module": "wifi",
+"api": "enableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.enableHotspot condition=WIFI_ON"
+},
+{
+"id": "WF_C_01741",
+"module": "wifi",
+"api": "enableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON_SCAN",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.enableHotspot condition=WIFI_ON_SCAN"
+},
+{
+"id": "WF_C_01742",
+"module": "wifi",
+"api": "enableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_OFF",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.enableHotspot condition=HOTSPOT_OFF"
+},
+{
+"id": "WF_C_01743",
+"module": "wifi",
+"api": "enableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.enableHotspot condition=HOTSPOT_ON"
+},
+{
+"id": "WF_C_01744",
+"module": "wifi",
+"api": "enableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.enableHotspot condition=P2P_IDLE"
+},
+{
+"id": "WF_C_01745",
+"module": "wifi",
+"api": "enableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.enableHotspot condition=P2P_DISCOVERING"
+},
+{
+"id": "WF_C_01746",
+"module": "wifi",
+"api": "disableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.disableHotspot condition=ANY"
+},
+{
+"id": "WF_C_01747",
+"module": "wifi",
+"api": "disableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_OFF",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.disableHotspot condition=WIFI_OFF"
+},
+{
+"id": "WF_C_01748",
+"module": "wifi",
+"api": "disableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.disableHotspot condition=WIFI_ON"
+},
+{
+"id": "WF_C_01749",
+"module": "wifi",
+"api": "disableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON_SCAN",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.disableHotspot condition=WIFI_ON_SCAN"
+},
+{
+"id": "WF_C_01750",
+"module": "wifi",
+"api": "disableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_OFF",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.disableHotspot condition=HOTSPOT_OFF"
+},
+{
+"id": "WF_C_01751",
+"module": "wifi",
+"api": "disableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.disableHotspot condition=HOTSPOT_ON"
+},
+{
+"id": "WF_C_01752",
+"module": "wifi",
+"api": "disableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.disableHotspot condition=P2P_IDLE"
+},
+{
+"id": "WF_C_01753",
+"module": "wifi",
+"api": "disableHotspot",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.disableHotspot condition=P2P_DISCOVERING"
+},
+{
+"id": "WF_C_01754",
+"module": "wifi",
+"api": "isHotspotActive",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isHotspotActive condition=ANY"
+},
+{
+"id": "WF_C_01755",
+"module": "wifi",
+"api": "isHotspotActive",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_OFF",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isHotspotActive condition=WIFI_OFF"
+},
+{
+"id": "WF_C_01756",
+"module": "wifi",
+"api": "isHotspotActive",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isHotspotActive condition=WIFI_ON"
+},
+{
+"id": "WF_C_01757",
+"module": "wifi",
+"api": "isHotspotActive",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON_SCAN",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isHotspotActive condition=WIFI_ON_SCAN"
+},
+{
+"id": "WF_C_01758",
+"module": "wifi",
+"api": "isHotspotActive",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_OFF",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isHotspotActive condition=HOTSPOT_OFF"
+},
+{
+"id": "WF_C_01759",
+"module": "wifi",
+"api": "isHotspotActive",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isHotspotActive condition=HOTSPOT_ON"
+},
+{
+"id": "WF_C_01760",
+"module": "wifi",
+"api": "isHotspotActive",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isHotspotActive condition=P2P_IDLE"
+},
+{
+"id": "WF_C_01761",
+"module": "wifi",
+"api": "isHotspotActive",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "boolean",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.isHotspotActive condition=P2P_DISCOVERING"
+},
+{
+"id": "WF_C_01762",
+"module": "wifi",
+"api": "getHotspotConfig",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getHotspotConfig condition=ANY"
+},
+{
+"id": "WF_C_01763",
+"module": "wifi",
+"api": "getHotspotConfig",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_OFF",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getHotspotConfig condition=WIFI_OFF"
+},
+{
+"id": "WF_C_01764",
+"module": "wifi",
+"api": "getHotspotConfig",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getHotspotConfig condition=WIFI_ON"
+},
+{
+"id": "WF_C_01765",
+"module": "wifi",
+"api": "getHotspotConfig",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON_SCAN",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getHotspotConfig condition=WIFI_ON_SCAN"
+},
+{
+"id": "WF_C_01766",
+"module": "wifi",
+"api": "getHotspotConfig",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_OFF",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getHotspotConfig condition=HOTSPOT_OFF"
+},
+{
+"id": "WF_C_01767",
+"module": "wifi",
+"api": "getHotspotConfig",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getHotspotConfig condition=HOTSPOT_ON"
+},
+{
+"id": "WF_C_01768",
+"module": "wifi",
+"api": "getHotspotConfig",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getHotspotConfig condition=P2P_IDLE"
+},
+{
+"id": "WF_C_01769",
+"module": "wifi",
+"api": "getHotspotConfig",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "object",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getHotspotConfig condition=P2P_DISCOVERING"
+},
+{
+"id": "WF_C_01770",
+"module": "wifi",
+"api": "getP2pPeerDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "array",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getP2pPeerDevices condition=ANY"
+},
+{
+"id": "WF_C_01771",
+"module": "wifi",
+"api": "getP2pPeerDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_OFF",
+"expectType": "array",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getP2pPeerDevices condition=WIFI_OFF"
+},
+{
+"id": "WF_C_01772",
+"module": "wifi",
+"api": "getP2pPeerDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "array",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getP2pPeerDevices condition=WIFI_ON"
+},
+{
+"id": "WF_C_01773",
+"module": "wifi",
+"api": "getP2pPeerDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON_SCAN",
+"expectType": "array",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getP2pPeerDevices condition=WIFI_ON_SCAN"
+},
+{
+"id": "WF_C_01774",
+"module": "wifi",
+"api": "getP2pPeerDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_OFF",
+"expectType": "array",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getP2pPeerDevices condition=HOTSPOT_OFF"
+},
+{
+"id": "WF_C_01775",
+"module": "wifi",
+"api": "getP2pPeerDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "array",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getP2pPeerDevices condition=HOTSPOT_ON"
+},
+{
+"id": "WF_C_01776",
+"module": "wifi",
+"api": "getP2pPeerDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "array",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getP2pPeerDevices condition=P2P_IDLE"
+},
+{
+"id": "WF_C_01777",
+"module": "wifi",
+"api": "getP2pPeerDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "array",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.getP2pPeerDevices condition=P2P_DISCOVERING"
+},
+{
+"id": "WF_C_01778",
+"module": "wifi",
+"api": "startDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.startDiscoverDevices condition=ANY"
+},
+{
+"id": "WF_C_01779",
+"module": "wifi",
+"api": "startDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_OFF",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.startDiscoverDevices condition=WIFI_OFF"
+},
+{
+"id": "WF_C_01780",
+"module": "wifi",
+"api": "startDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.startDiscoverDevices condition=WIFI_ON"
+},
+{
+"id": "WF_C_01781",
+"module": "wifi",
+"api": "startDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON_SCAN",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.startDiscoverDevices condition=WIFI_ON_SCAN"
+},
+{
+"id": "WF_C_01782",
+"module": "wifi",
+"api": "startDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_OFF",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.startDiscoverDevices condition=HOTSPOT_OFF"
+},
+{
+"id": "WF_C_01783",
+"module": "wifi",
+"api": "startDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.startDiscoverDevices condition=HOTSPOT_ON"
+},
+{
+"id": "WF_C_01784",
+"module": "wifi",
+"api": "startDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.startDiscoverDevices condition=P2P_IDLE"
+},
+{
+"id": "WF_C_01785",
+"module": "wifi",
+"api": "startDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.startDiscoverDevices condition=P2P_DISCOVERING"
+},
+{
+"id": "WF_C_01786",
+"module": "wifi",
+"api": "stopDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "ANY",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.stopDiscoverDevices condition=ANY"
+},
+{
+"id": "WF_C_01787",
+"module": "wifi",
+"api": "stopDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_OFF",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.stopDiscoverDevices condition=WIFI_OFF"
+},
+{
+"id": "WF_C_01788",
+"module": "wifi",
+"api": "stopDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.stopDiscoverDevices condition=WIFI_ON"
+},
+{
+"id": "WF_C_01789",
+"module": "wifi",
+"api": "stopDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "WIFI_ON_SCAN",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.stopDiscoverDevices condition=WIFI_ON_SCAN"
+},
+{
+"id": "WF_C_01790",
+"module": "wifi",
+"api": "stopDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_OFF",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.stopDiscoverDevices condition=HOTSPOT_OFF"
+},
+{
+"id": "WF_C_01791",
+"module": "wifi",
+"api": "stopDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "HOTSPOT_ON",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.stopDiscoverDevices condition=HOTSPOT_ON"
+},
+{
+"id": "WF_C_01792",
+"module": "wifi",
+"api": "stopDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_IDLE",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.stopDiscoverDevices condition=P2P_IDLE"
+},
+{
+"id": "WF_C_01793",
+"module": "wifi",
+"api": "stopDiscoverDevices",
+"category": "condition",
+"params": {},
+"comboSteps": [],
+"precond": "P2P_DISCOVERING",
+"expectType": "void",
+"expectAssert": "none",
+"allowError": true,
+"desc": "wifi.stopDiscoverDevices condition=P2P_DISCOVERING"
+},
+{
+"id": "WF_CB_01794",
+"module": "wifi",
+"api": "getScanInfoList",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"isWifiActive",
+"scan",
+"getScanInfoList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#0 var#0 -> getScanInfoList"
+},
+{
+"id": "WF_CB_01795",
+"module": "wifi",
+"api": "getScanInfoList",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"isWifiActive",
+"scan",
+"getScanInfoList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#0 var#1 -> getScanInfoList"
+},
+{
+"id": "WF_CB_01796",
+"module": "wifi",
+"api": "getScanInfoList",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"isWifiActive",
+"scan",
+"getScanInfoList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#0 var#2 -> getScanInfoList"
+},
+{
+"id": "WF_CB_01797",
+"module": "wifi",
+"api": "getScanInfoList",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"isWifiActive",
+"scan",
+"getScanInfoList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#0 var#3 -> getScanInfoList"
+},
+{
+"id": "WF_CB_01798",
+"module": "wifi",
+"api": "getScanInfoList",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"isWifiActive",
+"scan",
+"getScanInfoList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#0 var#4 -> getScanInfoList"
+},
+{
+"id": "WF_CB_01799",
+"module": "wifi",
+"api": "getScanInfoList",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"isWifiActive",
+"scan",
+"getScanInfoList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#0 var#5 -> getScanInfoList"
+},
+{
+"id": "WF_CB_01800",
+"module": "wifi",
+"api": "getScanInfoList",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"isWifiActive",
+"scan",
+"getScanInfoList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#0 var#6 -> getScanInfoList"
+},
+{
+"id": "WF_CB_01801",
+"module": "wifi",
+"api": "getScanInfoList",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"isWifiActive",
+"scan",
+"getScanInfoList"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#0 var#7 -> getScanInfoList"
+},
+{
+"id": "WF_CB_01802",
+"module": "wifi",
+"api": "getWifiDetailState",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"startScan",
+"getScanResultsSync",
+"getWifiDetailState"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#1 var#0 -> getWifiDetailState"
+},
+{
+"id": "WF_CB_01803",
+"module": "wifi",
+"api": "getWifiDetailState",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"startScan",
+"getScanResultsSync",
+"getWifiDetailState"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#1 var#1 -> getWifiDetailState"
+},
+{
+"id": "WF_CB_01804",
+"module": "wifi",
+"api": "getWifiDetailState",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"startScan",
+"getScanResultsSync",
+"getWifiDetailState"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#1 var#2 -> getWifiDetailState"
+},
+{
+"id": "WF_CB_01805",
+"module": "wifi",
+"api": "getWifiDetailState",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"startScan",
+"getScanResultsSync",
+"getWifiDetailState"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#1 var#3 -> getWifiDetailState"
+},
+{
+"id": "WF_CB_01806",
+"module": "wifi",
+"api": "getWifiDetailState",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"startScan",
+"getScanResultsSync",
+"getWifiDetailState"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#1 var#4 -> getWifiDetailState"
+},
+{
+"id": "WF_CB_01807",
+"module": "wifi",
+"api": "getWifiDetailState",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"startScan",
+"getScanResultsSync",
+"getWifiDetailState"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#1 var#5 -> getWifiDetailState"
+},
+{
+"id": "WF_CB_01808",
+"module": "wifi",
+"api": "getWifiDetailState",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"startScan",
+"getScanResultsSync",
+"getWifiDetailState"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#1 var#6 -> getWifiDetailState"
+},
+{
+"id": "WF_CB_01809",
+"module": "wifi",
+"api": "getWifiDetailState",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"startScan",
+"getScanResultsSync",
+"getWifiDetailState"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#1 var#7 -> getWifiDetailState"
+},
+{
+"id": "WF_CB_01810",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"getSupportedFeatures",
+"isFeatureSupported",
+"getCountryCode"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#2 var#0 -> getCountryCode"
+},
+{
+"id": "WF_CB_01811",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"getSupportedFeatures",
+"isFeatureSupported",
+"getCountryCode"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#2 var#1 -> getCountryCode"
+},
+{
+"id": "WF_CB_01812",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"getSupportedFeatures",
+"isFeatureSupported",
+"getCountryCode"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#2 var#2 -> getCountryCode"
+},
+{
+"id": "WF_CB_01813",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"getSupportedFeatures",
+"isFeatureSupported",
+"getCountryCode"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#2 var#3 -> getCountryCode"
+},
+{
+"id": "WF_CB_01814",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"getSupportedFeatures",
+"isFeatureSupported",
+"getCountryCode"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#2 var#4 -> getCountryCode"
+},
+{
+"id": "WF_CB_01815",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"getSupportedFeatures",
+"isFeatureSupported",
+"getCountryCode"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#2 var#5 -> getCountryCode"
+},
+{
+"id": "WF_CB_01816",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"getSupportedFeatures",
+"isFeatureSupported",
+"getCountryCode"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#2 var#6 -> getCountryCode"
+},
+{
+"id": "WF_CB_01817",
+"module": "wifi",
+"api": "getCountryCode",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"getSupportedFeatures",
+"isFeatureSupported",
+"getCountryCode"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#2 var#7 -> getCountryCode"
+},
+{
+"id": "WF_CB_01818",
+"module": "wifi",
+"api": "getIpv6Info",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"getDeviceMacAddress",
+"getIpInfo",
+"getIpv6Info"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#3 var#0 -> getIpv6Info"
+},
+{
+"id": "WF_CB_01819",
+"module": "wifi",
+"api": "getIpv6Info",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"getDeviceMacAddress",
+"getIpInfo",
+"getIpv6Info"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#3 var#1 -> getIpv6Info"
+},
+{
+"id": "WF_CB_01820",
+"module": "wifi",
+"api": "getIpv6Info",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"getDeviceMacAddress",
+"getIpInfo",
+"getIpv6Info"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#3 var#2 -> getIpv6Info"
+},
+{
+"id": "WF_CB_01821",
+"module": "wifi",
+"api": "getIpv6Info",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"getDeviceMacAddress",
+"getIpInfo",
+"getIpv6Info"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#3 var#3 -> getIpv6Info"
+},
+{
+"id": "WF_CB_01822",
+"module": "wifi",
+"api": "getIpv6Info",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"getDeviceMacAddress",
+"getIpInfo",
+"getIpv6Info"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#3 var#4 -> getIpv6Info"
+},
+{
+"id": "WF_CB_01823",
+"module": "wifi",
+"api": "getIpv6Info",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"getDeviceMacAddress",
+"getIpInfo",
+"getIpv6Info"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#3 var#5 -> getIpv6Info"
+},
+{
+"id": "WF_CB_01824",
+"module": "wifi",
+"api": "getIpv6Info",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"getDeviceMacAddress",
+"getIpInfo",
+"getIpv6Info"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#3 var#6 -> getIpv6Info"
+},
+{
+"id": "WF_CB_01825",
+"module": "wifi",
+"api": "getIpv6Info",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"getDeviceMacAddress",
+"getIpInfo",
+"getIpv6Info"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#3 var#7 -> getIpv6Info"
+},
+{
+"id": "WF_CB_01826",
+"module": "wifi",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#0 -> getDisconnectedReason"
+},
+{
+"id": "WF_CB_01827",
+"module": "wifi",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#1 -> getDisconnectedReason"
+},
+{
+"id": "WF_CB_01828",
+"module": "wifi",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#2 -> getDisconnectedReason"
+},
+{
+"id": "WF_CB_01829",
+"module": "wifi",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {
+"featureId": 1
+},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#3 -> getDisconnectedReason"
+},
+{
+"id": "WF_CB_01830",
+"module": "wifi",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {
+"allowed": true
+},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#4 -> getDisconnectedReason"
+},
+{
+"id": "WF_CB_01831",
+"module": "wifi",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {
+"devName": "ComboTest"
+},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#5 -> getDisconnectedReason"
+},
+{
+"id": "WF_CB_01832",
+"module": "wifi",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {
+"id": 0
+},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#6 -> getDisconnectedReason"
+},
+{
+"id": "WF_CB_01833",
+"module": "wifi",
+"api": "getDisconnectedReason",
+"category": "combo",
+"params": {
+"blockDuration": 60
+},
+"comboSteps": [
+"enableWifi",
+"getLinkedInfoSync",
+"isConnected",
+"getDisconnectedReason"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#4 var#7 -> getDisconnectedReason"
+},
+{
+"id": "WF_CB_01834",
+"module": "wifi",
+"api": "getScanAlwaysAllowed",
+"category": "combo",
+"params": {},
+"comboSteps": [
+"enableWifi",
+"getCandidateConfigs",
+"getDeviceConfigs",
+"getScanAlwaysAllowed"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#5 var#0 -> getScanAlwaysAllowed"
+},
+{
+"id": "WF_CB_01835",
+"module": "wifi",
+"api": "getScanAlwaysAllowed",
+"category": "combo",
+"params": {
+"netId": 0
+},
+"comboSteps": [
+"enableWifi",
+"getCandidateConfigs",
+"getDeviceConfigs",
+"getScanAlwaysAllowed"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",
+"allowError": true,
+"desc": "combo flow#5 var#1 -> getScanAlwaysAllowed"
+},
+{
+"id": "WF_CB_01836",
+"module": "wifi",
+"api": "getScanAlwaysAllowed",
+"category": "combo",
+"params": {
+"rssi": -50,
+"band": 1
+},
+"comboSteps": [
+"enableWifi",
+"getCandidateConfigs",
+"getDeviceConfigs",
+"getScanAlwaysAllowed"
+],
+"precond": "WIFI_ON",
+"expectType": "any",
+"expectAssert": "none",

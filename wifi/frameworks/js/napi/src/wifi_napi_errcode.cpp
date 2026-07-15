@@ -47,6 +47,7 @@ static std::map<int32_t, int32_t> errCodeMap = {
     { ErrCode::WIFI_OPT_USER_DOES_NOT_RESPOND, WifiNapiErrCode::WIFI_ERRCODE_USER_DOES_NOT_RESPOND },
     { ErrCode::WIFI_OPT_USER_REFUSE_THE_ACTION, WifiNapiErrCode::WIFI_ERRCODE_USER_REFUSE_THE_ACTION },
     { ErrCode::WIFI_OPT_INVALID_PARAM_NEW, WifiNapiErrCode::WIFI_ERRCODE_PARAM_VALIDATION_FAILED },
+    { ErrCode::WIFI_OPT_CONFIG_COUNT_EXCEED_LIMIT, WifiNapiErrCode::WIFI_ERRCODE_OPERATION_FAILED },
 };
 
 static std::map<int32_t, std::string> napiErrMsgMap {

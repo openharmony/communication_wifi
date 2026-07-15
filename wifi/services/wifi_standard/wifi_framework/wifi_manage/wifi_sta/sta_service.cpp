@@ -220,7 +220,7 @@ ErrCode StaService::AddCandidateConfig(const int uid, const WifiDeviceConfig &co
     WifiSettings::GetInstance().GetAllCandidateConfig(uid, tempConfigs);
     if (tempConfigs.size() >= UID_UNTRUSTED_CONFIG_LEN) {
         LOGE("AddCandidateConfig failed, exceed max num: %{public}d\n", UID_UNTRUSTED_CONFIG_LEN);
-        return WIFI_OPT_FAILED;
+        return WIFI_OPT_CONFIG_COUNT_EXCEED_LIMIT;
     }
 
     if (config.keyMgmt == KEY_MGMT_WEP) {

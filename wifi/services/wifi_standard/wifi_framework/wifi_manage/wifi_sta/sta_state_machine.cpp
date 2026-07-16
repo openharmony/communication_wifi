@@ -76,14 +76,16 @@
 namespace OHOS {
 namespace Wifi {
 namespace {
+constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
+constexpr int MAX_CHLOAD = 800;
+constexpr int PRE_ROAM_SCAN_WAIT_TIME_MS = 100;
+
+#ifdef READ_MAC_FROM_OEM
 /*
  * WiFi privacy configuration constants
  * Random MAC address: The second bit (L/G bit) of the first byte is 1
  * Real MAC address: The second bit (L/G bit) of the first byte is 0
  */
-constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
-constexpr int MAX_CHLOAD = 800;
-constexpr int PRE_ROAM_SCAN_WAIT_TIME_MS = 100;
 constexpr int RANDOM_MAC_LOCAT_BIT = 0x02;
 constexpr int MAC_STRING_MIN_LEN = 2;
 
@@ -98,6 +100,7 @@ static bool IsRandomMac(const std::string& mac)
     }
     return (firstByte & RANDOM_MAC_LOCAT_BIT) != 0;
 }
+#endif
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define ANY_BSSID "any"

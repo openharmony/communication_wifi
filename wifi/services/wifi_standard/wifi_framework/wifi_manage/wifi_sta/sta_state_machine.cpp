@@ -86,7 +86,7 @@ constexpr int PRE_ROAM_SCAN_WAIT_TIME_MS = 100;
  * Random MAC address: The second bit (L/G bit) of the first byte is 1
  * Real MAC address: The second bit (L/G bit) of the first byte is 0
  */
-constexpr int RANDOM_MAC_LOCAT_BIT = 0x02;
+constexpr int RANDOM_MAC_LOCAL_BIT = 0x02;
 constexpr int MAC_STRING_MIN_LEN = 2;
 
 static bool IsRandomMac(const std::string& mac)
@@ -98,7 +98,7 @@ static bool IsRandomMac(const std::string& mac)
     if (sscanf_s(mac.substr(0, MAC_STRING_MIN_LEN).c_str(), "%02x", &firstByte) != 1) {
         return false;
     }
-    return (firstByte & RANDOM_MAC_LOCAT_BIT) != 0;
+    return (firstByte & RANDOM_MAC_LOCAL_BIT) != 0;
 }
 #endif
 }

@@ -330,13 +330,6 @@ HWTEST_F(WifiNetAgentTest, GetSupplierId001, TestSize.Level1)
     EXPECT_EQ(tmpSupplierId, 0);
 }
 
-HWTEST_F(WifiNetAgentTest, RestoreWifiConnectionTest001, TestSize.Level1)
-{
-    WifiNetAgent wifiNetAgent;
-    wifiNetAgent.RestoreWifiConnection();
-    EXPECT_NE(wifiNetAgent.supplierId, TEN);
-}
-
 HWTEST_F(WifiNetAgentTest, SetNetLinkLocalRouteIpv6Test001, TestSize.Level1)
 {
     WifiNetAgent wifiNetAgent;

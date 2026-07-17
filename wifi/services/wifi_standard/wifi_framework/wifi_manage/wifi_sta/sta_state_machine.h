@@ -364,6 +364,7 @@ public:
         int expandRssi_ = 0;
         int rssiOffset_ = RSSI_OFFSET_DEFAULT;
         bool isExpandUpdateRssi_ = true;
+        int backgroundcount_ = 0;
     private:
 #ifndef OHOS_ARCH_LITE
         void CheckIfRestoreWifi();
@@ -374,6 +375,7 @@ public:
         void DealNetworkCheck(InternalMessagePtr msg);
         void FoldStatusNotify(InternalMessagePtr msg);
         bool ProcessMessageByMacros(InternalMessagePtr msg);
+        void CheckBackgroundNetDetection(SystemNetWorkState netState, const std::string &portalUrl);
 #ifdef DYNAMIC_ADJUST_WIFI_POWER_SAVE
         void DealWifiPowerSaveWhenScreenStatusNotify(InternalMessagePtr msg);
         void DealWifiPowerSaveWhenBatteryStatusNotify(InternalMessagePtr msg);
@@ -661,6 +663,15 @@ private:
      * @Return success: WIFI_OPT_SUCCESS  fail: WIFI_OPT_FAILED
      */
     ErrCode ConvertDeviceCfg(WifiDeviceConfig &config, std::string& apBssid, std::string& ifaceName);
+
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+    /**
+     * @Description  Whether the network is insecure.
+     *
+     * @param bssid - BSSID of the target network.
+     */
+    bool IsInsecureNetworkByBssid(const std::string &bssid);
+#endif
 
     /**
      * @Description  Save the current connected state into WifiLinkedInfo.
@@ -1124,6 +1135,7 @@ private:
     void DealSignalPacketChangedByTime(WifiSignalPollInfo &signalInfo);
     bool HasMultiBssidAp(const WifiDeviceConfig &config);
     void NotifyWifiDisconnectReason(const int reason, const int subReason);
+    void DisConnectBackgroundNetwork();
 private:
     std::shared_mutex m_staCallbackMutex;
     std::map<std::string, StaServiceCallback> m_staCallback;

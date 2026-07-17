@@ -503,5 +503,52 @@ HWTEST_F(WifiGlobalFuncTest, GetFoldActionTest, TestSize.Level1)
     bool ret = (action == -1 || action == 0 || action == 1);
     EXPECT_TRUE(ret);
 }
+
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+HWTEST_F(WifiGlobalFuncTest, GeneratePasswordForCarTest, TestSize.Level1)
+{
+    std::string pwd = GeneratePasswordForCar(8);
+    EXPECT_TRUE(pwd.length() == 8);
+    pwd = GeneratePasswordForCar(15);
+    EXPECT_TRUE(pwd.length() == 15);
+    pwd = GeneratePasswordForCar(0);
+    EXPECT_TRUE(pwd.length() == 0);
+    pwd = GeneratePasswordForCar(MAX_PSK_LEN + 1);
+    EXPECT_TRUE(pwd.length() == MAX_PSK_LEN);
+}
+
+HWTEST_F(WifiGlobalFuncTest, GeneratePasswordForCarCharTypeTest, TestSize.Level1)
+{
+    std::string pwd = GeneratePasswordForCar(8);
+    bool hasDigit = false;
+    bool hasSpecial = false;
+    bool hasLetter = false;
+    for (char c : pwd) {
+        if (c >= '0' && c <='9') {
+            hasDigit = true;
+        } else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+            hasLetter = true;
+        } else {
+            hasSpecial = true;
+        }
+    }
+    EXPECT_TRUE(hasDigit && hasSpecial && hasLetter);
+
+    pwd = GeneratePasswordForCar(8);
+    hasDigit = false;
+    hasSpecial = false;
+    hasLetter = false;
+    for (char c : pwd) {
+        if (c >= '0' && c <='9') {
+            hasDigit = true;
+        } else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+            hasLetter = true;
+        } else {
+            hasSpecial = true;
+        }
+    }
+    EXPECT_TRUE(hasDigit && hasSpecial && hasLetter);
+}
+#endif
 }  // namespace Wifi
 }  // namespace OHOS

@@ -53,6 +53,17 @@ HWTEST_F(WifiNotificationUtilTest, PublishWifiNotificationTest001, TestSize.Leve
     EXPECT_FALSE(g_errLog.find("WifiNotificationUtilTest")!=std::string::npos);
 }
 
+HWTEST_F(WifiNotificationUtilTest, PublishWifiNotificationTest002, TestSize.Level1)
+{
+    WifiNotificationUtil wifiNotificationUtil;
+    std::string ssid(sidSize, 'a');
+    bool backPortalConnect = true;
+    int networkid = 0;
+    wifiNotificationUtil.PublishWifiNotification(WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID, ssid,
+            WifiNotificationStatus::WIFI_PORTAL_TIMEOUT, backPortalConnect, networkid);
+    EXPECT_FALSE(g_errLog.find("WifiNotificationUtilTest")!=std::string::npos);
+}
+
 HWTEST_F(WifiNotificationUtilTest, CancelWifiNotificationTest001, TestSize.Level1)
 {
     WifiNotificationUtil wifiNotificationUtil;

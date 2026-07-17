@@ -251,6 +251,9 @@ enum class DisconnectedReason {
     /* Connect mdm blocklist or  wifi is fail*/
     DISC_REASON_CONNECTION_MDM_BLOCKLIST_FAIL = 5,
 
+    /* Prohibit connection to insecure networks */
+    DISC_REASON_INSECURE_NETWORK = 6,
+
     /* Connect fail reason max value, add new reason before this*/
     DISC_REASON_MAX_VALUE
 };
@@ -708,7 +711,9 @@ enum class DisabledReason {
     DISABLED_DISASSOC_REASON = 15,
     DISABLED_MDM_RESTRICTED = 16,
     USER_FORCE_DISCONNECT = 17,
-    NETWORK_SELECTION_DISABLED_MAX = 18
+    DISABLED_INSECURE_NETWORK = 18,
+    DISABLED_PORTAL_AUTH_TIMEOUT = 19,
+    NETWORK_SELECTION_DISABLED_MAX = 20
 };
 
 struct NetworkSelectionStatus {
@@ -740,6 +745,13 @@ struct NetworkSelectionStatus {
      * Rssi of the network when it is selected by user last time.  Used to compare with current Rssi to decide
      */
     int rssi;
+
+    /**
+     * This parameter represents the cumulative number of times a disable network
+     * (blocked due to background detection) fails to be detected.
+     * If this count is greater than or equal to the threshold, the network is removed from the disable.
+     */
+    int portalAuthClearCount;
     NetworkSelectionStatus()
     {
         status = WifiDeviceConfigStatus::ENABLED;
@@ -750,6 +762,7 @@ struct NetworkSelectionStatus {
         connectChoiceTimestamp = INVALID_NETWORK_SELECTION_DISABLE_TIMESTAMP;
         seenInLastQualifiedNetworkSelection = false;
         rssi = DEFAULT_CONNECT_RSSI;
+        portalAuthClearCount = 0;
     }
 };
 
@@ -1048,6 +1061,7 @@ struct IpV6Info {
     uint32_t validLifeTime;
     uint32_t preferredLifeTime;
     uint32_t routerLifeTime;
+    uint8_t raFlags = 0;
     IpV6Info()
     {
         linkIpV6Address = "";
@@ -1064,6 +1078,7 @@ struct IpV6Info {
         validLifeTime = MAX_LIFETIME_S;
         preferredLifeTime = MAX_LIFETIME_S;
         routerLifeTime = MAX_LIFETIME_S;
+        raFlags = 0;
     }
 };
 
@@ -1294,6 +1309,15 @@ struct WifiDeviceFeatures {
     bool isEnableScanOnlyOnHotspot { false };
     bool isZeroWaitDfsSupport { false };
     bool supportP2pSignalAcquisition {false};
+};
+
+struct HpfFilterData {
+    unsigned int ipAddr {0};
+    int netMaskLen {0};
+    std::vector<unsigned char> macAddr {};
+    int macLen {0};
+    int eventCode {-1};
+    std::string eventData {};
 };
 }  // namespace Wifi
 }  // namespace OHOS

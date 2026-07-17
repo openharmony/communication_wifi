@@ -266,6 +266,7 @@
         "OHOS::Wifi::WifiSettings::GetDefaultApSsid()";
         "OHOS::Wifi::WifiSettings::SetWifiP2pGroupInfo(std::__h::vector<OHOS::Wifi::WifiP2pGroupInfo, std::__h::allocator<OHOS::Wifi::WifiP2pGroupInfo>> const&)";
         "OHOS::Wifi::GetRandomStr(int)";
+        "OHOS::Wifi::GeneratePasswordForCar(int)";
         "OHOS::Wifi::Ipv4Address::defaultInetAddress";
         "OHOS::Wifi::MacAddress::GetMacAddr(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>> const&, unsigned char*)";
         "OHOS::Wifi::ArpChecker::Start(std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&, std::__h::basic_string<char, std::__h::char_traits<char>, std::__h::allocator<char>>&)";
@@ -314,7 +315,7 @@
         "OHOS::Wifi::WifiManager::GetWifiEventSubscriberManager()";
         "OHOS::Wifi::WifiManager::GetWifiMultiVapManager()";
         "OHOS::Wifi::WifiManager::GetRptInterface(int)";
-        "OHOS::Wifi::WifiManager::InstallPacketFilterProgram(int, int)";
+        "OHOS::Wifi::WifiManager::InstallPacketFilterProgram(OHOS::Wifi::HpfFilterData&, int)";
         "OHOS::Wifi::WifiManager::OnNativeProcessStatusChange(int)";
         "OHOS::Wifi::WifiManager::StopGetCacResultAndLocalCac(int)";
         "OHOS::Wifi::WifiManager::GetCacRadarDetectionStatus()";

@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -92,8 +92,8 @@ WifiErrorNo WifiP2PHalInterface::CancelWpsPbc(const std::string &groupInterface)
 #endif
 }
 
-WifiErrorNo WifiP2PHalInterface::StartWpsPin(
-    const std::string &groupInterface, const std::string &address, const std::string &pin, std::string &result) const
+WifiErrorNo WifiP2PHalInterface::StartWpsPin(const std::string &groupInterface, const std::string &address,
+    const std::string &pin, std::string &result) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
@@ -374,8 +374,8 @@ WifiErrorNo WifiP2PHalInterface::SaveConfig() const
     return WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo WifiP2PHalInterface::ReqServiceDiscovery(
-    const std::string &deviceAddress, const std::vector<unsigned char> &tlvs, std::string &reqID) const
+WifiErrorNo WifiP2PHalInterface::ReqServiceDiscovery(const std::string &deviceAddress,
+    const std::vector<unsigned char> &tlvs, std::string &reqID) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
@@ -420,8 +420,8 @@ WifiErrorNo WifiP2PHalInterface::SetPersistentReconnect(int mode) const
     return WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo WifiP2PHalInterface::RespServiceDiscovery(
-    const WifiP2pDevice &device, int frequency, int dialogToken, const std::vector<unsigned char> &tlvs) const
+WifiErrorNo WifiP2PHalInterface::RespServiceDiscovery(const WifiP2pDevice &device, int frequency, int dialogToken,
+    const std::vector<unsigned char> &tlvs) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
@@ -465,8 +465,8 @@ WifiErrorNo WifiP2PHalInterface::P2pGetSupportFrequenciesByBand(const std::strin
     return WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo WifiP2PHalInterface::P2pSetSingleConfig(int networkId,
-    const std::string &key, const std::string &value) const
+WifiErrorNo WifiP2PHalInterface::P2pSetSingleConfig(int networkId, const std::string &key,
+    const std::string &value) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
@@ -516,7 +516,7 @@ WifiErrorNo WifiP2PHalInterface::Hid2dConnect(const Hid2dConnectConfig &config) 
     return WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo WifiP2PHalInterface::DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string& carryData) const
+WifiErrorNo WifiP2PHalInterface::DeliverP2pData(int32_t cmdType, int32_t dataType, const std::string &carryData) const
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
@@ -558,7 +558,7 @@ WifiErrorNo WifiP2PHalInterface::P2pReject(const std::string &mac)
     return WIFI_HAL_OPT_FAILED;
 }
 
-WifiErrorNo WifiP2PHalInterface::SetMiracastSinkConfig(const std::string& config)
+WifiErrorNo WifiP2PHalInterface::SetMiracastSinkConfig(const std::string &config)
 {
 #ifdef HDI_WPA_INTERFACE_SUPPORT
     CHECK_NULL_AND_RETURN(mHdiWpaClient, WIFI_HAL_OPT_FAILED);
@@ -629,5 +629,5 @@ WifiErrorNo WifiP2PHalInterface::GetP2pSignalInfo(const std::string &interfaceNa
 #endif
     return WIFI_HAL_OPT_FAILED;
 }
-}  // namespace Wifi
-}  // namespace OHOS
+} // namespace Wifi
+} // namespace OHOS

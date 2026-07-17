@@ -15,6 +15,9 @@
 #include "wifi_global_func.h"
 #include <algorithm>
 #include <cstdlib>
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+#include <cstring>
+#endif
 #include <iostream>
 #include <sstream>
 #include <random>
@@ -71,6 +74,13 @@ constexpr const char* VENDOR_COUNTRY_KEY = "const.cust.custPath";
 constexpr const char* VENDOR_COUNTRY_DEFAULT = "";
 constexpr const int32_t SYS_PARAMETER_SIZE = 256;
 constexpr const int32_t PARAMETER_ERROR_CODE = 0;
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+constexpr int CHAR_TYPE_LEN = 4;  // 4 char types: digit, lowercase, uppercase, special
+constexpr int LOWERCASE_INDEX = 0;
+constexpr int UPPERCASE_INDEX = 1;
+constexpr int DIGIT_INDEX = 2;
+constexpr const char* PASSWORD_ALLOWED_SPECIAL = "!#$&*+-:;<=>?@^_";
+#endif
 
 constexpr int PROP_FSS_ENABLE_LEN = 16;
 constexpr int FSS_ENABLE_LEN = 4;
@@ -83,6 +93,68 @@ constexpr const char* PRODUCT_PROVIDED_DEVICE_FEATURES = "const.product.provided
 constexpr int EC_INVALID = -9;  // using sysparam_errno.h, invalid param value
 #endif
 constexpr int ASCALL_MINUS_SIGN_INDEX = 45;
+
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+static bool HasDigitAndSpecialAndLetter(const char *password)
+{
+    bool hasDigit = false;
+    bool hasSpecial = false;
+    bool hasLetter = false;
+
+    if (password == nullptr || password[0] == '\0') {
+        return false;
+    }
+
+    for (int i = 0; password[i] != '\0'; ++i) {
+        char c = password[i];
+        if (c >= '0' && c <='9') {
+            hasDigit = true;
+            continue;
+        }
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+            hasLetter = true;
+            continue;
+        }
+        if (strchr(PASSWORD_ALLOWED_SPECIAL, c) != nullptr) {
+            hasSpecial = true;
+        }
+    }
+    return hasDigit && hasSpecial && hasLetter;
+}
+
+std::string GeneratePasswordForCar(int len)
+{
+    std::random_device rd;
+    std::string res;
+    char rndbuf[MAX_PSK_LEN + 1] = {0};
+    int rndnum;
+    int specialLen = strlen(PASSWORD_ALLOWED_SPECIAL);
+    if (len > MAX_PSK_LEN) {
+        len = MAX_PSK_LEN;
+    }
+    do {
+        for (int n = 0; n < len; ++n) {
+            rndnum = std::abs((int)rd());
+            switch (rndnum % CHAR_TYPE_LEN) {
+                case LOWERCASE_INDEX:
+                    rndbuf[n] = ((rndnum % ('z' - 'a' + 1)) + 'a');
+                    break;
+                case UPPERCASE_INDEX:
+                    rndbuf[n] = ((rndnum % ('Z' - 'A' + 1)) + 'A');
+                    break;
+                case DIGIT_INDEX:
+                    rndbuf[n] = ((rndnum % ('9' - '0' + 1)) + '0');
+                    break;
+                default:
+                    rndbuf[n] = PASSWORD_ALLOWED_SPECIAL[rndnum % specialLen];
+                    break;
+            }
+        }
+    } while (!HasDigitAndSpecialAndLetter(rndbuf));
+    res = rndbuf;
+    return res;
+}
+#endif
 
 std::string GetRandomStr(int len)
 {

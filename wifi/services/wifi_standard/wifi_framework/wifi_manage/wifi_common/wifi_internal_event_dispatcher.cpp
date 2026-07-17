@@ -756,6 +756,14 @@ bool WifiInternalEventDispatcher::IsStatusBarFrozen(int uid, const WifiEventCall
     if (!(pEnhanceService->GetPackageNum(packageName) == 0) && !(pEnhanceService->GetPackageNum(packageName) == 1)) {
         return false;
     }
+
+    // Check background Portal connected
+    if (msg.linkInfo.connTriggerMode == NETWORK_SELECTED_BY_BACKGROUND_PORTAL) {
+        WIFI_LOGI("StatusBar freeze, msg.msgData:%{public}d, %{public}s, the detailedstate is %{public}d",
+            msg.msgData, packageName.c_str(), msg.linkInfo.detailedState);
+        return true;
+    }
+
     // Check CONNECTING and DISCONNECTED state
     if ((msg.msgData == static_cast<int32_t>(OHOS::Wifi::ConnState::CONNECTING) ||
             msg.msgData == static_cast<int32_t>(OHOS::Wifi::ConnState::DISCONNECTED)) &&

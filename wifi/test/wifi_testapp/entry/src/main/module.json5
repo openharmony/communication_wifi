@@ -51,6 +51,10 @@
         ]
       }
     ],
+    "testRunner": {
+      "name": "OpenHarmonyTestRunner",
+      "srcPath": "testrunner/OpenHarmonyTestRunner"
+    },
     "extensionAbilities": [
       {
         "name": "EntryBackupAbility",
@@ -71,7 +75,9 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "FormAbility"
+            "FormAbility",
+            "EntryAbility",
+            "TestAbility"
           ]
         }
       },
@@ -80,7 +86,9 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "FormAbility"
+            "FormAbility",
+            "EntryAbility",
+            "TestAbility"
           ]
         }
       },
@@ -89,7 +97,9 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "FormAbility"
+            "FormAbility",
+            "EntryAbility",
+            "TestAbility"
           ]
         }
       },
@@ -98,7 +108,41 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "EntryAbility"
+            "EntryAbility",
+            "TestAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.SET_WIFI_CONFIG",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility",
+            "TestAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_CONFIG",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility",
+            "TestAbility"
+          ],
+          "when": "inuse"
+        }
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_LOCAL_MAC",
+        "reason": "$string:app_name",
+        "usedScene": {
+          "abilities": [
+            "EntryAbility",
+            "TestAbility"
           ],
           "when": "inuse"
         }
@@ -108,7 +152,8 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "EntryAbility"
+            "EntryAbility",
+            "TestAbility"
           ],
           "when": "inuse"
         }
@@ -118,7 +163,8 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "EntryAbility"
+            "EntryAbility",
+            "TestAbility"
           ],
           "when": "inuse"
         }
@@ -128,7 +174,8 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "EntryAbility"
+            "EntryAbility",
+            "TestAbility"
           ],
           "when": "inuse"
         }
@@ -138,7 +185,8 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "EntryAbility"
+            "EntryAbility",
+            "TestAbility"
           ],
           "when": "inuse"
         }
@@ -148,7 +196,8 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "EntryAbility"
+            "EntryAbility",
+            "TestAbility"
           ],
           "when": "inuse"
         }
@@ -158,7 +207,9 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "FormAbility"
+            "FormAbility",
+            "EntryAbility",
+            "TestAbility"
           ]
         }
       },
@@ -167,7 +218,8 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "EntryAbility"
+            "EntryAbility",
+            "TestAbility"
           ],
           "when": "inuse"
         }
@@ -177,8 +229,11 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "FormAbility"
-          ]
+            "FormAbility",
+            "EntryAbility",
+            "TestAbility"
+          ],
+          "when": "always"
         }
       },
       {
@@ -186,7 +241,8 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "EntryAbility"
+            "EntryAbility",
+            "TestAbility"
           ],
           "when": "inuse"
         }
@@ -196,8 +252,11 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "FormAbility"
-          ]
+            "FormAbility",
+            "EntryAbility",
+            "TestAbility"
+          ],
+          "when": "always"
         }
       },
       {
@@ -205,8 +264,11 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "FormAbility"
-          ]
+            "FormAbility",
+            "EntryAbility",
+            "TestAbility"
+          ],
+          "when": "always"
         }
       },
       {
@@ -214,7 +276,8 @@
         "reason": "$string:app_name",
         "usedScene": {
           "abilities": [
-            "EntryAbility"
+            "EntryAbility",
+            "TestAbility"
           ],
           "when": "inuse"
         }

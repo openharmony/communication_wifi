@@ -161,5 +161,17 @@ HWTEST_F(NetworkStatusHistoryManagerTest, GetCurrentNetworkStatusHistory2Array, 
         NetworkStatusHistoryManager::GetCurrentNetworkStatusHistory2Array(networkStatusHistory);
     EXPECT_TRUE(expectResult == realResult);
 }
+
+HWTEST_F(NetworkStatusHistoryManagerTest, IsAllNoInternetByHistory_AllNoInternet, TestSize.Level1)
+{
+    // 10条全NO_INTERNET: 0b11111111111111111111 = 1048575
+    EXPECT_TRUE(NetworkStatusHistoryManager::IsAllNoInternetByHistory(0b11111111111111111111));
+}
+ 
+HWTEST_F(NetworkStatusHistoryManagerTest, IsAllNoInternetByHistory_ContainsHasInternet, TestSize.Level1)
+{
+    // 9条NO_INTERNET + 1条HAS_INTERNET(最新): 0b11111111111111111101 = 1048573
+    EXPECT_FALSE(NetworkStatusHistoryManager::IsAllNoInternetByHistory(0b11111111111111111101));
+}
 } // Wifi
 } // OHOS

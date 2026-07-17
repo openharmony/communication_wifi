@@ -479,6 +479,7 @@ void P2pMonitor::WpaEventInvitationReceived(const HalP2pInvitationInfo &recvInfo
 
     Broadcast2SmInvitationReceived(selectIfacName, group);
     P2pChrReporter::GetInstance().SetWpsSuccess(true);
+    P2pChrReporter::GetInstance().HandleP2pNormalConn();
 }
 
 void P2pMonitor::WpaEventInvitationResult(const std::string &bssid, int status) const
@@ -564,6 +565,7 @@ void P2pMonitor::WpaEventProvDiscPbcReq(const std::string &p2pDeviceAddress) con
     event.SetDevice(tempDevice);
     event.SetDiscEvent(DiscEvent::PBC_REQ);
     Broadcast2SmProvDiscPbcReq(selectIfacName, event);
+    P2pChrReporter::GetInstance().HandleP2pNormalConn();
 }
 
 void P2pMonitor::WpaEventProvDiscPbcResp(const std::string &p2pDeviceAddress) const
@@ -600,6 +602,7 @@ void P2pMonitor::WpaEventProvDiscShowPin(const std::string &p2pDeviceAddress, co
     event.SetDiscEvent(DiscEvent::SHOW_PIN);
     event.SetPin(generatedPin);
     Broadcast2SmProvDiscShowPin(selectIfacName, event);
+    P2pChrReporter::GetInstance().HandleP2pNormalConn();
 }
 
 void P2pMonitor::WpaEventProvDiscFailure(void) const

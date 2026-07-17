@@ -402,37 +402,20 @@ void ConnectToCandidateConfigBySettings(const ::ohos::wifiManager::ConnectSettin
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
         return;
     }
+    ConnectSettings settings;
+    int defaultTimeout = DEFAULT_DIALOG_TIMEOUT;
+    settings.networkId = connectSettings.networkId;
+    settings.withUserAction = connectSettings.withUserAction.value_or(false);
+    settings.userActionTimeout = connectSettings.userActionTimeout.value_or(std::move(defaultTimeout));
+    settings.addNetworkToSystem = connectSettings.addNetworkToSystem.value_or(false);
     WIFI_LOGI("ConnectToCandidateConfig networkId=%{public}d withUserAction=%{public}d "
         "userActionTimeout=%{public}d addNetworkToSystem=%{public}d",
-        connectSettings.networkId, connectSettings.withUserAction, connectSettings.userActionTimeout,
-        connectSettings.addNetworkToSystem);
-    ConnectSettings settings;
-    settings.networkId = connectSettings.networkId;
-    settings.withUserAction = connectSettings.withUserAction;
-    settings.userActionTimeout = connectSettings.userActionTimeout;
-    settings.addNetworkToSystem = connectSettings.addNetworkToSystem;
-    if (connectSettings.userActionTimeout <= 0 || connectSettings.userActionTimeout > MAX_DIALOG_TIMEOUT) {
+        settings.networkId, settings.withUserAction, settings.userActionTimeout,
+        settings.addNetworkToSystem);
+    if (settings.userActionTimeout <= 0 || settings.userActionTimeout > MAX_DIALOG_TIMEOUT) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
         return;
     }
-    ErrCode ret = g_wifiDevicePtr->ConnectToCandidateConfig(settings);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
-        return;
-    }
-}
-
-void ConnectToCandidateConfigWithConnectSettings(const ::ohos::wifiManager::ConnectSettings &connectSettings)
-{
-    if (g_wifiDevicePtr == nullptr) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-        return;
-    }
-    ConnectSettings settings;
-    settings.networkId = connectSettings.networkId;
-    settings.withUserAction = connectSettings.withUserAction;
-    settings.userActionTimeout = connectSettings.userActionTimeout;
-    settings.addNetworkToSystem = connectSettings.addNetworkToSystem;
     ErrCode ret = g_wifiDevicePtr->ConnectToCandidateConfig(settings);
     if (ret != WIFI_OPT_SUCCESS) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
@@ -1761,14 +1744,41 @@ bool IsWlanSupported()
 {
     bool isSupported = false;
     if (g_wifiDevicePtr == nullptr) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
         return isSupported;
     }
     ErrCode ret = g_wifiDevicePtr->IsWlanSupported(isSupported);
     if (ret != WIFI_OPT_SUCCESS) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_AP_CORE);
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_CORE);
     }
     return isSupported;
+}
+
+void SetWifiCapability(::ohos::wifiManager::WifiCapability capability, bool enable)
+{
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return;
+    }
+    ErrCode ret = g_wifiDevicePtr->SetWifiCapability(static_cast<int>(capability), enable);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+}
+
+bool GetWifiCapability(::ohos::wifiManager::WifiCapability capability)
+{
+    bool enabled = false;
+    if (g_wifiDevicePtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        return enabled;
+    }
+    ErrCode ret = g_wifiDevicePtr->GetWifiCapability(static_cast<int>(capability), enabled);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+    }
+    return enabled;
 }
 }
 
@@ -1796,7 +1806,6 @@ TH_EXPORT_CPP_API_GetCandidateConfigs(GetCandidateConfigs);
 TH_EXPORT_CPP_API_P2pCancelConnect(P2pCancelConnect);
 TH_EXPORT_CPP_API_ConnectToCandidateConfigByNetworkId(ConnectToCandidateConfigByNetworkId);
 TH_EXPORT_CPP_API_ConnectToCandidateConfigBySettings(ConnectToCandidateConfigBySettings);
-TH_EXPORT_CPP_API_ConnectToCandidateConfigWithConnectSettings(ConnectToCandidateConfigWithConnectSettings);
 TH_EXPORT_CPP_API_Reconnect(Reconnect);
 TH_EXPORT_CPP_API_Reassociate(Reassociate);
 TH_EXPORT_CPP_API_ConnectToDevice(ConnectToDevice);
@@ -1875,3 +1884,5 @@ TH_EXPORT_CPP_API_OffP2pPersistentGroupChange(OffP2pPersistentGroupChange);
 TH_EXPORT_CPP_API_OnP2pDiscoveryChange(OnP2pDiscoveryChange);
 TH_EXPORT_CPP_API_OffP2pDiscoveryChange(OffP2pDiscoveryChange);
 TH_EXPORT_CPP_API_IsWlanSupported(IsWlanSupported);
+TH_EXPORT_CPP_API_SetWifiCapability(SetWifiCapability);
+TH_EXPORT_CPP_API_GetWifiCapability(GetWifiCapability);

@@ -143,7 +143,7 @@ void WifiHotspotCallbackStub::OnHotspotStaLeave(const StationInfo &info)
 
 bool WifiHotspotCallbackStub::IsRemoteDied() const
 {
-    return mRemoteDied;
+    return mRemoteDied.load();
 }
 
 void WifiHotspotCallbackStub::SetRemoteDied(bool val)

@@ -868,5 +868,86 @@ HWTEST_F(NetworkSelectionTest, BuildReasonsStringEmptyTest, TestSize.Level1)
     std::string result = mgr.BuildReasonsString(filtedReason, 0);
     EXPECT_TRUE(result.empty());
 }
+
+HWTEST_F(NetworkSelectionTest, TestAllNoInternetHistoryOnPC, TestSize.Level1)
+{
+    NetworkSelectionResult selectionResult;
+    std::vector<InterScanInfo> scanInfos;
+    auto &scanInfo1 = scanInfos.emplace_back();
+    scanInfo1.bssid = "11:11:11:11:11";
+    scanInfo1.ssid = "test1";
+    scanInfo1.frequency = 5028;
+    scanInfo1.rssi = -77;
+ 
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetDeviceType()).WillRepeatedly(Return(ProductDeviceType::PC));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
+    EXPECT_CALL(WifiSettings::GetInstance(),
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+            WifiDeviceConfig &wifiDeviceConfig, int) {
+            wifiDeviceConfig.networkId = 0;
+            wifiDeviceConfig.uid = -1;
+            wifiDeviceConfig.isShared = false;
+            wifiDeviceConfig.isEphemeral = false;
+            wifiDeviceConfig.isPasspoint = false;
+            wifiDeviceConfig.isAllowAutoConnect = true;
+            wifiDeviceConfig.isSecureWifi = true;
+            wifiDeviceConfig.networkSelectionStatus.status = WifiDeviceConfigStatus::ENABLED;
+            wifiDeviceConfig.noInternetAccess = true;
+            wifiDeviceConfig.isPortal = false;
+            wifiDeviceConfig.lastConnectTime = 1000000;
+            wifiDeviceConfig.networkStatusHistory = 0b11111111111111111111;
+            return 0;
+        }));
+ 
+    NetworkSelectionManager selectionManager;
+    std::string failReason;
+    EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult,
+        NetworkSelectType::AUTO_CONNECT, scanInfos, failReason));
+    EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, 0);
+}
+ 
+HWTEST_F(NetworkSelectionTest, TestAllNoInternetHistoryOnNonPC, TestSize.Level1)
+{
+    NetworkSelectionResult selectionResult;
+    std::vector<InterScanInfo> scanInfos;
+    auto &scanInfo1 = scanInfos.emplace_back();
+    scanInfo1.bssid = "11:11:11:11:11";
+    scanInfo1.ssid = "test1";
+    scanInfo1.frequency = 5028;
+    scanInfo1.rssi = -77;
+ 
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetDeviceType()).WillRepeatedly(Return(ProductDeviceType::PHONE));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
+    EXPECT_CALL(WifiSettings::GetInstance(),
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+            WifiDeviceConfig &wifiDeviceConfig, int) {
+            wifiDeviceConfig.networkId = 0;
+            wifiDeviceConfig.uid = -1;
+            wifiDeviceConfig.isShared = false;
+            wifiDeviceConfig.isEphemeral = false;
+            wifiDeviceConfig.isPasspoint = false;
+            wifiDeviceConfig.isAllowAutoConnect = true;
+            wifiDeviceConfig.isSecureWifi = true;
+            wifiDeviceConfig.networkSelectionStatus.status = WifiDeviceConfigStatus::ENABLED;
+            wifiDeviceConfig.noInternetAccess = true;
+            wifiDeviceConfig.isPortal = false;
+            wifiDeviceConfig.networkStatusHistory = 0b11111111111111111111;
+            return 0;
+        }));
+ 
+    NetworkSelectionManager selectionManager;
+    std::string failReason;
+    EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult,
+        NetworkSelectType::AUTO_CONNECT, scanInfos, failReason));
+    EXPECT_EQ(selectionResult.wifiDeviceConfig.networkId, 0);
+}
 }
 }

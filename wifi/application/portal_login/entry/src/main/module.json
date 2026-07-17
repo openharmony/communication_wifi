@@ -27,7 +27,8 @@
         "removeMissionAfterTerminate": true,
         "permissions": [
           "ohos.permission.START_ABILITIES_FROM_BACKGROUND",
-          "ohos.permission.SET_WIFI_CONFIG"
+          "ohos.permission.SET_WIFI_CONFIG",
+          "ohos.permission.GET_WIFI_INFO"
         ]
       }
     ],
@@ -37,6 +38,9 @@
       },
       {
         "name": "ohos.permission.GET_NETWORK_INFO"
+      },
+      {
+        "name": "ohos.permission.GET_WIFI_INFO"
       },
       {
         "name": "ohos.permission.CAMERA",

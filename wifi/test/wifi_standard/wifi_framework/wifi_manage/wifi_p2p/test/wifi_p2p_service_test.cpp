@@ -315,6 +315,18 @@ HWTEST_F(WifiP2pServiceTest, HandleBusinessSAExceptionTest003, TestSize.Level1)
 HWTEST_F(WifiP2pServiceTest, QueryP2pLocalDeviceTest001, TestSize.Level1)
 {
     WifiP2pDevice device;
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GetDeviceAddress(testing::_))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+    EXPECT_EQ(pWifiP2pService->QueryP2pLocalDevice(device), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, QueryP2pLocalDeviceTest002, TestSize.Level1)
+{
+    WifiP2pDevice device;
+    device.SetDeviceAddress("00:00:00:00:00:00");
+    deviceManager.SetThisDevice(device);
+    EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GetDeviceAddress(testing::_))
+        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_EQ(pWifiP2pService->QueryP2pLocalDevice(device), ErrCode::WIFI_OPT_SUCCESS);
 }
 

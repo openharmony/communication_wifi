@@ -610,13 +610,8 @@ void EnhanceWriteAutoSelectHiSysEvent(
     cJSON_Delete(root);
 }
  
-void EnhanceWriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info)
+static void FillDhcpInfoToJson(cJSON* root, const IpInfo& ipInfo, const IpV6Info& ipv6Info)
 {
-    cJSON *root = cJSON_CreateObject();
-    if (root == nullptr) {
-        WIFI_LOGE("Failed to create cJSON object");
-        return;
-    }
     cJSON_AddStringToObject(root, "IPV4_IPADDRESS", Ipv4IntAnonymize(ipInfo.ipAddress).c_str());
     cJSON_AddStringToObject(root, "IPV4_GATEWAY", Ipv4IntAnonymize(ipInfo.gateway).c_str());
     cJSON_AddStringToObject(root, "IPV4_NETMASK", Ipv4IntAnonymize(ipInfo.netmask).c_str());
@@ -645,11 +640,22 @@ void EnhanceWriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6In
     cJSON_AddNumberToObject(root, "IPV6_PREFERRED_LIFE_TIME", ipv6Info.preferredLifeTime);
     cJSON_AddNumberToObject(root, "IPV6_VALID_LIFE_TIME", ipv6Info.validLifeTime);
     cJSON_AddNumberToObject(root, "IPV6_ROUTE_LIFE_TIME", ipv6Info.routerLifeTime);
+    cJSON_AddNumberToObject(root, "IPV6_RA_FLAGS", ipv6Info.raFlags);
     std::string ipv6Address;
     for (const auto& pair : ipv6Info.IpAddrMap) {
         ipv6Address += Ipv6Anonymize(pair.first) + "|" + std::to_string(pair.second) + ";";
     }
     cJSON_AddStringToObject(root, "IPV6_IPADDRMAP", ipv6Address.c_str());
+}
+
+void EnhanceWriteDhcpInfoHiSysEvent(const IpInfo &ipInfo, const IpV6Info &ipv6Info)
+{
+    cJSON *root = cJSON_CreateObject();
+    if (root == nullptr) {
+        WIFI_LOGE("Failed to create cJSON object");
+        return;
+    }
+    FillDhcpInfoToJson(root, ipInfo, ipv6Info);
     char *jsonStr = cJSON_PrintUnformatted(root);
     if (jsonStr == nullptr) {
         cJSON_Delete(root);

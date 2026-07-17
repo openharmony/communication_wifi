@@ -16,6 +16,7 @@
 #ifndef OHOS_WIFI_HOTSPOT_IMPL_H
 #define OHOS_WIFI_HOTSPOT_IMPL_H
 
+#include <atomic>
 #include <cstdint>
 #include <set>
 #include <vector>
@@ -293,7 +294,7 @@ private:
     sptr<IWifiHotspot> client_;
     sptr<WifiHotspotDeathRecipient> deathRecipient_;
     sptr<IRemoteObject> remoteService_;
-    bool mRemoteDied;
+    std::atomic<bool> mRemoteDied;
     static sptr<WifiHotspotCallbackStub> g_wifiHotspotCallbackStub;
 };
 }  // namespace Wifi

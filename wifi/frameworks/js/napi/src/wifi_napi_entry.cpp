@@ -285,6 +285,15 @@ static napi_value WapiPskTypeInit(napi_env env)
     SetNamedPropertyByInteger(env, wapiPskType, static_cast<int>(WapiPskType::WAPI_PSK_HEX), "WAPI_PSK_HEX");
     return wapiPskType;
 }
+
+static napi_value WifiCapabilityInit(napi_env env)
+{
+    napi_value wifiCapability = nullptr;
+    napi_create_object(env, &wifiCapability);
+    SetNamedPropertyByInteger(env, wifiCapability,
+        static_cast<int>(WifiCapabilityJs::WIFI_AUTO_ENABLE), "WIFI_AUTO_ENABLE");
+    return wifiCapability;
+}
 #endif
 
 static napi_value PropertyValueInit(napi_env env, napi_value exports)
@@ -311,6 +320,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value wifiCategoryObj = WifiCategoryInit(env);
     napi_value wifiLinkTypeObj = WifiLinkTypeInit(env);
     napi_value wifiDetailStateObj = WifiDetailStateInit(env);
+    napi_value wifiCapabilityObj = WifiCapabilityInit(env);
 #endif
     napi_property_descriptor exportFuncs[] = {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
@@ -324,6 +334,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("WifiCategory", wifiCategoryObj),
         DECLARE_NAPI_PROPERTY("WifiLinkType", wifiLinkTypeObj),
         DECLARE_NAPI_PROPERTY("WifiDetailState", wifiDetailStateObj),
+        DECLARE_NAPI_PROPERTY("WifiCapability", wifiCapabilityObj),
 #endif
         DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),

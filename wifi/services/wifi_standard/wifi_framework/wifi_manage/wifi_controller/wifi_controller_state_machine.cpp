@@ -28,6 +28,7 @@
 #endif
 #ifndef OHOS_ARCH_LITE
 #include "wifi_internal_event_dispatcher.h"
+#include "wifi_notification_util.h"
 #else
 #include "wifi_internal_event_dispatcher_lite.h"
 #endif
@@ -693,12 +694,17 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
     if (pWifiControllerMachine->ShouldDisableWifi(msg)) {
         pWifiControllerMachine->multiStaManagers.StopAllManagers();
         pWifiControllerMachine->concreteManagers.StopAllManagers();
+#ifndef OHOS_ARCH_LITE
+        if (id == INSTID_WLAN0) {
+            WifiNotificationUtil::GetInstance().CancelWifiNotification(WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
+        }
         return;
+#endif
     }
 #ifdef FEATURE_AP_SUPPORT
     if (pWifiControllerMachine->IsEnableScanOnlyOnHotspot() &&
         WifiConfigCenter::GetInstance().GetSoftapToggledState() &&
-        !pWifiControllerMachine->IsWifiConnected()) {
+        msg->GetMessageName() == CMD_WIFI_TOGGLED) {
         WIFI_LOGI("%{public}s, WiFi turning on while hotspot active, close hotspot first", __func__);
         WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, id);
     }
@@ -840,7 +846,13 @@ void WifiControllerMachine::EnableState::HandleStaStartFailure(int id)
 {
     WIFI_LOGE("HandleStaStartFailure");
     mWifiStartFailCount++;
-    if (pWifiControllerMachine->ShouldEnableWifi(id) && mWifiStartFailCount < WIFI_OPEN_RETRY_MAX_COUNT) {
+    int wifiOpenRetryMax = WIFI_OPEN_RETRY_MAX_COUNT;
+    int deviceType = WifiConfigCenter::GetInstance().GetDeviceType();
+    if (deviceType == ProductDeviceType::WEARABLE) {
+        // The maximum retry limit for wearable products is 5 times.
+        wifiOpenRetryMax = WIFI_WATCH_OPEN_RETRY_MAX_COUNT;
+    }
+    if (pWifiControllerMachine->ShouldEnableWifi(id) && mWifiStartFailCount < wifiOpenRetryMax) {
         pWifiControllerMachine->StartTimer(CMD_OPEN_WIFI_RETRY, WIFI_OPEN_RETRY_TIMEOUT);
     }
 }

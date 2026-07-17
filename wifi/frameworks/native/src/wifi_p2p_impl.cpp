@@ -272,7 +272,10 @@ ErrCode WifiP2pImpl::GetSupportedFeatures(long &features)
 bool WifiP2pImpl::IsFeatureSupported(long feature)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    RETURN_IF_FAIL(GetWifiP2pProxy());
+    if (!GetWifiP2pProxy()) {
+        WIFI_LOGI("'%{public}s' failed.", "GetWifiP2pProxy()");
+        return false;
+    }
     long tmpFeatures = 0;
     if (client_->GetSupportedFeatures(tmpFeatures) != WIFI_OPT_SUCCESS) {
         return false;

@@ -537,6 +537,17 @@ int GetBssidCounter(const WifiDeviceConfig &config, const std::vector<WifiScanIn
 bool IsSameEncryptType(const std::string& scanInfoKeymgmt, const std::string& deviceKeymgmt);
 #endif
 int GetFoldAction();
+
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+/**
+ * @Description Generate a random password for car product,
+    containing at least three different character types: letters, special characters, and digits.
+ *
+ * @param len - Random password length
+ * @return std::string - Random password
+ */
+std::string GeneratePasswordForCar(int len);
+#endif
 }  // namespace Wifi
 }  // namespace OHOS
 #endif

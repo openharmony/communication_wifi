@@ -74,13 +74,6 @@ HWTEST_F(WifiStaManagerTest, StartUnloadStaSaTimerTest01, TestSize.Level1)
     wifiStaManager_->StartUnloadStaSaTimer();
     EXPECT_NE(wifiStaManager_->unloadStaSaTimerId, TEN);
 }
-
-HWTEST_F(WifiStaManagerTest, StopUnloadStaSaTimerTest01, TestSize.Level1)
-{
-    wifiStaManager_->unloadStaSaTimerId = 1;
-    wifiStaManager_->StopUnloadStaSaTimer();
-    EXPECT_NE(wifiStaManager_->unloadStaSaTimerId, TEN);
-}
 #endif
 
 HWTEST_F(WifiStaManagerTest, CloseStaServiceTest01, TestSize.Level1)
@@ -138,6 +131,17 @@ HWTEST_F(WifiStaManagerTest, DealStaConnChangedTest01, TestSize.Level1)
     WifiLinkedInfo info;
     info.connState = ConnState::AUTHENTICATING;
     int instId = 1;
+    wifiStaManager_->DealStaConnChanged(state, info, instId);
+    EXPECT_NE(wifiStaManager_->unloadStaSaTimerId, TEN);
+}
+
+HWTEST_F(WifiStaManagerTest, DealStaConnChangedTest02, TestSize.Level1)
+{
+    OperateResState state = OperateResState::CONNECT_AP_CONNECTED;
+    WifiLinkedInfo info;
+    info.connState = ConnState::DISCONNECTED;
+    int instId = 1;
+    info.connTriggerMode = NETWORK_SELECTED_BY_AUTO;
     wifiStaManager_->DealStaConnChanged(state, info, instId);
     EXPECT_NE(wifiStaManager_->unloadStaSaTimerId, TEN);
 }

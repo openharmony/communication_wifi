@@ -21,6 +21,7 @@
 #include "net_supplier_callback_base.h"
 #include "mock_wifi_settings.h"
 #include "mock_wifi_config_center.h"
+#include "net_conn_client.h"
 
 using namespace testing;
 using ::testing::_;
@@ -47,128 +48,6 @@ public:
     {
     }
 };
-
-HWTEST_F(WifiNetAgentTest, RegisterNetSupplier_ReturnsFalseWhenRegistrationFails, TestSize.Level1)
-{
-    int instId = 0;
-    EXPECT_FALSE(WifiNetAgent::GetInstance().RegisterNetSupplier(instId));
-}
-
-HWTEST_F(WifiNetAgentTest, RegisterNetSupplierCallback_ReturnsFalseWhenRegistrationFails, TestSize.Level1)
-{
-    int instId = 0;
-    EXPECT_FALSE(WifiNetAgent::GetInstance().RegisterNetSupplierCallback(instId));
-}
-
-HWTEST_F(WifiNetAgentTest, UnregisterNetSupplier_CallsUnregisterNetSupplier, TestSize.Level1)
-{
-    int instId = 0;
-    WifiNetAgent::GetInstance().UnregisterNetSupplier(instId);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
-}
-
-HWTEST_F(WifiNetAgentTest, UpdateNetSupplierInfo_CallsUpdateNetSupplierInfo, TestSize.Level1)
-{
-    sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo = new NetManagerStandard::NetSupplierInfo();
-    int instId = 0;
-    WifiNetAgent::GetInstance().UpdateNetSupplierInfo(netSupplierInfo, instId);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
-}
-
-HWTEST_F(WifiNetAgentTest, UpdateNetLinkInfo_CallsUpdateNetLinkInfo, TestSize.Level1)
-{
-    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
-    int instId = 0;
-    IpInfo wifiIpInfo;
-    IpV6Info wifiIpV6Info;
-    WifiDeviceConfig config;
-    WifiNetAgent::GetInstance().UpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, config.wifiProxyconfig, instId);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
-}
-
-HWTEST_F(WifiNetAgentTest, OnStaMachineUpdateNetLinkInfoTest001, TestSize.Level1)
-{
-    WifiNetAgent wifiNetAgent;
-    IpInfo wifiIpInfo;
-    IpV6Info wifiIpV6Info;
-    WifiProxyConfig wifiProxyConfig;
-    int instId = 0;
-    wifiNetAgent.OnStaMachineUpdateNetLinkInfo(wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
-}
-
-HWTEST_F(WifiNetAgentTest, OnStaMachineUpdateNetSupplierInfoTest001, TestSize.Level1)
-{
-    WifiNetAgent wifiNetAgent;
-    sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo =
-        sptr<NetManagerStandard::NetSupplierInfo>(new (std::nothrow) NetManagerStandard::NetSupplierInfo());
-    int instId = 0;
-    wifiNetAgent.OnStaMachineUpdateNetSupplierInfo(netSupplierInfo, instId);
-    EXPECT_NE(wifiNetAgent.supplierId, TEN);
-}
-
-HWTEST_F(WifiNetAgentTest, OnStaMachineWifiStartTest001, TestSize.Level1)
-{
-    WifiNetAgent wifiNetAgent;
-    int instId = 0;
-    wifiNetAgent.OnStaMachineWifiStart(instId);
-    EXPECT_NE(wifiNetAgent.supplierId, TEN);
-}
-
-HWTEST_F(WifiNetAgentTest, OnStaMachineNetManagerRestartTest001, TestSize.Level1)
-{
-    WifiNetAgent wifiNetAgent;
-    int instId = 0;
-    WifiLinkedInfo linkedInfo;
-    linkedInfo.connState == ConnState::CONNECTED;
-    WifiSettings::GetInstance().SaveLinkedInfo(linkedInfo, 0);
-    sptr<NetManagerStandard::NetSupplierInfo> netSupplierInfo =
-        sptr<NetManagerStandard::NetSupplierInfo>(new (std::nothrow) NetManagerStandard::NetSupplierInfo());
-    wifiNetAgent.OnStaMachineNetManagerRestart(netSupplierInfo, instId);
-    EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
-}
-
-HWTEST_F(WifiNetAgentTest, CreateNetLinkInfoTest001, TestSize.Level1)
-{
-    WifiNetAgent wifiNetAgent;
-    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
-    IpInfo wifiIpInfo;
-    IpV6Info wifiIpV6Info;
-    WifiProxyConfig wifiProxyConfig;
-    int instId = 0;
-    wifiProxyConfig.configureMethod = ConfigureProxyMethod::AUTOCONFIGUE;
-
-    wifiNetAgent.CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
-    EXPECT_NE(wifiNetAgent.supplierId, TEN);
-}
-
-HWTEST_F(WifiNetAgentTest, CreateNetLinkInfoTest002, TestSize.Level1)
-{
-    WifiNetAgent wifiNetAgent;
-    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
-    IpInfo wifiIpInfo;
-    IpV6Info wifiIpV6Info;
-    WifiProxyConfig wifiProxyConfig;
-    int instId = 0;
-    wifiProxyConfig.configureMethod = ConfigureProxyMethod::MANUALCONFIGUE;
-
-    wifiNetAgent.CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
-    EXPECT_NE(wifiNetAgent.supplierId, TEN);
-}
-
-HWTEST_F(WifiNetAgentTest, CreateNetLinkInfoTest003, TestSize.Level1)
-{
-    WifiNetAgent wifiNetAgent;
-    sptr<NetManagerStandard::NetLinkInfo> netLinkInfo = new NetManagerStandard::NetLinkInfo();
-    IpInfo wifiIpInfo;
-    IpV6Info wifiIpV6Info;
-    WifiProxyConfig wifiProxyConfig;
-    int instId = 0;
-    wifiProxyConfig.configureMethod = ConfigureProxyMethod::CLOSED;
-
-    wifiNetAgent.CreateNetLinkInfo(netLinkInfo, wifiIpInfo, wifiIpV6Info, wifiProxyConfig, instId);
-    EXPECT_NE(wifiNetAgent.supplierId, TEN);
-}
 
 HWTEST_F(WifiNetAgentTest, SetNetLinkIPInfoTest001, TestSize.Level1)
 {

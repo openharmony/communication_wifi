@@ -15,6 +15,7 @@
 #include "wifi_internal_event_dispatcher_test.h"
 #include "wifi_internal_event_dispatcher.h"
 #include "log.h"
+#include "sta_define.h"
 
 using namespace testing::ext;
 
@@ -212,6 +213,18 @@ HWTEST_F(WifiInternalEventDispatcherTest, IsStatusBarFrozen, TestSize.Level1)
     sptr<IWifiDeviceCallBack> callback;
     WifiInternalEventDispatcher::GetInstance().InvokeDeviceCallbacksExtral(true, msg, callback);
     EXPECT_EQ(false, WifiInternalEventDispatcher::GetInstance().IsStatusBarFrozen(uid, msg));
+}
+
+HWTEST_F(WifiInternalEventDispatcherTest, IsStatusBarFrozen002, TestSize.Level1)
+{
+    WifiEventCallbackMsg msg;
+    msg.msgCode = WIFI_CBK_MSG_CONNECTION_CHANGE;
+    msg.msgData = static_cast<int32_t>(OHOS::Wifi::ConnState::CONNECTING);
+    int uid = 20000;
+    sptr<IWifiDeviceCallBack> callback;
+    msg.linkInfo.connTriggerMode = NETWORK_SELECTED_BY_BACKGROUND_PORTAL;
+    WifiInternalEventDispatcher::GetInstance().InvokeDeviceCallbacksExtral(true, msg, callback);
+    EXPECT_EQ(true, WifiInternalEventDispatcher::GetInstance().IsStatusBarFrozen(uid, msg));
 }
 }  // namespace Wifi
 }  // namespace OHOS

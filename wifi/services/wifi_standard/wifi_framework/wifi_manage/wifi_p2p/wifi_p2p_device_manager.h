@@ -147,6 +147,12 @@ public:
      * @return - bool true:success    false:failed
      */
     virtual bool UpdateGroupAddress(const std::string &deviceAddress, const std::string &groupAddress);
+    /**
+     * @Description - Set this device information.
+     * @param device - device information to be set
+     * @return - void
+     */
+    virtual void SetThisDevice(const WifiP2pDevice &device);
 
 private:
     /**

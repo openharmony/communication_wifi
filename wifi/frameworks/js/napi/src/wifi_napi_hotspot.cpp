@@ -19,6 +19,9 @@
 #include <vector>
 #include <map>
 #include "wifi_napi_errcode.h"
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+#include "histogram_plugin_macros.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -50,6 +53,9 @@ NO_SANITIZE("cfi") napi_value DisableHotspot(napi_env env, napi_callback_info in
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Disable hotspot error: %{public}d", ret);
     }
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.disableHotspot.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
 }
 
@@ -58,6 +64,9 @@ NO_SANITIZE("cfi") napi_value IsHotspotActive(napi_env env, napi_callback_info i
     WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
     bool isActive = false;
     ErrCode ret = wifiHotspotPtr->IsHotspotActive(isActive);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.isHotspotActive.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
     napi_value result;
     napi_get_boolean(env, isActive, &result);
@@ -211,6 +220,9 @@ NO_SANITIZE("cfi") napi_value SetHotspotConfig(napi_env env, napi_callback_info 
             WIFI_LOGE("Set hotspot config error: %{public}d", ret);
         }
     }
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.setHotspotConfig.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
 }
 
@@ -236,6 +248,9 @@ NO_SANITIZE("cfi") napi_value GetHotspotConfig(napi_env env, napi_callback_info 
         WIFI_LOGE("Get hotspot config error: %{public}d", ret);
     }
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getHotspotConfig.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     napi_value result;
     napi_create_object(env, &result);
     HotspotconfigToJs(env, config, result);
@@ -269,6 +284,9 @@ NO_SANITIZE("cfi") napi_value GetStations(napi_env env, napi_callback_info info)
     }
     WIFI_LOGI("Get station list size: %{public}zu", vecStationInfo.size());
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getStations.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
 
     napi_value arrayResult;
     napi_create_array_with_length(env, vecStationInfo.size(), &arrayResult);
@@ -305,6 +323,9 @@ NO_SANITIZE("cfi") napi_value AddHotspotBlockedList(napi_env env, napi_callback_
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Add block list fail: %{public}d", ret);
     }
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.addHotspotBlockList.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
 }
 
@@ -326,6 +347,9 @@ NO_SANITIZE("cfi") napi_value DelHotspotBlockedList(napi_env env, napi_callback_
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Del block list fail: %{public}d", ret);
     }
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.delHotspotBlockList.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
 }
 
@@ -340,7 +364,9 @@ NO_SANITIZE("cfi") napi_value GetHotspotBlockedList(napi_env env, napi_callback_
     }
     WIFI_LOGI("Get block list size: %{public}zu", vecStationInfo.size());
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
-
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getHotspotBlockList.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     napi_value arrayResult;
     napi_create_array_with_length(env, vecStationInfo.size(), &arrayResult);
     for (size_t i = 0; i != vecStationInfo.size(); ++i) {

@@ -2103,7 +2103,7 @@ ErrCode WifiDeviceServiceImpl::StartWifiDetection()
         return WIFI_OPT_STA_NOT_OPENED;
     }
     pService->StartWifiDetection();
-    return WIFI_OPT_SUCCESS; 
+    return WIFI_OPT_SUCCESS;
 }
 
 #ifndef OHOS_ARCH_LITE

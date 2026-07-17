@@ -2081,7 +2081,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
 
 ErrCode WifiDeviceServiceImpl::StartWifiDetection()
 {
-#ifndef OHOS_ARCH_LITE 
+#ifndef OHOS_ARCH_LITE
     WIFI_LOGI("StartWifiDetection(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
         GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
 #endif

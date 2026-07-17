@@ -44,7 +44,6 @@ public:
     void GetAclAuthPackages(std::vector<PackageInfo> &packageList);
     void GetScanLimitPackages(std::vector<PackageInfo> &packageList);
     void GetLandscapeSwitchLimitList(std::vector<PackageInfo> &packageList);
-    void GetNetDetectionAllowList(std::vector<PackageInfo> &packageList);
     void GetScanForegroundAllowLimitList(std::vector<PackageInfo> &packageList);
     void GetScanBackgroundAllowLimitList(std::vector<PackageInfo> &packageList);
 
@@ -60,7 +59,6 @@ private:
     std::vector<PackageInfo> mAclAuthList;
     std::vector<PackageInfo> mScanLimitPackage_;
     std::vector<PackageInfo> mLandscapeSwitchLimitList_;
-    std::vector<PackageInfo> mNetDetectionAllowList_;
     std::vector<PackageInfo> mScanForegroundAllowLimitList_;
     std::vector<PackageInfo> mScanBackgroundAllowLimitList_;
 };

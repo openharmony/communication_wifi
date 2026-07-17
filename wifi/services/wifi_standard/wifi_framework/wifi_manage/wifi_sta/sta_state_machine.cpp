@@ -79,6 +79,28 @@ namespace {
 constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
 constexpr int MAX_CHLOAD = 800;
 constexpr int PRE_ROAM_SCAN_WAIT_TIME_MS = 100;
+
+#ifdef READ_MAC_FROM_OEM
+/*
+ * WiFi privacy configuration constants
+ * Random MAC address: The second bit (L/G bit) of the first byte is 1
+ * Real MAC address: The second bit (L/G bit) of the first byte is 0
+ */
+constexpr int RANDOM_MAC_LOCAL_BIT = 0x02;
+constexpr int MAC_STRING_MIN_LEN = 2;
+
+static bool IsRandomMac(const std::string& mac)
+{
+    if (mac.empty() || mac.length() < MAC_STRING_MIN_LEN) {
+        return false;
+    }
+    unsigned char firstByte = 0;
+    if (sscanf_s(mac.substr(0, MAC_STRING_MIN_LEN).c_str(), "%02x", &firstByte) != 1) {
+        return false;
+    }
+    return (firstByte & RANDOM_MAC_LOCAL_BIT) != 0;
+}
+#endif
 }
 DEFINE_WIFILOG_LABEL("StaStateMachine");
 #define ANY_BSSID "any"
@@ -445,8 +467,14 @@ ErrCode StaStateMachine::ClosedState::GetRealMacAddressFromOemInfo()
     }
     wifiOemMac_ = mac;
     WifiConfigCenter::GetInstance().SetMacAddress(mac, pStaStateMachine->m_instId);
-    if ((!isFromHal && (realMacAddressWlan0.empty() || realMacAddressWlan0 != mac)) ||
-        (isFromHal && realMacAddressWlan0.empty())) {
+
+    // Refresh persisted real MAC whenever current detected MAC differs,
+    // including the case where HAL reports a new MAC after module replacement.
+    if (realMacAddressWlan0.empty() || realMacAddressWlan0 != mac) {
+        if (isFromHal && !mac.empty() && IsRandomMac(mac)) {
+            WIFI_LOGW("MAC from hal is random MAC, skip updating realMacAddress");
+            return WIFI_OPT_SUCCESS;
+        }
         WifiSettings::GetInstance().SetRealMacAddress(mac, pStaStateMachine->m_instId);
     }
     return WIFI_OPT_SUCCESS;

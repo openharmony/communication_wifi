@@ -38,6 +38,8 @@ const RETRY_CODE = 999;
 const MAX_RETRY = 3;
 const MAX_PROMPT_INPUT_LENGTH = 1000;
 const MAX_SSL_HANDLERS = 50;
+const MAX_RENDER_EXIT_RETRY = 3;
+const RENDER_EXIT_RELOAD_DELAY = 200;
 
 enum DeviceType {
   PHONE = 'Phone',
@@ -109,6 +111,7 @@ struct Index {
   @State overviewMode: boolean = false;
   @State originalOverviewMode: boolean = false;
   @State retryCount: number = 0;
+  private renderExitRetryCount: number = 0;
   @State isActionBarVisible: boolean = true;
   @State private promptMessage: string = '';
   @State private promptResult: string = '';
@@ -503,6 +506,7 @@ struct Index {
         })
         .onPageEnd((event) => {
           this.loadProgress = 100;
+          this.renderExitRetryCount = 0;
           if (event) {
             this.webUrl = event.url;
             hilog.info(DOMAIN, TAG, '%{public}s', 'Url:' + safeAnonymize(this.webUrl));
@@ -731,6 +735,41 @@ struct Index {
           this.overviewMode = this.originalOverviewMode;
           this.isActionBarVisible = true;
           this.handleFullScreenChange();
+        })
+        .onRenderExited((event) => {
+          if (event) {
+            hilog.info(DOMAIN, TAG, '%{public}s', 'onRenderExited reason:' + event.renderExitReason);
+            if (this.renderExitRetryCount < MAX_RENDER_EXIT_RETRY) {
+              this.renderExitRetryCount++;
+              this.loadProgress = 0;
+              if (this.isSslDialogShowing) {
+                this.sslErrorHandlers.forEach((handler) => {
+                  handler.handleCancel();
+                });
+                this.sslErrorHandlers = [];
+                this.isSslDialogShowing = false;
+                this.sslUserDecision = -1;
+              }
+              const reloadUrl = this.webUrl || this.defaultUrl;
+              setTimeout(() => {
+                try {
+                  if (reloadUrl && reloadUrl !== 'about:blank') {
+                    this.webviewController.loadUrl(reloadUrl);
+                    hilog.info(DOMAIN, TAG, '%{public}s',
+                      'onRenderExited reload url:' + safeAnonymize(reloadUrl) +
+                      ' retry:' + this.renderExitRetryCount);
+                  }
+                } catch (error) {
+                  let err = error as BusinessError;
+                  hilog.error(DOMAIN, TAG, '%{public}s',
+                    `onRenderExited reload failed. Code:${err.code}, message:${err.message}`);
+                }
+              }, RENDER_EXIT_RELOAD_DELAY);
+            } else {
+              hilog.warn(DOMAIN, TAG, '%{public}s',
+                'onRenderExited max retry reached, skip reload.');
+            }
+          }
         })
         .darkMode(WebDarkMode.Off)
         .backgroundColor(Color.White)

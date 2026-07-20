@@ -19,6 +19,10 @@
 #include "wifi_scan_control_msg.h"
 #include "wifi_msg.h"
 #include "wifi_crowdsourced_data.h"
+#ifndef OHOS_ARCH_LITE
+#include <vector>
+#include "net_stats_info.h"
+#endif
 
 namespace OHOS {
 namespace Wifi {
@@ -58,6 +62,9 @@ using P2pEnhanceCallback = std::function<void(const std::string &, int32_t, int3
 using SensorEnhanceCallback = std::function<void(int)>;
 using MovementEnhanceCallback = std::function<void(int32_t movementType, int32_t movementValue)>;
 using GenelinkEnhanceCallback = std::function<void(int, int)>;
+#ifndef OHOS_ARCH_LITE
+using NetStats = std::vector<NetManagerStandard::NetStatsInfo>;
+#endif
 
 struct StaEnhanceCallback {
     GenelinkEnhanceCallback OnGenelinkEvent { nullptr };
@@ -248,19 +255,18 @@ public:
     virtual ErrCode RegisterP2pEnhanceCallback(const std::string &name, P2pEnhanceCallback callback) = 0;
 
     /**
+     * @Description Check Enhance Vap Available
+     *
+     * @return true: available, false: not available
+     */
+    virtual bool CheckEnhanceVapAvailable() = 0;
+
+    /**
      * @Description Check if custom network
      *
      * @return true or false
      */
     virtual bool IsCustomNetwork(WifiDeviceConfig &config) = 0;
-
-    /**
-     * @Description Check Enhance Vap Available
-     *
-     * @return true: available, false: not available
-     */
-
-    virtual bool CheckEnhanceVapAvailable() = 0;
 
     /**
      * @Description Check if specific network
@@ -317,7 +323,7 @@ public:
      * @param notificationId - notification Id
      */
     virtual void OnDontShowReceive(int notificationId) = 0;
-
+ 
     /**
      * @Description on dialog receive
      *
@@ -329,7 +335,7 @@ public:
      * @Description user reset network settings notify
      */
     virtual void ResetNetworkSettingsNotify() = 0;
-
+ 
     /**
      * @Description obtain supported frequency
      *
@@ -338,13 +344,6 @@ public:
      * @return int - supported frequency
      */
     virtual int FreqEnhance(int freq, bool is160M) = 0;
-
-    /**
-     * @Description Check if DFS is usable
-     *
-     * @return true: usable, false: not usable
-     */
-    virtual bool DfsUsable() = 0;
 
     /**
      * @Description set the enhance signal poll info
@@ -440,7 +439,7 @@ public:
      * @return Ipv6ControlData Ipv6 data info
      */
     virtual Ipv6ControlData GetIpv6ControlData() = 0;
-
+    
     /**
      * @Description check is in action listen
      *
@@ -496,6 +495,13 @@ public:
     virtual bool IsSupportLpScanAbility() = 0;
 
     /**
+     * @Description perform network probing using GRS
+     *
+     * @return bool - network probing result
+     */
+    virtual bool GrsProbe() = 0;
+
+    /**
      * @Description notify wifi disconnect reason
      *
      * @param reason - main reason
@@ -503,13 +509,6 @@ public:
      * @return void
      */
     virtual void NotifyWifiDisconnectReason(const int reason, const int subReason) = 0;
-
-    /**
-     * @Description perform network probing using GRS
-     *
-     * @return bool - network probing result
-     */
-    virtual bool GrsProbe() = 0;
 
     /**
      * @Description Genelink interface for exchanging information between WiFi and Enhance
@@ -603,6 +602,16 @@ public:
      * @return WifiDeviceFeatures - A structure indicating device features.
      */
     virtual WifiDeviceFeatures GetDeviceFeatures() = 0;
+
+#ifndef OHOS_ARCH_LITE
+    /**
+     * @Description Update network stats traffic info to enhance module
+     *
+     * @param netStats - network stats traffic info
+     * @return void
+     */
+    virtual void UpdateNetStatsTraffic(const NetStats& netStats) = 0;
+#endif
 
     /**
      * @Description set the enhance p2p signal poll info

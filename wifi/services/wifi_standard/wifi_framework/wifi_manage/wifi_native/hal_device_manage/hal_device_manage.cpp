@@ -1643,8 +1643,8 @@ int32_t ChipIfaceCallback::OnWifiNetlinkMessage(uint32_t type, const std::vector
 }
 
 bool HalDeviceManager::GetP2pSignalInfo(const std::string &interfaceName, const std::string &macAddr,
-     SignalPollResult &signalPollResult)
-{ 
+    SignalPollResult &signalPollResult)
+{
     std::string ifaceName = "p2p0";
     std::string result;
     if (!SendCmdToDriver(ifaceName, interfaceName, CMD_GET_SIGNAL, macAddr, result)) {

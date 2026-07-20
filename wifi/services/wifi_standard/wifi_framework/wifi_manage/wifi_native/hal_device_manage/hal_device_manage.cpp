@@ -1643,8 +1643,8 @@ int32_t ChipIfaceCallback::OnWifiNetlinkMessage(uint32_t type, const std::vector
 }
 
 bool HalDeviceManager::GetP2pSignalInfo(const std::string &interfaceName, const std::string &macAddr,
-    SignalPollResult &signalPollResult)
-{
+     SignalPollResult &signalPollResult)
+{ 
     std::string ifaceName = "p2p0";
     std::string result;
     if (!SendCmdToDriver(ifaceName, interfaceName, CMD_GET_SIGNAL, macAddr, result)) {
@@ -1654,9 +1654,9 @@ bool HalDeviceManager::GetP2pSignalInfo(const std::string &interfaceName, const 
     DeserializeSignalPollResultFromPtr(signedCharPointer, result.size(), signalPollResult);
     LOGD("HalDeviceManager GetP2pSignalInfo finish, currentRssi %{public}d, associatedFreq %{public}d,\
         txBitrate %{public}d, rxBitrate %{public}d, currentNoise %{public}d, currentSnr %{public}d,\
-        currentChload %{public}d, currentUlDelay %{public}d, currentTxBytes %{public}lu, currentRxBytes %{public}lu,\
-        currentTxFailed %{public}d, currentTxPackets %{public}d, currentRxPackets %{public}d,\
-        chloadSelf %{public}d, c0Rssi %{public}d, c1Rssi %{public}d",
+        currentChload %{public}d, currentUlDelay %{public}d, [currentTxBytes %{public}" PRIu64 "],\
+        [currentRxBytes %{public}" PRIu64 "], currentTxFailed %{public}d, currentTxPackets %{public}d,\
+        currentRxPackets %{public}d, chloadSelf %{public}d, c0Rssi %{public}d, c1Rssi %{public}d",
         signalPollResult.currentRssi, signalPollResult.associatedFreq, signalPollResult.txBitrate,
         signalPollResult.rxBitrate, signalPollResult.currentNoise, signalPollResult.currentSnr,
         signalPollResult.currentChload, signalPollResult.currentUlDelay, signalPollResult.currentTxBytes,

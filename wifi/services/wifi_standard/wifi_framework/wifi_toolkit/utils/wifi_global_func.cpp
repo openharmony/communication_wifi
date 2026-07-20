@@ -703,8 +703,9 @@ bool CheckDeviceTypeByVendorCountry()
     }
 
     LOGI("vendor country: %{public}s, errorCode: %{public}d.", param, errorCode);
-    auto iter = std::string(param).find("hwit");
-    return iter != std::string::npos;
+    auto iterHwit = std::string(param).find("hwit");
+    auto iterTobasic = std::string(param).find("tobbasic");
+    return iterHwit != std::string::npos || iterTobasic != std::string::npos;
 }
 
 bool IsStartUpWifiEnableSupport()

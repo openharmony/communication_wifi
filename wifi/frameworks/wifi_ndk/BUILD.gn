@@ -39,6 +39,7 @@ ohos_shared_library("wifi_ndk") {
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
+    cfi_vcall_icall_only = true  # CFI优化，限定CFI检测范围
     debug = false
   }
 

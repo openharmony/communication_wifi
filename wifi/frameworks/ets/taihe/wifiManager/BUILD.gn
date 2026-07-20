@@ -36,10 +36,12 @@ ohos_taihe("run_taihe") {
 }
 
 taihe_shared_library("wifiManager_taihe_native") { #调用taihe_shared_library模板编译so
+  shlib_type = "ani"
   sanitize = {
     cfi = true  # Enable/disable control flow integrity detection
     boundary_sanitize = false  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
+    cfi_vcall_icall_only = true
     debug = false
   }
   taihe_generated_file_path = "${taihe_generated_file_path_wifiManager}"

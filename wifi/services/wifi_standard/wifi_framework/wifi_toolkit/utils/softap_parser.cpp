@@ -21,6 +21,14 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("SoftapParser");
+
+/* Hotspot config map */
+const std::unordered_map<std::string, HotspotConfigType> g_hotspotConfigMap = {
+    {XML_TAG_SOFTAP_SSID, HotspotConfigType::SOFTAP_SSID},
+    {XML_SECURITY_TYPE, HotspotConfigType::SECURITYTYPE},
+    {XML_PASSPHRASE, HotspotConfigType::PASSPHRASE},
+};
+
 const int BAND_2GHZ = 1 << 0;
 const int SECURITY_TYPE_WPA2_PSK = 1;
 

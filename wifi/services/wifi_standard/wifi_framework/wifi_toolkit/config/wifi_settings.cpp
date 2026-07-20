@@ -46,6 +46,27 @@ namespace Wifi {
 static const int MAX_FILE_SIZE = 1024 * 1024 * 1024;
 static const int MIN_FILE_SIZE = 0;
 std::string g_defaultApSsid;
+
+/* Country default band frequencies */
+const std::vector<CountryDefaultBandFreqs> g_countryDefaultFreqs = {
+    /* CN 2.4G valid frequencies */
+    { "CN", BandType::BAND_2GHZ, {2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472} },
+    /* CN 5G valid frequencies, exclude radar frequencies */
+    { "CN", BandType::BAND_5GHZ, {5180, 5200, 5220, 5240, 5745, 5765, 5785, 5805, 5825} },
+};
+
+/* Key management array */
+const std::string KEY_MGMT_ARRAY[KEY_MGMT_TOTAL_NUM] = {
+    KEY_MGMT_NONE,
+    KEY_MGMT_WEP,
+    KEY_MGMT_WPA_PSK,
+    KEY_MGMT_SAE,
+    KEY_MGMT_EAP,
+    KEY_MGMT_SUITE_B_192,
+    KEY_MGMT_WAPI_CERT,
+    KEY_MGMT_WAPI_PSK
+};
+
 #ifdef DTFUZZ_TEST
 static WifiSettings* gWifiSettings = nullptr;
 #endif
@@ -68,6 +89,7 @@ WifiSettings::WifiSettings()
       mApMaxConnNum(MAX_AP_CONN),
       mMaxNumConfigs(MAX_CONFIGS_NUM)
 {
+    mSpecialSsidList = {"juneyaoair", "CEAIR-WIFI"};
 }
 
 WifiSettings::~WifiSettings()

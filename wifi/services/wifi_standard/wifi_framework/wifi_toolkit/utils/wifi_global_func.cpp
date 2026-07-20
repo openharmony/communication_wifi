@@ -703,8 +703,17 @@ bool CheckDeviceTypeByVendorCountry()
     }
 
     LOGI("vendor country: %{public}s, errorCode: %{public}d.", param, errorCode);
-    auto iter = std::string(param).find("hwit");
-    return iter != std::string::npos;
+    const std::vector<std::string> vendorCountryKey = {"hwit", "tobbasic"};
+    std::string paramStr(param);
+    bool found = false;
+    for (size_t i = 0; i < vendorCountryKey.size(); i++) {
+        auto it = paramStr.find(vendorCountryKey[i]);
+        if (it != std::string::npos) {
+            found = true;
+            break;
+        }
+    }
+    return found;
 }
 
 bool IsStartUpWifiEnableSupport()

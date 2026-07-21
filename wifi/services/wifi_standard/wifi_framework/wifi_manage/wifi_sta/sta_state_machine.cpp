@@ -2806,7 +2806,7 @@ void StaStateMachine::HandleNetCheckResultIsWorking(SystemNetWorkState netState,
     mPortalUrl = "";
     if (linkedInfo.connTriggerMode == NETWORK_SELECTED_BY_BACKGROUND_PORTAL) {
         linkedInfo.connTriggerMode = NETWORK_SELECTED_BY_AUTO;
-        InvokeOnStaConnChanged(OperateResState::CONNECT_NETWORK_ENABLED, linkedInfo);
+        InvokeOnStaConnChanged(OperateResState::CONNECT_AP_CONNECTED, linkedInfo);
     }
 #ifndef OHOS_ARCH_LITE
     UpdateAcceptUnvalidatedState();

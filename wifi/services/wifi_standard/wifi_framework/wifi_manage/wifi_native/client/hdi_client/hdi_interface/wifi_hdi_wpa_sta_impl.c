@@ -97,6 +97,14 @@ static int GetInstId(const char *ifaceName)
     return inst;
 }
 
+void ReleaseStaCallback(const char *ifName)
+{ 
+    int instId = GetInstId(ifName);
+    StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaStaCallbackObj[instId]);
+    free(g_hdiWpaStaCallbackObj[instId]);
+    g_hdiWpaStaCallbackObj[instId] = NULL;
+}
+
 static WifiErrorNo RegisterEventCallback(const char *ifaceName)
 {
     LOGI("RegisterEventCallback enter! ifaceName = %{public}s", ifaceName);

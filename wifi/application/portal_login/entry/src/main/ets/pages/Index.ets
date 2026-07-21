@@ -737,6 +737,7 @@ struct Index {
           this.handleFullScreenChange();
         })
         .onRenderExited((event) => {
+          // when render start failed, retry 3 times
           if (event) {
             hilog.info(DOMAIN, TAG, '%{public}s', 'onRenderExited reason:' + event.renderExitReason);
             if (this.renderExitRetryCount < MAX_RENDER_EXIT_RETRY) {

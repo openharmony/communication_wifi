@@ -876,7 +876,11 @@ struct Index {
 
   aboutToAppear(): void {
     this.netConnect.register((err: BusinessError) => {
-      hilog.error(DOMAIN, TAG, '%{public}s', 'Failed to register netconnect.' + JSON.stringify(err));
+      if (err) {
+        hilog.error(DOMAIN, TAG, '%{public}s', 'Failed to register netconnect.' + JSON.stringify(err));
+      } else {
+        hilog.info(DOMAIN, TAG, '%{public}s', 'register netconnect.');
+      }
     });
     this.netConnect.on('netLost', (data: connection.NetHandle) => {
       handleNetworkChange(data, this.context);

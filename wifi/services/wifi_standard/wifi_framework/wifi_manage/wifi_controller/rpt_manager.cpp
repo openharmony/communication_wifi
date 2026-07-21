@@ -126,6 +126,18 @@ void RptManager::OnStationLeave(std::string mac)
     pRptManagerMachine->SendMessage(msg);
 }
 
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+void RptManager::OnStaConnChanged(bool linked)
+{
+    if (pRptManagerMachine == nullptr) {
+        WIFI_LOGE("pRptManagerMachine is null");
+        return;
+    }
+    auto msg = pRptManagerMachine->CreateMessage(linked ? RPT_CMD_ON_STA_LINKED : RPT_CMD_ON_STA_UNLINKED);
+    pRptManagerMachine->SendMessage(msg);
+}
+#endif
+
 void RptManager::AddBlock(const std::string &mac)
 {
     auto msg = pRptManagerMachine->CreateMessage(RPT_CMD_ADD_BLOCK);

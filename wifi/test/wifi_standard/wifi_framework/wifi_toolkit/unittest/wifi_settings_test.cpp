@@ -1171,5 +1171,65 @@ HWTEST_F(WifiSettingsTest, GetSpecialSsidListTest, TestSize.Level1)
     WIFI_LOGE("GetSpecialSsidListTest result(%{public}d)", result);
     EXPECT_EQ(result, WIFI_OPT_SUCCESS);
 }
+
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+HWTEST_F(WifiSettingsTest, SetAndGetRptHotspotConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("SetAndGetRptHotspotConfigTest enter");
+    HotspotConfig config;
+    config.SetSsid("RptUtSsid");
+    config.SetPreSharedKey("RptUtPass");
+    config.SetSecurityType(KeyMgmt::WPA2_PSK);
+    config.SetBand(BandType::BAND_5GHZ);
+    config.SetChannel(36);
+    EXPECT_EQ(WifiSettings::GetInstance().SetRptHotspotConfig(config), 0);
+
+    HotspotConfig got;
+    EXPECT_EQ(WifiSettings::GetInstance().GetRptHotspotConfig(got), 0);
+    EXPECT_EQ(got.GetSsid(), "RptUtSsid");
+    EXPECT_EQ(got.GetPreSharedKey(), "RptUtPass");
+    EXPECT_EQ(got.GetBand(), BandType::BAND_5GHZ);
+    EXPECT_EQ(got.GetChannel(), 36);
+    WifiSettings::GetInstance().ClearRptHotspotConfig();
+}
+
+HWTEST_F(WifiSettingsTest, GetRptHotspotConfigDefaultTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetRptHotspotConfigDefaultTest enter");
+    WifiSettings::GetInstance().ClearRptHotspotConfig();
+    HotspotConfig got;
+    EXPECT_EQ(WifiSettings::GetInstance().GetRptHotspotConfig(got), 0);
+    EXPECT_FALSE(got.GetSsid().empty());
+    EXPECT_EQ(got.GetBand(), BandType::BAND_5GHZ);
+    EXPECT_EQ(got.GetSecurityType(), KeyMgmt::WPA2_PSK);
+}
+
+HWTEST_F(WifiSettingsTest, EnsureRptHotspotConfigPersistedTest, TestSize.Level1)
+{
+    WIFI_LOGI("EnsureRptHotspotConfigPersistedTest enter");
+    WifiSettings::GetInstance().ClearRptHotspotConfig();
+    EXPECT_EQ(WifiSettings::GetInstance().EnsureRptHotspotConfigPersisted(), 0);
+    HotspotConfig got;
+    EXPECT_EQ(WifiSettings::GetInstance().GetRptHotspotConfig(got), 0);
+    EXPECT_FALSE(got.GetSsid().empty());
+    // Already persisted: second call should be no-op success.
+    EXPECT_EQ(WifiSettings::GetInstance().EnsureRptHotspotConfigPersisted(), 0);
+    WifiSettings::GetInstance().ClearRptHotspotConfig();
+}
+
+HWTEST_F(WifiSettingsTest, ClearAndSyncRptHotspotConfigTest, TestSize.Level1)
+{
+    WIFI_LOGI("ClearAndSyncRptHotspotConfigTest enter");
+    HotspotConfig config;
+    config.SetSsid("RptSyncSsid");
+    config.SetPreSharedKey("RptSyncPass");
+    config.SetSecurityType(KeyMgmt::WPA2_PSK);
+    config.SetBand(BandType::BAND_5GHZ);
+    EXPECT_EQ(WifiSettings::GetInstance().SetRptHotspotConfig(config), 0);
+    EXPECT_EQ(WifiSettings::GetInstance().SyncRptHotspotConfig(), 0);
+    WifiSettings::GetInstance().ClearRptHotspotConfig();
+    EXPECT_EQ(WifiSettings::GetInstance().SyncRptHotspotConfig(), 0);
+}
+#endif
 }  // namespace Wifi
-}  // namespace OHO
+}  // namespace OHOS

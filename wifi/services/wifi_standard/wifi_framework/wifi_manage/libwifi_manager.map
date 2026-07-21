@@ -194,6 +194,11 @@
         "OHOS::Wifi::WifiSettings::SetHotspotConfig(OHOS::Wifi::HotspotConfig const&, int)";
         "OHOS::Wifi::WifiSettings::GetHotspotConfig(OHOS::Wifi::HotspotConfig&, int)";
         "OHOS::Wifi::WifiSettings::ClearHotspotConfig()";
+        "OHOS::Wifi::WifiSettings::SyncRptHotspotConfig()";
+        "OHOS::Wifi::WifiSettings::SetRptHotspotConfig(OHOS::Wifi::HotspotConfig const&)";
+        "OHOS::Wifi::WifiSettings::GetRptHotspotConfig(OHOS::Wifi::HotspotConfig&)";
+        "OHOS::Wifi::WifiSettings::EnsureRptHotspotConfigPersisted()";
+        "OHOS::Wifi::WifiSettings::ClearRptHotspotConfig()";
         "OHOS::Wifi::WifiSettings::GetBlockList(std::__h::vector<OHOS::Wifi::StationInfo, std::__h::allocator<OHOS::Wifi::StationInfo>>&, int)";
         "OHOS::Wifi::WifiSettings::ManageBlockList(OHOS::Wifi::StationInfo const&, int, int)";
         "OHOS::Wifi::WifiSettings::SyncWifiP2pGroupInfoConfig()";
@@ -453,6 +458,7 @@
         "OHOS::Wifi::WifiHotspotManager::StartUnloadApSaTimer()";
         "OHOS::Wifi::WifiTogglerManager::GetControllerMachine()";
         "OHOS::Wifi::WifiTogglerManager::SoftapToggled(int, int)";
+        "OHOS::Wifi::WifiTogglerManager::RptToggled(int, int)";
         "OHOS::Wifi::WifiMultiVapManager::CheckCanUseSoftAp()";
         "OHOS::Wifi::WifiP2pManager::StartUnloadP2PSaTimer()";
         "OHOS::Wifi::WifiP2pManager::GetP2pCallback()";

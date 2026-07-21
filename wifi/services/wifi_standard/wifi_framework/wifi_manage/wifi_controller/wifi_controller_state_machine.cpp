@@ -280,6 +280,11 @@ bool WifiControllerMachine::EnableState::HandleExtMsg(InternalMessagePtr msg)
             HandleApRemoved(msg);
             break;
 #ifdef FEATURE_RPT_SUPPORT
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+        case CMD_RPT_TOGGLED:
+            HandleRptToggleChangeInEnabledState(msg);
+            break;
+#endif
         case CMD_RPT_STOPPED:
             pWifiControllerMachine->HandleRptStop(msg->GetParam1());
             break;
@@ -514,6 +519,11 @@ HotspotMode WifiControllerMachine::CalculateHotspotMode(int id)
 {
     WIFI_LOGI("%{public}s, isLocalOnlyHotspot=%{public}d, hotspotMode=%{public}d",
         __func__, static_cast<int>(isLocalOnlyHotspot_), static_cast<int>(hotspotMode));
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    if (WifiConfigCenter::GetInstance().GetSoftapToggledState()) {
+        return HotspotMode::SOFTAP;
+    }
+#endif
     if (hotspotMode != HotspotMode::NONE) {
         return hotspotMode;
     }
@@ -796,6 +806,35 @@ void WifiControllerMachine::EnableState::HandleSoftapOpen(int id)
     pWifiControllerMachine->MakeHotspotManager(id);
 }
 
+#ifdef FEATURE_RPT_SUPPORT
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+void WifiControllerMachine::EnableState::HandleRptToggleChangeInEnabledState(InternalMessagePtr msg)
+{
+    int open = msg->GetParam1();
+    int id = msg->GetParam2();
+    if (open == 1) {
+        HandleRptOpen(id);
+    } else {
+        HandleRptClose(id);
+    }
+}
+
+void WifiControllerMachine::EnableState::HandleRptOpen(int id)
+{
+    if (!pWifiControllerMachine->rptManagers.IdExist(id)) {
+        pWifiControllerMachine->MakeRptManager(RptManager::Role::ROLE_RPT, id);
+    }
+}
+
+void WifiControllerMachine::EnableState::HandleRptClose(int id)
+{
+    if (pWifiControllerMachine->rptManagers.IdExist(id)) {
+        pWifiControllerMachine->rptManagers.StopManager(id);
+    }
+}
+#endif
+#endif
+
 void WifiControllerMachine::EnableState::HandleSoftapClose(int id)
 {
 #ifndef HDI_CHIP_INTERFACE_SUPPORT
@@ -953,8 +992,12 @@ void WifiControllerMachine::EnableState::HandleP2pStop(InternalMessagePtr msg)
 
 void WifiControllerMachine::EnableState::HandleRptStartFail(InternalMessagePtr msg)
 {
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    WIFI_LOGE("rpt start fail, skip softap cleanup");
+#else
     WIFI_LOGE("rpt start fail, set softap toggled false");
     WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
+#endif
 }
 #endif
 #endif

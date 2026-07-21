@@ -192,6 +192,9 @@ ohos_unittest("wifi_sub_manage_unittest") {
     "FEATURE_SELF_CURE_SUPPORT",
     "SUPPORT_RANDOM_MAC_ADDR",
   ]
+  if (wifi_feature_with_go_simulation_ap) {
+    defines += [ "FEATURE_WITH_GO_SIMULATION_AP" ]
+  }
 
   if (wifi_feature_with_extensible_authentication) {
     sources += ["$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_common/net_eap/net_eap_observer.cpp",]

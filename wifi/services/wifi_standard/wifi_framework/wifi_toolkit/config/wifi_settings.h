@@ -74,6 +74,9 @@ inline constexpr char DEVICE_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/device_config
 inline constexpr char BACKUP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/backup_config.conf";
 inline constexpr char HOTSPOT_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/hotspot_config.conf";
 inline constexpr char HOTSPOT_BACKUP_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/hotspot_backup.conf";
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+inline constexpr char RPT_HOTSPOT_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/rpt_hotspot_config.conf";
+#endif
 inline constexpr char BLOCK_LIST_FILE_PATH[] = CONFIG_ROOR_DIR"/block_list.conf";
 inline constexpr char WIFI_CONFIG_FILE_PATH[] = CONFIG_ROOR_DIR"/wifi_config.conf";
 inline constexpr char WIFI_P2P_GROUP_INFO_FILE_PATH[] = CONFIG_ROOR_DIR"/p2p_groups.conf";
@@ -269,6 +272,19 @@ public:
 
     int SyncHotspotConfig();
 
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    int SyncRptHotspotConfig();
+
+    int SetRptHotspotConfig(const HotspotConfig &config);
+
+    int GetRptHotspotConfig(HotspotConfig &config);
+
+    /** Persist in-memory RPT config when not yet saved (e.g. first EnableRpt without SetRptConfig). */
+    int EnsureRptHotspotConfigPersisted();
+
+    void ClearRptHotspotConfig();
+#endif
+
     int SetHotspotConfig(const HotspotConfig &config, int id = 0);
 
     int GetHotspotConfig(HotspotConfig &config, int id = 0);
@@ -404,6 +420,10 @@ private:
     void InitPackageInfoConfig();
     void InitDefaultHotspotConfig();
     void InitHotspotConfig();
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    void InitDefaultRptHotspotConfig();
+    void InitRptHotspotConfig();
+#endif
     int SyncBlockList();
     int ReloadWifiP2pGroupInfoConfig();
     void InitDefaultP2pVendorConfig();
@@ -468,6 +488,11 @@ private:
     // AP
     std::mutex mApMutex;
     std::map<int, HotspotConfig> mHotspotConfig;
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    HotspotConfig mRptHotspotConfig;
+    bool mRptHotspotConfigValid {false};
+    WifiConfigFileImpl<HotspotConfig> mSavedRptHotspotConfig;
+#endif
     WifiConfigFileImpl<HotspotConfig> mSavedHotspotConfig;
     std::map<std::string, StationInfo> mBlockListInfo;
     WifiConfigFileImpl<StationInfo> mSavedBlockInfo;

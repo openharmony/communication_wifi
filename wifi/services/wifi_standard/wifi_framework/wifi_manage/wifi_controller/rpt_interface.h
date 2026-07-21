@@ -35,6 +35,9 @@ public:
     virtual void OnP2pConnectionChanged(P2pConnectedState p2pConnState) = 0;
     virtual void OnStationJoin(std::string mac) = 0;
     virtual void OnStationLeave(std::string mac) = 0;
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    virtual void OnStaConnChanged(bool linked) { (void)linked; }
+#endif
 };
 } // namespace OHOS::Wifi
 #endif

@@ -161,6 +161,10 @@ if (defined(ohos_lite)) {
       defines += [ "WIFI_FEATURE_CAR_COCKPIT_SUPPORTED" ]
     }
 
+    if (wifi_feature_with_go_simulation_ap) {
+      defines += [ "FEATURE_WITH_GO_SIMULATION_AP" ]
+    }
+
     external_deps = [
       "ability_base:want",
       "c_utils:utils",

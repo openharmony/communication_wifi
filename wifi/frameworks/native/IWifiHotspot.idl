@@ -45,4 +45,9 @@ interface OHOS.Wifi.IWifiHotspot {
     void DisableLocalOnlyHotspot([in] ServiceTypeParcel type);
     void GetHotspotMode([out] HotspotModeParcel mode);
     void GetLocalOnlyHotspotConfig([out] HotspotConfigParcel config);
+    void SetRptConfig([in] HotspotConfigParcel config);
+    void GetRptConfig([out] HotspotConfigParcel config);
+    void EnableRpt([in] ServiceTypeParcel type);
+    void DisableRpt([in] ServiceTypeParcel type);
+    void IsRptActive([out] boolean isActive);
 }

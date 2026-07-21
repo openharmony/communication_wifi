@@ -65,6 +65,16 @@ HWTEST_F(WifiTogglerManagerTest, SoftapToggledTest02, TestSize.Level1)
     EXPECT_EQ(wifiTogglerManager_->SoftapToggled(isOpen, id), WIFI_OPT_SUCCESS);
 }
 
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+HWTEST_F(WifiTogglerManagerTest, RptToggledTest01, TestSize.Level1)
+{
+    int isOpen = 1;
+    int id = 0;
+    EXPECT_EQ(wifiTogglerManager_->RptToggled(isOpen, id), WIFI_OPT_SUCCESS);
+    EXPECT_EQ(wifiTogglerManager_->RptToggled(0, id), WIFI_OPT_SUCCESS);
+}
+#endif
+
 HWTEST_F(WifiTogglerManagerTest, ScanOnlyToggledTest01, TestSize.Level1)
 {
     int isOpen = 0;

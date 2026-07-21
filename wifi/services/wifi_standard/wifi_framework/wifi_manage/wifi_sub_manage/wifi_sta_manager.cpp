@@ -247,6 +247,18 @@ static void HandleStaDisconnected(int instId)
     }
 }
 
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+#ifdef FEATURE_RPT_SUPPORT
+static void HandleRptStaConnChanged(bool linked, int instId)
+{
+    auto rptManager = WifiManager::GetInstance().GetRptInterface(instId);
+    if (rptManager != nullptr && rptManager->IsRptRunning()) {
+        rptManager->OnStaConnChanged(linked);
+    }
+}
+#endif
+#endif
+
 void WifiStaManager::DealSignalPollReport(const std::string &bssid, const int32_t signalLevel, const int32_t instId)
 {
 #ifndef OHOS_ARCH_LITE
@@ -331,6 +343,11 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
             WIFI_LOGI("Cancel TASK_NAME_WIFI_DISCONNECT due to network detection success");
             staManagerEventHandler_->RemoveAsyncTask(TASK_NAME_WIFI_DISCONNECT);
         }
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+#ifdef FEATURE_RPT_SUPPORT
+        HandleRptStaConnChanged(true, instId);
+#endif
+#endif
     }
     bool isConnected = (info.connState == CONNECTED) ? true : false;
     WifiProtectManager::GetInstance().UpdateWifiClientConnected(isConnected);
@@ -338,6 +355,11 @@ void WifiStaManager::DealStaConnChanged(OperateResState state, const WifiLinkedI
         if (instId == INSTID_WLAN0) {
             WifiNotificationUtil::GetInstance().CancelWifiNotification(WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
         }
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+#ifdef FEATURE_RPT_SUPPORT
+        HandleRptStaConnChanged(false, instId);
+#endif
+#endif
         HandleStaDisconnected(instId);
     }
 #endif

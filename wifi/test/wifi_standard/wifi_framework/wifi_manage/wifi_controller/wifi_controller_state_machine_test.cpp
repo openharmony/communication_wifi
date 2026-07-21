@@ -382,6 +382,9 @@ public:
 
     void CalculateHotspotModeTest()
     {
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetSoftapToggledState()).WillRepeatedly(Return(false));
+#endif
         pWifiControllerMachine->hotspotMode = HotspotMode::NONE;
         pWifiControllerMachine->CalculateHotspotMode(0);
 
@@ -390,7 +393,45 @@ public:
 
         pWifiControllerMachine->hotspotMode = HotspotMode::RPT;
         EXPECT_TRUE(pWifiControllerMachine->CalculateHotspotMode(0) == HotspotMode::RPT);
+
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+        // SoftAP toggle has priority over existing RPT mode in cockpit scenario.
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetSoftapToggledState()).WillRepeatedly(Return(true));
+        pWifiControllerMachine->hotspotMode = HotspotMode::RPT;
+        EXPECT_TRUE(pWifiControllerMachine->CalculateHotspotMode(0) == HotspotMode::SOFTAP);
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetSoftapToggledState()).WillRepeatedly(Return(false));
+#endif
     }
+
+#ifdef FEATURE_RPT_SUPPORT
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    void RptToggledOpenCloseTest()
+    {
+        InternalMessagePtr openMsg = std::make_shared<InternalMessage>();
+        openMsg->SetMessageName(CMD_RPT_TOGGLED);
+        openMsg->SetParam1(1);
+        openMsg->SetParam2(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(openMsg));
+        EXPECT_TRUE(pWifiControllerMachine->rptManagers.IdExist(0));
+
+        InternalMessagePtr closeMsg = std::make_shared<InternalMessage>();
+        closeMsg->SetMessageName(CMD_RPT_TOGGLED);
+        closeMsg->SetParam1(0);
+        closeMsg->SetParam2(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(closeMsg));
+    }
+
+    void HandleRptStartFail_SkipSoftapCleanupTest()
+    {
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), SetSoftapToggledState(_)).Times(0);
+        InternalMessagePtr msg = std::make_shared<InternalMessage>();
+        msg->SetMessageName(CMD_RPT_START_FAILURE);
+        msg->SetParam1(0);
+        msg->SetParam2(0);
+        EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
+    }
+#endif
+#endif
 
     void SoftApIdExistTest()
     {
@@ -617,6 +658,20 @@ HWTEST_F(WifiControllerMachineTest, CalculateHotspotModeTest, TestSize.Level1)
 {
     CalculateHotspotModeTest();
 }
+
+#ifdef FEATURE_RPT_SUPPORT
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+HWTEST_F(WifiControllerMachineTest, RptToggledOpenCloseTest, TestSize.Level1)
+{
+    RptToggledOpenCloseTest();
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleRptStartFail_SkipSoftapCleanupTest, TestSize.Level1)
+{
+    HandleRptStartFail_SkipSoftapCleanupTest();
+}
+#endif
+#endif
 
 HWTEST_F(WifiControllerMachineTest, SoftApIdExistTest, TestSize.Level1)
 {

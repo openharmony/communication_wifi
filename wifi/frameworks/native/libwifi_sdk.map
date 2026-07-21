@@ -33,6 +33,11 @@
         DisableHotspot;
         SetHotspotConfig;
         GetHotspotConfig;
+        SetRptConfig;
+        GetRptConfig;
+        EnableRpt;
+        DisableRpt;
+        IsRptActive;
         IsHotspotActive;
         GetStationList;
         GetStationNum;

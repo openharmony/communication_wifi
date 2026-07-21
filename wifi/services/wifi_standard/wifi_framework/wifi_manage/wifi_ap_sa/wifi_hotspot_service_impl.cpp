@@ -14,6 +14,7 @@
  */
 
 #include "wifi_hotspot_service_impl.h"
+#include "wifi_settings.h"
 #include <csignal>
 #include <limits>
 #include "wifi_permission_utils.h"
@@ -54,7 +55,11 @@ int32_t WifiHotspotServiceImpl::IsHotspotActive(bool &bActive)
         WIFI_LOGE("IsHotspotActive:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    bActive = IsApServiceRunning();
+#else
     bActive = IsApServiceRunning() || IsRptRunning();
+#endif
     return WIFI_OPT_SUCCESS;
 }
 
@@ -379,9 +384,11 @@ int32_t WifiHotspotServiceImpl::GetStationList(std::vector<StationInfoParcel> &p
             return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
         }
         errCode = pService->GetStationList(result);
+#ifndef FEATURE_WITH_GO_SIMULATION_AP
     } else if (IsRptRunning()) {
         auto rptManager = WifiManager::GetInstance().GetRptInterface(m_id);
         errCode = (rptManager != nullptr) ? rptManager->GetStationList(result) : WIFI_OPT_FAILED;
+#endif
     } else {
         WIFI_LOGE("Instance %{public}d hotspot service is not running!", m_id);
         return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
@@ -524,6 +531,188 @@ ErrCode WifiHotspotServiceImpl::CheckCanEnableHotspot(const ServiceType type)
     return WIFI_OPT_SUCCESS;
 }
 
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+ErrCode WifiHotspotServiceImpl::VerifyRptConfigValidity(const HotspotConfig &config)
+{
+    std::vector<BandType> bandsFromCenter;
+    HotspotConfig cfgFromCenter;
+    if (WifiSettings::GetInstance().GetRptHotspotConfig(cfgFromCenter) != 0) {
+        WIFI_LOGE("GetRptHotspotConfig error");
+        return WIFI_OPT_FAILED;
+    }
+    return IsValidHotspotConfig(config, cfgFromCenter, bandsFromCenter);
+}
+
+ErrCode WifiHotspotServiceImpl::CheckCanEnableRpt(const ServiceType type)
+{
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("EnableRpt:NOT System APP, PERMISSION_DENIED!");
+        return WIFI_OPT_NON_SYSTEMAPP;
+    }
+    if (CheckOperHotspotSwitchPermission(type) == PERMISSION_DENIED) {
+        WIFI_LOGE("EnableRpt:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+        return WIFI_OPT_PERMISSION_DENIED;
+    }
+#ifndef OHOS_ARCH_LITE
+    if (WifiManager::GetInstance().GetWifiEventSubscriberManager()->IsMdmForbidden(
+        MdmForbiddenType::HOTSPOT)) {
+        WIFI_LOGE("EnableRpt: Mdm hotspot forbidden PERMISSION_DENIED!");
+        return WIFI_OPT_ENTERPRISE_DENIED;
+    }
+#endif
+    if (WifiConfigCenter::GetInstance().GetPowerSavingModeState() == 1) {
+        WIFI_LOGI("EnableRpt: power saving mode, open failed!");
+        return WIFI_OPT_FORBID_POWSAVING;
+    }
+    int toggleState = WifiConfigCenter::GetInstance().GetWifiToggledEnable(m_id);
+    if (toggleState == WIFI_STATE_DISABLED) {
+        WIFI_LOGE("EnableRpt: wifi toggle is disabled");
+        return WIFI_OPT_STA_NOT_OPENED;
+    }
+    if (toggleState != WIFI_STATE_ENABLED && toggleState != WIFI_STATE_SEMI_ENABLED) {
+        WIFI_LOGE("EnableRpt: invalid wifi toggle state %{public}d", toggleState);
+        return WIFI_OPT_FAILED;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
+int32_t WifiHotspotServiceImpl::SetRptConfigInternal(const HotspotConfig &config)
+{
+    HotspotConfig innerConfig = config;
+    innerConfig.SetBandWidth(AP_BANDWIDTH_DEFAULT);
+    if (WifiSettings::GetInstance().SetRptHotspotConfig(innerConfig) != 0) {
+        return HandleHotspotIdlRet(WIFI_OPT_NOT_SUPPORTED);
+    }
+    return HandleHotspotIdlRet(WIFI_OPT_SUCCESS);
+}
+#endif
+
+int32_t WifiHotspotServiceImpl::SetRptConfig(const HotspotConfigParcel &parcelconfig)
+{
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    HotspotConfig config = parcelconfig.ToHotspotConfig();
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("SetRptConfig:NOT System APP, PERMISSION_DENIED!");
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
+    }
+    if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetRptConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
+    }
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("SetRptConfig:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
+    }
+    ErrCode validRetval = VerifyRptConfigValidity(config);
+    if (validRetval != ErrCode::WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("SetRptConfig:VerifyRptConfigValidity failed!");
+        return HandleHotspotIdlRet(validRetval);
+    }
+    return SetRptConfigInternal(config);
+#else
+    (void)parcelconfig;
+    return HandleHotspotIdlRet(WIFI_OPT_NOT_SUPPORTED);
+#endif
+}
+
+int32_t WifiHotspotServiceImpl::GetRptConfig(HotspotConfigParcel &parcelresult)
+{
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("GetRptConfig:NOT System APP, PERMISSION_DENIED!");
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
+    }
+    if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetRptConfig:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
+    }
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("GetRptConfig:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
+    }
+    HotspotConfig config;
+    if (WifiSettings::GetInstance().GetRptHotspotConfig(config) != 0) {
+        return HandleHotspotIdlRet(WIFI_OPT_FAILED);
+    }
+    parcelresult = HotspotConfigParcel(config);
+    return HandleHotspotIdlRet(WIFI_OPT_SUCCESS);
+#else
+    (void)parcelresult;
+    return HandleHotspotIdlRet(WIFI_OPT_NOT_SUPPORTED);
+#endif
+}
+
+int32_t WifiHotspotServiceImpl::EnableRpt(const ServiceTypeParcel parcelType)
+{
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("Inst%{public}d %{public}s, pid:%{public}d, uid:%{public}d", m_id, __func__,
+        GetCallingPid(), GetCallingUid());
+#endif
+    ServiceType type = FromParcel<ServiceType>(parcelType);
+    ErrCode errCode = CheckCanEnableRpt(type);
+    if (errCode != WIFI_OPT_SUCCESS) {
+        return HandleHotspotIdlRet(errCode);
+    }
+    if (IsRptRunning()) {
+        WIFI_LOGI("EnableRpt: RPT already running");
+        return HandleHotspotIdlRet(WIFI_OPT_SUCCESS);
+    }
+    if (WifiSettings::GetInstance().EnsureRptHotspotConfigPersisted() != 0) {
+        WIFI_LOGE("EnableRpt: persist rpt config failed");
+        return HandleHotspotIdlRet(WIFI_OPT_FAILED);
+    }
+    WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_BRIDGE_REQUEST);
+    ErrCode ret = WifiManager::GetInstance().GetWifiTogglerManager()->RptToggled(1, m_id);
+    return HandleHotspotIdlRet(ret);
+#else
+    (void)parcelType;
+    return HandleHotspotIdlRet(WIFI_OPT_NOT_SUPPORTED);
+#endif
+}
+
+int32_t WifiHotspotServiceImpl::DisableRpt(const ServiceTypeParcel parcelType)
+{
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("Inst%{public}d %{public}s, pid:%{public}d, uid:%{public}d", m_id, __func__,
+        GetCallingPid(), GetCallingUid());
+#endif
+    ServiceType type = FromParcel<ServiceType>(parcelType);
+    if (!WifiAuthCenter::IsSystemAccess()) {
+        WIFI_LOGE("DisableRpt:NOT System APP, PERMISSION_DENIED!");
+        return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
+    }
+    if (CheckOperHotspotSwitchPermission(type) == PERMISSION_DENIED) {
+        WIFI_LOGE("DisableRpt:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
+    }
+    if (!IsRptRunning()) {
+        return HandleHotspotIdlRet(WIFI_OPT_SUCCESS);
+    }
+    ErrCode ret = WifiManager::GetInstance().GetWifiTogglerManager()->RptToggled(0, m_id);
+    return HandleHotspotIdlRet(ret);
+#else
+    (void)parcelType;
+    return HandleHotspotIdlRet(WIFI_OPT_NOT_SUPPORTED);
+#endif
+}
+
+int32_t WifiHotspotServiceImpl::IsRptActive(bool &isActive)
+{
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
+        WIFI_LOGE("IsRptActive:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
+    }
+    isActive = IsRptRunning();
+    return HandleHotspotIdlRet(WIFI_OPT_SUCCESS);
+#else
+    isActive = false;
+    return HandleHotspotIdlRet(WIFI_OPT_NOT_SUPPORTED);
+#endif
+}
+
 int32_t WifiHotspotServiceImpl::EnableHotspot(const ServiceTypeParcel parcelType)
 {
 #ifndef OHOS_ARCH_LITE
@@ -568,10 +757,17 @@ int32_t WifiHotspotServiceImpl::EnableLocalOnlyHotspot(const ServiceTypeParcel p
     if (errCode != WIFI_OPT_SUCCESS) {
         return HandleHotspotIdlRet(errCode);
     }
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    if (IsApServiceRunning()) {
+        WIFI_LOGI("%{public}s, softap is running, can not use localOnlyHotspot", __func__);
+        return HandleHotspotIdlRet(WIFI_OPT_FAILED);
+    }
+#else
     if (IsRptRunning() || IsApServiceRunning()) {
         WIFI_LOGI("%{public}s, softap/rpt is running, can not use localOnlyHotspot", __func__);
         return HandleHotspotIdlRet(WIFI_OPT_FAILED);
     }
+#endif
     auto &wifiControllerMachine = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     if (wifiControllerMachine != nullptr) {
         wifiControllerMachine->IsLocalOnlyHotspot(true);
@@ -639,6 +835,7 @@ static ErrCode AddApBlockList(int m_id, StationInfo& updateInfo)
     return WIFI_OPT_SUCCESS;
 }
 
+#ifndef FEATURE_WITH_GO_SIMULATION_AP
 static ErrCode AddRptBlockList(int m_id, StationInfo &info)
 {
     auto rptManager = WifiManager::GetInstance().GetRptInterface(m_id);
@@ -648,6 +845,7 @@ static ErrCode AddRptBlockList(int m_id, StationInfo &info)
     rptManager->AddBlock(info.bssid);
     return WIFI_OPT_SUCCESS;
 }
+#endif
 
 int32_t WifiHotspotServiceImpl::AddBlockList(const StationInfoParcel &parcelInfo)
 {
@@ -669,12 +867,19 @@ int32_t WifiHotspotServiceImpl::AddBlockList(const StationInfoParcel &parcelInfo
     if (CheckMacIsValid(info.bssid)) {
         return HandleHotspotIdlRet(WIFI_OPT_INVALID_PARAM);
     }
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    if (!IsApServiceRunning()) {
+        WIFI_LOGE("ApService is not running!");
+        return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
+    }
+#else
     bool isApServiceRunning = IsApServiceRunning();
     bool isRptRunning = IsRptRunning();
     if (!isApServiceRunning && !isRptRunning) {
         WIFI_LOGE("ApService is not running!");
         return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
     }
+#endif
     StationInfo updateInfo = info;
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     TransRandomToRealMac(updateInfo, info);
@@ -686,8 +891,10 @@ int32_t WifiHotspotServiceImpl::AddBlockList(const StationInfoParcel &parcelInfo
 
     if (isApServiceRunning) {
         return AddApBlockList(m_id, updateInfo);
+#ifndef FEATURE_WITH_GO_SIMULATION_AP
     } else if (isRptRunning) {
         return AddRptBlockList(m_id, updateInfo);
+#endif
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -728,12 +935,14 @@ int32_t WifiHotspotServiceImpl::DelBlockList(const StationInfoParcel &parcelInfo
             WIFI_LOGE("request del hotspot blocklist failed!");
             return HandleHotspotIdlRet(WIFI_OPT_FAILED);
         }
+#ifndef FEATURE_WITH_GO_SIMULATION_AP
     } else if (IsRptRunning()) {
         auto rptManager = WifiManager::GetInstance().GetRptInterface(m_id);
         if (rptManager == nullptr) {
             return HandleHotspotIdlRet(WIFI_OPT_FAILED);
         }
         rptManager->DelBlock(info.bssid);
+#endif
     }
 
     if (WifiSettings::GetInstance().ManageBlockList(info, MODE_DEL, m_id) < 0) {
@@ -1224,12 +1433,18 @@ int32_t WifiHotspotServiceImpl::GetApIfaceName(std::string& ifaceName)
         WIFI_LOGE("GetBlockLists:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    if (IsApServiceRunning()) {
+        ifaceName = WifiConfigCenter::GetInstance().GetApIfaceName();
+    }
+#else
     if (IsApServiceRunning()) {
         ifaceName = WifiConfigCenter::GetInstance().GetApIfaceName();
     } else if (IsRptRunning()) {
         auto rptManager = WifiManager::GetInstance().GetRptInterface(m_id);
         ifaceName = (rptManager != nullptr) ? rptManager->GetRptIfaceName() : "";
     }
+#endif
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

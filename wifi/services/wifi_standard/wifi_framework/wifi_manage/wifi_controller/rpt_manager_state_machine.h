@@ -25,6 +25,9 @@
 #include "wifi_internal_msg.h"
 #include "wifi_controller_define.h"
 #include "ip2p_service_callbacks.h"
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+#include "wifi_rpt_nat_manager.h"
+#endif
 
 namespace OHOS::Wifi {
 
@@ -93,6 +96,10 @@ public:
         void GoOutState() override;
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
     private:
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+        bool ExecuteStateMsgEx(InternalMessagePtr msg);
+        void ProcessCmdEnableRpt();
+#endif
         RptManagerMachine *pRptManagerMachine;
     };
 
@@ -144,6 +151,10 @@ private:
     void BuildStateTree();
     ErrCode InitRptManagerStates();
     WifiP2pConfig CreateRptConfig();
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    void DisableRptNat();
+    bool EnableRptNat();
+#endif
 
     void SetMacFilter(std::string mac);
     void InitBlockList();
@@ -164,6 +175,12 @@ private:
 
     RptModeCallback mcb;
     static int mid;
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    WifiRptNatManager mRptNatManager;
+    std::string rptNatInIface_;
+    std::string rptNatOutIface_;
+    bool rptNatEnabled_{false};
+#endif
 };
 } // namespace OHOS::Wifi
 #endif

@@ -281,6 +281,52 @@ ErrCode WifiHotspotImpl::DisableHotspot(const ServiceType type)
     return ErrCodeToWifiErrCode(ret);
 }
 
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+ErrCode WifiHotspotImpl::SetRptConfig(const HotspotConfig &config)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
+    OHOS::ErrCode ret = client_->SetRptConfig(config);
+    return ErrCodeToWifiErrCode(ret);
+}
+
+ErrCode WifiHotspotImpl::GetRptConfig(HotspotConfig &config)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
+    HotspotConfigParcel parcelConfig;
+    OHOS::ErrCode ret = client_->GetRptConfig(parcelConfig);
+    if (ret == WIFI_OPT_SUCCESS) {
+        config = parcelConfig.ToHotspotConfig();
+    }
+    return ErrCodeToWifiErrCode(ret);
+}
+
+ErrCode WifiHotspotImpl::EnableRpt(const ServiceType type)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
+    OHOS::ErrCode ret = client_->EnableRpt(ToParcel<ServiceTypeParcel>(type));
+    return ErrCodeToWifiErrCode(ret);
+}
+
+ErrCode WifiHotspotImpl::DisableRpt(const ServiceType type)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
+    OHOS::ErrCode ret = client_->DisableRpt(ToParcel<ServiceTypeParcel>(type));
+    return ErrCodeToWifiErrCode(ret);
+}
+
+ErrCode WifiHotspotImpl::IsRptActive(bool &isActive)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiHotspotProxy());
+    OHOS::ErrCode ret = client_->IsRptActive(isActive);
+    return ErrCodeToWifiErrCode(ret);
+}
+#endif
+
 ErrCode WifiHotspotImpl::GetBlockLists(std::vector<StationInfo> &infos)
 {
     std::lock_guard<std::mutex> lock(mutex_);

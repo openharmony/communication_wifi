@@ -25,22 +25,13 @@
 #include "wifi_internal_msg.h"
 #include "wifi_settings.h"
 #include "wifi_scan_config.h"
+#include "hid2d_service_registry.h"
 #ifndef STA_INSTANCE_MAX_NUM
 #define STA_INSTANCE_MAX_NUM 2
 #endif
-#define SOFT_BUS_SERVICE_UID 1024
+
 #define WAUDIO_SERVICE_UID 7056
-#define CAST_ENGINE_SERVICE_UID 5526
-#define MIRACAST_SERVICE_UID 5529
-#define MIRACAST_SERVICE_SA_ID 5527
-#define SHARE_SERVICE_UID 5520
-#define MOUSE_CROSS_SERVICE_UID 6699
-#define HICAR_SERVICE_UID 65872
 #define EDM_SERVICE_UID 3057
-#define HICAR_SERVICE_SA_ID 65872
-#define GAMESERVICE_SA_UID 7011
-#define GAMESERVICE_SA_ID 66006
-#define WATCH_SERVICE_UID 7500
 #define HILINK_PRO_NETWORK 4
 namespace OHOS {
 namespace Wifi {

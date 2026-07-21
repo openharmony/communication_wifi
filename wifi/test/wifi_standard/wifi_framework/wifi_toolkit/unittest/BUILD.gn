@@ -28,6 +28,7 @@ ohos_unittest("toolkit_unittest") {
     "$WIFI_ROOT_DIR/base/utils/wifi_app_parser.cpp",
     "$WIFI_ROOT_DIR/base/utils/xml_parser.cpp",
     "$WIFI_ROOT_DIR/frameworks/native/src/wifi_p2p_msg.cpp",
+    "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/hid2d_service_registry.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_backup_config.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_config_center.cpp",
     "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_toolkit/config/wifi_config_file_spec.cpp",
@@ -71,6 +72,7 @@ ohos_unittest("toolkit_unittest") {
     "wifi_ip_tools_test.cpp",
     "wifi_randommac_helper_test.cpp",
     "wifi_settings_test.cpp",
+    "hid2d_service_registry_test.cpp",
     "xml_parser_test.cpp",
   ]
 

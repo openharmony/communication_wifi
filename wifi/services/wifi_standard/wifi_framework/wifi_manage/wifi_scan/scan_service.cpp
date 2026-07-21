@@ -19,6 +19,7 @@
 #include "wifi_internal_msg.h"
 #include "wifi_logger.h"
 #include "wifi_config_center.h"
+#include "hid2d_service_registry.h"
 #include "wifi_channel_helper.h"
 #include "wifi_sta_hal_interface.h"
 #include "wifi_common_util.h"
@@ -2915,21 +2916,7 @@ bool ScanService::AllowLpScan(ScanType scanType)
 bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
 {
     LOGD("Enter AllowScanByHid2dState.\n");
-    Hid2dUpperScene softbusScene;
-    Hid2dUpperScene castScene;
-    Hid2dUpperScene shareScene;
-    Hid2dUpperScene mouseCrossScene;
-    Hid2dUpperScene miracastScene;
-    Hid2dUpperScene gameScene;
-    Hid2dUpperScene watchScene;
     WifiP2pLinkedInfo linkedInfo;
-    WifiConfigCenter::GetInstance().GetHid2dUpperScene(SOFT_BUS_SERVICE_UID, softbusScene);
-    WifiConfigCenter::GetInstance().GetHid2dUpperScene(CAST_ENGINE_SERVICE_UID, castScene);
-    WifiConfigCenter::GetInstance().GetHid2dUpperScene(MIRACAST_SERVICE_UID, miracastScene);
-    WifiConfigCenter::GetInstance().GetHid2dUpperScene(SHARE_SERVICE_UID, shareScene);
-    WifiConfigCenter::GetInstance().GetHid2dUpperScene(MOUSE_CROSS_SERVICE_UID, mouseCrossScene);
-    WifiConfigCenter::GetInstance().GetHid2dUpperScene(GAMESERVICE_SA_UID, gameScene);
-    WifiConfigCenter::GetInstance().GetHid2dUpperScene(WATCH_SERVICE_UID, watchScene);
     WifiConfigCenter::GetInstance().GetP2pInfo(linkedInfo);
 
     if (IsAppInFilterList(scan_hid2d_list)) {
@@ -2939,9 +2926,9 @@ bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
     int64_t hid2dSceneLastSetTime = WifiConfigCenter::GetInstance().GetHid2dSceneLastSetTime();
     int64_t intervalTime = GetIntervalTime(hid2dSceneLastSetTime);
     if (intervalTime < 0) {
-      WIFI_LOGE("time error, abandon this scan and reset the hid2dSceneLastSetTime.");
-      WifiConfigCenter::GetInstance().SetHid2dSceneLastSetTime(0);
-      return false;
+        WIFI_LOGE("time error, abandon this scan and reset the hid2dSceneLastSetTime.");
+        WifiConfigCenter::GetInstance().SetHid2dSceneLastSetTime(0);
+        return false;
     }
     if (hid2dSceneLastSetTime != 0 && intervalTime > HID2D_TIMEOUT_INTERVAL
         && linkedInfo.GetConnectState() == P2pConnectedState::P2P_DISCONNECTED
@@ -2950,71 +2937,36 @@ bool ScanService::AllowScanByHid2dState(ScanType scanType, int &scanStyle)
         WifiConfigCenter::GetInstance().ClearLocalHid2dInfo();
         return true;
     }
-    // scene bit 0-2 is valid, 0x01: video, 0x02: audio, 0x04: file,
-    // scene & 0x07 > 0 means one of them takes effect.
-    if ((softbusScene.scene & 0x07) > 0) {
-        if ((softbusScene.scene & 0x07) <= 0x03 && AllowLpScan(scanType)) {
+    for (const auto& entry : GetHid2dServiceRegistry()) {
+        Hid2dUpperScene scene;
+        WifiConfigCenter::GetInstance().GetHid2dUpperScene(entry.uid, scene);
+        
+        if ((scene.scene & 0x07) == 0) {
+            continue;
+        }
+ 
+        if (entry.uid == SOFT_BUS_SERVICE_UID) {
+            if ((scene.scene & 0x07) <= 0x03 && AllowLpScan(scanType)) {
+                scanStyle = SCAN_TYPE_LOW_PRIORITY;
+                WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::LP_SCAN_UNCTRL_CNT);
+                WIFI_LOGI("LP Scan is allowed in %{public}s hid2d.", entry.serviceName.c_str());
+                return true;
+            }
+        } else if (entry.allowLpScan && AllowLpScan(scanType)) {
             scanStyle = SCAN_TYPE_LOW_PRIORITY;
             WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::LP_SCAN_UNCTRL_CNT);
-            WIFI_LOGI("LP Scan is allowed in cast/softbus hid2d.");
+            WIFI_LOGI("LP Scan is allowed in %{public}s hid2d.", entry.serviceName.c_str());
             return true;
         }
-        WIFI_LOGW("Scan is not allowed in softbus hid2d.");
+ 
+        WIFI_LOGW("Scan is not allowed in %{public}s hid2d.", entry.serviceName.c_str());
         WifiScanChr::GetInstance().RecordScanChrLimitInfo(
             WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
-            ScanLimitType::HID2D_SOFTBUS);
+            entry.limitType);
         return false;
-    } else if ((castScene.scene & 0x07) > 0) {
-        WifiScanChr::GetInstance().RecordScanChrLimitInfo(
-            WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
-            ScanLimitType::HID2D_CAST);
-        if (AllowLpScan(scanType)) {
-            scanStyle = SCAN_TYPE_LOW_PRIORITY;
-            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::LP_SCAN_UNCTRL_CNT);
-            WIFI_LOGI("LP Scan is allowed in cast hid2d.");
-            return true;
-        }
-        WIFI_LOGW("Scan is not allowed in cast hid2d.");
-        return false;
-    } else if ((miracastScene.scene & 0x07) > 0) {
-        WifiScanChr::GetInstance().RecordScanChrLimitInfo(
-            WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
-            ScanLimitType::HID2D_MIRACAST);
-        if (AllowLpScan(scanType)) {
-            scanStyle = SCAN_TYPE_LOW_PRIORITY;
-            WifiScanChr::GetInstance().RecordScanChrCommonInfo(ScanChrParam::LP_SCAN_UNCTRL_CNT);
-            WIFI_LOGI("LP Scan is allowed in miracast hid2d.");
-            return true;
-        }
-        WIFI_LOGW("Scan is not allowed in miracast hid2d.");
-        return false;
-    } else if ((shareScene.scene & 0x07) > 0) {
-        WIFI_LOGW("Scan is not allowed in share hid2d.");
-        WifiScanChr::GetInstance().RecordScanChrLimitInfo(
-            WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
-            ScanLimitType::HID2D_SHARE);
-        return false;
-    } else if ((mouseCrossScene.scene & 0x07) > 0) {
-        WIFI_LOGW("Scan is not allowed in mouse cross hid2d.");
-        WifiScanChr::GetInstance().RecordScanChrLimitInfo(
-            WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
-            ScanLimitType::HID2D_CROSS);
-        return false;
-    } else if ((gameScene.scene & 0x07) > 0) {
-        WIFI_LOGW("Scan is not allowed in game hid2d.");
-        WifiScanChr::GetInstance().RecordScanChrLimitInfo(
-            WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
-            ScanLimitType::HID2D_GAME);
-        return false;
-    } else if ((watchScene.scene & 0x07) > 0) {
-        WIFI_LOGW("Scan is not allowed in watch hid2d.");
-        WifiScanChr::GetInstance().RecordScanChrLimitInfo(
-            WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanDeviceInfo(),
-            ScanLimitType::HID2D_WATCH);
-        return false;
-    } else {
-        WIFI_LOGD("allow hid2d scan");
     }
+ 
+    WIFI_LOGD("allow hid2d scan");
     return true;
 }
 

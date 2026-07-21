@@ -38,9 +38,6 @@ namespace Wifi {
 #ifdef HAS_POWERMGR_PART
 inline const std::string COMMON_EVENT_POWER_MANAGER_STATE_CHANGED = "usual.event.POWER_MANAGER_STATE_CHANGED";
 #endif
-const int CAST_ENGINE_SA_ID = 65546;
-const int SHARE_SERVICE_ID = 2902;
-const int MOUSE_CROSS_SERVICE_ID = 65569;
 constexpr int32_t MOVEMENT_TYPE_STILL = 4;
 constexpr int32_t MOVEMENT_TYPE_STAY = 14;
 constexpr int32_t MOVEMENT_VALUE_ENTER = 1;
@@ -206,11 +203,6 @@ private:
     void HandleCommNetConnManagerSysChange(int systemAbilityId, bool add);
     void HandleEthernetServiceChange(int systemAbilityId, bool add);
     void HandleDistributedKvDataServiceChange(bool add);
-    void HandleCastServiceChange(bool add);
-    void HandleShareServiceChange(bool add);
-    void HandleMouseCrossServiceChange(bool add);
-    void HandleGameServiceChange(bool add);
-    void HandleWatchServiceChange(bool add);
     int GetLastStaStateByDatashare();
     void RegisterCesEvent();
 #ifdef HAS_POWERMGR_PART

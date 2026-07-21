@@ -22,6 +22,7 @@
 #include "wifi_channel_helper.h"
 #include "wifi_common_util.h"
 #include "wifi_config_center.h"
+#include "hid2d_service_registry.h"
 #include "wifi_dumper.h"
 #include "wifi_hid2d_service_utils.h"
 #include "wifi_internal_event_dispatcher.h"
@@ -1371,10 +1372,7 @@ ErrCode WifiP2pServiceImpl::Hid2dSetUpperScene(const std::string& ifName, const 
 {
     WIFI_LOGI("Hid2dSetUpperScene");
     int callingUid = GetCallingUid();
-    if (callingUid != SOFT_BUS_SERVICE_UID && callingUid != CAST_ENGINE_SERVICE_UID &&
-        callingUid != MIRACAST_SERVICE_UID && callingUid != SHARE_SERVICE_UID &&
-        callingUid != MOUSE_CROSS_SERVICE_UID && callingUid != HICAR_SERVICE_UID &&
-        callingUid != GAMESERVICE_SA_UID && callingUid != WATCH_SERVICE_UID) {
+    if (!IsHid2dServiceUid(callingUid)) {
         WIFI_LOGE("%{public}s, permission denied! uid = %{public}d", __func__, callingUid);
         return WIFI_OPT_PERMISSION_DENIED;
     }

@@ -17,6 +17,7 @@
 #define CONCRETE_MANAGER_STATE_MACHINE_H
 
 #include <string>
+#include <cstdint>
 #include "state_machine.h"
 #include "wifi_logger.h"
 #include "wifi_errcode.h"
@@ -47,6 +48,7 @@ public:
         void HandleSwitchToConnectMode(InternalMessagePtr msg);
         void HandleSwitchToScanOnlyMode(InternalMessagePtr msg);
         void HandleStartInIdleState(InternalMessagePtr msg);
+        void InitFastScanOnWearable();
         void HandleSwitchToSemiActiveMode(InternalMessagePtr msg);
     };
 
@@ -150,6 +152,7 @@ private:
     ConcreteModeCallback mcb;
     static int mid;
     static std::string ifaceName;
+    uint32_t fastScanTimerId{0};
 };
 } // namespace Wifi
 } // namespace OHOS

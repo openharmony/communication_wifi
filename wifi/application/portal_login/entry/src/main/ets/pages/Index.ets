@@ -924,7 +924,6 @@ struct Index {
 
   aboutToDisappear(): void {
     updateAboutToDisappear();
-    this.netConnect.off('netLost');
     this.netConnect.unregister((err: BusinessError) => {
       if (err) {
         hilog.error(

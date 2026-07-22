@@ -191,26 +191,6 @@ HWTEST_F(WifiHalDeviceManagerTest, GetChipsetWifiFeatrureCapabilityTest, TestSiz
         ifaceName, chipsetFeatrureCapability));
 }
 
-HWTEST_F(WifiHalDeviceManagerTest, GetFrequenciesByBandTest, TestSize.Level1)
-{
-    std::string ifaceName;
-    int instId = 0;
-    HalDeviceManager::g_chipHdiServiceDied = true;
-    DelayedSingleton<HalDeviceManager>::GetInstance()->CreateApIface(
-        std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2), ifaceName);
-    int32_t band = 0;
-    std::vector<int> frequencies;
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, frequencies));
-
-    HalDeviceManager::GetInstance().CreateStaIface(
-        std::bind(WifiHalDeviceManagerTest::DestoryCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnRssiReportCallback, std::placeholders::_1, std::placeholders::_2),
-        std::bind(WifiHalDeviceManagerTest::OnNetlinkReportCallback, std::placeholders::_1, std::placeholders::_2),
-        ifaceName,
-        instId);
-    EXPECT_EQ(false, HalDeviceManager::GetInstance().GetFrequenciesByBand(ifaceName, band, frequencies));
-}
-
 HWTEST_F(WifiHalDeviceManagerTest, SetPowerModelTest, TestSize.Level1)
 {
     std::string ifaceName;

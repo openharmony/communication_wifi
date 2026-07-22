@@ -1061,6 +1061,12 @@ private:
      * @param scan freq
      */
     void GetSavedNetworkFreq(std::vector<int> &scanFreqs);
+
+    /**
+     * @Description Check whether to skip scan on wearable during fast scan
+     * @return true if scan should be skipped
+     */
+    bool ShouldSkipScanOnWearable();
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -1313,6 +1313,10 @@ void ScanService::HandleStaStatusChanged(int status)
             break;
         }
         case static_cast<int>(OperateResState::CONNECT_AP_CONNECTED): {
+            if (WifiConfigCenter::GetInstance().IsNeedFastScan()) {
+                WIFI_LOGI("sta status changed to %{public}d, release fast scan flag", staStatus);
+                WifiConfigCenter::GetInstance().SetFastScan(false);
+            }
             SystemScanProcess(false);
             SystemSingleScanProcess();
             std::unique_lock<std::mutex> lock(scanConfigMapMutex);
@@ -1404,12 +1408,25 @@ void ScanService::HandleAutoConnectStateChanged(bool success)
     }
     if (staStatus == static_cast<int>(OperateResState::DISCONNECT_DISCONNECTED) && screenState != MODE_STATE_CLOSE &&
         !success && scanCount <= 1 && !isOutdoorScene) {
+        if (WifiConfigCenter::GetInstance().IsNeedFastScan()) {
+            WIFI_LOGI("auto connect failed, release fast scan flag");
+            WifiConfigCenter::GetInstance().SetFastScan(false);
+        }
         if (Scan(ScanType::SCAN_TYPE_SYSTEMTIMER) != WIFI_OPT_SUCCESS) {
             WIFI_LOGE("Scan failed.");
         }
         std::unique_lock<std::mutex> lock(scanControlInfoMutex);
         systemScanIntervalMode.scanIntervalMode.count++;
     }
+}
+
+bool ScanService::ShouldSkipScanOnWearable()
+{
+    if (GetDeviceType() == ProductDeviceType::WEARABLE && WifiConfigCenter::GetInstance().IsNeedFastScan()) {
+        WIFI_LOGI("skip scan on wearable, fast scan flag is set");
+        return true;
+    }
+    return false;
 }
 
 void ScanService::SystemScanProcess(bool scanAtOnce)
@@ -1744,6 +1761,10 @@ ErrCode ScanService::AllowExternScan(ScanType scanType, int &scanStyle)
     if (WifiConfigCenter::GetInstance().GetSystemMode() == SystemMode::M_FACTORY_MODE) {
         WIFI_LOGI("Enter AllowExternScan FactoryMode, extern scan has allowed.");
         return WIFI_OPT_SUCCESS;
+    }
+
+    if (ShouldSkipScanOnWearable()) {
+        return WIFI_OPT_FAILED;
     }
 
     if (!AllowExternScanByIntervalMode(appId, SCAN_SCENE_FREQUENCY_ORIGIN, scanMode)) {
@@ -2348,7 +2369,18 @@ void ScanService::GetSavedNetworkFreq(std::vector<int> &scanFreqs)
 
 void ScanService::CheckNeedFastScan(std::vector<int> &scanFreqs)
 {
-    if (GetDeviceType() != ProductDeviceType::WEARABLE && GetDeviceType() != ProductDeviceType::TV) {
+    if (GetDeviceType() == ProductDeviceType::WEARABLE) {
+        if (scanFreqs.empty() && WifiConfigCenter::GetInstance().IsNeedFastScan()) {
+            GetSavedNetworkFreq(scanFreqs);
+            WIFI_LOGI("CheckNeedFastScan triggered, fast scan freqs size: %{public}zu", scanFreqs.size());
+            if (scanFreqs.empty()) {
+                WIFI_LOGI("fast scan freqs empty, no saved network nearby, release fast scan flag");
+                WifiConfigCenter::GetInstance().SetFastScan(false);
+            }
+        }
+        return;
+    }
+    if (GetDeviceType() != ProductDeviceType::TV) {
         WIFI_LOGD("Not wearable or tv device, do not fast scan");
         return;
     }

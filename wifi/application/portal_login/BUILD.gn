@@ -32,8 +32,8 @@ ohos_app("portal_login_hap") {
   build_modules = [ "entry" ]  
   if (defined(sign_hap_py_path)) {
     certificate_profile = "${certificate_profile_path}"
-    key_alias = "CaptivePortalLoginHm Release"
-    private_key_path = "CaptivePortalLoginHm Release"
+    key_alias = "CaptivePortalLoginHm Release V2"
+    private_key_path = "CaptivePortalLoginHm Release V2"
     compatible_version = "14"
   }
 }

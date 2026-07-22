@@ -98,7 +98,7 @@ static int GetInstId(const char *ifaceName)
 }
 
 void ReleaseStaCallback(const char *ifName)
-{ 
+{
     int instId = GetInstId(ifName);
     StubCollectorRemoveObject(IWPACALLBACK_INTERFACE_DESC, g_hdiWpaStaCallbackObj[instId]);
     free(g_hdiWpaStaCallbackObj[instId]);

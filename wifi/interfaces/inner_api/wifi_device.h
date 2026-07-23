@@ -589,14 +589,6 @@ public:
     virtual ErrCode SetDpiMarkRule(const std::string &ifaceName, int uid, int protocol, int enable) = 0;
 
     /**
-     * @Description Accept network control information from RSS.
-     *
-     * @param networkControlInfo - structure of network control infomation
-     * @return ErrCode - operation result
-     */
-    virtual ErrCode ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) = 0;
-
-    /**
      * @Description Update Network Lag Info
      *
      * @param networkLagType - recv networkLagType
@@ -604,6 +596,14 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode UpdateNetworkLagInfo(const NetworkLagType networkLagType, const NetworkLagInfo &networkLagInfo) = 0;
+
+    /**
+     * @Description Accept network control information from RSS.
+     *
+     * @param networkControlInfo - structure of network control infomation
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode ReceiveNetworkControlInfo(const WifiNetworkControlInfo& networkControlInfo) = 0;
 
     /**
      * @Description Get Vowifi Signal Info.

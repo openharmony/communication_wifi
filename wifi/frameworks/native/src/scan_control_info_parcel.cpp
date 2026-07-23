@@ -104,7 +104,7 @@ ScanControlInfoParcel *ScanControlInfoParcel::Unmarshalling(Parcel &parcel)
     if (!parcel.ReadUint32(size))
         return nullptr;
 
-    if (size > MAX_SCAN_SIZE) {
+    if (size == 0 || size > MAX_SCAN_SIZE) {
         return nullptr;
     }
     info->scanForbidList.reserve(size);
@@ -129,7 +129,7 @@ ScanControlInfoParcel *ScanControlInfoParcel::Unmarshalling(Parcel &parcel)
     if (!parcel.ReadUint32(size))
         return nullptr;
 
-    if (size > MAX_SCAN_SIZE) {
+    if (size == 0 || size > MAX_SCAN_SIZE) {
         return nullptr;
     }
     info->scanIntervalList.reserve(size);

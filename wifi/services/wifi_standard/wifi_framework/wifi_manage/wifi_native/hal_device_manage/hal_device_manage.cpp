@@ -4,7 +4,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +29,9 @@
 #include "hdf_remote_service.h"
 #include "wifi_config_center.h"
 #include "wifi_hisysevent.h"
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+#include "parameters.h"
+#endif
 #include "securec.h"
 
 #undef LOG_TAG
@@ -55,6 +58,12 @@ constexpr int32_t MAX_CONNECT_DEFAULT = 8;
 constexpr int32_t CMD_SET_P2P_HIGH_PERF = 103;
 constexpr int32_t CMD_GET_SIGNAL = 104;
 constexpr size_t SIGNAL_POLL_RESULT_FIXED_SIZE = 76;
+
+#ifdef WLAN_PLUGGABLE_SUPPORTED
+const char* WLAN_PLUGGABLE_STATE = "persist.wlan.pluggable.state";
+const char* WLAN_PLUGGABLE_STATE_EXTRACT = "0";
+const char* WLAN_PLUGGABLE_STATE_EMPLACE = "1";
+#endif
 
 HalDeviceManager::HalDeviceManager()
 {
@@ -135,9 +144,8 @@ void HalDeviceManager::StopChipHdi()
 }
 
 bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCallback,
-                                      const RssiReportCallback &rssiReportCallback,
-                                      const NetlinkReportCallback &netlinkReportCallback, std::string &ifaceName,
-                                      int instId)
+    const RssiReportCallback &rssiReportCallback, const NetlinkReportCallback &netlinkReportCallback,
+    std::string &ifaceName, int instId)
 {
     LOGI("CreateStaIface, ifaceName: %{public}s, instId = %{public}d", ifaceName.c_str(), instId);
     if (!CheckReloadChipHdiService()) {
@@ -165,7 +173,7 @@ bool HalDeviceManager::CreateStaIface(const IfaceDestoryCallback &ifaceDestoryCa
     } else {
         LOGE("CreateStaIface wlan1 skip scan callback instId = %{public}d", instId);
     }
-    
+
     mIWifiStaIfaces[ifaceName] = iface;
     LOGI("CreateStaIface success! ifaceName:%{public}s", ifaceName.c_str());
     return true;
@@ -384,7 +392,7 @@ bool HalDeviceManager::GetScanInfos(const std::string &ifaceName, std::vector<Sc
     }
 
     LOGI("GetScanInfos success, scan info size:%{public}d", static_cast<int>(scanResultsInfo.size()));
-    return true;   
+    return true;
 }
 
 bool HalDeviceManager::GetConnectSignalInfo(const std::string &ifaceName, SignalPollResult &signalPollResult)
@@ -645,14 +653,10 @@ bool HalDeviceManager::SetTxPower(int power)
     }
 
     std::lock_guard<std::mutex> lock(mMutex);
-    int32_t staResult = IfaceSetTxPower(WifiConfigCenter::GetInstance().GetStaIfaceName(),
-                                        mIWifiStaIfaces, power);
-    int32_t p2pResult = IfaceSetTxPower(WifiConfigCenter::GetInstance().GetP2pIfaceName(),
-                                        mIWifiP2pIfaces, power);
-    int32_t apResult = IfaceSetTxPower(WifiConfigCenter::GetInstance().GetApIfaceName(),
-                                       mIWifiApIfaces, power);
-    LOGI("SetTxPower, result:sta:%{public}d, p2p:%{public}d, ap:%{public}d",
-        staResult, p2pResult, apResult);
+    int32_t staResult = IfaceSetTxPower(WifiConfigCenter::GetInstance().GetStaIfaceName(), mIWifiStaIfaces, power);
+    int32_t p2pResult = IfaceSetTxPower(WifiConfigCenter::GetInstance().GetP2pIfaceName(), mIWifiP2pIfaces, power);
+    int32_t apResult = IfaceSetTxPower(WifiConfigCenter::GetInstance().GetApIfaceName(), mIWifiApIfaces, power);
+    LOGI("SetTxPower, result:sta:%{public}d, p2p:%{public}d, ap:%{public}d", staResult, p2pResult, apResult);
     if (staResult == HDF_SUCCESS || p2pResult == HDF_SUCCESS || apResult == HDF_SUCCESS) {
         LOGE("SetTxPower success");
         return true;
@@ -660,8 +664,8 @@ bool HalDeviceManager::SetTxPower(int power)
     return false;
 }
 
-int32_t HalDeviceManager::IfaceSetTxPower(
-    const std::string &ifaceName, const std::map<std::string, sptr<IChipIface>> &mWifiIfaces, int power)
+int32_t HalDeviceManager::IfaceSetTxPower(const std::string &ifaceName,
+    const std::map<std::string, sptr<IChipIface>> &mWifiIfaces, int power)
 {
     int32_t result = HDF_FAILURE;
     auto iter = mWifiIfaces.find(ifaceName);
@@ -772,8 +776,8 @@ bool HalDeviceManager::SetApMacAddress(const std::string &ifaceName, const std::
     return true;
 }
 
-bool HalDeviceManager::SendCmdToDriver(const std::string &ifaceName, const std::string &interfaceName,
-    int cmd, const std::string &param, std::string &result)
+bool HalDeviceManager::SendCmdToDriver(const std::string &ifaceName, const std::string &interfaceName, int cmd,
+    const std::string &param, std::string &result)
 {
     if (!CheckReloadChipHdiService()) {
         return false;
@@ -800,6 +804,7 @@ bool HalDeviceManager::SendCmdToDriver(const std::string &ifaceName, const std::
     int32_t ret = iface->SendCmdToDriver(interfaceName, cmd, paramBuf, resultBuf);
     if (ret != HDF_SUCCESS) {
         LOGE("SendCmdToDriver, call SendCmdToDriver failed! ret:%{public}d", ret);
+        return false;
     }
     if (!resultBuf.empty()) {
         result.assign(resultBuf.begin(), resultBuf.end());
@@ -831,8 +836,7 @@ bool HalDeviceManager::SetBlockList(const std::string &ifaceName, const std::str
     return SendCmdToDriver(ifaceName, interfaceName, setMacFilterCmd, macFilterStr, result);
 }
 
-bool HalDeviceManager::DisAssociateSta(const std::string &ifaceName, const std::string &interfaceName,
-    std::string mac)
+bool HalDeviceManager::DisAssociateSta(const std::string &ifaceName, const std::string &interfaceName, std::string mac)
 {
     const int disAssociateStaCmd = 101;
     mac.erase(std::remove(mac.begin(), mac.end(), ':'), mac.end());
@@ -1211,7 +1215,7 @@ bool HalDeviceManager::CreateTheNeedChangeChipModeIfaceData(WifiChipInfo &wifiCh
             }
         }
     }
-    
+
     ifaceCreationData.chipInfo = wifiChipInfo;
     ifaceCreationData.chipModeId = chipMode.modeId;
     LOGI("CreateTheNeedChangeChipModeIfaceData, chip mode need change, create a new iface data");
@@ -1259,8 +1263,7 @@ bool HalDeviceManager::CanIfaceComboSupportRequest(WifiChipInfo &wifiChipInfo, U
     return true;
 }
 
-void HalDeviceManager::ExpandIfaceCombos(ComboIface &chipIfaceCombo,
-    std::vector<std::vector<int>> &expandedIfaceCombos)
+void HalDeviceManager::ExpandIfaceCombos(ComboIface &chipIfaceCombo, std::vector<std::vector<int>> &expandedIfaceCombos)
 {
     int numOfCombos = 1;
     for (auto &limit : chipIfaceCombo.limits) {
@@ -1320,16 +1323,16 @@ bool HalDeviceManager::CompareIfaceCreationData(IfaceCreationData &data1, IfaceC
     return false;
 }
 
-bool HalDeviceManager::ExecuteChipReconfiguration(IfaceCreationData &ifaceCreationData,
-    IfaceType createIfaceType, sptr<IChipIface> &iface)
+bool HalDeviceManager::ExecuteChipReconfiguration(IfaceCreationData &ifaceCreationData, IfaceType createIfaceType,
+    sptr<IChipIface> &iface)
 {
     if (ifaceCreationData.chipInfo.chip == nullptr) {
         LOGE("ExecuteChipReconfiguration, chip is nullptr");
         return false;
     }
 
-    bool isModeConfigNeeded = !ifaceCreationData.chipInfo.currentModeIdValid
-        || ifaceCreationData.chipInfo.currentModeId != ifaceCreationData.chipModeId;
+    bool isModeConfigNeeded = !ifaceCreationData.chipInfo.currentModeIdValid ||
+        ifaceCreationData.chipInfo.currentModeId != ifaceCreationData.chipModeId;
     if (isModeConfigNeeded) {
         for (auto &ifaceInfos : ifaceCreationData.chipInfo.ifaces) {
             for (auto &ifaceInfo : ifaceInfos.second) {
@@ -1350,13 +1353,13 @@ bool HalDeviceManager::ExecuteChipReconfiguration(IfaceCreationData &ifaceCreati
 
     int32_t ret = HDF_FAILURE;
     switch (createIfaceType) {
-        case IfaceType::STA :
+        case IfaceType::STA:
             ret = ifaceCreationData.chipInfo.chip->CreateStaService(iface);
             break;
-        case IfaceType::AP :
+        case IfaceType::AP:
             ret = ifaceCreationData.chipInfo.chip->CreateApService(iface);
             break;
-        case IfaceType::P2P :
+        case IfaceType::P2P:
             ret = ifaceCreationData.chipInfo.chip->CreateP2pService(iface);
             break;
         default:
@@ -1365,8 +1368,8 @@ bool HalDeviceManager::ExecuteChipReconfiguration(IfaceCreationData &ifaceCreati
     }
 
     if (ret != HDF_SUCCESS) {
-        LOGE("ExecuteChipReconfiguration, create iface failed! ret:%{public}d, createIfaceType:%{public}d",
-            ret, static_cast<int>(createIfaceType));
+        LOGE("ExecuteChipReconfiguration, create iface failed! ret:%{public}d, createIfaceType:%{public}d", ret,
+            static_cast<int>(createIfaceType));
         return false;
     }
 
@@ -1454,9 +1457,10 @@ void HalDeviceManager::DispatchIfaceDestoryCallback(std::string &removeIfaceName
     bool isCallback, IfaceType createIfaceType)
 {
     LOGI("DispatchIfaceDestoryCallback, removeIfaceName:%{public}s, removeIfaceType:%{public}d, isCallback:%{public}d,"
-        " createIfaceType:%{public}d", removeIfaceName.c_str(), removeIfaceType, isCallback, createIfaceType);
+        " createIfaceType:%{public}d",
+        removeIfaceName.c_str(), removeIfaceType, isCallback, createIfaceType);
     switch (removeIfaceType) {
-        case IfaceType::STA :
+        case IfaceType::STA:
             if (mIWifiStaIfaces.find(removeIfaceName) != mIWifiStaIfaces.end()) {
                 mIWifiStaIfaces.erase(removeIfaceName);
             }
@@ -1465,7 +1469,7 @@ void HalDeviceManager::DispatchIfaceDestoryCallback(std::string &removeIfaceName
                 WifiStaHalInterface::GetInstance().StopWifi();
             }
             break;
-        case IfaceType::AP :
+        case IfaceType::AP:
             if (mIWifiApIfaces.find(removeIfaceName) != mIWifiApIfaces.end()) {
                 mIWifiApIfaces.erase(removeIfaceName);
             }
@@ -1473,7 +1477,7 @@ void HalDeviceManager::DispatchIfaceDestoryCallback(std::string &removeIfaceName
                 WifiApHalInterface::GetInstance().StopAp();
             }
             break;
-        case IfaceType::P2P :
+        case IfaceType::P2P:
             if (mIWifiP2pIfaces.find(removeIfaceName) != mIWifiP2pIfaces.end()) {
                 mIWifiP2pIfaces.erase(removeIfaceName);
             }
@@ -1542,10 +1546,10 @@ bool HalDeviceManager::RemoveIface(sptr<IChipIface> &iface, bool isCallback, Ifa
             }
             ret = chip->RemoveStaService(ifaceName);
             break;
-        case IfaceType::AP :
+        case IfaceType::AP:
             ret = chip->RemoveApService(ifaceName);
             break;
-        case IfaceType::P2P :
+        case IfaceType::P2P:
             ret = chip->RemoveP2pService(ifaceName);
             break;
         default:
@@ -1579,14 +1583,15 @@ void HalDeviceManager::AddChipHdiDeathRecipient()
     }
 
     static HdfDeathRecipient recipient = {
-        .OnRemoteDied = [](HdfDeathRecipient *recipient, HdfRemoteService *service) {
-            LOGI("Chip Hdi service died!");
-            g_chipHdiServiceDied = true;
-            ResetHalDeviceManagerInfo(true);
-            RemoveChipHdiDeathRecipient();
-            LOGI("Chip Hdi service died process success!");
-            return;
-        }
+        .OnRemoteDied =
+            [](HdfDeathRecipient *recipient, HdfRemoteService *service) {
+                LOGI("Chip Hdi service died!");
+                g_chipHdiServiceDied = true;
+                ResetHalDeviceManagerInfo(true);
+                RemoveChipHdiDeathRecipient();
+                LOGI("Chip Hdi service died process success!");
+                return;
+            }
     };
 
     HdfRemoteServiceAddDeathRecipient(g_chipHdiService, &recipient);
@@ -1627,7 +1632,7 @@ int32_t ChipIfaceCallback::OnRssiReport(int32_t index, int32_t c0Rssi, int32_t c
     return 0;
 }
 
-int32_t ChipIfaceCallback::OnWifiNetlinkMessage(uint32_t type, const std::vector<uint8_t>& recvMsg)
+int32_t ChipIfaceCallback::OnWifiNetlinkMessage(uint32_t type, const std::vector<uint8_t> &recvMsg)
 {
     LOGI("OnWifiNetlinkMessage, type:%{public}d", type);
 
@@ -1660,7 +1665,7 @@ bool HalDeviceManager::GetP2pSignalInfo(const std::string &interfaceName, const 
         signalPollResult.c1Rssi);
     return true;
 }
- 	 
+
 bool HalDeviceManager::ReadInt32(const signed char *buf, size_t bufSize, size_t &offset, int32_t &value)
 {
     if (offset + sizeof(int32_t) > bufSize) {
@@ -1675,7 +1680,7 @@ bool HalDeviceManager::ReadInt32(const signed char *buf, size_t bufSize, size_t 
     offset += sizeof(int32_t);
     return true;
 }
- 	 
+
 bool HalDeviceManager::ReadUInt32(const signed char *buf, size_t bufSize, size_t &offset, uint32_t &value)
 {
     if (offset + sizeof(uint32_t) > bufSize) {
@@ -1690,7 +1695,7 @@ bool HalDeviceManager::ReadUInt32(const signed char *buf, size_t bufSize, size_t
     offset += sizeof(uint32_t);
     return true;
 }
- 	 
+
 bool HalDeviceManager::ReadUInt64(const signed char *buf, size_t bufSize, size_t &offset, uint64_t &value)
 {
     if (offset + sizeof(uint64_t) > bufSize) {
@@ -1705,7 +1710,7 @@ bool HalDeviceManager::ReadUInt64(const signed char *buf, size_t bufSize, size_t
     offset += sizeof(uint64_t);
     return true;
 }
- 	 
+
 bool HalDeviceManager::ReadUInt16(const signed char *buf, size_t bufSize, size_t &offset, uint16_t &value)
 {
     if (offset + sizeof(uint16_t) > bufSize) {
@@ -1720,7 +1725,7 @@ bool HalDeviceManager::ReadUInt16(const signed char *buf, size_t bufSize, size_t
     offset += sizeof(uint16_t);
     return true;
 }
- 	 
+
 bool HalDeviceManager::ReadBytes(const signed char *buf, size_t bufSize, size_t &offset, uint8_t *data, size_t len)
 {
     if (offset + len > bufSize) {
@@ -1735,7 +1740,6 @@ bool HalDeviceManager::ReadBytes(const signed char *buf, size_t bufSize, size_t 
     offset += len;
     return true;
 }
-
 void HalDeviceManager::DeserializeSignalPollBaseAttribute(const signed char *data, size_t dataSize, size_t &offset,
     SignalPollResult &result)
 {
@@ -1754,7 +1758,7 @@ void HalDeviceManager::DeserializeSignalPollBaseAttribute(const signed char *dat
     ReadInt32(data, dataSize, offset, result.currentRxPackets);
     ReadUInt16(data, dataSize, offset, result.chloadSelf);
 }
- 	 
+
 bool HalDeviceManager::DeserializeSignalPollResultFromPtr(const signed char *data, size_t dataSize,
     SignalPollResult &result)
 {
@@ -1785,8 +1789,8 @@ bool HalDeviceManager::DeserializeSignalPollResultFromPtr(const signed char *dat
     }
     if (offset + extLen > dataSize) {
         LOGE("DeserializeSignalPollResult: ext data overflow, offset:%{public}d,ext length:%{public}d,\
-            size:%{public}d",
-            static_cast<int>(offset), extLen, static_cast<int>(dataSize));
+             size:%{public}d",
+             static_cast<int>(offset), extLen, static_cast<int>(dataSize));
         return false;
     }
     result.ext.resize(extLen);

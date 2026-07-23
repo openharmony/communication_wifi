@@ -111,7 +111,7 @@ void WifiNotificationUtil::DisplaySettingWlanPage(
     auto result = StartAbility(want);
     WIFI_LOGI("Display setting wlan page end, result = %{public}d", result);
 }
- 
+
 int32_t WifiNotificationUtil::StartAbility(OHOS::AAFwk::Want& want)
 {
     sptr<ISystemAbilityManager> systemAbilityManager =
@@ -300,6 +300,9 @@ void UIExtensionAbilityConnection::OnAbilityConnectDone(const AppExecFwk::Elemen
     const sptr<IRemoteObject> &remoteObject, int32_t resultCode)
 {
     WIFI_LOGI("on ability connected");
+    if (remoteObject == nullptr) {
+        return;
+    }
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
@@ -311,9 +314,6 @@ void UIExtensionAbilityConnection::OnAbilityConnectDone(const AppExecFwk::Elemen
     data.WriteString16(u"parameters");
     data.WriteString16(Str8ToStr16(commandStr_));
 
-    if (remoteObject == nullptr) {
-        return;
-    }
     int32_t errCode = remoteObject->SendRequest(IAbilityConnection::ON_ABILITY_CONNECT_DONE, data, reply, option);
     WIFI_LOGI("AbilityConnectionWrapperProxy::OnAbilityConnectDone result %{public}d", errCode);
 }

@@ -603,7 +603,6 @@ if (defined(ohos_lite)) {
     configs = [ ":wifi_manager_service_header" ]
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc
-    ldflags = memory_optimization_ldflags
     external_deps = [
       "ability_base:want",
       "ability_base:zuri",
@@ -703,9 +702,7 @@ if (defined(ohos_lite)) {
 
     if (defined(global_parts_info) &&
         defined(global_parts_info.powermgr_power_manager)) {
-      if (wifi_feature_powermgr_support) {
-        defines += [ "HAS_POWERMGR_PART" ]
-      }
+      defines += [ "HAS_POWERMGR_PART" ]
     }
 
     if (defined(global_parts_info) &&
@@ -831,8 +828,6 @@ if (defined(ohos_lite)) {
     external_deps = [
       "hilog:libhilog",
       "ipc:ipc_single",
-      "libxml2:libxml2",
-      "netmanager_base:net_conn_manager_if",
     ]
 
     version_script = "libwifi_manager.map"

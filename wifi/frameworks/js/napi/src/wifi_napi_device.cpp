@@ -489,7 +489,7 @@ napi_value ConfigStaticIpv4(const napi_env& env, const napi_value& object, WifiD
     }
     napi_get_named_property(env, object, "staticIp", &staticIp);
     JsObjectToUint(env, staticIp, "ipAddress", cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.addressIpv4);
-    cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family = IPV4_ADDRESS_TYPE;
+    cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family = 0;
     JsObjectToUint(env, staticIp, "gateway", cppConfig.wifiIpConfig.staticIpAddress.gateway.addressIpv4);
     JsObjectToInt(env, staticIp, "prefixLength", cppConfig.wifiIpConfig.staticIpAddress.ipAddress.prefixLength);
     NAPI_CALL(env, napi_has_named_property(env, staticIp, "dnsServers", &hasProperty));
@@ -529,7 +529,7 @@ napi_value ConfigStaticIpv6(const napi_env& env, const napi_value& object, WifiD
     JsObjectToString(env, staticIp, "ipAddress", NAPI_MAX_STR_LENT, ipv6Temp);
     cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.SetIpv6Address(
         IpTools::ConvertIpv6AddressToCompleted(ipv6Temp));
-    cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family = IPV6_ADDRESS_TYPE;
+    cppConfig.wifiIpConfig.staticIpAddress.ipAddress.address.family = 1;
     std::string gatewayTemp;
     JsObjectToString(env, staticIp, "gateway", NAPI_MAX_STR_LENT, gatewayTemp);
     cppConfig.wifiIpConfig.staticIpAddress.gateway.SetIpv6Address(
@@ -2285,7 +2285,7 @@ NO_SANITIZE("cfi") napi_value SetWifiCapability(napi_env env, napi_callback_info
     WIFI_NAPI_ASSERT(env, enableType == napi_boolean, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
  
-    int capability = -1;
+    int capability = 0;
     bool enable = false;
     napi_get_value_int32(env, argv[0], &capability);
     napi_get_value_bool(env, argv[1], &enable);
@@ -2308,7 +2308,7 @@ NO_SANITIZE("cfi") napi_value GetWifiCapability(napi_env env, napi_callback_info
     napi_typeof(env, argv[0], &capabilityType);
     WIFI_NAPI_ASSERT(env, capabilityType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
  
-    int capability = -1;
+    int capability = 0;
     napi_get_value_int32(env, argv[0], &capability);
     bool enabled = false;
     ErrCode ret = wifiDevicePtr->GetWifiCapability(capability, enabled);

@@ -130,7 +130,7 @@ public:
     /**
      * @Description get hotspot mode
      *
-     * @param model - the model to be set
+     * @param mode - the mode to be get
      * @return ErrCode - operation result
      */
     virtual ErrCode GetHotspotMode(HotspotMode &mode) override;
@@ -138,7 +138,7 @@ public:
     /**
      * @Description set hotspot mode
      *
-     * @param model - the model to be set
+     * @param mode - the mode to be set
      * @return ErrCode - operation result
      */
     virtual ErrCode SetHotspotMode(const HotspotMode &mode) override;

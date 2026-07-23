@@ -38,7 +38,6 @@
 #include "wifi_watchdog_utils.h"
 #include "power_mgr_client.h"
 #endif
-
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiManager");

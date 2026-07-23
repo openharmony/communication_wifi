@@ -1058,11 +1058,8 @@ std::string WifiSettings::SetBackupReplyCode(int replyCode)
     std::string codeStr = std::to_string(replyCode);
     cJSON_AddStringToObject(errorInfo, "errorCode", codeStr.c_str());
     cJSON_AddStringToObject(errorInfo, "errorInfo", "");
- 
     cJSON_AddItemToArray(resultInfo, errorInfo);
- 
     cJSON_AddItemToObject(root, "resultInfo", resultInfo);
- 
     char *jsonStr = cJSON_PrintUnformatted(root);
     std::string result;
     if (jsonStr != nullptr) {
@@ -1076,12 +1073,20 @@ std::string WifiSettings::SetBackupReplyCode(int replyCode)
 
 void WifiSettings::RemoveBackupFile()
 {
-    remove(BACKUP_CONFIG_FILE_PATH);
+    if (remove(BACKUP_CONFIG_FILE_PATH) == 0) {
+        LOGD("RemoveBackup file removed successfully");
+    } else {
+        LOGE("Failed to remove RemoveBackup file");
+    }
 }
 
 void WifiSettings::RemoveHotspotBackupFile()
 {
-    remove(HOTSPOT_BACKUP_CONFIG_FILE_PATH);
+    if (remove(HOTSPOT_BACKUP_CONFIG_FILE_PATH) == 0) {
+        LOGD("HotspotBackup file removed successfully");
+    } else {
+        LOGE("Failed to remove HotspotBackup file");
+    }
 }
 
 int WifiSettings::OnHotspotRestore(UniqueFd &fd, const std::string &restoreInfo)
@@ -1888,13 +1893,13 @@ bool WifiSettings::IsModulePreLoad(const std::string &name)
 {
     std::unique_lock<std::mutex> lock(mWifiConfigMutex);
     if (name == WIFI_SERVICE_STA) {
-        return mWifiConfig[0].preLoadSta;
+        return true;
     } else if (name == WIFI_SERVICE_SCAN) {
-        return mWifiConfig[0].preLoadScan;
+        return true;
     } else if (name == WIFI_SERVICE_AP) {
         return mWifiConfig[0].preLoadAp;
     } else if (name == WIFI_SERVICE_P2P) {
-        return mWifiConfig[0].preLoadP2p;
+        return true;
     } else if (name == WIFI_SERVICE_AWARE) {
         return mWifiConfig[0].preLoadAware;
     } else if (name == WIFI_SERVICE_ENHANCE) {
@@ -2186,7 +2191,7 @@ std::string WifiSettings::GetSubstringByBytes(const std::string& value, int size
         } else {
             charLen = 1;
         }
-            if (result.length() + charLen <= static_cast<size_t>(size)) {
+        if (result.length() + charLen <= static_cast<size_t>(size)) {
             result.append(value, index, charLen);
             index += charLen;
         } else {
@@ -2249,7 +2254,7 @@ void WifiSettings::InitHotspotConfig()
     }
     LOGI("%{public}s, ApConfig ssid is %{public}s, preSharedKey_len is %{public}zu", __FUNCTION__,
         SsidAnonymize(mHotspotConfig[0].GetSsid()).c_str(),
-        PassWordAnonymize(mHotspotConfig[0].GetPreSharedKey()).length());
+        mHotspotConfig[0].GetPreSharedKey().length());
 
     /* init block list info */
     if (mSavedBlockInfo.LoadConfig() >= 0) {
@@ -2304,7 +2309,7 @@ void WifiSettings::InitDefaultP2pVendorConfig()
     mP2pVendorConfig.SetRandomMacSupport(false);
     mP2pVendorConfig.SetIsAutoListen(false);
     mP2pVendorConfig.SetDeviceName("");
-    mP2pVendorConfig.SetPrimaryDeviceType("");
+    mP2pVendorConfig.SetPrimaryDeviceType(PRIMARY_DEVICE_TYPE);
     mP2pVendorConfig.SetSecondaryDeviceType("");
 }
 
@@ -2384,7 +2389,6 @@ int WifiSettings::SyncWifiRestrictedListConfig()
 
 int WifiSettings::SyncWifiConfig()
 {
-    std::unique_lock<std::mutex> lock(mSyncWifiConfigMutex);
     std::vector<WifiConfig> tmp;
     for (auto &item : mWifiConfig) {
         tmp.push_back(item.second);
@@ -2645,7 +2649,7 @@ int WifiSettings::GetConfigbyBackupXml(std::vector<WifiDeviceConfig> &deviceConf
         LOGE("GetConfigbyBackupXml fstat fd fail.");
         return -1;
     }
-    int statBufSize = statBuf.st_size;
+    int64_t statBufSize = statBuf.st_size;
     if (statBufSize > MAX_FILE_SIZE || statBufSize < MIN_FILE_SIZE) {
         return -1;
     }
@@ -3004,8 +3008,8 @@ std::string WifiSettings::GetDefaultApSsid()
     const char* marketptr = GetMarketName();
     const char* brandPtr = GetBrand();
  
-    if (brandPtr == nullptr || marketptr == nullptr) {
-        LOGE(" GetMarketName() or GetBrand() returned null pointer");
+    if (marketptr == nullptr || brandPtr == nullptr) {
+        LOGE("GetMarketName() or GetBrand() returned null pointer");
         ssid = "OHOS_" + GetRandomStr(RANDOM_STR_LEN);
         return ssid;
     }
@@ -3025,13 +3029,13 @@ std::string WifiSettings::GetDefaultApSsid()
     } else {
         ssid = marketName;
     }
- 
+
     if (ssid.empty()) {
         LOGE("ssid is empty and use random generation");
         ssid = "OHOS_" + GetRandomStr(RANDOM_STR_LEN);
         return ssid;
     }
- 
+
     const std::string ellipsis = "...";
     if (ssid.length() > MAX_SSID_LEN) {
         LOGE("ssid is larger than 32, use ellipsis");

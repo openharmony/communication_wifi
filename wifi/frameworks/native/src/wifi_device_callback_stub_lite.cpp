@@ -189,9 +189,11 @@ int WifiDeviceCallBackStub::RemoteOnWifiConnectionChanged(uint32_t code, IpcIo *
     (void)ReadInt32(data, &state);
     WifiLinkedInfo info;
     (void)ReadInt32(data, &info.networkId);
-    info.ssid = reinterpret_cast<char *>(ReadString(data, &readLen));
-    
-    info.bssid = reinterpret_cast<char *>(ReadString(data, &readLen));
+    char *tmpSsid = reinterpret_cast<char *>(ReadString(data, &readLen));
+    char *tmpBssid = reinterpret_cast<char *>(ReadString(data, &readLen));
+    if (tmpSsid == nullptr || tmpBssid == nullptr) { return -1; }
+    info.ssid = tmpSsid;
+    info.bssid = tmpBssid;
     (void)ReadInt32(data, &info.rssi);
     (void)ReadInt32(data, &info.band);
     (void)ReadInt32(data, &info.frequency);

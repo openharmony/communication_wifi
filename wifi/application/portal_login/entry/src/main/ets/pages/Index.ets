@@ -915,6 +915,12 @@ struct Index {
   }
 
   aboutToAppear(): void {
+    this.netConnect.on('netLost', (data: connection.NetHandle) => {
+      handleNetworkChange(data, this.context);
+    });
+    this.netConnect.register((err: BusinessError) => {
+      hilog.error(DOMAIN, TAG, '%{public}s', 'Failed to register netconnect.' + JSON.stringify(err));
+    });
     bindToNetById(this.context)
     .then(()=>{
         hilog.info(DOMAIN, TAG, '%{public}s', 'aboutToAppear bindToNetById.');
@@ -955,6 +961,10 @@ struct Index {
 
   aboutToDisappear(): void {
     updateAboutToDisappear();
+    this.netConnect.unregister((err: BusinessError) => {
+      hilog.error(
+        DOMAIN, TAG, '%{public}s', 'Failed to unregister netconnect.' + JSON.stringify(err));
+    });
     emitter.off('WANT_UPDATE');
   }
 }

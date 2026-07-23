@@ -23,12 +23,22 @@
 #include "wifi_p2p_msg.h"
 #include "ip2p_service.h"
 #include "wifi_p2p_hal_interface.h"
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+#include "wifi_common_util.h"
+#include "wifi_ap_msg.h"
+#endif
 
 #define TIME_DELAY (1000)
 #define MAX_RETRY_COUNT (3)
 
 namespace OHOS::Wifi {
 DEFINE_WIFILOG_LABEL("RptManagerMachine");
+
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+std::string GetRptIfaceName();
+void DisAssSta(std::string mac);
+#endif
+
 int RptManagerMachine::mid{0};
 
 RptManagerMachine::RptManagerMachine() : StateMachine("RptManagerMachine"), pDefaultState(nullptr),
@@ -39,6 +49,9 @@ RptManagerMachine::RptManagerMachine() : StateMachine("RptManagerMachine"), pDef
 RptManagerMachine::~RptManagerMachine()
 {
     WIFI_LOGE("RptManagerMachine::~RptManagerMachine");
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    DisableRptNat();
+#endif
     StopHandlerThread();
     ParsePointer(pDefaultState);
     ParsePointer(pIdleState);
@@ -162,6 +175,9 @@ bool RptManagerMachine::IdleState::ExecuteStateMsg(InternalMessagePtr msg)
     WIFI_LOGE("IdleState-msgCode=%{public}d is received.\n", msg->GetMessageName());
     switch (msg->GetMessageName()) {
         case RPT_CMD_START:
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+            mid = msg->GetParam2();
+#endif
             pRptManagerMachine->pP2pConflictState->retryCount = 0;
             pRptManagerMachine->SwitchState(pRptManagerMachine->pStartingState);
             break;
@@ -329,12 +345,54 @@ void RptManagerMachine::StartedState::GoInState()
     WIFI_LOGE("StartedState GoInState function.\n");
     pRptManagerMachine->BroadcastApState(static_cast<int>(ApState::AP_STATE_STARTED));
     pRptManagerMachine->InitBlockList();
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    std::string rptIface = GetRptIfaceName();
+    if (!rptIface.empty() &&
+        WifiP2PHalInterface::GetInstance().SetP2pGroupIdle(rptIface, 0) != WIFI_HAL_OPT_OK) {
+        WIFI_LOGE("failed to disable RPT group idle timeout.");
+    }
+    pRptManagerMachine->SendMessage(RPT_CMD_START_RPT);
+#endif
 }
 
 void RptManagerMachine::StartedState::GoOutState()
 {
     WIFI_LOGE("StartedState GoOutState function.\n");
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    pRptManagerMachine->DisableRptNat();
+#endif
 }
+
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+void RptManagerMachine::StartedState::ProcessCmdEnableRpt()
+{
+    do {
+        if (!pRptManagerMachine->EnableRptNat()) {
+            break;
+        }
+        return;
+    } while (0);
+    WIFI_LOGW("Enable RPT nat failed, will retry when sta linked or station joins");
+}
+
+bool RptManagerMachine::StartedState::ExecuteStateMsgEx(InternalMessagePtr msg)
+{
+    switch (msg->GetMessageName()) {
+        case RPT_CMD_START_RPT:
+            ProcessCmdEnableRpt();
+            break;
+        case RPT_CMD_ON_STA_LINKED:
+            ProcessCmdEnableRpt();
+            break;
+        case RPT_CMD_ON_STA_UNLINKED:
+            pRptManagerMachine->DisableRptNat();
+            break;
+        default:
+            return false;
+    }
+    return true;
+}
+#endif
 
 bool RptManagerMachine::StartedState::ExecuteStateMsg(InternalMessagePtr msg)
 {
@@ -355,6 +413,9 @@ bool RptManagerMachine::StartedState::ExecuteStateMsg(InternalMessagePtr msg)
             break;
         case RPT_CMD_ON_STATION_JOIN: {
             auto mac = msg->GetStringFromMessage();
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+            ProcessCmdEnableRpt();
+#endif
             pRptManagerMachine->BroadcastStationJoin(mac);
         }
             break;
@@ -374,6 +435,11 @@ bool RptManagerMachine::StartedState::ExecuteStateMsg(InternalMessagePtr msg)
         }
             break;
         default:
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+            if (ExecuteStateMsgEx(msg)) {
+                break;
+            }
+#endif
             break;
     }
     return true;
@@ -449,6 +515,9 @@ RptManagerMachine::StoppedState::~StoppedState()
 void RptManagerMachine::StoppedState::GoInState()
 {
     WIFI_LOGE("StoppedState GoInState function.\n");
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    pRptManagerMachine->DisableRptNat();
+#endif
     WriteWifiBridgeStateHiSysEvent(P2P_BRIDGE_OFF);
     pRptManagerMachine->mcb.onStopped(mid);
     pRptManagerMachine->BroadcastApState(static_cast<int>(ApState::AP_STATE_CLOSED));
@@ -473,17 +542,31 @@ WifiP2pConfig RptManagerMachine::CreateRptConfig()
 {
     WifiP2pConfig p2pConfig;
     HotspotConfig hotspotConfig;
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    WifiSettings::GetInstance().GetRptHotspotConfig(hotspotConfig);
+    p2pConfig.SetGroupName(hotspotConfig.GetSsid());
+    p2pConfig.SetPassphrase(hotspotConfig.GetPreSharedKey());
+    int freq = ChannelToFrequency(hotspotConfig.GetChannel() > 0 ?
+        hotspotConfig.GetChannel() : AP_CHANNEL_5G_DEFAULT);
+    p2pConfig.SetFreq(freq);
+    p2pConfig.SetGoBand(GroupOwnerBand::GO_BAND_5GHZ);
+#else
     WifiSettings::GetInstance().GetHotspotConfig(hotspotConfig, mid);
     p2pConfig.SetGroupName(hotspotConfig.GetSsid());
     p2pConfig.SetPassphrase(hotspotConfig.GetPreSharedKey());
     p2pConfig.SetGoBand(hotspotConfig.GetBand() == BandType::BAND_2GHZ ? GroupOwnerBand::GO_BAND_2GHZ :
                         hotspotConfig.GetBand() == BandType::BAND_5GHZ ? GroupOwnerBand::GO_BAND_5GHZ :
                         GroupOwnerBand::GO_BAND_AUTO);
+#endif
     return p2pConfig;
 }
 
 void RptManagerMachine::BroadcastApState(int apState)
 {
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    WIFI_LOGI("RptManagerMachine skip hotspot state broadcast in cockpit, state %{public}d", apState);
+    return;
+#endif
     WIFI_LOGI("RptManagerMachine NotifyApState, state %{public}d", apState);
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;
@@ -497,6 +580,10 @@ void RptManagerMachine::BroadcastApState(int apState)
 
 void RptManagerMachine::BroadcastStationJoin(std::string mac)
 {
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    WIFI_LOGI("RptManagerMachine skip hotspot sta join broadcast in cockpit");
+    return;
+#endif
     StationInfo info;
     info.bssid = mac;
     WifiEventCallbackMsg cbMsg;
@@ -510,6 +597,10 @@ void RptManagerMachine::BroadcastStationJoin(std::string mac)
 
 void RptManagerMachine::BroadcastStationLeave(std::string mac)
 {
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    WIFI_LOGI("RptManagerMachine skip hotspot sta leave broadcast in cockpit");
+    return;
+#endif
     StationInfo info;
     info.bssid = mac;
     WifiEventCallbackMsg cbMsg;
@@ -520,6 +611,54 @@ void RptManagerMachine::BroadcastStationLeave(std::string mac)
     std::string msg = std::string("ApStaLeaved") + std::string("id = ") + std::to_string(mid);
     WifiCommonEventHelper::PublishApStaLeaveEvent(0, msg);
 }
+
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+void RptManagerMachine::DisableRptNat()
+{
+    if (!rptNatEnabled_) {
+        return;
+    }
+    if (!rptNatInIface_.empty() && !rptNatOutIface_.empty()) {
+        mRptNatManager.EnableBridgeNat(false, rptNatInIface_, rptNatOutIface_);
+    }
+    rptNatEnabled_ = false;
+    rptNatInIface_.clear();
+    rptNatOutIface_.clear();
+    WIFI_LOGI("RPT NAT disabled");
+}
+
+bool RptManagerMachine::EnableRptNat()
+{
+    std::string rptIface = GetRptIfaceName();
+    std::string staIface = WifiConfigCenter::GetInstance().GetStaIfaceName(mid);
+    if (rptIface.empty() || staIface.empty()) {
+        WIFI_LOGW("EnableRptNat: invalid iface, rpt empty=%{public}d, sta empty=%{public}d",
+            static_cast<int>(rptIface.empty()), static_cast<int>(staIface.empty()));
+        return false;
+    }
+    if (rptNatEnabled_ && rptNatInIface_ == rptIface && rptNatOutIface_ == staIface) {
+        return true;
+    }
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, mid);
+    if (linkedInfo.connState != ConnState::CONNECTED) {
+        WIFI_LOGI("EnableRptNat: STA not connected, skip NAT for now");
+        return false;
+    }
+    if (rptNatEnabled_) {
+        DisableRptNat();
+    }
+    if (!mRptNatManager.EnableBridgeNat(true, rptIface, staIface)) {
+        WIFI_LOGE("EnableRptNat: EnableBridgeNat failed");
+        return false;
+    }
+    rptNatEnabled_ = true;
+    rptNatInIface_ = rptIface;
+    rptNatOutIface_ = staIface;
+    WIFI_LOGI("RPT NAT enabled, in=%{private}s, out=%{private}s", rptIface.c_str(), staIface.c_str());
+    return true;
+}
+#endif
 
 std::string GetRptIfaceName()
 {

@@ -2052,6 +2052,16 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     if (curState == WifiOprMidState::RUNNING) {
         WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, m_instId);
     }
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+#ifdef FEATURE_RPT_SUPPORT
+    auto rptManager = WifiManager::GetInstance().GetRptInterface(m_instId);
+    if (rptManager != nullptr && rptManager->IsRptRunning()) {
+        WifiManager::GetInstance().GetWifiTogglerManager()->RptToggled(0, m_instId);
+    }
+    WifiSettings::GetInstance().ClearRptHotspotConfig();
+    WifiSettings::GetInstance().SyncRptHotspotConfig();
+#endif
+#endif
     // wifi device
     WifiSettings::GetInstance().ClearDeviceConfig();
     WifiSettings::GetInstance().SyncDeviceConfig();

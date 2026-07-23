@@ -250,6 +250,48 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode GetLocalOnlyHotspotConfig(HotspotConfig &config) = 0;
+
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    /**
+     * @Description Set the configuration of RPT (cockpit repeater hotspot).
+     *
+     * @param config - HotspotConfig object for RPT
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode SetRptConfig(const HotspotConfig &config) = 0;
+
+    /**
+     * @Description Get the configuration of RPT (cockpit repeater hotspot).
+     *
+     * @param config - Current RPT configuration
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode GetRptConfig(HotspotConfig &config) = 0;
+
+    /**
+     * @Description Enable RPT (cockpit repeater hotspot).
+     *
+     * @param type - service type
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode EnableRpt(const ServiceType type = ServiceType::DEFAULT) = 0;
+
+    /**
+     * @Description Disable RPT (cockpit repeater hotspot).
+     *
+     * @param type - service type
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode DisableRpt(const ServiceType type = ServiceType::DEFAULT) = 0;
+
+    /**
+     * @Description Check whether RPT (cockpit repeater hotspot) is active.
+     *
+     * @param isActive - active / inactive
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode IsRptActive(bool &isActive) = 0;
+#endif
 };
 }  // namespace Wifi
 }  // namespace OHOS

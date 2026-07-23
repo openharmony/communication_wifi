@@ -51,6 +51,9 @@ public:
     void OnP2pConnectionChanged(P2pConnectedState p2pConnState) override;
     void OnStationJoin(std::string mac) override;
     void OnStationLeave(std::string mac) override;
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    void OnStaConnChanged(bool linked) override;
+#endif
     void OnP2pClosed();
 private:
     RptManager::Role curRole;

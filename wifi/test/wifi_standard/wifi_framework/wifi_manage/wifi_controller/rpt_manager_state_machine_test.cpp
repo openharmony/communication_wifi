@@ -18,6 +18,9 @@
 #include "rpt_manager_state_machine.h"
 #include "wifi_logger.h"
 #include "wifi_log.h"
+#include "wifi_settings.h"
+#include "wifi_ap_msg.h"
+#include "wifi_p2p_msg.h"
 #include "mock_wifi_manager.h"
 
 using ::testing::_;
@@ -102,7 +105,12 @@ public:
             RPT_CMD_ADD_BLOCK,
             RPT_CMD_DEL_BLOCK,
             RPT_CMD_ON_STATION_JOIN,
-            RPT_CMD_ON_STATION_LEAVE
+            RPT_CMD_ON_STATION_LEAVE,
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+            RPT_CMD_ON_STA_LINKED,
+            RPT_CMD_ON_STA_UNLINKED,
+            RPT_CMD_START_RPT,
+#endif
         };
     }
 
@@ -191,4 +199,48 @@ HWTEST_F(RptManagerMachineTest, ExecuteStateMsg_By_StoppedState, TestSize.Level1
     TestExecuteStateMsg(GetRptMessages(), pRptManagerMachine->pStoppedState);
 }
 
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+HWTEST_F(RptManagerMachineTest, CreateRptConfig_UsesRptHotspotConfig, TestSize.Level1)
+{
+    HotspotConfig config;
+    config.SetSsid("GoSimRpt");
+    config.SetPreSharedKey("GoSimPass");
+    config.SetSecurityType(KeyMgmt::WPA2_PSK);
+    config.SetBand(BandType::BAND_5GHZ);
+    config.SetChannel(36);
+    WifiSettings::GetInstance().SetRptHotspotConfig(config);
+
+    WifiP2pConfig p2pConfig = pRptManagerMachine->CreateRptConfig();
+    EXPECT_EQ(p2pConfig.GetGroupName(), "GoSimRpt");
+    EXPECT_EQ(p2pConfig.GetPassphrase(), "GoSimPass");
+    EXPECT_EQ(p2pConfig.GetGoBand(), GroupOwnerBand::GO_BAND_5GHZ);
+    EXPECT_GT(p2pConfig.GetFreq(), 0);
+    WifiSettings::GetInstance().ClearRptHotspotConfig();
+}
+
+HWTEST_F(RptManagerMachineTest, StartedState_StaLinkUnlinkAndStartRpt, TestSize.Level1)
+{
+    InternalMessagePtr linkMsg = pRptManagerMachine->CreateMessage(RPT_CMD_ON_STA_LINKED);
+    InternalMessagePtr unlinkMsg = pRptManagerMachine->CreateMessage(RPT_CMD_ON_STA_UNLINKED);
+    InternalMessagePtr startMsg = pRptManagerMachine->CreateMessage(RPT_CMD_START_RPT);
+    EXPECT_TRUE(pRptManagerMachine->pStartedState->ExecuteStateMsg(linkMsg));
+    EXPECT_TRUE(pRptManagerMachine->pStartedState->ExecuteStateMsg(unlinkMsg));
+    EXPECT_TRUE(pRptManagerMachine->pStartedState->ExecuteStateMsg(startMsg));
+}
+
+HWTEST_F(RptManagerMachineTest, EnableDisableRptNat_WhenIfaceMissing, TestSize.Level1)
+{
+    EXPECT_FALSE(pRptManagerMachine->EnableRptNat());
+    pRptManagerMachine->DisableRptNat();
+    EXPECT_FALSE(pRptManagerMachine->rptNatEnabled_);
+}
+
+HWTEST_F(RptManagerMachineTest, BroadcastApState_SkipInCockpit, TestSize.Level1)
+{
+    pRptManagerMachine->BroadcastApState(static_cast<int>(ApState::AP_STATE_STARTED));
+    pRptManagerMachine->BroadcastStationJoin("aa:bb:cc:dd:ee:ff");
+    pRptManagerMachine->BroadcastStationLeave("aa:bb:cc:dd:ee:ff");
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+#endif
 }

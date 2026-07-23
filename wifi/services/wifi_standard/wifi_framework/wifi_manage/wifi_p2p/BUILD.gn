@@ -125,6 +125,10 @@ ohos_shared_library("wifi_p2p_service") {
     defines += [ "SUPPORT_P2P_UNTRUST_INVITATION" ]
   }
 
+  if (wifi_feature_with_go_simulation_ap) {
+    defines += [ "FEATURE_WITH_GO_SIMULATION_AP" ]
+  }
+
   external_deps = [
     "ability_base:base",
     "ability_base:want",

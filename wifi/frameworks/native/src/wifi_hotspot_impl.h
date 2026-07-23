@@ -281,6 +281,48 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode GetLocalOnlyHotspotConfig(HotspotConfig &config) override;
+
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    /**
+     * @Description Set the configuration of RPT (cockpit repeater hotspot).
+     *
+     * @param config - HotspotConfig object for RPT
+     * @return ErrCode - operation result
+     */
+    ErrCode SetRptConfig(const HotspotConfig &config) override;
+
+    /**
+     * @Description Get the configuration of RPT (cockpit repeater hotspot).
+     *
+     * @param config - Current RPT configuration
+     * @return ErrCode - operation result
+     */
+    ErrCode GetRptConfig(HotspotConfig &config) override;
+
+    /**
+     * @Description Enable RPT (cockpit repeater hotspot).
+     *
+     * @param type - service type
+     * @return ErrCode - operation result
+     */
+    ErrCode EnableRpt(const ServiceType type = ServiceType::DEFAULT) override;
+
+    /**
+     * @Description Disable RPT (cockpit repeater hotspot).
+     *
+     * @param type - service type
+     * @return ErrCode - operation result
+     */
+    ErrCode DisableRpt(const ServiceType type = ServiceType::DEFAULT) override;
+
+    /**
+     * @Description Check whether RPT (cockpit repeater hotspot) is active.
+     *
+     * @param isActive - active / inactive
+     * @return ErrCode - operation result
+     */
+    ErrCode IsRptActive(bool &isActive) override;
+#endif
 private:
     bool SetupClientWithDeathRecipient(sptr<IRemoteObject> service);
     void HandleRemoteDied(const wptr<IRemoteObject>& remoteObject);

@@ -74,6 +74,9 @@ WifiSettings::~WifiSettings()
 {
     SyncDeviceConfig();
     SyncHotspotConfig();
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    SyncRptHotspotConfig();
+#endif
     {
         std::unique_lock<std::mutex> lock(mApMutex);
         SyncBlockList();
@@ -89,6 +92,9 @@ int WifiSettings::Init()
     /* read ini config */
     mSavedDeviceConfig.SetConfigFilePath(DEVICE_CONFIG_FILE_PATH);
     mSavedHotspotConfig.SetConfigFilePath(HOTSPOT_CONFIG_FILE_PATH);
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    mSavedRptHotspotConfig.SetConfigFilePath(RPT_HOTSPOT_CONFIG_FILE_PATH);
+#endif
     mSavedBlockInfo.SetConfigFilePath(BLOCK_LIST_FILE_PATH);
     mSavedWifiConfig.SetConfigFilePath(WIFI_CONFIG_FILE_PATH);
     mSavedWifiP2pGroupInfo.SetConfigFilePath(WIFI_P2P_GROUP_INFO_FILE_PATH);
@@ -112,6 +118,9 @@ int WifiSettings::Init()
 #endif
     ReloadDeviceConfig();
     InitHotspotConfig();
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    InitRptHotspotConfig();
+#endif
     InitP2pVendorConfig();
     ReloadWifiP2pGroupInfoConfig();
     ReloadTrustListPolicies();
@@ -1360,6 +1369,76 @@ int WifiSettings::GetHotspotConfig(HotspotConfig &config, int id)
     return -1;
 }
 
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+int WifiSettings::SyncRptHotspotConfig()
+{
+    std::unique_lock<std::mutex> lock(mApMutex);
+    std::vector<HotspotConfig> tmp;
+    if (mRptHotspotConfigValid) {
+        tmp.push_back(mRptHotspotConfig);
+    }
+    mSavedRptHotspotConfig.SetValue(tmp);
+    return mSavedRptHotspotConfig.SaveConfig();
+}
+
+int WifiSettings::SetRptHotspotConfig(const HotspotConfig &config)
+{
+    std::unique_lock<std::mutex> lock(mApMutex);
+    mRptHotspotConfig = config;
+    mRptHotspotConfigValid = true;
+    std::vector<HotspotConfig> tmp;
+    tmp.push_back(mRptHotspotConfig);
+    mSavedRptHotspotConfig.SetValue(tmp);
+    return mSavedRptHotspotConfig.SaveConfig();
+}
+
+int WifiSettings::GetRptHotspotConfig(HotspotConfig &config)
+{
+    std::unique_lock<std::mutex> lock(mApMutex);
+    if (mRptHotspotConfigValid) {
+        config = mRptHotspotConfig;
+        return 0;
+    }
+    InitDefaultRptHotspotConfig();
+    config = mRptHotspotConfig;
+    return 0;
+}
+
+int WifiSettings::EnsureRptHotspotConfigPersisted()
+{
+    std::unique_lock<std::mutex> lock(mApMutex);
+    if (mRptHotspotConfigValid) {
+        return 0;
+    }
+    std::vector<HotspotConfig> tmp;
+    tmp.push_back(mRptHotspotConfig);
+    mRptHotspotConfigValid = true;
+    mSavedRptHotspotConfig.SetValue(tmp);
+    int ret = mSavedRptHotspotConfig.SaveConfig();
+    if (ret != 0) {
+        mRptHotspotConfigValid = false;
+        LOGE("EnsureRptHotspotConfigPersisted: SaveConfig failed");
+    } else {
+        LOGI("%{public}s, persist default RptConfig ssid=%{public}s", __FUNCTION__,
+            SsidAnonymize(mRptHotspotConfig.GetSsid()).c_str());
+    }
+    return ret;
+}
+
+void WifiSettings::ClearRptHotspotConfig()
+{
+    std::unique_lock<std::mutex> lock(mApMutex);
+    mRptHotspotConfigValid = false;
+    InitDefaultRptHotspotConfig();
+    std::vector<HotspotConfig> tmp;
+    mSavedRptHotspotConfig.SetValue(tmp);
+    mSavedRptHotspotConfig.SaveConfig();
+    if (remove(RPT_HOTSPOT_CONFIG_FILE_PATH) != 0) {
+        LOGD("remove rpt config file failed or not exist");
+    }
+}
+#endif
+
 void WifiSettings::ClearHotspotConfig()
 {
     std::unique_lock<std::mutex> lock(mApMutex);
@@ -2233,6 +2312,40 @@ void WifiSettings::InitDefaultHotspotConfig()
         mHotspotConfig[0] = cfg;
     }
 }
+
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+void WifiSettings::InitDefaultRptHotspotConfig()
+{
+    mRptHotspotConfig.SetSecurityType(KeyMgmt::WPA2_PSK);
+    mRptHotspotConfig.SetBand(BandType::BAND_5GHZ);
+    mRptHotspotConfig.SetChannel(AP_CHANNEL_5G_DEFAULT);
+    mRptHotspotConfig.SetSsid(g_defaultApSsid.empty() ? GetDefaultApSsid() : g_defaultApSsid);
+    mRptHotspotConfig.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
+    mRptHotspotConfig.SetPasswdDefault(true);
+}
+
+void WifiSettings::InitRptHotspotConfig()
+{
+    std::unique_lock<std::mutex> lock(mApMutex);
+    if (mSavedRptHotspotConfig.LoadConfig() >= 0) {
+        std::vector<HotspotConfig> tmp;
+        mSavedRptHotspotConfig.GetValue(tmp);
+        if (!tmp.empty()) {
+            mRptHotspotConfig = tmp[0];
+            mRptHotspotConfigValid = true;
+            LOGI("%{public}s, RptConfig ssid is %{public}s, preSharedKey_len is %{public}zu", __FUNCTION__,
+                SsidAnonymize(mRptHotspotConfig.GetSsid()).c_str(),
+                PassWordAnonymize(mRptHotspotConfig.GetPreSharedKey()).length());
+            return;
+        }
+        LOGI("load rpt hotspot config success, but tmp.size() = 0, use default config");
+    } else {
+        LOGI("load rpt hotspot config fail, use default config");
+    }
+    InitDefaultRptHotspotConfig();
+    mRptHotspotConfigValid = false;
+}
+#endif
 
 void WifiSettings::InitHotspotConfig()
 {

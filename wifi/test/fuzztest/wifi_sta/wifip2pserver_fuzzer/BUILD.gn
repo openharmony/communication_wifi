@@ -70,6 +70,10 @@ ohos_fuzztest("WifiP2pServerFuzzTest") {
 
   defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
 
+  if (wifi_feature_with_go_simulation_ap) {
+    defines += [ "FEATURE_WITH_GO_SIMULATION_AP" ]
+  }
+
   if (is_asan || use_clang_coverage) {
     defines += [ "DTFUZZ_TEST" ]
   }

@@ -297,6 +297,47 @@ public:
      * @return int32_t - operation result
      */
     int32_t GetApIfaceName(std::string &ifaceName) override;
+
+    /**
+     * @Description Set the configuration of RPT (cockpit repeater hotspot).
+     *
+     * @param config - HotspotConfigParcel object for RPT
+     * @return ErrCode - operation result
+     */
+    int32_t SetRptConfig(const HotspotConfigParcel &config) override;
+
+    /**
+     * @Description Get the configuration of RPT (cockpit repeater hotspot).
+     *
+     * @param config - Current RPT configuration
+     * @return ErrCode - operation result
+     */
+    int32_t GetRptConfig(HotspotConfigParcel &config) override;
+
+    /**
+     * @Description Enable RPT (cockpit repeater hotspot).
+     *
+     * @param type - service type
+     * @return ErrCode - operation result
+     */
+    int32_t EnableRpt(ServiceTypeParcel type = ServiceTypeParcel::DEFAULT) override;
+
+    /**
+     * @Description Disable RPT (cockpit repeater hotspot).
+     *
+     * @param type - service type
+     * @return ErrCode - operation result
+     */
+    int32_t DisableRpt(ServiceTypeParcel type = ServiceTypeParcel::DEFAULT) override;
+
+    /**
+     * @Description Check whether RPT (cockpit repeater hotspot) is active.
+     *
+     * @param isActive - active / inactive
+     * @return ErrCode - operation result
+     */
+    int32_t IsRptActive(bool &isActive) override;
+
     /**
      * @Description convert randomMac to realMac
      *
@@ -309,6 +350,11 @@ public:
     static ErrCode OnRestore(MessageParcel& data, MessageParcel& reply);
 private:
     ErrCode CheckCanEnableHotspot(const ServiceType type);
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    ErrCode CheckCanEnableRpt(const ServiceType type);
+    ErrCode VerifyRptConfigValidity(const HotspotConfig &config);
+    int32_t SetRptConfigInternal(const HotspotConfig &config);
+#endif
     ErrCode VerifyGetStationListPermission();
     int CheckOperHotspotSwitchPermission(const ServiceType type);
     bool IsApServiceRunning();

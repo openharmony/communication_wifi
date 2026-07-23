@@ -23,6 +23,10 @@
 #include "wifi_hisysevent.h"
 #include "wifi_net_agent.h"
 #include "p2p_chr_reporter.h"
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+#include "wifi_common_util.h"
+#include "wifi_ap_msg.h"
+#endif
 #include "wifi_global_func.h"
 #include "wifi_hid2d_service_utils.h"
 
@@ -88,11 +92,21 @@ bool P2pGroupOperatingState::ProcessCmdCreateRptGroup(const InternalMessagePtr m
         WIFI_LOGE("failed to get config.");
         return false;
     }
+    bool paramValid = !config.GetPassphrase().empty() && !config.GetGroupName().empty() &&
+        config.GetPassphrase().length() >= MIN_PSK_LEN && config.GetPassphrase().length() <= MAX_PSK_LEN;
+    int freq = 0;
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    freq = config.GetFreq();
+    if (freq <= 0) {
+        freq = ChannelToFrequency(AP_CHANNEL_5G_DEFAULT);
+    }
+#else
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    if (linkedInfo.connState == CONNECTED && !config.GetPassphrase().empty() && !config.GetGroupName().empty() &&
-        config.GetPassphrase().length() >= MIN_PSK_LEN && config.GetPassphrase().length() <= MAX_PSK_LEN) {
-        int freq = p2pStateMachine.GetAvailableFreqByBand(config.GetGoBand());
+    paramValid = paramValid && (linkedInfo.connState == CONNECTED);
+    freq = p2pStateMachine.GetAvailableFreqByBand(config.GetGoBand());
+#endif
+    if (paramValid) {
         WIFI_LOGI("Create rpt group. p2p freq is %{public}d", freq);
         WifiConfigCenter::GetInstance().SetExplicitGroup(true);
         if (p2pStateMachine.DealCreateRptGroupWithConfig(config, freq)) {

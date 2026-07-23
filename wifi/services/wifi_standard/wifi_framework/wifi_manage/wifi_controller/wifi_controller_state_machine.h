@@ -80,6 +80,11 @@ public:
 #ifdef FEATURE_RPT_SUPPORT
         void HandleRptStartFail(InternalMessagePtr msg);
         void HandleP2pStop(InternalMessagePtr msg);
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+        void HandleRptToggleChangeInEnabledState(InternalMessagePtr msg);
+        void HandleRptOpen(int id);
+        void HandleRptClose(int id);
+#endif
 #endif
 #endif
         WifiControllerMachine *pWifiControllerMachine;

@@ -160,6 +160,9 @@ ohos_unittest("toolkit_unittest") {
   if (wifi_feature_car_cockpit_supported) {
     defines += [ "WIFI_FEATURE_CAR_COCKPIT_SUPPORTED" ]
   }
+  if (wifi_feature_with_go_simulation_ap) {
+    defines += [ "FEATURE_WITH_GO_SIMULATION_AP" ]
+  }
   if (defined(global_parts_info) &&
       defined(global_parts_info.account_os_account)) {
     external_deps += [ "os_account:os_account_innerkits" ]

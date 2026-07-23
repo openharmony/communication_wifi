@@ -93,6 +93,9 @@ if (defined(ohos_lite)) {
       "$WIFI_ROOT_DIR/interfaces/innerkits",
       "$WIFI_ROOT_DIR/utils/inc",
     ]
+    if (wifi_feature_with_go_simulation_ap) {
+      defines = [ "FEATURE_WITH_GO_SIMULATION_AP" ]
+    }
   }
 
   config("wifi_sdk_config") {
@@ -300,6 +303,9 @@ ohos_source_set("wifi_scan_stub") {
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
     }
+    if (wifi_feature_with_go_simulation_ap) {
+      defines += [ "FEATURE_WITH_GO_SIMULATION_AP" ]
+    }
 
     deps = [":wifi_hotspot_interface"]
 
@@ -453,6 +459,9 @@ ohos_source_set("wifi_scan_stub") {
 
     if (wifi_feature_with_random_mac_addr) {
       defines += [ "SUPPORT_RANDOM_MAC_ADDR" ]
+    }
+    if (wifi_feature_with_go_simulation_ap) {
+      defines += [ "FEATURE_WITH_GO_SIMULATION_AP" ]
     }
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc

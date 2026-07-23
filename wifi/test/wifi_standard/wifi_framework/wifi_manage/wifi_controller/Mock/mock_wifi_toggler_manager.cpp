@@ -95,6 +95,13 @@ ErrCode WifiTogglerManager::SoftapToggled(int isOpen, int id)
     return WIFI_OPT_SUCCESS;
 }
 
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+ErrCode WifiTogglerManager::RptToggled(int isOpen, int id)
+{
+    return WIFI_OPT_SUCCESS;
+}
+#endif
+
 ErrCode WifiTogglerManager::ScanOnlyToggled(int isOpen)
 {
     return WIFI_OPT_SUCCESS;

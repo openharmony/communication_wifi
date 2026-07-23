@@ -228,8 +228,12 @@ if (defined(ohos_lite)) {
       cflags += [ "-DBINDER_IPC_32BIT" ]
     }
 
+    defines = []
     if (wifi_feature_non_seperate_p2p) {
-      defines = [ "NON_SEPERATE_P2P" ]
+      defines += [ "NON_SEPERATE_P2P" ]
+    }
+    if (wifi_feature_with_go_simulation_ap) {
+      defines += [ "FEATURE_WITH_GO_SIMULATION_AP" ]
     }
   }
 
@@ -378,6 +382,10 @@ if (defined(ohos_lite)) {
       defines += [ "WLAN_PLUGGABLE_SUPPORTED" ]
     }
 
+    if (wifi_feature_with_go_simulation_ap) {
+      defines += [ "FEATURE_WITH_GO_SIMULATION_AP" ]
+    }
+
     external_deps = [
       "ability_base:want",
       "ability_runtime:app_manager",
@@ -476,6 +484,10 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_with_rpt) {
       defines += [ "FEATURE_RPT_SUPPORT" ]
+    }
+
+    if (wifi_feature_with_go_simulation_ap) {
+      defines += [ "FEATURE_WITH_GO_SIMULATION_AP" ]
     }
 
     if (defined(global_parts_info) &&
@@ -767,6 +779,14 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_with_dynamic_adjust_wifi_power_save) {
       defines += [ "DYNAMIC_ADJUST_WIFI_POWER_SAVE" ]
+    }
+
+    if (wifi_feature_with_go_simulation_ap) {
+      defines += [ "FEATURE_WITH_GO_SIMULATION_AP" ]
+      sources += [
+        "$WIFI_ROOT_DIR/services/wifi_standard/wifi_framework/wifi_manage/wifi_controller/wifi_rpt_nat_manager.cpp",
+      ]
+      external_deps += [ "netmanager_base:netsys_controller" ]
     }
   
     if (defined(global_parts_info) &&

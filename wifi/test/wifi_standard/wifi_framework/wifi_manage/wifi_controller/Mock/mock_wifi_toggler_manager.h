@@ -35,6 +35,9 @@ public:
     RptModeCallback& GetRptCallback(void);
     ErrCode WifiToggled(int isOpen, int id = 0);
     ErrCode SoftapToggled(int isOpen, int id = 0);
+#ifdef FEATURE_WITH_GO_SIMULATION_AP
+    ErrCode RptToggled(int isOpen, int id = 0);
+#endif
     ErrCode ScanOnlyToggled(int isOpen);
     ErrCode AirplaneToggled(int isOpen);
     bool HasAnyApRuning();

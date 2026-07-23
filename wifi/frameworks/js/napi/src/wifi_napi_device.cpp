@@ -74,12 +74,12 @@ NO_SANITIZE("cfi") napi_value IsWifiActive(napi_env env, napi_callback_info info
 
 NO_SANITIZE("cfi") napi_value IsWlanSupported(napi_env env, napi_callback_info info)
 {
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
     bool isSupported = false;
     ErrCode ret = wifiDevicePtr->IsWlanSupported(isSupported);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get wlan supported status fail: %{public}d", ret);
-        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
     }
     napi_value result;
     napi_get_boolean(env, isSupported, &result);
@@ -1081,8 +1081,30 @@ NO_SANITIZE("cfi") napi_value ConnectToCandidateConfig(napi_env env, napi_callba
         if (connectSettings.withUserAction) {
             return ConnectToCandidateWithUserActionAsync(env, connectSettings, argc, argv);
         }
-        ret = wifiDevicePtr->ConnectToCandidateConfig(connectSettings);
-        WIFI_NAPI_RETURN_NUM_CODE(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
+        DeviceConfigContext *asyncContext = new DeviceConfigContext(env);
+        WIFI_NAPI_ASSERT(env, asyncContext != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+        napi_create_string_latin1(env, "ConnectToCandidateConfig", NAPI_AUTO_LENGTH,
+            &asyncContext->resourceName);
+        asyncContext->networkId = connectSettings.networkId;
+        asyncContext->withUserAction = connectSettings.withUserAction;
+        asyncContext->userActionTimeout = connectSettings.userActionTimeout;
+        asyncContext->addNetworkToSystem = connectSettings.addNetworkToSystem;
+        asyncContext->executeFunc = [&](void* data) -> void {
+            DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
+            ConnectSettings settings;
+            settings.networkId = context->networkId;
+            settings.withUserAction = context->withUserAction;
+            settings.userActionTimeout = context->userActionTimeout;
+            settings.addNetworkToSystem = context->addNetworkToSystem;
+            context->errorCode = wifiDevicePtr->ConnectToCandidateConfig(settings);
+        };
+        asyncContext->completeFunc = [&](void* data) -> void {
+            DeviceConfigContext *context = static_cast<DeviceConfigContext *>(data);
+            napi_get_boolean(context->env, (context->errorCode == WIFI_OPT_SUCCESS), &context->result);
+            WIFI_LOGI("Push connect candidate config result to client");
+        };
+        asyncContext->sysCap = SYSCAP_WIFI_STA;
+        return DoAsyncWork(env, asyncContext, argc, argv, 1);
     } else {
         WIFI_NAPI_ASSERT(env, false, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     }
@@ -2179,38 +2201,38 @@ NO_SANITIZE("cfi") napi_value SetWifiCapability(napi_env env, napi_callback_info
     size_t argc = 2;
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, argc == PARAMS_COUNT, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
+    WIFI_NAPI_ASSERT(env, argc == PARAMS_COUNT, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
  
     napi_valuetype capabilityType;
     napi_valuetype enableType;
     napi_typeof(env, argv[0], &capabilityType);
     napi_typeof(env, argv[1], &enableType);
-    WIFI_NAPI_ASSERT(env, capabilityType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
-    WIFI_NAPI_ASSERT(env, enableType == napi_boolean, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+    WIFI_NAPI_ASSERT(env, capabilityType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, enableType == napi_boolean, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
  
     int capability = -1;
     bool enable = false;
     napi_get_value_int32(env, argv[0], &capability);
     napi_get_value_bool(env, argv[1], &enable);
     ErrCode ret = wifiDevicePtr->SetWifiCapability(capability, enable);
-    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
  
 NO_SANITIZE("cfi") napi_value GetWifiCapability(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_CORE);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
  
     size_t argc = 1;
     napi_value argv[1];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
+    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
  
     napi_valuetype capabilityType;
     napi_typeof(env, argv[0], &capabilityType);
-    WIFI_NAPI_ASSERT(env, capabilityType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_CORE);
+    WIFI_NAPI_ASSERT(env, capabilityType == napi_number, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
  
     int capability = -1;
     napi_get_value_int32(env, argv[0], &capability);
@@ -2218,7 +2240,7 @@ NO_SANITIZE("cfi") napi_value GetWifiCapability(napi_env env, napi_callback_info
     ErrCode ret = wifiDevicePtr->GetWifiCapability(capability, enabled);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get wifi capability fail: %{public}d", ret);
-        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_CORE);
+        WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
  
     napi_value result;

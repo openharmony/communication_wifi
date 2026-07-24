@@ -119,7 +119,6 @@ ErrCode WifiIntelligenceStateMachine::Initialize()
     if (InitWifiIntelligenceStates() == WIFI_OPT_FAILED) {
         return WIFI_OPT_FAILED;
     }
-    apInfoHelper_->Init();
     BuildStateTree();
     SetFirstState(pInitialState_);
     StartStateMachine();
@@ -253,6 +252,7 @@ WifiIntelligenceStateMachine::InitialState::~InitialState() {}
 void WifiIntelligenceStateMachine::InitialState::GoInState()
 {
     WIFI_LOGI("Enter InitialState GoInState function.");
+    pWifiIntelligenceStateMachine_->apInfoHelper_->Init();
     pWifiIntelligenceStateMachine_->mIsAutoOpenSearch_ = false;
     if (WifiConfigCenter::GetInstance().GetWifiMidState() != WifiOprMidState::RUNNING) {
         pWifiIntelligenceStateMachine_->SwitchState(pWifiIntelligenceStateMachine_->pDisabledState_);

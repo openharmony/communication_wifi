@@ -324,6 +324,7 @@ bool ApInfoHelper::IsCellIdExitByData(ApInfoData info, std::string cellId)
 int32_t ApInfoHelper::QueryBssidInfoByParam(const std::map<std::string, std::string> &queryParams,
     std::vector<ApInfoData> &apInfoVector)
 {
+    WIFI_LOGI("%{public}s enter", __func__);
     if (wifiDataBaseUtils_ == nullptr) {
         WIFI_LOGE("%{public}s fail, wifiDataBaseUtils_ is nullptr", __func__);
         return QUERY_FAILED;
@@ -368,6 +369,7 @@ int32_t ApInfoHelper::QueryBssidInfoByParam(const std::map<std::string, std::str
         apInfoVector.emplace_back(curApInfo);
     } while (resultSet->GoToNextRow() == NativeRdb::E_OK);
     resultSet->Close();
+    WIFI_LOGI("%{public}s end", __func__);
     return QUERY_HAS_RECORD;
 }
 

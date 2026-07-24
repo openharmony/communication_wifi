@@ -43,6 +43,7 @@ struct WifiBackupConfig {
     WifiPrivacyConfig wifiPrivacySetting;
     bool isAllowAutoConnect;
     time_t lastDisconnectTime;
+    bool wifiAutoEnable;
     WifiBackupConfig()
     {
         instanceId = 0;
@@ -58,6 +59,7 @@ struct WifiBackupConfig {
         wifiPrivacySetting = WifiPrivacyConfig::RANDOMMAC;
         isAllowAutoConnect = true;
         lastDisconnectTime = -1;
+        wifiAutoEnable = true;
     }
 };
 

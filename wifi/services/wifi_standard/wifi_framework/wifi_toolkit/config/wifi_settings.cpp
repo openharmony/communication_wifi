@@ -1002,7 +1002,6 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
         LOGE("OnBackup key or iv is empty.");
         return -1;
     }
-
     std::vector<WifiDeviceConfig> localConfigs;
     {
         std::unique_lock<std::mutex> lock(mStaMutex);
@@ -1011,6 +1010,7 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
     }
 
     std::vector<WifiBackupConfig> backupConfigs;
+    bool wifiAutoEnable = GetWifiCapability(static_cast<int>(WifiCapability::WIFI_AUTO_ENABLE));
     for (auto &config : localConfigs) {
         if (config.wifiEapConfig.eap.length() != 0 || config.isPasspoint || !(config.uid == -1 || config.isShared)) {
             LOGI("OnBackup filterd, ssid : %{public}s.", SsidAnonymize(config.ssid).c_str());
@@ -1021,6 +1021,7 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
 #endif
         WifiBackupConfig backupConfig;
         ConvertDeviceCfgToBackupCfg(config, backupConfig);
+        backupConfig.wifiAutoEnable = wifiAutoEnable;
         backupConfigs.push_back(backupConfig);
     }
     std::vector<WifiDeviceConfig>().swap(localConfigs);
@@ -2841,6 +2842,9 @@ int WifiSettings::GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceCon
         WifiDeviceConfig config;
         ConvertBackupCfgToDeviceCfg(backupCfg, config);
         deviceConfigs.push_back(config);
+    }
+    if (!backupConfigs.empty()) {
+        SetWifiCapability(static_cast<int>(WifiCapability::WIFI_AUTO_ENABLE), backupConfigs[0].wifiAutoEnable);
     }
     return 0;
 }

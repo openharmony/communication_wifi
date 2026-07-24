@@ -246,7 +246,6 @@ int32_t ApInfoHelper::GetOldestApInfoData(ApInfoData &data)
 int32_t ApInfoHelper::QueryCellIdInfoByParam(const std::map<std::string, std::string> &queryParams,
     std::vector<CellInfoData> &cellInfoVector)
 {
-    WIFI_LOGI("%{public}s enter", __func__);
     if (wifiDataBaseUtils_ == nullptr) {
         WIFI_LOGE("%{public}s fail, wifiDataBaseUtils_ is nullptr", __func__);
         return QUERY_FAILED;
@@ -286,7 +285,6 @@ int32_t ApInfoHelper::QueryCellIdInfoByParam(const std::map<std::string, std::st
         cellInfoVector.emplace_back(curCellInfo);
     } while (resultSet->GoToNextRow() == NativeRdb::E_OK);
     resultSet->Close();
-    WIFI_LOGI("%{public}s end", __func__);
     return QUERY_HAS_RECORD;
 }
 
@@ -490,7 +488,6 @@ int32_t ApInfoHelper::AddNearbyApInfo(std::string bssid)
 int32_t ApInfoHelper::QueryNearbyInfoByParam(const std::map<std::string, std::string> &queryParams,
     std::vector<std::string> &nearbyInfoVector)
 {
-    WIFI_LOGI("%{public}s enter", __func__);
     if (wifiDataBaseUtils_ == nullptr) {
         WIFI_LOGE("%{public}s fail, wifiDataBaseUtils_ is nullptr", __func__);
         return QUERY_FAILED;
@@ -529,7 +526,6 @@ int32_t ApInfoHelper::QueryNearbyInfoByParam(const std::map<std::string, std::st
         nearbyInfoVector.emplace_back(curNearbyApInfo);
     } while (resultSet->GoToNextRow() == NativeRdb::E_OK);
     resultSet->Close();
-    WIFI_LOGI("%{public}s end", __func__);
     return QUERY_HAS_RECORD;
 }
 

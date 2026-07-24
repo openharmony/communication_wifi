@@ -380,6 +380,7 @@ void WifiDeviceProxy::WriteDeviceConfig(const WifiDeviceConfig &config, MessageP
     data.WriteString(config.wifiWapiConfig.wapiAsCertData);
     data.WriteString(config.wifiWapiConfig.wapiUserCertData);
     data.WriteBool(config.isAllowAutoConnect);
+    data.WriteBool(config.showNoInternetDialog);
 }
 
 ErrCode WifiDeviceProxy::RemoveCandidateConfig(const WifiDeviceConfig &config)

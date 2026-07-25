@@ -159,7 +159,7 @@ DEFINE_WIFILOG_LABEL("StaStateMachine");
 
 constexpr int32_t MAX_NO_INTERNET_CNT = 3;
 constexpr uint32_t PKT_DIR_RPT_CNT = 3;
-constexpr uint32_t DETECT_COUNT = 2;
+constexpr int32_t DETECT_COUNT = 2;
 constexpr int64_t ROAM_SCAN_MAX_AGE_US = 20 * 1000 * 1000;  // 20s
 
 const std::map<int, int> wpa3FailreasonMap {

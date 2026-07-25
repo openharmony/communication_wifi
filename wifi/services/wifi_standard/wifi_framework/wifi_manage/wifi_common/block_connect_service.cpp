@@ -184,11 +184,6 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus(const std::vector<InterSc
             WIFI_LOGI("NetworkId %{public}d blockDuration expired, auto enabled.", config.networkId);
         }
         LogDisabledConfig(config);
-#ifndef OHOS_ARCH_LITE
-        if (!scanInfos.empty()) {
-            CheckPortalAuthTimeoutClear(config, scanInfos);
-        }
-#endif
     }
     return true;
 }

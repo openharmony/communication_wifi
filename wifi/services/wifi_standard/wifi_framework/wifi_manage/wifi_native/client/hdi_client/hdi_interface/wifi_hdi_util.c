@@ -383,7 +383,7 @@ static void GetChanWidthCenterFreq(ScanInfo *pcmd, struct NeedParseIe* iesNeedPa
         pcmd->isErpExist = 1;
         return;
     }
-    LOGE("GetChanWidthCenterFreq fail.");
+    LOGD("GetChanWidthCenterFreq fail.");
     return;
 }
 
@@ -474,11 +474,6 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         }
         ++start;
         srcBuf[last] = '\0';
-        unsigned int hexStrLen = strlen(srcBuf + start);
-        unsigned int hexBufSize = len / lenValue + 1;
-        if (hexStrLen > hexBufSize) {
-            break;
-        }
         HexStringToString(srcBuf + start, infoElemsTemp[infoElemsSize].content);
         if ((length - last) > lastLength) { // make sure there is no useless character
             last = last + 1;

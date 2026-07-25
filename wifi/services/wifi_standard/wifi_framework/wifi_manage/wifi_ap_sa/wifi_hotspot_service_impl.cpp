@@ -867,13 +867,13 @@ int32_t WifiHotspotServiceImpl::AddBlockList(const StationInfoParcel &parcelInfo
     if (CheckMacIsValid(info.bssid)) {
         return HandleHotspotIdlRet(WIFI_OPT_INVALID_PARAM);
     }
+    bool isApServiceRunning = IsApServiceRunning();
 #ifdef FEATURE_WITH_GO_SIMULATION_AP
-    if (!IsApServiceRunning()) {
+    if (!isApServiceRunning) {
         WIFI_LOGE("ApService is not running!");
         return HandleHotspotIdlRet(WIFI_OPT_AP_NOT_OPENED);
     }
 #else
-    bool isApServiceRunning = IsApServiceRunning();
     bool isRptRunning = IsRptRunning();
     if (!isApServiceRunning && !isRptRunning) {
         WIFI_LOGE("ApService is not running!");

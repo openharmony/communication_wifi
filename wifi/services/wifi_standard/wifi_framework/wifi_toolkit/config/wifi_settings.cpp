@@ -2321,7 +2321,11 @@ void WifiSettings::InitDefaultRptHotspotConfig()
     mRptHotspotConfig.SetBand(BandType::BAND_5GHZ);
     mRptHotspotConfig.SetChannel(AP_CHANNEL_5G_DEFAULT);
     mRptHotspotConfig.SetSsid(g_defaultApSsid.empty() ? GetDefaultApSsid() : g_defaultApSsid);
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+    mRptHotspotConfig.SetPreSharedKey(GeneratePasswordForCar(RANDOM_PASSWD_LEN));
+#else
     mRptHotspotConfig.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
+#endif
     mRptHotspotConfig.SetPasswdDefault(true);
 }
 

@@ -59,6 +59,11 @@ ConcreteMangerMachine::ConcreteMangerMachine()
 ConcreteMangerMachine::~ConcreteMangerMachine()
 {
     WIFI_LOGE("~ConcreteMangerMachine");
+#ifndef OHOS_ARCH_LITE
+    if (fastScanTimerId != 0) {
+        WifiTimer::GetInstance()->UnRegister(fastScanTimerId);
+    }
+#endif
     StopTimer(CONCRETE_CMD_STOP_MACHINE_RETRY);
     StopHandlerThread();
     ParsePointer(pDefaultState);

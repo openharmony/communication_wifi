@@ -669,7 +669,7 @@ if (defined(ohos_lite)) {
       defines += [ "DYNAMIC_UNLOAD_SA" ]
     }
 
-    if (is_asan) {
+    if (is_asan && use_libfuzzer) {
       defines += [ "DTFUZZ_TEST" ]
     }
 

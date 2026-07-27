@@ -21,6 +21,7 @@ ohos_static_library("wifi_self_cure") {
     cfi = true  # Enable/disable control flow integrity detection
     boundary_sanitize = false  # Enable boundary san detection
     cfi_cross_dso = true  # Cross-SO CFI Checks
+    cfi_vcall_icall_only = true # CFI优化，限定CFI检测范围
     integer_overflow = false  # Enable integer overflow detection
     ubsan = false  # Enable some Ubsan options
     debug = false

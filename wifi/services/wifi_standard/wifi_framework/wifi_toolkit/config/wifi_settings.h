@@ -470,7 +470,7 @@ private:
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
     std::atomic_flag mEncryptionOnBootFlag = ATOMIC_FLAG_INIT;
     std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
-    std::vector<std::string> mSpecialSsidList = {"juneyaoair", "CEAIR-WIFI"};
+    std::vector<std::string> mSpecialSsidList;  // Initialized in cpp: {"juneyaoair", "CEAIR-WIFI"}
     WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig;
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT

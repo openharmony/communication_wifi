@@ -23,80 +23,80 @@ export class WifiModel extends BaseModel {
   }
 
   enableP2p() {
-    mLogUtil.log("enableP2p");
+    mLogUtil.log('enableP2p');
     return WifiNativeJs.enableP2p();
   }
 
   disableP2p() {
-    mLogUtil.log("disableP2p")
+    mLogUtil.log('disableP2p')
     return WifiNativeJs.disableP2p();
   }
 
   on(typeValue, callBack) {
-    mLogUtil.log("on  " + typeValue);
+    mLogUtil.log('on  ' + typeValue);
     WifiNativeJs.on(typeValue, callBack);
   }
 
   discoverDevices() {
-    mLogUtil.log("startDiscoverDevices");
+    mLogUtil.log('startDiscoverDevices');
     return WifiNativeJs.startDiscoverDevices();
   }
 
   stopDiscoverDevices() {
-    mLogUtil.log("stopDiscoverDevices");
+    mLogUtil.log('stopDiscoverDevices');
     return WifiNativeJs.stopDiscoverDevices();
   }
 
   discoverServices() {
-    mLogUtil.log("DiscoverServices");
+    mLogUtil.log('DiscoverServices');
     return WifiNativeJs.discoverServices();
   }
 
   setDeviceName(name) {
-    mLogUtil.log("setDeviceName");
+    mLogUtil.log('setDeviceName');
     return WifiNativeJs.setP2pDeviceName(name);
   }
 
   stopDiscoverServices() {
-    mLogUtil.log("stopDiscoverServices");
+    mLogUtil.log('stopDiscoverServices');
     return WifiNativeJs.stopDiscoverServices();
   }
 
   connectP2pDevices(config) {
-    mLogUtil.log("connectP2pDevices");
+    mLogUtil.log('connectP2pDevices');
     return WifiNativeJs.p2pConnect(config);
   }
 
   disconnectP2pDevices() {
-    mLogUtil.log("disconnectP2pDevices");
+    mLogUtil.log('disconnectP2pDevices');
     return WifiNativeJs.removeGroup();
   }
 
   cancelConnect() {
-    mLogUtil.log("wifi direct - p2pCancelConnect()");
+    mLogUtil.log('wifi direct - p2pCancelConnect()');
     return WifiNativeJs.p2pCancelConnect()();
   }
 
   getLinkInfo(cb) {
-    mLogUtil.log("getLinkInfo");
+    mLogUtil.log('getLinkInfo');
     WifiNativeJs.getP2pLinkedInfo((result) => {
-      mLogUtil.log("getLinkInfo  " + JSON.stringify(result));
+      mLogUtil.log('getLinkInfo  ' + JSON.stringify(result));
       let resultStr = null
       if (result != null) {
         let info = JSON.parse(JSON.stringify(result));
-        resultStr = 'connectState£º' + (info.connectState == 1 ? 'CONNECTED' : 'DISCONNECTED') + '\nisP2pGroupOwner£º' + info.isP2pGroupOwner + '\ngroupOwnerAddress£º' + info.groupOwnerAddress
+        resultStr = 'connectStateï¿½ï¿½' + (info.connectState == 1 ? 'CONNECTED' : 'DISCONNECTED') + '\nisP2pGroupOwnerï¿½ï¿½' + info.isP2pGroupOwner + '\ngroupOwnerAddressï¿½ï¿½' + info.groupOwnerAddress
       }
       cb(resultStr)
     });
   }
 
   getCurrentGroupInfo(cb) {
-    mLogUtil.log("getCurrentGroupInfo");
+    mLogUtil.log('getCurrentGroupInfo');
     WifiNativeJs.getCurrentGroup((result) => {
       let info = result;
-      mLogUtil.log("current group result = " + result);
+      mLogUtil.log('current group result = ' + result);
       if (result != null) {
-        mLogUtil.log("current group info = " + JSON.stringify(result));
+        mLogUtil.log('current group info = ' + JSON.stringify(result));
         info = JSON.parse(JSON.stringify(result));
       }
       cb(info);
@@ -104,12 +104,12 @@ export class WifiModel extends BaseModel {
   }
 
   getP2pDevicesCallBack() {
-    mLogUtil.log("wifi model getP2pDevicesCallBack");
+    mLogUtil.log('wifi model getP2pDevicesCallBack');
     let mDeviceList = [];
     return new Promise((resolve) => {
       WifiNativeJs.getP2pDevices((result) => {
         if (result == null) {
-          mLogUtil.log("WifiNativeJs queryP2pDevices");
+          mLogUtil.log('WifiNativeJs queryP2pDevices');
           return;
         }
         let datas = JSON.parse(JSON.stringify(result));
@@ -121,7 +121,7 @@ export class WifiModel extends BaseModel {
             status: datas[j].status
           });
         }
-        mLogUtil.log("mWifiList = " + JSON.stringify(mDeviceList));
+        mLogUtil.log('mWifiList = ' + JSON.stringify(mDeviceList));
         resolve(mDeviceList);
       });
     })
@@ -139,7 +139,7 @@ export class WifiModel extends BaseModel {
   }
 
   deletePersistentGroup(id) {
-    mLogUtil.log("deletePersistentGroup id = " + id)
+    mLogUtil.log('deletePersistentGroup id = ' + id)
     return WifiNativeJs.deletePersistentGroup(id)
   }
 
@@ -148,7 +148,7 @@ export class WifiModel extends BaseModel {
   }
 
   getMacAddress() {
-    mLogUtil.log("getMacAddress");
+    mLogUtil.log('getMacAddress');
     return WifiNativeJs.getDeviceMacAddress();
   }
 

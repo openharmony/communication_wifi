@@ -539,18 +539,20 @@ void BlockConnectService::CheckPortalAuthTimeoutClear(WifiDeviceConfig &config,
     }
     if (!apFound) {
         config.networkSelectionStatus.portalAuthClearCount++;
+        WifiSettings::GetInstance().AddDeviceConfig(config);
         WIFI_LOGD("Portal auth block: AP not found, counter=%{public}d, networkId=%{public}d",
             config.networkSelectionStatus.portalAuthClearCount, networkId);
         if (config.networkSelectionStatus.portalAuthClearCount >= MAX_CHECK_COUNT) {
+            WifiSettings::GetInstance().AddDeviceConfig(config);
             EnableNetworkSelectStatus(networkId);
             WifiNotificationUtil::GetInstance().CancelWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);
             WIFI_LOGI("Portal auth block: auto cleared after 3 scans, networkId=%{public}d", networkId);
         }
     } else {
+        WifiSettings::GetInstance().AddDeviceConfig(config);
         config.networkSelectionStatus.portalAuthClearCount = 0;
     }
-    WifiSettings::GetInstance().AddDeviceConfig(config);
 }
 
 void BlockConnectService::ReleaseUnusableBssidSet()

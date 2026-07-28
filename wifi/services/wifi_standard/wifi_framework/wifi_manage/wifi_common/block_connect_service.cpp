@@ -543,7 +543,6 @@ void BlockConnectService::CheckPortalAuthTimeoutClear(WifiDeviceConfig &config,
         WIFI_LOGD("Portal auth block: AP not found, counter=%{public}d, networkId=%{public}d",
             config.networkSelectionStatus.portalAuthClearCount, networkId);
         if (config.networkSelectionStatus.portalAuthClearCount >= MAX_CHECK_COUNT) {
-            WifiSettings::GetInstance().AddDeviceConfig(config);
             EnableNetworkSelectStatus(networkId);
             WifiNotificationUtil::GetInstance().CancelWifiNotification(
                 WifiNotificationId::WIFI_PORTAL_NOTIFICATION_ID);

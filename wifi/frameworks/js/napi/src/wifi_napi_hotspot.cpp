@@ -42,6 +42,9 @@ NO_SANITIZE("cfi") napi_value EnableHotspot(napi_env env, napi_callback_info inf
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Enable hotspot error: %{public}d", ret);
     }
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.enableHotspot.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
 }
 
@@ -78,6 +81,9 @@ NO_SANITIZE("cfi") napi_value IsHotspotDualBandSupported(napi_env env, napi_call
     WIFI_NAPI_ASSERT(env, wifiHotspotPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_AP_CORE);
     bool isSupported = false;
     ErrCode ret = wifiHotspotPtr->IsHotspotDualBandSupported(isSupported);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.isHotspotDualBandSupported.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_AP_CORE);
     napi_value result;
     napi_get_boolean(env, isSupported, &result);

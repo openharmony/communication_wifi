@@ -639,6 +639,7 @@ static napi_value JsObjToDeviceConfig(const napi_env& env, const napi_value& obj
     int ipType = static_cast<int>(AssignIpMethod::UNASSIGNED);
     JsObjectToInt(env, object, "ipType", ipType);
     JsObjectToBool(env, object, "isAutoConnectAllowed", cppConfig.isAllowAutoConnect);
+    JsObjectToBool(env, object, "showNoInternetDialog", cppConfig.showNoInternetDialog);
     WIFI_LOGI("JsObjToDeviceConfig, ipType: %{public}d, type: %{public}d.", ipType, type);
     if (IpTypeJs(ipType) == IpTypeJs::IP_TYPE_DHCP) {
         cppConfig.wifiIpConfig.assignMethod = AssignIpMethod::DHCP;
@@ -1788,6 +1789,7 @@ static napi_value DeviceConfigToJs(const napi_env& env, WifiDeviceConfig& config
 
     WapiConfigToJs(env, config, result);
     SetValueBool(env, "isAutoConnectAllowed", config.isAllowAutoConnect, result);
+    SetValueBool(env, "showNoInternetDialog", config.showNoInternetDialog, result);
     SetValueBool(env, "isSecureWifi", config.isSecureWifi, result);
 #ifdef WIFI_LOCAL_SECURITY_DETECT_ENABLE
     SetValueInt32(env, "riskType", static_cast<int>(config.riskType), result);

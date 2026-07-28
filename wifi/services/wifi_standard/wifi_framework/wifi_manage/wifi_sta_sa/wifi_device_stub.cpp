@@ -503,6 +503,7 @@ void WifiDeviceStub::ReadWifiDeviceConfig(MessageParcel &data, WifiDeviceConfig 
     config.wifiWapiConfig.wapiAsCertData = data.ReadString();
     config.wifiWapiConfig.wapiUserCertData = data.ReadString();
     config.isAllowAutoConnect = data.ReadBool();
+    config.showNoInternetDialog = data.ReadBool();
     return;
 }
 

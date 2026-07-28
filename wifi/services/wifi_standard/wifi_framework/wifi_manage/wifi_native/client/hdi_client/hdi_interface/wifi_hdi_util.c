@@ -383,7 +383,7 @@ static void GetChanWidthCenterFreq(ScanInfo *pcmd, struct NeedParseIe* iesNeedPa
         pcmd->isErpExist = 1;
         return;
     }
-    LOGD("GetChanWidthCenterFreq fail.");
+    Logd("GetChanWidthCenterFreq fail.");
     return;
 }
 

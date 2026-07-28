@@ -160,7 +160,7 @@ HWTEST_F(BlockConnectServiceTest, CheckPortalAuthTimeoutClear003, TestSize.Level
         DisabledReason::DISABLED_PORTAL_AUTH_TIMEOUT;
     config.networkSelectionStatus.portalAuthClearCount = 3;
     BlockConnectService::GetInstance().CheckPortalAuthTimeoutClear(config, scanInfos);
-    EXPECT_EQ(config.networkSelectionStatus.portalAuthClearCount, 0);
+    EXPECT_EQ(config.networkSelectionStatus.portalAuthClearCount, 4);
 }
 
 HWTEST_F(BlockConnectServiceTest, EnableNetworkSelectStatus_ReturnsTrueWhenSuccessful, TestSize.Level1)

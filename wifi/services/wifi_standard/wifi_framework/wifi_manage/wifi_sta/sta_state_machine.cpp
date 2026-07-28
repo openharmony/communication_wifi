@@ -4698,7 +4698,8 @@ void StaStateMachine::ConvertSsidToOriginalSsid(
     WifiConfigCenter::GetInstance().GetWifiScanConfig()->GetScanInfoList(scanInfoList);
     if (!halDeviceConfig.bssid.empty()) {
         for (auto &scanInfo : scanInfoList) {
-            if (halDeviceConfig.bssid == scanInfo.bssid) {
+            /* Also check SSID to avoid matching a renamed AP with same BSSID */
+            if (config.ssid == scanInfo.ssid && halDeviceConfig.bssid == scanInfo.bssid) {
                 AppendFastTransitionKeyMgmt(scanInfo, halDeviceConfig);
                 halDeviceConfig.ssid = scanInfo.oriSsid;
                 WIFI_LOGI("BssidMatchConvertSsid back to oriSsid:%{public}s, keyMgmt:%{public}s",

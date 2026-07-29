@@ -466,6 +466,7 @@ private:
         UniqueFd &fd, const std::string &key, const std::string &iv);
 #endif
     void LogDuplicateDeviceConfigs();
+    static std::string JoinNetworkIds(const std::vector<int> &networkIds);
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     bool IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) const;
     void DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;

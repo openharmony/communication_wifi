@@ -186,11 +186,13 @@ HWTEST_F(NetworkSelectionTest, TestPasspointNetwork, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(An<const std::string &>(),
+        An<const std::string &>(), _, _, _)).
     WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(),
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int, bool) {
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig,
+            int, bool) {
         wifiDeviceConfig.networkId = 0;
         wifiDeviceConfig.isPasspoint = true;
         return 0;
@@ -201,7 +203,8 @@ HWTEST_F(NetworkSelectionTest, TestPasspointNetwork, TestSize.Level1)
                     scanInfos, failReason));
     EXPECT_CALL(WifiSettings::GetInstance(),
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int, bool) {
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig,
+            int, bool) {
         wifiDeviceConfig.networkId = 0;
         wifiDeviceConfig.isPasspoint = false;
         return 0;

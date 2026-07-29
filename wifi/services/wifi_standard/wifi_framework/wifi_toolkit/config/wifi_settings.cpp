@@ -985,18 +985,23 @@ void WifiSettings::LogDuplicateDeviceConfigs()
     }
     for (const auto &pair : dupMap) {
         if (pair.second.size() > 1) {
-            std::string networkIds;
-            for (size_t i = 0; i < pair.second.size(); ++i) {
-                if (i != 0) {
-                    networkIds += ",";
-                }
-                networkIds += std::to_string(pair.second[i]);
-            }
             const std::string &ssid = pair.first.substr(0, pair.first.find("_"));
             LOGI("Duplicate device config found, ssid: %{public}s, networkIds: %{public}s",
-                SsidAnonymize(ssid).c_str(), networkIds.c_str());
+                SsidAnonymize(ssid).c_str(), JoinNetworkIds(pair.second).c_str());
         }
     }
+}
+
+std::string WifiSettings::JoinNetworkIds(const std::vector<int> &networkIds)
+{
+    std::string result;
+    for (size_t i = 0; i < networkIds.size(); ++i) {
+        if (i != 0) {
+            result += ",";
+        }
+        result += std::to_string(networkIds[i]);
+    }
+    return result;
 }
 
 int WifiSettings::GetNextNetworkId()

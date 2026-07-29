@@ -1220,6 +1220,7 @@ void PowermgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventDa
         HpfFilterData filterData;
         filterData.eventCode = eventData.GetCode();
         filterData.eventData = eventData.GetData();
+        WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::AP_SERVICE_CLOSE);
         for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
             WifiManager::GetInstance().InstallPacketFilterProgram(filterData, i);
         }

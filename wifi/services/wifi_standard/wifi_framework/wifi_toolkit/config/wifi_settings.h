@@ -157,6 +157,20 @@ public:
 
     int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0);
 
+    /**
+     * @Description Get device config by ssid and keymgmt with order option.
+     *
+     * @param ssid - ssid of the target network
+     * @param keymgmt - key management of the target network
+     * @param config - the matched device config (output)
+     * @param instId - instance id
+     * @param isLatest - true: return the latest matched device config (traverse from back to front);
+     *                   false: return the oldest matched device config (traverse from front to back, default)
+     * @return 0 on success, -1 on failure
+     */
+    int GetDeviceConfig(const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config,
+        int instId, bool isLatest);
+
     void SetUserConnectChoice(int networkId);
 
     void ClearAllNetworkConnectChoice();
@@ -470,6 +484,7 @@ private:
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
     std::atomic_flag mEncryptionOnBootFlag = ATOMIC_FLAG_INIT;
     std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
+    void LogDuplicateDeviceConfigs();
     std::vector<std::string> mSpecialSsidList = {"juneyaoair", "CEAIR-WIFI"};
     WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig;
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;

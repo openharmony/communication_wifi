@@ -242,6 +242,9 @@ private:
      */
     bool IsCandidateWithUserSelectChoiceHidden(NetworkSelectionResult &candidate);
 
+    void HandleSelectNetworkSuccess(NetworkSelectionResult &networkSelectionResult,
+        const std::vector<NetworkSelectionResult> &allSortedResults);
+    void HandleSelectNetworkFail(const std::string &failReason, const std::vector<InterScanInfo> &scanInfos);
     bool SelectNetworkFailConnectChoiceNetWork(NetworkSelectionResult &networkSelectionResult,
         const std::vector<InterScanInfo> &scanInfos);
     void ConnectNetwork(NetworkSelectionResult &networkSelectionResult, SelectedType &selectedType,

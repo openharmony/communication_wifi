@@ -739,6 +739,28 @@ HWTEST_F(WifiSettingsTest, GetDeviceConfigTest, TestSize.Level1)
     WifiSettings::GetInstance().ClearDeviceConfig();
 }
 
+HWTEST_F(WifiSettingsTest, GetDeviceConfigLatestTest, TestSize.Level1)
+{
+    WIFI_LOGI("GetDeviceConfigLatestTest enter");
+    std::string ssid = "test_ssid";
+    std::string keymgmt = KEY_MGMT_WPA_PSK;
+    WifiDeviceConfig configOld;
+    configOld.ssid = ssid;
+    configOld.keyMgmt = keymgmt;
+    configOld.uid = -1;
+    WifiSettings::GetInstance().SetKeyMgmtBitset(configOld);
+    WifiDeviceConfig configNew = configOld;
+    configNew.networkId = NETWORK_ID;
+    WifiSettings::GetInstance().mWifiDeviceConfig.emplace(SCORE, configOld);
+    WifiSettings::GetInstance().mWifiDeviceConfig.emplace(NETWORK_ID, configNew);
+
+    WifiDeviceConfig result;
+    int ret = WifiSettings::GetInstance().GetDeviceConfig(ssid, keymgmt, result, 0, true);
+    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(result.networkId, NETWORK_ID);
+    WifiSettings::GetInstance().ClearDeviceConfig();
+}
+
 HWTEST_F(WifiSettingsTest, RemoveWifiP2pSupplicantGroupInfoTets, TestSize.Level1)
 {
     WifiSettings::GetInstance().RemoveWifiP2pSupplicantGroupInfo();

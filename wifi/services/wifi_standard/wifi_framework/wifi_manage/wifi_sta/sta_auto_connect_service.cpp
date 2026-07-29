@@ -134,42 +134,65 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus(scanInfos);
     NetworkSelectionResult networkSelectionResult;
     std::string failReason = "";
+    std::vector<NetworkSelectionResult> allSortedResults;
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT,
-        scanInfos, failReason) ||
+        scanInfos, failReason, allSortedResults) ||
         SelectNetworkFailConnectChoiceNetWork(networkSelectionResult, scanInfos)) {
-        std::string bssid = "";
-        SelectedType selectedType = NETWORK_SELECTED_BY_AUTO;
-        if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
-            bssid = networkSelectionResult.interScanInfo.bssid;
-        }
-        if (IsCandidateWithUserSelectChoiceHidden(networkSelectionResult)) {
-            WIFI_LOGI("AutoSelectDevice select user choise hidden network");
-            selectedType = NETWORK_SELECTED_BY_USER;
-        }
-        ConnectNetwork(networkSelectionResult, selectedType, bssid);
+        HandleSelectNetworkSuccess(networkSelectionResult, allSortedResults);
     } else {
-        WIFI_LOGI("AutoSelectDevice return fail.");
-        std::vector<WifiDeviceConfig> savedConfigs;
-        WifiSettings::GetInstance().GetDeviceConfig(savedConfigs);
-        bool hasSavedConfigSeen = false;
-        for (const auto &config : savedConfigs) {
-            if (config.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
-                hasSavedConfigSeen = true;
-                break;
-            }
-        }
-        if (hasSavedConfigSeen) {
-            bool isFilteredByP2P = IsAutoConnectFailByP2PEnhanceFilter(scanInfos);
-            if (!failReason.empty()) {
-                EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_FAIL", failReason);
-            } else if (!isFilteredByP2P) {
-                EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_FAIL");
-            }
-        }
+        HandleSelectNetworkFail(failReason, scanInfos);
     }
     for (const auto &callBackItem : mStaCallbacks) {
         if (callBackItem.OnAutoSelectNetworkRes != nullptr) {
             callBackItem.OnAutoSelectNetworkRes(networkSelectionResult.wifiDeviceConfig.networkId, m_instId);
+        }
+    }
+}
+
+void StaAutoConnectService::HandleSelectNetworkSuccess(NetworkSelectionResult &networkSelectionResult,
+    const std::vector<NetworkSelectionResult> &allSortedResults)
+{
+    std::string bssid = "";
+    SelectedType selectedType = NETWORK_SELECTED_BY_AUTO;
+    if (OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
+        int targetNetworkId = networkSelectionResult.wifiDeviceConfig.networkId;
+        for (const auto &result : allSortedResults) {
+            if (result.wifiDeviceConfig.networkId == targetNetworkId) {
+                bssid = result.interScanInfo.bssid;
+                WIFI_LOGI("OverrideCandidate find best bssid: %{public}s for networkId: %{public}d",
+                    MacAnonymize(bssid).c_str(), targetNetworkId);
+                break;
+            }
+        }
+    } else {
+        bssid = networkSelectionResult.interScanInfo.bssid;
+    }
+    if (IsCandidateWithUserSelectChoiceHidden(networkSelectionResult)) {
+        WIFI_LOGI("AutoSelectDevice select user choise hidden network");
+        selectedType = NETWORK_SELECTED_BY_USER;
+    }
+    ConnectNetwork(networkSelectionResult, selectedType, bssid);
+}
+
+void StaAutoConnectService::HandleSelectNetworkFail(const std::string &failReason,
+    const std::vector<InterScanInfo> &scanInfos)
+{
+    WIFI_LOGI("AutoSelectDevice return fail.");
+    std::vector<WifiDeviceConfig> savedConfigs;
+    WifiSettings::GetInstance().GetDeviceConfig(savedConfigs);
+    bool hasSavedConfigSeen = false;
+    for (const auto &config : savedConfigs) {
+        if (config.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
+            hasSavedConfigSeen = true;
+            break;
+        }
+    }
+    if (hasSavedConfigSeen) {
+        bool isFilteredByP2P = IsAutoConnectFailByP2PEnhanceFilter(scanInfos);
+        if (!failReason.empty()) {
+            EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_FAIL", failReason);
+        } else if (!isFilteredByP2P) {
+            EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_FAIL");
         }
     }
 }

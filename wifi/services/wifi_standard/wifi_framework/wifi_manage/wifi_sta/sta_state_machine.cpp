@@ -1624,6 +1624,8 @@ void StaStateMachine::ApLinkingState::DealWpaLinkFullConnectFailEvent(InternalMe
     pStaStateMachine->wifiDataReportService_->ReportApConnEventInfo(ConnReportReason::CONN_ASSOCIATION_FULL,
         pStaStateMachine->targetNetworkId_);
 #endif
+    BlockConnectService::GetInstance().NotifyWifiConnFailedInfo(pStaStateMachine->targetNetworkId_,
+    pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_ASSOCIATION_REJECTION);
 #endif
     pStaStateMachine->AddRandomMacCure();
     pStaStateMachine->InvokeOnStaConnChanged(OperateResState::CONNECT_CONNECTION_FULL,

@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 
+#include <algorithm>
 #include <sstream>
+#include <utility>
 #include "wifi_comparator_impl.h"
 #include "network_selection_utils.h"
 #include "wifi_logger.h"
@@ -84,6 +86,42 @@ void WifiScorerComparator::GetBestCandidates(const std::vector<NetworkCandidate 
     }
     LogSelectedCandidates(bestNetworkCandidates, bestNetworkScoreResults);
     selectedCandidates.insert(selectedCandidates.end(), bestNetworkCandidates.begin(), bestNetworkCandidates.end());
+}
+
+void WifiScorerComparator::GetAllSortedCandidates(const std::vector<NetworkCandidate *> &candidates,
+                                                  std::vector<NetworkCandidate *> &sortedCandidates)
+{
+    /* if candidates is empty, it is unnecessary to score the candidate */
+    if (candidates.empty()) {
+        return;
+    }
+    /* pre-compute the score results of every candidate by every scorer */
+    std::vector<std::pair<NetworkCandidate *, std::vector<ScoreResult>>> scoredCandidates;
+    for (const auto &candidate : candidates) {
+        std::vector<ScoreResult> scoreResults;
+        for (const auto &scorer : scorers) {
+            ScoreResult scoreResult;
+            scorer->DoScore(*candidate, scoreResult);
+            scoreResults.emplace_back(scoreResult);
+        }
+        scoredCandidates.emplace_back(candidate, std::move(scoreResults));
+    }
+    /*
+     * sort candidates lexicographically by scorer scores (descending), which is consistent with
+     * the comparison strategy used in GetBestCandidates.
+     */
+    std::sort(scoredCandidates.begin(), scoredCandidates.end(),
+        [](const auto &lhs, const auto &rhs) {
+            for (std::size_t i = 0; i < lhs.second.size() && i < rhs.second.size(); ++i) {
+                if (lhs.second.at(i).score != rhs.second.at(i).score) {
+                    return lhs.second.at(i).score > rhs.second.at(i).score;
+                }
+            }
+            return false;
+        });
+    for (const auto &pair : scoredCandidates) {
+        sortedCandidates.emplace_back(pair.first);
+    }
 }
 
 void WifiScorerComparator::LogSelectedCandidates(std::vector<NetworkCandidate *> &selectedCandidates,

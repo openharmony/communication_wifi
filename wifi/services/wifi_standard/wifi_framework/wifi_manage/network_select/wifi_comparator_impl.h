@@ -34,6 +34,15 @@ public:
 
     void GetBestCandidates(const std::vector<NetworkCandidate *> &candidates,
                            std::vector<NetworkCandidate *> &selectedCandidates) override;
+
+    /**
+     * Score all candidates and return them sorted by score descending.
+     *
+     * @param candidates the candidate network before compare.
+     * @param sortedCandidates all candidate networks sorted by score.
+     */
+    void GetAllSortedCandidates(const std::vector<NetworkCandidate *> &candidates,
+                                std::vector<NetworkCandidate *> &sortedCandidates) override;
 private:
     void LogSelectedCandidates(std::vector<NetworkCandidate *> &selectedCandidates,
                                std::vector<ScoreResult> &scoreResults);

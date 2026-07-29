@@ -33,6 +33,8 @@ public:
     virtual int GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId = 0) = 0;
     virtual int GetDeviceConfig(
         const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId = 0) = 0;
+    virtual int GetDeviceConfig(
+        const std::string &ssid, const std::string &keymgmt, WifiDeviceConfig &config, int instId, bool isLatest) = 0;
     virtual const std::vector<TrustListPolicy> ReloadTrustListPolicies() = 0;
     virtual const MovingFreezePolicy ReloadMovingFreezePolicy() = 0;
     virtual int GetPackageInfoMap(std::map<std::string, std::vector<PackageInfo>> &filterMap) = 0;
@@ -59,6 +61,8 @@ public:
     MOCK_METHOD2(GetDeviceConfig, int(std::vector<WifiDeviceConfig> &results, int));
     MOCK_METHOD4(GetDeviceConfig, int(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config, int));
+    MOCK_METHOD5(GetDeviceConfig, int(const std::string &ssid, const std::string &keymgmt,
+        WifiDeviceConfig &config, int, bool));
     MOCK_METHOD0(ReloadTrustListPolicies, const std::vector<TrustListPolicy>());
     MOCK_METHOD0(ReloadMovingFreezePolicy, const MovingFreezePolicy());
     MOCK_METHOD1(GetPackageInfoMap,  int(std::map<std::string, std::vector<PackageInfo>> &filterMap));

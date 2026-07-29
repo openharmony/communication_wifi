@@ -275,6 +275,8 @@ void WifiDeviceStub::OnAddDeviceConfig(uint32_t code, IpcIo *req, IpcIo *reply)
     if (ret == WIFI_OPT_SUCCESS) {
         (void)WriteInt32(reply, result);
     }
+    std::fill(config.preSharedKey.begin(), config.preSharedKey.end(), 0);
+    std::fill(config.wifiEapConfig.password.begin(), config.wifiEapConfig.password.end(), 0);
 }
 
 void WifiDeviceStub::OnUpdateDeviceConfig(uint32_t code, IpcIo *req, IpcIo *reply)
@@ -289,6 +291,8 @@ void WifiDeviceStub::OnUpdateDeviceConfig(uint32_t code, IpcIo *req, IpcIo *repl
     if (ret == WIFI_OPT_SUCCESS) {
         (void)WriteInt32(reply, result);
     }
+    std::fill(config.preSharedKey.begin(), config.preSharedKey.end(), 0);
+    std::fill(config.wifiEapConfig.password.begin(), config.wifiEapConfig.password.end(), 0);
 }
 
 void WifiDeviceStub::OnRemoveDevice(uint32_t code, IpcIo *req, IpcIo *reply)
@@ -399,6 +403,8 @@ void WifiDeviceStub::OnConnect2To(uint32_t code, IpcIo *req, IpcIo *reply)
     ErrCode ret = ConnectToDevice(config);
     (void)WriteInt32(reply, 0);
     (void)WriteInt32(reply, ret);
+    std::fill(config.preSharedKey.begin(), config.preSharedKey.end(), 0);
+    std::fill(config.wifiEapConfig.password.begin(), config.wifiEapConfig.password.end(), 0);
 }
 
 void WifiDeviceStub::OnIsWifiConnected(uint32_t code, IpcIo *req, IpcIo *reply)

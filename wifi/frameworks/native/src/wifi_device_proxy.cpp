@@ -679,7 +679,6 @@ void WifiDeviceProxy::BigDataReadEapConfig(WifiEapConfig &wifiEapConfig, std::ve
     int pwdIdx = g_bigDataRecvLen++;
     wifiEapConfig.password = HexToString(tokens[pwdIdx]);
     std::fill(tokens[pwdIdx].begin(), tokens[pwdIdx].end(), 0);
-    wifiEapConfig.password = HexToString(tokens[g_bigDataRecvLen++]);
     wifiEapConfig.caCertPath = HexToString(tokens[g_bigDataRecvLen++]);
     wifiEapConfig.caCertAlias = HexToString(tokens[g_bigDataRecvLen++]);
     wifiEapConfig.clientCert = HexToString(tokens[g_bigDataRecvLen++]);

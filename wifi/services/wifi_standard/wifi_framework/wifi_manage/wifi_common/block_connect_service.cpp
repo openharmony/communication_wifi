@@ -158,6 +158,11 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus(const std::vector<InterSc
             (config.networkSelectionStatus.networkSelectionDisableReason == DisabledReason::DISABLED_NONE)) {
             continue;
         }
+#ifndef OHOS_ARCH_LITE
+        if (!scanInfos.empty()) {
+            CheckPortalAuthTimeoutClear(config, scanInfos);
+        }
+#endif
         DisablePolicy policy = CalculateDisablePolicy(config.networkSelectionStatus.networkSelectionDisableReason);
         if (policy.disableStatus == WifiDeviceConfigStatus::PERMEMANTLY_DISABLED) {
             LogDisabledConfig(config);
@@ -179,11 +184,6 @@ bool BlockConnectService::UpdateAllNetworkSelectStatus(const std::vector<InterSc
             WIFI_LOGI("NetworkId %{public}d blockDuration expired, auto enabled.", config.networkId);
         }
         LogDisabledConfig(config);
-#ifndef OHOS_ARCH_LITE
-        if (!scanInfos.empty()) {
-            CheckPortalAuthTimeoutClear(config, scanInfos);
-        }
-#endif
     }
     return true;
 }
@@ -539,6 +539,7 @@ void BlockConnectService::CheckPortalAuthTimeoutClear(WifiDeviceConfig &config,
     }
     if (!apFound) {
         config.networkSelectionStatus.portalAuthClearCount++;
+        WifiSettings::GetInstance().AddDeviceConfig(config);
         WIFI_LOGD("Portal auth block: AP not found, counter=%{public}d, networkId=%{public}d",
             config.networkSelectionStatus.portalAuthClearCount, networkId);
         if (config.networkSelectionStatus.portalAuthClearCount >= MAX_CHECK_COUNT) {
@@ -548,6 +549,7 @@ void BlockConnectService::CheckPortalAuthTimeoutClear(WifiDeviceConfig &config,
             WIFI_LOGI("Portal auth block: auto cleared after 3 scans, networkId=%{public}d", networkId);
         }
     } else {
+        WifiSettings::GetInstance().AddDeviceConfig(config);
         config.networkSelectionStatus.portalAuthClearCount = 0;
     }
 }

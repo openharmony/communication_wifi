@@ -33,7 +33,7 @@ export default class EntryAbility extends UIAbility {
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     try {
-      wifiManager.on("wifiStateChange", this.wifiStateCallback);
+      wifiManager.on('wifiStateChange', this.wifiStateCallback);
       hilog.info(DOMAIN, TAG, '%{public}s', 'Register wifiStateChange success');
     } catch (error) {
       hilog.error(DOMAIN, TAG, 'Register wifiStateChange failed. code: %{public}s', `${error.code}`);
@@ -61,7 +61,7 @@ export default class EntryAbility extends UIAbility {
 
   onDestroy(): void {
     try {
-      wifiManager.off("wifiStateChange", this.wifiStateCallback);
+      wifiManager.off('wifiStateChange', this.wifiStateCallback);
     } catch (error) {
       hilog.error(DOMAIN, TAG, 'Unregister wifiStateChange failed. code: %{public}s', `${error.code}`);
     }

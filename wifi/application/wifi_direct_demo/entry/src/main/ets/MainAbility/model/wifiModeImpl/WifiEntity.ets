@@ -14,10 +14,10 @@
  */
 
 export class WifiEntity {
-  index: number
-  deviceName: string
-  macAddress: string
-  status: number
+  public index: number
+  public deviceName: string
+  public macAddress: string
+  public status: number
 
   constructor(index: number, deviceName: string, macAddress: string, status: number) {
     this.index = index

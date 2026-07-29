@@ -40,12 +40,12 @@ struct Index {
     logUtil.log('start -----------------   aboutToAppear')
     wifiModel.setDeviceName('OHOS') //设置设备名称
     storageUtil.putObjData('deviceName', 'OHOS') //缓存设备名称到本地
-    wifiModel.getListener().on("p2pDevicesChange", this.onDevicesChange.bind(this))
-    wifiModel.getListener().on("p2pStateChange", this.onP2pStateChange.bind(this))
-    wifiModel.getListener().on("p2pConnStateChange", this.onP2pConnStateChange.bind(this))
-    wifiModel.getListener().on("p2pPeerDiscoveryStateChange", this.onP2pPeerDiscoveryStateChange.bind(this))
-    wifiModel.getListener().on("p2pCurrentDeviceChange", this.onP2pCurrentDeviceChange.bind(this))
-    wifiModel.getListener().on("p2pGroupStateChange", this.onP2pGroupStateChange.bind(this))
+    wifiModel.getListener().on('p2pDevicesChange', this.onDevicesChange.bind(this))
+    wifiModel.getListener().on('p2pStateChange', this.onP2pStateChange.bind(this))
+    wifiModel.getListener().on('p2pConnStateChange', this.onP2pConnStateChange.bind(this))
+    wifiModel.getListener().on('p2pPeerDiscoveryStateChange', this.onP2pPeerDiscoveryStateChange.bind(this))
+    wifiModel.getListener().on('p2pCurrentDeviceChange', this.onP2pCurrentDeviceChange.bind(this))
+    wifiModel.getListener().on('p2pGroupStateChange', this.onP2pGroupStateChange.bind(this))
     wifiModel.discoverDevices()
     logUtil.log('end -----------------   aboutToAppear')
   }
@@ -238,7 +238,7 @@ struct Index {
             bottom: 5
           })
         Text('').layoutWeight(1)
-        Image($r("app.media.ic_loading"))
+        Image($r('app.media.ic_loading'))
           .width(24)
           .height(24)
           .objectFit(ImageFit.Contain)
@@ -292,7 +292,7 @@ struct Index {
   }
 
   private connectP2pDevice(item) {
-    logUtil.log("wifi direct: connectP2pDevice  " + item.deviceName + "   " + item.status);
+    logUtil.log('wifi direct: connectP2pDevice  ' + item.deviceName + '   ' + item.status);
     if (item.status == 0) {
       this.connDeviceName = item.deviceName
       wifiModel.getLinkInfo((result) => {
@@ -322,7 +322,7 @@ struct Index {
   }
 //获取p2p设备列表
   private onDevicesChange() {
-    logUtil.log("onDevicesChange");
+    logUtil.log('onDevicesChange');
     this.p2pDeviceList = []
     wifiModel.getP2pDevicesCallBack().then((list) => {
       logUtil.log('-----------------------------  ' + JSON.stringify(list))
@@ -348,9 +348,9 @@ struct Index {
   }
 
   private onP2pStateChange(code) {
-    logUtil.log("onP2pStateChange " + code);
+    logUtil.log('onP2pStateChange ' + code);
     if (code === 3) {
-      logUtil.log("code is 3, call discoverDevices");
+      logUtil.log('code is 3, call discoverDevices');
       this.isDeviceStatus = true
       wifiModel.discoverDevices()
     } else {
@@ -360,33 +360,33 @@ struct Index {
   }
 
   private onP2pConnStateChange(code) {
-    logUtil.log("onP2pConnectedStateChange " + code);
+    logUtil.log('onP2pConnectedStateChange ' + code);
   }
 
   private onP2pPeerDiscoveryStateChange(code) {
-    logUtil.log("onP2pPeerDiscoveryStateChange " + JSON.stringify(code));
+    logUtil.log('onP2pPeerDiscoveryStateChange ' + JSON.stringify(code));
   }
 
   private onP2pCurrentDeviceChange(code) {
-    logUtil.log("onP2pCurrentDeviceChange " + JSON.stringify(code));
+    logUtil.log('onP2pCurrentDeviceChange ' + JSON.stringify(code));
   }
 
   private onP2pGroupStateChange(code) {
-    logUtil.log("onP2pGroupStateChange " + JSON.stringify(code));
+    logUtil.log('onP2pGroupStateChange ' + JSON.stringify(code));
   }
 
   private getCurrentGroupInfo() {
     wifiModel.getCurrentGroupInfo((info) => {
-      logUtil.log("current group info" + info);
+      logUtil.log('current group info' + info);
       this.currentGroupInfo = {
-        "isP2pGroupOwner": info.isP2pGroupOwner,
-        "passphrase": info.passphrase,
-        "interface": info.interface,
-        "groupName": info.groupName,
-        "networkId": info.networkId,
-        "frequency": info.frequency,
-        "isP2pPersistent": info.isP2pPersistent,
-        "goIpAddress": info.goIpAddress
+         'isP2pGroupOwner': info.isP2pGroupOwner,
+        'passphrase': info.passphrase,
+        'interface': info.interface,
+        'groupName': info.groupName,
+        'networkId': info.networkId,
+        'frequency': info.frequency,
+        'isP2pPersistent': info.isP2pPersistent,
+        'goIpAddress': info.goIpAddress
       }
       this.connDeviceName = '群组信息'
       this.connContent = JSON.stringify(this.currentGroupInfo)
@@ -400,9 +400,9 @@ struct Index {
     this.connDeviceName = '群组信息'
     this.connContent = '确定删除群组?'
     this.promptEvent = () => {
-      logUtil.log("deletePersistGroup" + JSON.stringify(this.currentGroupInfo));
+      logUtil.log('deletePersistGroup' + JSON.stringify(this.currentGroupInfo));
       if (this.currentGroupInfo && this.currentGroupInfo.isP2pPersistent) {
-        logUtil.log("networkid is " + this.currentGroupInfo.networkId);
+        logUtil.log('networkid is ' + this.currentGroupInfo.networkId);
         prompt.showToast({
           message: wifiModel.deletePersistentGroup(this.currentGroupInfo.networkId) ? '成功' : '失败'
         })
@@ -418,7 +418,7 @@ struct Index {
 
 @Component
 struct CustomItem {
-  private statusStr: string[] = ["已连接", "已邀请", "失败", "可用", "不可用"]
+  private statusStr: string[] = ['已连接', '已邀请', '失败', '可用', '不可用']
   @Prop deviceName: string
   @Prop macAddress: string
   @Prop status: number

@@ -434,7 +434,7 @@ private:
     std::atomic<bool> mWifiAllowSemiActive {false};
     std::atomic<bool> mWifiStoping {false};
     std::atomic<bool> txRxGoodButNoInternet_ {false};
-    std::vector<std::string> mStaIfaceName = {"wlan0", "wlan1"};
+    std::vector<std::string> mStaIfaceName;  // Initialized in cpp: {"wlan0", "wlan1"}
     std::map<int, std::atomic<int>> mWifiState;
     std::map<int, WifiDetailState> mWifiDetailState;
     std::map<int, std::atomic<WifiOprMidState>> mStaMidState;

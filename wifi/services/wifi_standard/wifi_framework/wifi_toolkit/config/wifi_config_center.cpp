@@ -49,6 +49,7 @@ WifiConfigCenter &WifiConfigCenter::GetInstance()
 
 WifiConfigCenter::WifiConfigCenter()
 {
+    mStaIfaceName = {"wlan0", "wlan1"};
     mWifiState.emplace(0, static_cast<int>(WifiState::DISABLED));
     mWifiDetailState.emplace(0, WifiDetailState::STATE_INACTIVE);
     mStaMidState.emplace(0, WifiOprMidState::CLOSED);

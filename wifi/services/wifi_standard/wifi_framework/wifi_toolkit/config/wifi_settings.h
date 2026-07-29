@@ -465,6 +465,7 @@ private:
     int GetHotspotConfigbyBackupFile(std::vector<HotspotConfig> &hotspotConfigs, std::vector<StationInfo> &stationInfos,
         UniqueFd &fd, const std::string &key, const std::string &iv);
 #endif
+    void LogDuplicateDeviceConfigs();
 #ifdef FEATURE_ENCRYPTION_SUPPORT
     bool IsWifiDeviceConfigDeciphered(const WifiDeviceConfig &config) const;
     void DecryptionWapiConfig(const WifiEncryptionInfo &wifiEncryptionInfo, WifiDeviceConfig &config) const;
@@ -484,8 +485,7 @@ private:
     std::atomic_flag deviceConfigLoadFlag = ATOMIC_FLAG_INIT;
     std::atomic_flag mEncryptionOnBootFlag = ATOMIC_FLAG_INIT;
     std::map<int, WifiDeviceConfig> mWifiDeviceConfig;
-    void LogDuplicateDeviceConfigs();
-    std::vector<std::string> mSpecialSsidList = {"juneyaoair", "CEAIR-WIFI"};
+    std::vector<std::string> mSpecialSsidList;  // Initialized in cpp: {"juneyaoair", "CEAIR-WIFI"}
     WifiConfigFileImpl<WifiDeviceConfig> mSavedDeviceConfig;
     std::vector<WifiStoreRandomMac> mWifiStoreRandomMac;
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT

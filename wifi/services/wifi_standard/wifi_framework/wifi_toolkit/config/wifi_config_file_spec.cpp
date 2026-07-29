@@ -1886,6 +1886,7 @@ static void ClearWifiBackupConfig(WifiBackupConfig &item)
     for (int i = 0; i < WEPKEYS_SIZE; ++i) {
         item.wepKeys[i].clear();
     }
+    item.wifiAutoEnable = true;
     return;
 }
 
@@ -1959,6 +1960,8 @@ static int SetWifiBackupConfig(WifiBackupConfig &item, const std::string &key, c
         if (pos >= 0 && pos < WEPKEYS_SIZE) {
             item.wepKeys[pos] = value;
         }
+    } else if (key == "wifiAutoEnable") {
+        item.wifiAutoEnable = (CheckDataLegal(tmpValue) != 0);
     } else {
         LOGE("Invalid config key value.");
     }
@@ -1999,6 +2002,7 @@ static std::string OutPutWifiBackupConfig(WifiBackupConfig &item)
     ss << "    " <<"isAllowAutoConnect=" << item.isAllowAutoConnect << std::endl;
     ss << "    " <<"lastDisconnectTime=" << item.lastDisconnectTime << std::endl;
     ss << "    " <<"wepTxKeyIndex=" << item.wepTxKeyIndex << std::endl;
+    ss << "    " <<"wifiAutoEnable=" << item.wifiAutoEnable << std::endl;
     for (int i = 0; i < WEPKEYS_SIZE; ++i) {
         ss << "    " <<"wepKeys_" << i << "=" << item.wepKeys[i] << std::endl;
     }

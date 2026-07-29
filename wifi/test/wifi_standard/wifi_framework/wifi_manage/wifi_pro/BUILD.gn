@@ -30,6 +30,7 @@ ohos_unittest("wifi_pro_unittest") {
     cfi = true
     boundary_sanitize = false
     cfi_cross_dso = true
+    cfi_vcall_icall_only = true # CFI优化，限定CFI检测范围
     integer_overflow = false
     ubsan = false
     debug = false

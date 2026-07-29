@@ -2998,9 +2998,14 @@ void StaStateMachine::SyncDeviceEverConnectedState(bool hasNet)
     std::string settings = WifiSettings::GetInstance().GetPackageName("SETTINGS");
     if (!WifiSettings::GetInstance().GetDeviceEverConnected(networkId)) {
         if (!hasNet) {
-            /*If it is the first time to connect and no network status, a pop-up window is displayed.*/
-            WifiNotificationUtil::GetInstance().ShowSettingsDialog(WifiDialogType::CDD, settings);
-            hasNoInternetDialog_ = true;
+            WifiDeviceConfig config = getCurrentWifiDeviceConfig();
+            if (config.showNoInternetDialog) {
+                /*If it is the first time to connect and no network status, a pop-up window is displayed.*/
+                WifiNotificationUtil::GetInstance().ShowSettingsDialog(WifiDialogType::CDD, settings);
+                hasNoInternetDialog_ = true;
+            } else {
+                WIFI_LOGI("showNoInternetDialog=false, skip dialog, networkid=%{public}d", networkId);
+            }
         }
         WifiSettings::GetInstance().SetDeviceEverConnected(networkId);
         WIFI_LOGI("First connection, Set DeviceEverConnected true, network is %{public}d", networkId);

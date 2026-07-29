@@ -46,6 +46,27 @@ namespace Wifi {
 static const int MAX_FILE_SIZE = 1024 * 1024 * 1024;
 static const int MIN_FILE_SIZE = 0;
 std::string g_defaultApSsid;
+
+/* Country default band frequencies */
+const std::vector<CountryDefaultBandFreqs> g_countryDefaultFreqs = {
+    /* CN 2.4G valid frequencies */
+    { "CN", BandType::BAND_2GHZ, {2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472} },
+    /* CN 5G valid frequencies, exclude radar frequencies */
+    { "CN", BandType::BAND_5GHZ, {5180, 5200, 5220, 5240, 5745, 5765, 5785, 5805, 5825} },
+};
+
+/* Key management array */
+const std::string KEY_MGMT_ARRAY[KEY_MGMT_TOTAL_NUM] = {
+    KEY_MGMT_NONE,
+    KEY_MGMT_WEP,
+    KEY_MGMT_WPA_PSK,
+    KEY_MGMT_SAE,
+    KEY_MGMT_EAP,
+    KEY_MGMT_SUITE_B_192,
+    KEY_MGMT_WAPI_CERT,
+    KEY_MGMT_WAPI_PSK
+};
+
 #ifdef DTFUZZ_TEST
 static WifiSettings* gWifiSettings = nullptr;
 #endif
@@ -68,6 +89,7 @@ WifiSettings::WifiSettings()
       mApMaxConnNum(MAX_AP_CONN),
       mMaxNumConfigs(MAX_CONFIGS_NUM)
 {
+    mSpecialSsidList = {"juneyaoair", "CEAIR-WIFI"};
 }
 
 WifiSettings::~WifiSettings()
@@ -1043,7 +1065,6 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
         LOGE("OnBackup key or iv is empty.");
         return -1;
     }
-
     std::vector<WifiDeviceConfig> localConfigs;
     {
         std::unique_lock<std::mutex> lock(mStaMutex);
@@ -1052,6 +1073,7 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
     }
 
     std::vector<WifiBackupConfig> backupConfigs;
+    bool wifiAutoEnable = GetWifiCapability(static_cast<int>(WifiCapability::WIFI_AUTO_ENABLE));
     for (auto &config : localConfigs) {
         if (config.wifiEapConfig.eap.length() != 0 || config.isPasspoint || !(config.uid == -1 || config.isShared)) {
             LOGI("OnBackup filterd, ssid : %{public}s.", SsidAnonymize(config.ssid).c_str());
@@ -1062,6 +1084,7 @@ int WifiSettings::OnBackup(UniqueFd &fd, const std::string &backupInfo)
 #endif
         WifiBackupConfig backupConfig;
         ConvertDeviceCfgToBackupCfg(config, backupConfig);
+        backupConfig.wifiAutoEnable = wifiAutoEnable;
         backupConfigs.push_back(backupConfig);
     }
     std::vector<WifiDeviceConfig>().swap(localConfigs);
@@ -2361,7 +2384,11 @@ void WifiSettings::InitDefaultRptHotspotConfig()
     mRptHotspotConfig.SetBand(BandType::BAND_5GHZ);
     mRptHotspotConfig.SetChannel(AP_CHANNEL_5G_DEFAULT);
     mRptHotspotConfig.SetSsid(g_defaultApSsid.empty() ? GetDefaultApSsid() : g_defaultApSsid);
+#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+    mRptHotspotConfig.SetPreSharedKey(GeneratePasswordForCar(RANDOM_PASSWD_LEN));
+#else
     mRptHotspotConfig.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
+#endif
     mRptHotspotConfig.SetPasswdDefault(true);
 }
 
@@ -2882,6 +2909,9 @@ int WifiSettings::GetConfigbyBackupFile(std::vector<WifiDeviceConfig> &deviceCon
         WifiDeviceConfig config;
         ConvertBackupCfgToDeviceCfg(backupCfg, config);
         deviceConfigs.push_back(config);
+    }
+    if (!backupConfigs.empty()) {
+        SetWifiCapability(static_cast<int>(WifiCapability::WIFI_AUTO_ENABLE), backupConfigs[0].wifiAutoEnable);
     }
     return 0;
 }

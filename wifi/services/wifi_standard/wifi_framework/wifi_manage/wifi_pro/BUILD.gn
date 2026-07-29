@@ -23,6 +23,7 @@ ohos_static_library("wifi_pro") {
     cfi_cross_dso = true  # Cross-SO CFI Checks
     integer_overflow = false  # Enable integer overflow detection
     ubsan = false  # Enable some Ubsan options
+    cfi_vcall_icall_only = true  # CFI优化，限定CFI检测范围
     debug = false
   }
   include_dirs = [

@@ -40,7 +40,7 @@ DEFINE_WIFILOG_P2P_LABEL("WifiP2pServiceImpl");
 namespace OHOS {
 namespace Wifi {
 std::mutex WifiP2pServiceImpl::instanceLock;
-std::mutex WifiP2pServiceImpl::g_p2pMutex
+std::mutex WifiP2pServiceImpl::g_p2pMutex;
 sptr<WifiP2pServiceImpl> WifiP2pServiceImpl::instance;
 const bool REGISTER_RESULT = SystemAbility::MakeAndRegisterAbility(WifiP2pServiceImpl::GetInstance().GetRefPtr());
 static constexpr int MIRACAST_CONFIG_MAX_LEN = 512;

@@ -17,7 +17,7 @@ import { webview } from '@kit.ArkWeb';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { i18n, resourceManager  } from '@kit.LocalizationKit';
 import { common, OpenLinkOptions, abilityAccessCtrl, Permissions } from '@kit.AbilityKit';
-import { BusinessError, emitter } from '@kit.BasicServicesKit';
+import { BusinessError, emitter, deviceInfo } from '@kit.BasicServicesKit';
 import { SymbolGlyphModifier, window, CustomContentDialog } from '@kit.ArkUI';
 import { wifiManager } from '@kit.ConnectivityKit';
 import { connection } from '@kit.NetworkKit';
@@ -97,6 +97,7 @@ struct Index {
   @State private isMenuVisible: boolean = false;
   @State private isSelectUASheetVisible: boolean = false;
   @State private adaptPadding: number = 16;
+  @State private actionBarMargin: number = 16;
   @State private loadProgress: number = 0;
   private sheetItemHeight = 50;
   private contextMenuWidth = 224;
@@ -113,6 +114,7 @@ struct Index {
   @State retryCount: number = 0;
   private renderExitRetryCount: number = 0;
   @State isActionBarVisible: boolean = true;
+  @State isWearable: boolean = false;
   @State private promptMessage: string = '';
   @State private promptResult: string = '';
   @State private promptJsResult: JsResult | null = null;
@@ -120,6 +122,7 @@ struct Index {
   private isSslDialogShowing: boolean = false;
   private sslErrorHandlers: SslErrorHandler[] = [];
   private sslUserDecision: number = -1;
+  private swipeStartX: number = -1;
 
   @Builder
   ContextMenu() {
@@ -161,13 +164,45 @@ struct Index {
   }
 
   @Builder
+  SheetTitleBuilder() {
+    Row() {
+      Text($r('app.string.site_setting_single_website_title', extractDomain(this.webUrl)))
+        .fontColor(Color.Black)
+        .fontSize('20vp')
+        .fontWeight(FontWeight.Bold)
+        .layoutWeight(1)
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+      Row() {
+        SymbolGlyph($r('sys.symbol.xmark'))
+          .fontSize('18vp')
+          .fontWeight(FontWeight.Regular)
+          .fontColor([Color.Black])
+      }
+      .width('40vp')
+      .height('40vp')
+      .borderRadius('20vp')
+      .backgroundColor('#26182431')
+      .justifyContent(FlexAlign.Center)
+      .alignItems(VerticalAlign.Center)
+      .onClick(() => {
+        this.isSelectUASheetVisible = false;
+      })
+    }
+    .width('100%')
+    .height('56vp')
+    .padding({ left: '16vp', right: '16vp' })
+    .alignItems(VerticalAlign.Center)
+  }
+
+  @Builder
   UASelectSheet() {
     Column() {
       // Title
       Row() {
         Column() {
           Text($r('app.string.actions_menu_user_agent'))
-            .fontColor($r('sys.color.font_secondary'))
+            .fontColor(this.isWearable ? Color.Black : $r('sys.color.font_secondary'))
             .fontSize($r('sys.float.Subtitle_S'))
             .fontWeight(FontWeight.Medium)
             .margin({left: '12vp'})
@@ -320,8 +355,8 @@ struct Index {
         .margin({
           top: '8vp',
           bottom: '6vp',
-          left: '16vp',
-          right: '16vp'
+          left: `${this.actionBarMargin}vp`,
+          right: `${this.actionBarMargin}vp`
         }).alignItems(VerticalAlign.Center)
 
         Progress({ value: 0, total: 100, type: ProgressType.Linear })
@@ -336,21 +371,39 @@ struct Index {
           .width('100%')
 
         // 绑定 bindSheet用
-        Column()
-          .height(0)
-          .bindSheet($$this.isSelectUASheetVisible, this.UASelectSheet(), {
-            showClose: true,
-            title: { title: $r('app.string.site_setting_single_website_title', extractDomain(this.webUrl)) },
-            onDisappear: () => {
-              try {
-                this.webviewController.setCustomUserAgent(this.selectedUA);
-                this.webviewController.refresh();
-              } catch (error) {
-                hilog.error(DOMAIN, TAG, '%{public}s',
-                  `Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
+        if (this.isWearable) {
+          Column()
+            .height(0)
+            .bindSheet($$this.isSelectUASheetVisible, this.UASelectSheet(), {
+              showClose: !this.isWearable,
+              title: this.SheetTitleBuilder,
+              onDisappear: () => {
+                try {
+                  this.webviewController.setCustomUserAgent(this.selectedUA);
+                  this.webviewController.refresh();
+                } catch (error) {
+                  hilog.error(DOMAIN, TAG, '%{public}s',
+                    `Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
+                }
               }
-            }
-          })
+            })
+        } else {
+          Column()
+            .height(0)
+            .bindSheet($$this.isSelectUASheetVisible, this.UASelectSheet(), {
+              showClose: true,
+              title: { title: $r('app.string.site_setting_single_website_title', extractDomain(this.webUrl)) },
+              onDisappear: () => {
+                try {
+                  this.webviewController.setCustomUserAgent(this.selectedUA);
+                  this.webviewController.refresh();
+                } catch (error) {
+                  hilog.error(DOMAIN, TAG, '%{public}s',
+                    `Failed setCustomUserAgent. Code:${error.code}, message:${error.message}`);
+                }
+              }
+            })
+        }
       }
       .width('100%')
       .constraintSize({
@@ -777,6 +830,26 @@ struct Index {
         .width('100%')
     }
     .padding({ top: px2vp(this.topRectHeight) })
+    .parallelGesture(
+      PanGesture({ fingers: 1, direction: PanDirection.Horizontal, distance: 50 })
+        .onActionStart((event: GestureEvent) => {
+          const x = event.fingerList[0].globalX;
+          this.swipeStartX = typeof x === 'number' ? px2vp(x) : px2vp(parseFloat(x));
+        })
+        .onActionEnd((even: GestureEvent) => {
+          if (!this.isWearable) {
+            return;
+          }
+          const EDGE_THRESHOLD = 45; // vp,Judge Edge Width
+          const startX = this.swipeStartX;
+          const fromLeftEdge = startX <= EDGE_THRESHOLD;
+          hilog.info(DOMAIN, TAG, '%{public}s', 'PanGesture end. startX:' + startX);
+          if (!fromLeftEdge) {
+            return;
+          }
+          exitApp(this.context);
+        })
+    )
   }
 
   private requestCamera() {
@@ -915,6 +988,11 @@ struct Index {
   }
 
   aboutToAppear(): void {
+    if (deviceInfo.deviceType === 'wearable') {
+      this.adaptPadding = 40;
+      this.actionBarMargin = 40;
+      this.isWearable = true;
+    }
     this.netConnect.on('netLost', (data: connection.NetHandle) => {
       handleNetworkChange(data, this.context);
     });

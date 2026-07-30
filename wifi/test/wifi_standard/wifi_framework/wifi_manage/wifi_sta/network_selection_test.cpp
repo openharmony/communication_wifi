@@ -915,7 +915,7 @@ HWTEST_F(NetworkSelectionTest, TestAllNoInternetHistoryOnPC, TestSize.Level1)
     EXPECT_CALL(WifiSettings::GetInstance(),
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
-            WifiDeviceConfig &wifiDeviceConfig, int) {
+            WifiDeviceConfig &wifiDeviceConfig, int, bool) {
             wifiDeviceConfig.networkId = 0;
             wifiDeviceConfig.uid = -1;
             wifiDeviceConfig.isShared = false;
@@ -956,7 +956,7 @@ HWTEST_F(NetworkSelectionTest, TestAllNoInternetHistoryOnNonPC, TestSize.Level1)
     EXPECT_CALL(WifiSettings::GetInstance(),
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
-            WifiDeviceConfig &wifiDeviceConfig, int) {
+            WifiDeviceConfig &wifiDeviceConfig, int, bool) {
             wifiDeviceConfig.networkId = 0;
             wifiDeviceConfig.uid = -1;
             wifiDeviceConfig.isShared = false;
@@ -1000,7 +1000,7 @@ HWTEST_F(NetworkSelectionTest, TestSelectNetworkWithAllSortedResults, TestSize.L
     EXPECT_CALL(WifiSettings::GetInstance(),
         GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
-            WifiDeviceConfig &wifiDeviceConfig, int) {
+            WifiDeviceConfig &wifiDeviceConfig, int, bool) {
             wifiDeviceConfig.networkId = (ssid == "test1") ? 1 : 2;
             wifiDeviceConfig.uid = -1;
             wifiDeviceConfig.isShared = false;

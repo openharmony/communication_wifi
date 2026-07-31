@@ -146,7 +146,7 @@ public:
             WIFI_LOGE("~WifiEventHandler is unavailable.");
             return;
         }
-        ffrt_queue_cancel_all(*queue);
+        ffrt_queue_cancel_and_wait(*queue);
         if (eventQueue != nullptr) {
             eventQueue.reset();
         }

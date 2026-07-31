@@ -561,6 +561,9 @@ void SelfCureStateMachine::ConnectedMonitorState::HandleInternetFailedDetected(I
         return;
     }
     WIFI_LOGI("HandleInternetFailedDetected, wifi has no internet when connected.");
+    if (pSelfCureStateMachine_->NeedWifi7MloSelfCure(lastConnectedBssid_)) {
+        return;
+    }
     if (isMobileHotspot_ && !pSelfCureStateMachine_->IsWifi6Network(lastConnectedBssid_)) {
         WIFI_LOGI("don't support selfcure, do nothing, isMobileHotspot_ = %{public}d", isMobileHotspot_);
         return;
@@ -1921,6 +1924,9 @@ bool SelfCureStateMachine::Wifi7SelfCureState::ExecuteStateMsg(InternalMessagePt
         case WIFI_CURE_CMD_WIFI7_SELFCURE:
             HandleWifi7ArpFailMsg();
             break;
+        case WIFI_CURE_CMD_WIFI7_MLO_NO_INTERNET_SELFCURE:
+            HandleWifi7MloSelfCureMsg();
+            break;
         default:
             ret = NOT_EXECUTED;
             break;
@@ -1968,6 +1974,33 @@ void SelfCureStateMachine::Wifi7SelfCureState::ExecuteWifi7ArpFailSelfCure(const
         }
     } else if (iter->second.actionType == ACTION_TYPE_WIFI7) {
         WIFI_LOGD("ExecuteWifi7ArpFailSelfCure do nothing");
+    }
+}
+
+void SelfCureStateMachine::Wifi7SelfCureState::HandleWifi7MloSelfCureMsg()
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (pSelfCureStateMachine_->lastSignalLevel_ >= SigLevel::SIG_LEVEL_3) {
+        time_t lastHasInetTime = pSelfCureStateMachine_->GetLastHasInternetTime();
+        if (lastHasInetTime > 0 && lastHasInetTime >= pSelfCureStateMachine_->connectedTime_) {
+            ExecuteWifi7MloSelfCure(linkedInfo);
+        }
+    }
+    pSelfCureStateMachine_->SwitchState(pSelfCureStateMachine_->pConnectedMonitorState_);
+}
+
+void SelfCureStateMachine::Wifi7SelfCureState::ExecuteWifi7MloSelfCure(const WifiLinkedInfo &info)
+{
+    WIFI_LOGI("ExecuteWifi7MloSelfCure start wifi7 mld back off for internet lost");
+    pSelfCureStateMachine_->HandleWifi7MldBackoff(info);
+    IStaService *pStaService = WifiServiceManager::GetInstance().GetStaServiceInst(0);
+    if (pStaService == nullptr) {
+        WIFI_LOGE("ExecuteWifi7MloSelfCure Get pStaService failed!");
+        return;
+    }
+    if (pStaService->ReAssociate() != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("ExecuteWifi7MloSelfCure ReAssociate failed.\n");
     }
 }
 
@@ -2550,6 +2583,37 @@ bool SelfCureStateMachine::NeedWifi7SelfCure(const std::string &bssid)
         return false;
     }
     MessageExecutedLater(WIFI_CURE_CMD_WIFI7_SELFCURE, SELF_CURE_DELAYED_MS);
+    SwitchState(pWifi7SelfCureState_);
+    return true;
+}
+
+bool SelfCureStateMachine::NeedWifi7MloSelfCure(const std::string &bssid)
+{
+    time_t lastHasInetTime = GetLastHasInternetTime();
+    if (lastHasInetTime <= 0 || lastHasInetTime < connectedTime_) {
+        WIFI_LOGI("NeedWifi7MloSelfCure network never had internet in this connection");
+        return false;
+    }
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, instId_) < SigLevel::SIG_LEVEL_3) {
+        return false;
+    }
+    if (linkedInfo.supportedWifiCategory != WifiCategory::WIFI7 &&
+        linkedInfo.supportedWifiCategory != WifiCategory::WIFI7_PLUS) {
+        return false;
+    }
+    if (!linkedInfo.isMloConnected) {
+        return false;
+    }
+    std::map<std::string, WifiCategoryBlackListInfo> wifi7BlackListCache;
+    WifiConfigCenter::GetInstance().GetWifiCategoryBlackListCache(EVENT_BE_BLA_LIST, wifi7BlackListCache);
+    if (wifi7BlackListCache.find(bssid) != wifi7BlackListCache.end()) {
+        WIFI_LOGI("NeedWifi7MloSelfCure current network is already in blacklist");
+        return false;
+    }
+    WIFI_LOGI("NeedWifi7MloSelfCure trigger wifi7 mlo selfcure for internet lost");
+    MessageExecutedLater(WIFI_CURE_CMD_WIFI7_MLO_NO_INTERNET_SELFCURE, SELF_CURE_DELAYED_MS);
     SwitchState(pWifi7SelfCureState_);
     return true;
 }

@@ -282,7 +282,9 @@ public:
     private:
         void HandleWifi7ArpFailMsg();
         void ExecuteWifi7ArpFailSelfCure(const WifiLinkedInfo &info);
-        
+        void HandleWifi7MloSelfCureMsg();
+        void ExecuteWifi7MloSelfCure(const WifiLinkedInfo &info);
+
     private:
         SelfCureStateMachine *pSelfCureStateMachine_;
     };
@@ -375,6 +377,7 @@ private:
     std::string GetCurrentBssid();
     bool IsWifi6Network(std::string currConnectedBssid);
     bool NeedWifi7SelfCure(const std::string &bssid);
+    bool NeedWifi7MloSelfCure(const std::string &bssid);
     void PeriodicArpDetection();
     bool IsSuppOnCompletedState();
     bool IfPeriodicArpDetection();

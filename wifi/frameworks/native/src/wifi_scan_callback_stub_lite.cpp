@@ -23,7 +23,7 @@
 DEFINE_WIFILOG_SCAN_LABEL("WifiScanCallbackStubLite");
 namespace OHOS {
 namespace Wifi {
-WifiScanCallbackStub::WifiScanCallbackStub() : userCallback_(nullptr), mRemoteDied(false)
+WifiScanCallbackStub::WifiScanCallbackStub() : userCallback_(nullptr), mRemoteDied_(false)
 {}
 
 WifiScanCallbackStub::~WifiScanCallbackStub()
@@ -33,9 +33,9 @@ int WifiScanCallbackStub::OnRemoteRequest(uint32_t code, IpcIo *data)
 {
     int ret = WIFI_OPT_FAILED;
     WIFI_LOGD("OnRemoteRequest code:%{public}u!", code);
-    if (mRemoteDied || data == nullptr) {
-        WIFI_LOGD("Failed to %{public}s,mRemoteDied:%{public}d data:%{public}d!",
-            __func__, mRemoteDied, data == nullptr);
+    if (mRemoteDied_.load() || data == nullptr) {
+        WIFI_LOGD("Failed to %{public}s,mRemoteDied_:%{public}d data:%{public}d!",
+            __func__, mRemoteDied_.load(), data == nullptr);
         return ret;
     }
 
@@ -79,12 +79,12 @@ void WifiScanCallbackStub::RegisterCallBack(const std::shared_ptr<IWifiScanCallb
 
 bool WifiScanCallbackStub::IsRemoteDied() const
 {
-    return mRemoteDied;
+    return mRemoteDied_.load();
 }
 
 void WifiScanCallbackStub::SetRemoteDied(bool val)
 {
-    mRemoteDied = val;
+    mRemoteDied_.store(val);
 }
 
 void WifiScanCallbackStub::OnWifiScanStateChanged(int state)

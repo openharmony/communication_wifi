@@ -57,7 +57,7 @@ private:
     std::shared_mutex userCallbackMutex_;
 #endif
 
-    bool mRemoteDied;
+    std::atomic<bool> mRemoteDied_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

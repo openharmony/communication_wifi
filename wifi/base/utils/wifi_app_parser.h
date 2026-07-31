@@ -29,7 +29,6 @@ enum class AppType {
     BLACK_LIST_APP,
     MULTILINK_BLACK_LIST_APP,
     CHARIOT_APP,
-    HIGH_TEMP_LIMIT_SPEED_APP,
     KEY_FOREGROUND_LIST_APP,
     KEY_BACKGROUND_LIMIT_LIST_APP,
     ASYNC_DELAY_TIME,
@@ -55,7 +54,6 @@ struct WhiteListAppInfo : CommonAppInfo {};
 struct BlackListAppInfo : CommonAppInfo {};
 struct MultiLinkAppInfo : CommonAppInfo {};
 struct ChariotAppInfo : CommonAppInfo {};
-struct HighTempLimitSpeedAppInfo : CommonAppInfo {};
 struct KeyForegroundListAppInfo : CommonAppInfo {};
 struct KeyBackgroundLimitListAppInfo : CommonAppInfo {};
 struct GameBackgroundLimitListAppInfo : CommonAppInfo {};
@@ -69,7 +67,6 @@ struct AppParserResult {
     std::vector<BlackListAppInfo> m_blackAppVec {};
     std::vector<MultiLinkAppInfo> m_multilinkAppVec {};
     std::vector<ChariotAppInfo> m_chariotAppVec {};
-    std::vector<HighTempLimitSpeedAppInfo> m_highTempLimitSpeedAppVec {};
     std::vector<KeyForegroundListAppInfo> m_keyForegroundListAppVec {};
     std::vector<KeyBackgroundLimitListAppInfo> m_keyBackgroundLimitListAppVec {};
     std::vector<LiveStreamAppInfo> m_liveStreamAppVec {};
@@ -95,7 +92,6 @@ private:
     BlackListAppInfo ParseBlackAppInfo(const xmlNodePtr &innode);
     MultiLinkAppInfo ParseMultiLinkAppInfo(const xmlNodePtr &innode);
     ChariotAppInfo ParseChariotAppInfo(const xmlNodePtr &innode);
-    HighTempLimitSpeedAppInfo ParseHighTempLimitSpeedAppInfo(const xmlNodePtr &innode);
     KeyForegroundListAppInfo ParseKeyForegroundListAppInfo(const xmlNodePtr &innode);
     KeyBackgroundLimitListAppInfo ParseKeyBackgroundLimitListAppInfo(const xmlNodePtr &innode);
     LiveStreamAppInfo ParseLiveStreamAppInfo(const xmlNodePtr &innode);
@@ -119,7 +115,6 @@ public:
     bool IsBlackListApp(const std::string &bundleName) const;
     bool IsMultiLinkApp(const std::string &bundleName) const;
     bool IsChariotApp(const std::string &bundleName) const;
-    bool IsHighTempLimitSpeedApp(const std::string &bundleName) const;
     bool IsKeyForegroundApp(const std::string &bundleName) const;
     bool IsKeyBackgroundLimitApp(const std::string &bundleName) const;
     std::string GetAsyncLimitSpeedDelayTime() const;

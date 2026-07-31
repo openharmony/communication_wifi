@@ -93,30 +93,6 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, GetBgLimitMaxMode, TestSize.Level1)
     EXPECT_EQ(BG_LIMIT_OFF, AppNetworkSpeedLimitService::GetInstance().GetBgLimitMaxMode());
 }
 
-HWTEST_F(AppNetworkSpeedLimitServiceTest, CheckNetWorkCanBeLimited_GameControlId, TestSize.Level1)
-{
-    // Prepare
-    int controlId = BG_LIMIT_CONTROL_ID_GAME;
-
-    // Execute
-    bool result = AppNetworkSpeedLimitService::GetInstance().CheckNetWorkCanBeLimited(controlId);
-
-    // Verify
-    EXPECT_TRUE(result);
-}
-
-HWTEST_F(AppNetworkSpeedLimitServiceTest, CheckNetWorkCanBeLimited_StreamControlId, TestSize.Level1)
-{
-    // Prepare
-    int controlId = BG_LIMIT_CONTROL_ID_STREAM;
-
-    // Execute
-    bool result = AppNetworkSpeedLimitService::GetInstance().CheckNetWorkCanBeLimited(controlId);
-
-    // Verify
-    EXPECT_TRUE(result);
-}
-
 HWTEST_F(AppNetworkSpeedLimitServiceTest, CheckNetWorkCanBeLimited_TempControlId_WifiConnected, TestSize.Level1)
 {
     // Prepare

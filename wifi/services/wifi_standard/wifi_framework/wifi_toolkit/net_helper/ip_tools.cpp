@@ -15,6 +15,7 @@
 
 #include "ip_tools.h"
 #include "wifi_common_util.h"
+#include <charconv>
 #include <fstream>
 
 namespace OHOS {
@@ -302,7 +303,11 @@ std::string IpTools::ConvertIpv6AddressToCompleted(const std::string &address)
         if (seg.empty()) {
             seg = "0";
         }
-        int value = CheckDataLegalHex(seg);
+        unsigned int value = 0;
+        auto [ptr, ec] = std::from_chars(seg.data(), seg.data() + seg.size(), value, 16);
+        if (ec != std::errc()) {
+            break;
+        }
         stream << std::setw(bitNum) << std::setfill('0') << std::hex << value;
     }
     return stream.str();

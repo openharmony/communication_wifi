@@ -154,7 +154,7 @@ private:
 private:
     HandleFuncMap handleFuncMap;
     sptr<IWifiP2pCallback> userCallback_;
-    bool mRemoteDied;
+    std::atomic<bool> mRemoteDied_;
 };
 }  // namespace Wifi
 }  // namespace OHOS

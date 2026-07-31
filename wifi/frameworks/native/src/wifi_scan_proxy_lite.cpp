@@ -36,8 +36,8 @@ static ErrCode ParseScanInfos(IpcIo *reply, std::vector<WifiScanInfo> &infos)
     constexpr int MAX_SIZE = 4096;
     int tmpsize = 0;
     (void)ReadInt32(reply, &tmpsize);
-    if (tmpsize > MAX_SIZE) {
-        WIFI_LOGE("Scan info size exceeds maximum allowed size: %{public}d", tmpsize);
+    if (tmpsize < 0 || tmpsize > MAX_SIZE) {
+        WIFI_LOGE("Scan info size error: %{public}d", tmpsize);
         return WIFI_OPT_FAILED;
     }
 
@@ -68,7 +68,7 @@ static ErrCode ParseScanInfos(IpcIo *reply, std::vector<WifiScanInfo> &infos)
         constexpr int IE_SIZE_MAX = 256;
         int ieSize = 0;
         (void)ReadInt32(reply, &ieSize);
-        if (ieSize > IE_SIZE_MAX) {
+        if (ieSize < 0 || ieSize > IE_SIZE_MAX) {
             WIFI_LOGE("ie size error: %{public}d", ieSize);
             return WIFI_OPT_FAILED;
         }

@@ -39,10 +39,10 @@ namespace OHOS {
 namespace Wifi {
 const int HOTSPOT_IDL_ERROR_OFFSET = 3500000;
 
-WifiHotspotServiceImpl::WifiHotspotServiceImpl()
+WifiHotspotServiceImpl::WifiHotspotServiceImpl() : m_id(0)
 {}
 
-WifiHotspotServiceImpl::WifiHotspotServiceImpl(int id) : WifiHotspotStub(id)
+WifiHotspotServiceImpl::WifiHotspotServiceImpl(int id) : m_id(id)
 {}
 
 WifiHotspotServiceImpl::~WifiHotspotServiceImpl()
@@ -202,9 +202,6 @@ ErrCode WifiHotspotServiceImpl::HostspotBandwidthConfig(HotspotConfig &config)
     unsigned int unsignedDataRead = static_cast<unsigned int>(dataRead);
     int channel = unsignedDataRead & 0x000000FF;
     int bandwidth = (unsignedDataRead & 0x00FF0000) >> 16;
-    if (channel < 0 || channel > MAX_IPV4_VALUE || bandwidth < 0 || bandwidth > MAX_IPV4_VALUE) {
-        return WIFI_OPT_INVALID_PARAM;
-    }
     config.SetBandWidth(bandwidth);
     config.SetChannel(channel);
     if (config.GetSsid().empty() ||
@@ -283,15 +280,15 @@ int32_t WifiHotspotServiceImpl::GetLocalOnlyHotspotConfig(HotspotConfigParcel &p
 {
     WIFI_LOGI("Instance %{public}d %{public}s!", m_id, __func__);
     if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("GetHotspotConfig:NOT System APP, PERMISSION_DENIED!");
+        WIFI_LOGE("GetLocalOnlyHotspotConfig:NOT System APP, PERMISSION_DENIED!");
         return HandleHotspotIdlRet(WIFI_OPT_NON_SYSTEMAPP);
     }
     if (WifiPermissionUtils::VerifyGetWifiConfigPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetHotspotConfig:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
+        WIFI_LOGE("GetLocalOnlyHotspotConfig:VerifyGetWifiConfigPermission PERMISSION_DENIED!");
         return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetHotspotConfig:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
+        WIFI_LOGE("GetLocalOnlyHotspotConfig:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return HandleHotspotIdlRet(WIFI_OPT_PERMISSION_DENIED);
     }
     HotspotConfig result;
@@ -782,11 +779,11 @@ int32_t WifiHotspotServiceImpl::DisableLocalOnlyHotspot(const ServiceTypeParcel 
     WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
     ServiceType type = FromParcel<ServiceType>(parcelType);
     if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("DisableHotspot:NOT System APP, PERMISSION_DENIED!");
+        WIFI_LOGE("DisableLocalOnlyHotspot:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (CheckOperHotspotSwitchPermission(type) == PERMISSION_DENIED) {
-        WIFI_LOGE("EnableHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+        WIFI_LOGE("DisableLocalOnlyHotspot:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     ErrCode ret = WifiManager::GetInstance().GetWifiTogglerManager()->SoftapToggled(0, m_id);
@@ -797,11 +794,11 @@ int32_t WifiHotspotServiceImpl::GetHotspotMode(HotspotModeParcel &parcelMode)
 {
     WIFI_LOGI("current ap service is %{public}d %{public}s", m_id, __func__);
     if (!WifiAuthCenter::IsSystemAccess()) {
-        WIFI_LOGE("GetBlockLists:NOT System APP, PERMISSION_DENIED!");
+        WIFI_LOGE("GetHotspotMode:NOT System APP, PERMISSION_DENIED!");
         return WIFI_OPT_NON_SYSTEMAPP;
     }
     if (WifiPermissionUtils::VerifyManageWifiHotspotPermission() == PERMISSION_DENIED) {
-        WIFI_LOGE("GetBlockLists:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
+        WIFI_LOGE("GetHotspotMode:VerifyManageWifiHotspotPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
     IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst(m_id);

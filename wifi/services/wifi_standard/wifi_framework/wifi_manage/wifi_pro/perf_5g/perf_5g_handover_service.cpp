@@ -506,11 +506,10 @@ void Perf5gHandoverService::ClearDeletedRelationAp(std::vector<WifiDeviceConfig>
         deletedBssids.insert(relationAps_[index].apInfo_.bssid);
         for (auto it = monitorApIndexs_.begin(); it != monitorApIndexs_.end();) {
             if (*it == index) {
-                monitorApIndexs_.erase(it);
+                it = monitorApIndexs_.erase(it);
             } else {
-                it++;
+                ++it;
             }
-        }
     }
     if (!deletedBssids.empty() && pDualBandRepostitory_ != nullptr) {
         pDualBandRepostitory_->DeleteAll(deletedBssids);
@@ -594,9 +593,7 @@ void Perf5gHandoverService::FoundMonitorAp(int32_t relationApIndex, std::vector<
     for (const auto &wifiScanInfo : wifiScanInfos) {
         std::string scanKeyMgmt = "";
         wifiScanInfo.GetDeviceMgmt(scanKeyMgmt);
-        if (!(wifiScanInfo.bssid == relationAps_[relationApIndex].apInfo_.bssid &&
-                WifiConfigCenter::GetInstance().IsSameKeyMgmt(
-                    scanKeyMgmt, relationAps_[relationApIndex].apInfo_.keyMgmt))) {
+        if (wifiScanInfo.bssid != relationAps_[relationApIndex].apInfo_.bssid) {
             continue;
         }
         bool hasMonitor = false;

@@ -23,6 +23,10 @@ enum DisconnectedReason: i32 {
     DISC_REASON_CONNECTION_FULL = 2
 }
 
+enum WifiCapability: i32 {
+    WIFI_AUTO_ENABLE = 0
+}
+
 enum EapMethod: i32 {
     EAP_NONE = 0,
     EAP_PEAP = 1,
@@ -382,9 +386,9 @@ struct WifiP2pGroupInfo {
 
 struct ConnectSettings {
     networkId: i32;
-    withUserAction: bool;
-    userActionTimeout: i32;
-    addNetworkToSystem: bool;
+    withUserAction: Optional<bool>;
+    userActionTimeout: Optional<i32>;
+    addNetworkToSystem: Optional<bool>;
 }
 
 
@@ -460,6 +464,9 @@ function GetScanAlwaysAllowed(): bool;
 function IsRandomMacDisabled(): bool;
 function StartWifiDetection(): void;
 function IsWlanSupported(): bool;
+
+function SetWifiCapability(capability: WifiCapability, enable: bool): void;
+function GetWifiCapability(capability: WifiCapability): bool;
 
 @gen_promise("connectToCandidateConfigWithUserAction")
 function ConnectToCandidateConfigWithUserActionSync(networkId: i32): void;

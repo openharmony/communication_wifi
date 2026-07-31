@@ -1840,6 +1840,37 @@ public:
         pStaStateMachine->SyncDeviceEverConnectedState(hasNet);
     }
 
+    void SyncDeviceEverConnectedStateWithPolicyTest(bool showNoInternetDialog, bool hasNet)
+    {
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetSystemMode())
+            .WillRepeatedly(Return(static_cast<int>(SystemMode::M_DEFAULT)));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), IsAllowPopUp()).WillRepeatedly(Return(true));
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), IsAllowPcPopUp()).WillRepeatedly(Return(true));
+        
+        WifiLinkedInfo linkedInfo;
+        linkedInfo.networkId = 1;
+        EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+            .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+        
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceEverConnected(_))
+            .WillRepeatedly(Return(false));
+        
+        WifiDeviceConfig config;
+        config.showNoInternetDialog = showNoInternetDialog;
+        EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+            .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+        
+        EXPECT_CALL(WifiSettings::GetInstance(), GetPackageName(_))
+            .WillRepeatedly(Return(std::string("settings")));
+        EXPECT_CALL(WifiSettings::GetInstance(), SetDeviceEverConnected(_))
+            .Times(AtLeast(1));
+        EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig())
+            .Times(AtLeast(1));
+
+        pStaStateMachine->hasNoInternetDialog_ = false;
+        pStaStateMachine->SyncDeviceEverConnectedState(hasNet);
+    }
+
     void DealGetDhcpIpTimeoutTest()
     {
         InternalMessagePtr msg = nullptr;

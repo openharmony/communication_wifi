@@ -909,6 +909,7 @@ struct WifiDeviceConfig {
     WifiRiskType riskType;
     int ipv4OnlyNetState {-1};
     int dualStackNetState {-1};
+    bool showNoInternetDialog { true };
 
     WifiDeviceConfig()
     {

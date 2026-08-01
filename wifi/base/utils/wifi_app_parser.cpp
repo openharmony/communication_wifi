@@ -497,11 +497,11 @@ bool AppParser::IsMultiLinkApp(const std::string &bundleName) const
         [bundleName](const MultiLinkAppInfo &app) { return app.packageName == bundleName; });
 }
 
-bool AppParser::IsHighTempLimitSpeedApp(const std::string &bundleName) const
+bool AppParser::IsChariotApp(const std::string &bundleName) const
 {
     std::shared_lock<std::shared_mutex> lock(appParserMutex_);
-    return std::any_of(result_.m_highTempLimitSpeedAppVec.begin(), result_.m_highTempLimitSpeedAppVec.end(),
-        [bundleName](const HighTempLimitSpeedAppInfo &app) { return app.packageName == bundleName; });
+    return std::any_of(result_.m_chariotAppVec.begin(), result_.m_chariotAppVec.end(),
+        [bundleName](const ChariotAppInfo &app) { return app.packageName == bundleName; });
 }
 
 bool AppParser::IsKeyForegroundApp(const std::string &bundleName) const

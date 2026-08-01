@@ -53,8 +53,8 @@ namespace {
     const int GAME_BOOST_DISABLE = 0;
     const int BOOST_UDP_TYPE = 17;
     constexpr int64_t LOW_LATENCY_EXIT_TIMEOUT = 3 * 60 * 1000;
-    // 5206: 云备份; 1009: 端云同步服务; 6666：后台系统升级
-    const std::unordered_set<int> SA_UID_LIST = {5206, 1009, 6666};
+    // 5206: 云备份; 1009: 端云同步服务; 6666：后台系统升级; 7508：Hianalytics服务；7234：hiview_upload
+    const std::unordered_set<int> SA_UID_LIST = {5206, 1009, 6666, 7508, 7234};
 }
 
 AppNetworkSpeedLimitService::AppNetworkSpeedLimitService()

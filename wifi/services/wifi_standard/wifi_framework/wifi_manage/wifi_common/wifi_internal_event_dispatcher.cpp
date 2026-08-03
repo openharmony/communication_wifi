@@ -901,12 +901,6 @@ void WifiInternalEventDispatcher::SendConfigChangeEvent(sptr<IWifiP2pCallback> &
         return;
     }
     callback->OnConfigChanged(cfgInfo->type, cfgInfo->data, cfgInfo->dataLen);
-    if (cfgInfo->data != nullptr) {
-        delete[] cfgInfo->data;
-        cfgInfo->data = nullptr;
-    }
-    delete cfgInfo;
-    cfgInfo = nullptr;
 }
 
 #ifdef SUPPORT_RANDOM_MAC_ADDR
@@ -953,7 +947,6 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
 {
     if (callback == nullptr) {
         WIFI_LOGE("%{public}s: callback is null", __func__);
-        FreecfgInfo(msg.cfgInfo);
         return;
     }
 
@@ -1014,7 +1007,6 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             callback->OnP2pChrErrCodeReport(msg.errCode);
             break;
         default:
-            FreecfgInfo(msg.cfgInfo);
             WIFI_LOGI("UnKnown msgcode %{public}d", msg.msgCode);
             break;
     }
@@ -1031,6 +1023,7 @@ void WifiInternalEventDispatcher::DealP2pCallbackMsg(
         SendP2pCallbackMsg(callback, msg, 0, 0, 0);
     }
     instance.InvokeP2pCallbacks(msg);
+    instance.FreecfgInfo(msg.cfgInfo);
     return;
 }
 

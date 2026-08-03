@@ -426,14 +426,6 @@ private:
     // STA
     mutable std::mutex mStaMutex;
     mutable std::mutex mutex;
-    std::atomic<bool> mWifiSelfcureReset {false};
-    std::atomic<bool> mWifiSelfcureResetEntered {false};
-    std::atomic<int> mLastNetworkId {INVALID_NETWORK_ID};
-    std::atomic<int> lastConnStaFreq_ {INVALID_NETWORK_ID};
-    ConnectSettings mCandidateConnectSettings;
-    std::atomic<bool> mWifiAllowSemiActive {false};
-    std::atomic<bool> mWifiStoping {false};
-    std::atomic<bool> txRxGoodButNoInternet_ {false};
     std::vector<std::string> mStaIfaceName;  // Initialized in cpp: {"wlan0", "wlan1"}
     std::map<int, std::atomic<int>> mWifiState;
     std::map<int, WifiDetailState> mWifiDetailState;
@@ -452,26 +444,34 @@ private:
     std::map<int, DisconnectedReason> mLastDiscReason;
     std::map<int, std::map<std::string, WifiCategoryBlackListInfo>> mWifiCategoryBlackListCache;
     std::map<std::string, WifiCategoryConnectFailInfo> mWifiConnectFailCache;
+    ConnectSettings mCandidateConnectSettings;
+    std::atomic<int> mLastNetworkId {INVALID_NETWORK_ID};
+    std::atomic<int> lastConnStaFreq_ {INVALID_NETWORK_ID};
+    std::atomic<bool> mWifiSelfcureReset {false};
+    std::atomic<bool> mWifiSelfcureResetEntered {false};
+    std::atomic<bool> mWifiAllowSemiActive {false};
+    std::atomic<bool> mWifiStoping {false};
+    std::atomic<bool> txRxGoodButNoInternet_ {false};
 
     // SCAN
     std::mutex mScanMutex;
     std::map<int, std::atomic<WifiOprMidState>> mScanMidState;
     std::map<int, std::atomic<WifiOprMidState>> mScanOnlyMidState;
     std::unique_ptr<WifiScanConfig> wifiScanConfig = nullptr;
-    bool isNeedFastScan = false;
     WifiNetworkControlInfo networkControlInfoRecord;
     std::atomic<int> scanStyle_ = 0xFF;
+    bool isNeedFastScan = false;
 
     // AP
     std::mutex mApMutex;
-    std::atomic<bool> mSoftapToggled {false};
-    std::atomic<int> mHotspotIdleTimeout {HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS};
     std::string mApIfaceName {"wlan0"};
     std::map<int, std::atomic<WifiOprMidState>> mApMidState;
     std::map <int, std::atomic<int>> mHotspotState;
     std::map<int, PowerModel> powerModel;
     std::map<std::string, StationInfo> mConnectStationInfo;
     HotspotConfig localOnlyHotspotConfig_;
+    std::atomic<int> mHotspotIdleTimeout {HOTSPOT_IDLE_TIMEOUT_INTERVAL_MS};
+    std::atomic<bool> mSoftapToggled {false};
 
     // P2P
     std::mutex mP2pMutex;
@@ -482,6 +482,8 @@ private:
 #endif
     std::map<int, Hid2dUpperScene> mHid2dUpperScenePair;
     std::atomic<int64_t> mHid2dSceneLastSetTime {0};
+    WifiP2pLinkedInfo mWifiP2pInfo;
+    WifiP2pGroupInfo m_P2pGroupInfo;
     std::atomic<WifiOprMidState> mP2pMidState {WifiOprMidState::CLOSED};
     std::atomic<int> mP2pState {static_cast<int>(P2pState::P2P_STATE_CLOSED)};
     std::atomic<int> p2pEnhanceState_ {0};
@@ -490,35 +492,33 @@ private:
     std::atomic<P2pBusinessType> mP2pBusinessType {P2pBusinessType::INVALID};
     std::atomic<int> mP2pCreatorUid {-1};
     std::atomic<bool> mExplicitGroup {false};
-    WifiP2pLinkedInfo mWifiP2pInfo;
-    WifiP2pGroupInfo m_P2pGroupInfo;
 
     // COMMON
-    std::atomic<bool> mIsSupportCoex {false};
-    std::atomic<int> mScreenState {MODE_STATE_DEFAULT};
-    std::atomic<bool> isWlanPage_{false};
-    std::atomic<int> mThermalLevel {static_cast<int>(ThermalLevel::NORMAL)};
-    std::atomic<int> mPowerIdelState {MODE_STATE_CLOSE};
-    std::atomic<int> mGnssFixState {MODE_STATE_CLOSE};
-    std::atomic<int> mScanGenieState {MODE_STATE_OPEN};
-    std::atomic<int> mAirplaneModeState {MODE_STATE_CLOSE};
-    std::vector<int> mPersistWifiState {std::vector<int>(2, WIFI_STATE_DISABLED)};
-    std::atomic<int> mPowerSavingModeState {MODE_STATE_CLOSE};
-    std::atomic<int> mFreezeModeState {MODE_STATE_CLOSE};
-    std::atomic<int> mNoChargerPlugModeState {MODE_STATE_CLOSE};
-    std::atomic<bool> mThreadStatusFlag_ {false};
-    std::atomic<uint64_t> mThreadStartTime {0};
-    // 0 PORTRAIT 1 LANDSCAPE 2 PORTRAIT_INVERTED 3 LANDSCAPE_INVERTED 4 UNKNOWN
-    std::atomic<int32_t> screenDisplayOrientation {0};
     std::mutex mMacAddrPairMutex;
+    std::vector<int> mPersistWifiState {std::vector<int>(2, WIFI_STATE_DISABLED)};
+    std::atomic<uint64_t> mThreadStartTime {0};
     std::map<WifiMacAddrInfo, std::string> mWifiScanMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mHotspotMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mP2pDeviceMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mP2pGroupsInfoMacAddrPair;
     std::map<WifiMacAddrInfo, std::string> mP2pCurrentgroupMacAddrPair;
+    DfsControlData dfsControlData_ = DfsControlData();
+    std::atomic<int> mScreenState {MODE_STATE_DEFAULT};
+    std::atomic<int> mThermalLevel {static_cast<int>(ThermalLevel::NORMAL)};
+    std::atomic<int> mPowerIdelState {MODE_STATE_CLOSE};
+    std::atomic<int> mGnssFixState {MODE_STATE_CLOSE};
+    std::atomic<int> mScanGenieState {MODE_STATE_OPEN};
+    std::atomic<int> mAirplaneModeState {MODE_STATE_CLOSE};
+    std::atomic<int> mPowerSavingModeState {MODE_STATE_CLOSE};
+    std::atomic<int> mFreezeModeState {MODE_STATE_CLOSE};
+    std::atomic<int> mNoChargerPlugModeState {MODE_STATE_CLOSE};
+    // 0 PORTRAIT 1 LANDSCAPE 2 PORTRAIT_INVERTED 3 LANDSCAPE_INVERTED 4 UNKNOWN
+    std::atomic<int32_t> screenDisplayOrientation {0};
     int systemMode_ = SystemMode::M_DEFAULT;
     int mDeviceType = ProductDeviceType::DEFAULT;
-    DfsControlData dfsControlData_ = DfsControlData();
+    std::atomic<bool> mIsSupportCoex {false};
+    std::atomic<bool> isWlanPage_{false};
+    std::atomic<bool> mThreadStatusFlag_ {false};
     std::atomic<bool> browserOn_ {false};
 };
 } // namespace Wifi

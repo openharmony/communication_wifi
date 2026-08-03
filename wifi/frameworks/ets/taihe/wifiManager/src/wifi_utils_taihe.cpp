@@ -661,6 +661,7 @@ WifiP2pConfig ConvertWifiP2pConfig(const ::ohos::wifiManager::WifiP2PConfig &con
     newConfig.SetPassphrase(passphrase);
     newConfig.SetGroupName(groupName);
     newConfig.SetGoBand(static_cast<GroupOwnerBand>(band));
+    std::fill(passphrase.begin(), passphrase.end(), 0);
     return newConfig;
 }
 

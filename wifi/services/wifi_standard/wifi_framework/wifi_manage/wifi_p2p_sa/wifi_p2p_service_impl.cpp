@@ -58,7 +58,7 @@ sptr<WifiP2pServiceImpl> WifiP2pServiceImpl::GetInstance()
 }
 
 WifiP2pServiceImpl::WifiP2pServiceImpl()
-    : SystemAbility(WIFI_P2P_ABILITY_ID, true), mPublishFlag(false), mState(ServiceRunningState::STATE_NOT_START)
+    : SystemAbility(WIFI_P2P_ABILITY_ID, true), mPublishFlag_(false), mState(ServiceRunningState::STATE_NOT_START)
 {}
 
 WifiP2pServiceImpl::~WifiP2pServiceImpl()
@@ -92,20 +92,20 @@ void WifiP2pServiceImpl::OnStart()
 void WifiP2pServiceImpl::OnStop()
 {
     mState = ServiceRunningState::STATE_NOT_START;
-    mPublishFlag = false;
+    mPublishFlag_ = false;
     WIFI_LOGI("Stop p2p service!");
 }
 
 bool WifiP2pServiceImpl::Init()
 {
     std::lock_guard<std::mutex> lock(g_p2pMutex);
-    if (!mPublishFlag) {
+    if (!mPublishFlag_.load()) {
         bool ret = Publish(WifiP2pServiceImpl::GetInstance());
         if (!ret) {
             WIFI_LOGE("Failed to publish p2p service!");
             return false;
         }
-        mPublishFlag = true;
+        mPublishFlag_ = true;
     }
     return true;
 }

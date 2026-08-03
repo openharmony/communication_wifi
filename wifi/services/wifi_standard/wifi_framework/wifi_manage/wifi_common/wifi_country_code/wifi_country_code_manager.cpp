@@ -91,17 +91,19 @@ ErrCode WifiCountryCodeManager::SetWifiCountryCodeFromExternal(const std::string
 
 void WifiCountryCodeManager::TriggerUpdateWifiCountryCode(int triggerReason)
 {
-    std::shared_ptr<WifiCountryCodePolicy> tempWifiCountryCodePolicy;
-    {
-        std::unique_lock<std::mutex> lock(mutex);
-        tempWifiCountryCodePolicy = m_wifiCountryCodePolicy;
-    }
     if (triggerReason == TRIGGER_UPDATE_REASON_TEL_NET_CHANGE && wifiCountryCodePolicyConf_[FEATURE_MCC]) {
         WIFI_LOGI("TEL_NET_CHANGE trigger update country code change");
         UpdateWifiCountryCode();
-    } else if (triggerReason == TRIGGER_UPDATE_REASON_SCAN_CHANGE &&
-        wifiCountryCodePolicyConf_[FEATURE_RCV_SCAN_RESLUT] && tempWifiCountryCodePolicy != nullptr) {
-        tempWifiCountryCodePolicy->HandleScanResultAction();
+    }
+    if (m_wifiCountryCodePolicy == nullptr) {
+        return;
+    }
+
+    if (triggerReason == TRIGGER_UPDATE_REASON_SCAN_CHANGE && wifiCountryCodePolicyConf_[FEATURE_RCV_SCAN_RESLUT]) {
+        {
+            std::unique_lock<std::mutex> lock(mutex);
+            m_wifiCountryCodePolicy->HandleScanResultAction();
+        }
         UpdateWifiCountryCode();
     }
 }

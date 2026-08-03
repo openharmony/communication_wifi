@@ -136,7 +136,7 @@ WifiDeviceServiceImpl::~WifiDeviceServiceImpl()
 ErrCode WifiDeviceServiceImpl::EnableWifi()
 {
 #ifndef OHOS_ARCH_LITE
-    WIFI_LOGI("EnableWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+    WIFI_LOGI("EnableWifi(), pid:%{public}d, uid:%{public}d, BundleName:%{private}s.",
         GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
 #endif
     ErrCode errCode = CheckCanEnableWifi();
@@ -2292,7 +2292,7 @@ ErrCode WifiDeviceServiceImpl::ReceiveNetworkControlInfo(const WifiNetworkContro
 ErrCode WifiDeviceServiceImpl::LimitSpeed(const int controlId, const int limitMode)
 {
 #ifndef OHOS_ARCH_LITE
-    WIFI_LOGD("%{public}s enter, pid:%{public}d, uid:%{public}d, BundleName:%{public}s.",
+    WIFI_LOGD("%{public}s enter, pid:%{public}d, uid:%{public}d, BundleName:%{private}s.",
         __FUNCTION__, GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
 #endif
     WIFI_LOGD("Enter LimitSpeed.");

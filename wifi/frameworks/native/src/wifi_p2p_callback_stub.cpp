@@ -24,7 +24,7 @@
 DEFINE_WIFILOG_P2P_LABEL("WifiP2pCallbackStub");
 namespace OHOS {
 namespace Wifi {
-WifiP2pCallbackStub::WifiP2pCallbackStub() : userCallback_(nullptr), mRemoteDied(false)
+WifiP2pCallbackStub::WifiP2pCallbackStub() : userCallback_(nullptr), mRemoteDied_(false)
 {
     InitHandleMap();
 }
@@ -99,13 +99,13 @@ void WifiP2pCallbackStub::RegisterCallBack(const sptr<IWifiP2pCallback> &userCal
 
 bool WifiP2pCallbackStub::IsRemoteDied() const
 {
-    return mRemoteDied;
+    return mRemoteDied_.load();
 }
 
 void WifiP2pCallbackStub::SetRemoteDied(bool val)
 {
     WIFI_LOGI("WifiP2pCallbackStub::SetRemoteDied: %{public}d", val);
-    mRemoteDied = val;
+    mRemoteDied_.store(val);
 }
 
 void WifiP2pCallbackStub::OnP2pStateChanged(int state)

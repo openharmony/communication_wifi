@@ -363,11 +363,14 @@ WifiErrorNo HdiWpaStop()
 
 WifiErrorNo IsHdiWpaStopped()
 {
+    pthread_mutex_lock(&g_wpaObjMutex);
     if (g_wpaObj == NULL && g_devMgr == NULL) {
         LOGI("HdiWpa already stopped");
+        pthread_mutex_unlock(&g_wpaObjMutex);
         return WIFI_HAL_OPT_OK;
     }
 
+    pthread_mutex_unlock(&g_wpaObjMutex);
     return WIFI_HAL_OPT_FAILED;
 }
 
@@ -425,12 +428,6 @@ WifiErrorNo HdiRemoveWpaIface(const char *ifName)
         }
         RemoveIfaceName(ifName);
     }
-    if (strncmp(ifName, "p2p", strlen("p2p")) == 0) {
-        ReleaseP2pCallback();
-    }
-    if (strncmp(ifName, "wlan", strlen("wlan")) == 0) {
-        ReleaseStaCallback(ifName);
-    }
     pthread_mutex_unlock(&g_wpaObjMutex);
     LOGI("%{public}s RemoveWpaIface success!", __func__);
     return WIFI_HAL_OPT_OK;
@@ -452,7 +449,7 @@ WifiErrorNo SetHdiStaIfaceName(const char *ifaceName, int instId)
 {
     pthread_mutex_lock(&g_ifaceNameMutex);
     LOGI("SetHdiStaIfaceName enter instId = %{public}d", instId);
-    if (ifaceName == NULL || instId >= STA_INSTANCE_MAX_NUM) {
+    if (ifaceName == NULL || instId >= STA_INSTANCE_MAX_NUM || instId < 0) {
         pthread_mutex_unlock(&g_ifaceNameMutex);
         return WIFI_HAL_OPT_INVALID_PARAM;
     }

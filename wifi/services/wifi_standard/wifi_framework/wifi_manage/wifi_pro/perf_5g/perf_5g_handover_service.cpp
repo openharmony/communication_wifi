@@ -510,6 +510,7 @@ void Perf5gHandoverService::ClearDeletedRelationAp(std::vector<WifiDeviceConfig>
             } else {
                 ++it;
             }
+        }
     }
     if (!deletedBssids.empty() && pDualBandRepostitory_ != nullptr) {
         pDualBandRepostitory_->DeleteAll(deletedBssids);

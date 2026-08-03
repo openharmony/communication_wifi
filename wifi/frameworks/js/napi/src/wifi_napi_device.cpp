@@ -73,6 +73,9 @@ NO_SANITIZE("cfi") napi_value IsWifiActive(napi_env env, napi_callback_info info
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     bool activeStatus = false;
     ErrCode ret = wifiDevicePtr->IsWifiActive(activeStatus);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.isWifiActive.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get wifi active status fail: %{public}d", ret);
         WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
@@ -102,6 +105,9 @@ NO_SANITIZE("cfi") napi_value Scan(napi_env env, napi_callback_info info)
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     bool compatible = true;
     ErrCode ret = wifiScanPtr->Scan(compatible);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.scan.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 }
 
@@ -322,7 +328,9 @@ NO_SANITIZE("cfi") napi_value GetScanResults(napi_env env, napi_callback_info in
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("GetScanInfoList return fail: %{public}d", ret);
     }
-
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getScanResults.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     WIFI_LOGI("GetScanInfoList, size: %{public}zu", scanInfos.size());
     napi_value arrayResult;
@@ -341,10 +349,12 @@ NO_SANITIZE("cfi") napi_value GetScanInfoList(napi_env env, napi_callback_info i
     bool compatible = false;
     std::vector<WifiScanInfo> scanInfos;
     ErrCode ret = wifiScanPtr->GetScanInfoList(scanInfos, compatible);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getScanInfoList.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("GetScanInfoList return fail: %{public}d", ret);
     }
-
     WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     WIFI_LOGI("GetScanInfoList, size: %{public}zu", scanInfos.size());
     napi_value arrayResult;
@@ -1269,6 +1279,9 @@ NO_SANITIZE("cfi") napi_value GetSignalLevel(napi_env env, napi_callback_info in
     napi_get_value_int32(env, argv[0], &rssi);
     napi_get_value_int32(env, argv[1], &band);
     ErrCode ret = wifiDevicePtr->GetSignalLevel(rssi, band, level);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getSignalLevel.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get wifi signal level fail: %{public}d", ret);
         WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
@@ -1501,6 +1514,9 @@ NO_SANITIZE("cfi") napi_value IsMeteredHotspot(napi_env env, napi_callback_info 
     WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
     bool isMeteredHotspot = false;
     ErrCode ret = wifiDevicePtr->IsMeteredHotspot(isMeteredHotspot);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.isMeteredHotspot.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get isMeteredHotspot value fail: %{public}d", ret);
         WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
@@ -1929,6 +1945,9 @@ NO_SANITIZE("cfi") napi_value GetCandidateConfigs(napi_env env, napi_callback_in
     std::vector<WifiDeviceConfig> vecDeviceConfigs;
     bool isCandidate = true;
     ErrCode ret = wifiDevicePtr->GetDeviceConfigs(vecDeviceConfigs, isCandidate);
+#ifdef WIFI_FEATURE_SUPPORT_API_METRICS
+    HISTOGRAM_BOOLEAN("connectivityKit.getCandidateConfigs.CALL", ret == WIFI_OPT_SUCCESS);
+#endif
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get candidate device configs fail: %{public}d", ret);
     }

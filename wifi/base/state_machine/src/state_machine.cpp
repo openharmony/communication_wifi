@@ -724,12 +724,15 @@ void StateMachineHandler::CallTreeStateEnters(int index)
 
 std::string StateMachineHandler::GetCurStateName()
 {
+    if (mStateVectorTopIndex < 0) {
+        return "";
+    }
     StateInfo *curStateInfo = mStateVector[mStateVectorTopIndex];
     if (curStateInfo == nullptr) {
         LOGE("StateInfo is null.");
         return "";
     }
-    return curStateInfo->state->GetStateName();
+    return curStateInfo->state != nullptr ? curStateInfo->state->GetStateName() : "";
 }
 }  // namespace Wifi
 }  // namespace OHOS

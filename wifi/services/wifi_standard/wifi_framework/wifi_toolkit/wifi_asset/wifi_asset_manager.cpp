@@ -32,11 +32,12 @@ const std::string WIFI_ASSET_NETWORK_ON_SYNC = "WifiAssetNetworkOnSync";
 bool IsExistInAsset(const WifiDeviceConfig &config, std::string key)
 {
     std::string aliasId = config.ssid + config.keyMgmt;
-    AssetBlob alias = {
-        static_cast<uint32_t>(aliasId.length()), reinterpret_cast<uint8_t *>(const_cast<char *>(aliasId.c_str()))};
+    AssetValue aliasValue = {.blob = {static_cast<uint32_t>(aliasId.size()),
+        const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(aliasId.c_str()))}};
+    AssetValue returnValue = {.u32 = SEC_ASSET_RETURN_ALL};
     AssetAttr attr[] = {
-        {.tag = SEC_ASSET_TAG_ALIAS, {.blob = alias}},
-        {.tag = SEC_ASSET_TAG_RETURN_TYPE, {.u32 = SEC_ASSET_RETURN_ALL}},
+        {.tag = SEC_ASSET_TAG_ALIAS, .value = aliasValue},
+        {.tag = SEC_ASSET_TAG_RETURN_TYPE, .value = returnValue},
         {.tag = SEC_ASSET_TAG_USER_ID, .value = g_userIdValue},
     };
     AssetResultSet resultSet = {0};

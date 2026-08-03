@@ -27,6 +27,10 @@ namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiProUtils");
 int32_t WifiProUtils::GetSignalLevel(int32_t instId)
 {
+    if (instId < 0) {
+        WIFI_LOGI("GetSignalLevel, invalid instId");
+        return 0;
+    }
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     return WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, instId);

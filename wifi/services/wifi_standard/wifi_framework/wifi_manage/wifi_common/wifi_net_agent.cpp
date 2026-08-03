@@ -207,7 +207,9 @@ void WifiNetAgent::OnStaMachineUpdateNetSupplierInfo(const sptr<NetManagerStanda
 {
     if (netAgentEventHandler_) {
         netAgentEventHandler_->PostSyncTask([this, netInfo = netSupplierInfo, m_instId = instId]() {
+            std::unique_lock<std::mutex> lock(netAgentMutex_);
             uint32_t& supplierIdNow = (m_instId == 0) ? supplierId : supplierIdForWlan1;
+            lock.unlock();
             if (supplierIdNow == INVALID_SUPPLIER_ID) {
                 WIFI_LOGI("Re-register when supplierId is abnormal.");
                 this->RegisterNetSupplier(m_instId);

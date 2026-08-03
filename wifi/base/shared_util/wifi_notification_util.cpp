@@ -292,6 +292,9 @@ void UIExtensionAbilityConnection::OnAbilityConnectDone(const AppExecFwk::Elemen
     const sptr<IRemoteObject> &remoteObject, int32_t resultCode)
 {
     WIFI_LOGI("on ability connected");
+    if (remoteObject == nullptr) {
+        return;
+    }
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;

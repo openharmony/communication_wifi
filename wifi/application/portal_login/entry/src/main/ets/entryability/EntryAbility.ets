@@ -26,7 +26,7 @@ import settings from '@ohos.settings';
 
 const DOMAIN = 0x01560;
 const TAG = 'Entry';
-const KEEP_SCREEN_ON_TIMEOUT = 30 * 1000; // 30 seconds
+const KEEP_SCREEN_ON_TIMEOUT = 80 * 1000; // 80 seconds
 
 export default class EntryAbility extends UIAbility {
   private keepScreenOnTimer: number = -1;

@@ -64,6 +64,10 @@ namespace Wifi {
 constexpr uint32_t TIMEOUT_EVENT_SUBSCRIBER = 3000;
 constexpr uint32_t PROP_TRUE_LEN = 4;
 constexpr uint32_t PROP_FALSE_LEN = 5;
+#ifdef FEATURE_HPF_SUPPORT
+constexpr uint32_t STATE_ENTER_FORCESLEEP = 40;
+constexpr uint32_t STATE_ENTER_SCREENOFF_HALF_HOUR_FILTER = 224;
+#endif
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT
 constexpr uint32_t TEL_STATE_REGISTRY_DELAY_TIME = 5 * 1000;
 #endif
@@ -1217,10 +1221,14 @@ void PowermgrEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventDa
 #ifdef FEATURE_HPF_SUPPORT
     if (action == COMMON_EVENT_POWER_MANAGER_STATE_CHANGED) {
         WIFI_LOGI("Receive power manager state Event: %{public}d", eventData.GetCode());
+        if (eventData.GetCode() == STATE_ENTER_FORCESLEEP ||
+            eventData.GetCode() == STATE_ENTER_SCREENOFF_HALF_HOUR_FILTER) {
+            WIFI_LOGI("Need close Ap service");
+            WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::AP_SERVICE_CLOSE);
+        }
         HpfFilterData filterData;
         filterData.eventCode = eventData.GetCode();
         filterData.eventData = eventData.GetData();
-        WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::AP_SERVICE_CLOSE);
         for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
             WifiManager::GetInstance().InstallPacketFilterProgram(filterData, i);
         }

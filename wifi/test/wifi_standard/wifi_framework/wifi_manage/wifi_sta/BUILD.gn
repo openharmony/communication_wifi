@@ -272,8 +272,8 @@ ohos_unittest("wifi_sta_unittest") {
     defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
   }
 
-  if (wifi_feature_car_cockpit_supported) {
-      defines += [ "WIFI_FEATURE_CAR_COCKPIT_SUPPORTED" ]
+  if (wifi_feature_secure_schedule_supported) {
+      defines += [ "FEATURE_WIFI_SECURE_SCHEDULE_SUPPORT" ]
   }
 
   if (wifi_feature_with_dynamic_adjust_wifi_power_save) {

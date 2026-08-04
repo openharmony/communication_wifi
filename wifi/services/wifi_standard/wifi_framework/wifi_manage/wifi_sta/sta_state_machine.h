@@ -664,7 +664,7 @@ private:
      */
     ErrCode ConvertDeviceCfg(WifiDeviceConfig &config, std::string& apBssid, std::string& ifaceName);
 
-#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+#ifdef FEATURE_WIFI_SECURE_SCHEDULE_SUPPORT
     /**
      * @Description  Whether the network is insecure.
      *

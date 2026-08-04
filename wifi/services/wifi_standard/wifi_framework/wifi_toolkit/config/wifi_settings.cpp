@@ -1473,7 +1473,7 @@ void WifiSettings::ClearHotspotConfig()
     config.SetMaxConn(GetApMaxConnNum());
     config.SetBandWidth(AP_BANDWIDTH_DEFAULT);
     config.SetSsid(g_defaultApSsid.empty()? GetDefaultApSsid() : g_defaultApSsid);
-#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+#ifdef FEATURE_WIFI_SECURE_SCHEDULE_SUPPORT
     config.SetPreSharedKey(GeneratePasswordForCar(RANDOM_PASSWD_LEN));
 #else
     config.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
@@ -2324,7 +2324,7 @@ void WifiSettings::InitDefaultHotspotConfig()
     cfg.SetMaxConn(GetApMaxConnNum());
     cfg.SetBandWidth(AP_BANDWIDTH_DEFAULT);
     cfg.SetSsid(g_defaultApSsid.empty()? GetDefaultApSsid() : g_defaultApSsid);
-#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+#ifdef FEATURE_WIFI_SECURE_SCHEDULE_SUPPORT
     cfg.SetPreSharedKey(GeneratePasswordForCar(RANDOM_PASSWD_LEN));
 #else
     cfg.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));
@@ -2343,7 +2343,7 @@ void WifiSettings::InitDefaultRptHotspotConfig()
     mRptHotspotConfig.SetBand(BandType::BAND_5GHZ);
     mRptHotspotConfig.SetChannel(AP_CHANNEL_5G_DEFAULT);
     mRptHotspotConfig.SetSsid(g_defaultApSsid.empty() ? GetDefaultApSsid() : g_defaultApSsid);
-#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+#ifdef FEATURE_WIFI_SECURE_SCHEDULE_SUPPORT
     mRptHotspotConfig.SetPreSharedKey(GeneratePasswordForCar(RANDOM_PASSWD_LEN));
 #else
     mRptHotspotConfig.SetPreSharedKey(GetRandomStr(RANDOM_PASSWD_LEN));

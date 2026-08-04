@@ -538,7 +538,7 @@ bool IsSameEncryptType(const std::string& scanInfoKeymgmt, const std::string& de
 #endif
 int GetFoldAction();
 
-#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+#ifdef FEATURE_WIFI_SECURE_SCHEDULE_SUPPORT
 /**
  * @Description Generate a random password for car product,
     containing at least three different character types: letters, special characters, and digits.

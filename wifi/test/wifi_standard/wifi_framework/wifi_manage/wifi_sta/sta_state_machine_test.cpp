@@ -3548,7 +3548,7 @@ HWTEST_F(StaStateMachineTest, ShowPortalNitificationHiLinkNoHistoryTest, TestSiz
     EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
 }
 #endif
-#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+#ifdef FEATURE_WIFI_SECURE_SCHEDULE_SUPPORT
 /* --------------------------- Test Case Data --------------------------- */
 
 static const std::string WPA1_BSSID = "aa:bb:cc:dd:ee:01";

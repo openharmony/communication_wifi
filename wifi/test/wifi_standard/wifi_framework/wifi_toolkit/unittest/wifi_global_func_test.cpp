@@ -504,7 +504,7 @@ HWTEST_F(WifiGlobalFuncTest, GetFoldActionTest, TestSize.Level1)
     EXPECT_TRUE(ret);
 }
 
-#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+#ifdef FEATURE_WIFI_SECURE_SCHEDULE_SUPPORT
 HWTEST_F(WifiGlobalFuncTest, GeneratePasswordForCarTest, TestSize.Level1)
 {
     std::string pwd = GeneratePasswordForCar(8);

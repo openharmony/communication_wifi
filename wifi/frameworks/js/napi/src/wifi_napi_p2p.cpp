@@ -73,19 +73,26 @@ static ErrCode GroupInfosToJs(const napi_env& env, const WifiP2pGroupInfo& group
     SetValueInt32(env, "frequency", groupInfo.GetFrequency(), result);
 
     napi_value devices;
+
     if (!groupInfo.IsClientDevicesEmpty()) {
         const std::vector<OHOS::Wifi::WifiP2pDevice>& vecDevices = groupInfo.GetClientDevices();
+ 
         napi_create_array_with_length(env, vecDevices.size(), &devices);
         if (DevicesToJsArray(env, vecDevices, devices) != WIFI_OPT_SUCCESS) {
             return WIFI_OPT_FAILED;
         }
-        status = napi_set_named_property(env, result, "clientDevices", devices);
+    } else {
+        status = napi_create_array_with_length(env, 0, &devices);
         if (status != napi_ok) {
-            WIFI_LOGE("napi_set_named_property clientDevices fail");
+            WIFI_LOGE("napi_create_array_with_length 0 fail");
             return WIFI_OPT_FAILED;
         }
-    } else {
-        napi_create_array_with_length(env, 0, &devices);
+    }
+
+    status = napi_set_named_property(env, result, "clientDevices", devices);
+    if (status != napi_ok) {
+        WIFI_LOGE("napi_set_named_property clientDevices fail");
+        return WIFI_OPT_FAILED;
     }
     SetValueUtf8String(env, "goIpAddress", groupInfo.GetGoIpAddress().c_str(), result);
     return WIFI_OPT_SUCCESS;

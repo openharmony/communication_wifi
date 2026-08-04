@@ -201,6 +201,7 @@ SecTypeTaihe ConvertKeyMgmtToSecType(const std::string& keyMgmt)
             static_cast<int32_t>(wifiDeviceConfig.networkSelectionStatus.status)),
         ::taihe::optional<bool>(std::in_place_t{}, wifiDeviceConfig.isAllowAutoConnect),
         ::taihe::optional<bool>(std::in_place_t{}, wifiDeviceConfig.isSecureWifi),
+        ::taihe::optional<bool>(std::in_place_t{}, wifiDeviceConfig.showNoInternetDialog),
     };
 }
 
@@ -447,6 +448,9 @@ WifiDeviceConfig ConvertWifiDeviceConfig(const ::ohos::wifiManager::WifiDeviceCo
         ProcessWapiConfig(config, result);
     }
     /* "isSecureWifi" is not supported currently */
+    if (config.showNoInternetDialog) {
+        result.showNoInternetDialog = *(config.showNoInternetDialog);
+    }
     return result;
 }
 

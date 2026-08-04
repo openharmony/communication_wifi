@@ -254,6 +254,7 @@ struct WifiDeviceConfig {
     configStatus: Optional<i32>;
     isAutoConnectAllowed: Optional<bool>;
     isSecureWifi: Optional<bool>;
+    showNoInternetDialog: Optional<bool>;
 }
 
 struct WifiInfoElem {

@@ -2591,7 +2591,6 @@ bool SelfCureStateMachine::NeedWifi7MloSelfCure(const std::string &bssid)
 {
     time_t lastHasInetTime = GetLastHasInternetTime();
     if (lastHasInetTime <= 0 || lastHasInetTime < connectedTime_) {
-        WIFI_LOGI("NeedWifi7MloSelfCure network never had internet in this connection");
         return false;
     }
     WifiLinkedInfo linkedInfo;
@@ -2609,7 +2608,7 @@ bool SelfCureStateMachine::NeedWifi7MloSelfCure(const std::string &bssid)
     std::map<std::string, WifiCategoryBlackListInfo> wifi7BlackListCache;
     WifiConfigCenter::GetInstance().GetWifiCategoryBlackListCache(EVENT_BE_BLA_LIST, wifi7BlackListCache);
     if (wifi7BlackListCache.find(bssid) != wifi7BlackListCache.end()) {
-        WIFI_LOGI("NeedWifi7MloSelfCure current network is already in blacklist");
+        WIFI_LOGI("NeedWifi7MloSelfCure current network is already selfcured");
         return false;
     }
     WIFI_LOGI("NeedWifi7MloSelfCure trigger wifi7 mlo selfcure for internet lost");

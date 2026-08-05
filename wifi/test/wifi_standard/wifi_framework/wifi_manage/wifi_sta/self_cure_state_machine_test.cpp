@@ -398,9 +398,8 @@ public:
         pSelfCureStateMachine_->connectedTime_ = CONNECTED_TIME_VAL;
         WifiDeviceConfig config;
         config.lastHasInternetTime = LAST_HAS_INTERNET_TIME_VAL;
-        int idx = 2;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
-            .Times(AtLeast(0)).WillRepeatedly(DoAll(SetArgReferee<idx>(config), Return(0)));
+            .Times(AtLeast(0)).WillRepeatedly(DoAll(SetArgReferee<2>(config), Return(0)));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
         bool ret = pSelfCureStateMachine_->NeedWifi7MloSelfCure(CURR_BSSID);
@@ -417,9 +416,8 @@ public:
         pSelfCureStateMachine_->connectedTime_ = CONNECTED_TIME_VAL;
         WifiDeviceConfig config;
         config.lastHasInternetTime = LAST_HAS_INTERNET_TIME_VAL;
-        int idx = 2;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
-            .Times(AtLeast(0)).WillRepeatedly(DoAll(SetArgReferee<idx>(config), Return(0)));
+            .Times(AtLeast(0)).WillRepeatedly(DoAll(SetArgReferee<2>(config), Return(0)));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
         bool ret = pSelfCureStateMachine_->NeedWifi7MloSelfCure(CURR_BSSID);

@@ -166,7 +166,6 @@ void NetworkSelectionManager::FillAllSortedResults(
         result.interScanInfo = candidate->interScanInfo;
         allSortedResults.emplace_back(result);
     }
-    WIFI_LOGI("allSortedResults size: %{public}zu", allSortedResults.size());
 }
 
 bool NetworkSelectionManager::CheckOutdoorFilterAndReportIod(

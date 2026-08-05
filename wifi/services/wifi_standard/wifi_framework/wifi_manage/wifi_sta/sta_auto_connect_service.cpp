@@ -20,6 +20,7 @@
 #include "block_connect_service.h"
 #include <sys/time.h>
 #include "wifi_chr_adapter.h"
+#include "network_status_history_manager.h"
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
 
@@ -200,21 +201,20 @@ void StaAutoConnectService::HandleSelectNetworkFail(const std::string &failReaso
 
 void StaAutoConnectService::LogAllSortedResults(const std::vector<NetworkSelectionResult> &allSortedResults)
 {
-    WIFI_LOGI("AllSortedResults size: %{public}zu", allSortedResults.size());
     for (size_t i = 0; i < allSortedResults.size(); ++i) {
         const auto &result = allSortedResults.at(i);
         const auto &scanInfo = result.interScanInfo;
         const auto &config = result.wifiDeviceConfig;
         WIFI_LOGI("SortedResult[%{public}zu]: ssid:%{public}s, bssid:%{public}s, freq:%{public}d, "
             "rssi:%{public}d, wifiCategory:%{public}s, keyMgmt:%{public}s, networkId:%{public}d, "
-            "noInternetAccess:%{public}d, isPortal:%{public}d, lastHasInternetTime:%{public}ld, "
-            "networkStatusHistory:%{public}u",
+            "isPortal:%{public}d, lastHasInternetTime:%{public}ld, "
+            "networkStatusHistory:%{public}s",
             i, SsidAnonymize(scanInfo.ssid).c_str(), MacAnonymize(scanInfo.bssid).c_str(),
             scanInfo.frequency, scanInfo.rssi,
             magic_enum::Enum2Name(scanInfo.supportedWifiCategory).c_str(),
-            config.keyMgmt.c_str(), config.networkId,
-            config.noInternetAccess, config.isPortal,
-            static_cast<long>(config.lastHasInternetTime), config.networkStatusHistory);
+            config.keyMgmt.c_str(), config.networkId, config.isPortal,
+            static_cast<long>(config.lastHasInternetTime),
+            NetworkStatusHistoryManager::ToString(config.networkStatusHistory).c_str());
     }
 }
 

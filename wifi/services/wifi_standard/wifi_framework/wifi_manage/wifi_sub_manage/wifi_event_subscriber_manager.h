@@ -154,13 +154,11 @@ private:
     Rosen::FoldStatus lastStatus_ { Rosen::FoldStatus::UNKNOWN };
 };
 
-class WifiDisplayStateListener : public Rosen::DisplayManagerLite::IDisplayListener {
+class WifiDisplayStateListener : public Rosen::DisplayManagerLite::IDisplayAttributeListener {
 public:
     WifiDisplayStateListener();
     ~WifiDisplayStateListener() = default;
-    void OnCreate(uint64_t displayId) override;
-    void OnDestroy(uint64_t displayId) override;
-    void OnChange(uint64_t displayId) override;
+    void OnAttributeChange(Rosen::DisplayId displayId, const std::vector<std::string>& attributes) override;
 };
 
 class NetworkConnSubscriber : public NetManagerStandard::NetConnCallbackStub {
@@ -294,7 +292,7 @@ private:
     std::mutex accessDataShareMutex_;
     sptr<Rosen::DisplayManagerLite::IFoldStatusListener> foldStatusListener_ = nullptr;
     std::mutex foldStatusListenerMutex_;
-    sptr<Rosen::DisplayManagerLite::IDisplayListener> displayStatusListener_ = nullptr;
+    sptr<Rosen::DisplayManagerLite::IDisplayAttributeListener> displayStatusListener_ = nullptr;
     std::mutex displayStatusListenerMutex_;
     std::mutex networkConnSubscriberLock_;
     sptr<NetworkConnSubscriber> networkConnSubscriber_ = nullptr;

@@ -100,7 +100,6 @@ private:
     void ParseAsyncLimitSpeedDelayTime(const xmlNodePtr &innode);
     HiGameExcludeAppInfo ParseHiGameExcludeAppInfo(const xmlNodePtr &innode);
     AppType GetAppTypeAsInt(const xmlNodePtr &innode);
-    std::string GetLocalFileVersion(const xmlNodePtr &innode);
 private:
     AppParserResult result_;
     std::atomic<bool> initFlag_ {false};

@@ -43,7 +43,6 @@ constexpr auto XML_TAG_SECTION_KEY_GAME_RTT_GAP = "mGameRttGap";
 constexpr auto XML_TAG_SECTION_KEY_GAME_NAME = "gameName";
 constexpr auto XML_TAG_SECTION_KEY_PACKAGE_NAME = "packageName";
 constexpr auto XML_TAG_SECTION_KEY_DELAY_TIME = "delayTime";
-constexpr auto XML_VERSION_NODE_NAME = "LimitSpeedAppVersionInfo";
 
 const std::unordered_map<std::string, AppType> appTypeMap = {
     { XML_TAG_SECTION_HEADER_GAME_INFO, AppType::LOW_LATENCY_APP },
@@ -145,10 +144,6 @@ void AppParserInner::ParseAppList(const xmlNodePtr &innode)
     result_.m_multilinkAppVec.clear();
     result_.m_chariotAppVec.clear();
     result_.m_blackAppVec.clear();
-    xmlNodePtr nodeVersion = innode->children;
-    if (nodeVersion != nullptr) {
-        GetLocalFileVersion(nodeVersion);
-    }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetAppTypeAsInt(node)) {
             case AppType::LOW_LATENCY_APP:
@@ -423,20 +418,6 @@ AppType AppParserInner::GetAppTypeAsInt(const xmlNodePtr &innode)
     }
     WIFI_LOGD("%{public}s not find targName:%{public}s in appTypeMap", __FUNCTION__, tagName.c_str());
     return AppType::OTHER_APP;
-}
-
-std::string AppParserInner::GetLocalFileVersion(const xmlNodePtr &innode)
-{
-    if (innode == nullptr || innode->name == nullptr) {
-        return "";
-    }
-    if (xmlStrcmp(innode->name, BAD_CAST(XML_VERSION_NODE_NAME)) != 0) {
-        WIFI_LOGE("innode name=%{public}s not equal version", innode->name);
-        return "";
-    }
-    std::string fileVersion = GetStringValue(innode);
-    WIFI_LOGI("%{public}s name=%{public}s", __FUNCTION__, fileVersion.c_str());
-    return fileVersion;
 }
 
 /* below: AppParser is used for judge whether application in certain list*/

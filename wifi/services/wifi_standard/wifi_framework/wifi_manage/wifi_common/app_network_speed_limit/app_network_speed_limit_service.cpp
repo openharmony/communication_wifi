@@ -263,8 +263,6 @@ bool AppNetworkSpeedLimitService::CheckNetWorkCanBeLimited(const int controlId)
             return true;
         case BgLimitControl::BG_LIMIT_CONTROL_ID_STREAM:
             return true;
-        case BgLimitControl::BG_LIMIT_CONTROL_ID_TEMP:
-            return false;
         case BgLimitControl::BG_LIMIT_CONTROL_ID_KEY_FG_APP:
             return true;
         case BgLimitControl::BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT:
@@ -355,9 +353,6 @@ bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const s
             } else {
                 return AppParser::GetInstance().IsGameBackgroundLimitApp(bundleName);
             }
-        case BgLimitControl::BG_LIMIT_CONTROL_ID_STREAM:
-        case BgLimitControl::BG_LIMIT_CONTROL_ID_TEMP:
-            return false;
         case BgLimitControl::BG_LIMIT_CONTROL_ID_KEY_FG_APP:
             return AppParser::GetInstance().IsKeyBackgroundLimitApp(bundleName);
         case BgLimitControl::BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT:

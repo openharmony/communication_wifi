@@ -1748,7 +1748,8 @@ void WifiEventSubscriberManager::RegisterDisplayListener()
         return;
     }
  
-    auto ret = Rosen::DisplayManagerLite::GetInstance().RegisterDisplayAttributeListener(listenAttributes, displayStatusListener_);
+    auto ret = Rosen::DisplayManagerLite::GetInstance().RegisterDisplayAttributeListener
+        (listenAttributes, displayStatusListener_);
     if (ret != Rosen::DMError::DM_OK) {
         WIFI_LOGE("RegisterDisplayListener fail");
         displayStatusListener_ = nullptr;

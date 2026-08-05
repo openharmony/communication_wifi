@@ -154,7 +154,6 @@ public:
         InternalMessagePtr msg = std::make_shared<InternalMessage>();
         msg->SetMessageName(SCAN_UPDATE_COUNTRY_CODE);
         EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(msg) == true);
-
         msg->AddStringMessageBody("CN");
         EXPECT_TRUE(pScanStateMachine->initState->ExecuteStateMsg(msg) == true);
     }

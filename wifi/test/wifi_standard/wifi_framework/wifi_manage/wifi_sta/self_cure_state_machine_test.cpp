@@ -47,6 +47,8 @@ namespace Wifi {
 static const int32_t SELFCURE_FAILED_CNT = 5;
 static const int32_t CONNECT_NETWORK_RETRY_CNT = 2;
 static const int64_t TIME_MILLS = 1615153293123;
+static const int64_t CONNECTED_TIME_VAL = 1000;
+static const int64_t LAST_HAS_INTERNET_TIME_VAL = 2000;
 static const std::string CURR_BSSID = "11:22:33:ef:ac:0e";
 static const std::string REAL_MAC = "fa:22:33:ef:ac:0e";
 static const std::string GATEWAY = "192.168.0.1";
@@ -393,11 +395,12 @@ public:
         WifiLinkedInfo linkedInfo;
         linkedInfo.rssi = RSSI_LEVEL_1_2G;
         linkedInfo.band = 1;
-        pSelfCureStateMachine_->connectedTime_ = 1000;
+        pSelfCureStateMachine_->connectedTime_ = CONNECTED_TIME_VAL;
         WifiDeviceConfig config;
-        config.lastHasInternetTime = 2000;
+        config.lastHasInternetTime = LAST_HAS_INTERNET_TIME_VAL;
+        int idx = 2;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
-            .Times(AtLeast(0)).WillRepeatedly(DoAll(SetArgReferee<2>(config), Return(0)));
+            .Times(AtLeast(0)).WillRepeatedly(DoAll(SetArgReferee<idx>(config), Return(0)));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
         bool ret = pSelfCureStateMachine_->NeedWifi7MloSelfCure(CURR_BSSID);
@@ -411,11 +414,12 @@ public:
         linkedInfo.band = 1;
         linkedInfo.supportedWifiCategory = WifiCategory::WIFI7;
         linkedInfo.isMloConnected = false;
-        pSelfCureStateMachine_->connectedTime_ = 1000;
+        pSelfCureStateMachine_->connectedTime_ = CONNECTED_TIME_VAL;
         WifiDeviceConfig config;
-        config.lastHasInternetTime = 2000;
+        config.lastHasInternetTime = LAST_HAS_INTERNET_TIME_VAL;
+        int idx = 2;
         EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
-            .Times(AtLeast(0)).WillRepeatedly(DoAll(SetArgReferee<2>(config), Return(0)));
+            .Times(AtLeast(0)).WillRepeatedly(DoAll(SetArgReferee<idx>(config), Return(0)));
         EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
             .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
         bool ret = pSelfCureStateMachine_->NeedWifi7MloSelfCure(CURR_BSSID);

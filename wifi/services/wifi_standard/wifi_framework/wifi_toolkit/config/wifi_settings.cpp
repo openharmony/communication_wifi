@@ -978,30 +978,22 @@ int WifiSettings::ReloadDeviceConfig()
 
 void WifiSettings::LogDuplicateDeviceConfigs()
 {
-    std::map<std::string, std::vector<int>> dupMap;
+    std::map<std::string, std::vector<WifiDeviceConfig>> dupMap;
     for (const auto &item : mWifiDeviceConfig) {
         std::string key = item.second.ssid + "_" + item.second.keyMgmt;
-        dupMap[key].push_back(item.first);
+        dupMap[key].push_back(item.second);
     }
     for (const auto &pair : dupMap) {
-        if (pair.second.size() > 1) {
-            const std::string &ssid = pair.first.substr(0, pair.first.find("_"));
-            LOGI("Duplicate device config found, ssid: %{public}s, networkIds: %{public}s",
-                SsidAnonymize(ssid).c_str(), JoinNetworkIds(pair.second).c_str());
+        if (pair.second.size() <= 1) {
+            continue;
+        }
+        for (const auto &config : pair.second) {
+            LOGI("Duplicate device config, ssid: %{public}s, networkId: %{public}d, keyMgmt: %{public}s, "
+                "uid: %{public}d, lastConnectTime: %{public}ld, lastDisconnectTime: %{public}ld",
+                SsidAnonymize(config.ssid).c_str(), config.networkId, config.keyMgmt.c_str(), config.uid,
+                static_cast<long>(config.lastConnectTime), static_cast<long>(config.lastDisconnectTime));
         }
     }
-}
-
-std::string WifiSettings::JoinNetworkIds(const std::vector<int> &networkIds)
-{
-    std::string result;
-    for (size_t i = 0; i < networkIds.size(); ++i) {
-        if (i != 0) {
-            result += ",";
-        }
-        result += std::to_string(networkIds[i]);
-    }
-    return result;
 }
 
 int WifiSettings::GetNextNetworkId()

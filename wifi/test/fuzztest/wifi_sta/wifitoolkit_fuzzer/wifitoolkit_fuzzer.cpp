@@ -188,7 +188,6 @@ void AppXmlParserTest(const uint8_t* data, size_t size)
     m_appXmlParser->appParserInner_->ParseGameBackgroundLimitListAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseAsyncLimitSpeedDelayTime(root_node);
     m_appXmlParser->appParserInner_->GetAppTypeAsInt(root_node);
-    m_appXmlParser->appParserInner_->GetLocalFileVersion(root_node);
     m_xmlParser->LoadConfiguration(buf);
     m_xmlParser->LoadConfigurationMemory(buf);
     ConvertStringToBool(buf);

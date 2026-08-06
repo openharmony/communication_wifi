@@ -1684,7 +1684,7 @@ WifiDisplayStateListener::WifiDisplayStateListener()
     WIFI_LOGI("WifiDisplayStateListener Enter");
 }
 
-void OnAttributeChange(Rosen::DisplayId displayId, const std::vector<std::string>& attributes)
+void WifiDisplayStateListener::OnAttributeChange(Rosen::DisplayId displayId, const std::vector<std::string>& attributes)
 {
     sptr<Rosen::DisplayLite> displayLite = Rosen::DisplayManagerLite::GetInstance().GetDisplayById(displayId);
     if (displayLite == nullptr) {

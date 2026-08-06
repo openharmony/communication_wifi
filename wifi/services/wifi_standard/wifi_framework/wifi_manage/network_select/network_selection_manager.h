@@ -62,6 +62,22 @@ public:
                        std::string &failReason);
 
     /**
+     * the function to select network and obtain all selected networks sorted by priority.
+     *
+     * @param networkSelectionResult Network selection result (the best one)
+     * @param type the type of networkSelection
+     * @param scanInfos scanInfos
+     * @param failReason the reason for selection failure (output parameter)
+     * @param allSortedResults all selected networks sorted by priority descending (output parameter)
+     * @return whether network selection is successful.
+     */
+    bool SelectNetwork(NetworkSelectionResult &networkSelectionResult,
+                       NetworkSelectType type,
+                       const std::vector<InterScanInfo> &scanInfos,
+                       std::string &failReason,
+                       std::vector<NetworkSelectionResult> &allSortedResults);
+
+    /**
      * get the saved deviceConfig associated with scanInfo
      *
      * @param networkCandidates  Candidate network
@@ -136,6 +152,23 @@ private:
      * @param networkCandidate best network candidate
      */
     bool IsOutdoorFilter(NetworkSelection::NetworkCandidate *networkCandidate);
+
+    /**
+     * fill all sorted network selection results from the network selector.
+     *
+     * @param networkSelector the network selector to get sorted candidates.
+     * @param allSortedResults all selected networks sorted by priority descending.
+     */
+    void FillAllSortedResults(const std::unique_ptr<NetworkSelection::INetworkSelector> &networkSelector,
+                              std::vector<NetworkSelectionResult> &allSortedResults);
+
+    /**
+     * check outdoor filter for the best candidate and report iod hisysevent.
+     *
+     * @param bestNetworkCandidate best candidate network
+     * @return true if the candidate passes outdoor filter, false if it is filtered out.
+     */
+    bool CheckOutdoorFilterAndReportIod(NetworkSelection::NetworkCandidate *bestNetworkCandidate);
 
 private:
     std::mutex rssiCntMutex_;

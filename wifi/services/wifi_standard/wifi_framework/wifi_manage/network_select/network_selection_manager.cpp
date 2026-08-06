@@ -87,6 +87,17 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
                                             const std::vector<InterScanInfo> &scanInfos,
                                             std::string &failReason)
 {
+    std::vector<NetworkSelectionResult> allSortedResults;
+    return SelectNetwork(networkSelectionResult, type, scanInfos, failReason, allSortedResults);
+}
+
+bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelectionResult,
+                                            NetworkSelectType type,
+                                            const std::vector<InterScanInfo> &scanInfos,
+                                            std::string &failReason,
+                                            std::vector<NetworkSelectionResult> &allSortedResults)
+{
+    allSortedResults.clear();
     if (scanInfos.empty()) {
         WIFI_LOGI("scanInfos is empty, ignore this selection");
         return false;
@@ -116,6 +127,9 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     std::vector<NetworkSelection::NetworkCandidate *> bestNetworkCandidates;
     networkSelector->GetBestCandidates(bestNetworkCandidates);
 
+    /* Get all nominated networkCandidates sorted by priority */
+    FillAllSortedResults(networkSelector, allSortedResults);
+
     std::string selectedInfo;
     if (bestNetworkCandidates.empty()) {
         if (!isSavedNetEmpty) {
@@ -129,9 +143,37 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
     }
 
     /* Determine whether to select bestNetworkCandidates in outdoor scene */
+    if (!CheckOutdoorFilterAndReportIod(bestNetworkCandidates.at(0))) {
+        return false;
+    }
+
+    /* if bestNetworkCandidates is not empty, assign the value of first bestNetworkCandidate
+     * to the network selection result, and return true which means the network selection is successful */
+    networkSelectionResult.wifiDeviceConfig = bestNetworkCandidates.at(0)->wifiDeviceConfig;
+    networkSelectionResult.interScanInfo = bestNetworkCandidates.at(0)->interScanInfo;
+    return true;
+}
+
+void NetworkSelectionManager::FillAllSortedResults(
+    const std::unique_ptr<NetworkSelection::INetworkSelector> &networkSelector,
+    std::vector<NetworkSelectionResult> &allSortedResults)
+{
+    std::vector<NetworkSelection::NetworkCandidate *> allSortedCandidates;
+    networkSelector->GetAllSortedCandidates(allSortedCandidates);
+    for (const auto &candidate : allSortedCandidates) {
+        NetworkSelectionResult result;
+        result.wifiDeviceConfig = candidate->wifiDeviceConfig;
+        result.interScanInfo = candidate->interScanInfo;
+        allSortedResults.emplace_back(result);
+    }
+}
+
+bool NetworkSelectionManager::CheckOutdoorFilterAndReportIod(
+    NetworkSelection::NetworkCandidate *bestNetworkCandidate)
+{
     IodStatisticInfo iodStatisticInfo;
     iodStatisticInfo.outdoorAutoSelectCnt++;
-    if (IsOutdoorFilter(bestNetworkCandidates.at(0))) {
+    if (IsOutdoorFilter(bestNetworkCandidate)) {
         WIFI_LOGI("bestNetworkCandidates do not satisfy outdoor select condition");
         iodStatisticInfo.outdoorFilterCnt++;
         EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_IOD_FILTER", "");
@@ -139,11 +181,6 @@ bool NetworkSelectionManager::SelectNetwork(NetworkSelectionResult &networkSelec
         return false;
     }
     EnhanceWriteIodHiSysEvent(iodStatisticInfo);
-
-    /* if bestNetworkCandidates is not empty, assign the value of first bestNetworkCandidate
-     * to the network selection result, and return true which means the network selection is successful */
-    networkSelectionResult.wifiDeviceConfig = bestNetworkCandidates.at(0)->wifiDeviceConfig;
-    networkSelectionResult.interScanInfo = bestNetworkCandidates.at(0)->interScanInfo;
     return true;
 }
 
@@ -198,7 +235,8 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
         auto& networkCandidate = networkCandidates.emplace_back(scanInfo);
         std::string deviceKeyMgmt;
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
-        WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, deviceKeyMgmt, networkCandidate.wifiDeviceConfig);
+        WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, deviceKeyMgmt,
+            networkCandidate.wifiDeviceConfig, 0, true);
 
         // save the indexes of saved network candidate in networkCandidates;
         if (networkCandidates.back().wifiDeviceConfig.networkId != INVALID_NETWORK_ID) {

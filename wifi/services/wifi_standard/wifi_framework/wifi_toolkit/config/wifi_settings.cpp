@@ -442,18 +442,35 @@ int WifiSettings::GetDeviceConfig(const std::string &index, const int &indexType
 int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &keymgmt,
     WifiDeviceConfig &config, int instId)
 {
+    return GetDeviceConfig(ssid, keymgmt, config, instId, false);
+}
+
+int WifiSettings::GetDeviceConfig(const std::string &ssid, const std::string &keymgmt,
+    WifiDeviceConfig &config, int instId, bool isLatest)
+{
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGD("Reload wifi config");
         ReloadDeviceConfig();
     }
 
     std::unique_lock<std::mutex> lock(mStaMutex);
-    for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-        if ((iter->second.ssid == ssid) && (InKeyMgmtBitset(iter->second, keymgmt))
-            && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
-            SyncAfterDecryped(iter->second);
-            config = iter->second;
-            return 0;
+    if (isLatest) {
+        for (auto iter = mWifiDeviceConfig.rbegin(); iter != mWifiDeviceConfig.rend(); iter++) {
+            if ((iter->second.ssid == ssid) && (InKeyMgmtBitset(iter->second, keymgmt))
+                && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
+                SyncAfterDecryped(iter->second);
+                config = iter->second;
+                return 0;
+            }
+        }
+    } else {
+        for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
+            if ((iter->second.ssid == ssid) && (InKeyMgmtBitset(iter->second, keymgmt))
+                && (iter->second.uid == -1 || iter->second.isShared) && iter->second.instanceId == instId) {
+                SyncAfterDecryped(iter->second);
+                config = iter->second;
+                return 0;
+            }
         }
     }
 
@@ -943,6 +960,7 @@ int WifiSettings::ReloadDeviceConfig()
         mWifiDeviceConfig.emplace(item.networkId, item);
     }
     LOGI("ReloadDeviceConfig load deviceConfig size: %{public}d", static_cast<int>(mWifiDeviceConfig.size()));
+    LogDuplicateDeviceConfigs();
     if (!mEncryptionOnBootFlag.test_and_set()) {
         mWifiEncryptionThread = std::make_unique<WifiEventHandler>("WifiEncryptionThread");
         mWifiEncryptionThread->PostAsyncTask([this]() {
@@ -956,6 +974,26 @@ int WifiSettings::ReloadDeviceConfig()
     mWifiDeviceConfig.clear();
     return 0;
 #endif
+}
+
+void WifiSettings::LogDuplicateDeviceConfigs()
+{
+    std::map<std::string, std::vector<WifiDeviceConfig>> dupMap;
+    for (const auto &item : mWifiDeviceConfig) {
+        std::string key = item.second.ssid + "_" + item.second.keyMgmt;
+        dupMap[key].push_back(item.second);
+    }
+    for (const auto &pair : dupMap) {
+        if (pair.second.size() <= 1) {
+            continue;
+        }
+        for (const auto &config : pair.second) {
+            LOGI("Duplicate device config, ssid: %{public}s, networkId: %{public}d, keyMgmt: %{public}s, "
+                "uid: %{public}d, lastConnectTime: %{public}ld, lastDisconnectTime: %{public}ld",
+                SsidAnonymize(config.ssid).c_str(), config.networkId, config.keyMgmt.c_str(), config.uid,
+                static_cast<long>(config.lastConnectTime), static_cast<long>(config.lastDisconnectTime));
+        }
+    }
 }
 
 int WifiSettings::GetNextNetworkId()

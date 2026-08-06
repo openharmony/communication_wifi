@@ -276,6 +276,17 @@ void NetworkSelector::GetBestCandidatesByComparator(std::vector<NetworkCandidate
     }
 }
 
+void NetworkSelector::GetAllSortedCandidatesByComparator(std::vector<NetworkCandidate *> &sortedNetworkCandidates)
+{
+    if (comparator) {
+        comparator->GetAllSortedCandidates(networkCandidates, sortedNetworkCandidates);
+    } else {
+        sortedNetworkCandidates.insert(sortedNetworkCandidates.end(),
+                                       networkCandidates.begin(),
+                                       networkCandidates.end());
+    }
+}
+
 SimpleNetworkSelector::SimpleNetworkSelector(const std::string &networkSelectorName)
     : NetworkSelector(networkSelectorName) {}
 
@@ -303,6 +314,11 @@ void SimpleNetworkSelector::GetBestCandidates(std::vector<NetworkCandidate *> &s
     GetBestCandidatesByComparator(selectedNetworkCandidates);
 }
 
+void SimpleNetworkSelector::GetAllSortedCandidates(std::vector<NetworkCandidate *> &sortedNetworkCandidates)
+{
+    GetAllSortedCandidatesByComparator(sortedNetworkCandidates);
+}
+
 CompositeNetworkSelector::CompositeNetworkSelector(const std::string &networkSelectorName) : NetworkSelector(
     networkSelectorName) {}
 
@@ -319,6 +335,28 @@ void CompositeNetworkSelector::GetBestCandidates(std::vector<NetworkCandidate *>
 {
     GetCandidatesFromSubNetworkSelector();
     GetBestCandidatesByComparator(selectedNetworkCandidates);
+}
+
+void CompositeNetworkSelector::GetAllSortedCandidates(std::vector<NetworkCandidate *> &sortedNetworkCandidates)
+{
+    /*
+     * Gather all nominated candidates from every sub network selector (without the category pruning
+     * performed in GetCandidatesFromSubNetworkSelector), so that a complete priority-sorted list of
+     * all selected networks can be returned.
+     */
+    std::vector<NetworkCandidate *> allCandidates;
+    for (const auto &subNetworkSelector : subNetworkSelectors) {
+        std::vector<NetworkCandidate *> subSortedCandidates;
+        subNetworkSelector->GetAllSortedCandidates(subSortedCandidates);
+        allCandidates.insert(allCandidates.end(), subSortedCandidates.begin(), subSortedCandidates.end());
+    }
+    if (comparator) {
+        comparator->GetAllSortedCandidates(allCandidates, sortedNetworkCandidates);
+    } else {
+        sortedNetworkCandidates.insert(sortedNetworkCandidates.end(),
+                                       allCandidates.begin(),
+                                       allCandidates.end());
+    }
 }
 
 std::string CompositeNetworkSelector::GetNetworkSelectorMsg()

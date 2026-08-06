@@ -228,6 +228,15 @@ public:
      */
     virtual void GetBestCandidates(const std::vector<NetworkCandidate *> &candidates,
                                    std::vector<NetworkCandidate *> &selectedCandidates) = 0;
+
+    /**
+     * GetAllSortedCandidates
+     *
+     * @param candidates the candidate network before compare.
+     * @param sortedCandidates all candidate networks sorted by score descending.
+     */
+    virtual void GetAllSortedCandidates(const std::vector<NetworkCandidate *> &candidates,
+                                        std::vector<NetworkCandidate *> &sortedCandidates) = 0;
 };
 
 class INetworkSelector {
@@ -247,6 +256,12 @@ public:
      * @param selectedNetworkCandidates the best candidate networks.
      */
     virtual void GetBestCandidates(std::vector<NetworkCandidate *> &selectedNetworkCandidates) = 0;
+
+    /**
+     * the function to get all candidate networks sorted by priority.
+     * @param sortedNetworkCandidates all candidate networks sorted by priority descending.
+     */
+    virtual void GetAllSortedCandidates(std::vector<NetworkCandidate *> &sortedNetworkCandidates) = 0;
 
     /**
      * transfer the info of network selector to json format string.
@@ -291,6 +306,13 @@ protected:
     virtual void GetBestCandidatesByComparator(std::vector<NetworkCandidate *> &selectedNetworkCandidates) final;
 
     /**
+     *  get all candidate networks sorted by comparator.
+     *
+     * @param sortedNetworkCandidates all candidate networks sorted by priority;
+     */
+    virtual void GetAllSortedCandidatesByComparator(std::vector<NetworkCandidate *> &sortedNetworkCandidates) final;
+
+    /**
      * deal with the candidate network which pass the filter.
      *
      * @param networkCandidate candidate network
@@ -310,6 +332,7 @@ public:
     ~SimpleNetworkSelector() override;
     std::string GetNetworkSelectorMsg() override;
     void GetBestCandidates(std::vector<NetworkCandidate *> &selectedNetworkCandidates) final;
+    void GetAllSortedCandidates(std::vector<NetworkCandidate *> &sortedNetworkCandidates) final;
 protected:
     bool Nominate(NetworkCandidate &networkCandidate) override;
 };
@@ -325,6 +348,7 @@ public:
      */
     void AddSubNetworkSelector(const std::shared_ptr<INetworkSelector> &subNetworkSelector);
     void GetBestCandidates(std::vector<NetworkCandidate *> &selectedNetworkCandidates) final;
+    void GetAllSortedCandidates(std::vector<NetworkCandidate *> &sortedNetworkCandidates) final;
     std::string GetNetworkSelectorMsg() override;
 protected:
     /**

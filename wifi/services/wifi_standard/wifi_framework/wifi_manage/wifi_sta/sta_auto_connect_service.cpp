@@ -20,6 +20,7 @@
 #include "block_connect_service.h"
 #include <sys/time.h>
 #include "wifi_chr_adapter.h"
+#include "network_status_history_manager.h"
 
 DEFINE_WIFILOG_LABEL("StaAutoConnectService");
 
@@ -134,43 +135,86 @@ void StaAutoConnectService::OnScanInfosReadyHandler(const std::vector<InterScanI
     BlockConnectService::GetInstance().UpdateAllNetworkSelectStatus(scanInfos);
     NetworkSelectionResult networkSelectionResult;
     std::string failReason = "";
+    std::vector<NetworkSelectionResult> allSortedResults;
     if (pNetworkSelectionManager->SelectNetwork(networkSelectionResult, NetworkSelectType::AUTO_CONNECT,
-        scanInfos, failReason) ||
+        scanInfos, failReason, allSortedResults) ||
         SelectNetworkFailConnectChoiceNetWork(networkSelectionResult, scanInfos)) {
-        std::string bssid = "";
-        SelectedType selectedType = NETWORK_SELECTED_BY_AUTO;
-        if (!OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
-            bssid = networkSelectionResult.interScanInfo.bssid;
-        }
-        if (IsCandidateWithUserSelectChoiceHidden(networkSelectionResult)) {
-            WIFI_LOGI("AutoSelectDevice select user choise hidden network");
-            selectedType = NETWORK_SELECTED_BY_USER;
-        }
-        ConnectNetwork(networkSelectionResult, selectedType, bssid);
+        LogAllSortedResults(allSortedResults);
+        HandleSelectNetworkSuccess(networkSelectionResult, allSortedResults);
     } else {
-        WIFI_LOGI("AutoSelectDevice return fail.");
-        std::vector<WifiDeviceConfig> savedConfigs;
-        WifiSettings::GetInstance().GetDeviceConfig(savedConfigs);
-        bool hasSavedConfigSeen = false;
-        for (const auto &config : savedConfigs) {
-            if (config.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
-                hasSavedConfigSeen = true;
-                break;
-            }
-        }
-        if (hasSavedConfigSeen) {
-            bool isFilteredByP2P = IsAutoConnectFailByP2PEnhanceFilter(scanInfos);
-            if (!failReason.empty()) {
-                EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_FAIL", failReason);
-            } else if (!isFilteredByP2P) {
-                EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_FAIL");
-            }
-        }
+        HandleSelectNetworkFail(failReason, scanInfos);
     }
     for (const auto &callBackItem : mStaCallbacks) {
         if (callBackItem.OnAutoSelectNetworkRes != nullptr) {
             callBackItem.OnAutoSelectNetworkRes(networkSelectionResult.wifiDeviceConfig.networkId, m_instId);
         }
+    }
+}
+
+void StaAutoConnectService::HandleSelectNetworkSuccess(NetworkSelectionResult &networkSelectionResult,
+    const std::vector<NetworkSelectionResult> &allSortedResults)
+{
+    std::string bssid = "";
+    SelectedType selectedType = NETWORK_SELECTED_BY_AUTO;
+    if (OverrideCandidateWithUserSelectChoice(networkSelectionResult)) {
+        int targetNetworkId = networkSelectionResult.wifiDeviceConfig.networkId;
+        for (const auto &result : allSortedResults) {
+            if (result.wifiDeviceConfig.networkId == targetNetworkId) {
+                bssid = result.interScanInfo.bssid;
+                WIFI_LOGI("OverrideCandidate find best bssid: %{public}s for networkId: %{public}d",
+                    MacAnonymize(bssid).c_str(), targetNetworkId);
+                break;
+            }
+        }
+    } else {
+        bssid = networkSelectionResult.interScanInfo.bssid;
+    }
+    if (IsCandidateWithUserSelectChoiceHidden(networkSelectionResult)) {
+        WIFI_LOGI("AutoSelectDevice select user choise hidden network");
+        selectedType = NETWORK_SELECTED_BY_USER;
+    }
+    ConnectNetwork(networkSelectionResult, selectedType, bssid);
+}
+
+void StaAutoConnectService::HandleSelectNetworkFail(const std::string &failReason,
+    const std::vector<InterScanInfo> &scanInfos)
+{
+    WIFI_LOGI("AutoSelectDevice return fail.");
+    std::vector<WifiDeviceConfig> savedConfigs;
+    WifiSettings::GetInstance().GetDeviceConfig(savedConfigs);
+    bool hasSavedConfigSeen = false;
+    for (const auto &config : savedConfigs) {
+        if (config.networkSelectionStatus.seenInLastQualifiedNetworkSelection) {
+            hasSavedConfigSeen = true;
+            break;
+        }
+    }
+    if (hasSavedConfigSeen) {
+        bool isFilteredByP2P = IsAutoConnectFailByP2PEnhanceFilter(scanInfos);
+        if (!failReason.empty()) {
+            EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_FAIL", failReason);
+        } else if (!isFilteredByP2P) {
+            EnhanceWriteAutoConnectFailEvent("AUTO_SELECT_FAIL");
+        }
+    }
+}
+
+void StaAutoConnectService::LogAllSortedResults(const std::vector<NetworkSelectionResult> &allSortedResults)
+{
+    for (size_t i = 0; i < allSortedResults.size(); ++i) {
+        const auto &result = allSortedResults.at(i);
+        const auto &scanInfo = result.interScanInfo;
+        const auto &config = result.wifiDeviceConfig;
+        WIFI_LOGI("SortedResult[%{public}zu]: ssid:%{public}s, bssid:%{public}s, freq:%{public}d, "
+            "rssi:%{public}d, wifiCategory:%{public}s, keyMgmt:%{public}s, networkId:%{public}d, "
+            "isPortal:%{public}d, lastHasInternetTime:%{public}ld, "
+            "networkStatusHistory:%{public}s",
+            i, SsidAnonymize(scanInfo.ssid).c_str(), MacAnonymize(scanInfo.bssid).c_str(),
+            scanInfo.frequency, scanInfo.rssi,
+            magic_enum::Enum2Name(scanInfo.supportedWifiCategory).c_str(),
+            config.keyMgmt.c_str(), config.networkId, config.isPortal,
+            static_cast<long>(config.lastHasInternetTime),
+            NetworkStatusHistoryManager::ToString(config.networkStatusHistory).c_str());
     }
 }
 

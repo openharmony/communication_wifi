@@ -78,8 +78,9 @@ HWTEST_F(NetworkSelectionTest, TestHiddenNetwork, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+            WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         wifiDeviceConfig.networkId = 0;
         return 0;
     }));
@@ -105,8 +106,9 @@ HWTEST_F(NetworkSelectionTest, TestMinRssiFor24G, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         wifiDeviceConfig.networkId = 0;
         return 0;
     }));
@@ -132,8 +134,9 @@ HWTEST_F(NetworkSelectionTest, TestMinRssiFor5G, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         wifiDeviceConfig.networkId = 0;
         return 0;
     }));
@@ -158,15 +161,17 @@ HWTEST_F(NetworkSelectionTest, TestUnSavedNetwork, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-    WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiSettings::GetInstance(),
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Return(0));
     NetworkSelectionManager selectionManager;
     std::string failReason;
     EXPECT_FALSE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT,
                     scanInfos, failReason));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         wifiDeviceConfig.networkId = 0;
         return 0;
     }));
@@ -186,11 +191,13 @@ HWTEST_F(NetworkSelectionTest, TestPasspointNetwork, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(An<const std::string &>(),
+        An<const std::string &>(), _, _, _)).
     WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig,
+            int, bool) {
         wifiDeviceConfig.networkId = 0;
         wifiDeviceConfig.isPasspoint = true;
         return 0;
@@ -200,8 +207,9 @@ HWTEST_F(NetworkSelectionTest, TestPasspointNetwork, TestSize.Level1)
     EXPECT_FALSE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT,
                     scanInfos, failReason));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig,
+            int, bool) {
         wifiDeviceConfig.networkId = 0;
         wifiDeviceConfig.isPasspoint = false;
         return 0;
@@ -222,11 +230,13 @@ HWTEST_F(NetworkSelectionTest, TestEphemeralNetwork, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-    WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiSettings::GetInstance(),
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         wifiDeviceConfig.networkId = 0;
         wifiDeviceConfig.isEphemeral = true;
         return 0;
@@ -236,8 +246,9 @@ HWTEST_F(NetworkSelectionTest, TestEphemeralNetwork, TestSize.Level1)
     EXPECT_FALSE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT,
                     scanInfos, failReason));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         wifiDeviceConfig.networkId = 0;
         wifiDeviceConfig.isEphemeral = false;
         return 0;
@@ -258,11 +269,13 @@ HWTEST_F(NetworkSelectionTest, TestEnableNetwork, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
-    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(An<const std::string &>(),
+        An<const std::string &>(), _, _, _)).
     WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         wifiDeviceConfig.networkId = 0;
         return 0;
     }));
@@ -271,16 +284,18 @@ HWTEST_F(NetworkSelectionTest, TestEnableNetwork, TestSize.Level1)
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT,
                     scanInfos, failReason));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         wifiDeviceConfig.networkId = 0;
         return 0;
     }));
     EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT,
                     scanInfos, failReason));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         wifiDeviceConfig.networkId = 0;
         return 0;
     }));
@@ -301,11 +316,12 @@ HWTEST_F(NetworkSelectionTest, TestMatchUserSelectBssidNetwork, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(
-        An<const std::string &>(), An<const std::string &>(), _, _)).
+        An<const std::string &>(), An<const std::string &>(), _, _, _)).
     WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         wifiDeviceConfig.networkId = 0;
         wifiDeviceConfig.userSelectBssid = "22:22:22:22:22";
         return 0;
@@ -344,8 +360,9 @@ HWTEST_F(NetworkSelectionTest, TestBlackListNetworks, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(
-        WifiSettings::GetInstance(), GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-    WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        WifiSettings::GetInstance(), GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+    WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
         } else if (ssid == "test2") {
@@ -381,8 +398,9 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksByDifferentHistoryStatus, 
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
         } else if (ssid == "test2") {
@@ -416,8 +434,9 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentSignalLevels,
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(ReturnRoundRobin({3, 4}));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
         } else if (ssid == "test2") {
@@ -452,8 +471,9 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentSecurities, T
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
         } else if (ssid == "test2") {
@@ -487,8 +507,9 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentBands, TestSi
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
         } else if (ssid == "test2") {
@@ -522,8 +543,9 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDifferentBandsAndDiffe
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(ReturnRoundRobin({4, 3}));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
         } else if (ssid == "test2") {
@@ -557,8 +579,9 @@ HWTEST_F(NetworkSelectionTest, TestHasInternetNetworksWithDiffrentRssi, TestSize
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
         } else if (ssid == "test2") {
@@ -592,8 +615,9 @@ HWTEST_F(NetworkSelectionTest, TestPortalNetworks, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(ReturnRoundRobin({4, 3}));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
             wifiDeviceConfig.lastHasInternetTime = time(0) - 1;
@@ -630,8 +654,9 @@ HWTEST_F(NetworkSelectionTest, TestBlackListNetworkAndNoInternetNetwork, TestSiz
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
             wifiDeviceConfig.connFailedCount = 3;
@@ -666,8 +691,9 @@ HWTEST_F(NetworkSelectionTest, TestNoInternetNetworkAndPortalNetwork, TestSize.L
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
             wifiDeviceConfig.noInternetAccess = true;
@@ -702,8 +728,9 @@ HWTEST_F(NetworkSelectionTest, TestPortalNetworkAndRecoveryNetwork, TestSize.Lev
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
             wifiDeviceConfig.isPortal = true;
@@ -739,8 +766,9 @@ HWTEST_F(NetworkSelectionTest, TestRecoveryNetworkAndHasInternetNetwork, TestSiz
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
-        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+    WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
             wifiDeviceConfig.noInternetAccess = true;
@@ -776,9 +804,9 @@ HWTEST_F(NetworkSelectionTest, TestRecentUserSelectNetwork, TestSize.Level1)
         time(0) - 8 * 60 * 60 + 1));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
         WillRepeatedly(
-            Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+            Invoke([](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
         } else {
@@ -811,9 +839,9 @@ HWTEST_F(NetworkSelectionTest, TestHighSecurityNetwork, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
         WillRepeatedly(Invoke(
-            [](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int) {
+            [](const std::string &ssid, const std::string &, WifiDeviceConfig &wifiDeviceConfig, int, bool) {
         if (ssid == "test1") {
             wifiDeviceConfig.networkId = 0;
         } else {
@@ -885,9 +913,9 @@ HWTEST_F(NetworkSelectionTest, TestAllNoInternetHistoryOnPC, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
-            WifiDeviceConfig &wifiDeviceConfig, int) {
+            WifiDeviceConfig &wifiDeviceConfig, int, bool) {
             wifiDeviceConfig.networkId = 0;
             wifiDeviceConfig.uid = -1;
             wifiDeviceConfig.isShared = false;
@@ -926,9 +954,9 @@ HWTEST_F(NetworkSelectionTest, TestAllNoInternetHistoryOnNonPC, TestSize.Level1)
     EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
     EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
     EXPECT_CALL(WifiSettings::GetInstance(),
-        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _)).
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
         WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
-            WifiDeviceConfig &wifiDeviceConfig, int) {
+            WifiDeviceConfig &wifiDeviceConfig, int, bool) {
             wifiDeviceConfig.networkId = 0;
             wifiDeviceConfig.uid = -1;
             wifiDeviceConfig.isShared = false;
@@ -947,6 +975,71 @@ HWTEST_F(NetworkSelectionTest, TestAllNoInternetHistoryOnNonPC, TestSize.Level1)
     std::string failReason;
     EXPECT_FALSE(selectionManager.SelectNetwork(selectionResult,
         NetworkSelectType::AUTO_CONNECT, scanInfos, failReason));
+}
+
+HWTEST_F(NetworkSelectionTest, TestSelectNetworkWithAllSortedResults, TestSize.Level1)
+{
+    NetworkSelectionResult selectionResult;
+    std::vector<InterScanInfo> scanInfos;
+    auto &scanInfo1 = scanInfos.emplace_back();
+    scanInfo1.bssid = "11:11:11:11:11";
+    scanInfo1.ssid = "test1";
+    scanInfo1.frequency = 5028;
+    scanInfo1.rssi = -60;
+    auto &scanInfo2 = scanInfos.emplace_back();
+    scanInfo2.bssid = "22:22:22:22:22";
+    scanInfo2.ssid = "test2";
+    scanInfo2.frequency = 5028;
+    scanInfo2.rssi = -70;
+
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkId(_)).WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetUserLastSelectedNetworkTimeVal(_)).WillRepeatedly(Return(0));
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), IsWlanPage()).WillRepeatedly(Return(true));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetSignalLevel(_, _, _)).WillRepeatedly(Return(4));
+    EXPECT_CALL(WifiSettings::GetInstance(),
+        GetDeviceConfig(An<const std::string &>(), An<const std::string &>(), _, _, _)).
+        WillRepeatedly(Invoke([](const std::string &ssid, const std::string &,
+            WifiDeviceConfig &wifiDeviceConfig, int, bool) {
+            wifiDeviceConfig.networkId = (ssid == "test1") ? 1 : 2;
+            wifiDeviceConfig.uid = -1;
+            wifiDeviceConfig.isShared = false;
+            wifiDeviceConfig.isEphemeral = false;
+            wifiDeviceConfig.isPasspoint = false;
+            wifiDeviceConfig.isAllowAutoConnect = true;
+            wifiDeviceConfig.isSecureWifi = true;
+            wifiDeviceConfig.networkSelectionStatus.status = WifiDeviceConfigStatus::ENABLED;
+            wifiDeviceConfig.noInternetAccess = false;
+            wifiDeviceConfig.isPortal = false;
+            wifiDeviceConfig.networkStatusHistory = 0b01;
+            return 0;
+        }));
+
+    NetworkSelectionManager selectionManager;
+    std::string failReason;
+    std::vector<NetworkSelectionResult> allSortedResults;
+    EXPECT_TRUE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT,
+        scanInfos, failReason, allSortedResults));
+    EXPECT_FALSE(allSortedResults.empty());
+    bool containsBest = false;
+    for (const auto &result : allSortedResults) {
+        if (result.interScanInfo.bssid == selectionResult.interScanInfo.bssid) {
+            containsBest = true;
+            break;
+        }
+    }
+    EXPECT_TRUE(containsBest);
+}
+
+HWTEST_F(NetworkSelectionTest, TestSelectNetworkAllSortedResultsEmptyWhenFail, TestSize.Level1)
+{
+    NetworkSelectionResult selectionResult;
+    std::vector<InterScanInfo> scanInfos;
+    std::string failReason;
+    std::vector<NetworkSelectionResult> allSortedResults;
+    NetworkSelectionManager selectionManager;
+    EXPECT_FALSE(selectionManager.SelectNetwork(selectionResult, NetworkSelectType::AUTO_CONNECT,
+        scanInfos, failReason, allSortedResults));
+    EXPECT_TRUE(allSortedResults.empty());
 }
 }
 }

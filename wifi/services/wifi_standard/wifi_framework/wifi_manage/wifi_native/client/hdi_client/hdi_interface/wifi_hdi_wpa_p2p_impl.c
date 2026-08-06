@@ -385,7 +385,6 @@ WifiErrorNo HdiP2pSetupWpsPbc(const char *groupIfc, const char *address)
                              anonymizeAddr, sizeof(anonymizeAddr)) != 0) {
         LOGE("HdiP2pSetupWpsPbc: failed to convert address!");
     }
-    LOGI("HdiP2pSetupWpsPbc enter groupIfc=%{public}s anonymizeAddr=%{public}s", groupIfc, anonymizeAddr);
     pthread_mutex_lock(GetWpaObjMutex());
     struct IWpaInterface *wpaObj = GetWpaInterface();
     if (wpaObj == NULL) {

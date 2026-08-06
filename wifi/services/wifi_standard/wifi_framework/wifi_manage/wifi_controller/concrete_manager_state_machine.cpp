@@ -279,7 +279,7 @@ void ConcreteMangerMachine::IdleState::HandleSwitchToSemiActiveMode(InternalMess
     pConcreteMangerMachine->SwitchState(pConcreteMangerMachine->pSemiActiveState);
 }
 
-void ConcreteMangerMachine::IdleState::InitFastScanOnWearable()
+void ConcreteMangerMachine::InitFastScanOnWearable()
 {
     if (GetDeviceType() != ProductDeviceType::WEARABLE) {
         return;
@@ -292,17 +292,16 @@ void ConcreteMangerMachine::IdleState::InitFastScanOnWearable()
     }
     WifiConfigCenter::GetInstance().SetFastScan(true);
 #ifndef OHOS_ARCH_LITE
-    if (pConcreteMangerMachine->fastScanTimerId != 0) {
-        WifiTimer::GetInstance()->UnRegister(pConcreteMangerMachine->fastScanTimerId);
-        pConcreteMangerMachine->fastScanTimerId = 0;
+    if (fastScanTimerId != 0) {
+        WifiTimer::GetInstance()->UnRegister(fastScanTimerId);
+        fastScanTimerId = 0;
     }
     WifiTimer::TimerCallback timeOutCallback = []() {
         WIFI_LOGI("fast scan timeout, reset fast scan flag");
         WifiConfigCenter::GetInstance().SetFastScan(false);
     };
-    WifiTimer::GetInstance()->Register(timeOutCallback, pConcreteMangerMachine->fastScanTimerId, FAST_SCAN_TIMEOUT_MS);
-    WIFI_LOGI("wearable device set fast scan before scan service start, timerId: %{public}u",
-        pConcreteMangerMachine->fastScanTimerId);
+    WifiTimer::GetInstance()->Register(timeOutCallback, fastScanTimerId, FAST_SCAN_TIMEOUT_MS);
+    WIFI_LOGI("wearable device set fast scan before scan service start, timerId: %{public}u", fastScanTimerId);
 #endif
 }
 
@@ -310,7 +309,7 @@ void ConcreteMangerMachine::IdleState::HandleStartInIdleState(InternalMessagePtr
 {
     mid = msg->GetParam1();
     WIFI_LOGI("HandleStartInIdleState mTargetRole:%{public}d mid:%{public}d", mTargetRole, mid);
-    InitFastScanOnWearable();
+    pConcreteMangerMachine->InitFastScanOnWearable();
     ErrCode res = WifiServiceScheduler::GetInstance().AutoStartScanOnly(mid, ifaceName);
     if (res != WIFI_OPT_SUCCESS) {
         pConcreteMangerMachine->mcb.onStartFailure(mid);
@@ -449,6 +448,7 @@ bool ConcreteMangerMachine::ScanonlyState::ExecuteStateMsg(InternalMessagePtr ms
 
 void ConcreteMangerMachine::ScanonlyState::SwitchConnectInScanOnlyState()
 {
+    pConcreteMangerMachine->InitFastScanOnWearable();
     ErrCode ret = WifiServiceScheduler::GetInstance().AutoStartStaService(mid, ifaceName);
     if (ret != WIFI_OPT_SUCCESS) {
         pConcreteMangerMachine->mcb.onStartFailure(mid);

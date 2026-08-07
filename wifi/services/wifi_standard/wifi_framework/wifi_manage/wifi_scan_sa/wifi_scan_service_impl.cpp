@@ -796,9 +796,7 @@ void WifiScanServiceImpl::UpdateScanMode()
 
     WIFI_LOGI("Wifi caller - uid: %{public}d, packageName: %{private}s, isForeground: %{public}s",
         uid, packageName.c_str(), isForeground ? "true" : "false");
-
-    if (WifiAppStateAware::GetInstance().IsAppInFilterList("ScanBackgroundAllowLimitList", packageName)
-        && !isForeground) {
+    if (!isForeground) {
         if (WifiAppStateAware::GetInstance().CheckAssociatedAppInForeground(uid)) {
             isForeground = true;
             WIFI_LOGI("CheckAssociatedAppInForeground, Treat as foreground");

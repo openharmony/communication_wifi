@@ -28,7 +28,6 @@ public:
     virtual bool IsWhiteListApp(const std::string &bundleName) const = 0;
     virtual bool IsBlackListApp(const std::string &bundleName) const = 0;
     virtual bool IsChariotApp(const std::string &bundleName) const = 0;
-    virtual bool IsHighTempLimitSpeedApp(const std::string &bundleName) const = 0;
     virtual bool IsKeyForegroundApp(const std::string &bundleName) const = 0;
     virtual bool IsBackgroundLimitApp(const std::string &bundleName) const = 0;
     virtual bool IsLiveStreamApp(const std::string &bundleName) const = 0;
@@ -44,7 +43,6 @@ public:
     MOCK_CONST_METHOD1(IsWhiteListApp, bool(const std::string &bundleName));
     MOCK_CONST_METHOD1(IsBlackListApp, bool(const std::string &bundleName));
     MOCK_CONST_METHOD1(IsChariotApp, bool(const std::string &bundleName));
-    MOCK_CONST_METHOD1(IsHighTempLimitSpeedApp, bool(const std::string &bundleName));
     MOCK_CONST_METHOD1(IsKeyForegroundApp, bool(const std::string &bundleName));
     MOCK_CONST_METHOD1(IsBackgroundLimitApp, bool(const std::string &bundleName));
     MOCK_CONST_METHOD1(IsLiveStreamApp, bool(const std::string &bundleName));

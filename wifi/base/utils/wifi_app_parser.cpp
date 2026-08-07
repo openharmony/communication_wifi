@@ -31,7 +31,6 @@ constexpr auto XML_TAG_SECTION_HEADER_APP_WHITE_LIST = "AppWhiteList";
 constexpr auto XML_TAG_SECTION_HEADER_APP_BLACK_LIST = "AppBlackList";
 constexpr auto XML_TAG_SECTION_HEADER_MULTILINK_BLACK_LIST = "MultiLinkBlackList";
 constexpr auto XML_TAG_SECTION_HEADER_CHARIOT_APP = "ChariotApp";
-constexpr auto XML_TAG_SECTION_HEADER_HIGH_TEMP_LIMIT_SPEED_APP = "HighTempLimitSpeedApp";
 constexpr auto XML_TAG_SECTION_HEADER_APP_KEY_FOREGROUND_LIST = "KeyAppForegroundList";
 constexpr auto XML_TAG_SECTION_HEADER_APP_KEY_BACKGROUND_LIMIT_LIST = "KeyBackgroundLimitListApp";
 constexpr auto XML_TAG_SECTION_HEADER_APP_LIVE_STREAM_LIST = "AppLiveStream";
@@ -44,7 +43,6 @@ constexpr auto XML_TAG_SECTION_KEY_GAME_RTT_GAP = "mGameRttGap";
 constexpr auto XML_TAG_SECTION_KEY_GAME_NAME = "gameName";
 constexpr auto XML_TAG_SECTION_KEY_PACKAGE_NAME = "packageName";
 constexpr auto XML_TAG_SECTION_KEY_DELAY_TIME = "delayTime";
-constexpr auto XML_VERSION_NODE_NAME = "HighTempLimitSpeedAppVersionInfo";
 
 const std::unordered_map<std::string, AppType> appTypeMap = {
     { XML_TAG_SECTION_HEADER_GAME_INFO, AppType::LOW_LATENCY_APP },
@@ -52,7 +50,6 @@ const std::unordered_map<std::string, AppType> appTypeMap = {
     { XML_TAG_SECTION_HEADER_APP_BLACK_LIST, AppType::BLACK_LIST_APP },
     { XML_TAG_SECTION_HEADER_MULTILINK_BLACK_LIST, AppType::MULTILINK_BLACK_LIST_APP },
     { XML_TAG_SECTION_HEADER_CHARIOT_APP, AppType::CHARIOT_APP },
-    {XML_TAG_SECTION_HEADER_HIGH_TEMP_LIMIT_SPEED_APP, AppType::HIGH_TEMP_LIMIT_SPEED_APP},
     { XML_TAG_SECTION_HEADER_APP_KEY_FOREGROUND_LIST, AppType::KEY_FOREGROUND_LIST_APP},
     { XML_TAG_SECTION_HEADER_APP_KEY_BACKGROUND_LIMIT_LIST, AppType::KEY_BACKGROUND_LIMIT_LIST_APP},
     { XML_TAG_SECTION_HEADER_ASYNC_DELAY_TIME, AppType::ASYNC_DELAY_TIME},
@@ -147,11 +144,6 @@ void AppParserInner::ParseAppList(const xmlNodePtr &innode)
     result_.m_multilinkAppVec.clear();
     result_.m_chariotAppVec.clear();
     result_.m_blackAppVec.clear();
-    result_.m_highTempLimitSpeedAppVec.clear();
-    xmlNodePtr nodeVersion = innode->children;
-    if (nodeVersion != nullptr) {
-        GetLocalFileVersion(nodeVersion);
-    }
     for (xmlNodePtr node = innode->children; node != nullptr; node = node->next) {
         switch (GetAppTypeAsInt(node)) {
             case AppType::LOW_LATENCY_APP:
@@ -168,9 +160,6 @@ void AppParserInner::ParseAppList(const xmlNodePtr &innode)
                 break;
             case AppType::CHARIOT_APP:
                 result_.m_chariotAppVec.push_back(ParseChariotAppInfo(node));
-                break;
-            case AppType::HIGH_TEMP_LIMIT_SPEED_APP:
-                result_.m_highTempLimitSpeedAppVec.push_back(ParseHighTempLimitSpeedAppInfo(node));
                 break;
             case AppType::HIGAME_EXCLUDE_LIST_APP:
                 result_.m_hiGameExcludeAppVec.push_back(ParseHiGameExcludeAppInfo(node));
@@ -321,20 +310,6 @@ ChariotAppInfo AppParserInner::ParseChariotAppInfo(const xmlNodePtr &innode)
     return appInfo;
 }
 
-HighTempLimitSpeedAppInfo AppParserInner::ParseHighTempLimitSpeedAppInfo(const xmlNodePtr &innode)
-{
-    HighTempLimitSpeedAppInfo appInfo;
-    xmlChar *value = xmlGetProp(innode, BAD_CAST(XML_TAG_SECTION_KEY_PACKAGE_NAME));
-    if (value == NULL) {
-        WIFI_LOGE("%{public}s xml parser  app info error.", __FUNCTION__);
-        return appInfo;
-    }
-    std::string packageName = std::string(reinterpret_cast<char *>(value));
-    appInfo.packageName = packageName;
-    xmlFree(value);
-    return appInfo;
-}
-
 KeyForegroundListAppInfo AppParserInner::ParseKeyForegroundListAppInfo(const xmlNodePtr &innode)
 {
     KeyForegroundListAppInfo appInfo;
@@ -445,20 +420,6 @@ AppType AppParserInner::GetAppTypeAsInt(const xmlNodePtr &innode)
     return AppType::OTHER_APP;
 }
 
-std::string AppParserInner::GetLocalFileVersion(const xmlNodePtr &innode)
-{
-    if (innode == nullptr || innode->name == nullptr) {
-        return "";
-    }
-    if (xmlStrcmp(innode->name, BAD_CAST(XML_VERSION_NODE_NAME)) != 0) {
-        WIFI_LOGE("innode name=%{public}s not equal version", innode->name);
-        return "";
-    }
-    std::string fileVersion = GetStringValue(innode);
-    WIFI_LOGI("%{public}s name=%{public}s", __FUNCTION__, fileVersion.c_str());
-    return fileVersion;
-}
-
 /* below: AppParser is used for judge whether application in certain list*/
 
 AppParser::AppParser()
@@ -522,13 +483,6 @@ bool AppParser::IsChariotApp(const std::string &bundleName) const
     std::shared_lock<std::shared_mutex> lock(appParserMutex_);
     return std::any_of(result_.m_chariotAppVec.begin(), result_.m_chariotAppVec.end(),
         [bundleName](const ChariotAppInfo &app) { return app.packageName == bundleName; });
-}
-
-bool AppParser::IsHighTempLimitSpeedApp(const std::string &bundleName) const
-{
-    std::shared_lock<std::shared_mutex> lock(appParserMutex_);
-    return std::any_of(result_.m_highTempLimitSpeedAppVec.begin(), result_.m_highTempLimitSpeedAppVec.end(),
-        [bundleName](const HighTempLimitSpeedAppInfo &app) { return app.packageName == bundleName; });
 }
 
 bool AppParser::IsKeyForegroundApp(const std::string &bundleName) const

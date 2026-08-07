@@ -182,14 +182,12 @@ void AppXmlParserTest(const uint8_t* data, size_t size)
     m_appXmlParser->appParserInner_->ParseBlackAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseMultiLinkAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseChariotAppInfo(root_node);
-    m_appXmlParser->appParserInner_->ParseHighTempLimitSpeedAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseKeyForegroundListAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseKeyBackgroundLimitListAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseLiveStreamAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseGameBackgroundLimitListAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseAsyncLimitSpeedDelayTime(root_node);
     m_appXmlParser->appParserInner_->GetAppTypeAsInt(root_node);
-    m_appXmlParser->appParserInner_->GetLocalFileVersion(root_node);
     m_xmlParser->LoadConfiguration(buf);
     m_xmlParser->LoadConfigurationMemory(buf);
     ConvertStringToBool(buf);
@@ -226,7 +224,6 @@ void AppXmlParserTest2(const uint8_t* data, size_t size)
     m_appXmlParser->IsBlackListApp(conditionName);
     m_appXmlParser->IsMultiLinkApp(conditionName);
     m_appXmlParser->IsChariotApp(conditionName);
-    m_appXmlParser->IsHighTempLimitSpeedApp(conditionName);
     m_appXmlParser->IsKeyForegroundApp(conditionName);
     m_appXmlParser->IsKeyBackgroundLimitApp(conditionName);
     m_appXmlParser->IsLiveStreamApp(conditionName);

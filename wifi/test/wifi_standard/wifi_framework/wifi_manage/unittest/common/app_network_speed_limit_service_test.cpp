@@ -117,32 +117,6 @@ HWTEST_F(AppNetworkSpeedLimitServiceTest, CheckNetWorkCanBeLimited_StreamControl
     EXPECT_TRUE(result);
 }
 
-HWTEST_F(AppNetworkSpeedLimitServiceTest, CheckNetWorkCanBeLimited_TempControlId_WifiConnected, TestSize.Level1)
-{
-    // Prepare
-    int controlId = BG_LIMIT_CONTROL_ID_TEMP;
-    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = true;
-
-    // Execute
-    bool result = AppNetworkSpeedLimitService::GetInstance().CheckNetWorkCanBeLimited(controlId);
-
-    // Verify
-    EXPECT_TRUE(result);
-}
-
-HWTEST_F(AppNetworkSpeedLimitServiceTest, CheckNetWorkCanBeLimited_TempControlId_WifiDisconnected, TestSize.Level1)
-{
-    // Prepare
-    int controlId = BG_LIMIT_CONTROL_ID_TEMP;
-    AppNetworkSpeedLimitService::GetInstance().m_isWifiConnected = false;
-
-    // Execute
-    bool result = AppNetworkSpeedLimitService::GetInstance().CheckNetWorkCanBeLimited(controlId);
-
-    // Verify
-    EXPECT_FALSE(result);
-}
-
 HWTEST_F(AppNetworkSpeedLimitServiceTest, CheckNetWorkCanBeLimited_ModuleForegroundOptControlId, TestSize.Level1)
 {
     // Prepare

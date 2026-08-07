@@ -53,8 +53,8 @@ namespace {
     const int GAME_BOOST_DISABLE = 0;
     const int BOOST_UDP_TYPE = 17;
     constexpr int64_t LOW_LATENCY_EXIT_TIMEOUT = 3 * 60 * 1000;
-    // 5206: 云备份; 1009: 端云同步服务; 6666：后台系统升级
-    const std::unordered_set<int> SA_UID_LIST = {5206, 1009, 6666};
+    // 5206: 云备份; 1009: 端云同步服务; 6666：后台系统升级; 7508：Hianalytics服务；7234：hiview_upload
+    const std::unordered_set<int> SA_UID_LIST = {5206, 1009, 6666, 7508, 7234};
 }
 
 AppNetworkSpeedLimitService::AppNetworkSpeedLimitService()
@@ -263,8 +263,6 @@ bool AppNetworkSpeedLimitService::CheckNetWorkCanBeLimited(const int controlId)
             return true;
         case BgLimitControl::BG_LIMIT_CONTROL_ID_STREAM:
             return true;
-        case BgLimitControl::BG_LIMIT_CONTROL_ID_TEMP:
-            return m_isWifiConnected;
         case BgLimitControl::BG_LIMIT_CONTROL_ID_KEY_FG_APP:
             return true;
         case BgLimitControl::BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT:
@@ -355,9 +353,6 @@ bool AppNetworkSpeedLimitService::IsLimitSpeedBgApp(const int controlId, const s
             } else {
                 return AppParser::GetInstance().IsGameBackgroundLimitApp(bundleName);
             }
-        case BgLimitControl::BG_LIMIT_CONTROL_ID_STREAM:
-        case BgLimitControl::BG_LIMIT_CONTROL_ID_TEMP:
-            return AppParser::GetInstance().IsHighTempLimitSpeedApp(bundleName);
         case BgLimitControl::BG_LIMIT_CONTROL_ID_KEY_FG_APP:
             return AppParser::GetInstance().IsKeyBackgroundLimitApp(bundleName);
         case BgLimitControl::BG_LIMIT_CONTROL_ID_MODULE_FOREGROUND_OPT:

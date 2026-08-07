@@ -120,8 +120,8 @@ ohos_shared_library("wifi_ap_service") {
     external_deps += [ "drivers_interface_wlan:libchip_proxy_2.0" ]
   }
 
-  if (wifi_feature_car_cockpit_supported) {
-    defines += [ "WIFI_FEATURE_CAR_COCKPIT_SUPPORTED" ]
+  if (wifi_feature_secure_schedule_supported) {
+    defines += [ "FEATURE_WIFI_SECURE_SCHEDULE_SUPPORT" ]
   }
   version_script = "libwifi_ap_service.map"
   part_name = "wifi"

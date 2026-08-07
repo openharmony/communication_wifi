@@ -158,8 +158,8 @@ if (defined(ohos_lite)) {
     if (wifi_feature_with_local_security_detect) {
       defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
     }
-    if (wifi_feature_car_cockpit_supported) {
-      defines += [ "WIFI_FEATURE_CAR_COCKPIT_SUPPORTED" ]
+    if (wifi_feature_secure_schedule_supported) {
+      defines += [ "FEATURE_WIFI_SECURE_SCHEDULE_SUPPORT" ]
     }
 
     if (wifi_feature_with_go_simulation_ap) {

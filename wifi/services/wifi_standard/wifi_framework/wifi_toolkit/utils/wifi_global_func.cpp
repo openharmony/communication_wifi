@@ -15,7 +15,7 @@
 #include "wifi_global_func.h"
 #include <algorithm>
 #include <cstdlib>
-#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+#ifdef FEATURE_WIFI_SECURE_SCHEDULE_SUPPORT
 #include <cstring>
 #endif
 #include <iostream>
@@ -74,7 +74,7 @@ constexpr const char* VENDOR_COUNTRY_KEY = "const.cust.custPath";
 constexpr const char* VENDOR_COUNTRY_DEFAULT = "";
 constexpr const int32_t SYS_PARAMETER_SIZE = 256;
 constexpr const int32_t PARAMETER_ERROR_CODE = 0;
-#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+#ifdef FEATURE_WIFI_SECURE_SCHEDULE_SUPPORT
 constexpr int CHAR_TYPE_LEN = 4;  // 4 char types: digit, lowercase, uppercase, special
 constexpr int LOWERCASE_INDEX = 0;
 constexpr int UPPERCASE_INDEX = 1;
@@ -94,7 +94,7 @@ constexpr int EC_INVALID = -9;  // using sysparam_errno.h, invalid param value
 #endif
 constexpr int ASCALL_MINUS_SIGN_INDEX = 45;
 
-#ifdef WIFI_FEATURE_CAR_COCKPIT_SUPPORTED
+#ifdef FEATURE_WIFI_SECURE_SCHEDULE_SUPPORT
 static bool HasDigitAndSpecialAndLetter(const char *password)
 {
     bool hasDigit = false;

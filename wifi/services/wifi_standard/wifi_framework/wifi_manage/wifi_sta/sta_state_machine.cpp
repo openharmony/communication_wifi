@@ -93,10 +93,11 @@ static bool IsRandomMac(const std::string& mac)
     if (mac.empty() || mac.length() < MAC_STRING_MIN_LEN) {
         return false;
     }
-    unsigned char firstByte = 0;
-    if (sscanf_s(mac.substr(0, MAC_STRING_MIN_LEN).c_str(), "%02x", &firstByte) != 1) {
+    unsigned int firstByteVal = 0;
+    if (sscanf_s(mac.substr(0, MAC_STRING_MIN_LEN).c_str(), "%02x", &firstByteVal) != 1) {
         return false;
     }
+    unsigned char firstByte = static_cast<unsigned char>(firstByteVal);
     return (firstByte & RANDOM_MAC_LOCAL_BIT) != 0;
 }
 #endif

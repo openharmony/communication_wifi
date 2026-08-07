@@ -48,7 +48,6 @@ public:
         void HandleSwitchToConnectMode(InternalMessagePtr msg);
         void HandleSwitchToScanOnlyMode(InternalMessagePtr msg);
         void HandleStartInIdleState(InternalMessagePtr msg);
-        void InitFastScanOnWearable();
         void HandleSwitchToSemiActiveMode(InternalMessagePtr msg);
     };
 
@@ -109,6 +108,7 @@ public:
 public:
     ErrCode InitConcreteMangerMachine();
     void RegisterCallback(ConcreteModeCallback &callback);
+    void InitFastScanOnWearable();
 
 private:
     template <typename T>

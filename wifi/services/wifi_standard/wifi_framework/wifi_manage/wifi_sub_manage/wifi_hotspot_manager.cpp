@@ -98,6 +98,15 @@ void WifiHotspotManager::ApCloseDhcpSa(void)
 void WifiHotspotManager::CloseApService(int id)
 {
     WIFI_LOGI("close %{public}d ap service", id);
+    if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
+        WIFI_LOGE("close ap service failed: WifiTogglerManager is null");
+        return;
+    }
+    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
+    if (ins == nullptr) {
+        WIFI_LOGE("close ap service faild: WifiControllerMachine is null");
+        return;
+    }
     HotspotMode hotspotMode = HotspotMode::SOFTAP;
     IApService *pService = WifiServiceManager::GetInstance().GetApServiceInst();
     if (pService != nullptr) {
@@ -106,15 +115,6 @@ void WifiHotspotManager::CloseApService(int id)
     WifiServiceManager::GetInstance().UnloadService(WIFI_SERVICE_AP, id);
     WifiConfigCenter::GetInstance().SetApMidState(WifiOprMidState::CLOSED, id);
     WifiConfigCenter::GetInstance().SetHotspotState(static_cast<int>(ApState::AP_STATE_CLOSED), id);
-    if (WifiManager::GetInstance().GetWifiTogglerManager() == nullptr) {
-        WIFI_LOGE("close ap service failed: WifiTogglerManager is null"):
-        return;
-    }
-    auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
-    if (ins == nullptr) {
-        WIFI_LOGE("close ap service faild: WifiControllerMachine is null");
-        return;
-    }
     ins->SendMessage(CMD_AP_STOPPED, id);
     WifiEventCallbackMsg cbMsg;
     cbMsg.msgCode = WIFI_CBK_MSG_HOTSPOT_STATE_CHANGE;

@@ -104,7 +104,7 @@ void WifiHotspotManager::CloseApService(int id)
     }
     auto &ins = WifiManager::GetInstance().GetWifiTogglerManager()->GetControllerMachine();
     if (ins == nullptr) {
-        WIFI_LOGE("close ap service faild: WifiControllerMachine is null");
+        WIFI_LOGE("close ap service failed: WifiControllerMachine is null");
         return;
     }
     HotspotMode hotspotMode = HotspotMode::SOFTAP;

@@ -712,7 +712,7 @@ void WifiControllerMachine::EnableState::HandleWifiToggleChangeInEnabledState(In
 #endif
     }
 #ifdef FEATURE_AP_SUPPORT
-    if (pWifiControllerMachine->IsEnableScanOnlyOnHotspot() &&
+    if (isOpen == 1 && pWifiControllerMachine->IsEnableScanOnlyOnHotspot() &&
         WifiConfigCenter::GetInstance().GetSoftapToggledState() &&
         msg->GetMessageName() == CMD_WIFI_TOGGLED) {
         WIFI_LOGI("%{public}s, WiFi turning on while hotspot active, close hotspot first", __func__);

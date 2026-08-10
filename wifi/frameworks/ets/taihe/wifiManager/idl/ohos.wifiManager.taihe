@@ -371,6 +371,7 @@ struct WifiP2PConfig {
     passphrase: String;
     groupName: String;
     goBand: GroupOwnerBand;
+    goFreq: Optional<i32>;
 }
 
 struct WifiP2pGroupInfo {

@@ -651,6 +651,7 @@ WifiP2pConfig ConvertWifiP2pConfig(const ::ohos::wifiManager::WifiP2PConfig &con
     std::string passphrase = "";
     std::string groupName = "";
     int band = static_cast<int>(GroupOwnerBand::GO_BAND_AUTO);
+    int goFreq = -1;
     address = static_cast<std::string>(config.deviceAddress);
     if (config.deviceAddressType) {
         bssidType = static_cast<int>(*(config.deviceAddressType));
@@ -659,6 +660,9 @@ WifiP2pConfig ConvertWifiP2pConfig(const ::ohos::wifiManager::WifiP2PConfig &con
     passphrase = static_cast<std::string>(config.passphrase);
     groupName = static_cast<std::string>(config.groupName);
     band = static_cast<int>(config.goBand);
+    if (config.goFreq) {
+        goFreq = *(config.goFreq);
+    }
     newConfig.SetDeviceAddress(address);
     newConfig.SetDeviceAddressType(bssidType);
     newConfig.SetNetId(netId);
@@ -666,6 +670,7 @@ WifiP2pConfig ConvertWifiP2pConfig(const ::ohos::wifiManager::WifiP2PConfig &con
     newConfig.SetGroupName(groupName);
     newConfig.SetGoBand(static_cast<GroupOwnerBand>(band));
     std::fill(passphrase.begin(), passphrase.end(), 0);
+    newConfig.SetFreq(goFreq);
     return newConfig;
 }
 

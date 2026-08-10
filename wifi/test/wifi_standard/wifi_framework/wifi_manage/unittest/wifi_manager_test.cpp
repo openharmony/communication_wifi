@@ -675,14 +675,14 @@ HWTEST_F(WifiManagerTest, RegisterFoldStatusListenerTest, TestSize.Level1)
 
 HWTEST_F(WifiManagerTest, UnregisterDisplayListenerTest, TestSize.Level1)
 {
-    sptr<Rosen::DisplayManagerLite::IDisplayListener> displayStatusListener_ = nullptr;
+    sptr<Rosen::DisplayManagerLite::IDisplayAttributeListener> displayStatusListener_ = nullptr;
     wifiManager.wifiEventSubscriberManager->UnregisterDisplayListener();
     EXPECT_FALSE(g_errLog.find("ERR LOG IS NULL") != std::string::npos);
 }
 
 HWTEST_F(WifiManagerTest, RegisterDisplayListenerTest, TestSize.Level1)
 {
-    sptr<Rosen::DisplayManagerLite::IDisplayListener> displayStatusListener_ = nullptr;
+    sptr<Rosen::DisplayManagerLite::IDisplayAttributeListener> displayStatusListener_ = nullptr;
     wifiManager.wifiEventSubscriberManager->RegisterDisplayListener();
 
     displayStatusListener_ = new(std::nothrow) WifiDisplayStateListener();

@@ -1683,13 +1683,8 @@ WifiDisplayStateListener::WifiDisplayStateListener()
 {
     WIFI_LOGI("WifiDisplayStateListener Enter");
 }
-void WifiDisplayStateListener::OnCreate(uint64_t displayId)
-{}
- 
-void WifiDisplayStateListener::OnDestroy(uint64_t displayId)
-{}
- 
-void WifiDisplayStateListener::OnChange(uint64_t displayId)
+
+void WifiDisplayStateListener::OnAttributeChange(Rosen::DisplayId displayId, const std::vector<std::string>& attributes)
 {
     sptr<Rosen::DisplayLite> displayLite = Rosen::DisplayManagerLite::GetInstance().GetDisplayById(displayId);
     if (displayLite == nullptr) {
@@ -1746,13 +1741,15 @@ void WifiEventSubscriberManager::RegisterDisplayListener()
     if (displayStatusListener_ != nullptr) {
         return;
     }
+    std::vector<std::string> listenAttributes = {"rotation"};
     displayStatusListener_ = new(std::nothrow) WifiDisplayStateListener();
     if (displayStatusListener_ == nullptr) {
         WIFI_LOGE("RegisterDisplayListener fail");
         return;
     }
  
-    auto ret = Rosen::DisplayManagerLite::GetInstance().RegisterDisplayListener(displayStatusListener_);
+    auto ret = Rosen::DisplayManagerLite::GetInstance().RegisterDisplayAttributeListener(
+        listenAttributes, displayStatusListener_);
     if (ret != Rosen::DMError::DM_OK) {
         WIFI_LOGE("RegisterDisplayListener fail");
         displayStatusListener_ = nullptr;
@@ -1769,7 +1766,7 @@ void WifiEventSubscriberManager::UnregisterDisplayListener()
         return;
     }
  
-    auto ret = Rosen::DisplayManagerLite::GetInstance().UnregisterDisplayListener(displayStatusListener_);
+    auto ret = Rosen::DisplayManagerLite::GetInstance().UnregisterDisplayAttributeListener(displayStatusListener_);
     if (ret != Rosen::DMError::DM_OK) {
         WIFI_LOGE("UnregisterDisplayListener fail");
     }

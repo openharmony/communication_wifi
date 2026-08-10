@@ -65,7 +65,7 @@ constexpr uint32_t TIMEOUT_EVENT_SUBSCRIBER = 3000;
 constexpr uint32_t PROP_TRUE_LEN = 4;
 constexpr uint32_t PROP_FALSE_LEN = 5;
 #ifdef FEATURE_HPF_SUPPORT
-constexpr uint32_t STATE_ENTER_FORCESLEEP = 40;
+constexpr uint32_t STATE_ENTER_FORCESLEEP = 48;
 constexpr uint32_t STATE_ENTER_SCREENOFF_HALF_HOUR_FILTER = 224;
 #endif
 #ifdef FEATURE_AUTOOPEN_SPEC_LOC_SUPPORT

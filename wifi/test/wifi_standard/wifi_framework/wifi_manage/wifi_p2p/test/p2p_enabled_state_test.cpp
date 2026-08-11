@@ -79,9 +79,8 @@ HWTEST_F(P2pEnabledStateTest, GoInState, TestSize.Level1)
     ON_CALL(WifiP2PHalInterface::GetInstance(), SetP2pDeviceType(_))
         .WillByDefault(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), SetP2pConfigMethods(_))
-        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
-        .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));
+        .WillOnce(DoAll(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED)))
+        .WillRepeatedly(DoAll(Return(WifiErrorNo::WIFI_HAL_OPT_OK)));
     EXPECT_CALL(WifiP2PHalInterface::GetInstance(), GetDeviceAddress(_))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_FAILED))
         .WillOnce(Return(WifiErrorNo::WIFI_HAL_OPT_OK));

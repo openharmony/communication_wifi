@@ -231,7 +231,7 @@ bool WifiAppStateAware::CheckAssociatedAppInForeground(const int32_t uid)
         if (it->extensionUid != uid) {
             continue;
         }
-        if (IsForegroundApp(it->callerUid) && IsAppInFilterList("ScanForegroundAllowLimitList", it->callerName)) {
+        if (IsForegroundApp(it->callerUid)) {
             WIFI_LOGI("The Wifi caller is called by foreground app(callerUid: %{public}d, packageName: %{public}s)",
                 it->callerUid,
                 it->callerName.c_str());

@@ -373,7 +373,12 @@ void ProcessEapConfig(const ::ohos::wifiManager::WifiDeviceConfig &config, WifiD
         devConfig.wifiEapConfig.phase2Method = Phase2Method(static_cast<int32_t>(eapConfig.phase2Method));
         devConfig.wifiEapConfig.identity = eapConfig.identity;
         devConfig.wifiEapConfig.anonymousIdentity = eapConfig.anonymousIdentity;
-        devConfig.wifiEapConfig.password = eapConfig.password;
+        std::string pwd = static_cast<std::string>(eapConfig.password);
+        devConfig.wifiEapConfig.password = pwd;
+        if (!pwd.empty()) {
+            (void)memset_s(&pwd[0], pwd.size(), 0, pwd.size());
+        }
+        std::string().swap(pwd);
         devConfig.wifiEapConfig.caCertAlias = eapConfig.caCertAlias;
         devConfig.wifiEapConfig.caCertPath = eapConfig.caPath;
         devConfig.wifiEapConfig.clientCert = eapConfig.clientCertAlias;
@@ -383,6 +388,10 @@ void ProcessEapConfig(const ::ohos::wifiManager::WifiDeviceConfig &config, WifiD
             pd.c_str(), pd.length()) != EOK) {
             WIFI_LOGE("%{public}s: failed to copy", __func__);
         }
+        if (!pd.empty()) {
+            (void)memset_s(&pd[0], pd.size(), 0, pd.size());
+        }
+        std::string().swap(pd);
         devConfig.wifiEapConfig.altSubjectMatch = eapConfig.altSubjectMatch;
         devConfig.wifiEapConfig.domainSuffixMatch = eapConfig.domainSuffixMatch;
         devConfig.wifiEapConfig.realm = eapConfig.realm;
@@ -669,7 +678,10 @@ WifiP2pConfig ConvertWifiP2pConfig(const ::ohos::wifiManager::WifiP2PConfig &con
     newConfig.SetPassphrase(passphrase);
     newConfig.SetGroupName(groupName);
     newConfig.SetGoBand(static_cast<GroupOwnerBand>(band));
-    std::fill(passphrase.begin(), passphrase.end(), 0);
+    if (!passphrase.empty()) {
+        (void)memset_s(&passphrase[0], passphrase.size(), 0, passphrase.size());
+    }
+    std::string().swap(passphrase);
     newConfig.SetFreq(goFreq);
     return newConfig;
 }

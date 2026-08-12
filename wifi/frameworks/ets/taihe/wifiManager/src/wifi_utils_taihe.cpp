@@ -388,7 +388,7 @@ void ProcessEapConfig(const ::ohos::wifiManager::WifiDeviceConfig &config, WifiD
             pd.c_str(), pd.length()) != EOK) {
             WIFI_LOGE("%{public}s: failed to copy", __func__);
         }
-         if (!pd.empty()) {
+        if (!pd.empty()) {
             (void)memset_s(&pd[0], pd.size(), 0, pd.size());
         }
         std::string().swap(pd);

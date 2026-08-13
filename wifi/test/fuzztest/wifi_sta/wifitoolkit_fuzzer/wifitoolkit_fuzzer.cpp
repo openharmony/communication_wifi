@@ -38,6 +38,8 @@
 #include "network_selection.h"
 #include "network_selector_factory.h"
 #include "wifi_watchdog_utils.h"
+#include"wifi_pro_utils.h"
+#include "wifi_net_observer.h"
 #include <mutex>
 #include <fuzzer/FuzzedDataProvider.h>
 
@@ -47,6 +49,7 @@ constexpr int U32_AT_SIZE_ZERO = 4;
 constexpr int WIFI_MAX_SSID_LEN = 16;
 constexpr int TWO = 2;
 constexpr int SIX = 6;
+constexpr int SEVEN = 7;
 constexpr int FORTYTHREE = 43;
 constexpr int HUNDRED = 100;
 static bool g_isInsted = false;
@@ -71,6 +74,7 @@ static std::unique_ptr<WifiAssetManager> m_WifiAssetManager = nullptr;
 static std::unique_ptr<WifiNotificationUtil> m_WifiNotificationUtil = nullptr;
 static std::unique_ptr<NetworkSelectionManager> m_NetworkSelectionManager = nullptr;
 static std::unique_ptr<WifiWatchDogUtils> m_WifiWatchDogUtils = nullptr;
+static std::unique_ptr<WifiProUtils> m_WifiProUtils = nullptr;
 void MyExit()
 {
     m_networkXmlParser.reset();
@@ -79,6 +83,7 @@ void MyExit()
     m_softapXmlParser.reset();
     m_WifiAssetManager.reset();
     m_WifiNotificationUtil.reset();
+    m_NetworkSelectionManager.reset();
     sleep(3);
     printf("exiting\n");
 }
@@ -105,6 +110,7 @@ void InitParam()
         m_softapXmlParser = std::make_unique<SoftapXmlParser>();
         m_WifiAssetManager = std::make_unique<WifiAssetManager>();
         m_WifiNotificationUtil = std::make_unique<WifiNotificationUtil>();
+        m_NetworkSelectionManager = std::make_unique<NetworkSelectionManager>();
         InitAppParserTest();
         if (m_networkXmlParser == nullptr) {
             return;
@@ -182,12 +188,14 @@ void AppXmlParserTest(const uint8_t* data, size_t size)
     m_appXmlParser->appParserInner_->ParseBlackAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseMultiLinkAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseChariotAppInfo(root_node);
+    m_appXmlParser->appParserInner_->ParseHighTempLimitSpeedAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseKeyForegroundListAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseKeyBackgroundLimitListAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseLiveStreamAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseGameBackgroundLimitListAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseAsyncLimitSpeedDelayTime(root_node);
     m_appXmlParser->appParserInner_->GetAppTypeAsInt(root_node);
+    m_appXmlParser->appParserInner_->GetLocalFileVersion(root_node);
     m_xmlParser->LoadConfiguration(buf);
     m_xmlParser->LoadConfigurationMemory(buf);
     ConvertStringToBool(buf);
@@ -224,6 +232,7 @@ void AppXmlParserTest2(const uint8_t* data, size_t size)
     m_appXmlParser->IsBlackListApp(conditionName);
     m_appXmlParser->IsMultiLinkApp(conditionName);
     m_appXmlParser->IsChariotApp(conditionName);
+    m_appXmlParser->IsHighTempLimitSpeedApp(conditionName);
     m_appXmlParser->IsKeyForegroundApp(conditionName);
     m_appXmlParser->IsKeyBackgroundLimitApp(conditionName);
     m_appXmlParser->IsLiveStreamApp(conditionName);
@@ -339,15 +348,42 @@ void WifinetworkselectionmanagerTest()
     InterScanInfo interScanInfo;
     NetworkSelectionResult networkSelectionResult;
     std::string autoSelectBssid = FDP->ConsumeBytesAsString(NUM_BYTES);
-    bool isSavedNetEmpty = FDP->ConsumeIntegral<bool>();
     std::vector<NetworkSelection::NetworkCandidate> networkCandidates;
     std::vector<InterScanInfo> scanInfos;
+    if (m_NetworkSelectionManager == nullptr) {
+        return;
+    }
     m_NetworkSelectionManager->SelectNetworkWithSsid(deviceConfig, autoSelectBssid);
     m_NetworkSelectionManager->GetAllDeviceConfigs(networkCandidates, scanInfos);
     m_NetworkSelectionManager->ConvertScanInfo(wifiScanInfo, interScanInfo);
     m_NetworkSelectionManager->GetFilteredReasonForChr(networkCandidates);
-    m_NetworkSelectionManager->GetSavedNetInfoForChr(networkCandidates, isSavedNetEmpty);
-    m_NetworkSelectionManager->GetFilteredLastReasonForChr(networkCandidates);
+}
+
+void WifinetworkselectionmanagerSelectTest()
+{
+    if (m_NetworkSelectionManager == nullptr) {
+        return;
+    }
+    NetworkSelectionResult networkSelectionResult;
+    std::vector<InterScanInfo> scanInfos;
+    InterScanInfo scanInfo;
+    scanInfo.ssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    scanInfo.bssid = FDP->ConsumeBytesAsString(NUM_BYTES);
+    scanInfo.frequency = FDP->ConsumeIntegral<int>();
+    scanInfo.rssi = FDP->ConsumeIntegral<int>();
+    scanInfos.push_back(scanInfo);
+    int selectType = FDP->ConsumeIntegral<int>() % SEVEN;
+    NetworkSelectType type = static_cast<NetworkSelectType>(selectType);
+    std::string failReason;
+    m_NetworkSelectionManager->SelectNetwork(networkSelectionResult, type, scanInfos, failReason);
+    std::vector<NetworkSelectionResult> allSortedResults;
+    m_NetworkSelectionManager->SelectNetwork(networkSelectionResult, type, scanInfos, failReason, allSortedResults);
+    std::vector<NetworkSelection::NetworkCandidate> networkCandidates;
+    NetworkSelectorFactory selectorFactory;
+    auto selectorOptional = selectorFactory.GetNetworkSelector(type);
+    if (selectorOptional.has_value()) {
+        NetworkSelectionManager::TryNominate(networkCandidates, selectorOptional.value());
+    }
 }
 
 void WifinotificationutilTest()
@@ -399,6 +435,22 @@ void WifiWatchDogUtilsTest()
     m_WifiWatchDogUtils->ReportResetEvent(threadName);
 }
 
+void WifiProUtilsTest(const uint8_t* data, size_t size)
+{
+    FuzzedDataProvider fdp(data, size);
+    int32_t instId = fdp.ConsumeIntegral<int32_t>();
+    SupplicantState supplicantState = static_cast<SupplicantState>(fdp.ConsumeIntegral<int>() % SIX);
+    
+    m_WifiProUtils->GetSignalLevel(instId);
+    m_WifiProUtils->IsWifiConnected(instId);
+    m_WifiProUtils->GetCurrentTimeMs();
+    m_WifiProUtils->IsUserSelectNetwork();
+    m_WifiProUtils->IsSupplicantConnectionProcess(supplicantState);
+    m_WifiProUtils->IsSupplicantConnectingProcess(supplicantState);
+    m_WifiProUtils->IsDefaultNet();
+    m_WifiProUtils->IsAppInWhiteLists();
+}
+
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
@@ -417,6 +469,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Wifi::SoftapParserTest();
     OHOS::Wifi::WifiencryptionutilTest();
     OHOS::Wifi::WifinetworkselectionmanagerTest();
+    OHOS::Wifi::WifinetworkselectionmanagerSelectTest();
     OHOS::Wifi::AssetManagerTest();
     OHOS::Wifi::WifinotificationutilTest();
     OHOS::Wifi::WifiWatchDogUtilsTest();

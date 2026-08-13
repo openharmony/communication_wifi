@@ -985,7 +985,7 @@ private:
     bool IsSpecificNetwork();
 
     /**
-     * @Description check if IPv6 is blocklisted within 12h based on persisted timestamp
+     * @Description check if IPv6 is blocklisted within 24h based on persisted timestamp
      */
     bool IsInIpv6Blocklist();
 

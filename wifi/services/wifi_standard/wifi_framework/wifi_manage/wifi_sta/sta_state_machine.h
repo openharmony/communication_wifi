@@ -985,6 +985,11 @@ private:
     bool IsSpecificNetwork();
 
     /**
+     * @Description check if IPv6 is blocklisted within 12h based on persisted timestamp
+     */
+    bool IsInIpv6Blocklist();
+
+    /**
      * @Description operation after dhcp
      */
     void HandlePostDhcpSetup();

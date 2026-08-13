@@ -17,6 +17,7 @@
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
 #include "wifi_config_center.h"
+#include "wifi_settings.h"
 #include "wifi_logger.h"
 #include "wifi_chr_adapter.h"
 #ifdef HDI_CHIP_INTERFACE_SUPPORT
@@ -107,10 +108,26 @@ ErrCode WifiTogglerManager::WifiToggled(int isOpen, int id)
         if (pSelfCureService != nullptr) {
             pSelfCureService->StopSelfCureWifi(SCE_WIFI_STATUS_LOST);
         }
+        ClearIpv6DisableTimestamp(id);
     }
 #endif // FEATURE_SELF_CURE_SUPPORT
     pWifiControllerMachine->SendMessage(CMD_WIFI_TOGGLED, isOpen, id);
     return WIFI_OPT_SUCCESS;
+}
+
+void WifiTogglerManager::ClearIpv6DisableTimestamp(int id)
+{
+    std::vector<WifiDeviceConfig> allConfigs;
+    if (WifiSettings::GetInstance().GetDeviceConfig(allConfigs, id) != 0 || allConfigs.empty()) {
+        return;
+    }
+    for (auto &cfg : allConfigs) {
+        if (cfg.ipv6DisableTimestamp != 0) {
+            cfg.ipv6DisableTimestamp = 0;
+            WifiSettings::GetInstance().AddDeviceConfig(cfg);
+        }
+    }
+    WIFI_LOGI("Cleared IPv6 disable timestamp on WiFi toggle off, instId:%{public}d", id);
 }
 
 void WifiTogglerManager::StartWifiToggledTimer()

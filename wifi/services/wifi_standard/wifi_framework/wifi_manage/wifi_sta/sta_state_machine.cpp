@@ -4917,11 +4917,11 @@ bool StaStateMachine::IsInIpv6Blocklist()
         return false;
     }
     if ((GetCurrentTimeSeconds() - savedConfig.ipv6DisableTimestamp) >= IPV6_DISABLE_DURATION_SECONDS) {
-        WIFI_LOGI("IPv6 blacklist expired (over 24h), timestamp=%{public}" PRId64 ", will re-enable IPv6",
+        WIFI_LOGI("IPv6 blocklist expired (over 24h), timestamp=%{public}" PRId64 ", will re-enable IPv6",
                   savedConfig.ipv6DisableTimestamp);
         return false;
     }
-    WIFI_LOGI("IPv6 blacklisted within 24h, timestamp=%{public}" PRId64 ", networkId=%{public}d",
+    WIFI_LOGI("IPv6 blocklisted within 24h, timestamp=%{public}" PRId64 ", networkId=%{public}d",
               savedConfig.ipv6DisableTimestamp,
               linkedInfo.networkId);
     return true;

@@ -216,6 +216,8 @@ static int SetWifiDeviceConfigExternal(WifiDeviceConfig &item, const std::string
         item.lastDetectTime = CheckDataLegal(tmpValue);
     } else if (key == "lastDisconnectTime") {
         item.lastDisconnectTime = CheckDataLegal(tmpValue);
+    } else if (key == "ipv6DisableTimestamp") {
+        item.ipv6DisableTimestamp = static_cast<int64_t>(CheckDataTolonglong(tmpValue));
     } else {
         return -1;
     }
@@ -646,6 +648,7 @@ static std::string OutPutWifiDeviceConfigExtral(WifiDeviceConfig &item)
     ss << "    " <<"isSecureWifi=" << item.isSecureWifi << std::endl;
     ss << "    " <<"lastDetectTime=" << item.lastDetectTime << std::endl;
     ss << "    " <<"lastDisconnectTime=" << item.lastDisconnectTime << std::endl;
+    ss << "    " <<"ipv6DisableTimestamp=" << item.ipv6DisableTimestamp << std::endl;
     return ss.str();
 }
 

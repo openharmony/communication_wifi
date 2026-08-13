@@ -148,6 +148,7 @@ if (defined(ohos_lite)) {
       "samgr:samgr_proxy",
       "ipc:ipc_single",
       "netmanager_base:net_stats_manager_if",
+      "bounds_checking_function:libsec_shared",
     ]
     part_name = "wifi"
     subsystem_name = "communication"

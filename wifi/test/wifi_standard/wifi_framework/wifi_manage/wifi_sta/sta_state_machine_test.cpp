@@ -25,6 +25,7 @@
 #include "define.h"
 #include "sta_state_machine.h"
 #include "sta_service.h"
+#include "wifi_common_util.h"
 #include "wifi_app_state_aware.h"
 #include "wifi_internal_msg.h"
 #include "wifi_msg.h"
@@ -3981,5 +3982,61 @@ HWTEST_F(InsecureNetworkInterceptionTest, StartConnectToNetwork_Wpa2, TestSize.L
         pStaStateMachine->StartConnectToNetwork(1, WPA2_BSSID, NETWORK_SELECTED_BY_USER));
 }
 #endif
+
+/**
+ * @Description Test IsInIpv6Blocklist when GetDeviceConfig fails (returns non-zero)
+ */
+HWTEST_F(StaStateMachineTest, IsInIpv6Blocklist_GetDeviceConfigFail, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    pStaStateMachine->m_instId = INSTID_WLAN0;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(Return(-1));
+    EXPECT_FALSE(pStaStateMachine->IsInIpv6Blocklist());
+}
+ 
+/**
+ * @Description Test IsInIpv6Blocklist when ipv6DisableTimestamp <= 0 (never disabled)
+ */
+HWTEST_F(StaStateMachineTest, IsInIpv6Blocklist_TimestampZero, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    pStaStateMachine->m_instId = INSTID_WLAN0;
+    WifiDeviceConfig config;
+    config.ipv6DisableTimestamp = 0;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_FALSE(pStaStateMachine->IsInIpv6Blocklist());
+}
+ 
+/**
+ * @Description Test IsInIpv6Blocklist when timestamp has expired (>= 24h)
+ */
+HWTEST_F(StaStateMachineTest, IsInIpv6Blocklist_TimestampExpired, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    pStaStateMachine->m_instId = INSTID_WLAN0;
+    WifiDeviceConfig config;
+    // Set timestamp to 25 hours ago (25 * 3600 = 90000 seconds)
+    config.ipv6DisableTimestamp = GetCurrentTimeSeconds() - 90000;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_FALSE(pStaStateMachine->IsInIpv6Blocklist());
+}
+ 
+/**
+ * @Description Test IsInIpv6Blocklist when timestamp is within 24h (should return true)
+ */
+HWTEST_F(StaStateMachineTest, IsInIpv6Blocklist_Within24h, TestSize.Level1)
+{
+    pStaStateMachine->linkedInfo.networkId = 1;
+    pStaStateMachine->m_instId = INSTID_WLAN0;
+    WifiDeviceConfig config;
+    // Set timestamp to 1 hour ago (within 24h window)
+    config.ipv6DisableTimestamp = GetCurrentTimeSeconds() - 3600;
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_TRUE(pStaStateMachine->IsInIpv6Blocklist());
+}
 } // namespace Wifi
 } // namespace OHOS

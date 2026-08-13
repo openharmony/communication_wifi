@@ -162,6 +162,7 @@ constexpr int32_t MAX_NO_INTERNET_CNT = 3;
 constexpr uint32_t PKT_DIR_RPT_CNT = 3;
 constexpr int32_t DETECT_COUNT = 2;
 constexpr int64_t ROAM_SCAN_MAX_AGE_US = 20 * 1000 * 1000;  // 20s
+constexpr int64_t IPV6_DISABLE_DURATION_SECONDS = 24 * 60 * 60; // 24 hours
 
 const std::map<int, int> wpa3FailreasonMap {
     {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
@@ -2123,7 +2124,7 @@ void StaStateMachine::GetIpState::GoInState()
             config.prohibitUseCacheIp = IsProhibitUseCacheIp();
         }
         config.isStaticIpv4 = isStaticIpv4;
-        config.bIpv6 = !isStaticIpv6 && !isIpv6Disabled;
+        config.bIpv6 = !isStaticIpv6 && !isIpv6Disabled && !pStaStateMachine->IsInIpv6Blocklist();
         config.bSpecificNetwork = pStaStateMachine->IsSpecificNetwork();
         if (strncpy_s(config.ifname, sizeof(config.ifname), ifname.c_str(), ifname.length()) != EOK) {
             break;
@@ -4904,6 +4905,26 @@ bool StaStateMachine::IsSpecificNetwork()
 #else
     return false;
 #endif
+}
+
+bool StaStateMachine::IsInIpv6Blocklist()
+{
+    WifiDeviceConfig savedConfig;
+    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, savedConfig, m_instId) != 0) {
+        return false;
+    }
+    if (savedConfig.ipv6DisableTimestamp <= 0) {
+        return false;
+    }
+    if ((GetCurrentTimeSeconds() - savedConfig.ipv6DisableTimestamp) >= IPV6_DISABLE_DURATION_SECONDS) {
+        WIFI_LOGI("IPv6 blacklist expired (over 24h), timestamp=%{public}" PRId64 ", will re-enable IPv6",
+                  savedConfig.ipv6DisableTimestamp);
+        return false;
+    }
+    WIFI_LOGI("IPv6 blacklisted within 24h, timestamp=%{public}" PRId64 ", networkId=%{public}d",
+              savedConfig.ipv6DisableTimestamp,
+              linkedInfo.networkId);
+    return true;
 }
 
 void StaStateMachine::HandlePostDhcpSetup()

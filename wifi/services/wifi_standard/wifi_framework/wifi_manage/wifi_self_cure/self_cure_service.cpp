@@ -17,6 +17,7 @@
 #include "self_cure_service_callback.h"
 #include "self_cure_utils.h"
 #include "wifi_config_center.h"
+#include "wifi_settings.h"
 #include "wifi_logger.h"
 #include "ip_qos_monitor.h"
 
@@ -318,6 +319,19 @@ bool SelfCureService::NotifyIpv6FailureDetected(bool isIpv4Good)
     if (!wlan0Disabled) {
         // Disable IPv6 to avoid potential connection issues
         ret = SelfCureUtils::GetInstance().DisableIpv6(0) || ret;
+    }
+    if (ret) {
+        // Record the IPv6 disable timestamp to WifiDeviceConfig for persistence
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, 0);
+        WifiDeviceConfig deviceConfig;
+        if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, deviceConfig, 0) == 0) {
+            deviceConfig.ipv6DisableTimestamp = GetCurrentTimeSeconds();
+            WIFI_LOGI("Record IPv6 disable timestamp=%{public}" PRId64 " for networkId=%{public}d",
+                      deviceConfig.ipv6DisableTimestamp,
+                      linkedInfo.networkId);
+            WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
+        }
     }
     return ret;
 }

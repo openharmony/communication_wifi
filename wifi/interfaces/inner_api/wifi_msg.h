@@ -910,6 +910,7 @@ struct WifiDeviceConfig {
     int ipv4OnlyNetState {-1};
     int dualStackNetState {-1};
     bool showNoInternetDialog { true };
+    int64_t ipv6DisableTimestamp { 0 };
 
     WifiDeviceConfig()
     {

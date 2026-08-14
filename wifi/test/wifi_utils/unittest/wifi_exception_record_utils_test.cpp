@@ -105,8 +105,7 @@ HWTEST_F(WifiExceptionRecordUtilsTest, AddException_DifferentReasonsNotMerged, T
 HWTEST_F(WifiExceptionRecordUtilsTest, AddException_PerGroupLimit10, TestSize.Level0)
 {
     WifiExceptionRecordUtils utils;
-    for (int i = 0; i < 15; i++)
-    {
+    for (int i = 0; i < 15; i++) {
         auto rec = MakeRecord("AP1", static_cast<ExceptionReason>(DHCP_REASON_BASE + i), 1000 + i, i, "x");
         utils.AddException(rec);
     }
@@ -119,10 +118,8 @@ HWTEST_F(WifiExceptionRecordUtilsTest, AddException_PerGroupLimit10, TestSize.Le
 HWTEST_F(WifiExceptionRecordUtilsTest, AddException_GlobalLimit50, TestSize.Level0)
 {
     WifiExceptionRecordUtils utils;
-    for (int g = 0; g < 6; g++)
-    {
-        for (int i = 0; i < MAX_FAULTS_PER_GROUP; i++)
-        {
+    for (int g = 0; g < 6; g++) {
+        for (int i = 0; i < MAX_FAULTS_PER_GROUP; i++) {
             std::string ssid = "AP" + std::to_string(g);
             auto rec = MakeRecord(ssid, static_cast<ExceptionReason>(DHCP_REASON_BASE + i),
                                   1000 + g * MAX_FAULTS_PER_GROUP + i, i, "x");

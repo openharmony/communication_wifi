@@ -116,7 +116,7 @@ static cJSON* BuildGroupsJson(const std::vector<ApGroup>& groups, WifiExceptionR
 static int WriteTmpAndRename(const std::string& jsonStr)
 {
     std::string tmpPath = std::string(FILE_PATH) + ".tmp";
-    int fd = open(tmpPath.c_str(), O_WRONLY|O_CREAT|O_TRUNC, FILE_PERMISSION_MODE);
+    int fd = open(tmpPath.c_str(), O_WRONLY | O_CREAT | O_TRUNC, FILE_PERMISSION_MODE);
     if (fd < 0)
     {
         WIFI_LOGE("WriteTmpAndRename: open tmp failed");
@@ -329,7 +329,6 @@ static ApGroup& FindOrAddGroup(std::vector<ApGroup>& groups, const std::string& 
     }
     groups.push_back(ApGroup{ssid, {}});
     return groups.back();
-
 }
 
 static void MergeOrAddFault(std::vector<MergedFault>& faults, const WifiExceptionRecord& record)
@@ -399,7 +398,7 @@ int32_t WifiExceptionRecordUtils::AddException(const WifiExceptionRecord& record
         WIFI_LOGE("AddException: path invalid");
         return -1;
     }
-    int fd = open(FILE_PATH, O_RDWR|O_CREAT, FILE_PERMISSION_MODE);
+    int fd = open(FILE_PATH, O_RDWR | O_CREAT, FILE_PERMISSION_MODE);
     if (fd < 0)
     {
         WIFI_LOGE("AddException: open failed");
@@ -434,7 +433,7 @@ int32_t WifiExceptionRecordUtils::ClearExceptions()
     {
         return -1;
     }
-    int fd = open(FILE_PATH, O_RDWR|O_CREAT, FILE_PERMISSION_MODE);
+    int fd = open(FILE_PATH, O_RDWR | O_CREAT, FILE_PERMISSION_MODE);
     if (fd < 0)
     {
         return -1;
@@ -451,11 +450,6 @@ int32_t WifiExceptionRecordUtils::ClearExceptions()
     close(fd);
     return 0;
 }
-
-
-
-
-
 
 }
 }

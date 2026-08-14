@@ -124,7 +124,8 @@ HWTEST_F(WifiExceptionRecordUtilsTest, AddException_GlobalLimit50, TestSize.Leve
         for (int i = 0; i < MAX_FAULTS_PER_GROUP; i++)
         {
             std::string ssid = "AP" + std::to_string(g);
-            auto rec = MakeRecord(ssid, static_cast<ExceptionReason>(DHCP_REASON_BASE + i), 1000 + g * MAX_FAULTS_PER_GROUP + i, i, "x");
+            auto rec = MakeRecord(ssid, static_cast<ExceptionReason>(DHCP_REASON_BASE + i),
+                                  1000 + g * MAX_FAULTS_PER_GROUP + i, i, "x");
             utils.AddException(rec);
         }
     }
@@ -169,20 +170,20 @@ HWTEST_F(WifiExceptionRecordUtilsTest, ReasonToString_AllReasons, TestSize.Level
     EXPECT_EQ(utils.ReasonToString(ExceptionReason::DHCP_GET_IP_TIMEOUT), "DHCP_GET_IP_TIMEOUT");
     EXPECT_EQ(utils.ReasonToString(ExceptionReason::DHCP_IPV4_RESULT_FAIL), "DHCP_IPV4_RESULT_FAIL");
     EXPECT_EQ(utils.ReasonToString(ExceptionReason::DHCP_IP_EXPIRED), "DHCP_IP_EXPIRED");
-
 }
+
 HWTEST_F(WifiExceptionRecordUtilsTest, CategoryToString_AllCategories, TestSize.Level0)
 {
     WifiExceptionRecordUtils utils;
     EXPECT_EQ(utils.CategoryToString(ExceptionReason::DHCP_CONNECTION_FAIL), "DHCP");
 }
+
 HWTEST_F(WifiExceptionRecordUtilsTest, FormatTime_BasicFormat, TestSize.Level0)
 {
     WifiExceptionRecordUtils utils;
     std::string result = utils.FormatTime(0);
     EXPECT_FALSE(result.empty());
     EXPECT_EQ(result.length(), 19u);
-
 }
 
 }

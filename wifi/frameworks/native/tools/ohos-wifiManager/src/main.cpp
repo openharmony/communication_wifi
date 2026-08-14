@@ -220,6 +220,31 @@ int CmdScanStart(int argc, char** argv)
     return 1;
 }
 
+static cJSON* BuildScanResultJson(const std::vector<OHOS::Wifi::WifiScanInfo>& scanInfoList)
+{
+    cJSON* data = cJSON_CreateObject();
+    cJSON* networks = cJSON_CreateArray();
+
+    for (const auto& info : scanInfoList)
+    {
+        cJSON* network = cJSON_CreateObject();
+
+        cJSON_AddStringToObject(network, "ssid",
+            info.ssid.empty() ? "<unknown>" : info.ssid.c_str());
+        cJSON_AddStringToObject(network, "bssid",
+            info.bssid.empty() ? "<unknown>" : info.bssid.c_str());
+        cJSON_AddNumberToObject(network, "securityType", static_cast<int>(info.securityType));
+        cJSON_AddNumberToObject(network, "rssi", info.rssi);
+        cJSON_AddNumberToObject(network, "frequency", info.frequency);
+
+        cJSON_AddItemToArray(networks, network);
+    }
+
+    cJSON_AddItemToObject(data, "networks", networks);
+    cJSON_AddNumberToObject(data, "count", static_cast<int>(scanInfoList.size()));
+    return data;
+}
+
 int CmdScanList(int argc, char** argv)
 {
     WIFI_LOGI("scan-list command started");
@@ -240,27 +265,7 @@ int CmdScanList(int argc, char** argv)
 
     if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS)
     {
-        cJSON* data = cJSON_CreateObject();
-        cJSON* networks = cJSON_CreateArray();
-
-        for (const auto& info : scanInfoList)
-        {
-            cJSON* network = cJSON_CreateObject();
-
-            cJSON_AddStringToObject(network, "ssid",
-                info.ssid.empty() ? "<unknown>" : info.ssid.c_str());
-            cJSON_AddStringToObject(network, "bssid",
-                info.bssid.empty() ? "<unknown>" : info.bssid.c_str());
-            cJSON_AddNumberToObject(network, "securityType", static_cast<int>(info.securityType));
-            cJSON_AddNumberToObject(network, "rssi", info.rssi);
-            cJSON_AddNumberToObject(network, "frequency", info.frequency);
-
-            cJSON_AddItemToArray(networks, network);
-        }
-
-        cJSON_AddItemToObject(data, "networks", networks);
-        cJSON_AddNumberToObject(data, "count", static_cast<int>(scanInfoList.size()));
-        OutputSuccessJson(data);
+        OutputSuccessJson(BuildScanResultJson(scanInfoList));
         return 0;
     }
 
@@ -360,7 +365,6 @@ int ExecuteWifiConnect(std::shared_ptr<OHOS::Wifi::WifiDevice>& wifiDevice,
     OutputErrorJson("WIFI_ERROR", errorMsg, suggestion);
     return 1;
 }
-
 
 int CmdStaConnect(int argc, char** argv)
 {

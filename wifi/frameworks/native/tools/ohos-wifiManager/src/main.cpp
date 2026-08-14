@@ -534,24 +534,24 @@ static cJSON* SerializeFaultForCli(const OHOS::Wifi::MergedFault& f, const std::
 }
 
 static void FilterGroups(std::vector<OHOS::Wifi::ApGroup>& groups, const std::string& ssid,
-                        const std::string& category, int reasonCode)
+                         const std::string& category, int reasonCode)
 {
     using namespace OHOS::Wifi;
     WifiExceptionRecordUtils utils;
     if (!ssid.empty()) {
         groups.erase(std::remove_if(groups.begin(), groups.end(),
-            [&ssid](const ApGroup& g){ return g.ssid != ssid; }), groups.end());
+            [&ssid](const ApGroup& g) { return g.ssid != ssid; }), groups.end());
     }
     for (auto& g : groups) {
         g.faults.erase(std::remove_if(g.faults.begin(), g.faults.end(),
-            [&utils, &category, reasonCode](const MergedFault& f){
+            [&utils, &category, reasonCode](const MergedFault& f) {
                 if (!category.empty() && utils.CategoryToString(f.reason) != category) return true;
                 if (reasonCode != NO_REASON_FILTER && static_cast<int>(f.reason) != reasonCode) return true;
                 return false;
             }), g.faults.end());
     }
     groups.erase(std::remove_if(groups.begin(), groups.end(),
-        [](const ApGroup& g){ return g.faults.empty();}), groups.end());
+        [](const ApGroup& g) { return g.faults.empty();}), groups.end());
 }
 
 static void ApplyPerApLimit(std::vector<OHOS::Wifi::ApGroup>& groups, int perAp)
@@ -561,7 +561,7 @@ static void ApplyPerApLimit(std::vector<OHOS::Wifi::ApGroup>& groups, int perAp)
     for (auto& g : groups) {
         if (static_cast<int>(g.faults.size()) > perAp) {
             std::sort(g.faults.begin(), g.faults.end(),
-                [](const MergedFault& a, const MergedFault& b){ return a.timestamp > b.timestamp; });
+                [](const MergedFault& a, const MergedFault& b) { return a.timestamp > b.timestamp; });
             g.faults.resize(perAp);
         }
     }

@@ -71,8 +71,11 @@ std::string WifiExceptionRecordUtils::FormatTime(int64_t ts)
     struct tm result = {};
     localtime_r(&t, &result);
     char buf[32] = {0};
-    strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &result);
-    return std::string(buf);
+    size_t len = strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &result);
+    if (len == 0) {
+    return std::string(); 
+}
+    return std::string(buf, len);
 }
 
 static void SerializeDetail(cJSON* obj, const DhcpFaultDetail& d)
@@ -314,7 +317,7 @@ static void TrimPerGroup(std::vector<ApGroup>& groups)
     for (auto& g : groups) {
         if (g.faults.size() > MAX_FAULTS_PER_GROUP) {
             std::sort(g.faults.begin(), g.faults.end(),
-                [](const MergedFault& a, const MergedFault& b){return a.timestamp > b.timestamp;});
+                [](const MergedFault& a, const MergedFault& b) {return a.timestamp > b.timestamp;});
             g.faults.resize(MAX_FAULTS_PER_GROUP);
         }
     }

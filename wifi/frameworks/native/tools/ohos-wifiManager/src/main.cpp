@@ -484,10 +484,14 @@ int CmdHelp(int argc, char** argv)
 }
 
 #ifdef WIFI_EXCEPTION_RECORD_ENABLE
+constexpr int NO_REASON_FILTER = -1;
+constexpr int NO_PER_AP_LIMIT = 0;
+
 static std::string GetSuggestion(OHOS::Wifi::ExceptionReason reason, const std::string& ssid)
 {
     using R = OHOS::Wifi::ExceptionReason;
-    switch (reason){
+    switch (reason)
+    {
         case R::DHCP_CONNECTION_FAIL:
             return "Failed to start IP request for " + ssid + ". Try toggling WiFi.";
         case R::DHCP_GET_IP_TIMEOUT:
@@ -504,7 +508,8 @@ static std::string GetSuggestion(OHOS::Wifi::ExceptionReason reason, const std::
 static void SerializeDetailForCli(cJSON* obj, const OHOS::Wifi::FaultDetail& detail)
 {
     using namespace OHOS::Wifi;
-    if(std::holds_alternative<DhcpFaultDetail>(detail)){
+    if(std::holds_alternative<DhcpFaultDetail>(detail))
+    {
         auto& d = std::get<DhcpFaultDetail>(detail);
         cJSON_AddNumberToObject(obj, "dhcpStatus", d.dhcpStatus);
         cJSON_AddStringToObject(obj, "extra", d.extra.c_str());
@@ -522,39 +527,43 @@ static cJSON* SerializeFaultForCli(const OHOS::Wifi::MergedFault& f, const std::
     cJSON_AddStringToObject(item, "reason", utils.ReasonToString(f.reason).c_str());
     cJSON_AddStringToObject(item, "category", utils.CategoryToString(f.reason).c_str());
     SerializeDetailForCli(item, f.detail);
-    cJSON_AddStringToObject(item,"suggestion", GetSuggestion(f.reason,ssid).c_str());
+    cJSON_AddStringToObject(item, "suggestion", GetSuggestion(f.reason, ssid).c_str());
     return item;
 }
 
-static void FilterGroups(std::vector<OHOS::Wifi::ApGroup>& groups,const std::string& ssid,
+static void FilterGroups(std::vector<OHOS::Wifi::ApGroup>& groups, const std::string& ssid,
                         const std::string& category, int reasonCode)
 {
     using namespace OHOS::Wifi;
     WifiExceptionRecordUtils utils;
-    if(!ssid.empty()){
-        groups.erase(std::remove_if(groups.begin(),groups.end(),
-            [&ssid](const ApGroup& g){ return g.ssid != ssid; }),groups.end());
+    if(!ssid.empty())
+    {
+        groups.erase(std::remove_if(groups.begin(), groups.end(),
+            [&ssid](const ApGroup& g){ return g.ssid != ssid; }), groups.end());
     }
-    for (auto& g : groups){
+    for (auto& g : groups)
+    {
         g.faults.erase(std::remove_if(g.faults.begin(), g.faults.end(),
             [&utils, &category, reasonCode](const MergedFault& f){
                 if(!category.empty() && utils.CategoryToString(f.reason) != category ) return true;
-                if(reasonCode!=-1 && static_cast<int>(f.reason) != reasonCode) return true;
+                if(reasonCode != NO_REASON_FILTER && static_cast<int>(f.reason) != reasonCode) return true;
                 return false;  
-            }),g.faults.end());
+            }), g.faults.end());
     }
-    groups.erase(std::remove_if(groups.begin(),groups.end(),
-        [](const ApGroup& g){ return g.faults.empty();}),groups.end());
+    groups.erase(std::remove_if(groups.begin(), groups.end(),
+        [](const ApGroup& g){ return g.faults.empty();}), groups.end());
 }
 
 static void ApplyPerApLimit(std::vector<OHOS::Wifi::ApGroup>& groups, int perAp)
 {
     using namespace OHOS::Wifi;
-    if (perAp<=0) return;
-    for (auto& g : groups){
-        if(static_cast<int>(g.faults.size()) > perAp){
-            std::sort(g.faults.begin(),g.faults.end(),
-                [](const MergedFault& a,const MergedFault& b){ return a.timestamp > b.timestamp; });
+    if (perAp <= NO_PER_AP_LIMIT) return;
+    for (auto& g : groups)
+    {
+        if(static_cast<int>(g.faults.size()) > perAp)
+        {
+            std::sort(g.faults.begin(), g.faults.end(),
+                [](const MergedFault& a, const MergedFault& b){ return a.timestamp > b.timestamp; });
             g.faults.resize(perAp);
         }
     }
@@ -565,8 +574,9 @@ static int DoClearExceptions()
     using namespace OHOS::Wifi;
     WifiExceptionRecordUtils utils;
     int32_t ret = utils.ClearExceptions();
-    if (ret !=0 ){
-        OutputErrorJson("CLEAR_ERROR","Failed to clear exception records","");
+    if (ret !=0 )
+    {
+        OutputErrorJson("CLEAR_ERROR", "Failed to clear exception records", "");
         return 1;
     }
     cJSON* data = cJSON_CreateObject();
@@ -583,24 +593,26 @@ static int DoListExceptions(const std::string& ssid, const std::string& category
     std::vector<ApGroup> groups;
     utils.GetAllExceptions(groups);
     FilterGroups(groups, ssid, category, reasonCode);
-    ApplyPerApLimit(groups,perAp);
+    ApplyPerApLimit(groups, perAp);
 
     cJSON* data = cJSON_CreateObject();
     cJSON* arr = cJSON_CreateArray();
     int count = 0;
-    for (const auto& g : groups){
+    for (const auto& g : groups)
+    {
         cJSON* grp = cJSON_CreateObject();
-        cJSON_AddStringToObject(grp,"ssid", g.ssid.c_str());
+        cJSON_AddStringToObject(grp, "ssid", g.ssid.c_str());
         cJSON* faults = cJSON_CreateArray();
-        for(const auto& f : g.faults){
-            cJSON_AddItemToArray(faults,SerializeFaultForCli(f,g.ssid));
+        for(const auto& f : g.faults)
+        {
+            cJSON_AddItemToArray(faults, SerializeFaultForCli(f, g.ssid));
             count++;
         }
-        cJSON_AddItemToObject(grp,"faults",faults);
-        cJSON_AddItemToArray(arr,grp);
+        cJSON_AddItemToObject(grp, "faults", faults);
+        cJSON_AddItemToArray(arr, grp);
     }
-    cJSON_AddItemToObject(data,"exceptions",arr);
-    cJSON_AddNumberToObject(data,"count",count);
+    cJSON_AddItemToObject(data, "exceptions", arr);
+    cJSON_AddNumberToObject(data, "count", count);
     OutputSuccessJson(data);
     return 0;
 }
@@ -610,9 +622,10 @@ int CmdWifiException(int argc, char** argv)
     bool doClear = false;
     std::string filterSsid;
     std::string filterCategory;
-    int filterReason = -1;
-    int perAp = 0;
-    for (int i = 0; i<argc;++i){
+    int filterReason = NO_REASON_FILTER;
+    int perAp = NO_PER_AP_LIMIT;
+    for (int i = 0; i<argc;++i)
+    {
         std::string arg = argv[i];
         if(arg == "--clear") doClear = true;
         else if(arg == "--ssid" && i+1<argc ) filterSsid = argv[++i];
@@ -621,7 +634,7 @@ int CmdWifiException(int argc, char** argv)
         else if(arg == "--per-ap" && i+1<argc ) perAp = atoi(argv[++i]);
     }
     if (doClear) return DoClearExceptions();
-    return DoListExceptions(filterSsid,filterCategory,filterReason,perAp);
+    return DoListExceptions(filterSsid, filterCategory, filterReason, perAp);
 }
 #endif
 
@@ -644,8 +657,8 @@ void InitCommands()
 int main(int argc, char** argv)
 {
     WIFI_LOGI("enter ohos-wifiManager");
-    int argcSubcommandNum = 2;
-    if (argc < argcSubcommandNum) {
+    constexpr int MIN_ARG_COUNT = 2;
+    if (argc < MIN_ARG_COUNT) {
         CmdHelp(argc, argv);
         return 1;
     }
@@ -660,8 +673,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    int cmdArgc = argc - argcSubcommandNum;
-    char** cmdArgv = argv + argcSubcommandNum;
+    int cmdArgc = argc - MIN_ARG_COUNT;
+    char** cmdArgv = argv + MIN_ARG_COUNT;
 
     WIFI_LOGI("Executing command: %{public}s", cmdName.c_str());
     int ret = it->second.handler(cmdArgc, cmdArgv);

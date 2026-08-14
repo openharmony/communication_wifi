@@ -48,8 +48,7 @@ static int CategoryOf(ExceptionReason r)
 
 std::string WifiExceptionRecordUtils::ReasonToString(ExceptionReason r)
 {
-    switch (r)
-    {
+    switch (r) {
         case ExceptionReason::DHCP_CONNECTION_FAIL:    return "DHCP_CONNECTION_FAIL";
         case ExceptionReason::DHCP_GET_IP_TIMEOUT:     return "DHCP_GET_IP_TIMEOUT";
         case ExceptionReason::DHCP_IPV4_RESULT_FAIL:   return "DHCP_IPV4_RESULT_FAIL";
@@ -60,8 +59,7 @@ std::string WifiExceptionRecordUtils::ReasonToString(ExceptionReason r)
 
 std::string WifiExceptionRecordUtils::CategoryToString(ExceptionReason r)
 {
-    switch (CategoryOf(r))
-    {
+    switch (CategoryOf(r)) {
         case 1: return "DHCP";
         default: return "UNKNOWN";
     }
@@ -164,8 +162,7 @@ static int32_t SaveToFile(const std::vector<ApGroup>& groups)
 
 static FaultDetail ParseDetail(cJSON* faultNode, ExceptionReason reason)
 {
-    switch (CategoryOf(reason))
-    {
+    switch (CategoryOf(reason)) {
         case 1:
         {
             cJSON* ds = cJSON_GetObjectItem(faultNode, "dhcpStatus");
@@ -201,8 +198,7 @@ static void ParseFaults(cJSON* faultsArr, std::vector<MergedFault>& faults)
         return;
     }
     int fsize = cJSON_GetArraySize(faultsArr);
-    for (int j = 0; j < fsize; j++)
-    {
+    for (int j = 0; j < fsize; j++) {
         cJSON* faultNode = cJSON_GetArrayItem(faultsArr, j);
         if (faultNode)
         {
@@ -218,8 +214,7 @@ static void ParseGroups(cJSON* groupsArr, std::vector<ApGroup>& groups)
         return;
     }
     int size = cJSON_GetArraySize(groupsArr);
-    for (int i = 0; i < size; i++)
-    {
+    for (int i = 0; i < size; i++) {
         cJSON* grpNode = cJSON_GetArrayItem(groupsArr, i);
         if (!grpNode)
         {
@@ -320,8 +315,7 @@ static bool IsPathValid(const std::string& path)
 }
 static ApGroup& FindOrAddGroup(std::vector<ApGroup>& groups, const std::string& ssid)
 {
-    for (auto& g: groups)
-    {
+    for (auto& g: groups) {
         if (g.ssid == ssid)
         {
             return g;
@@ -333,8 +327,7 @@ static ApGroup& FindOrAddGroup(std::vector<ApGroup>& groups, const std::string& 
 
 static void MergeOrAddFault(std::vector<MergedFault>& faults, const WifiExceptionRecord& record)
 {
-    for (auto& f : faults)
-    {
+    for (auto& f : faults) {
         if (f.reason == record.reason && f.detail == record.detail)
         {
             f.timestamp = record.timestamp;
@@ -346,8 +339,7 @@ static void MergeOrAddFault(std::vector<MergedFault>& faults, const WifiExceptio
 
 static void TrimPerGroup(std::vector<ApGroup>& groups)
 {
-    for (auto& g : groups)
-    {
+    for (auto& g : groups) {
         if (g.faults.size() > MAX_FAULTS_PER_GROUP)
         {
             std::sort(g.faults.begin(), g.faults.end(),
@@ -360,27 +352,22 @@ static void TrimGlobal(std::vector<ApGroup>& groups)
 {
     int total = 0;
     for (const auto& g : groups) total += static_cast<int>(g.faults.size());
-    if (total <= MAX_TOTAL_RECORDS)
-    {
+    if (total <= MAX_TOTAL_RECORDS){
         return;
     }
     struct Item { int gIdx; int fIdx; int64_t ts; };
     std::vector<Item> items;
-    for (int gi = 0; gi < static_cast<int>(groups.size()); gi++)
-    {
-        for (int fi = 0; fi < static_cast<int>(groups[gi].faults.size()); fi++)
-        {
+    for (int gi = 0; gi < static_cast<int>(groups.size()); gi++) {
+        for (int fi = 0; fi < static_cast<int>(groups[gi].faults.size()); fi++) {
             items.push_back({gi, fi, groups[gi].faults[fi].timestamp});
         }
     }
     std::sort(items.begin(), items.end(), [](const Item& a, const Item& b) { return a.ts > b.ts;});
     std::vector<std::vector<MergedFault>> kept(groups.size());
-    for (int i = 0; i < MAX_TOTAL_RECORDS && i < static_cast<int>(items.size()); i++)
-    {
+    for (int i = 0; i < MAX_TOTAL_RECORDS && i < static_cast<int>(items.size()); i++) {
         kept[items[i].gIdx].push_back(groups[items[i].gIdx].faults[items[i].fIdx]);
     }
-    for (int gi = 0; gi < static_cast<int>(groups.size()); gi++)
-    {
+    for (int gi = 0; gi < static_cast<int>(groups.size()); gi++) {
         groups[gi].faults = std::move(kept[gi]);
     }
 }

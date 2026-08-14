@@ -225,8 +225,7 @@ static cJSON* BuildScanResultJson(const std::vector<OHOS::Wifi::WifiScanInfo>& s
     cJSON* data = cJSON_CreateObject();
     cJSON* networks = cJSON_CreateArray();
 
-    for (const auto& info : scanInfoList)
-    {
+    for (const auto& info : scanInfoList) {
         cJSON* network = cJSON_CreateObject();
 
         cJSON_AddStringToObject(network, "ssid",
@@ -322,8 +321,7 @@ void SetKeyMgmtBySecurityType(OHOS::Wifi::WifiSecurity securityType, std::string
 
 void ParseConnectArgs(int argc, char** argv, OHOS::Wifi::WifiDeviceConfig& tmpConfig)
 {
-    for (int i = 0; i < argc - 1; ++i)
-    {
+    for (int i = 0; i < argc - 1; ++i) {
         std::string arg = argv[i];
         if (arg == "--ssid")
         {
@@ -396,8 +394,7 @@ int CmdStaConnect(int argc, char** argv)
         return 1;
     }
     bool isFound = false;
-    for (const auto& scanInfo : scanInfoList)
-    {
+    for (const auto& scanInfo : scanInfoList) {
         if (scanInfo.ssid == tmpConfig.ssid)
         {
             SetKeyMgmtBySecurityType(scanInfo.securityType, tmpConfig.keyMgmt);
@@ -507,8 +504,7 @@ int CmdHelp(int argc, char** argv)
     cJSON* data = cJSON_CreateObject();
     cJSON* cmdArr = cJSON_CreateArray();
 
-    for (const auto& pair : g_commands)
-    {
+    for (const auto& pair : g_commands) {
         cJSON* item = cJSON_CreateObject();
         cJSON_AddStringToObject(item, "cmd", pair.first.c_str());
         cJSON_AddStringToObject(item, "desc", pair.second.description);
@@ -526,8 +522,7 @@ constexpr int NO_PER_AP_LIMIT = 0;
 static std::string GetSuggestion(OHOS::Wifi::ExceptionReason reason, const std::string& ssid)
 {
     using R = OHOS::Wifi::ExceptionReason;
-    switch (reason)
-    {
+    switch (reason) {
         case R::DHCP_CONNECTION_FAIL:
             return "Failed to start IP request for " + ssid + ". Try toggling WiFi.";
         case R::DHCP_GET_IP_TIMEOUT:
@@ -577,8 +572,7 @@ static void FilterGroups(std::vector<OHOS::Wifi::ApGroup>& groups, const std::st
         groups.erase(std::remove_if(groups.begin(), groups.end(),
             [&ssid](const ApGroup& g){ return g.ssid != ssid; }), groups.end());
     }
-    for (auto& g : groups)
-    {
+    for (auto& g : groups) {
         g.faults.erase(std::remove_if(g.faults.begin(), g.faults.end(),
             [&utils, &category, reasonCode](const MergedFault& f){
                 if (!category.empty() && utils.CategoryToString(f.reason) != category) return true;
@@ -594,8 +588,7 @@ static void ApplyPerApLimit(std::vector<OHOS::Wifi::ApGroup>& groups, int perAp)
 {
     using namespace OHOS::Wifi;
     if (perAp <= NO_PER_AP_LIMIT) return;
-    for (auto& g : groups)
-    {
+    for (auto& g : groups) {
         if (static_cast<int>(g.faults.size()) > perAp)
         {
             std::sort(g.faults.begin(), g.faults.end(),
@@ -634,13 +627,11 @@ static int DoListExceptions(const std::string& ssid, const std::string& category
     cJSON* data = cJSON_CreateObject();
     cJSON* arr = cJSON_CreateArray();
     int count = 0;
-    for (const auto& g : groups)
-    {
+    for (const auto& g : groups) {
         cJSON* grp = cJSON_CreateObject();
         cJSON_AddStringToObject(grp, "ssid", g.ssid.c_str());
         cJSON* faults = cJSON_CreateArray();
-        for (const auto& f : g.faults)
-        {
+        for (const auto& f : g.faults) {
             cJSON_AddItemToArray(faults, SerializeFaultForCli(f, g.ssid));
             count++;
         }
@@ -660,8 +651,7 @@ int CmdWifiException(int argc, char** argv)
     std::string filterCategory;
     int filterReason = NO_REASON_FILTER;
     int perAp = NO_PER_AP_LIMIT;
-    for (int i = 0; i < argc; ++i)
-    {
+    for (int i = 0; i < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "--clear") doClear = true;
         else if (arg == "--ssid" && i + 1 < argc) filterSsid = argv[++i];

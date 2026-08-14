@@ -489,13 +489,13 @@ static std::string GetSuggestion(OHOS::Wifi::ExceptionReason reason, const std::
     using R = OHOS::Wifi::ExceptionReason;
     switch (reason){
         case R::DHCP_CONNECTION_FAIL:
-            return "Failed to start IP request for" + ssid + ". Try toggling WiFi.";
+            return "Failed to start IP request for " + ssid + ". Try toggling WiFi.";
         case R::DHCP_GET_IP_TIMEOUT:
-            return "IP request to" + ssid + "timed out. Try restarting the router.";
+            return "IP request to " + ssid + " timed out. Try restarting the router.";
         case R::DHCP_IPV4_RESULT_FAIL:
-            return "IP allocation failed for" + ssid +". Possible IP conflict.";
+            return "IP allocation failed for " + ssid +". Possible IP conflict.";
         case R::DHCP_IP_EXPIRED:
-            return "IP lease for" + ssid + "expired. Reconnect to obtain a new IP.";
+            return "IP lease for " + ssid + " expired. Reconnect to obtain a new IP.";
         default:
             return "WiFi connection anomaly. Try again.";
     }
@@ -593,7 +593,7 @@ static int DoListExceptions(const std::string& ssid, const std::string& category
         cJSON_AddStringToObject(grp,"ssid", g.ssid.c_str());
         cJSON* faults = cJSON_CreateArray();
         for(const auto& f : g.faults){
-            cJSON_AddItemToArray(fault,SerializeFaultForCli(f,g.ssid));
+            cJSON_AddItemToArray(faults,SerializeFaultForCli(f,g.ssid));
             count++;
         }
         cJSON_AddItemToObject(grp,"faults",faults);
@@ -605,7 +605,7 @@ static int DoListExceptions(const std::string& ssid, const std::string& category
     return 0;
 }
 
-int CmdWifiException(int argc.char** argv)
+int CmdWifiException(int argc, char** argv)
 {
     bool doClear = false;
     std::string filterSsid;
@@ -621,7 +621,7 @@ int CmdWifiException(int argc.char** argv)
         else if(arg == "--per-ap" && i+1<argc ) perAp = atoi(argv[++i]);
     }
     if (doClear) return DoClearExceptions();
-    return DoListExceptions(filterSsid,filterCategory,filterReason,perAp);
+    return DoListExceptions(filterSsid,filterCategory,filterReason,perAp)；
 }
 #endif
 

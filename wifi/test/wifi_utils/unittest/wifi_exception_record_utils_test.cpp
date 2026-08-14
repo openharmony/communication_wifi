@@ -48,8 +48,8 @@ public:
         rec.detail = DhcpFaultDetail{dhcpStatus, extra};
         return rec;
     }
-}
-HWTEST_F(WifiExceptionRecordUtilsTest,AddException_SingleDhcpFault, TestSize.Level10)
+};
+HWTEST_F(WifiExceptionRecordUtilsTest,AddException_SingleDhcpFault, TestSize.Level0)
 {
     WifiExceptionRecordUtils utils;
     auto rec = MakeRecord("TestAP",ExceptionReason::DHCP_CONNECTION_FAIL, 1000,-1,"fail");
@@ -121,7 +121,6 @@ HWTEST_F(WifiExceptionRecordUtilsTest,GetAllExceptions_EmptyFile, TestSize.Level
 {
     WifiExceptionRecordUtils utils;
     std::vector<ApGroup>groups;
-    utils.GetAllExceptions(groups);
     EXPECT_EQ(utils.GetAllExceptions(groups), 0);
     EXPECT_TRUE(groups.empty());
 }
@@ -130,7 +129,7 @@ HWTEST_F(WifiExceptionRecordUtilsTest,GetAllExceptions_MultipleGroups, TestSize.
 {
     WifiExceptionRecordUtils utils;
     utils.AddException(MakeRecord("AP_A",ExceptionReason::DHCP_CONNECTION_FAIL, 1000,-1,"a"));
-    utils.AddException(MakeRecord("AP_B",ExceptionReason::DHCP_GRT_IP_TIMEOUT, 2000,-1,"b"));
+    utils.AddException(MakeRecord("AP_B",ExceptionReason::DHCP_GET_IP_TIMEOUT, 2000,-1,"b"));
     std::vector<ApGroup> groups;
     utils.GetAllExceptions(groups);
     EXPECT_EQ(groups.size(),2u);

@@ -21,6 +21,7 @@
 #include <cstring>
 #include <climits>
 #include <algorithm>
+#include <fstream>
 #include <sstream>
 #include "wifi_logger.h"
 #include "cJSON.h"
@@ -136,7 +137,7 @@ static int32_t SaveToFile(const std::vector<ApGroup>& groups)
     cJSON_AddNumberToObject(root,"version",FILE_VERSION);
     cJSON_AddNumberToObject(root,"maxRecords",50);
     cJSON_AddItemToObject(root,"groups",BuildGroupsJson(groups,utils));
-    char* jsonStr = cJSON_PrintUniformatted(root);
+    char* jsonStr = cJSON_PrintUnformatted(root);
     cJSON_Delete(root);
     if(jsonStr == nullptr){
         return -1;
@@ -163,7 +164,7 @@ static FaultDetail ParseDetail(cJSON* faultNode, ExceptionReason reason)
 
 static MergedFault ParseFault(cJSON* faultNode)
 {
-    MergedFault fault = {}
+    MergedFault fault = {};
     cJSON* tsNode = cJSON_GetObjectItem(faultNode, "timestamp");
     if(tsNode && cJSON_IsNumber(tsNode)){
         fault.timestamp = static_cast<int64_t>(tsNode->valuedouble);
@@ -236,7 +237,7 @@ static int32_t LoadFromFile(std::vector<ApGroup>& groups)
         return 0;
     }
     cJSON* groupsArr = cJSON_GetObjectItem(root,"groups");
-    ParseGroups(groupsArr,groups)；
+    ParseGroups(groupsArr,groups);
     cJSON_Delete(root);
     return 0;
 }
@@ -346,18 +347,18 @@ static void EnforceLimits(std::vector<ApGroup>& groups)
 int32_t WifiExceptionRecordUtils::AddException(const WifiExceptionRecord& record)
 {
     if(!IsPathValid(FILE_PATH)){
-        WIFI_LOGE("AddException:path invalid");
+        WIFI_LOGE("AddException: path invalid");
         return -1;
     }
     int fd = open(FILE_PATH,O_RDWR|O_CREAT, 0600);
     if(fd<0){
-        WIFI_LOGE("AddException:open failed");
+        WIFI_LOGE("AddException: open failed");
         return -1;
     }
     fchmod(fd,0600);
     if(AcquireLock(fd,true)<0){
         close(fd);
-        WIFI_LOGE("AddException:lock failed,drop record");
+        WIFI_LOGE("AddException: lock failed,drop record");
         return -1;
     }
     std::vector<ApGroup> groups;

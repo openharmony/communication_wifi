@@ -554,7 +554,7 @@ static void ApplyPerApLimit(std::vector<OHOS::Wifi::ApGroup>& groups, int perAp)
     for (auto& g : groups){
         if(static_cast<int>(g.faults.size()) > perAp){
             std::sort(g.faults.begin(),g.faults.end(),
-                [](const MergedFault& a,const Merged Fault& b){ return a.timestamp > b.timestamp; });
+                [](const MergedFault& a,const MergedFault& b){ return a.timestamp > b.timestamp; });
             g.faults.resize(perAp);
         }
     }

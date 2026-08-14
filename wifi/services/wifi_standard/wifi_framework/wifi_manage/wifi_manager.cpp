@@ -66,7 +66,7 @@ int WifiManager::Init()
 #ifdef WIFI_EXCEPTION_RECORD_ENABLE
     WifiExceptionRecordUtils exceptionRecordUtils;
     exceptionRecordUtils.ClearExceptions();
-    WIFI_LOGI("WifiManager::Init:cleared WiFi exception records on startup")
+    WIFI_LOGI("WifiManager::Init:cleared WiFi exception records on startup");
 #endif
 #ifndef OHOS_ARCH_LITE
     WifiWatchDogUtils::GetInstance(); // init watchdog to set ffrt callback timeout before ffrt thread created

@@ -42,7 +42,6 @@ void ConvertBackupCfgToDeviceCfg(const WifiBackupConfig &backupCfg, WifiDeviceCo
     config.wifiPrivacySetting = backupCfg.wifiPrivacySetting;
     config.isAllowAutoConnect = backupCfg.isAllowAutoConnect;
     config.lastDisconnectTime = backupCfg.lastDisconnectTime;
-    config.ipv6DisableTimestamp = backupCfg.ipv6DisableTimestamp;
 }
 
 void ConvertDeviceCfgToBackupCfg(const WifiDeviceConfig &config, WifiBackupConfig &backupCfg)
@@ -70,7 +69,6 @@ void ConvertDeviceCfgToBackupCfg(const WifiDeviceConfig &config, WifiBackupConfi
     backupCfg.wifiPrivacySetting = config.wifiPrivacySetting;
     backupCfg.isAllowAutoConnect = config.isAllowAutoConnect;
     backupCfg.lastDisconnectTime = config.lastDisconnectTime;
-    backupCfg.ipv6DisableTimestamp = config.ipv6DisableTimestamp;
 }
 }  // namespace Wifi
 }  // namespace OHOS

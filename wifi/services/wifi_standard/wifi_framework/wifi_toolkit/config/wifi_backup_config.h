@@ -44,7 +44,6 @@ struct WifiBackupConfig {
     bool isAllowAutoConnect;
     time_t lastDisconnectTime;
     bool wifiAutoEnable;
-    int64_t ipv6DisableTimestamp { 0 };
     WifiBackupConfig()
     {
         instanceId = 0;

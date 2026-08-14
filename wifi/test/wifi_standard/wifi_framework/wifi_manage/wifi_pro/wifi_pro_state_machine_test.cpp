@@ -1076,5 +1076,19 @@ HWTEST_F(WifiProStateMachineTest, HandleScanResultInHasNetTest01, TestSize.Level
     wifiHasNetState_->HandleScanResultInHasNet(nullptr);
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
+
+HWTEST_F(WifiProStateMachineTest, HandleScanResultInHasNetInnerTest01, TestSize.Level1)
+{
+    std::vector<InterScanInfo> scanInfos;
+    InterScanInfo scanInfo1;
+    scanInfo1.bssid = "AA:BB:CC:DD:EE:0B";
+    scanInfo1.ssid = "test";
+    scanInfo1.rssi = -75;
+    scanInfos.push_back(scanInfo1);
+    pWifiProStateMachine_->wifiSwitchReason_ = WIFI_SWITCH_REASON_APP_QOE_SLOW;
+    wifiHasNetState_->qoeSwitch_  = true;
+    wifiHasNetState_->HandleScanResultInHasNetInner(scanInfos);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
 } // namespace Wifi
 } // namespace OHOS

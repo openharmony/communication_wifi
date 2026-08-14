@@ -31,7 +31,7 @@
 #include "wifi_logger.h"
 #include "securec.h"
 #ifdef WIFI_EXCEPTION_RECORD_ENABLE
-#include "wifi_exception_record_utlis.h"
+#include "wifi_exception_record_utils.h"
 #endif
 namespace {
 DEFINE_WIFILOG_LABEL("WifiCli");
@@ -489,7 +489,7 @@ static std::string GetSuggestion(OHOS::Wifi::ExceptionReason reason, const std::
     using R = OHOS::Wifi::ExceptionReason;
     switch (reason){
         case R::DHCP_CONNECTION_FAIL:
-            return "Failed to start IP request for" + ssid + ". Try toggling Wifi.";
+            return "Failed to start IP request for" + ssid + ". Try toggling WiFi.";
         case R::DHCP_GET_IP_TIMEOUT:
             return "IP request to" + ssid + "timed out. Try restarting the router.";
         case R::DHCP_IPV4_RESULT_FAIL:
@@ -497,14 +497,14 @@ static std::string GetSuggestion(OHOS::Wifi::ExceptionReason reason, const std::
         case R::DHCP_IP_EXPIRED:
             return "IP lease for" + ssid + "expired. Reconnect to obtain a new IP.";
         default:
-            return "Wifi connection anomaly. Try again.";
+            return "WiFi connection anomaly. Try again.";
     }
 }
 
 static void SerializeDetailForCli(cJSON* obj, const OHOS::Wifi::FaultDetail& detail)
 {
     using namespace OHOS::Wifi;
-    if(std::hold_alternative<DhcpFaultDetail>(detail)){
+    if(std::holds_alternative<DhcpFaultDetail>(detail)){
         auto& d = std::get<DhcpFaultDetail>(detail);
         cJSON_AddNumberToObject(obj, "dhcpStatus", d.dhcpStatus);
         cJSON_AddStringToObject(obj, "extra", d.extra.c_str());
@@ -521,7 +521,7 @@ static cJSON* SerializeFaultForCli(const OHOS::Wifi::MergedFault& f, const std::
     cJSON_AddNumberToObject(item, "reasonCode", static_cast<int>(f.reason));
     cJSON_AddStringToObject(item, "reason", utils.ReasonToString(f.reason).c_str());
     cJSON_AddStringToObject(item, "category", utils.CategoryToString(f.reason).c_str());
-    SerializeDetailFoCli(item, f.detail);
+    SerializeDetailForCli(item, f.detail);
     cJSON_AddStringToObject(item,"suggestion", GetSuggestion(f.reason,ssid).c_str());
     return item;
 }
@@ -544,7 +544,7 @@ static void FilterGroups(std::vector<OHOS::Wifi::ApGroup>& groups,const std::str
             }),g.faults.end());
     }
     groups.erase(std::remove_if(groups.begin(),groups.end(),
-        [](const ApGroup& g){ return g.fault.empty();}),groups.end());
+        [](const ApGroup& g){ return g.faults.empty();}),groups.end());
 }
 
 static void ApplyPerApLimit(std::vector<OHOS::Wifi::ApGroup>& groups, int perAp)
@@ -552,10 +552,10 @@ static void ApplyPerApLimit(std::vector<OHOS::Wifi::ApGroup>& groups, int perAp)
     using namespace OHOS::Wifi;
     if (perAp<=0) return;
     for (auto& g : groups){
-        if(static_cast<int>(g.fault.size()) > perAp){
+        if(static_cast<int>(g.faults.size()) > perAp){
             std::sort(g.faults.begin(),g.faults.end(),
                 [](const MergedFault& a,const Merged Fault& b){ return a.timestamp > b.timestamp; });
-            g.fault.resize(perAp);
+            g.faults.resize(perAp);
         }
     }
 }
@@ -575,29 +575,29 @@ static int DoClearExceptions()
     return 0;
 }
 
-static int DoListExceptions(const std::string& ssid, const std::string& category, int reasonCode, int perAp)
+static int DoListExceptions(const std::string& ssid, const std::string& category, 
+                            int reasonCode, int perAp)
 {
     using namespace OHOS::Wifi;
-    WifiExceptionRecodeUtils utils;
+    WifiExceptionRecordUtils utils;
     std::vector<ApGroup> groups;
-    utils.GetAllEXceptions(groups);
+    utils.GetAllExceptions(groups);
     FilterGroups(groups, ssid, category, reasonCode);
     ApplyPerApLimit(groups,perAp);
 
-    cJSON* data = cJSON_CreateObject()
-    cJSON* arr = cJSON_CreateArray()
-    int count = 0
-    for (const auto& g : groups)
-    {
+    cJSON* data = cJSON_CreateObject();
+    cJSON* arr = cJSON_CreateArray();
+    int count = 0;
+    for (const auto& g : groups){
         cJSON* grp = cJSON_CreateObject();
         cJSON_AddStringToObject(grp,"ssid", g.ssid.c_str());
         cJSON* faults = cJSON_CreateArray();
         for(const auto& f : g.faults){
-            cJSON_AddItemToArray(fault,SerializeFaultToCli(f,g.ssid));
+            cJSON_AddItemToArray(fault,SerializeFaultForCli(f,g.ssid));
             count++;
         }
         cJSON_AddItemToObject(grp,"faults",faults);
-        cJSON_AddItemToObject(arr,grp);
+        cJSON_AddItemToArray(arr,grp);
     }
     cJSON_AddItemToObject(data,"exceptions",arr);
     cJSON_AddNumberToObject(data,"count",count);
@@ -610,9 +610,9 @@ int CmdWifiException(int argc.char** argv)
     bool doClear = false;
     std::string filterSsid;
     std::string filterCategory;
-    int filterReason = -1
-    int perAr = 0;
-    for (int i = 1; i<argc;++i){
+    int filterReason = -1;
+    int perAp = 0;
+    for (int i = 0; i<argc;++i){
         std::string arg = argv[i];
         if(arg == "--clear") doClear = true;
         else if(arg == "--ssid" && i+1<argc ) filterSsid = argv[++i];
@@ -621,7 +621,7 @@ int CmdWifiException(int argc.char** argv)
         else if(arg == "--per-ap" && i+1<argc ) perAp = atoi(argv[++i]);
     }
     if (doClear) return DoClearExceptions();
-    return DoListExceptions(filterSsid,filterCategory,filterReason，perAp)；
+    return DoListExceptions(filterSsid,filterCategory,filterReason,perAp);
 }
 #endif
 

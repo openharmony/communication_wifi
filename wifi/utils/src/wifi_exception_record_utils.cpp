@@ -1,3 +1,17 @@
+/*
+ * Copyright (C) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #include "wifi_exception_record_utils.h"
 #include <fcntl.h>
 #include <unistd.h>
@@ -7,12 +21,12 @@
 #include <cstring>
 #include <climits>
 #include <algorithm>
-#include <fstream>
+#include <sstream>
 #include "wifi_logger.h"
 #include "cJSON.h"
 
 namespace OHOS{
-namespace WiFi{
+namespace Wifi{
 
 DEFINE_WIFILOG_LABEL("WifiExceptionRecordUtils");
 
@@ -39,7 +53,7 @@ std::string WifiExceptionRecordUtils::ReasonToString(ExceptionReason r)
 std::string WifiExceptionRecordUtils::CategoryToString(ExceptionReason r)
 {
     switch(CategoryOf(r)){
-        case 1: return "DCHP";
+        case 1: return "DHCP";
         default:return "UNKNOWN";
     }
 }
@@ -50,7 +64,7 @@ std::string WifiExceptionRecordUtils::FormatTime(int64_t ts)
     struct tm result = {};
     localtime_r(&t,&result);
     char buf[32] = {0};
-    strftime(buf,sizeof(buf),"%Y-%m-%d %H:%M:%S", &result)
+    strftime(buf,sizeof(buf),"%Y-%m-%d %H:%M:%S", &result);
     return std::string(buf);
 }
 
@@ -63,18 +77,18 @@ static void SerializeDetail(cJSON* obj,const DhcpFaultDetail& d)
 static cJSON* SerializeFault(const MergedFault& f,WifiExceptionRecordUtils& utils)
 {
     cJSON* item = cJSON_CreateObject();
-    cJSON_AddNumberToObject(item, "timestamp", static_cast<double>(f.timestamp))
-    cJSON_AddStringToObject(item, "timeReadable", utils.FormatTime(f.timestamp).c_str())
+    cJSON_AddNumberToObject(item, "timestamp", static_cast<double>(f.timestamp));
+    cJSON_AddStringToObject(item, "timeReadable", utils.FormatTime(f.timestamp).c_str());
     cJSON_AddNumberToObject(item, "reasonCode", static_cast<int>(f.reason));
     cJSON_AddStringToObject(item, "reason", utils.ReasonToString(f.reason).c_str());
-    cJSON_AddStringToObject(item, "category", utils.CategoryToString().c_str());
+    cJSON_AddStringToObject(item, "category", utils.CategoryToString(f.reason).c_str());
     std::visit([item](const auto& d){SerializeDetail(item,d);},f.detail);
     return item;
 }
 
 static cJSON* BuildGroupsJson(const std::vector<ApGroup>& groups, WifiExceptionRecordUtils& utils)
 {
-    cJSON& arr = cJSON_CreateArray();
+    cJSON* arr = cJSON_CreateArray();
     for (const auto& g : groups){
         cJSON* grp = cJSON_CreateObject();
         cJSON_AddStringToObject(grp,"ssid",g.ssid.c_str());
@@ -83,7 +97,7 @@ static cJSON* BuildGroupsJson(const std::vector<ApGroup>& groups, WifiExceptionR
             cJSON_AddItemToArray(faults,SerializeFault(f,utils));
         }
         cJSON_AddItemToObject(grp, "faults", faults);
-        cJSON_AddItemToArray(arr,grp)
+        cJSON_AddItemToArray(arr,grp);
     }
     return arr;
 }
@@ -93,18 +107,18 @@ static int WriteTmpAndRename(const std::string& jsonStr)
     std::string tmpPath = std::string(FILE_PATH) + ".tmp";
     int fd = open(tmpPath.c_str(), O_WRONLY|O_CREAT|O_TRUNC,0600);
     if(fd<0){
-        WIFI_LOGE("WriteTmpAndRename:open tmp failed");
+        WIFI_LOGE("WriteTmpAndRename: open tmp failed");
         return -1;
     }
     ssize_t written = write(fd,jsonStr.c_str(),jsonStr.size());
     fsync(fd);
     close(fd);
     if(written<0){
-        WIFI_LOGE("WriteTmpAndRename:written failed");
+        WIFI_LOGE("WriteTmpAndRename: write failed");
         return -1;
     }
     if(rename(tmpPath.c_str(),FILE_PATH) !=0){
-        WIFI_LOGE("WriteTmpAndRename:rename failed");
+        WIFI_LOGE("WriteTmpAndRename: rename failed");
         return -1;
     }
     int dirFd = open("/data/service/el1/public/wifi",O_RDONLY);
@@ -120,7 +134,7 @@ static int32_t SaveToFile(const std::vector<ApGroup>& groups)
     WifiExceptionRecordUtils utils;
     cJSON* root = cJSON_CreateObject();
     cJSON_AddNumberToObject(root,"version",FILE_VERSION);
-    cJSON_AddNumberToObject(root,"maxRecords",50)
+    cJSON_AddNumberToObject(root,"maxRecords",50);
     cJSON_AddItemToObject(root,"groups",BuildGroupsJson(groups,utils));
     char* jsonStr = cJSON_PrintUniformatted(root);
     cJSON_Delete(root);
@@ -140,8 +154,7 @@ static FaultDetail ParseDetail(cJSON* faultNode, ExceptionReason reason)
             cJSON* ex = cJSON_GetObjectItem(faultNode,"extra");
             return DhcpFaultDetail{
                 ds && cJSON_IsNumber(ds) ? ds ->valueint :-1,
-                ds && cJSON_IsString(ex) ? ex ->valuestring :""
-            };
+                ex && cJSON_IsString(ex) ? ex ->valuestring :""};
         }
         default:
             return DhcpFaultDetail{-1, "unknown reason"};
@@ -150,7 +163,7 @@ static FaultDetail ParseDetail(cJSON* faultNode, ExceptionReason reason)
 
 static MergedFault ParseFault(cJSON* faultNode)
 {
-    MergeFault fault = {}
+    MergedFault fault = {}
     cJSON* tsNode = cJSON_GetObjectItem(faultNode, "timestamp");
     if(tsNode && cJSON_IsNumber(tsNode)){
         fault.timestamp = static_cast<int64_t>(tsNode->valuedouble);
@@ -162,12 +175,12 @@ static MergedFault ParseFault(cJSON* faultNode)
     return fault;
 }
 
-static void ParseFaults(cJSON* faultArr,std::vector<MergedFault>& faults)
+static void ParseFaults(cJSON* faultsArr,std::vector<MergedFault>& faults)
 {
     if(!faultsArr || !cJSON_IsArray(faultsArr)){
         return;
     }
-    int fsize = cJSON_GetArraySize(faultArr);
+    int fsize = cJSON_GetArraySize(faultsArr);
     for(int j = 0; j < fsize; j++){
         cJSON* faultNode = cJSON_GetArrayItem(faultsArr,j);
         if(faultNode){
@@ -183,12 +196,12 @@ static void ParseGroups(cJSON* groupsArr,std::vector<ApGroup>& groups)
     }
     int size = cJSON_GetArraySize(groupsArr);
     for (int i = 0; i<size; i++){
-        cJSON* grpNode = cJSON_GetArrayItem(groupArr, i);
+        cJSON* grpNode = cJSON_GetArrayItem(groupsArr, i);
         if(!grpNode){
             continue;
         }
         cJSON* ssidNode = cJSON_GetObjectItem(grpNode, "ssid");
-        if(!ssidNode || !cJSON_GetObjectItem(ssidNode)){
+        if(!ssidNode || !cJSON_IsString(ssidNode)){
             continue;
         }
         ApGroup group;
@@ -208,7 +221,7 @@ static int32_t LoadFromFile(std::vector<ApGroup>& groups)
     }
     std::stringstream ss;
     ss << ifs.rdbuf();
-    std::string cintent = ss.str();
+    std::string content = ss.str();
     if(content.empty()){
         return 0;
     }
@@ -217,11 +230,15 @@ static int32_t LoadFromFile(std::vector<ApGroup>& groups)
         WIFI_LOGE("LoadFromFile: parse failed, treating as empty");
         return 0;
     }
-    cJSON* verNode = cJSON_GetObjectItem(root,"version")；
+    cJSON* verNode = cJSON_GetObjectItem(root,"version");
     if (!verNode || !cJSON_IsNumber(verNode) || verNode->valueint != FILE_VERSION){
         cJSON_Delete(root);
         return 0;
     }
+    cJSON* groupsArr = cJSON_GetObjectItem(root,"groups");
+    ParseGroups(groupsArr,groups)；
+    cJSON_Delete(root);
+    return 0;
 }
 
 static int AcquireLock(int fd, bool exclusive)
@@ -255,7 +272,7 @@ static bool IsPathValid(const std::string& path)
     if (path.find(prefix) !=0){
         return false;
     } 
-    std::string dir = path.substr(0,path.find_last_od('/'));
+    std::string dir = path.substr(0,path.find_last_of('/'));
     if(access(dir.c_str(),F_OK)!=0){
         if(mkdir(dir.c_str(),0700) != 0&& errno != EEXIST){
             return false;
@@ -263,7 +280,7 @@ static bool IsPathValid(const std::string& path)
     }
     return true;
 }
-static ApGroup& FindOrAddGroup(std::vector<ApGroup>& faults, const WifiExceptionRecord& record)
+static ApGroup& FindOrAddGroup(std::vector<ApGroup>& groups, const std::string& ssid)
 {
     for (auto& g: groups){
         if(g.ssid == ssid){
@@ -306,13 +323,16 @@ static void TrimGlobal(std::vector<ApGroup>& groups)
     struct Item { int gIdx; int fIdx; int64_t ts; };
     std:: vector<Item> items;
     for (int gi = 0; gi < static_cast<int>(groups.size());gi++){
-        for (int fi = 0; fi < static_cast<int>(groups[gi].fault.size());fi++){
-            item.push_back({gi, fi, groups[gi].faults[fi].timestamp});
+        for (int fi = 0; fi < static_cast<int>(groups[gi].faults.size());fi++){
+            items.push_back({gi, fi, groups[gi].faults[fi].timestamp});
         }
     }
     std::sort(items.begin(), items.end(),[](const Item& a, const Item& b) { return a.ts >b.ts;});
     std::vector<std::vector<MergedFault>> kept(groups.size());
-    for (int i = 0; i < 50 && i< static_cast<int>(items.size());gi++){
+    for (int i = 0; i < 50 && i< static_cast<int>(items.size());i++){
+        kept[items[i].gIdx].push_back(groups[items[i].gIdx].faults[items[i].fIdx]);
+    }
+    for (int gi = 0; gi < static_cast<int>(groups.size()); gi++){
         groups[gi].faults = std::move(kept[gi]);
     }
 }
@@ -370,8 +390,8 @@ int32_t WifiExceptionRecordUtils::ClearExceptions()
         close(fd);
         return -1;
     }
-    std::vector<ApGroup> groups;
-    SaveToFile(groups);
+    std::vector<ApGroup> empty;
+    SaveToFile(empty);
     flock(fd,LOCK_UN);
     close(fd);
     return 0;    

@@ -2071,7 +2071,7 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
 #ifdef WIFI_EXCEPTION_RECORD_ENABLE
     WifiExceptionRecordUtils exceptionRecordUtils;
     exceptionRecordUtils.ClearExceptions();
-    WIFI_LOGI("FactoryReset: cleared WiFi exception records")
+    WIFI_LOGI("FactoryReset: cleared WiFi exception records");
 #endif
 #ifndef OHOS_ARCH_LITE
     WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();

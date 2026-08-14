@@ -2260,6 +2260,7 @@ void StaStateMachine::GetIpState::DealGetDhcpIpv4Timeout(InternalMessagePtr msg)
         pStaStateMachine->linkedInfo.bssid, DisabledReason::DISABLED_DHCP_FAILURE);
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
 #ifdef WIFI_EXCEPTION_RECORD_ENABLE
+{
     WifiExceptionRecord rec;
     rec.ssid = pStaStateMachine->linkedInfo.ssid;
     rec.timestamp = static_cast<int64_t>(time(nullptr));
@@ -2267,6 +2268,7 @@ void StaStateMachine::GetIpState::DealGetDhcpIpv4Timeout(InternalMessagePtr msg)
     rec.detail = DhcpFaultDetail{-1,"wifi sta dhcp get ip timeout (30s)"};
     WifiExceptionRecordUtils utils;
     utils.AddException(rec);
+}
 #endif
     pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_DHCP_FAIL,
         DhcpFailType::TYPE_GET_IP_TIMEOUT);

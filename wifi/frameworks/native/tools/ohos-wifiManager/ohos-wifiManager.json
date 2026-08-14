@@ -209,7 +209,7 @@
         "inputSchema":{
             "type":"object",
             "properties":{
-                "clear":{"type":"string"},
+                "clear":{"type":"boolean"},
                 "ssid":{"type":"string"},
                 "category":{"type":"string"},
                 "reason":{"type":"number"},
@@ -231,8 +231,8 @@
                                 "type":"object",
                                 "properties":{
                                     "ssid":{"type":"string"},
-                                    "fault":{
-                                        "type":"object",
+                                    "faults":{
+                                        "type":"array",
                                         "items":{
                                             "type":"object",
                                             "properties":{

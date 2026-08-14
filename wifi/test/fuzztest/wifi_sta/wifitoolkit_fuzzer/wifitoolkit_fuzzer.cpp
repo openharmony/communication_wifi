@@ -38,7 +38,7 @@
 #include "network_selection.h"
 #include "network_selector_factory.h"
 #include "wifi_watchdog_utils.h"
-#include"wifi_pro_utils.h"
+#include "wifi_pro_utils.h"
 #include "wifi_net_observer.h"
 #include <mutex>
 #include <fuzzer/FuzzedDataProvider.h>

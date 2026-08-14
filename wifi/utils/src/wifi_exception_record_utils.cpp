@@ -73,7 +73,7 @@ std::string WifiExceptionRecordUtils::FormatTime(int64_t ts)
     char buf[32] = {0};
     size_t len = strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &result);
     if (len == 0) {
-    return std::string(); 
+    return std::string();
 }
     return std::string(buf, len);
 }

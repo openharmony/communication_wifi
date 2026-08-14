@@ -1086,7 +1086,7 @@ HWTEST_F(WifiProStateMachineTest, HandleScanResultInHasNetInnerTest01, TestSize.
     scanInfo1.rssi = -75;
     scanInfos.push_back(scanInfo1);
     pWifiProStateMachine_->wifiSwitchReason_ = WIFI_SWITCH_REASON_APP_QOE_SLOW;
-    wifiHasNetState_->qoeSwitch_  = true;
+    wifiHasNetState_->qoeSwitch_ = false;
     wifiHasNetState_->HandleScanResultInHasNetInner(scanInfos);
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }

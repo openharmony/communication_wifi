@@ -69,7 +69,8 @@ void OutputSuccessJson(cJSON* data)
     cJSON_AddItemToObject(root, "data", data);
 
     char* jsonStr = cJSON_PrintUnformatted(root);
-    if (jsonStr != nullptr) {
+    if (jsonStr != nullptr)
+    {
         std::cout << jsonStr << std::endl;
         cJSON_free(jsonStr);
     }
@@ -85,7 +86,8 @@ void OutputErrorJson(const std::string& code, const std::string& message, const 
     cJSON_AddStringToObject(root, "errMsg", message.c_str());
 
     char* jsonStr = cJSON_PrintUnformatted(root);
-    if (jsonStr != nullptr) {
+    if (jsonStr != nullptr)
+    {
         std::cout << jsonStr << std::endl;
         cJSON_free(jsonStr);
     }
@@ -97,7 +99,8 @@ int CmdStaEnable(int argc, char** argv)
     WIFI_LOGI("sta-enable command started");
 
     auto wifiDevice = GetWifiDevice();
-    if (wifiDevice == nullptr) {
+    if (wifiDevice == nullptr)
+    {
         WIFI_LOGE("Failed to get WifiDevice instance");
         OutputErrorJson("INTERNAL_ERROR", "Failed to get WifiDevice instance",
                         "Please check if WiFi service is available");
@@ -107,7 +110,8 @@ int CmdStaEnable(int argc, char** argv)
     OHOS::Wifi::ErrCode ret = wifiDevice->EnableWifi();
     WIFI_LOGI("EnableWifi returned %{public}d", ret);
 
-    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
+    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS)
+    {
         cJSON* data = cJSON_CreateObject();
         cJSON_AddStringToObject(data, "message", "WiFi STA mode enabled successfully");
         OutputSuccessJson(data);
@@ -115,7 +119,8 @@ int CmdStaEnable(int argc, char** argv)
     }
 
     std::string errorMsg;
-    switch (ret) {
+    switch (ret)
+    {
         case OHOS::Wifi::WIFI_OPT_FORBID_AIRPLANE:
             errorMsg = "WiFi cannot be enabled in airplane mode";
             break;
@@ -138,7 +143,8 @@ int CmdStaDisable(int argc, char** argv)
     WIFI_LOGI("sta-disable command started");
 
     auto wifiDevice = GetWifiDevice();
-    if (wifiDevice == nullptr) {
+    if (wifiDevice == nullptr)
+    {
         WIFI_LOGE("Failed to get WifiDevice instance");
         OutputErrorJson("INTERNAL_ERROR", "Failed to get WifiDevice instance",
                         "Please check if WiFi service is available");
@@ -148,7 +154,8 @@ int CmdStaDisable(int argc, char** argv)
     OHOS::Wifi::ErrCode ret = wifiDevice->DisableWifi();
     WIFI_LOGI("DisableWifi returned %{public}d", ret);
 
-    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
+    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS)
+    {
         cJSON* data = cJSON_CreateObject();
         cJSON_AddStringToObject(data, "message", "WiFi STA mode disabled successfully");
         OutputSuccessJson(data);
@@ -156,7 +163,8 @@ int CmdStaDisable(int argc, char** argv)
     }
 
     std::string errorMsg;
-    switch (ret) {
+    switch (ret)
+    {
         case OHOS::Wifi::WIFI_OPT_CLOSE_SUCC_WHEN_CLOSED:
             errorMsg = "WiFi is already disabled";
             break;
@@ -176,7 +184,8 @@ int CmdScanStart(int argc, char** argv)
     WIFI_LOGI("scan-start command started");
 
     auto wifiScan = GetWifiScan();
-    if (wifiScan == nullptr) {
+    if (wifiScan == nullptr)
+    {
         WIFI_LOGE("Failed to get WifiScan instance");
         OutputErrorJson("INTERNAL_ERROR", "Failed to get WifiScan instance",
                         "Please check if WiFi scan service is available");
@@ -186,7 +195,8 @@ int CmdScanStart(int argc, char** argv)
     OHOS::Wifi::ErrCode ret = wifiScan->Scan(false);
     WIFI_LOGI("Scan(false) returned %{public}d", ret);
 
-    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
+    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS)
+    {
         cJSON* data = cJSON_CreateObject();
         cJSON_AddStringToObject(data, "message", "WiFi scan started successfully");
         OutputSuccessJson(data);
@@ -194,7 +204,8 @@ int CmdScanStart(int argc, char** argv)
     }
 
     std::string errorMsg;
-    switch (ret) {
+    switch (ret)
+    {
         case OHOS::Wifi::WIFI_OPT_SCAN_NOT_OPENED:
             errorMsg = "Scan service is not opened";
             break;
@@ -214,7 +225,8 @@ int CmdScanList(int argc, char** argv)
     WIFI_LOGI("scan-list command started");
 
     auto wifiScan = GetWifiScan();
-    if (wifiScan == nullptr) {
+    if (wifiScan == nullptr)
+    {
         WIFI_LOGE("Failed to get WifiScan instance");
         OutputErrorJson("INTERNAL_ERROR", "Failed to get WifiScan instance",
                         "Please check if WiFi scan service is available");
@@ -226,11 +238,13 @@ int CmdScanList(int argc, char** argv)
     WIFI_LOGI("GetScanInfoList returned %{public}d, found %{public}zu networks",
               ret, scanInfoList.size());
 
-    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
+    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS)
+    {
         cJSON* data = cJSON_CreateObject();
         cJSON* networks = cJSON_CreateArray();
 
-        for (const auto& info : scanInfoList) {
+        for (const auto& info : scanInfoList)
+        {
             cJSON* network = cJSON_CreateObject();
 
             cJSON_AddStringToObject(network, "ssid",
@@ -251,7 +265,8 @@ int CmdScanList(int argc, char** argv)
     }
 
     std::string errorMsg;
-    switch (ret) {
+    switch (ret)
+    {
         case OHOS::Wifi::WIFI_OPT_SCAN_NOT_OPENED:
             errorMsg = "Scan service is not opened";
             break;
@@ -268,7 +283,8 @@ int CmdScanList(int argc, char** argv)
 
 void SetKeyMgmtBySecurityType(OHOS::Wifi::WifiSecurity securityType, std::string &keyMgmt)
 {
-    switch (securityType) {
+    switch (securityType)
+    {
         case OHOS::Wifi::WifiSecurity::PSK:
         case OHOS::Wifi::WifiSecurity::PSK_SAE:
             keyMgmt = "WPA-PSK";
@@ -301,12 +317,15 @@ void SetKeyMgmtBySecurityType(OHOS::Wifi::WifiSecurity securityType, std::string
 
 void ParseConnectArgs(int argc, char** argv, OHOS::Wifi::WifiDeviceConfig& tmpConfig)
 {
-    for (int i = 0; i < argc - 1; ++i) {
+    for (int i = 0; i < argc - 1; ++i)
+    {
         std::string arg = argv[i];
-        if (arg == "--ssid") {
+        if (arg == "--ssid")
+        {
             tmpConfig.ssid = argv[i + 1];
         }
-        if (arg == "--preSharedKey") {
+        if (arg == "--preSharedKey")
+        {
             tmpConfig.preSharedKey = argv[i + 1];
         }
     }
@@ -316,7 +335,8 @@ int ExecuteWifiConnect(std::shared_ptr<OHOS::Wifi::WifiDevice>& wifiDevice,
     OHOS::Wifi::WifiDeviceConfig& tmpConfig)
 {
     OHOS::Wifi::ErrCode ret = wifiDevice->ConnectToDevice(tmpConfig);
-    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS) {
+    if (ret == OHOS::Wifi::WIFI_OPT_SUCCESS)
+    {
         cJSON* data = cJSON_CreateObject();
         cJSON_AddStringToObject(data, "ssid", tmpConfig.ssid.c_str());
         cJSON_AddStringToObject(data, "message", "WiFi connection initiated successfully");
@@ -326,7 +346,8 @@ int ExecuteWifiConnect(std::shared_ptr<OHOS::Wifi::WifiDevice>& wifiDevice,
 
     std::string errorMsg;
     std::string suggestion;
-    switch (ret) {
+    switch (ret)
+    {
         case OHOS::Wifi::WIFI_OPT_STA_NOT_OPENED:
             errorMsg = "WiFi STA is not enabled";
             suggestion = "Enable WiFi first with 'ohos-wifiManager sta-enable'";
@@ -347,7 +368,8 @@ int CmdStaConnect(int argc, char** argv)
 
     OHOS::Wifi::WifiDeviceConfig tmpConfig;
     ParseConnectArgs(argc, argv, tmpConfig);
-    if (tmpConfig.ssid.empty()) {
+    if (tmpConfig.ssid.empty())
+    {
         OutputErrorJson("ERR_PARAM_INVALID",
             "Missing required parameter: --ssid",
             "Usage: ohos-wifiManager sta-connect --ssid <ssid> [--preSharedKey <preSharedKey>]");
@@ -355,26 +377,31 @@ int CmdStaConnect(int argc, char** argv)
     }
     auto wifiDevice = GetWifiDevice();
     auto wifiScan = GetWifiScan();
-    if (wifiDevice == nullptr || wifiScan == nullptr) {
+    if (wifiDevice == nullptr || wifiScan == nullptr)
+    {
         OutputErrorJson("INTERNAL_ERROR", "Failed to get WifiScan instance",
                         "Please check if WiFi scan service is available");
         return 1;
     }
-    
+
     std::vector<OHOS::Wifi::WifiScanInfo> scanInfoList;
     OHOS::Wifi::ErrCode ret = wifiScan->GetScanInfoList(scanInfoList, false);
-    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS)
+    {
         OutputErrorJson("WIFI_ERROR", "Cannot get the scan list", "Please check if WiFi scan service is available");
         return 1;
     }
     bool isFound = false;
-    for (const auto& scanInfo : scanInfoList) {
-        if (scanInfo.ssid == tmpConfig.ssid) {
+    for (const auto& scanInfo : scanInfoList)
+    {
+        if (scanInfo.ssid == tmpConfig.ssid)
+        {
             SetKeyMgmtBySecurityType(scanInfo.securityType, tmpConfig.keyMgmt);
             isFound = true;
         }
     }
-    if (!isFound) {
+    if (!isFound)
+    {
         OutputErrorJson("WIFI_ERROR", "Failed to find the network", "Check if the network is available");
         return 1;
     }
@@ -384,7 +411,8 @@ int CmdStaConnect(int argc, char** argv)
 
 std::string GetDetailedStateErr(OHOS::Wifi::DetailedState state)
 {
-    switch (state) {
+    switch (state)
+    {
         case OHOS::Wifi::DetailedState::VERIFYING_POOR_LINK:
             return "VerifyingPoorLink";
         case OHOS::Wifi::DetailedState::PASSWORD_ERROR:
@@ -404,7 +432,8 @@ std::string GetDetailedStateErr(OHOS::Wifi::DetailedState state)
 }
 std::string GetDetailedStateStr(OHOS::Wifi::DetailedState state)
 {
-    switch (state) {
+    switch (state)
+    {
         case OHOS::Wifi::DetailedState::AUTHENTICATING:
             return "Authenticating";
         case OHOS::Wifi::DetailedState::BLOCKED:
@@ -441,7 +470,8 @@ std::string GetDetailedStateStr(OHOS::Wifi::DetailedState state)
 int CmdStaGetLinkedInfo(int argc, char** argv)
 {
     auto wifiDevice = GetWifiDevice();
-    if (wifiDevice == nullptr) {
+    if (wifiDevice == nullptr)
+    {
         OutputErrorJson("INTERNAL_ERROR", "Failed to get wifiDevice instance",
                         "Please check if WiFi service is available");
         return 1;
@@ -449,7 +479,8 @@ int CmdStaGetLinkedInfo(int argc, char** argv)
 
     OHOS::Wifi::WifiLinkedInfo info;
     OHOS::Wifi::ErrCode ret = wifiDevice->GetLinkedInfo(info);
-    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS) {
+    if (ret != OHOS::Wifi::WIFI_OPT_SUCCESS)
+    {
         OutputErrorJson("WIFI_ERROR", "Failed to get WiFi linked info", "Ensure WiFi is enabled and connected");
         return 1;
     }
@@ -472,7 +503,8 @@ int CmdHelp(int argc, char** argv)
     cJSON* data = cJSON_CreateObject();
     cJSON* cmdArr = cJSON_CreateArray();
 
-    for (const auto& pair : g_commands) {
+    for (const auto& pair : g_commands)
+    {
         cJSON* item = cJSON_CreateObject();
         cJSON_AddStringToObject(item, "cmd", pair.first.c_str());
         cJSON_AddStringToObject(item, "desc", pair.second.description);
@@ -497,7 +529,7 @@ static std::string GetSuggestion(OHOS::Wifi::ExceptionReason reason, const std::
         case R::DHCP_GET_IP_TIMEOUT:
             return "IP request to " + ssid + " timed out. Try restarting the router.";
         case R::DHCP_IPV4_RESULT_FAIL:
-            return "IP allocation failed for " + ssid +". Possible IP conflict.";
+            return "IP allocation failed for " + ssid + ". Possible IP conflict.";
         case R::DHCP_IP_EXPIRED:
             return "IP lease for " + ssid + " expired. Reconnect to obtain a new IP.";
         default:
@@ -508,7 +540,7 @@ static std::string GetSuggestion(OHOS::Wifi::ExceptionReason reason, const std::
 static void SerializeDetailForCli(cJSON* obj, const OHOS::Wifi::FaultDetail& detail)
 {
     using namespace OHOS::Wifi;
-    if(std::holds_alternative<DhcpFaultDetail>(detail))
+    if (std::holds_alternative<DhcpFaultDetail>(detail))
     {
         auto& d = std::get<DhcpFaultDetail>(detail);
         cJSON_AddNumberToObject(obj, "dhcpStatus", d.dhcpStatus);
@@ -536,7 +568,7 @@ static void FilterGroups(std::vector<OHOS::Wifi::ApGroup>& groups, const std::st
 {
     using namespace OHOS::Wifi;
     WifiExceptionRecordUtils utils;
-    if(!ssid.empty())
+    if (!ssid.empty())
     {
         groups.erase(std::remove_if(groups.begin(), groups.end(),
             [&ssid](const ApGroup& g){ return g.ssid != ssid; }), groups.end());
@@ -545,9 +577,9 @@ static void FilterGroups(std::vector<OHOS::Wifi::ApGroup>& groups, const std::st
     {
         g.faults.erase(std::remove_if(g.faults.begin(), g.faults.end(),
             [&utils, &category, reasonCode](const MergedFault& f){
-                if(!category.empty() && utils.CategoryToString(f.reason) != category ) return true;
-                if(reasonCode != NO_REASON_FILTER && static_cast<int>(f.reason) != reasonCode) return true;
-                return false;  
+                if (!category.empty() && utils.CategoryToString(f.reason) != category) return true;
+                if (reasonCode != NO_REASON_FILTER && static_cast<int>(f.reason) != reasonCode) return true;
+                return false;
             }), g.faults.end());
     }
     groups.erase(std::remove_if(groups.begin(), groups.end(),
@@ -560,7 +592,7 @@ static void ApplyPerApLimit(std::vector<OHOS::Wifi::ApGroup>& groups, int perAp)
     if (perAp <= NO_PER_AP_LIMIT) return;
     for (auto& g : groups)
     {
-        if(static_cast<int>(g.faults.size()) > perAp)
+        if (static_cast<int>(g.faults.size()) > perAp)
         {
             std::sort(g.faults.begin(), g.faults.end(),
                 [](const MergedFault& a, const MergedFault& b){ return a.timestamp > b.timestamp; });
@@ -574,7 +606,7 @@ static int DoClearExceptions()
     using namespace OHOS::Wifi;
     WifiExceptionRecordUtils utils;
     int32_t ret = utils.ClearExceptions();
-    if (ret !=0 )
+    if (ret != 0)
     {
         OutputErrorJson("CLEAR_ERROR", "Failed to clear exception records", "");
         return 1;
@@ -585,7 +617,7 @@ static int DoClearExceptions()
     return 0;
 }
 
-static int DoListExceptions(const std::string& ssid, const std::string& category, 
+static int DoListExceptions(const std::string& ssid, const std::string& category,
                             int reasonCode, int perAp)
 {
     using namespace OHOS::Wifi;
@@ -603,7 +635,7 @@ static int DoListExceptions(const std::string& ssid, const std::string& category
         cJSON* grp = cJSON_CreateObject();
         cJSON_AddStringToObject(grp, "ssid", g.ssid.c_str());
         cJSON* faults = cJSON_CreateArray();
-        for(const auto& f : g.faults)
+        for (const auto& f : g.faults)
         {
             cJSON_AddItemToArray(faults, SerializeFaultForCli(f, g.ssid));
             count++;
@@ -624,14 +656,14 @@ int CmdWifiException(int argc, char** argv)
     std::string filterCategory;
     int filterReason = NO_REASON_FILTER;
     int perAp = NO_PER_AP_LIMIT;
-    for (int i = 0; i<argc;++i)
+    for (int i = 0; i < argc; ++i)
     {
         std::string arg = argv[i];
-        if(arg == "--clear") doClear = true;
-        else if(arg == "--ssid" && i+1<argc ) filterSsid = argv[++i];
-        else if(arg == "--category" && i+1<argc ) filterCategory = argv[++i];
-        else if(arg == "--reason" && i+1<argc ) filterReason = atoi(argv[++i]);
-        else if(arg == "--per-ap" && i+1<argc ) perAp = atoi(argv[++i]);
+        if (arg == "--clear") doClear = true;
+        else if (arg == "--ssid" && i + 1 < argc) filterSsid = argv[++i];
+        else if (arg == "--category" && i + 1 < argc) filterCategory = argv[++i];
+        else if (arg == "--reason" && i + 1 < argc) filterReason = atoi(argv[++i]);
+        else if (arg == "--per-ap" && i + 1 < argc) perAp = atoi(argv[++i]);
     }
     if (doClear) return DoClearExceptions();
     return DoListExceptions(filterSsid, filterCategory, filterReason, perAp);
@@ -658,7 +690,8 @@ int main(int argc, char** argv)
 {
     WIFI_LOGI("enter ohos-wifiManager");
     constexpr int MIN_ARG_COUNT = 2;
-    if (argc < MIN_ARG_COUNT) {
+    if (argc < MIN_ARG_COUNT)
+    {
         CmdHelp(argc, argv);
         return 1;
     }
@@ -667,7 +700,8 @@ int main(int argc, char** argv)
 
     std::string cmdName = argv[1];
     auto it = g_commands.find(cmdName);
-    if (it == g_commands.end()) {
+    if (it == g_commands.end())
+    {
         WIFI_LOGE("Unknown command: %{public}s", cmdName.c_str());
         CmdHelp(argc, argv);
         return 1;

@@ -20,15 +20,15 @@
 #include "wifi_logger.h"
 
 using namespace testing::ext;
-using::testing::_;
-using::testing::Return;
-using::testing::ext::TestSize;
+using ::testing::_;
+using ::testing::Return;
+using ::testing::ext::TestSize;
 
-namespace OHOS{
-namespace Wifi{
+namespace OHOS {
+namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiExceptionRecordUtilsTest");
 
-static constexpr const char* TEST_FILE_PATH = 
+static constexpr const char* TEST_FILE_PATH =
     "/data/service/el1/public/wifi/wifi_exception.json";
 
 static constexpr int MAX_FAULTS_PER_GROUP = 10;
@@ -105,12 +105,12 @@ HWTEST_F(WifiExceptionRecordUtilsTest, AddException_DifferentReasonsNotMerged, T
 HWTEST_F(WifiExceptionRecordUtilsTest, AddException_PerGroupLimit10, TestSize.Level0)
 {
     WifiExceptionRecordUtils utils;
-    for (int i = 0; i<15; i++)
+    for (int i = 0; i < 15; i++)
     {
-        auto rec = MakeRecord("AP1", static_cast<ExceptionReason>(DHCP_REASON_BASE + i), 1000+i, i, "x");
+        auto rec = MakeRecord("AP1", static_cast<ExceptionReason>(DHCP_REASON_BASE + i), 1000 + i, i, "x");
         utils.AddException(rec);
     }
-    std::vector<ApGroup>groups;
+    std::vector<ApGroup> groups;
     utils.GetAllExceptions(groups);
     ASSERT_EQ(groups.size(), 1u);
     EXPECT_LE(groups[0].faults.size(), static_cast<size_t>(MAX_FAULTS_PER_GROUP));
@@ -119,25 +119,25 @@ HWTEST_F(WifiExceptionRecordUtilsTest, AddException_PerGroupLimit10, TestSize.Le
 HWTEST_F(WifiExceptionRecordUtilsTest, AddException_GlobalLimit50, TestSize.Level0)
 {
     WifiExceptionRecordUtils utils;
-    for(int g=0;g<6;g++)
+    for (int g = 0; g < 6; g++)
     {
-        for(int i= 0;i<MAX_FAULTS_PER_GROUP;i++)
+        for (int i = 0; i < MAX_FAULTS_PER_GROUP; i++)
         {
-            std::string ssid = "AP" +std::to_string(g);
-            auto rec = MakeRecord(ssid, static_cast<ExceptionReason>(DHCP_REASON_BASE + i), 1000+g*MAX_FAULTS_PER_GROUP+i, i, "x");
+            std::string ssid = "AP" + std::to_string(g);
+            auto rec = MakeRecord(ssid, static_cast<ExceptionReason>(DHCP_REASON_BASE + i), 1000 + g * MAX_FAULTS_PER_GROUP + i, i, "x");
             utils.AddException(rec);
         }
     }
-    std::vector<ApGroup>groups;
+    std::vector<ApGroup> groups;
     utils.GetAllExceptions(groups);
     int total = 0;
-    for (const auto& g : groups) total+=static_cast<int>(g.faults.size());
+    for (const auto& g : groups) total += static_cast<int>(g.faults.size());
     EXPECT_LE(total, MAX_TOTAL_RECORDS);
 }
 HWTEST_F(WifiExceptionRecordUtilsTest, GetAllExceptions_EmptyFile, TestSize.Level0)
 {
     WifiExceptionRecordUtils utils;
-    std::vector<ApGroup>groups;
+    std::vector<ApGroup> groups;
     EXPECT_EQ(utils.GetAllExceptions(groups), 0);
     EXPECT_TRUE(groups.empty());
 }
@@ -169,7 +169,7 @@ HWTEST_F(WifiExceptionRecordUtilsTest, ReasonToString_AllReasons, TestSize.Level
     EXPECT_EQ(utils.ReasonToString(ExceptionReason::DHCP_GET_IP_TIMEOUT), "DHCP_GET_IP_TIMEOUT");
     EXPECT_EQ(utils.ReasonToString(ExceptionReason::DHCP_IPV4_RESULT_FAIL), "DHCP_IPV4_RESULT_FAIL");
     EXPECT_EQ(utils.ReasonToString(ExceptionReason::DHCP_IP_EXPIRED), "DHCP_IP_EXPIRED");
-    
+
 }
 HWTEST_F(WifiExceptionRecordUtilsTest, CategoryToString_AllCategories, TestSize.Level0)
 {
@@ -182,7 +182,7 @@ HWTEST_F(WifiExceptionRecordUtilsTest, FormatTime_BasicFormat, TestSize.Level0)
     std::string result = utils.FormatTime(0);
     EXPECT_FALSE(result.empty());
     EXPECT_EQ(result.length(), 19u);
-    
+
 }
 
 }

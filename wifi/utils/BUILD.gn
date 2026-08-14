@@ -82,6 +82,9 @@ if (defined(ohos_lite)) {
       "src/wifi_timer.cpp",
     ]
 
+    if (wifi_feature_exception_record){
+      sources += ["src/wifi_exception_record_utils.cpp"]
+    }
     deps = []
 
     external_deps = [
@@ -112,6 +115,10 @@ if (defined(ohos_lite)) {
       defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
     }
 
+    if (wifi_feature_exception_record){
+      defines += ["WIFI_EXCEPTION_RECORD_ENABLE"]
+    }
+    
     cflags = memory_optimization_cflags
     cflags_cc = memory_optimization_cflags_cc
     ldflags = memory_optimization_ldflags

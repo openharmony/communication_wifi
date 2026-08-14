@@ -43,7 +43,8 @@ ohos_cli_executable("ohos-wifiManager") {
 
     deps = [
         "$WIFI_ROOT_DIR/frameworks/native:wifi_sdk",
-        "$WIFI_ROOT_DIR/base:wifi_base"
+        "$WIFI_ROOT_DIR/base:wifi_base",
+        "$WIFI_ROOT_DIR/utils:wifi_utils"
     ]
 
     external_deps = [
@@ -62,4 +63,9 @@ ohos_cli_executable("ohos-wifiManager") {
     cli_config_file = "ohos-wifiManager.json"
     part_name = "wifi"
     subsystem_name = "communication"
+
+    defines = []
+    if(wifi_feature_exception_record){
+        defines += ["WIFI_EXCEPTION_RECORD_ENABLE"]
+    }
 }

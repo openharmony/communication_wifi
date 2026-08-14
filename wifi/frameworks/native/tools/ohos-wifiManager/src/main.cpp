@@ -20,6 +20,8 @@
 #include <unordered_map>
 #include <functional>
 #include <cstring>
+#include <algorithm>
+#include <cstdlib>
 #include "cJSON.h"
 #include "wifi_logger.h"
 #include "wifi_device.h"
@@ -28,7 +30,9 @@
 #include "define.h"
 #include "wifi_logger.h"
 #include "securec.h"
-
+#ifdef WIFI_EXCEPTION_RECORD_ENABLE
+#include "wifi_exception_record_utlis.h"
+#endif
 namespace {
 DEFINE_WIFILOG_LABEL("WifiCli");
 
@@ -479,6 +483,148 @@ int CmdHelp(int argc, char** argv)
     return 0;
 }
 
+#ifdef WIFI_EXCEPTION_RECORD_ENABLE
+static std::string GetSuggestion(OHOS::Wifi::ExceptionReason reason, const std::string& ssid)
+{
+    using R = OHOS::Wifi::ExceptionReason;
+    switch (reason){
+        case R::DHCP_CONNECTION_FAIL:
+            return "Failed to start IP request for" + ssid + ". Try toggling Wifi.";
+        case R::DHCP_GET_IP_TIMEOUT:
+            return "IP request to" + ssid + "timed out. Try restarting the router.";
+        case R::DHCP_IPV4_RESULT_FAIL:
+            return "IP allocation failed for" + ssid +". Possible IP conflict.";
+        case R::DHCP_IP_EXPIRED:
+            return "IP lease for" + ssid + "expired. Reconnect to obtain a new IP.";
+        default:
+            return "Wifi connection anomaly. Try again.";
+    }
+}
+
+static void SerializeDetailForCli(cJSON* obj, const OHOS::Wifi::FaultDetail& detail)
+{
+    using namespace OHOS::Wifi;
+    if(std::hold_alternative<DhcpFaultDetail>(detail)){
+        auto& d = std::get<DhcpFaultDetail>(detail);
+        cJSON_AddNumberToObject(obj, "dhcpStatus", d.dhcpStatus);
+        cJSON_AddStringToObject(obj, "extra", d.extra.c_str());
+    }
+}
+
+static cJSON* SerializeFaultForCli(const OHOS::Wifi::MergedFault& f, const std::string& ssid)
+{
+    using namespace OHOS::Wifi;
+    WifiExceptionRecordUtils utils;
+    cJSON* item = cJSON_CreateObject();
+    cJSON_AddNumberToObject(item, "timestamp", static_cast<double>(f.timestamp));
+    cJSON_AddStringToObject(item, "timeReadable", utils.FormatTime(f.timestamp).c_str());
+    cJSON_AddNumberToObject(item, "reasonCode", static_cast<int>(f.reason));
+    cJSON_AddStringToObject(item, "reason", utils.ReasonToString(f.reason).c_str());
+    cJSON_AddStringToObject(item, "category", utils.CategoryToString(f.reason).c_str());
+    SerializeDetailFoCli(item, f.detail);
+    cJSON_AddStringToObject(item,"suggestion", GetSuggestion(f.reason,ssid).c_str());
+    return item;
+}
+
+static void FilterGroups(std::vector<OHOS::Wifi::ApGroup>& groups,const std::string& ssid,
+                        const std::string& category, int reasonCode)
+{
+    using namespace OHOS::Wifi;
+    WifiExceptionRecordUtils utils;
+    if(!ssid.empty()){
+        groups.erase(std::remove_if(groups.begin(),groups.end(),
+            [&ssid](const ApGroup& g){ return g.ssid != ssid; }),groups.end());
+    }
+    for (auto& g : groups){
+        g.faults.erase(std::remove_if(g.faults.begin(), g.faults.end(),
+            [&utils, &category, reasonCode](const MergedFault& f){
+                if(!category.empty() && utils.CategoryToString(f.reason) != category ) return true;
+                if(reasonCode!=-1 && static_cast<int>(f.reason) != reasonCode) return true;
+                return false;  
+            }),g.faults.end());
+    }
+    groups.erase(std::remove_if(groups.begin(),groups.end(),
+        [](const ApGroup& g){ return g.fault.empty();}),groups.end());
+}
+
+static void ApplyPerApLimit(std::vector<OHOS::Wifi::ApGroup>& groups, int perAp)
+{
+    using namespace OHOS::Wifi;
+    if (perAp<=0) return;
+    for (auto& g : groups){
+        if(static_cast<int>(g.fault.size()) > perAp){
+            std::sort(g.faults.begin(),g.faults.end(),
+                [](const MergedFault& a,const Merged Fault& b){ return a.timestamp > b.timestamp; });
+            g.fault.resize(perAp);
+        }
+    }
+}
+
+static int DoClearExceptions()
+{
+    using namespace OHOS::Wifi;
+    WifiExceptionRecordUtils utils;
+    int32_t ret = utils.ClearExceptions();
+    if (ret !=0 ){
+        OutputErrorJson("CLEAR_ERROR","Failed to clear exception records","");
+        return 1;
+    }
+    cJSON* data = cJSON_CreateObject();
+    cJSON_AddStringToObject(data, "message", "All exception records cleared");
+    OutputSuccessJson(data);
+    return 0;
+}
+
+static int DoListExceptions(const std::string& ssid, const std::string& category, int reasonCode, int perAp)
+{
+    using namespace OHOS::Wifi;
+    WifiExceptionRecodeUtils utils;
+    std::vector<ApGroup> groups;
+    utils.GetAllEXceptions(groups);
+    FilterGroups(groups, ssid, category, reasonCode);
+    ApplyPerApLimit(groups,perAp);
+
+    cJSON* data = cJSON_CreateObject()
+    cJSON* arr = cJSON_CreateArray()
+    int count = 0
+    for (const auto& g : groups)
+    {
+        cJSON* grp = cJSON_CreateObject();
+        cJSON_AddStringToObject(grp,"ssid", g.ssid.c_str());
+        cJSON* faults = cJSON_CreateArray();
+        for(const auto& f : g.faults){
+            cJSON_AddItemToArray(fault,SerializeFaultToCli(f,g.ssid));
+            count++;
+        }
+        cJSON_AddItemToObject(grp,"faults",faults);
+        cJSON_AddItemToObject(arr,grp);
+    }
+    cJSON_AddItemToObject(data,"exceptions",arr);
+    cJSON_AddNumberToObject(data,"count",count);
+    OutputSuccessJson(data);
+    return 0;
+}
+
+int CmdWifiException(int argc.char** argv)
+{
+    bool doClear = false;
+    std::string filterSsid;
+    std::string filterCategory;
+    int filterReason = -1
+    int perAr = 0;
+    for (int i = 1; i<argc;++i){
+        std::string arg = argv[i];
+        if(arg == "--clear") doClear = true;
+        else if(arg == "--ssid" && i+1<argc ) filterSsid = argv[++i];
+        else if(arg == "--category" && i+1<argc ) filterCategory = argv[++i];
+        else if(arg == "--reason" && i+1<argc ) filterReason = atoi(argv[++i]);
+        else if(arg == "--per-ap" && i+1<argc ) perAp = atoi(argv[++i]);
+    }
+    if (doClear) return DoClearExceptions();
+    return DoListExceptions(filterSsid,filterCategory,filterReason，perAp)；
+}
+#endif
+
 void InitCommands()
 {
     g_commands["sta-enable"] = {"sta-enable", "Enable WiFi STA mode", CmdStaEnable};
@@ -487,6 +633,9 @@ void InitCommands()
     g_commands["scan-list"] = {"scan-list", "List scan results", CmdScanList};
     g_commands["sta-connect"] = {"sta-connect", "Start WiFi connect", CmdStaConnect};
     g_commands["sta-getLinkedInfo"] = {"sta-getLinkedInfo", "Return linked info", CmdStaGetLinkedInfo};
+#ifdef WIFI_EXCEPTION_RECORD_ENABLE
+    g_commands["wifi-exception"] = {"wifi-exception", "List/Clear WiFi exception records", CmdWifiException};
+#endif
     g_commands["--help"] = {"--help", "Show help information", CmdHelp};
 }
 

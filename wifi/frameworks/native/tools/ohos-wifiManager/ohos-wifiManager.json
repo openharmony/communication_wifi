@@ -200,6 +200,61 @@
                 "errMsg": { "type": "string" }
             }
         }
+    },
+    "wifi-exception":{
+        "description":"List or clear WiFi exception records grouped by SSID",
+        "requirePermissions":[
+            "ohos.permission.cli.MANAGE_WIFI_SCAN"
+        ],
+        "inputSchema":{
+            "type":"object",
+            "properties":{
+                "clear":{"type":"string"},
+                "ssid":{"type":"string"},
+                "category":{"type":"string"},
+                "reason":{"type":"number"},
+                "per-ap":{"type":"number"}
+            },
+            "required":[]
+        },
+        "outputSchema":{
+            "type":"object",
+            "properties":{
+                "type":{"type":"string"},
+                "status":{"type":"string"},
+                "data":{
+                    "type":"object",
+                    "properties":{
+                        "exceptions":{
+                            "type":"array",
+                            "items":{
+                                "type":"object",
+                                "properties":{
+                                    "ssid":{"type":"string"},
+                                    "fault":{
+                                        "type":"object",
+                                        "items":{
+                                            "type":"object",
+                                            "properties":{
+                                                "timestamp":{"type":"number"},
+                                                "timeReadable":{"type":"string"},
+                                                "reasonCode":{"type":"number"},
+                                                "reason":{"type":"string"},
+                                                "category":{"type":"string"},
+                                                "suggestion":{"type":"string"}
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "count":{"type":"number"}
+                    }
+                },
+                "errCode":{"type":"string"},
+                "errMsg":{"type":"string"}
+            }   
+        }
     }
     },
     "eventTypes": [],

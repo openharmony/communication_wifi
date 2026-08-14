@@ -2155,7 +2155,7 @@ void StaStateMachine::GetIpState::GoInState()
         rec.ssid = pStaStateMachine->linkedInfo.ssid;
         rec.timestamp = static_cast<int64_t>(time(nullptr));
         rec.reason = ExceptionReason::DHCP_CONNECTION_FAIL;
-        rec.detail = DhcpFaultDetail{-1,"START_DHCP_CLIENT_FAIL"};
+        rec.detail = DhcpFaultDetail{-1, "START_DHCP_CLIENT_FAIL"};
         WifiExceptionRecordUtils utils;
         utils.AddException(rec);
 #endif
@@ -2265,7 +2265,7 @@ void StaStateMachine::GetIpState::DealGetDhcpIpv4Timeout(InternalMessagePtr msg)
     rec.ssid = pStaStateMachine->linkedInfo.ssid;
     rec.timestamp = static_cast<int64_t>(time(nullptr));
     rec.reason = ExceptionReason::DHCP_GET_IP_TIMEOUT;
-    rec.detail = DhcpFaultDetail{-1,"wifi sta dhcp get ip timeout (30s)"};
+    rec.detail = DhcpFaultDetail{-1, "wifi sta dhcp get ip timeout (30s)"};
     WifiExceptionRecordUtils utils;
     utils.AddException(rec);
 }

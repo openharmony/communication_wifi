@@ -89,7 +89,7 @@ static cJSON* SerializeFault(const MergedFault& f, WifiExceptionRecordUtils& uti
     cJSON_AddNumberToObject(item, "reasonCode", static_cast<int>(f.reason));
     cJSON_AddStringToObject(item, "reason", utils.ReasonToString(f.reason).c_str());
     cJSON_AddStringToObject(item, "category", utils.CategoryToString(f.reason).c_str());
-    std::visit([item](const auto& d){SerializeDetail(item, d);}, f.detail);
+    std::visit([item](const auto& d) {SerializeDetail(item, d);}, f.detail);
     return item;
 }
 
@@ -323,7 +323,7 @@ static void TrimGlobal(std::vector<ApGroup>& groups)
 {
     int total = 0;
     for (const auto& g : groups) total += static_cast<int>(g.faults.size());
-    if (total <= MAX_TOTAL_RECORDS){
+    if (total <= MAX_TOTAL_RECORDS) {
         return;
     }
     struct Item { int gIdx; int fIdx; int64_t ts; };

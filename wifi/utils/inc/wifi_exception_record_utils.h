@@ -20,10 +20,10 @@
 #include <variant>
 #include <cstdint>
 
-namespace OHOS{
-namespace Wifi{
+namespace OHOS {
+namespace Wifi {
 
-enum class ExceptionReason{
+enum class ExceptionReason {
     DHCP_CONNECTION_FAIL   = 101,
     DHCP_GET_IP_TIMEOUT    = 102,
     DHCP_IPV4_RESULT_FAIL  = 103,
@@ -37,25 +37,25 @@ struct DhcpFaultDetail {
 
 using FaultDetail = std::variant<DhcpFaultDetail>;
 
-struct WifiExceptionRecord{
+struct WifiExceptionRecord {
     std::string     ssid;
     int64_t         timestamp;
     ExceptionReason reason;
     FaultDetail     detail;
 };
 
-struct MergedFault{
+struct MergedFault {
     int64_t         timestamp;
     ExceptionReason reason;
     FaultDetail     detail;
 };
 
-struct ApGroup{
+struct ApGroup {
     std::string              ssid;
     std::vector<MergedFault> faults;
 };
 
-class WifiExceptionRecordUtils{
+class WifiExceptionRecordUtils {
 public:
     WifiExceptionRecordUtils() = default;
     ~WifiExceptionRecordUtils() = default;
@@ -66,10 +66,7 @@ public:
     std::string FormatTime(int64_t ts);
     std::string ReasonToString(ExceptionReason r);
     std::string CategoryToString(ExceptionReason r);
-
-
 };
-
 }
 }
 

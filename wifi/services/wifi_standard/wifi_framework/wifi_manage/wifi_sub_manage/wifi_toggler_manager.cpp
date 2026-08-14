@@ -17,7 +17,6 @@
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
 #include "wifi_config_center.h"
-#include "wifi_settings.h"
 #include "wifi_logger.h"
 #include "wifi_chr_adapter.h"
 #ifdef HDI_CHIP_INTERFACE_SUPPORT

@@ -621,7 +621,7 @@ int CmdWifiException(int argc, char** argv)
         else if(arg == "--per-ap" && i+1<argc ) perAp = atoi(argv[++i]);
     }
     if (doClear) return DoClearExceptions();
-    return DoListExceptions(filterSsid,filterCategory,filterReason,perAp)；
+    return DoListExceptions(filterSsid,filterCategory,filterReason,perAp);
 }
 #endif
 

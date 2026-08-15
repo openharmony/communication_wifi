@@ -23,7 +23,7 @@ namespace Wifi {
 class MockDhcpService {
 public:
     MOCK_METHOD2(RegisterDhcpClientCallBack, DhcpErrorCode(const char *ifname, const ClientCallBack *event));
-    MOCK_METHOD2(StartDhcpClient, DhcpErrorCode(const char *ifname, bool bIpv6));
+    MOCK_METHOD1(StartDhcpClient, DhcpErrorCode(const RouterConfig &config));
     MOCK_METHOD2(StopDhcpClient, DhcpErrorCode(const char *ifname, bool bIpv6));
     MOCK_METHOD2(RegisterDhcpServerCallBack, DhcpErrorCode(const char *ifname, const ServerCallBack *event));
     MOCK_METHOD1(StartDhcpServer, DhcpErrorCode(const char *ifname));

@@ -25,6 +25,7 @@ namespace Wifi {
 constexpr int VEC_POS_3 = 3;
 constexpr int GET_NEXT_IP_MAC_CNT = 10;
 constexpr int64_t IPV6_CHR_EVENT_MIN_INTERVAL = 30 * 60 * 1000 * 1000; // 30 minutes
+constexpr int64_t IPV6_DISABLE_DURATION_SECONDS = 24 * 60 * 60; // 24 hours
 inline constexpr const char* CONST_WIFI_DNSCURE_IPCFG = "const.wifi.dnscure_ipcfg";
 class SelfCureUtils {
 public:
@@ -59,6 +60,7 @@ public:
     bool DisableIpv6(int instId = 0);
     bool HasIpv6Disabled(int instId = 0) const;
     void ReportIpv6ChrEvent();
+    bool IsInIpv6Blocklist(int instId);
 private:
     class SelfCureDnsResultCallback : public NetManagerStandard::NetsysDnsReportCallback {
     public:

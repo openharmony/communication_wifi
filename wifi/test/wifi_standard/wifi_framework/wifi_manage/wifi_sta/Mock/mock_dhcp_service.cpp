@@ -39,11 +39,11 @@ DhcpErrorCode __wrap_RegisterDhcpClientCallBack(const char *ifname, const Client
     return MockDhcpService::GetInstance().RegisterDhcpClientCallBack(ifname, event);
 }
 
-DhcpErrorCode __real_StartDhcpClient(const char *ifname, bool bIpv6);
-DhcpErrorCode __wrap_StartDhcpClient(const char *ifname, bool bIpv6)
+DhcpErrorCode __real_StartDhcpClient(const RouterConfig &config);
+DhcpErrorCode __wrap_StartDhcpClient(const RouterConfig &config)
 {
     WIFI_LOGI("SUN MockDhcpService::StartDhcpClient");
-    return MockDhcpService::GetInstance().StartDhcpClient(ifname, bIpv6);
+    return MockDhcpService::GetInstance().StartDhcpClient(config);
 }
 
 DhcpErrorCode __real_StopDhcpClient(const char *ifname, bool bIpv6);

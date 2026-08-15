@@ -2123,7 +2123,8 @@ void StaStateMachine::GetIpState::GoInState()
             config.prohibitUseCacheIp = IsProhibitUseCacheIp();
         }
         config.isStaticIpv4 = isStaticIpv4;
-        config.bIpv6 = !isStaticIpv6 && !isIpv6Disabled;
+        config.bIpv6 = !isStaticIpv6 && !isIpv6Disabled &&
+                       !SelfCureUtils::GetInstance().IsInIpv6Blocklist(pStaStateMachine->m_instId);
         config.bSpecificNetwork = pStaStateMachine->IsSpecificNetwork();
         if (strncpy_s(config.ifname, sizeof(config.ifname), ifname.c_str(), ifname.length()) != EOK) {
             break;

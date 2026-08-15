@@ -14,6 +14,7 @@
  */
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <chrono>
 #include "mock_wifi_config_center.h"
 #include "mock_wifi_settings.h"
 #include "self_cure_utils.h"
@@ -188,6 +189,64 @@ HWTEST_F(SelfCureUtilsTest, IsResetSelfCureFrequentTest003, TestSize.Level1)
     int64_t currentMs = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
     bool result = SelfCureUtils::GetInstance().IsResetSelfCureFrequent(historyInfo, currentMs);
     EXPECT_FALSE(result);
+}
+
+HWTEST_F(SelfCureUtilsTest, IsInIpv6BlocklistTest001, TestSize.Level1)
+{
+    // GetDeviceConfig returns failure, should return false
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.networkId = 1;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(Return(-1));
+    EXPECT_FALSE(SelfCureUtils::GetInstance().IsInIpv6Blocklist(0));
+}
+ 
+HWTEST_F(SelfCureUtilsTest, IsInIpv6BlocklistTest002, TestSize.Level1)
+{
+    // ipv6DisableTimestamp is 0 (never disabled), should return false
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.networkId = 1;
+    WifiDeviceConfig config;
+    config.ipv6DisableTimestamp = 0;
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_FALSE(SelfCureUtils::GetInstance().IsInIpv6Blocklist(0));
+}
+ 
+HWTEST_F(SelfCureUtilsTest, IsInIpv6BlocklistTest003, TestSize.Level1)
+{
+    // ipv6DisableTimestamp is set but expired (over 24h ago), should return false
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.networkId = 1;
+    WifiDeviceConfig config;
+    auto now = std::chrono::system_clock::now();
+    int64_t currentSeconds = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+    config.ipv6DisableTimestamp = currentSeconds - 90000; // 25 hours ago, > 86400 (24h)
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_FALSE(SelfCureUtils::GetInstance().IsInIpv6Blocklist(0));
+}
+ 
+HWTEST_F(SelfCureUtilsTest, IsInIpv6BlocklistTest004, TestSize.Level1)
+{
+    // ipv6DisableTimestamp is set and within 24h, should return true
+    WifiLinkedInfo linkedInfo;
+    linkedInfo.networkId = 1;
+    WifiDeviceConfig config;
+    auto now = std::chrono::system_clock::now();
+    int64_t currentSeconds = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
+    config.ipv6DisableTimestamp = currentSeconds - 3600; // 1 hour ago, < 86400 (24h)
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _))
+        .WillRepeatedly(DoAll(SetArgReferee<0>(linkedInfo), Return(0)));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _))
+        .WillRepeatedly(DoAll(SetArgReferee<1>(config), Return(0)));
+    EXPECT_TRUE(SelfCureUtils::GetInstance().IsInIpv6Blocklist(0));
 }
 }
 }

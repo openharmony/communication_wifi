@@ -658,7 +658,16 @@ bool SelfCureUtils::DisableIpv6(int instId)
     // Use NetManagerStandard API to disable IPv6 on WiFi interface
     int result = NetManagerStandard::NetsysController::GetInstance().SetEnableIpv6(ifName, 0);
     if (result == 0) {
-        WIFI_LOGI("IPv6 disabled successfully on interface %{public}s", ifName.c_str());
+        // Record the IPv6 disable timestamp to WifiDeviceConfig
+        WifiLinkedInfo linkedInfo;
+        WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, instId);
+        WifiDeviceConfig deviceConfig;
+        if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, deviceConfig, instId) == 0) {
+            deviceConfig.ipv6DisableTimestamp = GetCurrentTimeSeconds();
+            WifiSettings::GetInstance().AddDeviceConfig(deviceConfig);
+            WIFI_LOGI("IPv6 disabled successfully on interface(disable 24h) %{public}s, networkId %{public}d",
+                      ifName.c_str(), linkedInfo.networkId);
+        }
         return true;
     } else {
         WIFI_LOGE("Failed to disable IPv6 on interface %{public}s, result: %{public}d", ifName.c_str(), result);
@@ -666,5 +675,26 @@ bool SelfCureUtils::DisableIpv6(int instId)
     }
 }
 
+bool SelfCureUtils::IsInIpv6Blocklist(int instId)
+{
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo, instId);
+    WifiDeviceConfig savedConfig;
+    if (WifiSettings::GetInstance().GetDeviceConfig(linkedInfo.networkId, savedConfig, instId) != 0) {
+        return false;
+    }
+    if (savedConfig.ipv6DisableTimestamp <= 0) {
+        return false;
+    }
+    if ((GetCurrentTimeSeconds() - savedConfig.ipv6DisableTimestamp) >= IPV6_DISABLE_DURATION_SECONDS) {
+        WIFI_LOGI("IPv6 blocklist expired (over 24h), timestamp=%{public}" PRId64 ", will re-enable IPv6",
+                  savedConfig.ipv6DisableTimestamp);
+        return false;
+    }
+    WIFI_LOGI("IPv6 blocklisted within 24h, timestamp=%{public}" PRId64 ", networkId=%{public}d",
+              savedConfig.ipv6DisableTimestamp,
+              linkedInfo.networkId);
+    return true;
+}
 } // namespace Wifi
 } // namespace OHOS

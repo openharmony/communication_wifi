@@ -41,7 +41,8 @@ static const std::string EAP_METHOD[] = { "NONE", "PEAP", "TLS", "TTLS", "PWD", 
 
 std::shared_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::shared_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
-constexpr uint32_t CANDIDATE_CALLBACK_TIMEOUT = 2 * 1000; // 2s
+constexpr uint32_t CANDIDATE_CALLBACK_TIMEOUT = 10 * 1000; // 10s
+constexpr uint32_t MS_OF_S = 1000;
 
 void Ipv4ConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& result);
 void Ipv6ConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& result);
@@ -1026,7 +1027,7 @@ static void CandidateConnectCompleteFunc(void *data)
         context->callbackFunc(context);
     };
     WifiTimer::GetInstance()->Register(timeoutCallback, context->timerId,
-        context->userActionTimeout + CANDIDATE_CALLBACK_TIMEOUT);
+        (context->userActionTimeout * MS_OF_S) + CANDIDATE_CALLBACK_TIMEOUT);
 
     if (context->callbackTriggered) {
         WifiTimer::GetInstance()->UnRegister(context->timerId);

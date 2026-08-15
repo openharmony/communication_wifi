@@ -1458,7 +1458,7 @@ bool WifiProStateMachine::WifiHasNetState::HandleScanResultInHasNetInner(const s
     if (pWifiProStateMachine_->wifiSwitchReason_ == WIFI_SWITCH_REASON_APP_QOE_SLOW && !qoeSwitch_) {
         WIFI_LOGI("HandleScanResultInHasNet, qoe has tried to switch.");
         WifiProChr::GetInstance().RecordCountWiFiPro(false);
-        return;
+        return false;
     }
     qoeSwitch_ = false;
     WIFI_LOGD("wifi to wifi step 1: select network.");

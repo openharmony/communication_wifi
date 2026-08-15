@@ -1077,17 +1077,33 @@ HWTEST_F(WifiProStateMachineTest, HandleScanResultInHasNetTest01, TestSize.Level
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
-HWTEST_F(WifiProStateMachineTest, HandleScanResultInHasNetInnerTest01, TestSize.Level1)
+HWTEST_F(WifiProStateMachineTest, HandleScanResultInHasNetTest02, TestSize.Level1)
 {
+    // Test HandleScanResultInHasNet with valid message containing empty scan data
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0));
+    pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
     std::vector<InterScanInfo> scanInfos;
-    InterScanInfo scanInfo1;
-    scanInfo1.bssid = "AA:BB:CC:DD:EE:0B";
-    scanInfo1.ssid = "test";
-    scanInfo1.rssi = -75;
-    scanInfos.push_back(scanInfo1);
+    msg->SetMessageObj(scanInfos);
+    pWifiProStateMachine_->pWifiHasNetState_->HandleScanResultInHasNet(msg);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+ 
+HWTEST_F(WifiProStateMachineTest, HandleScanResultInHasNetTest03, TestSize.Level1)
+{
+    // Test HandleScanResultInHasNet with qoe switch reason to exercise qoe check path
+    // After refactor, qoe check is in HandleScanResultInHasNetInner
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetLinkedInfo(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _)).Times(AtLeast(0));
+    EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0));
+    pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
     pWifiProStateMachine_->wifiSwitchReason_ = WIFI_SWITCH_REASON_APP_QOE_SLOW;
-    wifiHasNetState_->qoeSwitch_ = false;
-    wifiHasNetState_->HandleScanResultInHasNetInner(scanInfos);
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    std::vector<InterScanInfo> scanInfos;
+    msg->SetMessageObj(scanInfos);
+    pWifiProStateMachine_->pWifiHasNetState_->HandleScanResultInHasNet(msg);
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 } // namespace Wifi

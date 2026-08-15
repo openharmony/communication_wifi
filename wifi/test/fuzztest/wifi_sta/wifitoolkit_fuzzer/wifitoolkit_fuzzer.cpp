@@ -38,8 +38,6 @@
 #include "network_selection.h"
 #include "network_selector_factory.h"
 #include "wifi_watchdog_utils.h"
-#include "wifi_pro_utils.h"
-#include "wifi_net_observer.h"
 #include <mutex>
 #include <fuzzer/FuzzedDataProvider.h>
 
@@ -74,7 +72,6 @@ static std::unique_ptr<WifiAssetManager> m_WifiAssetManager = nullptr;
 static std::unique_ptr<WifiNotificationUtil> m_WifiNotificationUtil = nullptr;
 static std::unique_ptr<NetworkSelectionManager> m_NetworkSelectionManager = nullptr;
 static std::unique_ptr<WifiWatchDogUtils> m_WifiWatchDogUtils = nullptr;
-static std::unique_ptr<WifiProUtils> m_WifiProUtils = nullptr;
 void MyExit()
 {
     m_networkXmlParser.reset();
@@ -188,14 +185,12 @@ void AppXmlParserTest(const uint8_t* data, size_t size)
     m_appXmlParser->appParserInner_->ParseBlackAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseMultiLinkAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseChariotAppInfo(root_node);
-    m_appXmlParser->appParserInner_->ParseHighTempLimitSpeedAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseKeyForegroundListAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseKeyBackgroundLimitListAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseLiveStreamAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseGameBackgroundLimitListAppInfo(root_node);
     m_appXmlParser->appParserInner_->ParseAsyncLimitSpeedDelayTime(root_node);
     m_appXmlParser->appParserInner_->GetAppTypeAsInt(root_node);
-    m_appXmlParser->appParserInner_->GetLocalFileVersion(root_node);
     m_xmlParser->LoadConfiguration(buf);
     m_xmlParser->LoadConfigurationMemory(buf);
     ConvertStringToBool(buf);
@@ -232,7 +227,6 @@ void AppXmlParserTest2(const uint8_t* data, size_t size)
     m_appXmlParser->IsBlackListApp(conditionName);
     m_appXmlParser->IsMultiLinkApp(conditionName);
     m_appXmlParser->IsChariotApp(conditionName);
-    m_appXmlParser->IsHighTempLimitSpeedApp(conditionName);
     m_appXmlParser->IsKeyForegroundApp(conditionName);
     m_appXmlParser->IsKeyBackgroundLimitApp(conditionName);
     m_appXmlParser->IsLiveStreamApp(conditionName);
@@ -433,22 +427,6 @@ void WifiWatchDogUtilsTest()
 
     m_WifiWatchDogUtils->ResetProcess(usingHiviewDfx, threadName, notResetProcess);
     m_WifiWatchDogUtils->ReportResetEvent(threadName);
-}
-
-void WifiProUtilsTest(const uint8_t* data, size_t size)
-{
-    FuzzedDataProvider fdp(data, size);
-    int32_t instId = fdp.ConsumeIntegral<int32_t>();
-    SupplicantState supplicantState = static_cast<SupplicantState>(fdp.ConsumeIntegral<int>() % SIX);
-    
-    m_WifiProUtils->GetSignalLevel(instId);
-    m_WifiProUtils->IsWifiConnected(instId);
-    m_WifiProUtils->GetCurrentTimeMs();
-    m_WifiProUtils->IsUserSelectNetwork();
-    m_WifiProUtils->IsSupplicantConnectionProcess(supplicantState);
-    m_WifiProUtils->IsSupplicantConnectingProcess(supplicantState);
-    m_WifiProUtils->IsDefaultNet();
-    m_WifiProUtils->IsAppInWhiteLists();
 }
 
 /* Fuzzer entry point */

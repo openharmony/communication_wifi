@@ -41,7 +41,7 @@ static const std::string EAP_METHOD[] = { "NONE", "PEAP", "TLS", "TTLS", "PWD", 
 
 std::shared_ptr<WifiDevice> wifiDevicePtr = WifiDevice::GetInstance(WIFI_DEVICE_ABILITY_ID);
 std::shared_ptr<WifiScan> wifiScanPtr = WifiScan::GetInstance(WIFI_SCAN_ABILITY_ID);
-constexpr uint32_t CANDIDATE_CALLBACK_TIMEOUT = 32 * 1000; // 2s
+constexpr uint32_t CANDIDATE_CALLBACK_TIMEOUT = 2 * 1000; // 2s
 
 void Ipv4ConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& result);
 void Ipv6ConfigToJs(const napi_env& env, const WifiIpConfig& wifiIpConfig, napi_value& result);

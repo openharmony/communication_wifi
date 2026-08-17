@@ -35,6 +35,7 @@ group("fuzztest") {
     "enablep2p_fuzzer:EnableP2pFuzzTest",
     "enablewifi_fuzzer:EnableWifiFuzzTest",
     "isconnected_fuzzer:IsConnectedFuzzTest",
+    "p2pchrreporter_fuzzer:P2pChrReporterFuzzTest",
     "reassociate_fuzzer:ReAssociateFuzzTest",
     "reconnect_fuzzer:ReConnectFuzzTest",
     "wifiap_fuzzer:WifiApFuzzTest",

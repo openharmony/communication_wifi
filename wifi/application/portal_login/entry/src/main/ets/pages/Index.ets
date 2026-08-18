@@ -22,10 +22,11 @@ import { SymbolGlyphModifier, window, CustomContentDialog } from '@kit.ArkUI';
 import { wifiManager } from '@kit.ConnectivityKit';
 import { connection } from '@kit.NetworkKit';
 import { call } from '@kit.TelephonyKit';
+import { inputMethodEngine } from '@kit.IMEKit';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
   validateURL, getIsInOOBE, getHmosUAComplexRegex, StringNumberPair, getRetryList, getDefaultUrl, modifyCode,
-  convertToPermissions, reqPermissionsFromUser, modifyUserAgent, UserAgentCompatibleInfo
+  convertToPermissions, reqPermissionsFromUser, modifyUserAgent, UserAgentCompatibleInfo, preventEnterKeyScript
 } from '../common/utils';
 import {
   updateFinalUrl, updateOnHttpErrorReceive, updateOnErrorReceive, updateOnSslErrorEvent, updateAboutToDisappear,
@@ -40,6 +41,13 @@ const MAX_PROMPT_INPUT_LENGTH = 1000;
 const MAX_SSL_HANDLERS = 50;
 const MAX_RENDER_EXIT_RETRY = 3;
 const RENDER_EXIT_RELOAD_DELAY = 200;
+const WEARABLE_KEYBOARD_OPTIONS: WebKeyboardOptions = {
+  useSystemKeyboard: true,
+  enterKeyType: inputMethodEngine.ENTER_KEY_TYPE_DONE,
+};
+const DEFAULT_KEYBOARD_OPTIONS: WebKeyboardOptions = {
+  useSystemKeyboard: true,
+};
 
 enum DeviceType {
   PHONE = 'Phone',
@@ -415,6 +423,12 @@ struct Index {
 
       Web({ src: '', controller: this.webviewController })
         .javaScriptAccess(true)
+        .onInterceptKeyboardAttach((_KeyboardCallbackInfo) => {
+          if (deviceInfo.deviceType === 'wearable') {
+            return WEARABLE_KEYBOARD_OPTIONS;
+          }
+          return DEFAULT_KEYBOARD_OPTIONS;
+        })
         .fileAccess(false)
         .geolocationAccess(false)
         .domStorageAccess(true)
@@ -519,6 +533,7 @@ struct Index {
           }
         })
         .javaScriptOnDocumentStart([{ script: modifyCode, scriptRules: ["*"] }])
+        .javaScriptOnDocumentEnd(this.isWearable ? [{ script: preventEnterKeyScript, scriptRules: ["*"] }] : [])
         .onPageBegin(() => {
           updateFinalUrl(this.webUrl);
           this.loadProgress = 0;

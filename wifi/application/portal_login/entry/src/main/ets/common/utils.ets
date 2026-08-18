@@ -238,6 +238,20 @@ export function modifyUserAgent(originalUA: string, appendInfo: string): string 
 
 export const modifyCode = `Object.defineProperty(navigator, 'platform', { get: () => 'Linux aarch64' });`;
 
+export const preventEnterKeyScript = `
+(function() {
+  function handleEnter(e) {
+    if (e.keyCode === 13 || e.key === 'Enter' || e.code === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+      e.target.blur();
+      return false;
+    }
+  }
+  document.addEventListener('keydown', handleEnter, true);
+})();
+`;
+
 export function loadUAWhiteList(context: common.Context): void {
   try {
     const rawContent: Uint8Array = context.resourceManager.getRawFileContentSync('config.json');

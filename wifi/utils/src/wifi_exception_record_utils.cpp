@@ -337,8 +337,8 @@ static void TrimGlobal(std::vector<ApGroup>& groups)
             items.push_back({groupIndex, faultIndex, groups[groupIndex].faults[faultIndex].timestamp});
         }
     }
-    std::sort(items.begin(), items.end(), [](const Item& left, const Item& right) { 
-        return left.timestamp > right.timestamp;});
+    std::sort(items.begin(), items.end(), [](const Item& left, 
+        const Item& right) {return left.timestamp > right.timestamp;});
     std::vector<std::vector<MergedFault>> kept(groups.size());
     for (int index = 0; index < MAX_TOTAL_RECORDS && index < static_cast<int>(items.size()); index++) {
         kept[items[index].groupIndex].push_back(groups[items[index].groupIndex].faults[items[index].faultIndex]);

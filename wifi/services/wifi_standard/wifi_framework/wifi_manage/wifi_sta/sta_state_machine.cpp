@@ -2152,7 +2152,8 @@ void StaStateMachine::GetIpState::GoInState()
     if (!pStaStateMachine->isRoam) {
 #ifdef WIFI_EXCEPTION_RECORD_ENABLE
         WifiExceptionRecordUtils utils;
-        utils.AddException(pStaStateMachine->linkedInfo.ssid, ExceptionReason::DHCP_CONNECTION_FAIL, -1, "START_DHCP_CLIENT_FAIL");
+        utils.AddException(pStaStateMachine->linkedInfo.ssid,
+            ExceptionReason::DHCP_CONNECTION_FAIL, -1, "START_DHCP_CLIENT_FAIL");
 #endif
         pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_DHCP_FAIL,
             DhcpFailType::TYPE_DHCP_CONNECTION_FAIL);
@@ -2256,7 +2257,8 @@ void StaStateMachine::GetIpState::DealGetDhcpIpv4Timeout(InternalMessagePtr msg)
     pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
 #ifdef WIFI_EXCEPTION_RECORD_ENABLE
     WifiExceptionRecordUtils utils;
-    utils.AddException(pStaStateMachine->linkedInfo.ssid, ExceptionReason::DHCP_GET_IP_TIMEOUT, -1, "wifi sta dhcp get ip timeout (30s)");
+    utils.AddException(pStaStateMachine->linkedInfo.ssid,
+        ExceptionReason::DHCP_GET_IP_TIMEOUT, -1, "wifi sta dhcp get ip timeout (30s)");
 #endif
     pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_DHCP_FAIL,
         DhcpFailType::TYPE_GET_IP_TIMEOUT);
@@ -4508,7 +4510,8 @@ void StaStateMachine::DhcpResultNotify::OnFailedDhcpResult(int status, const cha
     if (status == DHCP_LEASE_EXPIRED) {
 #ifdef WIFI_EXCEPTION_RECORD_ENABLE
         WifiExceptionRecordUtils utils;
-        utils.AddException(pStaStateMachine->linkedInfo.ssid, ExceptionReason::DHCP_IP_EXPIRED_FAIL, status, reason ? reason : "");
+        utils.AddException(pStaStateMachine->linkedInfo.ssid,
+            ExceptionReason::DHCP_IP_EXPIRED_FAIL, status, reason ? reason : "");
 #endif
         DhcpResultNotifyEvent(DhcpReturnCode::DHCP_IP_EXPIRED);
         return;

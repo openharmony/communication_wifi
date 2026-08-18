@@ -27,11 +27,12 @@ enum class ExceptionReason {
     DHCP_CONNECTION_FAIL   = 101,
     DHCP_GET_IP_TIMEOUT    = 102,
     DHCP_IPV4_RESULT_FAIL  = 103,
-    DHCP_IP_EXPIRED        = 104,
+    DHCP_IP_EXPIRED_FAIL   = 104,
 };
 
 struct DhcpFaultDetail {
-    int dhcpStatus; std::string extra;
+    int dhcpStatus;
+    std::string extra;
     bool operator==(const DhcpFaultDetail& o) const { return dhcpStatus == o.dhcpStatus && extra == o.extra; }
 };
 
@@ -61,6 +62,7 @@ public:
     ~WifiExceptionRecordUtils() = default;
 
     int32_t AddException(const WifiExceptionRecord& record);
+    int32_t AddException(const std::string& ssid, ExceptionReason reason, int dhcpStatus, const std::string& extra);
     int32_t GetAllExceptions(std::vector<ApGroup>& groups);
     int32_t ClearExceptions();
     std::string FormatTime(int64_t ts);

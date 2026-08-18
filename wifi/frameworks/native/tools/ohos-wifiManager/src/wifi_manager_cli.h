@@ -12,9 +12,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "wifi_manager_cli.h"
+#ifndef OHOS_WIFI_MANAGER_CLI_H
+#define OHOS_WIFI_MANAGER_CLI_H
 
-int main(int argc, char** argv)
-{
-    return OHOS::WifiCli::RunCommand(argc, argv);
-}
+#include <string>
+
+#include "cJSON.h"
+
+namespace OHOS {
+namespace WifiCli {
+
+void OutputSuccessJson(cJSON* data);
+void OutputErrorJson(const std::string& code, const std::string& message, const std::string& suggestion = "");
+int RunCommand(int argc, char** argv);
+
+} // namespace WifiCli
+} // namespace OHOS
+
+#endif // OHOS_WIFI_MANAGER_CLI_H

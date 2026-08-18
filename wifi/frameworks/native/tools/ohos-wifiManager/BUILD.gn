@@ -23,6 +23,8 @@ import("//build/ohos/cli/ohos_cli_executable.gni")
 ohos_cli_executable("ohos-wifiManager") {
     sources = [
         "src/main.cpp",
+        "src/wifi_manager_cli.cpp",
+        "src/wifi_exception_cli.cpp",
     ]
 
     sanitize = {

@@ -31,80 +31,81 @@ namespace Wifi {
 
 DEFINE_WIFILOG_LABEL("WifiExceptionRecordUtils");
 
+constexpr const char* WIFI_DIR_PATH = "/data/service/el1/public/wifi";
 constexpr const char* FILE_PATH = "/data/service/el1/public/wifi/wifi_exception.json";
-constexpr int FILE_VERSION = 3;
 constexpr int LOCK_RETRIES = 3;
 constexpr int MAX_FAULTS_PER_GROUP = 10;
 constexpr int MAX_TOTAL_RECORDS = 50;
 constexpr int REASON_CATEGORY_BASE = 100;
+constexpr int DHCP_CATEGORY = 1;
 constexpr mode_t FILE_PERMISSION_MODE = 0600;
 constexpr mode_t DIR_PERMISSION_MODE = 0700;
 constexpr int LOCK_RETRY_INTERVAL_US = 50000;
 
-static int CategoryOf(ExceptionReason r)
+static int CategoryOf(ExceptionReason reason)
 {
-    return static_cast<int>(r) / REASON_CATEGORY_BASE;
+    return static_cast<int>(reason) / REASON_CATEGORY_BASE;
 }
 
-std::string WifiExceptionRecordUtils::ReasonToString(ExceptionReason r)
+std::string WifiExceptionRecordUtils::ReasonToString(ExceptionReason reason)
 {
-    switch (r) {
+    switch (reason) {
         case ExceptionReason::DHCP_CONNECTION_FAIL:    return "DHCP_CONNECTION_FAIL";
         case ExceptionReason::DHCP_GET_IP_TIMEOUT:     return "DHCP_GET_IP_TIMEOUT";
         case ExceptionReason::DHCP_IPV4_RESULT_FAIL:   return "DHCP_IPV4_RESULT_FAIL";
-        case ExceptionReason::DHCP_IP_EXPIRED:         return "DHCP_IP_EXPIRED";
+        case ExceptionReason::DHCP_IP_EXPIRED_FAIL:    return "DHCP_IP_EXPIRED_FAIL";
         default: return "UNKNOWN";
     }
 }
 
-std::string WifiExceptionRecordUtils::CategoryToString(ExceptionReason r)
+std::string WifiExceptionRecordUtils::CategoryToString(ExceptionReason reason)
 {
-    switch (CategoryOf(r)) {
-        case 1: return "DHCP";
+    switch (CategoryOf(reason)) {
+        case DHCP_CATEGORY: return "DHCP";
         default: return "UNKNOWN";
     }
 }
 
-std::string WifiExceptionRecordUtils::FormatTime(int64_t ts)
+std::string WifiExceptionRecordUtils::FormatTime(int64_t timestamp)
 {
-    time_t t = static_cast<time_t>(ts);
+    time_t timeValue = static_cast<time_t>(timestamp);
     struct tm result = {};
-    localtime_r(&t, &result);
+    localtime_r(&timeValue, &result);
     char buf[32] = {0};
     size_t len = strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &result);
     if (len == 0) {
-    return std::string();
-}
+        return std::string();
+    }
     return std::string(buf, len);
 }
 
-static void SerializeDetail(cJSON* obj, const DhcpFaultDetail& d)
+static void SerializeDetail(cJSON* obj, const DhcpFaultDetail& detail)
 {
-    cJSON_AddNumberToObject(obj, "dhcpStatus", d.dhcpStatus);
-    cJSON_AddStringToObject(obj, "extra", d.extra.c_str());
+    cJSON_AddNumberToObject(obj, "dhcpStatus", detail.dhcpStatus);
+    cJSON_AddStringToObject(obj, "extra", detail.extra.c_str());
 }
 
-static cJSON* SerializeFault(const MergedFault& f, WifiExceptionRecordUtils& utils)
+static cJSON* SerializeFault(const MergedFault& fault, WifiExceptionRecordUtils& utils)
 {
     cJSON* item = cJSON_CreateObject();
-    cJSON_AddNumberToObject(item, "timestamp", static_cast<double>(f.timestamp));
-    cJSON_AddStringToObject(item, "timeReadable", utils.FormatTime(f.timestamp).c_str());
-    cJSON_AddNumberToObject(item, "reasonCode", static_cast<int>(f.reason));
-    cJSON_AddStringToObject(item, "reason", utils.ReasonToString(f.reason).c_str());
-    cJSON_AddStringToObject(item, "category", utils.CategoryToString(f.reason).c_str());
-    std::visit([item](const auto& d) {SerializeDetail(item, d);}, f.detail);
+    cJSON_AddNumberToObject(item, "timestamp", static_cast<double>(fault.timestamp));
+    cJSON_AddStringToObject(item, "timeReadable", utils.FormatTime(fault.timestamp).c_str());
+    cJSON_AddNumberToObject(item, "reasonCode", static_cast<int>(fault.reason));
+    cJSON_AddStringToObject(item, "reason", utils.ReasonToString(fault.reason).c_str());
+    cJSON_AddStringToObject(item, "category", utils.CategoryToString(fault.reason).c_str());
+    std::visit([item](const auto& detail) {SerializeDetail(item, detail);}, fault.detail);
     return item;
 }
 
 static cJSON* BuildGroupsJson(const std::vector<ApGroup>& groups, WifiExceptionRecordUtils& utils)
 {
     cJSON* arr = cJSON_CreateArray();
-    for (const auto& g : groups) {
+    for (const auto& group : groups) {
         cJSON* grp = cJSON_CreateObject();
-        cJSON_AddStringToObject(grp, "ssid", g.ssid.c_str());
+        cJSON_AddStringToObject(grp, "ssid", group.ssid.c_str());
         cJSON* faults = cJSON_CreateArray();
-        for (const auto& f : g.faults) {
-            cJSON_AddItemToArray(faults, SerializeFault(f, utils));
+        for (const auto& fault : group.faults) {
+            cJSON_AddItemToArray(faults, SerializeFault(fault, utils));
         }
         cJSON_AddItemToObject(grp, "faults", faults);
         cJSON_AddItemToArray(arr, grp);
@@ -131,7 +132,7 @@ static int WriteTmpAndRename(const std::string& jsonStr)
         WIFI_LOGE("WriteTmpAndRename: rename failed");
         return -1;
     }
-    int dirFd = open("/data/service/el1/public/wifi", O_RDONLY);
+    int dirFd = open(WIFI_DIR_PATH, O_RDONLY);
     if (dirFd >= 0) {
         fsync(dirFd);
         close(dirFd);
@@ -143,7 +144,6 @@ static int32_t SaveToFile(const std::vector<ApGroup>& groups)
 {
     WifiExceptionRecordUtils utils;
     cJSON* root = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "version", FILE_VERSION);
     cJSON_AddNumberToObject(root, "maxRecords", MAX_TOTAL_RECORDS);
     cJSON_AddItemToObject(root, "groups", BuildGroupsJson(groups, utils));
     char* jsonStr = cJSON_PrintUnformatted(root);
@@ -159,12 +159,12 @@ static int32_t SaveToFile(const std::vector<ApGroup>& groups)
 static FaultDetail ParseDetail(cJSON* faultNode, ExceptionReason reason)
 {
     switch (CategoryOf(reason)) {
-        case 1: {
-            cJSON* ds = cJSON_GetObjectItem(faultNode, "dhcpStatus");
-            cJSON* ex = cJSON_GetObjectItem(faultNode, "extra");
+        case DHCP_CATEGORY: {
+            cJSON* dhcpStatusNode = cJSON_GetObjectItem(faultNode, "dhcpStatus");
+            cJSON* extraNode = cJSON_GetObjectItem(faultNode, "extra");
             return DhcpFaultDetail{
-                ds && cJSON_IsNumber(ds) ? ds->valueint : -1,
-                ex && cJSON_IsString(ex) ? ex->valuestring : ""};
+                dhcpStatusNode && cJSON_IsNumber(dhcpStatusNode) ? dhcpStatusNode->valueint : -1,
+                extraNode && cJSON_IsString(extraNode) ? extraNode->valuestring : ""};
         }
         default:
             return DhcpFaultDetail{-1, "unknown reason"};
@@ -174,12 +174,12 @@ static FaultDetail ParseDetail(cJSON* faultNode, ExceptionReason reason)
 static MergedFault ParseFault(cJSON* faultNode)
 {
     MergedFault fault = {};
-    cJSON* tsNode = cJSON_GetObjectItem(faultNode, "timestamp");
-    if (tsNode && cJSON_IsNumber(tsNode)) {
-        fault.timestamp = static_cast<int64_t>(tsNode->valuedouble);
+    cJSON* timestampNode = cJSON_GetObjectItem(faultNode, "timestamp");
+    if (timestampNode && cJSON_IsNumber(timestampNode)) {
+        fault.timestamp = static_cast<int64_t>(timestampNode->valuedouble);
     }
-    cJSON* rcNode = cJSON_GetObjectItem(faultNode, "reasonCode");
-    int reasonCode = rcNode && cJSON_IsNumber(rcNode) ? rcNode->valueint : 0;
+    cJSON* reasonCodeNode = cJSON_GetObjectItem(faultNode, "reasonCode");
+    int reasonCode = reasonCodeNode && cJSON_IsNumber(reasonCodeNode) ? reasonCodeNode->valueint : 0;
     fault.reason = static_cast<ExceptionReason>(reasonCode);
     fault.detail = ParseDetail(faultNode, fault.reason);
     return fault;
@@ -190,9 +190,9 @@ static void ParseFaults(cJSON* faultsArr, std::vector<MergedFault>& faults)
     if (!faultsArr || !cJSON_IsArray(faultsArr)) {
         return;
     }
-    int fsize = cJSON_GetArraySize(faultsArr);
-    for (int j = 0; j < fsize; j++) {
-        cJSON* faultNode = cJSON_GetArrayItem(faultsArr, j);
+    int faultCount = cJSON_GetArraySize(faultsArr);
+    for (int index = 0; index < faultCount; index++) {
+        cJSON* faultNode = cJSON_GetArrayItem(faultsArr, index);
         if (faultNode) {
             faults.push_back(ParseFault(faultNode));
         }
@@ -204,9 +204,9 @@ static void ParseGroups(cJSON* groupsArr, std::vector<ApGroup>& groups)
     if (!groupsArr || !cJSON_IsArray(groupsArr)) {
         return;
     }
-    int size = cJSON_GetArraySize(groupsArr);
-    for (int i = 0; i < size; i++) {
-        cJSON* grpNode = cJSON_GetArrayItem(groupsArr, i);
+    int groupCount = cJSON_GetArraySize(groupsArr);
+    for (int index = 0; index < groupCount; index++) {
+        cJSON* grpNode = cJSON_GetArrayItem(groupsArr, index);
         if (!grpNode) {
             continue;
         }
@@ -238,11 +238,6 @@ static int32_t LoadFromFile(std::vector<ApGroup>& groups)
     cJSON* root = cJSON_Parse(content.c_str());
     if (!root) {
         WIFI_LOGE("LoadFromFile: parse failed, treating as empty");
-        return 0;
-    }
-    cJSON* verNode = cJSON_GetObjectItem(root, "version");
-    if (!verNode || !cJSON_IsNumber(verNode) || verNode->valueint != FILE_VERSION) {
-        cJSON_Delete(root);
         return 0;
     }
     cJSON* groupsArr = cJSON_GetObjectItem(root, "groups");
@@ -278,7 +273,7 @@ static bool IsPathValid(const std::string& path)
     if (path.find("..") != std::string::npos) {
         return false;
     }
-    const char* prefix = "/data/service/el1/public/wifi/";
+    std::string prefix = std::string(WIFI_DIR_PATH) + "/";
     if (path.find(prefix) != 0) {
         return false;
     }
@@ -290,11 +285,12 @@ static bool IsPathValid(const std::string& path)
     }
     return true;
 }
+
 static ApGroup& FindOrAddGroup(std::vector<ApGroup>& groups, const std::string& ssid)
 {
-    for (auto& g: groups) {
-        if (g.ssid == ssid) {
-            return g;
+    for (auto& group : groups) {
+        if (group.ssid == ssid) {
+            return group;
         }
     }
     groups.push_back(ApGroup{ssid, {}});
@@ -303,9 +299,9 @@ static ApGroup& FindOrAddGroup(std::vector<ApGroup>& groups, const std::string& 
 
 static void MergeOrAddFault(std::vector<MergedFault>& faults, const WifiExceptionRecord& record)
 {
-    for (auto& f : faults) {
-        if (f.reason == record.reason && f.detail == record.detail) {
-            f.timestamp = record.timestamp;
+    for (auto& fault : faults) {
+        if (fault.reason == record.reason && fault.detail == record.detail) {
+            fault.timestamp = record.timestamp;
             return;
         }
     }
@@ -314,35 +310,40 @@ static void MergeOrAddFault(std::vector<MergedFault>& faults, const WifiExceptio
 
 static void TrimPerGroup(std::vector<ApGroup>& groups)
 {
-    for (auto& g : groups) {
-        if (g.faults.size() > MAX_FAULTS_PER_GROUP) {
-            std::sort(g.faults.begin(), g.faults.end(),
-                [](const MergedFault& a, const MergedFault& b) {return a.timestamp > b.timestamp;});
-            g.faults.resize(MAX_FAULTS_PER_GROUP);
+    for (auto& group : groups) {
+        if (group.faults.size() > MAX_FAULTS_PER_GROUP) {
+            std::sort(group.faults.begin(), group.faults.end(),
+                [](const MergedFault& left, const MergedFault& right) {return left.timestamp > right.timestamp;});
+            group.faults.resize(MAX_FAULTS_PER_GROUP);
         }
     }
 }
+
 static void TrimGlobal(std::vector<ApGroup>& groups)
 {
     int total = 0;
-    for (const auto& g : groups) total += static_cast<int>(g.faults.size());
+    for (const auto& group : groups) total += static_cast<int>(group.faults.size());
     if (total <= MAX_TOTAL_RECORDS) {
         return;
     }
-    struct Item { int gIdx; int fIdx; int64_t ts; };
+    struct Item {
+        int groupIndex;
+        int faultIndex;
+        int64_t timestamp;
+    };
     std::vector<Item> items;
-    for (int gi = 0; gi < static_cast<int>(groups.size()); gi++) {
-        for (int fi = 0; fi < static_cast<int>(groups[gi].faults.size()); fi++) {
-            items.push_back({gi, fi, groups[gi].faults[fi].timestamp});
+    for (int groupIndex = 0; groupIndex < static_cast<int>(groups.size()); groupIndex++) {
+        for (int faultIndex = 0; faultIndex < static_cast<int>(groups[groupIndex].faults.size()); faultIndex++) {
+            items.push_back({groupIndex, faultIndex, groups[groupIndex].faults[faultIndex].timestamp});
         }
     }
-    std::sort(items.begin(), items.end(), [](const Item& a, const Item& b) { return a.ts > b.ts;});
+    std::sort(items.begin(), items.end(), [](const Item& left, const Item& right) { return left.timestamp > right.timestamp;});
     std::vector<std::vector<MergedFault>> kept(groups.size());
-    for (int i = 0; i < MAX_TOTAL_RECORDS && i < static_cast<int>(items.size()); i++) {
-        kept[items[i].gIdx].push_back(groups[items[i].gIdx].faults[items[i].fIdx]);
+    for (int index = 0; index < MAX_TOTAL_RECORDS && index < static_cast<int>(items.size()); index++) {
+        kept[items[index].groupIndex].push_back(groups[items[index].groupIndex].faults[items[index].faultIndex]);
     }
-    for (int gi = 0; gi < static_cast<int>(groups.size()); gi++) {
-        groups[gi].faults = std::move(kept[gi]);
+    for (int groupIndex = 0; groupIndex < static_cast<int>(groups.size()); groupIndex++) {
+        groups[groupIndex].faults = std::move(kept[groupIndex]);
     }
 }
 
@@ -378,6 +379,17 @@ int32_t WifiExceptionRecordUtils::AddException(const WifiExceptionRecord& record
     flock(fd, LOCK_UN);
     close(fd);
     return 0;
+}
+
+int32_t WifiExceptionRecordUtils::AddException(const std::string& ssid, ExceptionReason reason,
+    int dhcpStatus, const std::string& extra)
+{
+    WifiExceptionRecord record;
+    record.ssid = ssid;
+    record.timestamp = static_cast<int64_t>(time(nullptr));
+    record.reason = reason;
+    record.detail = DhcpFaultDetail{dhcpStatus, extra};
+    return AddException(record);
 }
 
 int32_t WifiExceptionRecordUtils::GetAllExceptions(std::vector<ApGroup>& groups)

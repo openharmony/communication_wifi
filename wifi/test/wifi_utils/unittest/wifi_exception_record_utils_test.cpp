@@ -166,7 +166,7 @@ HWTEST_F(WifiExceptionRecordUtilsTest, ReasonToString_AllReasons, TestSize.Level
     EXPECT_EQ(utils.ReasonToString(ExceptionReason::DHCP_CONNECTION_FAIL), "DHCP_CONNECTION_FAIL");
     EXPECT_EQ(utils.ReasonToString(ExceptionReason::DHCP_GET_IP_TIMEOUT), "DHCP_GET_IP_TIMEOUT");
     EXPECT_EQ(utils.ReasonToString(ExceptionReason::DHCP_IPV4_RESULT_FAIL), "DHCP_IPV4_RESULT_FAIL");
-    EXPECT_EQ(utils.ReasonToString(ExceptionReason::DHCP_IP_EXPIRED), "DHCP_IP_EXPIRED");
+    EXPECT_EQ(utils.ReasonToString(ExceptionReason::DHCP_IP_EXPIRED_FAIL), "DHCP_IP_EXPIRED_FAIL");
 }
 
 HWTEST_F(WifiExceptionRecordUtilsTest, CategoryToString_AllCategories, TestSize.Level0)

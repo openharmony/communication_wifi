@@ -286,7 +286,7 @@ static bool IsPathValid(const std::string& path)
             return false;
         }
     }
-    if (access(dir.c_str(), W_OK) !=0) {
+    if (access(dir.c_str(), W_OK) != 0) {
         WIFI_LOGE("IsPathValid: dir not writable, errno=%{public}d, dir=%{public}s", errno, dir.c_str());
         return false;
     }
@@ -369,11 +369,11 @@ static int OpenWithRecover()
     }
     int err = errno;
     WIFI_LOGE("OpenWithRecover: open failed, errno=%{public}d, try recover", err);
-    if (err == EACCES && unlink(FILE_PATH) == 0){
+    if (err == EACCES && unlink(FILE_PATH) == 0) {
         WIFI_LOGI("OpenWithRecover: stale file unlinked, recreating");
         fd = open(FILE_PATH, O_RDWR | O_CREAT, FILE_PERMISSION_MODE);
         if (fd >= 0) {
-        return fd;
+            return fd;
         }
         WIFI_LOGE("OpenWithRecover: reopen failed, errno=%{public}d", errno);
     }
@@ -386,7 +386,7 @@ int32_t WifiExceptionRecordUtils::AddException(const WifiExceptionRecord& record
         WIFI_LOGE("AddException: path invalid");
         return -1;
     }
-    int fd = openWithRecover();
+    int fd = OpenWithRecover();
     if (fd < 0) {
         return -1;
     }

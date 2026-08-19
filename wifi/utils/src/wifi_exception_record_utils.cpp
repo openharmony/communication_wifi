@@ -116,9 +116,10 @@ static cJSON* BuildGroupsJson(const std::vector<ApGroup>& groups, WifiExceptionR
 static int WriteTmpAndRename(const std::string& jsonStr)
 {
     std::string tmpPath = std::string(FILE_PATH) + ".tmp";
+    unlink(tmpPath.c_str());
     int fd = open(tmpPath.c_str(), O_WRONLY | O_CREAT | O_TRUNC, FILE_PERMISSION_MODE);
     if (fd < 0) {
-        WIFI_LOGE("WriteTmpAndRename: open tmp failed");
+        WIFI_LOGE("WriteTmpAndRename: open tmp failed, errno=%{public}d", errno);
         return -1;
     }
     ssize_t written = write(fd, jsonStr.c_str(), jsonStr.size());
@@ -279,9 +280,15 @@ static bool IsPathValid(const std::string& path)
     }
     std::string dir = path.substr(0, path.find_last_of('/'));
     if (access(dir.c_str(), F_OK) != 0) {
+        WIFI_LOGI("IsPathValid: dir not exist, mkdir %{public}s", dir.c_str());
         if (mkdir(dir.c_str(), DIR_PERMISSION_MODE) != 0 && errno != EEXIST) {
+            WIFI_LOGE("IsPathValid: mkdir failed, errno=%{public}d", errno);
             return false;
         }
+    }
+    if (access(dir.c_str(), W_OK) !=0) {
+        WIFI_LOGE("IsPathValid: dir not writable, errno=%{public}d, dir=%{public}s", errno, dir.c_str());
+        return false;
     }
     return true;
 }
@@ -354,15 +361,33 @@ static void EnforceLimits(std::vector<ApGroup>& groups)
     TrimGlobal(groups);
 }
 
+static int OpenWithRecover()
+{
+    int fd = open(FILE_PATH, O_RDWR | O_CREAT, FILE_PERMISSION_MODE);
+    if (fd >= 0) {
+        return fd;
+    }
+    int err = errno;
+    WIFI_LOGE("OpenWithRecover: open failed, errno=%{public}d, try recover", err);
+    if (err == EACCES && unlink(FILE_PATH) == 0){
+        WIFI_LOGI("OpenWithRecover: stale file unlinked, recreating");
+        fd = open(FILE_PATH, O_RDWR | O_CREAT, FILE_PERMISSION_MODE);
+        if (fd >= 0) {
+        return fd;
+        }
+        WIFI_LOGE("OpenWithRecover: reopen failed, errno=%{public}d", errno);
+    }
+    return -1;
+}
+
 int32_t WifiExceptionRecordUtils::AddException(const WifiExceptionRecord& record)
 {
     if (!IsPathValid(FILE_PATH)) {
         WIFI_LOGE("AddException: path invalid");
         return -1;
     }
-    int fd = open(FILE_PATH, O_RDWR | O_CREAT, FILE_PERMISSION_MODE);
+    int fd = openWithRecover();
     if (fd < 0) {
-        WIFI_LOGE("AddException: open failed");
         return -1;
     }
     fchmod(fd, FILE_PERMISSION_MODE);
@@ -403,19 +428,10 @@ int32_t WifiExceptionRecordUtils::ClearExceptions()
     if (!IsPathValid(FILE_PATH)) {
         return -1;
     }
-    int fd = open(FILE_PATH, O_RDWR | O_CREAT, FILE_PERMISSION_MODE);
-    if (fd < 0) {
+    if (unlink(FILE_PATH) != 0 && errno != ENOENT) {
+        WIFI_LOGE("ClearExceptions: unlink failed, errno=%{public}d", errno);
         return -1;
     }
-    fchmod(fd, FILE_PERMISSION_MODE);
-    if (AcquireLock(fd, true) < 0) {
-        close(fd);
-        return -1;
-    }
-    std::vector<ApGroup> empty;
-    SaveToFile(empty);
-    flock(fd, LOCK_UN);
-    close(fd);
     return 0;
 }
 

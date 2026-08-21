@@ -47,6 +47,7 @@ private:
     void InitHandleMap(void);
     void InitHandleMapEx(void);
     void InitHandleMapExPart3(void);
+    void InitHandleMapExPart4(void);
     void OnEnableP2p(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnDisableP2p(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnDiscoverDevices(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);

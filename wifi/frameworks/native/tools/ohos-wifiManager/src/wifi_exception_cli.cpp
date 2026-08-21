@@ -16,6 +16,7 @@
 #include "wifi_manager_cli.h"
 
 #include <algorithm>
+#include <cerrno>
 #include <cstdint>
 #include <cstdlib>
 #include <string>
@@ -36,7 +37,7 @@ namespace WifiCli {
 constexpr int NO_REASON_FILTER = -1;
 constexpr int NO_PER_AP_LIMIT = 0;
 constexpr int DECIMAL_BASE = 10;
-constexpr int INT_MIN_VALUE = -2147483647-1;
+constexpr int INT_MIN_VALUE = -2147483647 - 1;
 constexpr int INT_MAX_VALUE = 2147483647;
 
 static std::string GetSuggestion(OHOS::Wifi::ExceptionReason reason, const std::string& ssid)

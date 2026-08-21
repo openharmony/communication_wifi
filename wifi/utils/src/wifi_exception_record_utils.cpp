@@ -228,7 +228,7 @@ static void ParseFaults(cJSON* faultsArr, std::vector<MergedFault>& faults)
         cJSON* faultNode = cJSON_GetArrayItem(faultsArr, index);
         if (faultNode) {
             MergedFault fault;
-            if (ParseFault(faultNode,fault)) {
+            if (ParseFault(faultNode, fault)) {
                 faults.push_back(fault);
             }
         }
@@ -465,7 +465,7 @@ int32_t WifiExceptionRecordUtils::GetAllExceptions(std::vector<ApGroup>& groups)
         WIFI_LOGE("GetAllExceptions: lock failed");
         return -1;
     }
-    int32_t ret=LoadFromFile(groups);
+    int32_t ret = LoadFromFile(groups);
     ReleaseFileLock(lockFd);
     return ret;
 }

@@ -247,6 +247,14 @@ enum class GroupOwnerBandJs {
     GO_BAND_5GHZ = 2,
 };
 
+enum class P2pServiceProtocolTypeJs {
+    ALL = 0,
+    BONJOUR = 1,
+    UP_NP = 2,
+    WS_DISCOVERY = 3,
+    VENDOR_SPECIFIC = 255,
+};
+
 enum class Phase2MethodJs {
     PHASE2_NONE,
     PHASE2_PAP,

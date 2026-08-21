@@ -64,5 +64,35 @@ HWTEST_F(WifiP2pUpnpServiceInfoTest, BuildWpaQuery, TestSize.Level1)
     WarpCreateSupQuery();
     EXPECT_FALSE(g_errLog.find("processWiTasDecisiveMessage")!=std::string::npos);
 }
+
+HWTEST_F(WifiP2pUpnpServiceInfoTest, CheckSuccess, TestSize.Level1)
+{
+    const std::string uuid = "550e8400-e29b-41d4-a716-446655440000";
+    std::vector<std::string> services;
+    services.push_back("urn:schemas-upnp-org:service:ContentDirectory:1");
+    EXPECT_EQ(WifiP2pUpnpServiceInfo::Check(uuid, "urn:schemas-upnp-org:device:MediaServer:1",
+        services, "upnp-svc"), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pUpnpServiceInfoTest, CheckInvalidUuid, TestSize.Level1)
+{
+    std::vector<std::string> services;
+    EXPECT_EQ(WifiP2pUpnpServiceInfo::Check("invalid-uuid", "device", services, "svc"),
+        ErrCode::WIFI_OPT_INVALID_PARAM);
+    EXPECT_EQ(WifiP2pUpnpServiceInfo::Check("550e8400e29b41d4a716446655440000", "device", services, "svc"),
+        ErrCode::WIFI_OPT_INVALID_PARAM);
+}
+
+HWTEST_F(WifiP2pUpnpServiceInfoTest, CheckInvalidLength, TestSize.Level1)
+{
+    const std::string uuid = "550e8400-e29b-41d4-a716-446655440000";
+    std::vector<std::string> services;
+    std::string overDevice(WifiP2pUpnpServiceInfo::MAX_UPNP_DEVICE_LEN + 1, 'd');
+    std::string overName(WifiP2pUpnpServiceInfo::MAX_UPNP_SERVICE_NAME_LEN + 1, 'n');
+    EXPECT_EQ(WifiP2pUpnpServiceInfo::Check(uuid, overDevice, services, "svc"),
+        ErrCode::WIFI_OPT_INVALID_PARAM);
+    EXPECT_EQ(WifiP2pUpnpServiceInfo::Check(uuid, "device", services, overName),
+        ErrCode::WIFI_OPT_INVALID_PARAM);
+}
 }  // namespace Wifi
 }  // namespace OHOS

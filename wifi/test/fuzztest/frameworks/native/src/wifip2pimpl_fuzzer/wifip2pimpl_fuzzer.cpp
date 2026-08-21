@@ -73,6 +73,35 @@ namespace Wifi {
         WifiP2pPtr->DeleteLocalP2pService(srvInfo);
     }
 
+    void AddDnsSdLocalP2pServiceTest(FuzzedDataProvider& FDP)
+    {
+        WifiP2pServiceInfo srvInfo;
+        std::string instanceName = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string serviceType = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string serviceName = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::map<std::string, std::string> txtMap;
+        txtMap.emplace(FDP.ConsumeBytesAsString(NUM_BYTES), FDP.ConsumeBytesAsString(NUM_BYTES));
+        WifiP2pPtr->AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName, srvInfo);
+    }
+
+    void AddUpnpLocalP2pServiceTest(FuzzedDataProvider& FDP)
+    {
+        WifiP2pServiceInfo srvInfo;
+        std::string uuid = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string device = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::string serviceName = FDP.ConsumeBytesAsString(NUM_BYTES);
+        std::vector<std::string> services;
+        services.push_back(FDP.ConsumeBytesAsString(NUM_BYTES));
+        WifiP2pPtr->AddUpnpLocalP2pService(uuid, device, services, serviceName, srvInfo);
+    }
+
+    void QueryLocalP2pServicesTest(FuzzedDataProvider& FDP)
+    {
+        (void)FDP;
+        std::vector<WifiP2pServiceInfo> services;
+        WifiP2pPtr->QueryLocalP2pServices(services);
+    }
+
     void QueryP2pLinkedInfoTest(const uint8_t* data, size_t size)
     {
         if (size == 0) {
@@ -182,6 +211,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     
     OHOS::Wifi::PutLocalP2pServiceTest(FDP);
     OHOS::Wifi::DeleteLocalP2pServiceTest(FDP);
+    OHOS::Wifi::AddDnsSdLocalP2pServiceTest(FDP);
+    OHOS::Wifi::AddUpnpLocalP2pServiceTest(FDP);
+    OHOS::Wifi::QueryLocalP2pServicesTest(FDP);
     OHOS::Wifi::WifiHotSpotImplFuzzTest(data, size);
     return 0;
 }

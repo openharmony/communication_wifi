@@ -1118,6 +1118,80 @@ void RemoveCandidateConfigSync(int32_t networkId)
     return MakeWifiP2pGroupInfo(groupInfo);
 }
 
+::ohos::wifiManager::WifiP2pServiceInfo AddDnsSdLocalP2pService(::taihe::string_view instanceName,
+    ::taihe::string_view serviceType, ::taihe::map_view<::taihe::string, ::taihe::string> txtRecord,
+    ::taihe::string_view serviceName)
+{
+    std::map<std::string, std::string> txtMap;
+    for (const auto& item : txtRecord) {
+        txtMap[static_cast<std::string>(item.first)] = static_cast<std::string>(item.second);
+    }
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return MakeWifiP2pServiceInfo(WifiP2pServiceInfo());
+    }
+    WifiP2pServiceInfo info;
+    ErrCode ret = g_wifiP2pPtr->AddDnsSdLocalP2pService(static_cast<std::string>(instanceName),
+        static_cast<std::string>(serviceType), txtMap, static_cast<std::string>(serviceName), info);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+    return MakeWifiP2pServiceInfo(info);
+}
+
+::ohos::wifiManager::WifiP2pServiceInfo AddUpnpLocalP2pService(::taihe::string_view uuid,
+    ::taihe::string_view device, ::taihe::array_view<::taihe::string> services, ::taihe::string_view serviceName)
+{
+    std::vector<std::string> serviceList;
+    for (const auto& service : services) {
+        serviceList.emplace_back(static_cast<std::string>(service));
+    }
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return MakeWifiP2pServiceInfo(WifiP2pServiceInfo());
+    }
+    WifiP2pServiceInfo info;
+    ErrCode ret = g_wifiP2pPtr->AddUpnpLocalP2pService(static_cast<std::string>(uuid),
+        static_cast<std::string>(device), serviceList, static_cast<std::string>(serviceName), info);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+    return MakeWifiP2pServiceInfo(info);
+}
+
+void RemoveLocalP2pService(::ohos::wifiManager::WifiP2pServiceInfo const& srvInfo)
+{
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return;
+    }
+    WifiP2pServiceInfo info = ConvertWifiP2pServiceInfo(srvInfo);
+    ErrCode ret = g_wifiP2pPtr->DeleteLocalP2pService(info);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+    }
+}
+
+::taihe::array<::ohos::wifiManager::WifiP2pServiceInfo> GetLocalP2pServicesSync()
+{
+    if (g_wifiP2pPtr == nullptr) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
+        return {};
+    }
+    std::vector<WifiP2pServiceInfo> services;
+    ErrCode ret = g_wifiP2pPtr->QueryLocalP2pServices(services);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_P2P);
+        return {};
+    }
+    std::vector<::ohos::wifiManager::WifiP2pServiceInfo> result;
+    for (WifiP2pServiceInfo& info : services) {
+        result.emplace_back(MakeWifiP2pServiceInfo(info));
+    }
+    return ::taihe::array<::ohos::wifiManager::WifiP2pServiceInfo>(
+        taihe::copy_data_t{}, result.data(), result.size());
+}
+
 void OnWifiStateChange(::taihe::callback_view<void(int)> callback)
 {
     std::unique_lock<std::shared_mutex> guard(g_wifiStateChangeLock);
@@ -1853,6 +1927,10 @@ TH_EXPORT_CPP_API_RemoveCandidateConfigSync(RemoveCandidateConfigSync);
 TH_EXPORT_CPP_API_GetP2pLocalDeviceSync(GetP2pLocalDeviceSync);
 TH_EXPORT_CPP_API_GetP2pGroupsSync(GetP2pGroupsSync);
 TH_EXPORT_CPP_API_GetCurrentGroupSync(GetCurrentGroupSync);
+TH_EXPORT_CPP_API_AddDnsSdLocalP2pService(AddDnsSdLocalP2pService);
+TH_EXPORT_CPP_API_AddUpnpLocalP2pService(AddUpnpLocalP2pService);
+TH_EXPORT_CPP_API_RemoveLocalP2pService(RemoveLocalP2pService);
+TH_EXPORT_CPP_API_GetLocalP2pServicesSync(GetLocalP2pServicesSync);
 TH_EXPORT_CPP_API_OnWifiStateChange(OnWifiStateChange);
 TH_EXPORT_CPP_API_OffWifiStateChange(OffWifiStateChange);
 TH_EXPORT_CPP_API_OnWifiConnectionChange(OnWifiConnectionChange);

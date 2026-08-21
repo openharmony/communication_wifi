@@ -83,6 +83,32 @@ public:
     virtual ErrCode DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo) override;
 
     /**
+     * @Description Add Bonjour (DNS-SD) local P2P service (create then put)
+     * @param instanceName - DNS-SD instance name
+     * @param serviceType - DNS-SD service type
+     * @param txtMap - TXT record map
+     * @param serviceName - local service name
+     * @param srvInfo - output WifiP2pServiceInfo object
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
+        const std::map<std::string, std::string> &txtMap, const std::string &serviceName,
+        WifiP2pServiceInfo &srvInfo) override;
+
+    /**
+     * @Description Add UPnP local P2P service (create then put)
+     * @param uuid - UPnP device UUID
+     * @param device - UPnP device type string
+     * @param services - UPnP service type strings
+     * @param serviceName - local service name
+     * @param srvInfo - output WifiP2pServiceInfo object
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
+        const std::vector<std::string> &services, const std::string &serviceName,
+        WifiP2pServiceInfo &srvInfo) override;
+
+    /**
      * @Description - Request specified services.
      * @param  device - requested target device
      * @param  request - initiated service request data
@@ -196,6 +222,14 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode QueryP2pServices(std::vector<WifiP2pServiceInfo> &services) override;
+
+    /**
+     * @Description Query local registered P2P services
+     * @param services - list of local service information
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode QueryLocalP2pServices(std::vector<WifiP2pServiceInfo> &services) override;
+
     /**
      * @Description - Register all callbacks provided by the P2P.
      * @param  callbacks - all callbacks added

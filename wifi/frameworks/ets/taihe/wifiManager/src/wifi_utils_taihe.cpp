@@ -690,5 +690,35 @@ WifiP2pConfig ConvertWifiP2pConfig(const ::ohos::wifiManager::WifiP2PConfig &con
         groupInfo.GetGoIpAddress()
     };
 }
+
+::ohos::wifiManager::WifiP2pServiceInfo MakeWifiP2pServiceInfo(const WifiP2pServiceInfo& srvInfo)
+{
+    const std::vector<std::string>& queryList = srvInfo.GetQueryList();
+    std::vector<::taihe::string> queries;
+    for (const std::string& query : queryList) {
+        queries.emplace_back(query);
+    }
+    auto queryArray = ::taihe::array<::taihe::string>(taihe::copy_data_t{}, queries.data(), queries.size());
+    return {
+        srvInfo.GetServiceName(),
+        static_cast<::ohos::wifiManager::P2pServiceProtocolType::key_t>(
+            srvInfo.GetServicerProtocolType()),
+        queryArray
+    };
+}
+
+WifiP2pServiceInfo ConvertWifiP2pServiceInfo(const ::ohos::wifiManager::WifiP2pServiceInfo& srvInfo)
+{
+    WifiP2pServiceInfo info;
+    info.SetServiceName(static_cast<std::string>(srvInfo.serviceName));
+    info.SetServicerProtocolType(
+        static_cast<P2pServicerProtocolType>(static_cast<int>(srvInfo.protocolType)));
+    std::vector<std::string> queryList;
+    for (const auto& query : srvInfo.queryList) {
+        queryList.emplace_back(static_cast<std::string>(query));
+    }
+    info.SetQueryList(queryList);
+    return info;
+}
 }  // namespace Wifi
 }  // namespace OHOS

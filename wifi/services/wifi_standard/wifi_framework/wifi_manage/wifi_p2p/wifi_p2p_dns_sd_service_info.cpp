@@ -42,6 +42,17 @@ WifiP2pDnsSdServiceInfo::WifiP2pDnsSdServiceInfo(const std::vector<std::string> 
 WifiP2pDnsSdServiceInfo::WifiP2pDnsSdServiceInfo()
 {}
 
+ErrCode WifiP2pDnsSdServiceInfo::Check(const std::string &instanceName, const std::string &serviceType,
+    const std::map<std::string, std::string> &txtMap, const std::string &svrName)
+{
+    (void)txtMap;
+    if (instanceName.size() > MAX_DNS_SD_NAME_LEN || serviceType.size() > MAX_DNS_SD_NAME_LEN ||
+        svrName.size() > MAX_DNS_SD_NAME_LEN) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    return WIFI_OPT_SUCCESS;
+}
+
 WifiP2pDnsSdServiceInfo WifiP2pDnsSdServiceInfo::Create(const std::string &instanceName, const std::string &serviceType,
     const std::map<std::string, std::string> &txtMap, const std::string &svrName)
 {

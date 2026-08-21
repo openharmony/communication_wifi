@@ -131,6 +131,14 @@ void WifiP2pStub::InitHandleMapExPart3()
         [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
             OnHid2dSetGroupType(code, data, reply, option);
         };
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_ADD_LOCAL_SERVICE)] =
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
+            OnAddLocalP2pService(code, data, reply, option);
+        };
+    handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_LOCAL_SERVICES)] =
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
+            OnQueryLocalP2pServices(code, data, reply, option);
+        };
 }
 
 void WifiP2pStub::InitHandleMap()
@@ -334,6 +342,75 @@ void WifiP2pStub::OnDeleteLocalP2pService(
     ErrCode ret = DeleteLocalP2pService(config);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
+    return;
+}
+
+ErrCode WifiP2pStub::ParseAndAddDnsSdLocalP2pService(MessageParcel &data, WifiP2pServiceInfo &srvInfo)
+{
+    constexpr int MAX_TXT_RECORDS = 64;
+    const char *instanceName = data.ReadCString();
+    const char *serviceType = data.ReadCString();
+    const char *serviceName = data.ReadCString();
+    if (instanceName == nullptr || serviceType == nullptr || serviceName == nullptr) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    std::map<std::string, std::string> txtMap;
+    int txtSize = data.ReadInt32();
+    if (txtSize > MAX_TXT_RECORDS) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    for (int i = 0; i < txtSize; ++i) {
+        const char *key = data.ReadCString();
+        const char *val = data.ReadCString();
+        if (key == nullptr || val == nullptr) {
+            return WIFI_OPT_INVALID_PARAM;
+        }
+        txtMap.emplace(key, val);
+    }
+    return AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName, srvInfo);
+}
+
+ErrCode WifiP2pStub::ParseAndAddUpnpLocalP2pService(MessageParcel &data, WifiP2pServiceInfo &srvInfo)
+{
+    constexpr int MAX_UPNP_SERVICES = 64;
+    const char *uuid = data.ReadCString();
+    const char *device = data.ReadCString();
+    const char *serviceName = data.ReadCString();
+    if (uuid == nullptr || device == nullptr || serviceName == nullptr) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    std::vector<std::string> services;
+    int serviceSize = data.ReadInt32();
+    if (serviceSize > MAX_UPNP_SERVICES) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    for (int i = 0; i < serviceSize; ++i) {
+        const char *service = data.ReadCString();
+        if (service == nullptr) {
+            return WIFI_OPT_INVALID_PARAM;
+        }
+        services.emplace_back(service);
+    }
+    return AddUpnpLocalP2pService(uuid, device, services, serviceName, srvInfo);
+}
+
+void WifiP2pStub::OnAddLocalP2pService(
+    uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int buildType = data.ReadInt32();
+    WifiP2pServiceInfo srvInfo;
+    ErrCode ret = WIFI_OPT_INVALID_PARAM;
+    if (buildType == static_cast<int32_t>(P2pBuildServiceType::BUILD_DNS_SD)) {
+        ret = ParseAndAddDnsSdLocalP2pService(data, srvInfo);
+    } else if (buildType == static_cast<int32_t>(P2pBuildServiceType::BUILD_UPNP)) {
+        ret = ParseAndAddUpnpLocalP2pService(data, srvInfo);
+    }
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+    if (ret == WIFI_OPT_SUCCESS) {
+        WriteWifiP2pServiceInfo(reply, srvInfo);
+    }
     return;
 }
 
@@ -564,6 +641,24 @@ void WifiP2pStub::OnQueryP2pServices(uint32_t code, MessageParcel &data, Message
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     std::vector<WifiP2pServiceInfo> services;
     ErrCode ret = QueryP2pServices(services);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+
+    if (ret == WIFI_OPT_SUCCESS) {
+        int size = static_cast<int>(services.size());
+        reply.WriteInt32(size);
+        for (int i = 0; i < size; ++i) {
+            WriteWifiP2pServiceInfo(reply, services[i]);
+        }
+    }
+    return;
+}
+
+void WifiP2pStub::OnQueryLocalP2pServices(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    std::vector<WifiP2pServiceInfo> services;
+    ErrCode ret = QueryLocalP2pServices(services);
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
 

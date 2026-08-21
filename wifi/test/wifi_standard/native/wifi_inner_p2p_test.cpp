@@ -59,6 +59,32 @@ HWTEST_F(WifiInnerP2pTest, DeleteLocalP2pServiceTest, TestSize.Level1)
     EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
 }
 
+HWTEST_F(WifiInnerP2pTest, AddDnsSdLocalP2pServiceTest, TestSize.Level1)
+{
+    WifiP2pServiceInfo srvInfo;
+    std::map<std::string, std::string> txtMap;
+    ASSERT_TRUE(p2pPtr != nullptr);
+    p2pPtr->AddDnsSdLocalP2pService("instance", "_test._tcp", txtMap, "svc", srvInfo);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+
+HWTEST_F(WifiInnerP2pTest, AddUpnpLocalP2pServiceTest, TestSize.Level1)
+{
+    WifiP2pServiceInfo srvInfo;
+    std::vector<std::string> services;
+    ASSERT_TRUE(p2pPtr != nullptr);
+    p2pPtr->AddUpnpLocalP2pService("550e8400-e29b-41d4-a716-446655440000", "device", services, "svc", srvInfo);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+
+HWTEST_F(WifiInnerP2pTest, QueryLocalP2pServicesTest, TestSize.Level1)
+{
+    std::vector<WifiP2pServiceInfo> services;
+    ASSERT_TRUE(p2pPtr != nullptr);
+    p2pPtr->QueryLocalP2pServices(services);
+    EXPECT_FALSE(g_errLog.find("service is null")!=std::string::npos);
+}
+
 HWTEST_F(WifiInnerP2pTest, QueryP2pLinkedInfoTest, TestSize.Level1)
 {
     WifiP2pLinkedInfo linkedInfo;

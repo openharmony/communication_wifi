@@ -56,6 +56,9 @@ private:
     void OnRequestService(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnPutLocalP2pService(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnDeleteLocalP2pService(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnAddLocalP2pService(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    ErrCode ParseAndAddDnsSdLocalP2pService(MessageParcel &data, WifiP2pServiceInfo &srvInfo);
+    ErrCode ParseAndAddUpnpLocalP2pService(MessageParcel &data, WifiP2pServiceInfo &srvInfo);
     void OnStartP2pListen(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnStopP2pListen(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnCreateGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
@@ -72,6 +75,7 @@ private:
     void OnQueryP2pDevices(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnQueryP2pGroups(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnQueryP2pServices(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnQueryLocalP2pServices(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnSetP2pDeviceName(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);

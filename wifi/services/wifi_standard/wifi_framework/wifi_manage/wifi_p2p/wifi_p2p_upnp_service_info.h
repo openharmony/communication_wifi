@@ -17,6 +17,7 @@
 
 #include "wifi_p2p_msg.h"
 #include "p2p_macro.h"
+#include "wifi_errcode.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -24,6 +25,9 @@ namespace Wifi {
     FRIEND_GTEST(WifiP2pUpnpServiceInfo);
     public:
         static const int VERSION_1_0 = 0x10;
+        static constexpr size_t UPNP_UUID_LEN = 36;
+        static constexpr size_t MAX_UPNP_DEVICE_LEN = 255;
+        static constexpr size_t MAX_UPNP_SERVICE_NAME_LEN = 63;
         /**
          * @Description Construct a new WifiP2pUpnpServiceInfo object.
          *
@@ -35,6 +39,19 @@ namespace Wifi {
          */
         static WifiP2pUpnpServiceInfo Create(const std::string &uuid, const std::string &device,
                                                   const std::vector<std::string> &services, const std::string &svrName);
+
+        /**
+         * @Description Check whether UPnP local service parameters are valid.
+         *
+         * @param uuid - string of uuid
+         * @param device - string of device
+         * @param services - string list of services
+         * @param svrName - service name
+         * @return ErrCode - WIFI_OPT_SUCCESS if valid, otherwise WIFI_OPT_INVALID_PARAM
+         */
+        static ErrCode Check(const std::string &uuid, const std::string &device,
+            const std::vector<std::string> &services, const std::string &svrName);
+
         /**
          * @Description Destroy the WifiP2pUpnpServiceInfo object.
          *

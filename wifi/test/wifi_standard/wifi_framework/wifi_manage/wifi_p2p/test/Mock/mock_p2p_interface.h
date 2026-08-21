@@ -33,6 +33,12 @@ public:
     virtual ErrCode StopDiscoverServices();
     virtual ErrCode PutLocalP2pService(const WifiP2pServiceInfo &srvInfo);
     virtual ErrCode DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo);
+    virtual ErrCode AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
+        const std::map<std::string, std::string> &txtMap, const std::string &serviceName,
+        WifiP2pServiceInfo &srvInfo);
+    virtual ErrCode AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
+        const std::vector<std::string> &services, const std::string &serviceName,
+        WifiP2pServiceInfo &srvInfo);
     virtual ErrCode RequestService(const WifiP2pDevice &device, const WifiP2pServiceRequest &request);
     virtual ErrCode StartP2pListen(int period, int interval);
     virtual ErrCode StopP2pListen();
@@ -52,6 +58,7 @@ public:
     virtual ErrCode QueryP2pLocalDevice(WifiP2pDevice &device);
     virtual ErrCode QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups);
     virtual ErrCode QueryP2pServices(std::vector<WifiP2pServiceInfo> &services);
+    virtual ErrCode QueryLocalP2pServices(std::vector<WifiP2pServiceInfo> &services);
     virtual ErrCode RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks);
     virtual ErrCode UnRegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks);
     virtual ErrCode Hid2dCreateGroup(const int frequency, FreqType type);

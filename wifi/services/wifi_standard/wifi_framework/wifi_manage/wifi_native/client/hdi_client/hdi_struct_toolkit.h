@@ -90,5 +90,50 @@ static void FreeHdiP2pDeviceInfo(HdiP2pDeviceInfo *hdiP2pDeviceInfo)
     hdiP2pDeviceInfo->operSsid = nullptr;
     hdiP2pDeviceInfo = nullptr;
 }
+
+static bool AllocHdiP2pServiceField(uint8_t **field, uint32_t *fieldLen, const char *data, uint32_t dataLen)
+{
+    if (field == nullptr || fieldLen == nullptr) {
+        return false;
+    }
+    *field = nullptr;
+    *fieldLen = 0;
+    if (data == nullptr || dataLen == 0) {
+        return true;
+    }
+    uint8_t *buf = (uint8_t *)calloc(dataLen + 1, sizeof(uint8_t));
+    if (buf == nullptr) {
+        return false;
+    }
+    if (memcpy_s(buf, dataLen + 1, data, dataLen) != EOK) {
+        free(buf);
+        return false;
+    }
+    *field = buf;
+    *fieldLen = dataLen;
+    return true;
+}
+
+static void FreeHdiP2pServiceInfo(HdiP2pServiceInfo *servInfo)
+{
+    if (servInfo == nullptr) {
+        return;
+    }
+    if (servInfo->name != nullptr) {
+        free(servInfo->name);
+        servInfo->name = nullptr;
+    }
+    if (servInfo->query != nullptr) {
+        free(servInfo->query);
+        servInfo->query = nullptr;
+    }
+    if (servInfo->resp != nullptr) {
+        free(servInfo->resp);
+        servInfo->resp = nullptr;
+    }
+    servInfo->nameLen = 0;
+    servInfo->queryLen = 0;
+    servInfo->respLen = 0;
+}
 #endif
 #endif

@@ -20,6 +20,7 @@
 
 #include "wifi_p2p_msg.h"
 #include "wifi_p2p_dns_txt_record.h"
+#include "wifi_errcode.h"
 
 namespace OHOS {
 namespace Wifi {
@@ -28,6 +29,7 @@ class WifiP2pDnsSdServiceInfo : public WifiP2pServiceInfo {
 
 public:
     enum { VERSION_1 = 1, DNS_PTR_TYPE = 12, DNS_TXT_TYPE = 16 };
+    static constexpr size_t MAX_DNS_SD_NAME_LEN = 63;
     /**
      * @Description Construct a new WifiP2pDnsSdServiceInfo object.
      *
@@ -51,6 +53,18 @@ public:
      * @return WifiP2pDnsSdServiceInfo
      */
     static WifiP2pDnsSdServiceInfo Create(const std::string &instanceName, const std::string &serviceType,
+        const std::map<std::string, std::string> &txtMap, const std::string &svrName);
+
+    /**
+     * @Description Check whether DNS-SD local service parameters are valid.
+     *
+     * @param instanceName - name of the dns service
+     * @param serviceType - dns service type name
+     * @param txtMap - TXT character table of the dns service
+     * @param svrName - service name
+     * @return ErrCode - WIFI_OPT_SUCCESS if valid, otherwise WIFI_OPT_INVALID_PARAM
+     */
+    static ErrCode Check(const std::string &instanceName, const std::string &serviceType,
         const std::map<std::string, std::string> &txtMap, const std::string &svrName);
 
     /**

@@ -132,6 +132,20 @@ static napi_value GroupOwnerBandInit(napi_env env)
     return groupOwnerBand;
 }
 
+static napi_value P2pServiceProtocolTypeInit(napi_env env)
+{
+    napi_value protocolType = nullptr;
+    napi_create_object(env, &protocolType);
+    SetNamedPropertyByInteger(env, protocolType, static_cast<int>(P2pServiceProtocolTypeJs::ALL), "ALL");
+    SetNamedPropertyByInteger(env, protocolType, static_cast<int>(P2pServiceProtocolTypeJs::BONJOUR), "BONJOUR");
+    SetNamedPropertyByInteger(env, protocolType, static_cast<int>(P2pServiceProtocolTypeJs::UP_NP), "UP_NP");
+    SetNamedPropertyByInteger(env, protocolType,
+        static_cast<int>(P2pServiceProtocolTypeJs::WS_DISCOVERY), "WS_DISCOVERY");
+    SetNamedPropertyByInteger(env, protocolType,
+        static_cast<int>(P2pServiceProtocolTypeJs::VENDOR_SPECIFIC), "VENDOR_SPECIFIC");
+    return protocolType;
+}
+
 static napi_value DisconnectedReasonInit(napi_env env)
 {
     napi_value reason = nullptr;
@@ -308,6 +322,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value p2pConnStateObj = P2pConnStateInit(env);
     napi_value P2pDeviceStatusObj = P2pDeviceStatusInit(env);
     napi_value groupOwnerBandObj = GroupOwnerBandInit(env);
+    napi_value p2pServiceProtocolTypeObj = P2pServiceProtocolTypeInit(env);
     napi_value disconnectedReasonObj = DisconnectedReasonInit(env);
 #ifdef ENABLE_NAPI_WIFI_MANAGER
     napi_value phase2MethodObj = Phase2MethodInit(env);
@@ -346,6 +361,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("P2pConnectState", p2pConnStateObj),
         DECLARE_NAPI_PROPERTY("P2pDeviceStatus", P2pDeviceStatusObj),
         DECLARE_NAPI_PROPERTY("GroupOwnerBand", groupOwnerBandObj),
+        DECLARE_NAPI_PROPERTY("P2pServiceProtocolType", p2pServiceProtocolTypeObj),
         DECLARE_NAPI_PROPERTY("DisconnectedReason", disconnectedReasonObj),
     };
     napi_define_properties(env, exports, sizeof(exportFuncs) / sizeof(napi_property_descriptor), exportFuncs);
@@ -441,6 +457,10 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("getP2pGroups", GetP2pGroups),
         DECLARE_NAPI_FUNCTION("setDeviceName", SetDeviceName),
         DECLARE_NAPI_FUNCTION("setP2pDeviceName", SetDeviceName),
+        DECLARE_NAPI_FUNCTION("addDnsSdLocalP2pService", AddDnsSdLocalP2pService),
+        DECLARE_NAPI_FUNCTION("addUpnpLocalP2pService", AddUpnpLocalP2pService),
+        DECLARE_NAPI_FUNCTION("removeLocalP2pService", RemoveLocalP2pService),
+        DECLARE_NAPI_FUNCTION("getLocalP2pServices", GetLocalP2pServices),
         DECLARE_NAPI_FUNCTION("isBandTypeSupported", IsBandTypeSupported),
         DECLARE_NAPI_FUNCTION("get5GChannelList", Get5GHzChannelList),
         DECLARE_NAPI_FUNCTION("setScanAlwaysAllowed", SetScanOnlyAvailable),

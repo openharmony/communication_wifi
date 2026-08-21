@@ -17,8 +17,43 @@
 
 namespace OHOS {
 namespace Wifi {
+static bool IsStandardUuid(const std::string &uuid)
+{
+    if (uuid.size() != WifiP2pUpnpServiceInfo::UPNP_UUID_LEN) {
+        return false;
+    }
+    constexpr size_t hyphenPos[] = {8, 13, 18, 23};
+    size_t hyphenIdx = 0;
+    for (size_t i = 0; i < WifiP2pUpnpServiceInfo::UPNP_UUID_LEN; ++i) {
+        if (hyphenIdx < sizeof(hyphenPos) / sizeof(hyphenPos[0]) && i == hyphenPos[hyphenIdx]) {
+            if (uuid[i] != '-') {
+                return false;
+            }
+            ++hyphenIdx;
+            continue;
+        }
+        char c = uuid[i];
+        bool isHex = (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+        if (!isHex) {
+            return false;
+        }
+    }
+    return true;
+}
+
 WifiP2pUpnpServiceInfo::WifiP2pUpnpServiceInfo(std::vector<std::string> &queryList) : WifiP2pServiceInfo(queryList)
 {}
+
+ErrCode WifiP2pUpnpServiceInfo::Check(const std::string &uuid, const std::string &device,
+    const std::vector<std::string> &services, const std::string &svrName)
+{
+    (void)services;
+    if (!IsStandardUuid(uuid) || device.size() > MAX_UPNP_DEVICE_LEN ||
+        svrName.size() > MAX_UPNP_SERVICE_NAME_LEN) {
+        return WIFI_OPT_INVALID_PARAM;
+    }
+    return WIFI_OPT_SUCCESS;
+}
 
 WifiP2pUpnpServiceInfo WifiP2pUpnpServiceInfo::Create(const std::string &uuid, const std::string &device,
     const std::vector<std::string> &services, const std::string &svrName)

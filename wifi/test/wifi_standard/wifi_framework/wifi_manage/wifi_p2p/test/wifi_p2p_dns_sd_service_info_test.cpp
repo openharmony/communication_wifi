@@ -77,5 +77,25 @@ HWTEST_F(WifiP2pDnsSdServiceInfoTest, TurnDnsNameToStream, TestSize.Level1)
 {
     WarpTurnDnsNameToStream();
 }
+
+HWTEST_F(WifiP2pDnsSdServiceInfoTest, CheckSuccess, TestSize.Level1)
+{
+    std::map<std::string, std::string> txtMap;
+    txtMap.insert(std::make_pair(std::string("ip"), std::string("127.0.0.1")));
+    EXPECT_EQ(WifiP2pDnsSdServiceInfo::Check("instance", "_test._tcp", txtMap, "svc"),
+        ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pDnsSdServiceInfoTest, CheckInvalidParam, TestSize.Level1)
+{
+    std::map<std::string, std::string> txtMap;
+    std::string overLen(WifiP2pDnsSdServiceInfo::MAX_DNS_SD_NAME_LEN + 1, 'a');
+    EXPECT_EQ(WifiP2pDnsSdServiceInfo::Check(overLen, "_test._tcp", txtMap, "svc"),
+        ErrCode::WIFI_OPT_INVALID_PARAM);
+    EXPECT_EQ(WifiP2pDnsSdServiceInfo::Check("instance", overLen, txtMap, "svc"),
+        ErrCode::WIFI_OPT_INVALID_PARAM);
+    EXPECT_EQ(WifiP2pDnsSdServiceInfo::Check("instance", "_test._tcp", txtMap, overLen),
+        ErrCode::WIFI_OPT_INVALID_PARAM);
+}
 }  // namespace Wifi
 }  // namespace OHOS

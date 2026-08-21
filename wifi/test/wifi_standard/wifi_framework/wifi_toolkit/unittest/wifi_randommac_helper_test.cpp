@@ -173,5 +173,24 @@ HWTEST_F(WifiRandomMacHelperTest, CalculateRandomMacForWifiDeviceConfig_003, Tes
     WIFI_LOGI("CalculateRandomMacForWifiDeviceConfig_003 exit");
 }
 
+HWTEST_F(WifiRandomMacHelperTest, GetWifi2RandomMac_001, TestSize.Level1)
+{
+    std::string mac = "f2:5a:ab:80:de:99";
+    EXPECT_TRUE(WifiRandomMacHelper::GetWifi2RandomMac(mac));
+    EXPECT_EQ(mac, "f2:5a:ab:00:de:99");
+ 
+    mac = "f2:5a:ab:8f:de:99";
+    EXPECT_TRUE(WifiRandomMacHelper::GetWifi2RandomMac(mac));
+    EXPECT_EQ(mac, "f2:5a:ab:0f:de:99");
+ 
+    mac = "f2:5a:ab:00:de:99";
+    EXPECT_TRUE(WifiRandomMacHelper::GetWifi2RandomMac(mac));
+    EXPECT_EQ(mac, "f2:5a:ab:80:de:99");
+ 
+    mac = "f2:5a:ab:7f:de:99";
+    EXPECT_TRUE(WifiRandomMacHelper::GetWifi2RandomMac(mac));
+    EXPECT_EQ(mac, "f2:5a:ab:ff:de:99");
+}
+
 }  // namespace Wifi
 }  // namespace OHOS

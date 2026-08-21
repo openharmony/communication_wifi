@@ -286,7 +286,7 @@ bool WifiRandomMacHelper::GetWifi2RandomMac(std::string &wifi2RandomMac)
     }
     unsigned int outputHexMac = inputHexMac ^ WIFI2_RANDOM_MAC_MASK;
     std::stringstream outSsMac;
-    outSsMac << std::hex <<outputHexMac;
+    outSsMac << std::hex << std::setw(WIFI2_RANDOM_MAC_CHANGE_LEN) << std::setfill('0') << outputHexMac;
     wifi2RandomMac.replace(WIFI2_RANDOM_MAC_CHANGE_POS, WIFI2_RANDOM_MAC_CHANGE_LEN, outSsMac.str());
     return true;
 }

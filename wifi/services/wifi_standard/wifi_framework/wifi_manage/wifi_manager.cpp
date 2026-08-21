@@ -34,6 +34,9 @@
 #include "wifi_common_service_manager.h"
 #include "wifi_native_define.h"
 #include "wifi_sta_hal_interface.h"
+#ifdef WIFI_EXCEPTION_RECORD_ENABLE
+#include "wifi_exception_record_utils.h"
+#endif
 #ifndef OHOS_ARCH_LITE
 #include "wifi_watchdog_utils.h"
 #include "power_mgr_client.h"
@@ -60,6 +63,11 @@ int WifiManager::Init()
 {
     std::unique_lock<std::mutex> lock(initStatusMutex);
     WifiConfigCenter::GetInstance().SetSystemMode(IsFactoryMode() ? SystemMode::M_FACTORY_MODE : SystemMode::M_DEFAULT);
+#ifdef WIFI_EXCEPTION_RECORD_ENABLE
+    WifiExceptionRecordUtils exceptionRecordUtils;
+    exceptionRecordUtils.ClearExceptions();
+    WIFI_LOGI("WifiManager::Init:cleared WiFi exception records on startup");
+#endif
 #ifndef OHOS_ARCH_LITE
     WifiWatchDogUtils::GetInstance(); // init watchdog to set ffrt callback timeout before ffrt thread created
 #endif

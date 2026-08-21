@@ -33,6 +33,9 @@
 #include "wifi_native_struct.h"
 #include "wifi_chr_utils.h"
 #include "network_selection_manager.h"
+#ifdef WIFI_EXCEPTION_RECORD_ENABLE
+#include "wifi_exception_record_utils.h"
+#endif
 
 #ifndef OHOS_ARCH_LITE
 #include "want.h"
@@ -498,6 +501,11 @@ public:
         DhcpResult DhcpOfferInfo;
         bool isDhcpIpv4Success = false;
         bool isDhcpIpv6Success = false;
+#ifdef WIFI_EXCEPTION_RECORD_ENABLE
+        int lastDhcpFailStatus = -1;
+        std::string lastDhcpFailReason;
+        std::mutex dhcpFailMutex;
+#endif
     };
 
 public:

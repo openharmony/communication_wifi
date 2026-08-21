@@ -12,9 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "wifi_manager_cli.h"
+#ifndef OHOS_WIFI_EXCEPTION_CLI_H
+#define OHOS_WIFI_EXCEPTION_CLI_H
 
-int main(int argc, char** argv)
-{
-    return OHOS::WifiCli::RunCommand(argc, argv);
-}
+#ifdef WIFI_EXCEPTION_RECORD_ENABLE
+
+namespace OHOS {
+namespace WifiCli {
+
+int CmdWifiException(int argc, char** argv);
+
+} // namespace WifiCli
+} // namespace OHOS
+
+#endif // WIFI_EXCEPTION_RECORD_ENABLE
+
+#endif // OHOS_WIFI_EXCEPTION_CLI_H

@@ -46,6 +46,9 @@
 #include "wifi_sta_hal_interface.h"
 #include "block_connect_service.h"
 #include "wifi_hisysevent.h"
+#ifdef WIFI_EXCEPTION_RECORD_ENABLE
+#include "wifi_exception_record_utils.h"
+#endif
 #ifdef WLAN_PLUGGABLE_SUPPORTED
 #include "parameters.h"
 #endif
@@ -2065,6 +2068,11 @@ ErrCode WifiDeviceServiceImpl::FactoryReset()
     // wifi device
     WifiSettings::GetInstance().ClearDeviceConfig();
     WifiSettings::GetInstance().SyncDeviceConfig();
+#ifdef WIFI_EXCEPTION_RECORD_ENABLE
+    WifiExceptionRecordUtils exceptionRecordUtils;
+    exceptionRecordUtils.ClearExceptions();
+    WIFI_LOGI("FactoryReset: cleared WiFi exception records");
+#endif
 #ifndef OHOS_ARCH_LITE
     WifiHistoryRecordManager::GetInstance().DeleteAllApInfo();
     FactoryResetNotify();

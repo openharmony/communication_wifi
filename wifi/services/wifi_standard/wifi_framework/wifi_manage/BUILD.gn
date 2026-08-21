@@ -386,6 +386,10 @@ if (defined(ohos_lite)) {
       defines += [ "FEATURE_WITH_GO_SIMULATION_AP" ]
     }
 
+    if (wifi_feature_exception_record){
+      defines += ["WIFI_EXCEPTION_RECORD_ENABLE"]
+    }
+
     external_deps = [
       "ability_base:want",
       "ability_runtime:app_manager",
@@ -800,6 +804,10 @@ if (defined(ohos_lite)) {
 
     if (wifi_feature_with_p2p_untrust_invitation) {
       defines += [ "SUPPORT_P2P_UNTRUST_INVITATION" ]
+    }
+
+    if (wifi_feature_exception_record){
+      defines += ["WIFI_EXCEPTION_RECORD_ENABLE"]
     }
 
     part_name = "wifi"

@@ -30,6 +30,13 @@ ohos_unittest("utils_unittest") {
     "wifi_hisysevent_test.cpp",
   ]
 
+if (wifi_feature_exception_record){
+  sources += [
+    "$WIFI_ROOT_DIR/utils/src/wifi_exception_record_utils.cpp",
+    "wifi_exception_record_utils_test.cpp",
+    ]
+}
+
   include_dirs = [
     "$WIFI_ROOT_DIR/interfaces/inner_api",
     "$WIFI_ROOT_DIR/frameworks/native/interfaces",
@@ -50,6 +57,10 @@ ohos_unittest("utils_unittest") {
 
   if (wifi_feature_with_local_security_detect) {
     defines += [ "WIFI_LOCAL_SECURITY_DETECT_ENABLE" ]
+  }
+
+  if (wifi_feature_exception_record){
+    defines += ["WIFI_EXCEPTION_RECORD_ENABLE"]
   }
 
   external_deps = [

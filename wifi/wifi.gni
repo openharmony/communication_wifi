@@ -90,6 +90,7 @@ declare_args() {
   wifi_feature_with_bt_proxy_speed_limit = false
   wifi_feature_secure_schedule_supported = false
   wifi_feature_with_go_simulation_ap = false
+  wifi_feature_exception_record = false
 }
 
 memory_optimization_cflags = [

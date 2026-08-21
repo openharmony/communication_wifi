@@ -35,6 +35,9 @@ namespace WifiCli {
 
 constexpr int NO_REASON_FILTER = -1;
 constexpr int NO_PER_AP_LIMIT = 0;
+constexpr int DECIMAL_BASE = 10;
+constexpr int INT_MIN_VALUE = -2147483647-1;
+constexpr int INT_MAX_VALUE = 2147483647;
 
 static std::string GetSuggestion(OHOS::Wifi::ExceptionReason reason, const std::string& ssid)
 {
@@ -157,6 +160,27 @@ static int DoListExceptions(const std::string& ssid, const std::string& category
     return 0;
 }
 
+static bool ParseIntArg(const char* str, int& outValue, std::string& errMsg)
+{
+    if (str == nullptr || *str == '\0') {
+        srrMsg = "Value is empty";
+        return false;
+    }
+    char* endPtr = nullptr;
+    errno = 0;
+    long value = strtol(str, &endPtr, DECIMAL_BASE);
+    if (endPtr == str || *str == '\0') {
+        srrMsg = "Value is not a valid integer";
+        return false;
+    }
+    if (errno == ERANGE || value < INT_MIN_VALUE || value > INT_MAX_VALUE) {
+        errMsg = "Value out of range";
+        return false;
+    }
+    outValue = static_cast<int>(value);
+    return true;
+}
+
 int CmdWifiException(int argc, char** argv)
 {
     bool doClear = false;
@@ -166,13 +190,29 @@ int CmdWifiException(int argc, char** argv)
     int perAp = NO_PER_AP_LIMIT;
     for (int i = 0; i < argc; ++i) {
         std::string arg = argv[i];
-        if (arg == "--clear") doClear = true;
-        else if (arg == "--ssid" && i + 1 < argc) filterSsid = argv[++i];
-        else if (arg == "--category" && i + 1 < argc) filterCategory = argv[++i];
-        else if (arg == "--reason" && i + 1 < argc) filterReason = atoi(argv[++i]);
-        else if (arg == "--per-ap" && i + 1 < argc) perAp = atoi(argv[++i]);
+        if (arg == "--clear") {
+            doClear = true;
+        } else if (arg == "--ssid" && i + 1 < argc) {
+            filterSsid = argv[++i];
+        } else if (arg == "--category" && i + 1 < argc) {
+            filterCategory = argv[++i];
+        } else if (arg == "--reason" && i + 1 < argc) {
+            std::string err;
+            if (!ParseIntArg(argv[++i], filterReason, err)) {
+                OutputErrorJson("ERR_PARAM_INVALID", "Invalid --reason value", err);
+                return 1;
+            }
+        } else if (arg == "--per-ap" && i + 1 < argc) {
+            std::string err;
+            if (!ParseIntArg(argv[++i], perAp, err)) {
+                OutputErrorJson("ERR_PARAM_INVALID", "Invalid --per-ap value", err);
+                return 1;
+            }
+        }
     }
-    if (doClear) return DoClearExceptions();
+    if (doClear) {
+        return DoClearExceptions();
+    }
     return DoListExceptions(filterSsid, filterCategory, filterReason, perAp);
 }
 

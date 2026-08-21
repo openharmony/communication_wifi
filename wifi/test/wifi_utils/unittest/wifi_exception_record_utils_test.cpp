@@ -34,6 +34,7 @@ static constexpr const char* TEST_FILE_PATH =
 static constexpr int MAX_FAULTS_PER_GROUP = 10;
 static constexpr int MAX_TOTAL_RECORDS = 50;
 static constexpr int DHCP_REASON_BASE = 101;
+static constexpr int VALID_REASON_COUNT = 4;
 
 class WifiExceptionRecordUtilsTest : public testing::Test {
 public:
@@ -106,7 +107,8 @@ HWTEST_F(WifiExceptionRecordUtilsTest, AddException_PerGroupLimit10, TestSize.Le
 {
     WifiExceptionRecordUtils utils;
     for (int i = 0; i < 15; i++) {
-        auto rec = MakeRecord("AP1", static_cast<ExceptionReason>(DHCP_REASON_BASE + i), 1000 + i, i, "x");
+        auto rec = MakeRecord("AP1", static_cast<ExceptionReason>(DHCP_REASON_BASE + i % VALID_REASON_COUNT),
+                            1000 + i, i, "x");
         utils.AddException(rec);
     }
     std::vector<ApGroup> groups;
@@ -121,7 +123,7 @@ HWTEST_F(WifiExceptionRecordUtilsTest, AddException_GlobalLimit50, TestSize.Leve
     for (int g = 0; g < 6; g++) {
         for (int i = 0; i < MAX_FAULTS_PER_GROUP; i++) {
             std::string ssid = "AP" + std::to_string(g);
-            auto rec = MakeRecord(ssid, static_cast<ExceptionReason>(DHCP_REASON_BASE + i),
+            auto rec = MakeRecord(ssid, static_cast<ExceptionReason>(DHCP_REASON_BASE + i % VALID_REASON_COUNT),
                                   1000 + g * MAX_FAULTS_PER_GROUP + i, i, "x");
             utils.AddException(rec);
         }

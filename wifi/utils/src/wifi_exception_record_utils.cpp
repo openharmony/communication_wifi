@@ -113,6 +113,27 @@ static cJSON* BuildGroupsJson(const std::vector<ApGroup>& groups, WifiExceptionR
     return arr;
 }
 
+static int WriteAll(int fd, const char* data, size_t size)
+{
+    size_t written = 0;
+    while (written < size){
+        ssize_t ret = write(fd, data + written, size - written);
+        if (ret < 0){
+            if (errno == EINTR){
+                continue;
+            }
+            WIFI_LOGE("WriteAll: write failed, errno=%{public}d", errno);
+            return -1;
+        }
+        if (ret == 0) {
+            WIFI_LOGE("WriteAll: write returned 0, possible filesystem issue");
+            return -1;
+        }
+        written += static_cast<size_t>(ret);
+    }
+    return 0;
+}
+
 static int WriteTmpAndRename(const std::string& jsonStr)
 {
     std::string tmpPath = std::string(FILE_PATH) + ".tmp";
@@ -122,15 +143,16 @@ static int WriteTmpAndRename(const std::string& jsonStr)
         WIFI_LOGE("WriteTmpAndRename: open tmp failed, errno=%{public}d", errno);
         return -1;
     }
-    ssize_t written = write(fd, jsonStr.c_str(), jsonStr.size());
-    fsync(fd);
-    close(fd);
-    if (written < 0) {
-        WIFI_LOGE("WriteTmpAndRename: write failed");
+    if (WriteAll(fd, jsonStr.c_str(), jsonStr.size()) < 0){
+        close(fd);
+        unlink(tmpPath.c_str());
         return -1;
     }
+    fsync(fd);
+    close(fd);
     if (rename(tmpPath.c_str(), FILE_PATH) != 0) {
         WIFI_LOGE("WriteTmpAndRename: rename failed");
+        unlink(tmpPath.c_str());
         return -1;
     }
     int dirFd = open(WIFI_DIR_PATH, O_RDONLY);
@@ -172,18 +194,28 @@ static FaultDetail ParseDetail(cJSON* faultNode, ExceptionReason reason)
     }
 }
 
-static MergedFault ParseFault(cJSON* faultNode)
+static bool IsValidReason(int reasonCode)
 {
-    MergedFault fault = {};
+    return reasonCode >= static_cast<int>(ExceptionReason::DHCP_CONNECTION_FAIL) &&
+        reasonCode <= static_cast<int>(ExceptionReason::DHCP_IP_EXPIRED_FAIL)
+}
+
+static bool ParseFault(cJSON* faultNode)
+{
+    fault = {};
     cJSON* timestampNode = cJSON_GetObjectItem(faultNode, "timestamp");
     if (timestampNode && cJSON_IsNumber(timestampNode)) {
         fault.timestamp = static_cast<int64_t>(timestampNode->valuedouble);
     }
     cJSON* reasonCodeNode = cJSON_GetObjectItem(faultNode, "reasonCode");
     int reasonCode = reasonCodeNode && cJSON_IsNumber(reasonCodeNode) ? reasonCodeNode->valueint : 0;
+    if (!IsValidReason(reasonCode)){
+        WIFI_LOGW("ParseFault: invalid reasonCode=%{public}d, skip", reasonCode);
+        return false;
+    }
     fault.reason = static_cast<ExceptionReason>(reasonCode);
     fault.detail = ParseDetail(faultNode, fault.reason);
-    return fault;
+    return true;
 }
 
 static void ParseFaults(cJSON* faultsArr, std::vector<MergedFault>& faults)
@@ -195,7 +227,10 @@ static void ParseFaults(cJSON* faultsArr, std::vector<MergedFault>& faults)
     for (int index = 0; index < faultCount; index++) {
         cJSON* faultNode = cJSON_GetArrayItem(faultsArr, index);
         if (faultNode) {
-            faults.push_back(ParseFault(faultNode));
+            MergedFault fault;
+            if (ParseFault(faultNode,fault)){
+                faults.push_back(fault);
+            }
         }
     }
 }
@@ -256,16 +291,19 @@ static int AcquireLock(int fd, bool exclusive)
         if (ret == 0) {
             return 0;
         }
-        if (errno == EINTR) {
+        int err = errno;
+        if (err == EINTR) {
             continue;
         }
-        if (errno == EWOULDBLOCK) {
+        if (err == EWOULDBLOCK) {
             usleep(LOCK_RETRY_INTERVAL_US);
             retries--;
             continue;
         }
+        WIFI_LOGE("AcquireLock: flock failed, errno=%{public}d", err);
         return -1;
     }
+    WIFI_LOGE("AcquireLock: flock timeout after %{public}d retries", LOCK_RETRIES);
     return -1;
 }
 
@@ -357,27 +395,32 @@ static void TrimGlobal(std::vector<ApGroup>& groups)
 
 static void EnforceLimits(std::vector<ApGroup>& groups)
 {
-    TrimPerGroup(groups);
     TrimGlobal(groups);
+    TrimPerGroup(groups);
 }
 
-static int OpenWithRecover()
+static int AcquireFileLock(bool createIfMissing, bool exclusive)
 {
-    int fd = open(FILE_PATH, O_RDWR | O_CREAT, FILE_PERMISSION_MODE);
+    int flags = createIfMissing ? (O_RDWR | O_CREAT) : O_RDONLY;
+    int fd = open(FILE_PATH, flags, FILE_PERMISSION_MODE);
+
+    if (fd < 0) {
+        WIFI_LOGE("AcquireFileLock: open failed, errno=%{public}d", errno);
+        return -1;
+    }  
+    if (AcquireLock(fd, exclusive) < 0) {
+        close(fd);
+        return -1;
+    }
+    return fd;
+}
+
+static void ReleaseFileLock(int fd)
+{
     if (fd >= 0) {
-        return fd;
+        flock(fd, LOCK_UN);
+        close(fd);
     }
-    int err = errno;
-    WIFI_LOGE("OpenWithRecover: open failed, errno=%{public}d, try recover", err);
-    if (err == EACCES && unlink(FILE_PATH) == 0) {
-        WIFI_LOGI("OpenWithRecover: stale file unlinked, recreating");
-        fd = open(FILE_PATH, O_RDWR | O_CREAT, FILE_PERMISSION_MODE);
-        if (fd >= 0) {
-            return fd;
-        }
-        WIFI_LOGE("OpenWithRecover: reopen failed, errno=%{public}d", errno);
-    }
-    return -1;
 }
 
 int32_t WifiExceptionRecordUtils::AddException(const WifiExceptionRecord& record)
@@ -386,25 +429,20 @@ int32_t WifiExceptionRecordUtils::AddException(const WifiExceptionRecord& record
         WIFI_LOGE("AddException: path invalid");
         return -1;
     }
-    int fd = OpenWithRecover();
-    if (fd < 0) {
+    int lockFd = AcquireFileLock(true, true);
+    if (lockFd < 0) {
+        WIFI_LOGE("AcquireFileLock: lock failed, drop record");
         return -1;
     }
-    fchmod(fd, FILE_PERMISSION_MODE);
-    if (AcquireLock(fd, true) < 0) {
-        close(fd);
-        WIFI_LOGE("AddException: lock failed,drop record");
-        return -1;
-    }
+    fchmod(lockFd, FILE_PERMISSION_MODE);
     std::vector<ApGroup> groups;
     LoadFromFile(groups);
     ApGroup& group = FindOrAddGroup(groups, record.ssid);
     MergeOrAddFault(group.faults, record);
     EnforceLimits(groups);
-    SaveToFile(groups);
-    flock(fd, LOCK_UN);
-    close(fd);
-    return 0;
+    int32_t ret = SaveToFile(groups);
+    ReleaseFileLock(lockFd);
+    return ret;
 }
 
 int32_t WifiExceptionRecordUtils::AddException(const std::string& ssid, ExceptionReason reason,
@@ -420,7 +458,17 @@ int32_t WifiExceptionRecordUtils::AddException(const std::string& ssid, Exceptio
 
 int32_t WifiExceptionRecordUtils::GetAllExceptions(std::vector<ApGroup>& groups)
 {
-    return LoadFromFile(groups);
+    if (access(FILE_PATH, F_OK) !=0) {
+        return 0;
+    }
+    int lockFd = AcquireFileLock(false, false)
+    if (lockFd < 0) {
+        WIFI_LOGE("GetAllExceptions: lock failed");
+        return -1;
+    }
+    int32_t ret=LoadFromFile(groups);
+    ReleaseFileLock(lockFd);
+    return ret;
 }
 
 int32_t WifiExceptionRecordUtils::ClearExceptions()
@@ -428,11 +476,21 @@ int32_t WifiExceptionRecordUtils::ClearExceptions()
     if (!IsPathValid(FILE_PATH)) {
         return -1;
     }
-    if (unlink(FILE_PATH) != 0 && errno != ENOENT) {
-        WIFI_LOGE("ClearExceptions: unlink failed, errno=%{public}d", errno);
+    if (access(FILE_PATH, F_OK) !=0) {
+        return 0;
+    }
+    int lockFd = AcquireFileLock(false, true)
+    if (lockFd < 0) {
+        WIFI_LOGE("ClearExceptions: lock failed");
         return -1;
     }
-    return 0;
+    int32_t ret = 0;
+    if (unlink(FILE_PATH) != 0 && errno != ENOENT) {
+        WIFI_LOGE("ClearExceptions: unlink failed, errno=%{public}d", errno);
+        ret = -1;
+    }
+    ReleaseFileLock(lockFd);
+    return ret;
 }
 
 }

@@ -4519,8 +4519,11 @@ void StaStateMachine::DhcpResultNotify::OnFailedDhcpResult(int status, const cha
     WIFI_LOGI("Enter DhcpResultNotify::OnFailed. ifname=%{public}s, status=%{public}d, reason=%{public}s",
         ifname, status, reason);
 #ifdef WIFI_EXCEPTION_RECORD_ENABLE
-    lastDhcpFailStatus = status;
-    lastDhcpFailReason = reason ? reason : "";
+    {
+        std::lock_guard<std::mutex> lock(dhcpFailMutex);
+        lastDhcpFailStatus = status;
+        lastDhcpFailReason = reason ? reason : "";
+    }
 #endif
     EnhanceWriteDhcpFailHiSysEvent("DHCP_FAIL", status);
     DhcpResultNotifyEvent(DhcpReturnCode::DHCP_FAIL);
@@ -4547,9 +4550,16 @@ void StaStateMachine::DhcpResultNotify::DealDhcpIpv4ResultFailed()
     pStaStateMachine->NotifyWifiDisconnectReason(WifiDisconnectReason::DISCONNECT_BY_DHCP_FAIL,
         DhcpFailType::TYPE_DEAL_IPV4_RESULT_FAIL);
 #ifdef WIFI_EXCEPTION_RECORD_ENABLE
+    int failStatus;
+    std::string failReason;
+    {
+        std::lock_guard<std::mutex> lock(dhcpFailMutex);
+        failStatus = lastDhcpFailStatus;
+        failReason = lastDhcpFailReason;
+    }
     WifiExceptionRecordUtils utils;
     utils.AddException(pStaStateMachine->linkedInfo.ssid, ExceptionReason::DHCP_IPV4_RESULT_FAIL,
-        lastDhcpFailStatus, lastDhcpFailReason);
+        failStatus, failReason);
 #endif
     pStaStateMachine->StartDisConnectToNetwork();
 }

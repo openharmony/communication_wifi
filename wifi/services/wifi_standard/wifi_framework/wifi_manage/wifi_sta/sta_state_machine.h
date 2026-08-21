@@ -504,6 +504,7 @@ public:
 #ifdef WIFI_EXCEPTION_RECORD_ENABLE
         int lastDhcpFailStatus = -1;
         std::string lastDhcpFailReason;
+        std::mutex dhcpFailMutex;
 #endif
     };
 

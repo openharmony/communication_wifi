@@ -132,13 +132,11 @@ void WifiP2pStub::InitHandleMapExPart3()
             OnHid2dSetGroupType(code, data, reply, option);
         };
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_ADD_LOCAL_SERVICE)] =
-        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
-            OnAddLocalP2pService(code, data, reply, option);
-        };
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) 
+        { OnAddLocalP2pService(code, data, reply, option); };
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_LOCAL_SERVICES)] =
-        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
-            OnQueryLocalP2pServices(code, data, reply, option);
-        };
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) 
+        { OnQueryLocalP2pServices(code, data, reply, option); };
 }
 
 void WifiP2pStub::InitHandleMap()
@@ -654,7 +652,8 @@ void WifiP2pStub::OnQueryP2pServices(uint32_t code, MessageParcel &data, Message
     return;
 }
 
-void WifiP2pStub::OnQueryLocalP2pServices(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+void WifiP2pStub::OnQueryLocalP2pServices(uint32_t code, MessageParcel &data,
+     MessageParcel &reply, MessageOption &option)
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     std::vector<WifiP2pServiceInfo> services;

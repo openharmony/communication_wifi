@@ -206,7 +206,8 @@ void P2pServerFuzzTest(const uint8_t* data, size_t size)
         pP2pInterface->AddDnsSdLocalP2pService(serviceName, groupOwnerAddress, txtMap, mDeviceAddress02, addSrvInfo);
         std::vector<std::string> upnpServices;
         upnpServices.push_back(serviceName);
-        pP2pInterface->AddUpnpLocalP2pService(groupOwnerAddress, mDeviceAddress02, upnpServices, serviceName, addSrvInfo);
+        pP2pInterface->AddUpnpLocalP2pService(groupOwnerAddress, mDeviceAddress02,
+             upnpServices, serviceName, addSrvInfo);
         std::vector<WifiP2pServiceInfo> localServices;
         pP2pInterface->QueryLocalP2pServices(localServices);
     }

@@ -137,8 +137,8 @@ void WifiP2pStub::InitHandleMapExPart3()
 void WifiP2pStub::InitHandleMapExPart4()
 {
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_ADD_LOCAL_SERVICE)] =
-        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) { 
-            OnAddLocalP2pService(code, data, reply, option); 
+        [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {
+            OnAddLocalP2pService(code, data, reply, option);
         };
     handleFuncMap[static_cast<uint32_t>(P2PInterfaceCode::WIFI_SVR_CMD_P2P_QUERY_LOCAL_SERVICES)] =
         [this](uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) {

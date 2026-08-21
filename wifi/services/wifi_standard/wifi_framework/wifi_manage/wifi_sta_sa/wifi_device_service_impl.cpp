@@ -1066,12 +1066,12 @@ void WifiDeviceServiceImpl::CheckAndHandleVapConflict()
 
 ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate, int dialogTimeout)
 {
-    CheckAndHandleVapConflict();
     if (WifiPermissionUtils::VerifyWifiConnectionPermission() == PERMISSION_DENIED &&
         WifiPermissionUtils::VerifyEnterpriseWifiConnectionPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("ConnectToNetwork:VerifyWifiConnectionPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    CheckAndHandleVapConflict();
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_STA_REQUEST);
 
     if (!IsStaServiceRunning()) {
@@ -1095,11 +1095,11 @@ ErrCode WifiDeviceServiceImpl::ConnectToNetwork(int networkId, bool isCandidate,
 
 ErrCode WifiDeviceServiceImpl::ConnectToCandidateConfig(ConnectSettings &connectSettings)
 {
-    CheckAndHandleVapConflict();
     if (WifiPermissionUtils::VerifySetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("ConnectToCandidateConfig:VerifySetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
     }
+    CheckAndHandleVapConflict();
     WifiManager::GetInstance().StopGetCacResultAndLocalCac(CAC_STOP_BY_STA_REQUEST);
 
     if (!IsStaServiceRunning()) {

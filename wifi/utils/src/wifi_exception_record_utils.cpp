@@ -116,10 +116,10 @@ static cJSON* BuildGroupsJson(const std::vector<ApGroup>& groups, WifiExceptionR
 static int WriteAll(int fd, const char* data, size_t size)
 {
     size_t written = 0;
-    while (written < size){
+    while (written < size) {
         ssize_t ret = write(fd, data + written, size - written);
-        if (ret < 0){
-            if (errno == EINTR){
+        if (ret < 0) {
+            if (errno == EINTR) {
                 continue;
             }
             WIFI_LOGE("WriteAll: write failed, errno=%{public}d", errno);
@@ -143,7 +143,7 @@ static int WriteTmpAndRename(const std::string& jsonStr)
         WIFI_LOGE("WriteTmpAndRename: open tmp failed, errno=%{public}d", errno);
         return -1;
     }
-    if (WriteAll(fd, jsonStr.c_str(), jsonStr.size()) < 0){
+    if (WriteAll(fd, jsonStr.c_str(), jsonStr.size()) < 0) {
         close(fd);
         unlink(tmpPath.c_str());
         return -1;
@@ -197,10 +197,10 @@ static FaultDetail ParseDetail(cJSON* faultNode, ExceptionReason reason)
 static bool IsValidReason(int reasonCode)
 {
     return reasonCode >= static_cast<int>(ExceptionReason::DHCP_CONNECTION_FAIL) &&
-        reasonCode <= static_cast<int>(ExceptionReason::DHCP_IP_EXPIRED_FAIL)
+        reasonCode <= static_cast<int>(ExceptionReason::DHCP_IP_EXPIRED_FAIL);
 }
 
-static bool ParseFault(cJSON* faultNode)
+static bool ParseFault(cJSON* faultNode, MergedFault& fault)
 {
     fault = {};
     cJSON* timestampNode = cJSON_GetObjectItem(faultNode, "timestamp");
@@ -209,7 +209,7 @@ static bool ParseFault(cJSON* faultNode)
     }
     cJSON* reasonCodeNode = cJSON_GetObjectItem(faultNode, "reasonCode");
     int reasonCode = reasonCodeNode && cJSON_IsNumber(reasonCodeNode) ? reasonCodeNode->valueint : 0;
-    if (!IsValidReason(reasonCode)){
+    if (!IsValidReason(reasonCode)) {
         WIFI_LOGW("ParseFault: invalid reasonCode=%{public}d, skip", reasonCode);
         return false;
     }
@@ -228,7 +228,7 @@ static void ParseFaults(cJSON* faultsArr, std::vector<MergedFault>& faults)
         cJSON* faultNode = cJSON_GetArrayItem(faultsArr, index);
         if (faultNode) {
             MergedFault fault;
-            if (ParseFault(faultNode,fault)){
+            if (ParseFault(faultNode,fault)) {
                 faults.push_back(fault);
             }
         }
@@ -403,11 +403,10 @@ static int AcquireFileLock(bool createIfMissing, bool exclusive)
 {
     int flags = createIfMissing ? (O_RDWR | O_CREAT) : O_RDONLY;
     int fd = open(FILE_PATH, flags, FILE_PERMISSION_MODE);
-
     if (fd < 0) {
         WIFI_LOGE("AcquireFileLock: open failed, errno=%{public}d", errno);
         return -1;
-    }  
+    }
     if (AcquireLock(fd, exclusive) < 0) {
         close(fd);
         return -1;
@@ -431,7 +430,7 @@ int32_t WifiExceptionRecordUtils::AddException(const WifiExceptionRecord& record
     }
     int lockFd = AcquireFileLock(true, true);
     if (lockFd < 0) {
-        WIFI_LOGE("AcquireFileLock: lock failed, drop record");
+        WIFI_LOGE("AddException: lock failed, drop record");
         return -1;
     }
     fchmod(lockFd, FILE_PERMISSION_MODE);
@@ -458,10 +457,10 @@ int32_t WifiExceptionRecordUtils::AddException(const std::string& ssid, Exceptio
 
 int32_t WifiExceptionRecordUtils::GetAllExceptions(std::vector<ApGroup>& groups)
 {
-    if (access(FILE_PATH, F_OK) !=0) {
+    if (access(FILE_PATH, F_OK) != 0) {
         return 0;
     }
-    int lockFd = AcquireFileLock(false, false)
+    int lockFd = AcquireFileLock(false, false);
     if (lockFd < 0) {
         WIFI_LOGE("GetAllExceptions: lock failed");
         return -1;
@@ -476,10 +475,10 @@ int32_t WifiExceptionRecordUtils::ClearExceptions()
     if (!IsPathValid(FILE_PATH)) {
         return -1;
     }
-    if (access(FILE_PATH, F_OK) !=0) {
+    if (access(FILE_PATH, F_OK) != 0) {
         return 0;
     }
-    int lockFd = AcquireFileLock(false, true)
+    int lockFd = AcquireFileLock(false, true);
     if (lockFd < 0) {
         WIFI_LOGE("ClearExceptions: lock failed");
         return -1;

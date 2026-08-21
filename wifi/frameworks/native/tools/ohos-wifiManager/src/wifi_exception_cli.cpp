@@ -163,14 +163,14 @@ static int DoListExceptions(const std::string& ssid, const std::string& category
 static bool ParseIntArg(const char* str, int& outValue, std::string& errMsg)
 {
     if (str == nullptr || *str == '\0') {
-        srrMsg = "Value is empty";
+        errMsg = "Value is empty";
         return false;
     }
     char* endPtr = nullptr;
     errno = 0;
     long value = strtol(str, &endPtr, DECIMAL_BASE);
-    if (endPtr == str || *str == '\0') {
-        srrMsg = "Value is not a valid integer";
+    if (endPtr == str || *endPtr != '\0') {
+        errMsg = "Value is not a valid integer";
         return false;
     }
     if (errno == ERANGE || value < INT_MIN_VALUE || value > INT_MAX_VALUE) {

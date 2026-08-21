@@ -108,7 +108,7 @@ HWTEST_F(WifiExceptionRecordUtilsTest, AddException_PerGroupLimit10, TestSize.Le
     WifiExceptionRecordUtils utils;
     for (int i = 0; i < 15; i++) {
         auto rec = MakeRecord("AP1", static_cast<ExceptionReason>(DHCP_REASON_BASE + i % VALID_REASON_COUNT),
-                            1000 + i, i, "x");
+                              1000 + i, i, "x");
         utils.AddException(rec);
     }
     std::vector<ApGroup> groups;

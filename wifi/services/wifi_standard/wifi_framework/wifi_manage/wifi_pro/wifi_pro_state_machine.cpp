@@ -528,6 +528,12 @@ bool WifiProStateMachine::IsSatisfiedWifi2WifiCondition()
         return false;
     }
 
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr && pEnhanceService->IsEnhancedRoamingInProgress()) {
+        WIFI_LOGI("IsSatisfiedWifi2WifiCondition: roaming in progress");
+        return false;
+    }
+
     return true;
 }
 

@@ -266,8 +266,10 @@ HWTEST_F(WifiProStateMachineTest, FastScanTest01, TestSize.Level1)
 HWTEST_F(WifiProStateMachineTest, IsSatisfiedWifi2WifiConditionTest01, TestSize.Level1)
 {
     pWifiProStateMachine_->isWifi2WifiSwitching_ = false;
+    pWifiProStateMachine_->isDisableWifiAutoSwitch_ = false;
     pWifiProStateMachine_->IsSatisfiedWifi2WifiCondition();
     EXPECT_EQ(pWifiProStateMachine_->isWifi2WifiSwitching_, false);
+    EXPECT_EQ(pWifiProStateMachine_->isDisableWifiAutoSwitch_, false);
 }
 
 HWTEST_F(WifiProStateMachineTest, ProcessSwitchResultTest01, TestSize.Level1)

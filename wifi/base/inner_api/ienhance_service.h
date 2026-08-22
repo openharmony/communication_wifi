@@ -628,7 +628,7 @@ public:
      *
      * @return true if enhanced roaming in progress, else false
      */
-    virtual void IsEnhancedRoamingInProgress() = 0;
+    virtual bool IsEnhancedRoamingInProgress() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

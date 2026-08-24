@@ -43,6 +43,8 @@ using P2pCallbackMapType = std::map<sptr<IRemoteObject>, sptr<IWifiP2pCallback>>
 using P2pCallbackInfo = std::map<sptr<IRemoteObject>, WifiCallingInfo>;
 using CallbackEventPermissionMap = std::multimap<int, std::pair<std::function<int()>, std::string>>;
 
+#define MAX_STA_CALLBACK_COUNT 2000
+
 class WifiInternalEventDispatcher {
 public:
     WifiInternalEventDispatcher();

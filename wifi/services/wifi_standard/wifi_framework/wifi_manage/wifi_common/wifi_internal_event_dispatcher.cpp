@@ -135,10 +135,7 @@ ErrCode WifiInternalEventDispatcher::AddStaCallback(
     const std::string &eventName, int tokenId, int instId)
 {
     WIFI_LOGD("WifiInternalEventDispatcher::AddStaCallback, remote! instId: %{public}d", instId);
-    if (remote == nullptr || callback == nullptr) {
-        WIFI_LOGE("remote object is null!");
-        return WIFI_OPT_INVALID_PARAM;
-    }
+    if (remote == nullptr || callback == nullptr) { return WIFI_OPT_INVALID_PARAM; }
 
     auto eventIter = g_staCallBackNameEventIdMap.find(eventName);
     if (eventIter == g_staCallBackNameEventIdMap.end()) {
@@ -162,6 +159,10 @@ ErrCode WifiInternalEventDispatcher::AddStaCallback(
                 instId);
             return WIFI_OPT_SUCCESS;
         } else {
+            if (mStaCallBackInfo[instId].size() >= MAX_STA_CALLBACK_COUNT) {
+                WIFI_LOGE("%{public}s, sta callback count exceeded max limit.", __func__);
+                return WIFI_OPT_FAILED;
+            }
             WifiCallingInfo callbackInfo;
             callbackInfo.callingUid = GetCallingUid();
             callbackInfo.callingPid = pid;

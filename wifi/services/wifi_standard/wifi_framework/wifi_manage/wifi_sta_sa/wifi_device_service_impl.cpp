@@ -2121,11 +2121,6 @@ ErrCode WifiDeviceServiceImpl::StartWifiDetection()
         return WIFI_OPT_STA_NOT_OPENED;
     }
 
-    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
-    if (pEnhanceService == nullptr) {
-        WIFI_LOGE("%{public}s pEnhanceService is nullptr!", __FUNCTION__);
-        return WIFI_OPT_FAILED;
-    }
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
     std::vector<std::string> specialSsidList;

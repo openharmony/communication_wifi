@@ -474,6 +474,13 @@ public:
     virtual ErrCode ReadNvInfo(int nvPhynum, std::string &nvInfo) = 0;
 
     /**
+     * @Description screen status
+     *
+     * @return void
+     */
+    virtual bool OnDisplayOrientationChanged(const int32_t orientation) = 0;
+
+    /**
      * @Description fold status
      *
      * @return success: 0, failed: -1

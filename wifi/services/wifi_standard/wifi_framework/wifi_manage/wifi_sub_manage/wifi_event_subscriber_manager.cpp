@@ -1699,6 +1699,13 @@ void WifiDisplayStateListener::OnAttributeChange(Rosen::DisplayId displayId, con
     // screen state
     auto orientation = displayInfo->GetDisplayOrientation();
     WifiConfigCenter::GetInstance().SetScreenDispalyState(static_cast<int32_t>(orientation));
+#ifndef OHOS_ARCH_LITE
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService != nullptr) {
+        WIFI_LOGD("OnChange trigger, orientation=%{public}d", orientation);
+        pEnhanceService->OnDisplayOrientationChanged(static_cast<int32_t>(orientation));
+    }
+#endif
 }
 
 WifiFoldStateListener::WifiFoldStateListener(int foldAction)

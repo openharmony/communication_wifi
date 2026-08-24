@@ -622,13 +622,6 @@ public:
      */
     virtual void SetEnhanceP2pSignalPollInfo(bool needKeepAlgo, const WifiSignalPollInfo &info,
         const std::string p2pInterfaceName) = 0;
-
-    /**
-     * @Description query whether enhanced roaming in-progress
-     *
-     * @return true if enhanced roaming in progress, else false
-     */
-    virtual bool IsEnhancedRoamingInProgress() = 0;
 };
 }  // namespace Wifi
 }  // namespace OHOS

@@ -49,6 +49,7 @@ public:
         bool ExecuteStateMsg(InternalMessagePtr msg) override;
 
     private:
+        void HandleWifiToggleChangeInDisabledState(InternalMessagePtr msg);
         WifiControllerMachine *pWifiControllerMachine;
     };
 
@@ -69,6 +70,7 @@ public:
         void HandleApStart(int id);
         bool HandleWifiToggleChangeForWlan1(int id, int isOpen);
         void HandleWifiToggleChangeInEnabledState(InternalMessagePtr msg);
+        void HandleEnableStateManagerExist(int id, int isOpen, InternalMessagePtr msg);
         void HandleRetryOpenP2p(void);
         bool HandleExtMsg(InternalMessagePtr msg);
 #ifdef FEATURE_AP_SUPPORT
@@ -126,6 +128,7 @@ public:
     void ShutdownWifi(bool shutDownAp = true);
     void SelfcureResetWifi(int id);
     void IsLocalOnlyHotspot(bool isLohs);
+    void HandleScanOnlyModeChanged(int isOpen);
 private:
     template <typename T>
     inline void ParsePointer(T *&pointer)

@@ -57,6 +57,7 @@ public:
     void ClearP2pIfaceNameMap(int instId);
     void ClearSoftApIfaceNameMap(int instId);
     void SelfcureResetSta(int instId);
+    void BroadcastScanOnlyStateChanged(int code);
 
 private:
     void BroadCastWifiStateChange(WifiState state, int instId);

@@ -24,7 +24,6 @@
 #define static
 #define LOGI(...)
 #define LOGE(...)
-#define LOGD(...)
 #endif
 
 #undef LOG_TAG
@@ -384,7 +383,7 @@ static void GetChanWidthCenterFreq(ScanInfo *pcmd, struct NeedParseIe* iesNeedPa
         pcmd->isErpExist = 1;
         return;
     }
-    LOGD("GetChanWidthCenterFreq fail.");
+    LOGE("GetChanWidthCenterFreq fail.");
     return;
 }
 

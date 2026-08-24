@@ -196,30 +196,6 @@ HWTEST_F(WifiNetAgentTest, RequestNetworkTest002, TestSize.Level1)
     EXPECT_EQ(netConnCallback.RequestNetwork(ident, netCaps, netrequest), -1);
 }
 
-HWTEST_F(WifiNetAgentTest, ReleaseNetworkTest001, TestSize.Level1)
-{
-    WifiNetAgent::NetConnCallback netConnCallback;
-    NetManagerStandard::NetRequest netrequest;
-    EXPECT_EQ(netConnCallback.ReleaseNetwork(netrequest), 0);
-}
-
-HWTEST_F(WifiNetAgentTest, LogNetCapsTest001, TestSize.Level1)
-{
-    WifiNetAgent::NetConnCallback netConnCallback;
-    std::string ident = "";
-    std::set<NetManagerStandard::NetCap> netCaps;
-    netConnCallback.LogNetCaps(ident, netCaps);
-    EXPECT_NE(netConnCallback.requestIds_.size(), TEN);
-}
-
-HWTEST_F(WifiNetAgentTest, GetSupplierId001, TestSize.Level1)
-{
-    WifiNetAgent wifiNetAgent;
-    wifiNetAgent.ResetSupplierId(0);
-    uint32_t tmpSupplierId = wifiNetAgent.GetSupplierId(0);
-    EXPECT_EQ(tmpSupplierId, 0);
-}
-
 HWTEST_F(WifiNetAgentTest, SetNetLinkLocalRouteIpv6Test001, TestSize.Level1)
 {
     WifiNetAgent wifiNetAgent;

@@ -196,7 +196,12 @@ void ApInfoHelper::AddApInfo(std::string cellId, int32_t networkId)
 void ApInfoHelper::AddNewApInfo(const std::string &cellId, const WifiDeviceConfig &config)
 {
     ApInfoData data;
-    if (apInfos_.size() >= DB_BSSID_MAX_QUANTA) {
+    size_t apInfosSize = 0;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        apInfosSize = apInfos_.size();
+    }
+    if (apInfosSize >= DB_BSSID_MAX_QUANTA) {
         ApInfoData oldestData;
         int32_t index = GetOldestApInfoData(oldestData);
         if (index != -1) {
@@ -226,6 +231,7 @@ void ApInfoHelper::AddNewApInfo(const std::string &cellId, const WifiDeviceConfi
 
 int32_t ApInfoHelper::GetOldestApInfoData(ApInfoData &data)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (apInfos_.size() == 0) {
         return -1;
     }

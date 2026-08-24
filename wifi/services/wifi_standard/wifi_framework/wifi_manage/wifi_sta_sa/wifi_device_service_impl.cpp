@@ -2120,6 +2120,13 @@ ErrCode WifiDeviceServiceImpl::StartWifiDetection()
         WIFI_LOGE("pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
+
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    if (linkedInfo.ssid == "CEAIR-WIFI") {
+        WIFI_LOGI("%{public}s special wifi donot support wifi detect", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
     pService->StartWifiDetection();
     return WIFI_OPT_SUCCESS;
 }

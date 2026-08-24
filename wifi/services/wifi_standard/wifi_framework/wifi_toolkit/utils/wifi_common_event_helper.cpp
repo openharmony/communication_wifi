@@ -257,6 +257,14 @@ bool WifiCommonEventHelper::PublishNetCheckResultChange(const int &code, const s
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_NET_CHECK_RESULT_CHANGE, code, data);
 }
 
+bool WifiCommonEventHelper::PublishScanOnlyStateChangedEvent(const int &code, const std::string &data)
+{
+    WIFI_LOGI("PublishScanOnlyStateChangedEvent code:%{public}d",code);
+    std::vector<std::string> permissions;
+    permissions.push_back(COMMON_EVENT_GET_WIFI_CONFIG_PERMISSION);
+    return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_SCAN_ONLY_STATE_CHANGED, code, data, permissions);
+}
+
 void WifiCommonEventHelper::PublishHideDropDownWindowEvent()
 {
 #ifndef OHOS_ARCH_LITE

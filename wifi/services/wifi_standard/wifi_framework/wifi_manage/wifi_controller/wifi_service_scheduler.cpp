@@ -267,6 +267,11 @@ void WifiServiceScheduler::HandleGetStaFailed(int instId)
     WifiConfigCenter::GetInstance().SetWifiMidState(WifiOprMidState::CLOSED, instId);
 }
 
+void WifiServiceScheduler::BroadcastScanOnlyStateChanged(int code)
+{
+    WifiCommonEventHelper::PublishScanOnlyStateChangedEvent(code, "ScanOnlyMode");
+}
+
 ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfName)
 {
     WifiOprMidState curState = WifiConfigCenter::GetInstance().GetWifiScanOnlyMidState(instId);
@@ -297,6 +302,7 @@ ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfNa
         },
         ifaceName, instId)) {
         WIFI_LOGE("AutoStartScanOnly, create iface failed!");
+        BroadcastScanOnlyStateChanged(static_cast<int>(WifiScanOnlyState::SCAN_ONLY_ENABLED_FAILED));
         return WIFI_OPT_FAILED;
     }
     WIFI_LOGI("AutoStartScanOnly SetStaIfaceName:%{public}s, instId:%{public}d", ifaceName.c_str(), instId);
@@ -310,6 +316,7 @@ ErrCode WifiServiceScheduler::AutoStartScanOnly(int instId, std::string &staIfNa
     }
     WifiManager::GetInstance().GetWifiScanManager()->CheckAndStartScanService(instId);
     WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(WifiOprMidState::RUNNING, instId);
+    BroadcastScanOnlyStateChanged(static_cast<int>(WifiScanOnlyState::SCAN_ONLY_ENABLED_SUCCESS));
     return WIFI_OPT_SUCCESS;
 }
 
@@ -330,6 +337,7 @@ ErrCode WifiServiceScheduler::AutoStopScanOnly(int instId, bool setIfaceDown)
 
     if (!WifiConfigCenter::GetInstance().SetWifiScanOnlyMidState(curState, WifiOprMidState::CLOSING, instId)) {
         WIFI_LOGE("set wifi scan only mid state opening failed!");
+        BroadcastScanOnlyStateChanged(static_cast<int>(WifiScanOnlyState::SCAN_ONLY_DISABLED_FAILED));
         return WIFI_OPT_FAILED;
     }
 
@@ -344,6 +352,7 @@ ErrCode WifiServiceScheduler::AutoStopScanOnly(int instId, bool setIfaceDown)
 #ifdef DYNAMIC_UNLOAD_SA
     WifiManager::GetInstance().PushServiceCloseMsg(WifiCloseServiceCode::SCAN_SERVICE_CLOSE, instId);
 #endif
+    BroadcastScanOnlyStateChanged(static_cast<int>(WifiScanOnlyState::SCAN_ONLY_DISABLED_SUCCESS));
     return WIFI_OPT_SUCCESS;
 }
 

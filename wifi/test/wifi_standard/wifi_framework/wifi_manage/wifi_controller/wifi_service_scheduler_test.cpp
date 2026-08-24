@@ -505,5 +505,37 @@ HWTEST_F(WifiServiceSchedulerTest, AutoStopApServiceTest01, TestSize.Level1)
         .WillRepeatedly(Return(true));
     EXPECT_EQ(pWifiServiceScheduler->AutoStopApService(instId), WIFI_OPT_SUCCESS);
 }
+
+HWTEST_F(WifiServiceSchedulerTest, BroadcastScanOnlyStateChangedTest01, TestSize.Level1)
+{
+    // Test BroadcastScanOnlyStateChanged with SCAN_ONLY_DISABLED_SUCCESS code
+    int code = static_cast<int>(WifiScanOnlyState::SCAN_ONLY_DISABLED_SUCCESS);
+    pWifiServiceScheduler->BroadcastScanOnlyStateChanged(code);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(WifiServiceSchedulerTest, BroadcastScanOnlyStateChangedTest02, TestSize.Level1)
+{
+    // Test BroadcastScanOnlyStateChanged with SCAN_ONLY_DISABLED_FAILED code
+    int code = static_cast<int>(WifiScanOnlyState::SCAN_ONLY_DISABLED_FAILED);
+    pWifiServiceScheduler->BroadcastScanOnlyStateChanged(code);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(WifiServiceSchedulerTest, BroadcastScanOnlyStateChangedTest03, TestSize.Level1)
+{
+    // Test BroadcastScanOnlyStateChanged with SCAN_ONLY_ENABLED_SUCCESS code
+    int code = static_cast<int>(WifiScanOnlyState::SCAN_ONLY_ENABLED_SUCCESS);
+    pWifiServiceScheduler->BroadcastScanOnlyStateChanged(code);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(WifiServiceSchedulerTest, BroadcastScanOnlyStateChangedTest04, TestSize.Level1)
+{
+    // Test BroadcastScanOnlyStateChanged with SCAN_ONLY_ENABLED_FAILED code
+    int code = static_cast<int>(WifiScanOnlyState::SCAN_ONLY_ENABLED_FAILED);
+    pWifiServiceScheduler->BroadcastScanOnlyStateChanged(code);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
 }
 }

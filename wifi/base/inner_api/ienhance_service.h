@@ -478,7 +478,7 @@ public:
      *
      * @return void
      */
-    virtual void OnDisplayOrientationChanged(const int32_t orientation) = 0;
+    virtual bool OnDisplayOrientationChanged(const int32_t orientation) = 0;
 
     /**
      * @Description fold status

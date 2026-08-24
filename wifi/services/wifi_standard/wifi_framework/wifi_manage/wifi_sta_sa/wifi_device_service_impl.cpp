@@ -2120,6 +2120,21 @@ ErrCode WifiDeviceServiceImpl::StartWifiDetection()
         WIFI_LOGE("pService is nullptr!");
         return WIFI_OPT_STA_NOT_OPENED;
     }
+
+    IEnhanceService *pEnhanceService = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (pEnhanceService == nullptr) {
+        WIFI_LOGE("%{public}s pEnhanceService is nullptr!", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
+    WifiLinkedInfo linkedInfo;
+    WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
+    std::vector<std::string> specialSsidList;
+    WifiSettings::GetInstance().GetSpecialSsidList(specialSsidList);
+    if (std::find(specialSsidList.begin(), specialSsidList.end(), linkedInfo.ssid)
+        != specialSsidList.end()) {
+        WIFI_LOGI("%{public}s special wifi donot support wifi detect", __FUNCTION__);
+        return WIFI_OPT_FAILED;
+    }
     pService->StartWifiDetection();
     return WIFI_OPT_SUCCESS;
 }

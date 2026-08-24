@@ -75,24 +75,22 @@ namespace Wifi {
 
     void AddDnsSdLocalP2pServiceTest(FuzzedDataProvider& FDP)
     {
-        WifiP2pServiceInfo srvInfo;
         std::string instanceName = FDP.ConsumeBytesAsString(NUM_BYTES);
         std::string serviceType = FDP.ConsumeBytesAsString(NUM_BYTES);
         std::string serviceName = FDP.ConsumeBytesAsString(NUM_BYTES);
         std::map<std::string, std::string> txtMap;
         txtMap.emplace(FDP.ConsumeBytesAsString(NUM_BYTES), FDP.ConsumeBytesAsString(NUM_BYTES));
-        WifiP2pPtr->AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName, srvInfo);
+        WifiP2pPtr->AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName);
     }
 
     void AddUpnpLocalP2pServiceTest(FuzzedDataProvider& FDP)
     {
-        WifiP2pServiceInfo srvInfo;
         std::string uuid = FDP.ConsumeBytesAsString(NUM_BYTES);
         std::string device = FDP.ConsumeBytesAsString(NUM_BYTES);
         std::string serviceName = FDP.ConsumeBytesAsString(NUM_BYTES);
         std::vector<std::string> services;
         services.push_back(FDP.ConsumeBytesAsString(NUM_BYTES));
-        WifiP2pPtr->AddUpnpLocalP2pService(uuid, device, services, serviceName, srvInfo);
+        WifiP2pPtr->AddUpnpLocalP2pService(uuid, device, services, serviceName);
     }
 
     void QueryLocalP2pServicesTest(FuzzedDataProvider& FDP)

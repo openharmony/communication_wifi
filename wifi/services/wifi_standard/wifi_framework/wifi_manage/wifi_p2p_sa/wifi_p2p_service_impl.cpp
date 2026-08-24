@@ -352,8 +352,7 @@ ErrCode WifiP2pServiceImpl::DeleteLocalP2pService(const WifiP2pServiceInfo &srvI
 }
 
 ErrCode WifiP2pServiceImpl::AddDnsSdLocalP2pService(const std::string &instanceName,
-    const std::string &serviceType, const std::map<std::string, std::string> &txtMap, const std::string &serviceName,
-    WifiP2pServiceInfo &srvInfo)
+    const std::string &serviceType, const std::map<std::string, std::string> &txtMap, const std::string &serviceName)
 {
     WIFI_LOGI("AddDnsSdLocalP2pService");
     if (!WifiAuthCenter::IsSystemAccess()) {
@@ -373,11 +372,11 @@ ErrCode WifiP2pServiceImpl::AddDnsSdLocalP2pService(const std::string &instanceN
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    return pService->AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName, srvInfo);
+    return pService->AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName);
 }
 
 ErrCode WifiP2pServiceImpl::AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
-    const std::vector<std::string> &services, const std::string &serviceName, WifiP2pServiceInfo &srvInfo)
+    const std::vector<std::string> &services, const std::string &serviceName)
 {
     WIFI_LOGI("AddUpnpLocalP2pService");
     if (!WifiAuthCenter::IsSystemAccess()) {
@@ -397,7 +396,7 @@ ErrCode WifiP2pServiceImpl::AddUpnpLocalP2pService(const std::string &uuid, cons
         WIFI_LOGE("Get P2P service failed!");
         return WIFI_OPT_P2P_NOT_OPENED;
     }
-    return pService->AddUpnpLocalP2pService(uuid, device, services, serviceName, srvInfo);
+    return pService->AddUpnpLocalP2pService(uuid, device, services, serviceName);
 }
 
 ErrCode WifiP2pServiceImpl::StartP2pListen(int period, int interval)

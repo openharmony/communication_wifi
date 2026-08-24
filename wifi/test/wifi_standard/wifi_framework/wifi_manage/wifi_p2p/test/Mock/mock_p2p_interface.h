@@ -34,11 +34,9 @@ public:
     virtual ErrCode PutLocalP2pService(const WifiP2pServiceInfo &srvInfo);
     virtual ErrCode DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo);
     virtual ErrCode AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
-        const std::map<std::string, std::string> &txtMap, const std::string &serviceName,
-        WifiP2pServiceInfo &srvInfo);
+        const std::map<std::string, std::string> &txtMap, const std::string &serviceName);
     virtual ErrCode AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
-        const std::vector<std::string> &services, const std::string &serviceName,
-        WifiP2pServiceInfo &srvInfo);
+        const std::vector<std::string> &services, const std::string &serviceName);
     virtual ErrCode RequestService(const WifiP2pDevice &device, const WifiP2pServiceRequest &request);
     virtual ErrCode StartP2pListen(int period, int interval);
     virtual ErrCode StopP2pListen();

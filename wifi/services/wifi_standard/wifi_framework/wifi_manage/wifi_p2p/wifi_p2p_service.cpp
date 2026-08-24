@@ -118,7 +118,7 @@ ErrCode WifiP2pService::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
 }
 
 ErrCode WifiP2pService::AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
-    const std::map<std::string, std::string> &txtMap, const std::string &serviceName, WifiP2pServiceInfo &srvInfo)
+    const std::map<std::string, std::string> &txtMap, const std::string &serviceName)
 {
     WIFI_LOGI("AddDnsSdLocalP2pService");
     ErrCode ret = WifiP2pDnsSdServiceInfo::Check(instanceName, serviceType, txtMap, serviceName);
@@ -127,12 +127,12 @@ ErrCode WifiP2pService::AddDnsSdLocalP2pService(const std::string &instanceName,
             "serviceNameLen=%{public}zu", instanceName.size(), serviceType.size(), serviceName.size());
         return ret;
     }
-    srvInfo = WifiP2pDnsSdServiceInfo::Create(instanceName, serviceType, txtMap, serviceName);
+    WifiP2pServiceInfo srvInfo = WifiP2pDnsSdServiceInfo::Create(instanceName, serviceType, txtMap, serviceName);
     return PutLocalP2pService(srvInfo);
 }
 
 ErrCode WifiP2pService::AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
-    const std::vector<std::string> &services, const std::string &serviceName, WifiP2pServiceInfo &srvInfo)
+    const std::vector<std::string> &services, const std::string &serviceName)
 {
     WIFI_LOGI("AddUpnpLocalP2pService");
     ErrCode ret = WifiP2pUpnpServiceInfo::Check(uuid, device, services, serviceName);
@@ -141,7 +141,7 @@ ErrCode WifiP2pService::AddUpnpLocalP2pService(const std::string &uuid, const st
             "serviceNameLen=%{public}zu", uuid.size(), device.size(), serviceName.size());
         return ret;
     }
-    srvInfo = WifiP2pUpnpServiceInfo::Create(uuid, device, services, serviceName);
+    WifiP2pServiceInfo srvInfo = WifiP2pUpnpServiceInfo::Create(uuid, device, services, serviceName);
     return PutLocalP2pService(srvInfo);
 }
 

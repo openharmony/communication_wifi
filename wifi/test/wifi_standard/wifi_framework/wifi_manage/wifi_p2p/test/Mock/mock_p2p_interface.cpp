@@ -64,13 +64,13 @@ ErrCode P2pInterface::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
 }
 
 ErrCode P2pInterface::AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
-    const std::map<std::string, std::string> &txtMap, const std::string &serviceName, WifiP2pServiceInfo &srvInfo)
+    const std::map<std::string, std::string> &txtMap, const std::string &serviceName)
 {
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode P2pInterface::AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
-    const std::vector<std::string> &services, const std::string &serviceName, WifiP2pServiceInfo &srvInfo)
+    const std::vector<std::string> &services, const std::string &serviceName)
 {
     return WIFI_OPT_SUCCESS;
 }

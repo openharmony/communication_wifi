@@ -336,7 +336,7 @@ ErrCode WifiP2pProxy::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
 }
 
 ErrCode WifiP2pProxy::AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
-    const std::map<std::string, std::string> &txtMap, const std::string &serviceName, WifiP2pServiceInfo &srvInfo)
+    const std::map<std::string, std::string> &txtMap, const std::string &serviceName)
 {
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
@@ -371,15 +371,11 @@ ErrCode WifiP2pProxy::AddDnsSdLocalP2pService(const std::string &instanceName, c
         return WIFI_OPT_FAILED;
     }
     ErrCode ret = ErrCode(reply.ReadInt32());
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ret;
-    }
-    ReadWifiP2pServiceInfo(reply, srvInfo);
-    return WIFI_OPT_SUCCESS;
+    return ret;
 }
 
 ErrCode WifiP2pProxy::AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
-    const std::vector<std::string> &services, const std::string &serviceName, WifiP2pServiceInfo &srvInfo)
+    const std::vector<std::string> &services, const std::string &serviceName)
 {
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
@@ -413,11 +409,7 @@ ErrCode WifiP2pProxy::AddUpnpLocalP2pService(const std::string &uuid, const std:
         return WIFI_OPT_FAILED;
     }
     ErrCode ret = ErrCode(reply.ReadInt32());
-    if (ret != WIFI_OPT_SUCCESS) {
-        return ret;
-    }
-    ReadWifiP2pServiceInfo(reply, srvInfo);
-    return WIFI_OPT_SUCCESS;
+    return ret;
 }
 
 ErrCode WifiP2pProxy::StartP2pListen(int period, int interval)

@@ -99,15 +99,15 @@ ErrCode P2pInterface::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
 }
 
 ErrCode P2pInterface::AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
-    const std::map<std::string, std::string> &txtMap, const std::string &serviceName, WifiP2pServiceInfo &srvInfo)
+    const std::map<std::string, std::string> &txtMap, const std::string &serviceName)
 {
-    return p2pService.AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName, srvInfo);
+    return p2pService.AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName);
 }
 
 ErrCode P2pInterface::AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
-    const std::vector<std::string> &services, const std::string &serviceName, WifiP2pServiceInfo &srvInfo)
+    const std::vector<std::string> &services, const std::string &serviceName)
 {
-    return p2pService.AddUpnpLocalP2pService(uuid, device, services, serviceName, srvInfo);
+    return p2pService.AddUpnpLocalP2pService(uuid, device, services, serviceName);
 }
 
 ErrCode P2pInterface::RequestService(const WifiP2pDevice &device, const WifiP2pServiceRequest &request)

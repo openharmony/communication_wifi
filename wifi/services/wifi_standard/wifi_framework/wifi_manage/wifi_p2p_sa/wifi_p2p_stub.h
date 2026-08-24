@@ -58,8 +58,8 @@ private:
     void OnPutLocalP2pService(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnDeleteLocalP2pService(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnAddLocalP2pService(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
-    ErrCode ParseAndAddDnsSdLocalP2pService(MessageParcel &data, WifiP2pServiceInfo &srvInfo);
-    ErrCode ParseAndAddUpnpLocalP2pService(MessageParcel &data, WifiP2pServiceInfo &srvInfo);
+    ErrCode ParseAndAddDnsSdLocalP2pService(MessageParcel &data);
+    ErrCode ParseAndAddUpnpLocalP2pService(MessageParcel &data);
     void OnStartP2pListen(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnStopP2pListen(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnCreateGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);

@@ -520,8 +520,8 @@ function GetP2pGroupsSync(): Array<WifiP2pGroupInfo>;
 @gen_promise("getCurrentGroup")
 function GetCurrentGroupSync(): WifiP2pGroupInfo;
 
-function AddDnsSdLocalP2pService(instanceName: String, serviceType: String, txtRecord: Map<String, String>, serviceName: String): WifiP2pServiceInfo;
-function AddUpnpLocalP2pService(uuid: String, device: String, services: Array<String>, serviceName: String): WifiP2pServiceInfo;
+function AddDnsSdLocalP2pService(instanceName: String, serviceType: String, txtRecord: Map<String, String>, serviceName: String): void;
+function AddUpnpLocalP2pService(uuid: String, device: String, services: Array<String>, serviceName: String): void;
 function RemoveLocalP2pService(srvInfo: WifiP2pServiceInfo): void;
 
 @gen_promise("getLocalP2pServices")

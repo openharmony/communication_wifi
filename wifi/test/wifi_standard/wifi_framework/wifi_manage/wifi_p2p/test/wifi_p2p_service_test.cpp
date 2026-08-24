@@ -102,41 +102,33 @@ HWTEST_F(WifiP2pServiceTest, DeleteLocalP2pService, TestSize.Level1)
 
 HWTEST_F(WifiP2pServiceTest, AddDnsSdLocalP2pServiceSuccess, TestSize.Level1)
 {
-    WifiP2pServiceInfo srvInfo;
     std::map<std::string, std::string> txtMap;
     txtMap.insert(std::make_pair(std::string("ip"), std::string("127.0.0.1")));
-    EXPECT_EQ(pWifiP2pService->AddDnsSdLocalP2pService("instance", "_test._tcp", txtMap, "svc", srvInfo),
+    EXPECT_EQ(pWifiP2pService->AddDnsSdLocalP2pService("instance", "_test._tcp", txtMap, "svc"),
         ErrCode::WIFI_OPT_SUCCESS);
-    EXPECT_EQ(srvInfo.GetServiceName(), "svc");
-    EXPECT_EQ(srvInfo.GetServicerProtocolType(), P2pServicerProtocolType::SERVICE_TYPE_BONJOUR);
 }
 
 HWTEST_F(WifiP2pServiceTest, AddDnsSdLocalP2pServiceInvalidParam, TestSize.Level1)
 {
-    WifiP2pServiceInfo srvInfo;
     std::map<std::string, std::string> txtMap;
     std::string overLen(WifiP2pDnsSdServiceInfo::MAX_DNS_SD_NAME_LEN + 1, 'a');
-    EXPECT_EQ(pWifiP2pService->AddDnsSdLocalP2pService(overLen, "_test._tcp", txtMap, "svc", srvInfo),
+    EXPECT_EQ(pWifiP2pService->AddDnsSdLocalP2pService(overLen, "_test._tcp", txtMap, "svc"),
         ErrCode::WIFI_OPT_INVALID_PARAM);
 }
 
 HWTEST_F(WifiP2pServiceTest, AddUpnpLocalP2pServiceSuccess, TestSize.Level1)
 {
-    WifiP2pServiceInfo srvInfo;
     const std::string uuid = "550e8400-e29b-41d4-a716-446655440000";
     std::vector<std::string> services;
     services.push_back("urn:schemas-upnp-org:service:ContentDirectory:1");
     EXPECT_EQ(pWifiP2pService->AddUpnpLocalP2pService(uuid, "urn:schemas-upnp-org:device:MediaServer:1",
-        services, "upnp-svc", srvInfo), ErrCode::WIFI_OPT_SUCCESS);
-    EXPECT_EQ(srvInfo.GetServiceName(), "upnp-svc");
-    EXPECT_EQ(srvInfo.GetServicerProtocolType(), P2pServicerProtocolType::SERVICE_TYPE_UP_NP);
+        services, "upnp-svc"), ErrCode::WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiP2pServiceTest, AddUpnpLocalP2pServiceInvalidParam, TestSize.Level1)
 {
-    WifiP2pServiceInfo srvInfo;
     std::vector<std::string> services;
-    EXPECT_EQ(pWifiP2pService->AddUpnpLocalP2pService("bad-uuid", "device", services, "svc", srvInfo),
+    EXPECT_EQ(pWifiP2pService->AddUpnpLocalP2pService("bad-uuid", "device", services, "svc"),
         ErrCode::WIFI_OPT_INVALID_PARAM);
 }
 

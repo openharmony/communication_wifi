@@ -350,7 +350,7 @@ void WifiP2pStub::OnDeleteLocalP2pService(
     return;
 }
 
-ErrCode WifiP2pStub::ParseAndAddDnsSdLocalP2pService(MessageParcel &data, WifiP2pServiceInfo &srvInfo)
+ErrCode WifiP2pStub::ParseAndAddDnsSdLocalP2pService(MessageParcel &data)
 {
     constexpr int MAX_TXT_RECORDS = 64;
     const char *instanceName = data.ReadCString();
@@ -372,10 +372,10 @@ ErrCode WifiP2pStub::ParseAndAddDnsSdLocalP2pService(MessageParcel &data, WifiP2
         }
         txtMap.emplace(key, val);
     }
-    return AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName, srvInfo);
+    return AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName);
 }
 
-ErrCode WifiP2pStub::ParseAndAddUpnpLocalP2pService(MessageParcel &data, WifiP2pServiceInfo &srvInfo)
+ErrCode WifiP2pStub::ParseAndAddUpnpLocalP2pService(MessageParcel &data)
 {
     constexpr int MAX_UPNP_SERVICES = 64;
     const char *uuid = data.ReadCString();
@@ -396,7 +396,7 @@ ErrCode WifiP2pStub::ParseAndAddUpnpLocalP2pService(MessageParcel &data, WifiP2p
         }
         services.emplace_back(service);
     }
-    return AddUpnpLocalP2pService(uuid, device, services, serviceName, srvInfo);
+    return AddUpnpLocalP2pService(uuid, device, services, serviceName);
 }
 
 void WifiP2pStub::OnAddLocalP2pService(
@@ -404,18 +404,14 @@ void WifiP2pStub::OnAddLocalP2pService(
 {
     WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
     int buildType = data.ReadInt32();
-    WifiP2pServiceInfo srvInfo;
     ErrCode ret = WIFI_OPT_INVALID_PARAM;
     if (buildType == static_cast<int32_t>(P2pBuildServiceType::BUILD_DNS_SD)) {
-        ret = ParseAndAddDnsSdLocalP2pService(data, srvInfo);
+        ret = ParseAndAddDnsSdLocalP2pService(data);
     } else if (buildType == static_cast<int32_t>(P2pBuildServiceType::BUILD_UPNP)) {
-        ret = ParseAndAddUpnpLocalP2pService(data, srvInfo);
+        ret = ParseAndAddUpnpLocalP2pService(data);
     }
     reply.WriteInt32(0);
     reply.WriteInt32(ret);
-    if (ret == WIFI_OPT_SUCCESS) {
-        WriteWifiP2pServiceInfo(reply, srvInfo);
-    }
     return;
 }
 

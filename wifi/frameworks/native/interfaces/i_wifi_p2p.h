@@ -105,12 +105,10 @@ public:
      * @param serviceType - DNS-SD service type
      * @param txtMap - TXT record map
      * @param serviceName - service name
-     * @param srvInfo - output WifiP2pServiceInfo object
      * @return ErrCode - operation result
      */
     virtual ErrCode AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
-        const std::map<std::string, std::string> &txtMap, const std::string &serviceName,
-        WifiP2pServiceInfo &srvInfo) = 0;
+        const std::map<std::string, std::string> &txtMap, const std::string &serviceName) = 0;
 
     /**
      * @Description Add UPnP local P2P service (create then put)
@@ -119,12 +117,10 @@ public:
      * @param device - UPnP device
      * @param services - UPnP service list
      * @param serviceName - service name
-     * @param srvInfo - output WifiP2pServiceInfo object
      * @return ErrCode - operation result
      */
     virtual ErrCode AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
-        const std::vector<std::string> &services, const std::string &serviceName,
-        WifiP2pServiceInfo &srvInfo) = 0;
+        const std::vector<std::string> &services, const std::string &serviceName) = 0;
 
     /**
      * @Description Enable Wi-Fi P2P listening.

@@ -627,13 +627,8 @@ NO_SANITIZE("cfi") napi_value AddDnsSdLocalP2pService(napi_env env, napi_callbac
     WIFI_NAPI_ASSERT(env, ParseJsString(env, argv[1], serviceType), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
     WIFI_NAPI_ASSERT(env, ParseJsStringMap(env, argv[2], txtMap), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
     WIFI_NAPI_ASSERT(env, ParseJsString(env, argv[3], serviceName), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
-    WifiP2pServiceInfo srvInfo;
-    ErrCode ret = wifiP2pPtr->AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName, srvInfo);
-    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
-    napi_value result = nullptr;
-    napi_create_object(env, &result);
-    ServiceInfoToJs(env, srvInfo, result);
-    return result;
+    ErrCode ret = wifiP2pPtr->AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
 NO_SANITIZE("cfi") napi_value AddUpnpLocalP2pService(napi_env env, napi_callback_info info)
@@ -655,13 +650,8 @@ NO_SANITIZE("cfi") napi_value AddUpnpLocalP2pService(napi_env env, napi_callback
     WIFI_NAPI_ASSERT(env, ParseJsStringArray(env, argv[2], services), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
     WIFI_NAPI_ASSERT(env, ParseJsString(env, argv[3], serviceName), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
 
-    WifiP2pServiceInfo srvInfo;
-    ErrCode ret = wifiP2pPtr->AddUpnpLocalP2pService(uuid, device, services, serviceName, srvInfo);
-    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
-    napi_value result = nullptr;
-    napi_create_object(env, &result);
-    ServiceInfoToJs(env, srvInfo, result);
-    return result;
+    ErrCode ret = wifiP2pPtr->AddUpnpLocalP2pService(uuid, device, services, serviceName);
+    WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
 
 NO_SANITIZE("cfi") napi_value RemoveLocalP2pService(napi_env env, napi_callback_info info)

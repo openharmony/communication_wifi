@@ -83,26 +83,30 @@ export function updateOnErrorReceive(code: number) {
 export function updateOnSslErrorEvent(code: number) {
   sslErrorCode_ = code;
 }
- 
+
 function portalHiSysEvent() {
   hilog.info(DOMAIN, TAG, '%{public}s', 'Enter portalHiSysEvent');
   if (httpErrorCode_ == 0 && errorCode_ == 0 &&  sslErrorCode_ == 0) {
     isPortalSuccess_ = 1;
   }
+  const eventValue: string = JSON.stringify({
+    IS_ON_NEW_WANT: isOnNewWant_,
+    BIND_NET_DURATION: bindNetDuration_,
+    IS_BIND_NET_SUCCESS: isBindNetSuccess_,
+    INIT_URL: initUrl_,
+    FINAL_URL: finalUrl_,
+    HTTP_ERROR_CODE: httpErrorCode_,
+    ERROR_CODE: errorCode_,
+    SSL_ERROR_CODE: sslErrorCode_,
+    IS_PORTAL_SUCCESS: isPortalSuccess_,
+  });
   hiSysEvent.write({
     domain: 'COMMUNICATION',
-    name:'PORTAL_LOGIN_LOAD_INFO',
+    name: 'WIFI_CHR_EVENT',
     eventType: hiSysEvent.EventType.STATISTIC,
-    params:{
-      'IS_ON_NEW_WANT': isOnNewWant_,
-      'BIND_NET_DURATION': bindNetDuration_,
-      'IS_BIND_NET_SUCCESS': isBindNetSuccess_,
-      'INIT_URL': initUrl_,
-      'FINAL_URL': finalUrl_,
-      'HTTP_ERROR_CODE': httpErrorCode_,
-      'ERROR_CODE': errorCode_,
-      'SSL_ERROR_CODE': sslErrorCode_,
-      'IS_PORTAL_SUCCESS': isPortalSuccess_,
+    params: {
+      'EVENT_NAME': 'PORTAL_LOGIN_LOAD_INFO',
+      'EVENT_VALUE': eventValue,
     },
   }, (err:BusinessError) => {
     if(err){
@@ -112,7 +116,7 @@ function portalHiSysEvent() {
     hilog.info(DOMAIN, TAG, `success to write event`);
   });
 }
- 
+
 export function updateOnBackground() {
   if ((httpErrorCode_ != 0 || errorCode_ != 0 || sslErrorCode_ != 0) && !isUpload_) {
     portalHiSysEvent();

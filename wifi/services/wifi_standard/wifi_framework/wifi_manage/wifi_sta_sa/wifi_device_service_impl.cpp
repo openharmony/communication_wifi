@@ -2123,10 +2123,7 @@ ErrCode WifiDeviceServiceImpl::StartWifiDetection()
 
     WifiLinkedInfo linkedInfo;
     WifiConfigCenter::GetInstance().GetLinkedInfo(linkedInfo);
-    std::vector<std::string> specialSsidList;
-    WifiSettings::GetInstance().GetSpecialSsidList(specialSsidList);
-    if (std::find(specialSsidList.begin(), specialSsidList.end(), linkedInfo.ssid)
-        != specialSsidList.end()) {
+    if (linkedInfo.ssid == "CEAIR-WIFI") {
         WIFI_LOGI("%{public}s special wifi donot support wifi detect", __FUNCTION__);
         return WIFI_OPT_FAILED;
     }

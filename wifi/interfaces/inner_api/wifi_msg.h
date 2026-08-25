@@ -1295,7 +1295,7 @@ struct WifiFastReconnectConfig {
 };
 
 #ifndef OHOS_ARCH_LITE
-using EnhanceConfigVariant = std::variant<WifiFastReconnectConfig>;
+using EnhanceConfigVariant = std::variant<WifiFastReconnectConfig, bool>;
 #endif
 
 struct WifiDeviceFeatures {

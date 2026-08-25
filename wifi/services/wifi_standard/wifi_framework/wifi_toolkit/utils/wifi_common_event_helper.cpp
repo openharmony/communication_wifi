@@ -259,8 +259,9 @@ bool WifiCommonEventHelper::PublishNetCheckResultChange(const int &code, const s
 
 bool WifiCommonEventHelper::PublishScanOnlyStateChangedEvent(const int &code, const std::string &data)
 {
-    WIFI_LOGI("PublishScanOnlyStateChangedEvent code:%{public}d",code);
+    WIFI_LOGI("PublishScanOnlyStateChangedEvent code:%{public}d", code);
     std::vector<std::string> permissions;
+    permissions.push_back(COMMON_EVENT_GET_WIFI_INFO_PERMISSION);
     permissions.push_back(COMMON_EVENT_GET_WIFI_CONFIG_PERMISSION);
     return WifiCommonEventHelper::PublishEvent(COMMON_EVENT_WIFI_SCAN_ONLY_STATE_CHANGED, code, data, permissions);
 }

@@ -792,7 +792,6 @@ void WifiControllerMachine::EnableState::HandleEnableStateManagerExist(int id, i
         pWifiControllerMachine->HandleScanOnlyModeChanged(isOpen);
     }
     pWifiControllerMachine->SwitchRole(presentRole);
-
 }
 
 #ifdef FEATURE_AP_SUPPORT

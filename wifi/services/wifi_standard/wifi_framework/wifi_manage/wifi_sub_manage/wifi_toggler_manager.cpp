@@ -172,6 +172,10 @@ void WifiTogglerManager::OnSemiWifiToggledTimeOut()
 
 ErrCode WifiTogglerManager::SoftapToggled(int isOpen, int id)
 {
+    if (!pWifiControllerMachine) {
+        WIFI_LOGE("pWifiControllerMachine is null!");
+        return WIFI_OPT_FAILED;
+    }
     if (isOpen) {
         WIFI_LOGI("set softap toggled true");
         WifiConfigCenter::GetInstance().SetSoftapToggledState(true);
@@ -179,9 +183,6 @@ ErrCode WifiTogglerManager::SoftapToggled(int isOpen, int id)
     } else {
         WIFI_LOGI("set softap toggled false");
         WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
-    }
-    if (!pWifiControllerMachine) {
-        return WIFI_OPT_FAILED;
     }
     pWifiControllerMachine->SendMessage(CMD_SOFTAP_TOGGLED, isOpen, id);
     return WIFI_OPT_SUCCESS;
@@ -192,6 +193,7 @@ ErrCode WifiTogglerManager::RptToggled(int isOpen, int id)
 {
     if (pWifiControllerMachine) {
         pWifiControllerMachine->SendMessage(CMD_RPT_TOGGLED, isOpen, id);
+        return WIFI_OPT_FAILED;
     }
     return WIFI_OPT_SUCCESS;
 }
@@ -210,6 +212,7 @@ ErrCode WifiTogglerManager::ScanOnlyToggled(int isOpen)
         return WIFI_OPT_FAILED;
     }
     if (!pWifiControllerMachine) {
+        WIFI_LOGE("pWifiControllerMachine is null!");
         return WIFI_OPT_FAILED;
     }
     pWifiControllerMachine->SendMessage(CMD_SCAN_ALWAYS_MODE_CHANGED, isOpen, 0);
@@ -218,6 +221,10 @@ ErrCode WifiTogglerManager::ScanOnlyToggled(int isOpen)
 
 ErrCode WifiTogglerManager::AirplaneToggled(int isOpen)
 {
+    if (!pWifiControllerMachine) {
+        WIFI_LOGE("pWifiControllerMachine is null!");
+        return WIFI_OPT_FAILED;
+    }
 #ifdef FEATURE_SELF_CURE_SUPPORT
     if (isOpen) {
         for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
@@ -228,9 +235,6 @@ ErrCode WifiTogglerManager::AirplaneToggled(int isOpen)
         }
     }
 #endif // FEATURE_SELF_CURE_SUPPORT
-    if (!pWifiControllerMachine) {
-        return WIFI_OPT_FAILED;
-    }
     pWifiControllerMachine->SendMessage(CMD_AIRPLANE_TOGGLED, isOpen);
     return WIFI_OPT_SUCCESS;
 }

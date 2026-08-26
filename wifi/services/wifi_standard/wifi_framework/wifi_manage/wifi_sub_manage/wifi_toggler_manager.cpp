@@ -180,9 +180,10 @@ ErrCode WifiTogglerManager::SoftapToggled(int isOpen, int id)
         WIFI_LOGI("set softap toggled false");
         WifiConfigCenter::GetInstance().SetSoftapToggledState(false);
     }
-    if (pWifiControllerMachine) {
-        pWifiControllerMachine->SendMessage(CMD_SOFTAP_TOGGLED, isOpen, id);
+    if (!pWifiControllerMachine) {
+        return WIFI_OPT_FAILED;
     }
+    pWifiControllerMachine->SendMessage(CMD_SOFTAP_TOGGLED, isOpen, id);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -208,9 +209,10 @@ ErrCode WifiTogglerManager::ScanOnlyToggled(int isOpen)
         WIFI_LOGE("Softap(wlan0) mode do not start scanonly.");
         return WIFI_OPT_FAILED;
     }
-    if (pWifiControllerMachine) {
-        pWifiControllerMachine->SendMessage(CMD_SCAN_ALWAYS_MODE_CHANGED, isOpen, 0);
+    if (!pWifiControllerMachine) {
+        return WIFI_OPT_FAILED;
     }
+    pWifiControllerMachine->SendMessage(CMD_SCAN_ALWAYS_MODE_CHANGED, isOpen, 0);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -226,9 +228,10 @@ ErrCode WifiTogglerManager::AirplaneToggled(int isOpen)
         }
     }
 #endif // FEATURE_SELF_CURE_SUPPORT
-    if (pWifiControllerMachine) {
-        pWifiControllerMachine->SendMessage(CMD_AIRPLANE_TOGGLED, isOpen);
+    if (!pWifiControllerMachine) {
+        return WIFI_OPT_FAILED;
     }
+    pWifiControllerMachine->SendMessage(CMD_AIRPLANE_TOGGLED, isOpen);
     return WIFI_OPT_SUCCESS;
 }
 

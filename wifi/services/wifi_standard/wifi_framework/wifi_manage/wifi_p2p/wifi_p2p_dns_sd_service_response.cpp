@@ -86,9 +86,10 @@ bool WifiP2pDnsSdServiceResponse::FetchDnsName(std::istringstream &istream, std:
             if (t > (istream.str().size() - static_cast<unsigned char>(istream.tellg()))) {
                 return false;
             }
-            std::unique_ptr<char[]> ptr = std::make_unique<char[]>(t);
+            std::unique_ptr<char[]> ptr = std::make_unique<char[]>(t + 1);
             istream.read(ptr.get(), t);
-            dnsName.append(ptr.get(), 0, t);
+            ptr[t] = '\0';
+            dnsName.append(ptr.get(), static_cast<std::string::size_type>(istream.gcount()));
             dnsName.append(".");
         }
         t = istream.get();
@@ -138,9 +139,10 @@ bool WifiP2pDnsSdServiceResponse::ParseData()
     if (!istream.eof() && istream.get() == ';') {
         std::string svrName("");
         unsigned char svrNameLength = static_cast<unsigned char>(istream.get());
-        std::unique_ptr<char[]> ptr = std::make_unique<char[]>(svrNameLength);
+        std::unique_ptr<char[]> ptr = std::make_unique<char[]>(svrNameLength + 1);
         istream.read(ptr.get(), svrNameLength);
-        svrName.append(ptr.get(), 0, svrNameLength);
+        ptr[svrNameLength] = '\0';
+        svrName.append(ptr.get(), static_cast<std::string::size_type>(istream.gcount()));
         mSvrName = svrName;
     }
     return true;

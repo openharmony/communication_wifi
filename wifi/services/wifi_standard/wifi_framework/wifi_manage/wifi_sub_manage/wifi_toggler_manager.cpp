@@ -193,9 +193,9 @@ ErrCode WifiTogglerManager::RptToggled(int isOpen, int id)
 {
     if (pWifiControllerMachine) {
         pWifiControllerMachine->SendMessage(CMD_RPT_TOGGLED, isOpen, id);
-        return WIFI_OPT_FAILED;
+        return WIFI_OPT_SUCCESS;
     }
-    return WIFI_OPT_SUCCESS;
+    return WIFI_OPT_FAILED;
 }
 #endif
 

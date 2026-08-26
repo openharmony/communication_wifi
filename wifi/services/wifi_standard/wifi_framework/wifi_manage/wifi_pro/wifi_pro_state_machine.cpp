@@ -528,6 +528,14 @@ bool WifiProStateMachine::IsSatisfiedWifi2WifiCondition()
         return false;
     }
 
+#ifndef OHOS_ARCH_LITE
+    IEnhanceService *inst = WifiServiceManager::GetInstance().GetEnhanceServiceInst();
+    if (inst != nullptr && std::get<bool>(inst->GetWifiEnhanceConfig(WifiEnhanceConfigType::ROAM_STATE))) {
+        WIFI_LOGI("IsSatisfiedWifi2WifiCondition: roaming in progress");
+        return false;
+    }
+#endif
+
     return true;
 }
 

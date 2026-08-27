@@ -63,6 +63,7 @@ ohos_unittest("base_unittest") {
   deps = [ "$WIFI_ROOT_DIR/base:wifi_base" ]
 
   external_deps = [
+    "ability_runtime:ability_connect_callback_stub",
     "ability_runtime:ability_manager",
     "c_utils:utils",
     "googletest:gmock_main",

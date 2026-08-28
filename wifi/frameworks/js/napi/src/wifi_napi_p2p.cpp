@@ -472,100 +472,6 @@ NO_SANITIZE("cfi") napi_value GetP2pLinkedInfo(napi_env env, napi_callback_info 
     return DoAsyncWork(env, asyncContext, argc, argv, nonCallbackArgNum);
 }
 
-static bool ParseJsString(const napi_env& env, napi_value value, std::string& out)
-{
-    napi_valuetype type = napi_undefined;
-    napi_typeof(env, value, &type);
-    if (type != napi_string) {
-        return false;
-    }
-    size_t len = 0;
-    napi_get_value_string_utf8(env, value, nullptr, 0, &len);
-    out.assign(len, '\0');
-    napi_get_value_string_utf8(env, value, out.data(), len + 1, &len);
-    return true;
-}
-
-static bool ParseJsStringArray(const napi_env& env, napi_value value, std::vector<std::string>& out)
-{
-    bool isArray = false;
-    napi_is_array(env, value, &isArray);
-    if (!isArray) {
-        return false;
-    }
-    uint32_t length = 0;
-    napi_get_array_length(env, value, &length);
-    out.clear();
-    out.reserve(length);
-    for (uint32_t i = 0; i < length; ++i) {
-        napi_value element = nullptr;
-        napi_get_element(env, value, i, &element);
-        std::string str;
-        if (!ParseJsString(env, element, str)) {
-            return false;
-        }
-        out.emplace_back(str);
-    }
-    return true;
-}
-
-static bool ParseJsStringMapFromObject(const napi_env& env, napi_value object, std::map<std::string, std::string>& out)
-{
-    napi_value propertyNames = nullptr;
-    if (napi_get_property_names(env, object, &propertyNames) != napi_ok) {
-        return false;
-    }
-    uint32_t length = 0;
-    napi_get_array_length(env, propertyNames, &length);
-    out.clear();
-    for (uint32_t i = 0; i < length; ++i) {
-        napi_value keyVal = nullptr;
-        napi_get_element(env, propertyNames, i, &keyVal);
-        std::string key;
-        if (!ParseJsString(env, keyVal, key)) {
-            return false;
-        }
-        napi_value propVal = nullptr;
-        if (napi_get_property(env, object, keyVal, &propVal) != napi_ok) {
-            return false;
-        }
-        std::string valueStr;
-        if (!ParseJsString(env, propVal, valueStr)) {
-            return false;
-        }
-        out[key] = valueStr;
-    }
-    return true;
-}
-
-static bool ParseJsStringMap(const napi_env& env, napi_value value, std::map<std::string, std::string>& out)
-{
-    napi_valuetype type = napi_undefined;
-    napi_typeof(env, value, &type);
-    if (type != napi_object) {
-        return false;
-    }
-    napi_value target = value;
-    napi_value entriesFunc = nullptr;
-    napi_get_named_property(env, value, "entries", &entriesFunc);
-    napi_valuetype entriesType = napi_undefined;
-    napi_typeof(env, entriesFunc, &entriesType);
-    if (entriesType == napi_function) {
-        napi_value global = nullptr;
-        napi_get_global(env, &global);
-        napi_value objectVal = nullptr;
-        napi_get_named_property(env, global, "Object", &objectVal);
-        napi_value fromEntries = nullptr;
-        napi_get_named_property(env, objectVal, "fromEntries", &fromEntries);
-        napi_value converted = nullptr;
-        if (napi_call_function(env, objectVal, fromEntries, 1, &value, &converted) != napi_ok) {
-            return false;
-        }
-        target = converted;
-    }
-    return ParseJsStringMapFromObject(env, target, out);
-}
-
 static void ServiceInfoToJs(const napi_env& env, const WifiP2pServiceInfo& info, napi_value& result)
 {
     SetValueUtf8String(env, "serviceName", info.GetServiceName().c_str(), result);
@@ -600,7 +506,7 @@ static bool JsObjToServiceInfo(const napi_env& env, napi_value object, WifiP2pSe
     }
     napi_get_named_property(env, object, "queryList", &queryListVal);
     std::vector<std::string> queries;
-    if (!ParseJsStringArray(env, queryListVal, queries)) {
+    if (!JsToStringVector(env, queryListVal, queries)) {
         return false;
     }
     info.SetServiceName(serviceName);
@@ -612,21 +518,22 @@ static bool JsObjToServiceInfo(const napi_env& env, napi_value object, WifiP2pSe
 NO_SANITIZE("cfi") napi_value AddDnsSdLocalP2pService(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    size_t argc = 4;
-    napi_value argv[4];
+    const size_t PARAMS_NUM = 4;
+    size_t argc = PARAMS_NUM;
+    napi_value argv[PARAMS_NUM];
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, argc == 4, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
+    WIFI_NAPI_ASSERT(env, argc == PARAMS_NUM, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
     WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     std::string instanceName;
     std::string serviceType;
     std::map<std::string, std::string> txtMap;
     std::string serviceName;
-    WIFI_NAPI_ASSERT(env, ParseJsString(env, argv[0], instanceName), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
-    WIFI_NAPI_ASSERT(env, ParseJsString(env, argv[1], serviceType), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
-    WIFI_NAPI_ASSERT(env, ParseJsStringMap(env, argv[2], txtMap), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
-    WIFI_NAPI_ASSERT(env, ParseJsString(env, argv[3], serviceName), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
+    WIFI_NAPI_ASSERT(env, JsToString(env, argv[0], instanceName), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
+    WIFI_NAPI_ASSERT(env, JsToString(env, argv[1], serviceType), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
+    WIFI_NAPI_ASSERT(env, JsToStringMap(env, argv[2], txtMap), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
+    WIFI_NAPI_ASSERT(env, JsToString(env, argv[3], serviceName), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
     ErrCode ret = wifiP2pPtr->AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName);
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
 }
@@ -634,21 +541,22 @@ NO_SANITIZE("cfi") napi_value AddDnsSdLocalP2pService(napi_env env, napi_callbac
 NO_SANITIZE("cfi") napi_value AddUpnpLocalP2pService(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    size_t argc = 4;
-    napi_value argv[4];
+    const size_t PARAMS_NUM = 4;
+    size_t argc = PARAMS_NUM;
+    napi_value argv[PARAMS_NUM];
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, argc == 4, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
+    WIFI_NAPI_ASSERT(env, argc == PARAMS_NUM, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
     WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     std::string uuid;
     std::string device;
     std::vector<std::string> services;
     std::string serviceName;
-    WIFI_NAPI_ASSERT(env, ParseJsString(env, argv[0], uuid), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
-    WIFI_NAPI_ASSERT(env, ParseJsString(env, argv[1], device), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
-    WIFI_NAPI_ASSERT(env, ParseJsStringArray(env, argv[2], services), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
-    WIFI_NAPI_ASSERT(env, ParseJsString(env, argv[3], serviceName), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
+    WIFI_NAPI_ASSERT(env, JsToString(env, argv[0], uuid), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
+    WIFI_NAPI_ASSERT(env, JsToString(env, argv[1], device), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
+    WIFI_NAPI_ASSERT(env, JsToStringVector(env, argv[2], services), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
+    WIFI_NAPI_ASSERT(env, JsToString(env, argv[3], serviceName), WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
 
     ErrCode ret = wifiP2pPtr->AddUpnpLocalP2pService(uuid, device, services, serviceName);
     WIFI_NAPI_RETURN(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_P2P);
@@ -657,11 +565,12 @@ NO_SANITIZE("cfi") napi_value AddUpnpLocalP2pService(napi_env env, napi_callback
 NO_SANITIZE("cfi") napi_value RemoveLocalP2pService(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    size_t argc = 1;
-    napi_value argv[1];
+    const size_t PARAMS_NUM = 1;
+    size_t argc = PARAMS_NUM;
+    napi_value argv[PARAMS_NUM];
     napi_value thisVar = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
-    WIFI_NAPI_ASSERT(env, argc == 1, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
+    WIFI_NAPI_ASSERT(env, argc == PARAMS_NUM, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_P2P);
     WIFI_NAPI_ASSERT(env, wifiP2pPtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_P2P);
 
     WifiP2pServiceInfo srvInfo;

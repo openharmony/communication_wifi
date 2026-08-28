@@ -361,7 +361,7 @@ ErrCode WifiP2pStub::ParseAndAddDnsSdLocalP2pService(MessageParcel &data)
     }
     std::map<std::string, std::string> txtMap;
     int txtSize = data.ReadInt32();
-    if (txtSize > MAX_TXT_RECORDS) {
+    if (txtSize < 0 || txtSize > MAX_TXT_RECORDS) {
         return WIFI_OPT_INVALID_PARAM;
     }
     for (int i = 0; i < txtSize; ++i) {
@@ -386,7 +386,7 @@ ErrCode WifiP2pStub::ParseAndAddUpnpLocalP2pService(MessageParcel &data)
     }
     std::vector<std::string> services;
     int serviceSize = data.ReadInt32();
-    if (serviceSize > MAX_UPNP_SERVICES) {
+    if (serviceSize < 0 || serviceSize > MAX_UPNP_SERVICES) {
         return WIFI_OPT_INVALID_PARAM;
     }
     for (int i = 0; i < serviceSize; ++i) {

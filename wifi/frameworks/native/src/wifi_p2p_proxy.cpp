@@ -338,6 +338,11 @@ ErrCode WifiP2pProxy::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
 ErrCode WifiP2pProxy::AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
     const std::map<std::string, std::string> &txtMap, const std::string &serviceName)
 {
+    const size_t MAX_TXT_RECORDS = 64;
+    if (txtMap.size() > MAX_TXT_RECORDS) {
+        WIFI_LOGE("AddDnsSdLocalP2pService txtMap size error: %{public}zu", txtMap.size());
+        return WIFI_OPT_INVALID_PARAM;
+    }
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
@@ -377,6 +382,11 @@ ErrCode WifiP2pProxy::AddDnsSdLocalP2pService(const std::string &instanceName, c
 ErrCode WifiP2pProxy::AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
     const std::vector<std::string> &services, const std::string &serviceName)
 {
+    const size_t MAX_UPNP_SERVICES = 64;
+    if (services.size() > MAX_UPNP_SERVICES) {
+        WIFI_LOGE("AddUpnpLocalP2pService services size error: %{public}zu", services.size());
+        return WIFI_OPT_INVALID_PARAM;
+    }
     if (mRemoteDied) {
         WIFI_LOGW("failed to `%{public}s`,remote service is died!", __func__);
         return WIFI_OPT_FAILED;
@@ -1182,9 +1192,9 @@ ErrCode WifiP2pProxy::QueryLocalP2pServices(std::vector<WifiP2pServiceInfo> &ser
     if (ErrCode(ret) != WIFI_OPT_SUCCESS) {
         return ErrCode(ret);
     }
-    constexpr int MAX_SIZE = 512;
+    const size_t MAX_LOCAL_P2P_SERVICES = 512;
     int size = reply.ReadInt32();
-    if (size > MAX_SIZE) {
+    if (size > static_cast<int>(MAX_LOCAL_P2P_SERVICES)) {
         WIFI_LOGE("Get local p2p service size error: %{public}d", size);
         return WIFI_OPT_FAILED;
     }

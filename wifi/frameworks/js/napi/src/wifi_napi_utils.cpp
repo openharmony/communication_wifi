@@ -214,6 +214,100 @@ std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& o
     return result;
 }
 
+bool JsToString(const napi_env& env, napi_value value, std::string& out)
+{
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, value, &type);
+    if (type != napi_string) {
+        return false;
+    }
+    size_t len = 0;
+    napi_get_value_string_utf8(env, value, nullptr, 0, &len);
+    out.assign(len, '\0');
+    napi_get_value_string_utf8(env, value, out.data(), len + 1, &len);
+    return true;
+}
+
+bool JsToStringVector(const napi_env& env, napi_value value, std::vector<std::string>& out)
+{
+    bool isArray = false;
+    napi_is_array(env, value, &isArray);
+    if (!isArray) {
+        return false;
+    }
+    uint32_t length = 0;
+    napi_get_array_length(env, value, &length);
+    out.clear();
+    out.reserve(length);
+    for (uint32_t i = 0; i < length; ++i) {
+        napi_value element = nullptr;
+        napi_get_element(env, value, i, &element);
+        std::string str;
+        if (!JsToString(env, element, str)) {
+            return false;
+        }
+        out.emplace_back(str);
+    }
+    return true;
+}
+
+static bool JsObjectToStringMap(const napi_env& env, napi_value object, std::map<std::string, std::string>& out)
+{
+    napi_value propertyNames = nullptr;
+    if (napi_get_property_names(env, object, &propertyNames) != napi_ok) {
+        return false;
+    }
+    uint32_t length = 0;
+    napi_get_array_length(env, propertyNames, &length);
+    out.clear();
+    for (uint32_t i = 0; i < length; ++i) {
+        napi_value keyVal = nullptr;
+        napi_get_element(env, propertyNames, i, &keyVal);
+        std::string key;
+        if (!JsToString(env, keyVal, key)) {
+            return false;
+        }
+        napi_value propVal = nullptr;
+        if (napi_get_property(env, object, keyVal, &propVal) != napi_ok) {
+            return false;
+        }
+        std::string valueStr;
+        if (!JsToString(env, propVal, valueStr)) {
+            return false;
+        }
+        out[key] = valueStr;
+    }
+    return true;
+}
+
+bool JsToStringMap(const napi_env& env, napi_value value, std::map<std::string, std::string>& out)
+{
+    napi_valuetype type = napi_undefined;
+    napi_typeof(env, value, &type);
+    if (type != napi_object) {
+        return false;
+    }
+    napi_value target = value;
+    napi_value entriesFunc = nullptr;
+    napi_get_named_property(env, value, "entries", &entriesFunc);
+    napi_valuetype entriesType = napi_undefined;
+    napi_typeof(env, entriesFunc, &entriesType);
+    if (entriesType == napi_function) {
+        napi_value global = nullptr;
+        napi_get_global(env, &global);
+        napi_value objectVal = nullptr;
+        napi_get_named_property(env, global, "Object", &objectVal);
+        napi_value fromEntries = nullptr;
+        napi_get_named_property(env, objectVal, "fromEntries", &fromEntries);
+        napi_value converted = nullptr;
+        if (napi_call_function(env, objectVal, fromEntries, 1, &value, &converted) != napi_ok) {
+            return false;
+        }
+        target = converted;
+    }
+    return JsObjectToStringMap(env, target, out);
+}
+
 napi_status SetValueUtf8String(const napi_env& env, const char* fieldStr, const char* str,
     napi_value& result, size_t strLen)
 {

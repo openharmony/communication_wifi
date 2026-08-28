@@ -28,7 +28,7 @@
 
 void StrSafeCopy(char *dst, unsigned len, const char *src)
 {
-    if (dst == NULL) {
+    if (dst == NULL || len == 0) {
         return;
     }
     if (src == NULL) {

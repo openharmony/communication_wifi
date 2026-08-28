@@ -930,6 +930,57 @@ void WifiInternalEventDispatcher::updateP2pDeviceMacAddress(std::vector<WifiP2pD
 }
 #endif
 
+void WifiInternalEventDispatcher::HandleP2pPeerChange(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
+    int pid, int uid, int tokenId)
+{
+    WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d, tokenId: %{private}d", __func__, pid, uid, tokenId);
+#ifdef SUPPORT_RANDOM_MAC_ADDR
+    if ((pid != 0) && (uid != 0)) {
+        std::vector<WifiP2pDevice> deviceVec = msg.device;
+        if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
+            WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
+                __func__, pid, uid);
+            updateP2pDeviceMacAddress(deviceVec);
+        }
+        callback->OnP2pPeersChanged(deviceVec);
+    }
+#else
+    callback->OnP2pPeersChanged(msg.device);
+#endif
+}
+
+void WifiInternalEventDispatcher::HandleP2pGcJoinGroup(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
+    int pid, int uid, int tokenId)
+{
+    WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d, tokenId: %{private}d", __func__, pid, uid, tokenId);
+    if ((pid != 0) && (uid != 0) &&
+        WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
+        WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
+            __func__, pid, uid);
+        GcInfo gcInfoCopy = msg.gcInfo;
+        gcInfoCopy.mac = "";
+        callback->OnP2pGcJoinGroup(gcInfoCopy);
+    } else {
+        callback->OnP2pGcJoinGroup(msg.gcInfo);
+    }
+}
+
+void WifiInternalEventDispatcher::HandleP2pGcLeaveGroup(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
+    int pid, int uid, int tokenId)
+{
+    WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d, tokenId: %{private}d", __func__, pid, uid, tokenId);
+    if ((pid != 0) && (uid != 0) &&
+        WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
+        WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
+            __func__, pid, uid);
+        GcInfo gcInfoCopy = msg.gcInfo;
+        gcInfoCopy.mac = "";
+        callback->OnP2pGcLeaveGroup(gcInfoCopy);
+    } else {
+        callback->OnP2pGcLeaveGroup(msg.gcInfo);
+    }
+}
+
 void WifiInternalEventDispatcher::FreecfgInfo(CfgInfo* cfgInfo)
 {
     if (cfgInfo == nullptr) {
@@ -962,24 +1013,8 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             callback->OnP2pThisDeviceChanged(msg.p2pDevice);
             break;
         case WIFI_CBK_MSG_PEER_CHANGE:
-            {
-                WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d, tokenId: %{private}d",
-                    __func__, pid, uid, tokenId);
-            #ifdef SUPPORT_RANDOM_MAC_ADDR
-                if ((pid != 0) && (uid != 0)) {
-                    std::vector<WifiP2pDevice> deviceVec = msg.device;
-                    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
-                        WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
-                            __func__, pid, uid);
-                        updateP2pDeviceMacAddress(deviceVec);
-                    }
-                    callback->OnP2pPeersChanged(deviceVec);
-                }
-            #else
-                callback->OnP2pPeersChanged(msg.device);
-            #endif
-                break;
-            }
+            HandleP2pPeerChange(callback, msg, pid, uid, tokenId);
+            break;
         case WIFI_CBK_MSG_SERVICE_CHANGE:
             callback->OnP2pServicesChanged(msg.serviceInfo);
             break;
@@ -993,34 +1028,10 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             callback->OnP2pActionResult(msg.p2pAction, static_cast<ErrCode>(msg.msgData));
             break;
         case WIFI_CBK_MSG_P2P_GC_JOIN_GROUP:
-            WIFI_LOGD("%{public}s P2P_GC_JOIN pid: %{public}d, uid: %{public}d, tokenId: %{private}d",
-                __func__, pid, uid, tokenId);
-            if ((pid != 0) && (uid != 0)) {
-                GcInfo gcInfoCopy = msg.gcInfo;
-                if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
-                    WIFI_LOGD("%{public}s: P2P_GC_JOIN GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d,
-                        uid: %{public}d", __func__, pid, uid);
-                    gcInfoCopy.mac = "";
-                }
-                callback->OnP2pGcJoinGroup(gcInfoCopy);
-            } else {
-                callback->OnP2pGcJoinGroup(msg.gcInfo);
-            }
+            HandleP2pGcJoinGroup(callback, msg, pid, uid, tokenId);
             break;
         case WIFI_CBK_MSG_P2P_GC_LEAVE_GROUP:
-            WIFI_LOGD("%{public}s P2P_GC_LEAVE pid: %{public}d, uid: %{public}d, tokenId: %{private}d",
-                __func__, pid, uid, tokenId);
-            if ((pid != 0) && (uid != 0)) {
-                GcInfo gcInfoCopy = msg.gcInfo;
-                if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
-                    WIFI_LOGD("%{public}s: P2P_GC_LEAVE GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d,
-                        uid: %{public}d", __func__, pid, uid);
-                    gcInfoCopy.mac = "";
-                }
-                callback->OnP2pGcLeaveGroup(gcInfoCopy);
-            } else {
-                callback->OnP2pGcLeaveGroup(msg.gcInfo);
-            }
+            HandleP2pGcLeaveGroup(callback, msg, pid, uid, tokenId);
             break;
         case WIFI_CBK_MSG_CFG_CHANGE:
             SendConfigChangeEvent(callback, msg.cfgInfo);

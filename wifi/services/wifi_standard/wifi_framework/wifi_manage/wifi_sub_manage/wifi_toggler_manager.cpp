@@ -99,6 +99,10 @@ RptModeCallback& WifiTogglerManager::GetRptCallback()
 
 ErrCode WifiTogglerManager::WifiToggled(int isOpen, int id)
 {
+    if (pWifiControllerMachine == nullptr) {
+        WIFI_LOGE("pWifiControllerMachine is null!");
+        return WIFI_OPT_FAILED;
+    }
     pWifiControllerMachine->ClearWifiStartFailCount();
     WIFI_LOGI("WifiTogglerManager::WifiToggled, isOpen %{public}d instId: %{public}d", isOpen, id);
 #ifdef FEATURE_SELF_CURE_SUPPORT
@@ -118,8 +122,10 @@ void WifiTogglerManager::StartWifiToggledTimer()
     WIFI_LOGD("StartWifiToggledTimer");
     WifiOprMidState midState = WifiConfigCenter::GetInstance().GetWifiMidState(INSTID_WLAN0);
     if (midState != WifiOprMidState::RUNNING && midState != WifiOprMidState::OPENING) {
-        pWifiControllerMachine->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
-        pWifiControllerMachine->MessageExecutedLater(CMD_WIFI_TOGGLED_TIMEOUT, WIFI_OPEN_TIMEOUT);
+        if (pWifiControllerMachine) {
+            pWifiControllerMachine->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
+            pWifiControllerMachine->MessageExecutedLater(CMD_WIFI_TOGGLED_TIMEOUT, WIFI_OPEN_TIMEOUT);
+        }
     } else {
         WIFI_LOGW("start wifi when wifi is already opening or opened");
     }
@@ -128,7 +134,9 @@ void WifiTogglerManager::StartWifiToggledTimer()
 void WifiTogglerManager::StopWifiToggledTimer()
 {
     WIFI_LOGD("StopWifiToggledTimer");
-    pWifiControllerMachine->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
+    if (pWifiControllerMachine) {
+        pWifiControllerMachine->StopTimer(CMD_WIFI_TOGGLED_TIMEOUT);
+    }
 }
 
 void WifiTogglerManager::OnWifiToggledTimeOut()
@@ -141,14 +149,18 @@ void WifiTogglerManager::OnWifiToggledTimeOut()
 void WifiTogglerManager::StartSemiWifiToggledTimer()
 {
     WIFI_LOGD("StartSemiWifiToggledTimer");
-    pWifiControllerMachine->StopTimer(CMD_SEMI_WIFI_TOGGLED_TIMEOUT);
-    pWifiControllerMachine->MessageExecutedLater(CMD_SEMI_WIFI_TOGGLED_TIMEOUT, WIFI_OPEN_TIMEOUT);
+    if (pWifiControllerMachine) {
+        pWifiControllerMachine->StopTimer(CMD_SEMI_WIFI_TOGGLED_TIMEOUT);
+        pWifiControllerMachine->MessageExecutedLater(CMD_SEMI_WIFI_TOGGLED_TIMEOUT, WIFI_OPEN_TIMEOUT);
+    }
 }
 
 void WifiTogglerManager::StopSemiWifiToggledTimer()
 {
     WIFI_LOGD("StopSemiWifiToggledTimer");
-    pWifiControllerMachine->StopTimer(CMD_SEMI_WIFI_TOGGLED_TIMEOUT);
+    if (pWifiControllerMachine) {
+        pWifiControllerMachine->StopTimer(CMD_SEMI_WIFI_TOGGLED_TIMEOUT);
+    }
 }
 
 void WifiTogglerManager::OnSemiWifiToggledTimeOut()
@@ -160,6 +172,10 @@ void WifiTogglerManager::OnSemiWifiToggledTimeOut()
 
 ErrCode WifiTogglerManager::SoftapToggled(int isOpen, int id)
 {
+    if (!pWifiControllerMachine) {
+        WIFI_LOGE("pWifiControllerMachine is null!");
+        return WIFI_OPT_FAILED;
+    }
     if (isOpen) {
         WIFI_LOGI("set softap toggled true");
         WifiConfigCenter::GetInstance().SetSoftapToggledState(true);
@@ -175,8 +191,11 @@ ErrCode WifiTogglerManager::SoftapToggled(int isOpen, int id)
 #ifdef FEATURE_WITH_GO_SIMULATION_AP
 ErrCode WifiTogglerManager::RptToggled(int isOpen, int id)
 {
-    pWifiControllerMachine->SendMessage(CMD_RPT_TOGGLED, isOpen, id);
-    return WIFI_OPT_SUCCESS;
+    if (pWifiControllerMachine) {
+        pWifiControllerMachine->SendMessage(CMD_RPT_TOGGLED, isOpen, id);
+        return WIFI_OPT_SUCCESS;
+    }
+    return WIFI_OPT_FAILED;
 }
 #endif
 
@@ -192,12 +211,20 @@ ErrCode WifiTogglerManager::ScanOnlyToggled(int isOpen)
         WIFI_LOGE("Softap(wlan0) mode do not start scanonly.");
         return WIFI_OPT_FAILED;
     }
+    if (!pWifiControllerMachine) {
+        WIFI_LOGE("pWifiControllerMachine is null!");
+        return WIFI_OPT_FAILED;
+    }
     pWifiControllerMachine->SendMessage(CMD_SCAN_ALWAYS_MODE_CHANGED, isOpen, 0);
     return WIFI_OPT_SUCCESS;
 }
 
 ErrCode WifiTogglerManager::AirplaneToggled(int isOpen)
 {
+    if (!pWifiControllerMachine) {
+        WIFI_LOGE("pWifiControllerMachine is null!");
+        return WIFI_OPT_FAILED;
+    }
 #ifdef FEATURE_SELF_CURE_SUPPORT
     if (isOpen) {
         for (int i = 0; i < STA_INSTANCE_MAX_NUM; ++i) {
@@ -208,9 +235,7 @@ ErrCode WifiTogglerManager::AirplaneToggled(int isOpen)
         }
     }
 #endif // FEATURE_SELF_CURE_SUPPORT
-    if (pWifiControllerMachine) {
-        pWifiControllerMachine->SendMessage(CMD_AIRPLANE_TOGGLED, isOpen);
-    }
+    pWifiControllerMachine->SendMessage(CMD_AIRPLANE_TOGGLED, isOpen);
     return WIFI_OPT_SUCCESS;
 }
 
@@ -381,7 +406,9 @@ void WifiTogglerManager::CheckSatelliteState()
         }
     }
     if (isUp) {
-        pWifiControllerMachine->ShutdownWifi();
+        if (pWifiControllerMachine) {
+            pWifiControllerMachine->ShutdownWifi();
+        }
     }
 }
 

@@ -949,8 +949,8 @@ void WifiInternalEventDispatcher::HandleP2pPeerChange(sptr<IWifiP2pCallback> &ca
 #endif
 }
 
-void WifiInternalEventDispatcher::HandleP2pGcJoinGroup(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
-    int pid, int uid, int tokenId)
+void WifiInternalEventDispatcher::HandleP2pGcJoinGroup(sptr<IWifiP2pCallback> &callback,
+    const WifiEventCallbackMsg &msg, int pid, int uid, int tokenId)
 {
     WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d, tokenId: %{private}d", __func__, pid, uid, tokenId);
     if ((pid != 0) && (uid != 0) &&
@@ -965,8 +965,8 @@ void WifiInternalEventDispatcher::HandleP2pGcJoinGroup(sptr<IWifiP2pCallback> &c
     }
 }
 
-void WifiInternalEventDispatcher::HandleP2pGcLeaveGroup(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
-    int pid, int uid, int tokenId)
+void WifiInternalEventDispatcher::HandleP2pGcLeaveGroup(sptr<IWifiP2pCallback> &callback,
+    const WifiEventCallbackMsg &msg, int pid, int uid, int tokenId)
 {
     WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d, tokenId: %{private}d", __func__, pid, uid, tokenId);
     if ((pid != 0) && (uid != 0) &&

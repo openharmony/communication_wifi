@@ -396,7 +396,7 @@ void ConnectToCandidateConfigByNetworkId(int32_t networkId)
     }
 }
 
-void ConnectToCandidateConfigWithUserActionProcess(const ConnectSettings &settings)
+void ConnectToCandidateConfigWithUserActionProcess(ConnectSettings &settings)
 {
     std::vector<std::string> event = {EVENT_STA_CANDIDATE_CONNECT_CHANGE};
     ErrCode ret = g_wifiDevicePtr->RegisterCallBack(wifiDeviceCallback, event);

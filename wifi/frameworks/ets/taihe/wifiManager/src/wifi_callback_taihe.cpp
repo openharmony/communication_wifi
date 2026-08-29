@@ -18,6 +18,10 @@
 namespace OHOS {
 namespace Wifi {
 DEFINE_WIFILOG_LABEL("WifiCallbackTaihe");
+
+std::mutex g_candidateConnectMutex;
+std::condition_variable g_candidateConnectCV;
+int g_candidateApprovalStatus = -1;
 std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiStateChangeVec = {};
 std::shared_mutex g_wifiStateChangeLock;
@@ -146,6 +150,14 @@ void WifiIdlDeviceEventCallback::OnDeviceConfigChanged(ConfigChange value)
             (*callback)(result);
         }
     }
+}
+
+void WifiIdlDeviceEventCallback::OnCandidateApprovalStatusChanged(CandidateApprovalStatus status)
+{
+    WIFI_LOGI("OnCandidateApprovalStatusChanged event: %{public}d", static_cast<int>(status));
+    std::unique_lock<std::mutex> lock(g_candidateConnectMutex);
+    g_candidateApprovalStatus = static_cast<int>(status);
+    g_candidateConnectCV.notify_one();
 }
 
 OHOS::sptr<OHOS::IRemoteObject> WifiIdlDeviceEventCallback::AsObject()

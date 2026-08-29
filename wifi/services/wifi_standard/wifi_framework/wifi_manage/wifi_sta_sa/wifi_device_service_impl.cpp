@@ -1751,7 +1751,10 @@ ErrCode WifiDeviceServiceImpl::IsFeatureSupported(long feature, bool &isSupporte
 
 ErrCode WifiDeviceServiceImpl::GetDeviceMacAddress(std::string &result)
 {
-    WIFI_LOGD("GetDeviceMacAddress");
+#ifndef OHOS_ARCH_LITE
+    WIFI_LOGI("GetDeviceMacAddress(), pid:%{public}d, uid:%{public}d, BundleName:%{private}s.",
+        GetCallingPid(), GetCallingUid(), GetBundleName().c_str());
+#endif
     if (WifiPermissionUtils::VerifyGetWifiInfoPermission() == PERMISSION_DENIED) {
         WIFI_LOGE("GetDeviceMacAddress:VerifyGetWifiInfoPermission PERMISSION_DENIED!");
         return WIFI_OPT_PERMISSION_DENIED;
@@ -1762,8 +1765,15 @@ ErrCode WifiDeviceServiceImpl::GetDeviceMacAddress(std::string &result)
         return WIFI_OPT_PERMISSION_DENIED;
     }
 
+    bool isAutomicService = false;
+    AppExecFwk::RunningProcessInfo processInfo;
+    if (DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance()->GetRunningProcessInfoByPid(
+        IPCSkeleton::GetCallingPid(), processInfo) == ERR_OK && processInfo.bundleType ==
+        static_cast<int>(AppExecFwk::BundleType::ATOMIC_SERVICE)) {
+        isAutomicService = true;
+    }
     /* mac will be got from hal when wifi is enabled. if wifi is disabled, we don't return mac. */
-    if (!IsStaServiceRunning()) {
+    if (!IsStaServiceRunning() && !isAutomicService) {
         return WIFI_OPT_STA_NOT_OPENED;
     }
     

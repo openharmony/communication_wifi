@@ -20,6 +20,8 @@
 #include "taihe/runtime.hpp"
 #include "stdexcept"
 
+#include <condition_variable>
+#include <mutex>
 #include <shared_mutex>
 #include "wifi_logger.h"
 #include "wifi_device.h"
@@ -37,6 +39,10 @@ namespace Wifi {
 extern std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiStateChangeVec;
 extern std::shared_mutex g_wifiStateChangeLock;
+
+extern std::mutex g_candidateConnectMutex;
+extern std::condition_variable g_candidateConnectCV;
+extern int g_candidateApprovalStatus;
  
 extern std::vector<::taihe::optional<::taihe::callback<void(int)>>>
     g_wifiConnectionChangeVec;
@@ -108,6 +114,7 @@ public:
     void OnWifiWpsStateChanged(int state, const std::string &pinCode) override;
     void OnStreamChanged(int direction) override;
     void OnDeviceConfigChanged(ConfigChange value) override;
+    void OnCandidateApprovalStatusChanged(CandidateApprovalStatus status) override;
     OHOS::sptr<OHOS::IRemoteObject> AsObject() override;
 
 public:

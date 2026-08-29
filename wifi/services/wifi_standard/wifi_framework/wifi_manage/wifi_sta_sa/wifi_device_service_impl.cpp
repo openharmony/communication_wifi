@@ -32,6 +32,7 @@
 #include "wifi_country_code_manager.h"
 #include "app_network_speed_limit_service.h"
 #include "wifi_history_record_manager.h"
+#include "app_mgr_client.h"
 #endif
 #include "wifi_manager.h"
 #include "wifi_service_manager.h"
@@ -52,7 +53,6 @@
 #ifdef WLAN_PLUGGABLE_SUPPORTED
 #include "parameters.h"
 #endif
-#include "app_mgr_client.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {

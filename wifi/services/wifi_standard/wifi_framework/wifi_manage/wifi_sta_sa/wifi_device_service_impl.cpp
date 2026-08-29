@@ -1767,12 +1767,14 @@ ErrCode WifiDeviceServiceImpl::GetDeviceMacAddress(std::string &result)
     }
 
     bool isAutomicService = false;
+#ifndef OHOS_ARCH_LITE
     AppExecFwk::RunningProcessInfo processInfo;
     if (DelayedSingleton<AppExecFwk::AppMgrClient>::GetInstance()->GetRunningProcessInfoByPid(
         IPCSkeleton::GetCallingPid(), processInfo) == ERR_OK && processInfo.bundleType ==
         static_cast<int>(AppExecFwk::BundleType::ATOMIC_SERVICE)) {
         isAutomicService = true;
     }
+#endif
     /* mac will be got from hal when wifi is enabled. if wifi is disabled, we don't return mac. */
     if (!IsStaServiceRunning() && !isAutomicService) {
         return WIFI_OPT_STA_NOT_OPENED;

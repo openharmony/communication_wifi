@@ -52,6 +52,7 @@
 #ifdef WLAN_PLUGGABLE_SUPPORTED
 #include "parameters.h"
 #endif
+#include "app_mgr_client.h"
 
 DEFINE_WIFILOG_LABEL("WifiDeviceServiceImpl");
 namespace OHOS {

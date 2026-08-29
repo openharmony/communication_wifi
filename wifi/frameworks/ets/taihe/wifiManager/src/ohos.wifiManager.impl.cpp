@@ -395,6 +395,47 @@ void ConnectToCandidateConfigByNetworkId(int32_t networkId)
         return;
     }
 }
+
+void ConnectToCandidateConfigWithUserActionProcess(const ConnectSettings &settings)
+{
+    std::vector<std::string> event = {EVENT_STA_CANDIDATE_CONNECT_CHANGE};
+    ErrCode ret = g_wifiDevicePtr->RegisterCallBack(wifiDeviceCallback, event);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        WIFI_LOGE("%{public}s RegisterCallBack fail", __FUNCTION__);
+        return;
+    }
+    ret = g_wifiDevicePtr->ConnectToCandidateConfig(settings);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
+        return;
+    }
+    std::unique_lock<std::mutex> lock(g_candidateConnectMutex);
+    g_candidateApprovalStatus = -1;
+    bool received = g_candidateConnectCV.wait_for(lock,
+        std::chrono::seconds(settings.userActionTimeout),
+        [] {return g_candidateApprovalStatus >= 0; });
+    if (!received) {
+        WIFI_LOGE("%{public}s wait user action timeout", __FUNCTION__);
+        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_USER_DOES_NOT_RESPOND, SYSCAP_WIFI_STA);
+        return;
+    }
+    int status = g_candidateApprovalStatus;
+    g_candidateApprovalStatus = -1;
+    switch (static_cast<CandidateApprovalStatus>(status)) {
+        case CandidateApprovalStatus::USER_ACCEPT:
+            break;
+        case CandidateApprovalStatus::USER_REJECT:
+            WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_USER_REFUSE_THE_ACTION, SYSCAP_WIFI_STA);
+            break;
+        case CandidateApprovalStatus::USER_NO_RESPOND:
+            WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_USER_DOES_NOT_RESPOND, SYSCAP_WIFI_STA);
+            break;
+        default:
+            WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+            break;
+    }
+}
  
 void ConnectToCandidateConfigBySettings(const ::ohos::wifiManager::ConnectSettings &connectSettings)
 {
@@ -417,43 +458,7 @@ void ConnectToCandidateConfigBySettings(const ::ohos::wifiManager::ConnectSettin
         return;
     }
     if (settings.withUserAction) {
-        std::vector<std::string> event = {EVENT_STA_CANDIDATE_CONNECT_CHANGE};
-        ErrCode ret = g_wifiDevicePtr->RegisterCallBack(wifiDeviceCallback, event);
-        if (ret != WIFI_OPT_SUCCESS) {
-            WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
-            WIFI_LOGE("ConnectToCandidateConfigBySettings RegisterCallBack fail");
-            return;
-        }
-        ret = g_wifiDevicePtr->ConnectToCandidateConfig(settings);
-        if (ret != WIFI_OPT_SUCCESS) {
-            WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
-            return;
-        }
-        std::unique_lock<std::mutex> lock(g_candidateConnectMutex);
-        g_candidateApprovalStatus = -1;
-        bool received = g_candidateConnectCV.wait_for(lock,
-            std::chrono::seconds(settings.userActionTimeout),
-            [] {return g_candidateApprovalStatus >= 0; });
-        if (!received) {
-            WIFI_LOGE("ConnectToCandidateConfigBySettings wait user action timeout");
-            WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_USER_DOES_NOT_RESPOND, SYSCAP_WIFI_STA);
-            return;
-        }
-        int status = g_candidateApprovalStatus;
-        g_candidateApprovalStatus = -1;
-        switch (static_cast<CandidateApprovalStatus>(status)) {
-            case CandidateApprovalStatus::USER_ACCEPT:
-                break;
-            case CandidateApprovalStatus::USER_REJECT:
-                WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_USER_REFUSE_THE_ACTION, SYSCAP_WIFI_STA);
-                break;
-            case CandidateApprovalStatus::USER_NO_RESPOND:
-                WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_USER_DOES_NOT_RESPOND, SYSCAP_WIFI_STA);
-                break;
-            default:
-                WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-                break;
-        }
+        ConnectToCandidateConfigWithUserActionProcess(settings);
         return;
     }
     ErrCode ret = g_wifiDevicePtr->ConnectToCandidateConfig(settings);
@@ -996,49 +1001,14 @@ void StartWifiDetection()
 
 void ConnectToCandidateConfigWithUserActionSync(int32_t networkId)
 {
-    std::vector<std::string> event = {EVENT_STA_CANDIDATE_CONNECT_CHANGE};
     if (g_wifiDevicePtr == nullptr) {
         WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
         return;
     }
-    ErrCode ret = g_wifiDevicePtr->RegisterCallBack(wifiDeviceCallback, event);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
-    }
-
     ConnectSettings settings;
     settings.networkId = networkId;
     settings.withUserAction = true;
-    ret = g_wifiDevicePtr->ConnectToCandidateConfig(settings);
-    if (ret != WIFI_OPT_SUCCESS) {
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, ret, SYSCAP_WIFI_STA);
-        return;
-    }
-    std::unique_lock<std::mutex> lock(g_candidateConnectMutex);
-    g_candidateApprovalStatus = -1;
-    bool received = g_candidateConnectCV.wait_for(lock,
-        std::chrono::seconds(settings.userActionTimeout),
-        [] {return g_candidateApprovalStatus >= 0; });
-    if (!received) {
-        WIFI_LOGE("ConnectToCandidateConfigWithUserActionSync wait user action timeout");
-        WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_USER_DOES_NOT_RESPOND, SYSCAP_WIFI_STA);
-        return;
-    }
-    int status = g_candidateApprovalStatus;
-    g_candidateApprovalStatus = -1;
-    switch (static_cast<CandidateApprovalStatus>(status)) {
-        case CandidateApprovalStatus::USER_ACCEPT:
-            break;
-        case CandidateApprovalStatus::USER_REJECT:
-            WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_USER_REFUSE_THE_ACTION, SYSCAP_WIFI_STA);
-            break;
-        case CandidateApprovalStatus::USER_NO_RESPOND:
-            WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_USER_DOES_NOT_RESPOND, SYSCAP_WIFI_STA);
-            break;
-        default:
-            WifiIdlErrorCode::TaiheSetBusinessError(__FUNCTION__, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
-            break;
-    }
+    ConnectToCandidateConfigWithUserActionProcess(settings);
 }
 
 ::ohos::wifiManager::WifiLinkedInfo GetLinkedInfoSync()

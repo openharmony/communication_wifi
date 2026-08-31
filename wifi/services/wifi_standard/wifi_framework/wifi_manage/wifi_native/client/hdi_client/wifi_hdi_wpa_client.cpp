@@ -20,6 +20,8 @@
 #include <fstream>
 #include <iostream>
 #include <locale>
+#include <charconv>
+#include <system_error>
 #include <securec.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -63,6 +65,22 @@ constexpr int WIFI_MAX_SCAN_COUNT = 256;
 constexpr int P2P_SUPPLICANT_DISCONNECTED = 0;
 constexpr int P2P_SUPPLICANT_CONNECTED = 1;
 constexpr int BAND_WIDTH_OFFSET = 16;
+
+namespace {
+bool ParseP2pUpnpVersion(const std::string &text, int &out)
+{
+    if (text.empty()) {
+        return false;
+    }
+    int value = 0;
+    auto [ptr, ec] = std::from_chars(text.data(), text.data() + text.size(), value);
+    if (ec != std::errc{} || ptr != text.data() + text.size()) {
+        return false;
+    }
+    out = value;
+    return true;
+}
+}
 
 WifiErrorNo WifiHdiWpaClient::StartWifi(const std::string &ifaceName, int instId)
 {
@@ -1233,7 +1251,12 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pAddService(const WifiP2pServiceInfo &info) c
         const std::string &tmp = vec[HAL_P2P_SERVICE_TYPE_2_POS];
         if (vec[0] == "upnp") {
             servInfo.mode = 0;
-            servInfo.version = atoi(vec[1].c_str());
+            int version = 0;
+            if (!ParseP2pUpnpVersion(vec[1], version)) {
+                LOGE("ReqP2pAddService invalid upnp version %{public}s", vec[1].c_str());
+                return WIFI_HAL_OPT_FAILED;
+            }
+            servInfo.version = version;
             if (strncpy_s((char *)servInfo.name, sizeof(servInfo.name), tmp.c_str(), tmp.length()) != EOK) {
                 return WIFI_HAL_OPT_FAILED;
             }
@@ -1282,7 +1305,12 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRemoveService(const WifiP2pServiceInfo &info
         const std::string &tmp = vec[HAL_P2P_SERVICE_TYPE_2_POS];
         if (vec[0] == "upnp") {
             servInfo.mode = 0;
-            servInfo.version = atoi(vec[1].c_str());
+            int version = 0;
+            if (!ParseP2pUpnpVersion(vec[1], version)) {
+                LOGE("ReqP2pRemoveService invalid upnp version %{public}s", vec[1].c_str());
+                return WIFI_HAL_OPT_FAILED;
+            }
+            servInfo.version = version;
             if (strncpy_s((char *)servInfo.name, sizeof(servInfo.name), tmp.c_str(), tmp.length()) != EOK) {
                 return WIFI_HAL_OPT_FAILED;
             }

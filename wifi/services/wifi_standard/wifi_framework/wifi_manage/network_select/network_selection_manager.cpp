@@ -236,7 +236,7 @@ void NetworkSelectionManager::GetAllDeviceConfigs(std::vector<NetworkSelection::
         std::string deviceKeyMgmt;
         scanInfo.GetDeviceMgmt(deviceKeyMgmt);
         WifiSettings::GetInstance().GetDeviceConfig(scanInfo.ssid, deviceKeyMgmt,
-            networkCandidate.wifiDeviceConfig, 0, true);
+            networkCandidate.wifiDeviceConfig, 0, false);
 
         // save the indexes of saved network candidate in networkCandidates;
         if (networkCandidates.back().wifiDeviceConfig.networkId != INVALID_NETWORK_ID) {

@@ -1034,7 +1034,7 @@ bool ScanService::StoreUserScanInfo(const StoreScanConfig &scanConfig, std::vect
     WIFI_LOGI("Enter StoreUserScanInfo.\n");
 
     std::vector<WifiScanInfo> storeInfoList;
-    std::vector<InterScanInfo>::const_iterator iter = scanInfoList.begin();
+    std::vector<InterScanInfo>::iterator iter = scanInfoList.begin();
     for (; iter != scanInfoList.end(); ++iter) {
         /* frequency filtering. */
         if (!scanConfig.scanFreqs.empty()) {
@@ -1055,6 +1055,14 @@ bool ScanService::StoreUserScanInfo(const StoreScanConfig &scanConfig, std::vect
         }
 
         WifiScanInfo scanInfo;
+        if (mEnhanceService != nullptr) {
+            iter->supportedWifiCategory = mEnhanceService->GetWifiCategory(iter->infoElems,
+                chipsetCategory, chipsetFeatrureCapability);
+            WifiConfigCenter::GetInstance().GetWifiScanConfig()->RecordWifiCategory(
+                iter->bssid, iter->supportedWifiCategory);
+            WIFI_LOGD("GetWifiCategory supportedWifiCategory=%{public}d.\n",
+                static_cast<int>(iter->supportedWifiCategory));
+        }
         ConvertScanInfo(scanInfo, *iter);
         storeInfoList.push_back(scanInfo);
     }

@@ -136,6 +136,12 @@ private:
     static void DealP2pCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void SendP2pCallbackMsg(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
         int pid, int uid, int tokenId);
+    static void HandleP2pPeerChange(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
+        int pid, int uid, int tokenId);
+    static void HandleP2pGcJoinGroup(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
+        int pid, int uid, int tokenId);
+    static void HandleP2pGcLeaveGroup(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
+        int pid, int uid, int tokenId);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     static void updateP2pDeviceMacAddress(std::vector<WifiP2pDevice> &device);
 #endif

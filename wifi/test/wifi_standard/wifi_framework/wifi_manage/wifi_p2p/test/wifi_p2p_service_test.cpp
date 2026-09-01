@@ -19,6 +19,8 @@
 #include "wifi_hid2d_msg.h"
 #include "wifi_p2p_msg.h"
 #include "wifi_p2p_service.h"
+#include "wifi_p2p_dns_sd_service_info.h"
+#include "wifi_p2p_upnp_service_info.h"
 #include "mock_wifi_config_center.h"
 #include "wifi_country_code_manager.h"
 
@@ -96,6 +98,44 @@ HWTEST_F(WifiP2pServiceTest, DeleteLocalP2pService, TestSize.Level1)
 {
     WifiP2pServiceInfo srvInfo;
     EXPECT_EQ(pWifiP2pService->DeleteLocalP2pService(srvInfo), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, AddDnsSdLocalP2pServiceSuccess, TestSize.Level1)
+{
+    std::map<std::string, std::string> txtMap;
+    txtMap.insert(std::make_pair(std::string("ip"), std::string("127.0.0.1")));
+    EXPECT_EQ(pWifiP2pService->AddDnsSdLocalP2pService("instance", "_test._tcp", txtMap, "svc"),
+        ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, AddDnsSdLocalP2pServiceInvalidParam, TestSize.Level1)
+{
+    std::map<std::string, std::string> txtMap;
+    std::string overLen(WifiP2pDnsSdServiceInfo::MAX_DNS_SD_NAME_LEN + 1, 'a');
+    EXPECT_EQ(pWifiP2pService->AddDnsSdLocalP2pService(overLen, "_test._tcp", txtMap, "svc"),
+        ErrCode::WIFI_OPT_INVALID_PARAM);
+}
+
+HWTEST_F(WifiP2pServiceTest, AddUpnpLocalP2pServiceSuccess, TestSize.Level1)
+{
+    const std::string uuid = "550e8400-e29b-41d4-a716-446655440000";
+    std::vector<std::string> services;
+    services.push_back("urn:schemas-upnp-org:service:ContentDirectory:1");
+    EXPECT_EQ(pWifiP2pService->AddUpnpLocalP2pService(uuid, "urn:schemas-upnp-org:device:MediaServer:1",
+        services, "upnp-svc"), ErrCode::WIFI_OPT_SUCCESS);
+}
+
+HWTEST_F(WifiP2pServiceTest, AddUpnpLocalP2pServiceInvalidParam, TestSize.Level1)
+{
+    std::vector<std::string> services;
+    EXPECT_EQ(pWifiP2pService->AddUpnpLocalP2pService("bad-uuid", "device", services, "svc"),
+        ErrCode::WIFI_OPT_INVALID_PARAM);
+}
+
+HWTEST_F(WifiP2pServiceTest, QueryLocalP2pServices, TestSize.Level1)
+{
+    std::vector<WifiP2pServiceInfo> services;
+    EXPECT_EQ(pWifiP2pService->QueryLocalP2pServices(services), ErrCode::WIFI_OPT_SUCCESS);
 }
 
 HWTEST_F(WifiP2pServiceTest, RequestService, TestSize.Level1)

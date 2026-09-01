@@ -136,6 +136,22 @@ ErrCode WifiP2pImpl::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
     return client_->DeleteLocalP2pService(srvInfo);
 }
 
+ErrCode WifiP2pImpl::AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
+    const std::map<std::string, std::string> &txtMap, const std::string &serviceName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName);
+}
+
+ErrCode WifiP2pImpl::AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
+    const std::vector<std::string> &services, const std::string &serviceName)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->AddUpnpLocalP2pService(uuid, device, services, serviceName);
+}
+
 ErrCode WifiP2pImpl::StartP2pListen(int period, int interval)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -253,6 +269,13 @@ ErrCode WifiP2pImpl::QueryP2pServices(std::vector<WifiP2pServiceInfo> &services)
     std::lock_guard<std::mutex> lock(mutex_);
     RETURN_IF_FAIL(GetWifiP2pProxy());
     return client_->QueryP2pServices(services);
+}
+
+ErrCode WifiP2pImpl::QueryLocalP2pServices(std::vector<WifiP2pServiceInfo> &services)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiP2pProxy());
+    return client_->QueryLocalP2pServices(services);
 }
 
 ErrCode WifiP2pImpl::RegisterCallBack(const sptr<IWifiP2pCallback> &callback, const std::vector<std::string> &event)

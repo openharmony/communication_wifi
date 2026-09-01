@@ -84,6 +84,18 @@ HWTEST_F(WifiP2pServiceManagerTest, GetLocalServiceList, TestSize.Level1)
     EXPECT_EQ(pWifiP2pServiceManager->GetLocalServiceList(), localServicesInfo);
 }
 
+HWTEST_F(WifiP2pServiceManagerTest, AddLocalServiceIgnoreDeviceAddress, TestSize.Level1)
+{
+    WifiP2pServiceInfo info1;
+    info1.SetServiceName("local-svc");
+    info1.SetDeviceAddress("AA:BB:CC:DD:EE:FF");
+    WifiP2pServiceInfo info2 = info1;
+    info2.SetDeviceAddress("11:22:33:44:55:66");
+    EXPECT_TRUE(pWifiP2pServiceManager->AddLocalService(info1));
+    EXPECT_FALSE(pWifiP2pServiceManager->AddLocalService(info2));
+    EXPECT_TRUE(pWifiP2pServiceManager->RemoveLocalService(info2));
+}
+
 HWTEST_F(WifiP2pServiceManagerTest, AddDeviceResponses, TestSize.Level1)
 {
     WifiP2pDevice device;

@@ -22,6 +22,7 @@
 #include "wifi_p2p_msg.h"
 #include "i_wifi_p2p_callback.h"
 #include "wifi_hid2d_msg.h"
+#include <map>
 
 namespace OHOS {
 namespace Wifi {
@@ -96,6 +97,30 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo) = 0;
+
+    /**
+     * @Description Add Bonjour (DNS-SD) local P2P service (create then put)
+     *
+     * @param instanceName - DNS-SD instance name
+     * @param serviceType - DNS-SD service type
+     * @param txtMap - TXT record map
+     * @param serviceName - service name
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
+        const std::map<std::string, std::string> &txtMap, const std::string &serviceName) = 0;
+
+    /**
+     * @Description Add UPnP local P2P service (create then put)
+     *
+     * @param uuid - UPnP UUID
+     * @param device - UPnP device
+     * @param services - UPnP service list
+     * @param serviceName - service name
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
+        const std::vector<std::string> &services, const std::string &serviceName) = 0;
 
     /**
      * @Description Enable Wi-Fi P2P listening.
@@ -229,6 +254,14 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode QueryP2pServices(std::vector<WifiP2pServiceInfo> &services) = 0;
+
+    /**
+     * @Description Query local registered P2P services
+     *
+     * @param services - Get result vector of WifiP2pServiceInfo
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode QueryLocalP2pServices(std::vector<WifiP2pServiceInfo> &services) = 0;
 
     /**
      * @Description Register callback function.

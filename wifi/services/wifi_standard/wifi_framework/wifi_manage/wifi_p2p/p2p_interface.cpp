@@ -98,6 +98,18 @@ ErrCode P2pInterface::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
     return p2pService.DeleteLocalP2pService(srvInfo);
 }
 
+ErrCode P2pInterface::AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
+    const std::map<std::string, std::string> &txtMap, const std::string &serviceName)
+{
+    return p2pService.AddDnsSdLocalP2pService(instanceName, serviceType, txtMap, serviceName);
+}
+
+ErrCode P2pInterface::AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
+    const std::vector<std::string> &services, const std::string &serviceName)
+{
+    return p2pService.AddUpnpLocalP2pService(uuid, device, services, serviceName);
+}
+
 ErrCode P2pInterface::RequestService(const WifiP2pDevice &device, const WifiP2pServiceRequest &request)
 {
     return p2pService.RequestService(device, request);
@@ -206,6 +218,11 @@ ErrCode P2pInterface::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)
 ErrCode P2pInterface::QueryP2pServices(std::vector<WifiP2pServiceInfo> &services)
 {
     return p2pService.QueryP2pServices(services);
+}
+
+ErrCode P2pInterface::QueryLocalP2pServices(std::vector<WifiP2pServiceInfo> &services)
+{
+    return p2pService.QueryLocalP2pServices(services);
 }
 
 ErrCode P2pInterface::RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks)

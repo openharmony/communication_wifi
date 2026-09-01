@@ -95,6 +95,30 @@ public:
     ErrCode DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo) override;
 
     /**
+     * @Description Add Bonjour (DNS-SD) local P2P service (create then put)
+     *
+     * @param instanceName - DNS-SD instance name
+     * @param serviceType - DNS-SD service type
+     * @param txtMap - TXT record map
+     * @param serviceName - service name
+     * @return ErrCode - operation result
+     */
+    ErrCode AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
+        const std::map<std::string, std::string> &txtMap, const std::string &serviceName) override;
+
+    /**
+     * @Description Add UPnP local P2P service (create then put)
+     *
+     * @param uuid - UPnP UUID
+     * @param device - UPnP device
+     * @param services - UPnP service list
+     * @param serviceName - service name
+     * @return ErrCode - operation result
+     */
+    ErrCode AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
+        const std::vector<std::string> &services, const std::string &serviceName) override;
+
+    /**
      * @Description Enable Wi-Fi P2P listening
      *
      * @param period - period
@@ -228,6 +252,14 @@ public:
      * @return ErrCode - operation result
      */
     ErrCode QueryP2pServices(std::vector<WifiP2pServiceInfo> &services) override;
+
+    /**
+     * @Description Query local registered P2P services
+     *
+     * @param services - Get result vector of WifiP2pServiceInfo
+     * @return ErrCode - operation result
+     */
+    ErrCode QueryLocalP2pServices(std::vector<WifiP2pServiceInfo> &services) override;
 
     /**
      * @Description Register callback function

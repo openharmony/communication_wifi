@@ -215,6 +215,8 @@ enum class  P2PInterfaceCode {
     WIFI_SVR_CMD_P2P_GET_SUPPORT_CHANN_FOR_BAND = 0x202E,  /* Get support channels for band*/
     WIFI_SVR_CMD_SET_P2P_HIGH_PERF_MODE = 0x202F,  /* Set p2p high perf mode*/
     WIFI_SVR_CMD_SET_P2P_GROUP_ALIVE_MODE = 0x2030,  /* Set p2p group alive mode*/
+    WIFI_SVR_CMD_P2P_ADD_LOCAL_SERVICE = 0x2031,   /* add typed local P2P service (create+put) */
+    WIFI_SVR_CMD_P2P_QUERY_LOCAL_SERVICES = 0x2032, /* query local registered P2P services */
 
     /* 新增WIFI_SVR_CMD_类code，请在此下方添加 */
     WIFI_SVR_CMD_P2P_REMOVE_GROUP_CLIENT = 0x3000,
@@ -232,6 +234,11 @@ enum class  P2PInterfaceCode {
     WIFI_CBK_CMD_P2P_GC_LEAVE_GROUP = 0x3210,    /* Gc disconnected */
     WIFI_CBK_CMD_PRIVATE_PEER_CHANGE = 0x3211,
     WIFI_CBK_CMD_CHR_ERRCODE_REPORT = 0x3212,
+};
+
+enum class P2pBuildServiceType : int32_t {
+    BUILD_DNS_SD = 1,
+    BUILD_UPNP = 2,
 };
 
 /* SAID: 1124 */

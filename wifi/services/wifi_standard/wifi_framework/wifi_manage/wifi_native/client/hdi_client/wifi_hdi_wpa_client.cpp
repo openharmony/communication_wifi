@@ -1206,6 +1206,31 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pGetGroupCapability(const std::string &device
     return ret;
 }
 
+static bool BuildHdiP2pServiceInfo(const std::vector<std::string> &vec, HdiP2pServiceInfo &servInfo, bool needResp)
+{
+    const std::string &tmp = vec[HAL_P2P_SERVICE_TYPE_2_POS];
+    if (vec[0] == "upnp") {
+        servInfo.mode = 0;
+        servInfo.version = atoi(vec[1].c_str());
+        return AllocHdiP2pServiceField(&servInfo.name, &servInfo.nameLen, tmp.c_str(),
+            static_cast<uint32_t>(tmp.length()));
+    }
+    if (vec[0] == "bonjour") {
+        servInfo.mode = 1;
+        const std::string &query = vec[1];
+        if (!AllocHdiP2pServiceField(&servInfo.query, &servInfo.queryLen, query.c_str(),
+            static_cast<uint32_t>(query.length()))) {
+            return false;
+        }
+        if (needResp && !AllocHdiP2pServiceField(&servInfo.resp, &servInfo.respLen, tmp.c_str(),
+            static_cast<uint32_t>(tmp.length()))) {
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
 WifiErrorNo WifiHdiWpaClient::ReqP2pAddService(const WifiP2pServiceInfo &info) const
 {
     WifiErrorNo ret = WIFI_HAL_OPT_OK;
@@ -1230,24 +1255,12 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pAddService(const WifiP2pServiceInfo &info) c
         if (memset_s(&servInfo, sizeof(servInfo), 0, sizeof(servInfo)) != EOK) {
             return WIFI_HAL_OPT_FAILED;
         }
-        const std::string &tmp = vec[HAL_P2P_SERVICE_TYPE_2_POS];
-        if (vec[0] == "upnp") {
-            servInfo.mode = 0;
-            servInfo.version = atoi(vec[1].c_str());
-            if (strncpy_s((char *)servInfo.name, sizeof(servInfo.name), tmp.c_str(), tmp.length()) != EOK) {
-                return WIFI_HAL_OPT_FAILED;
-            }
-            ret = HdiP2pAddService(&servInfo);
-        } else if (vec[0] == "bonjour") {
-            servInfo.mode = 1;
-            if (strncpy_s((char *)servInfo.query, sizeof(servInfo.query), vec[1].c_str(), vec[1].length()) != EOK ||
-                strncpy_s((char *)servInfo.resp, sizeof(servInfo.resp), tmp.c_str(), tmp.length()) != EOK) {
-                return WIFI_HAL_OPT_FAILED;
-            }
-            ret = HdiP2pAddService(&servInfo);
-        } else {
-            ret = WIFI_HAL_OPT_FAILED;
+        if (!BuildHdiP2pServiceInfo(vec, servInfo, true)) {
+            FreeHdiP2pServiceInfo(&servInfo);
+            return WIFI_HAL_OPT_FAILED;
         }
+        ret = HdiP2pAddService(&servInfo);
+        FreeHdiP2pServiceInfo(&servInfo);
         if (ret != WIFI_HAL_OPT_OK) {
             break;
         }
@@ -1279,23 +1292,12 @@ WifiErrorNo WifiHdiWpaClient::ReqP2pRemoveService(const WifiP2pServiceInfo &info
         if (memset_s(&servInfo, sizeof(servInfo), 0, sizeof(servInfo)) != EOK) {
             return WIFI_HAL_OPT_FAILED;
         }
-        const std::string &tmp = vec[HAL_P2P_SERVICE_TYPE_2_POS];
-        if (vec[0] == "upnp") {
-            servInfo.mode = 0;
-            servInfo.version = atoi(vec[1].c_str());
-            if (strncpy_s((char *)servInfo.name, sizeof(servInfo.name), tmp.c_str(), tmp.length()) != EOK) {
-                return WIFI_HAL_OPT_FAILED;
-            }
-            ret = HdiP2pRemoveService(&servInfo);
-        } else if (vec[0] == "bonjour") {
-            servInfo.mode = 1;
-            if (strncpy_s((char *)servInfo.query, sizeof(servInfo.query), vec[1].c_str(), vec[1].length()) != EOK) {
-                return WIFI_HAL_OPT_FAILED;
-            }
-            ret = HdiP2pRemoveService(&servInfo);
-        } else {
-            ret = WIFI_HAL_OPT_FAILED;
+        if (!BuildHdiP2pServiceInfo(vec, servInfo, false)) {
+            FreeHdiP2pServiceInfo(&servInfo);
+            return WIFI_HAL_OPT_FAILED;
         }
+        ret = HdiP2pRemoveService(&servInfo);
+        FreeHdiP2pServiceInfo(&servInfo);
         if (ret != WIFI_HAL_OPT_OK) {
             break;
         }

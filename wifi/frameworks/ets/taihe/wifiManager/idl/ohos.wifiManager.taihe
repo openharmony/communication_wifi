@@ -386,6 +386,20 @@ struct WifiP2pGroupInfo {
     goIpAddress: String;
 }
 
+enum P2pServiceProtocolType: i32 {
+    ALL = 0,
+    BONJOUR = 1,
+    UP_NP = 2,
+    WS_DISCOVERY = 3,
+    VENDOR_SPECIFIC = 255,
+}
+
+struct WifiP2pServiceInfo {
+    serviceName: String;
+    protocolType: P2pServiceProtocolType;
+    queryList: Array<String>;
+}
+
 struct ConnectSettings {
     networkId: i32;
     withUserAction: Optional<bool>;
@@ -506,6 +520,13 @@ function GetP2pGroupsSync(): Array<WifiP2pGroupInfo>;
 @gen_async("getCurrentGroup")
 @gen_promise("getCurrentGroup")
 function GetCurrentGroupSync(): WifiP2pGroupInfo;
+
+function AddDnsSdLocalP2pService(instanceName: String, serviceType: String, txtRecord: Map<String, String>, serviceName: String): void;
+function AddUpnpLocalP2pService(uuid: String, device: String, services: Array<String>, serviceName: String): void;
+function RemoveLocalP2pService(srvInfo: WifiP2pServiceInfo): void;
+
+@gen_promise("getLocalP2pServices")
+function GetLocalP2pServicesSync(): Array<WifiP2pServiceInfo>;
 
 function OnWifiStateChange(callback: (data: i32) => void): void;
 function OffWifiStateChange(callback: Optional<(data: i32) => void>): void;

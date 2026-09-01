@@ -24,6 +24,8 @@
 #include "wifi_country_code_manager.h"
 #include "wifi_p2p_hal_interface.h"
 #include "wifi_notification_util.h"
+#include "wifi_p2p_dns_sd_service_info.h"
+#include "wifi_p2p_upnp_service_info.h"
 #include "ap_define.h"
 #include "p2p_chr_reporter.h"
 
@@ -113,6 +115,34 @@ ErrCode WifiP2pService::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
     const std::any info = srvInfo;
     p2pStateMachine.SendMessage(static_cast<int>(P2P_STATE_MACHINE_CMD::CMD_DEL_LOCAL_SERVICE), info);
     return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
+    const std::map<std::string, std::string> &txtMap, const std::string &serviceName)
+{
+    WIFI_LOGI("AddDnsSdLocalP2pService");
+    ErrCode ret = WifiP2pDnsSdServiceInfo::Check(instanceName, serviceType, txtMap, serviceName);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AddDnsSdLocalP2pService invalid param, instanceNameLen=%{public}zu serviceTypeLen=%{public}zu "
+            "serviceNameLen=%{public}zu", instanceName.size(), serviceType.size(), serviceName.size());
+        return ret;
+    }
+    WifiP2pServiceInfo srvInfo = WifiP2pDnsSdServiceInfo::Create(instanceName, serviceType, txtMap, serviceName);
+    return PutLocalP2pService(srvInfo);
+}
+
+ErrCode WifiP2pService::AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
+    const std::vector<std::string> &services, const std::string &serviceName)
+{
+    WIFI_LOGI("AddUpnpLocalP2pService");
+    ErrCode ret = WifiP2pUpnpServiceInfo::Check(uuid, device, services, serviceName);
+    if (ret != WIFI_OPT_SUCCESS) {
+        WIFI_LOGE("AddUpnpLocalP2pService invalid param, uuidLen=%{public}zu deviceLen=%{public}zu "
+            "serviceNameLen=%{public}zu", uuid.size(), device.size(), serviceName.size());
+        return ret;
+    }
+    WifiP2pServiceInfo srvInfo = WifiP2pUpnpServiceInfo::Create(uuid, device, services, serviceName);
+    return PutLocalP2pService(srvInfo);
 }
 
 ErrCode WifiP2pService::RequestService(const WifiP2pDevice &device, const WifiP2pServiceRequest &request)
@@ -361,6 +391,13 @@ ErrCode WifiP2pService::QueryP2pServices(std::vector<WifiP2pServiceInfo> &servic
 {
     WIFI_LOGI("QueryP2pServices");
     serviceManager.GetDeviceServices(services);
+    return ErrCode::WIFI_OPT_SUCCESS;
+}
+
+ErrCode WifiP2pService::QueryLocalP2pServices(std::vector<WifiP2pServiceInfo> &services)
+{
+    WIFI_LOGI("QueryLocalP2pServices");
+    services = serviceManager.GetLocalServiceList();
     return ErrCode::WIFI_OPT_SUCCESS;
 }
 

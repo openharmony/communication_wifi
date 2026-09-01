@@ -16,8 +16,10 @@
 #ifndef WIFI_NAPI_UTILS_H_
 #define WIFI_NAPI_UTILS_H_
 
-#include <string>
 #include <chrono>
+#include <map>
+#include <string>
+#include <vector>
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
@@ -118,6 +120,9 @@ napi_value JsObjectToInt(const napi_env& env, const napi_value& object, const ch
 napi_value JsObjectToUint(const napi_env& env, const napi_value& object, const char* fieldStr, uint32_t& fieldRef);
 napi_value JsObjectToBool(const napi_env& env, const napi_value& object, const char* fieldStr, bool& fieldRef);
 std::vector<uint8_t> JsObjectToU8Vector(const napi_env& env, const napi_value& object, const char* fieldStr);
+bool JsToString(const napi_env& env, napi_value value, std::string& out);
+bool JsToStringVector(const napi_env& env, napi_value value, std::vector<std::string>& out);
+bool JsToStringMap(const napi_env& env, napi_value value, std::map<std::string, std::string>& out);
 napi_status SetValueUtf8String(const napi_env& env, const char* fieldStr, const char* str,
     napi_value& result, size_t strLen = NAPI_AUTO_LENGTH);
 napi_status SetValueUtf8String(const napi_env& env, const std::string &fieldStr, const std::string &valueStr,
@@ -245,6 +250,14 @@ enum class GroupOwnerBandJs {
     GO_BAND_AUTO = 0,
     GO_BAND_2GHZ = 1,
     GO_BAND_5GHZ = 2,
+};
+
+enum class P2pServiceProtocolTypeJs {
+    ALL = 0,
+    BONJOUR = 1,
+    UP_NP = 2,
+    WS_DISCOVERY = 3,
+    VENDOR_SPECIFIC = 255,
 };
 
 enum class Phase2MethodJs {

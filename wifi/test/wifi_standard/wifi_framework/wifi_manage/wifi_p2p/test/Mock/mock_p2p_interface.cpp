@@ -63,6 +63,18 @@ ErrCode P2pInterface::DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo)
     return WIFI_OPT_SUCCESS;
 }
 
+ErrCode P2pInterface::AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
+    const std::map<std::string, std::string> &txtMap, const std::string &serviceName)
+{
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode P2pInterface::AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
+    const std::vector<std::string> &services, const std::string &serviceName)
+{
+    return WIFI_OPT_SUCCESS;
+}
+
 ErrCode P2pInterface::RequestService(const WifiP2pDevice &device, const WifiP2pServiceRequest &request)
 {
     return WIFI_OPT_SUCCESS;
@@ -154,6 +166,11 @@ ErrCode P2pInterface::QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups)
 }
 
 ErrCode P2pInterface::QueryP2pServices(std::vector<WifiP2pServiceInfo> &services)
+{
+    return WIFI_OPT_SUCCESS;
+}
+
+ErrCode P2pInterface::QueryLocalP2pServices(std::vector<WifiP2pServiceInfo> &services)
 {
     return WIFI_OPT_SUCCESS;
 }

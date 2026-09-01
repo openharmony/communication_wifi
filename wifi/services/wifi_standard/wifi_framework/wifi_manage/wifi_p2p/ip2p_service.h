@@ -83,6 +83,28 @@ public:
     virtual ErrCode DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo) = 0;
 
     /**
+     * @Description Add Bonjour (DNS-SD) local P2P service (create then put)
+     * @param instanceName - DNS-SD instance name
+     * @param serviceType - DNS-SD service type
+     * @param txtMap - TXT record key-value pairs
+     * @param serviceName - local service name
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
+        const std::map<std::string, std::string> &txtMap, const std::string &serviceName) = 0;
+
+    /**
+     * @Description Add UPnP local P2P service (create then put)
+     * @param uuid - UPnP device UUID
+     * @param device - UPnP device type string
+     * @param services - UPnP service type strings
+     * @param serviceName - local service name
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
+        const std::vector<std::string> &services, const std::string &serviceName) = 0;
+
+    /**
      * @Description - The interface of add service request.
      * @param  device - target device information.
      * @param  request - request information.
@@ -213,6 +235,13 @@ public:
      * @return ErrCode - operation result
      */
     virtual ErrCode QueryP2pServices(std::vector<WifiP2pServiceInfo> &services) = 0;
+
+    /**
+     * @Description Query local registered P2P services
+     * @param services - local WifiP2pServiceInfo list
+     * @return ErrCode - operation result
+     */
+    virtual ErrCode QueryLocalP2pServices(std::vector<WifiP2pServiceInfo> &services) = 0;
 
     /**
      * @Description - The interface of register p2p service callbacks,

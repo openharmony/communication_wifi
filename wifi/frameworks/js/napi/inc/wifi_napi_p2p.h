@@ -34,6 +34,10 @@ napi_value StartDiscoverDevices(napi_env env, napi_callback_info info);
 napi_value StopDiscoverDevices(napi_env env, napi_callback_info info);
 napi_value DeletePersistentGroup(napi_env env, napi_callback_info info);
 napi_value SetDeviceName(napi_env env, napi_callback_info info);
+napi_value AddDnsSdLocalP2pService(napi_env env, napi_callback_info info);
+napi_value AddUpnpLocalP2pService(napi_env env, napi_callback_info info);
+napi_value RemoveLocalP2pService(napi_env env, napi_callback_info info);
+napi_value GetLocalP2pServices(napi_env env, napi_callback_info info);
 
 class P2pLocalDeviceAsyncContext : public AsyncContext {
 public:

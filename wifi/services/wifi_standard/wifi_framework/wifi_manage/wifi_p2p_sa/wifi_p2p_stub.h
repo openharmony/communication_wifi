@@ -47,6 +47,7 @@ private:
     void InitHandleMap(void);
     void InitHandleMapEx(void);
     void InitHandleMapExPart3(void);
+    void InitHandleMapExPart4(void);
     void OnEnableP2p(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnDisableP2p(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnDiscoverDevices(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
@@ -56,6 +57,9 @@ private:
     void OnRequestService(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnPutLocalP2pService(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnDeleteLocalP2pService(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnAddLocalP2pService(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    ErrCode ParseAndAddDnsSdLocalP2pService(MessageParcel &data);
+    ErrCode ParseAndAddUpnpLocalP2pService(MessageParcel &data);
     void OnStartP2pListen(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnStopP2pListen(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnCreateGroup(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
@@ -72,6 +76,7 @@ private:
     void OnQueryP2pDevices(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnQueryP2pGroups(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnQueryP2pServices(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
+    void OnQueryLocalP2pServices(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnRegisterCallBack(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnGetSupportedFeatures(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);
     void OnSetP2pDeviceName(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option);

@@ -35,6 +35,10 @@ public:
     ErrCode RequestService(const WifiP2pDevice &device, const WifiP2pServiceRequest &request);
     ErrCode PutLocalP2pService(const WifiP2pServiceInfo &srvInfo);
     ErrCode DeleteLocalP2pService(const WifiP2pServiceInfo &srvInfo);
+    ErrCode AddDnsSdLocalP2pService(const std::string &instanceName, const std::string &serviceType,
+        const std::map<std::string, std::string> &txtMap, const std::string &serviceName);
+    ErrCode AddUpnpLocalP2pService(const std::string &uuid, const std::string &device,
+        const std::vector<std::string> &services, const std::string &serviceName);
     ErrCode StartP2pListen(int period, int interval);
     ErrCode StopP2pListen();
     ErrCode CreateGroup(const WifiP2pConfig &config);
@@ -50,6 +54,7 @@ public:
     ErrCode QueryP2pDevices(std::vector<WifiP2pDevice> &devices);
     ErrCode QueryP2pGroups(std::vector<WifiP2pGroupInfo> &groups);
     ErrCode QueryP2pServices(std::vector<WifiP2pServiceInfo> &services);
+    ErrCode QueryLocalP2pServices(std::vector<WifiP2pServiceInfo> &services);
     ErrCode RegisterP2pServiceCallbacks(const IP2pServiceCallbacks &callbacks);
     ErrCode CreateRptGroup(const WifiP2pConfig &config);
     ErrCode GetRptStationsList(std::vector<StationInfo> &result);

@@ -123,6 +123,13 @@ enum class OperateResState {
     CONNECT_EMLSR_END,                  /* emlsr end */
 };
 
+enum WifiScanOnlyState : int {
+    SCAN_ONLY_DISABLED_SUCCESS = 0,
+    SCAN_ONLY_DISABLED_FAILED = 1,
+    SCAN_ONLY_ENABLED_SUCCESS = 2,
+    SCAN_ONLY_ENABLED_FAILED = 3,
+};
+
 enum SystemMode : int {
     M_DEFAULT = 1,
     M_FACTORY_MODE = 2,

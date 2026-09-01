@@ -807,5 +807,139 @@ HWTEST_F(WifiControllerMachineTest, HandleSoftapCloseRecoverWifiTest, TestSize.L
  
     EXPECT_TRUE(pWifiControllerMachine->pEnableState->ExecuteStateMsg(msg));
 }
+
+HWTEST_F(WifiControllerMachineTest, HandleScanOnlyModeChangedTest01, TestSize.Level1)
+{
+    // Test HandleScanOnlyModeChanged with isOpen = 1 (scan only enabled)
+    pWifiControllerMachine->HandleScanOnlyModeChanged(1);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleScanOnlyModeChangedTest02, TestSize.Level1)
+{
+    // Test HandleScanOnlyModeChanged with isOpen = 0 (scan only disabled)
+    pWifiControllerMachine->HandleScanOnlyModeChanged(0);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleWifiToggleChangeInDisabledStateTest01, TestSize.Level1)
+{
+    // Test HandleWifiToggleChangeInDisabledState via CMD_SCAN_ALWAYS_MODE_CHANGED
+    // when ShouldEnableWifi returns false (WiFi should not be enabled)
+    int instId = 0;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(CMD_SCAN_ALWAYS_MODE_CHANGED);
+    msg->SetParam1(1); // isOpen = 1 (scan only mode open)
+    msg->SetParam2(instId);
+
+    WifiConfigCenter::GetInstance().SetWifiToggledState(false, instId);
+    WifiSettings::GetInstance().SetScanOnlySwitchState(0, 0);
+    WifiConfigCenter::GetInstance().SetWifiStopState(true);
+
+    EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleWifiToggleChangeInDisabledStateTest02, TestSize.Level1)
+{
+    // Test HandleWifiToggleChangeInDisabledState when msg is not CMD_SCAN_ALWAYS_MODE_CHANGED
+    // and ShouldEnableWifi returns true (WiFi can be enabled)
+    int instId = 0;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(CMD_WIFI_TOGGLED);
+    msg->SetParam1(1); // isOpen = 1
+    msg->SetParam2(instId);
+
+    WifiConfigCenter::GetInstance().SetWifiToggledState(true, instId);
+    WifiConfigCenter::GetInstance().SetWifiStopState(false);
+
+    // Set up mock for GetWifiRole
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetWifiState(_))
+        .WillRepeatedly(Return(WIFI_STATE_DISABLED));
+
+    EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleWifiToggleChangeInDisabledStateTest03, TestSize.Level1)
+{
+    // Test HandleWifiToggleChangeInDisabledState with CMD_SCAN_ALWAYS_MODE_CHANGED
+    // and ShouldEnableWifi returns true but GetWifiRole returns ROLE_UNKNOW
+    int instId = 0;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(CMD_SCAN_ALWAYS_MODE_CHANGED);
+    msg->SetParam1(1);
+    msg->SetParam2(instId);
+
+    WifiConfigCenter::GetInstance().SetWifiToggledState(true, instId);
+    WifiConfigCenter::GetInstance().SetWifiStopState(false);
+
+    EXPECT_TRUE(pWifiControllerMachine->pDisableState->ExecuteStateMsg(msg));
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleEnableStateManagerExistTest01, TestSize.Level1)
+{
+    // Test HandleEnableStateManagerExist with null msg (should early return)
+    int id = 0;
+    int isOpen = 1;
+    pWifiControllerMachine->pEnableState->HandleEnableStateManagerExist(id, isOpen, nullptr);
+    EXPECT_TRUE(g_errLog.find("HandleEnableStateManagerExist: msg is null") != std::string::npos);
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleEnableStateManagerExistTest02, TestSize.Level1)
+{
+    // Test HandleEnableStateManagerExist when GetWifiStopState returns true (should early return)
+    int id = 0;
+    int isOpen = 1;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(CMD_WIFI_TOGGLED);
+    msg->SetParam1(isOpen);
+    msg->SetParam2(id);
+
+    WifiConfigCenter::GetInstance().SetWifiStopState(true);
+
+    pWifiControllerMachine->pEnableState->HandleEnableStateManagerExist(id, isOpen, msg);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleEnableStateManagerExistTest03, TestSize.Level1)
+{
+    // Test HandleEnableStateManagerExist with valid msg and GetWifiStopState returns false
+    // and GetWifiRole returns ROLE_UNKNOW (should early return)
+    int id = 0;
+    int isOpen = 1;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(CMD_WIFI_TOGGLED);
+    msg->SetParam1(isOpen);
+    msg->SetParam2(id);
+
+    WifiConfigCenter::GetInstance().SetWifiStopState(false);
+
+    pWifiControllerMachine->pEnableState->HandleEnableStateManagerExist(id, isOpen, msg);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
+
+HWTEST_F(WifiControllerMachineTest, HandleEnableStateManagerExistTest04, TestSize.Level1)
+{
+    // Test HandleEnableStateManagerExist with CMD_SCAN_ALWAYS_MODE_CHANGED message
+    // This triggers HandleScanOnlyModeChanged call
+    int id = 0;
+    int isOpen = 1;
+    InternalMessagePtr msg = std::make_shared<InternalMessage>();
+    msg->SetMessageName(CMD_SCAN_ALWAYS_MODE_CHANGED);
+    msg->SetParam1(isOpen);
+    msg->SetParam2(id);
+
+    WifiConfigCenter::GetInstance().SetWifiStopState(false);
+    WifiConfigCenter::GetInstance().SetWifiToggledState(WIFI_STATE_ENABLED, id);
+
+    // Add a concrete manager so the IdExist check passes
+    auto clientmode = std::make_shared<ConcreteClientModeManager>(ConcreteManagerRole::ROLE_CLIENT_STA, id);
+    clientmode->pConcreteMangerMachine = new MockConcreteMangerMachine();
+    pWifiControllerMachine->concreteManagers.AddManager(clientmode);
+
+    pWifiControllerMachine->pEnableState->HandleEnableStateManagerExist(id, isOpen, msg);
+
+    pWifiControllerMachine->concreteManagers.RemoveManager(id);
+    EXPECT_FALSE(g_errLog.find("service is null") != std::string::npos);
+}
 }
 }

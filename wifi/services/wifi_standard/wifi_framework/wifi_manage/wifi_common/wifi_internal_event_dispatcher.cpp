@@ -995,13 +995,13 @@ WifiLinkedInfo WifiInternalEventDispatcher::ProcessLinkInfoForPermission(const W
     if (WifiPermissionUtils::VerifyGetWifiLocalMacPermissionEx(callingInfo.callingPid, callingInfo.callingUid,
         callingInfo.callingTokenId) == PERMISSION_DENIED) {
         WIFI_LOGD("%{public}s: GET_WIFI_LOCAL_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
-            __func__, pid, uid);
+            __func__, callingInfo.callingPid, callingInfo.callingUid);
         result.macAddress = "";
     }
     if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(callingInfo.callingPid, callingInfo.callingUid,
         callingInfo.callingTokenId) == PERMISSION_DENIED) {
         WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
-            __func__, pid, uid);
+            __func__, callingInfo.callingPid, callingInfo.callingUid);
         result.bssid = "";
     }
     return result;

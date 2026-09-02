@@ -144,7 +144,7 @@ private:
     static void HandleP2pGcLeaveGroup(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
         int pid, int uid, int tokenId);
     static WifiLinkedInfo ProcessLinkInfoForPermission(const WifiLinkedInfo &linkInfo,
-        int pid, int uid, int tokenId);
+        const WifiCallingInfo &callingInfo);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     static void updateP2pDeviceMacAddress(std::vector<WifiP2pDevice> &device);
 #endif

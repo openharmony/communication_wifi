@@ -101,7 +101,7 @@ public:
     int VerifyGetWifiLocalMacPermission(const int &pid, const int &uid);
 
     /**
-     * @Description : Get wifi local mac Permission.
+     * @Description : Verify whether the tokenId has the permission to get mac address
      *
      * @param pid - Process ID.[in]
      * @param uid - User ID.[in]

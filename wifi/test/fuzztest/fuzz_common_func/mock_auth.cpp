@@ -93,6 +93,12 @@ int WifiAuthCenter::VerifyGetWifiPeersMacPermissionEx(const int &pid, const int 
 {
     return PERMISSION_DENIED;
 }
+
+int WifiAuthCenter::VerifyGetWifiLocalMacPermissionEx(const int &pid, const int &uid, const int &tokenId)
+{
+    return PERMISSION_DENIED;
+}
+
 int WifiAuthCenter::VerifyGetWifiInfoInternalPermission(const int &pid, const int &uid)
 {
     return PERMISSION_DENIED;

@@ -101,6 +101,16 @@ public:
     int VerifyGetWifiLocalMacPermission(const int &pid, const int &uid);
 
     /**
+     * @Description : Get wifi local mac Permission.
+     *
+     * @param pid - Process ID.[in]
+     * @param uid - User ID.[in]
+     * @param tokenId - Token ID.[in]
+     * @return int - PERMISSION_DENIED or PERMISSION_GRANTED
+     */
+    int VerifyGetWifiLocalMacPermissionEx(const int &pid, const int &uid, const int &tokenId);
+
+    /**
      * @Description Verify whether the app has the permission to open / close hotspot
      *
      * @param pid - the app's process id

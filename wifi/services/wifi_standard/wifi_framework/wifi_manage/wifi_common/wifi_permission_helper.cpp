@@ -119,6 +119,14 @@ int WifiPermissionHelper::VerifyGetWifiLocalMacPermission(const int &pid, const 
     return PERMISSION_GRANTED;
 }
 
+int WifiPermissionHelper::VerifyGetWifiLocalMacPermissionEx(const int &pid, const int &uid, const int &tokenId)
+{
+    if (VerifyPermission("ohos.permission.GET_WIFI_LOCAL_MAC", pid, uid, tokenId) == PERMISSION_DENIED) {
+        return PERMISSION_DENIED;
+    }
+    return PERMISSION_GRANTED;
+}
+
 int WifiPermissionHelper::VerifyWifiConnectionPermission(const int &pid, const int &uid)
 {
     if (VerifyPermission("ohos.permission.MANAGE_WIFI_CONNECTION", pid, uid, 0) == PERMISSION_DENIED) {

@@ -718,22 +718,22 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(
             WIFI_LOGD("InvokeDeviceCallbacks, msg.msgCode: %{public}d, instId: %{public}d", msg.msgCode, msg.id);
             auto remote = itr->first;
             bool isFrozen = false;
-            int uid = mStaCallBackInfo[msg.id][remote].callingUid;
-            int pid = mStaCallBackInfo[msg.id][remote].callingPid;
+            WifiCallingInfo callingInfo = mStaCallBackInfo[msg.id][remote];
 #ifdef FEATURE_APP_FROZEN
-            isFrozen = IsAppFrozen(pid);
+            isFrozen = IsAppFrozen(callingInfo.callingPid);
 #endif
             WIFI_LOGD("Check calling APP is hardwareProxied,"
-                "uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d", uid, pid, isFrozen);
+                "uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d",
+                callingInfo.callingUid, callingInfo.callingPid, isFrozen);
             if (mStaCallBackInfo[msg.id][remote].regCallBackEventId.count(msg.msgCode) == 0) {
                 WIFI_LOGD("InvokeDeviceCallbacks, Not registered callback event! msg.msgCode: %{public}d,"
                     "instId: %{public}d", msg.msgCode, msg.id);
                 continue;
             }
-            if (IsStatusBarFrozen(uid, msg)) {
+            if (IsStatusBarFrozen(callingInfo.callingUid,, msg)) {
                 continue;
             }
-            InvokeDeviceCallbacksExtral(isFrozen, msg, callback);
+            InvokeDeviceCallbacksExtral(isFrozen, msg, callback, callingInfo);
         }
     }
 }
@@ -777,7 +777,8 @@ bool WifiInternalEventDispatcher::IsStatusBarFrozen(int uid, const WifiEventCall
 }
 
 void WifiInternalEventDispatcher::InvokeDeviceCallbacksExtral(
-    bool isFrozen, const WifiEventCallbackMsg &msg, const sptr<IWifiDeviceCallBack> callback)
+    bool isFrozen, const WifiEventCallbackMsg &msg, const sptr<IWifiDeviceCallBack> callback,
+    const WifiCallingInfo &callingInfo)
 {
     if (callback == nullptr) {
         return;
@@ -787,7 +788,11 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacksExtral(
             callback->OnWifiStateChanged(msg.msgData);
             break;
         case WIFI_CBK_MSG_CONNECTION_CHANGE:
-            callback->OnWifiConnectionChanged(msg.msgData, msg.linkInfo);
+            {
+                WifiLinkedInfo linkInfo = ProcessLinkInfoForPermission(msg.linkInfo, callingInfo.callingPid,
+                    callingInfo.callingUid, callingInfo.callingTokenId);
+                callback->OnWifiConnectionChanged(msg.msgData, linkInfo);
+            }
             break;
         case WIFI_CBK_MSG_RSSI_CHANGE:
             if (isFrozen == false) {
@@ -979,6 +984,26 @@ void WifiInternalEventDispatcher::HandleP2pGcLeaveGroup(sptr<IWifiP2pCallback> &
     } else {
         callback->OnP2pGcLeaveGroup(msg.gcInfo);
     }
+}
+
+WifiLinkedInfo WifiInternalEventDispatcher::ProcessLinkInfoForPermission(const WifiLinkedInfo &linkInfo,
+    int pid, int uid, int tokenId)
+{
+    if ((pid == 0) || (uid == 0)) {
+        return linkInfo;
+    }
+    WifiLinkedInfo result = linkInfo;
+    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
+        WIFI_LOGD("%{public}s: GET_WIFI_LOCAL_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
+            __func__, pid, uid);
+        result.macAddress = "";
+    }
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
+        WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
+            __func__, pid, uid);
+        result.bssid = "";
+    }
+    return result;
 }
 
 void WifiInternalEventDispatcher::FreecfgInfo(CfgInfo* cfgInfo)

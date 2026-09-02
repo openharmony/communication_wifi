@@ -123,6 +123,14 @@ int WifiAuthCenter::VerifyGetWifiLocalMacPermission(const int &pid, const int &u
     return WifiPermissionHelper::VerifyGetWifiLocalMacPermission(pid, uid);
 }
 
+int WifiAuthCenter::VerifyGetWifiLocalMacPermissionEx(const int &pid, const int &uid, const int &tokenId)
+{
+    if (g_permissinAlwaysGrant) {
+        return PERMISSION_GRANTED;
+    }
+    return WifiPermissionHelper::VerifyGetWifiLocalMacPermissionEx(pid, uid, tokenId);
+}
+
 int WifiAuthCenter::VerifyWifiConnectionPermission(const int &pid, const int &uid)
 {
     if (g_permissinAlwaysGrant) {

@@ -128,7 +128,8 @@ public:
     int GetRemoteUid(const sptr<IRemoteObject> &remote);
     bool IsStatusBarFrozen(int uid, const WifiEventCallbackMsg &msg);
     void InvokeDeviceCallbacksExtral(
-        bool isFrozen, const WifiEventCallbackMsg &msg, const sptr<IWifiDeviceCallBack> callback);
+        bool isFrozen, const WifiEventCallbackMsg &msg, const sptr<IWifiDeviceCallBack> callback,
+        const WifiCallingInfo &callingInfo);
 private:
     static void DealStaCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
     static void DealScanCallbackMsg(WifiInternalEventDispatcher &pInstance, const WifiEventCallbackMsg &msg);
@@ -141,6 +142,8 @@ private:
     static void HandleP2pGcJoinGroup(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
         int pid, int uid, int tokenId);
     static void HandleP2pGcLeaveGroup(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
+        int pid, int uid, int tokenId);
+    static WifiLinkedInfo ProcessLinkInfoForPermission(const WifiLinkedInfo &linkInfo,
         int pid, int uid, int tokenId);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     static void updateP2pDeviceMacAddress(std::vector<WifiP2pDevice> &device);

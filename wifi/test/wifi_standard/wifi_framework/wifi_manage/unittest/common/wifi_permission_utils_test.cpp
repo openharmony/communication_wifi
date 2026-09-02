@@ -100,6 +100,14 @@ HWTEST_F(WifiPermissionUtilsTest, VerifyGetWifiPeersMacPermissionEx_ReturnsPermi
     EXPECT_EQ(WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId), PERMISSION_GRANTED);
 }
 
+HWTEST_F(WifiPermissionUtilsTest, VerifyGetWifiLocalMacPermissionEx_ReturnsPermissionGranted, TestSize.Level1)
+{
+    int pid = 123;
+    int uid = 456;
+    int tokenId = 789;
+    EXPECT_EQ(WifiPermissionUtils::VerifyGetWifiLocalMacPermissionEx(pid, uid, tokenId), PERMISSION_GRANTED);
+}
+
 HWTEST_F(WifiPermissionUtilsTest, VerifyGetWifiInfoInternalPermission_ReturnsPermissionGranted, TestSize.Level1)
 {
     EXPECT_EQ(WifiPermissionUtils::VerifyGetWifiInfoInternalPermission(), PERMISSION_GRANTED);

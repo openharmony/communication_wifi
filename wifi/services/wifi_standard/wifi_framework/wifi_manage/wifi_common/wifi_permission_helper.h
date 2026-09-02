@@ -91,7 +91,7 @@ public:
     static int VerifyGetWifiLocalMacPermission(const int &pid, const int &uid);
 
     /**
-     * @Description : Verify get wifi local mac Permission.
+     * @Description : Verify Get Local Mac Address Permission.
      *
      * @param pid - Process ID.[in]
      * @param uid - User ID.[in]

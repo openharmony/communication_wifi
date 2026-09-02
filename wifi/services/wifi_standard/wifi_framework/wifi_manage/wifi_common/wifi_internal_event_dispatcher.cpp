@@ -789,8 +789,7 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacksExtral(
             break;
         case WIFI_CBK_MSG_CONNECTION_CHANGE:
             {
-                WifiLinkedInfo linkInfo = ProcessLinkInfoForPermission(msg.linkInfo, callingInfo.callingPid,
-                    callingInfo.callingUid, callingInfo.callingTokenId);
+                WifiLinkedInfo linkInfo = ProcessLinkInfoForPermission(msg.linkInfo, callingInfo);
                 callback->OnWifiConnectionChanged(msg.msgData, linkInfo);
             }
             break;
@@ -987,18 +986,20 @@ void WifiInternalEventDispatcher::HandleP2pGcLeaveGroup(sptr<IWifiP2pCallback> &
 }
 
 WifiLinkedInfo WifiInternalEventDispatcher::ProcessLinkInfoForPermission(const WifiLinkedInfo &linkInfo,
-    int pid, int uid, int tokenId)
+    const WifiCallingInfo &callingInfo)
 {
-    if ((pid == 0) || (uid == 0)) {
+    if ((callingInfo.callingPid == 0) || (callingInfo.callingUid == 0)) {
         return linkInfo;
     }
     WifiLinkedInfo result = linkInfo;
-    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
+    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermissionEx(callingInfo.callingPid, callingInfo.callingUid,
+        callingInfo.callingTokenId) == PERMISSION_DENIED) {
         WIFI_LOGD("%{public}s: GET_WIFI_LOCAL_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
             __func__, pid, uid);
         result.macAddress = "";
     }
-    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(callingInfo.callingPid, callingInfo.callingUid,
+        callingInfo.callingTokenId) == PERMISSION_DENIED) {
         WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
             __func__, pid, uid);
         result.bssid = "";

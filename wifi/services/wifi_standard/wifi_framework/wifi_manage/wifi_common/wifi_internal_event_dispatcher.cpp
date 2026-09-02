@@ -730,7 +730,7 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(
                     "instId: %{public}d", msg.msgCode, msg.id);
                 continue;
             }
-            if (IsStatusBarFrozen(callingInfo.callingUid,, msg)) {
+            if (IsStatusBarFrozen(callingInfo.callingUid, msg)) {
                 continue;
             }
             InvokeDeviceCallbacksExtral(isFrozen, msg, callback, callingInfo);

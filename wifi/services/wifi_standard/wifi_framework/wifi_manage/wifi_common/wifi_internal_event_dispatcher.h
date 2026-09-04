@@ -145,6 +145,12 @@ private:
         int pid, int uid, int tokenId);
     static WifiLinkedInfo ProcessLinkInfoForPermission(const WifiLinkedInfo &linkInfo,
         const WifiCallingInfo &callingInfo);
+    static void HandleP2pServiceChange(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
+        int pid, int uid, int tokenId);
+    static void HandleP2pConnectChange(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
+        int pid, int uid, int tokenId);
+    static void HandleP2pPrivatePeerChange(sptr<IWifiP2pCallback> &callback, const WifiEventCallbackMsg &msg,
+        int pid, int uid, int tokenId);
 #ifdef SUPPORT_RANDOM_MAC_ADDR
     static void updateP2pDeviceMacAddress(std::vector<WifiP2pDevice> &device);
 #endif

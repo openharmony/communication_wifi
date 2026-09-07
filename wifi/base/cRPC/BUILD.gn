@@ -94,6 +94,7 @@ if (defined(ohos_lite)) {
     cflags_cc += [ "-fno-rtti" ]
     deps = []
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "hilog:libhilog",
     ]
@@ -123,6 +124,7 @@ if (defined(ohos_lite)) {
     cflags_cc += [ "-fno-rtti" ]
     deps = []
     external_deps = [
+      "bounds_checking_function:libsec_shared",
       "c_utils:utils",
       "hilog:libhilog",
     ]

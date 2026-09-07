@@ -4464,6 +4464,16 @@ void StaStateMachine::DhcpResultNotify::DhcpResultNotifyEvent(DhcpReturnCode res
     pStaStateMachine->SendMessage(msg);
 }
 
+bool StaStateMachine::DhcpResultNotify::HasValidIpv6Address(const IpV6Info &ipv6Info)
+{
+    bool isPc = WifiConfigCenter::GetInstance().GetDeviceType() == static_cast<int>(ProductDeviceType::PC);
+    bool ret = !ipv6Info.globalIpV6Address.empty() || !ipv6Info.randGlobalIpV6Address.empty();
+    if (isPc) {
+        ret |= (!ipv6Info.uniqueLocalAddress1.empty() || !ipv6Info.uniqueLocalAddress2.empty());
+    }
+    return ret;
+}
+
 void StaStateMachine::DhcpResultNotify::TryToJumpToConnectedState(int iptype)
 {
     if (isDhcpIpv4Success) {
@@ -4475,7 +4485,7 @@ void StaStateMachine::DhcpResultNotify::TryToJumpToConnectedState(int iptype)
         IpV6Info ipv6Info;
         WifiConfigCenter::GetInstance().GetIpv6Info(ipv6Info, pStaStateMachine->m_instId);
         // if get ipv6 global address, start delay timer to jump to connected state
-        if (!ipv6Info.globalIpV6Address.empty() || !ipv6Info.randGlobalIpV6Address.empty()) {
+        if (HasValidIpv6Address(ipv6Info)) {
             isDhcpIpv6Success = true;
             pStaStateMachine->StopTimer(static_cast<int>(CMD_START_GET_DHCP_IP_TIMEOUT));
             pStaStateMachine->StopTimer(static_cast<int>(CMD_IPV6_DELAY_TIMEOUT));

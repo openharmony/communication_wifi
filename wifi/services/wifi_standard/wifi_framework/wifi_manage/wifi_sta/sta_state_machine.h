@@ -493,6 +493,7 @@ public:
         void SaveDhcpResultExt(DhcpResult *dest, DhcpResult *source);
         void DhcpResultNotifyEvent(DhcpReturnCode result, int ipType = -1);
         void ClearDhcpResult(DhcpResult *result);
+        bool HasValidIpv6Address(const IpV6Info &ipv6Info);
         static StaStateMachine *pStaStateMachineList[STA_INSTANCE_MAX_NUM];
         StaStateMachine *pStaStateMachine;
         std::mutex dhcpResultMutex;

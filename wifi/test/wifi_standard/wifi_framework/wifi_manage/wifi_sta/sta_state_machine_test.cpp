@@ -3202,6 +3202,54 @@ HWTEST_F(StaStateMachineTest, DhcpResultNotifyClear2Test, TestSize.Level1)
     EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->DhcpIpv4Result.isOptSuc == 0);
 }
 
+HWTEST_F(StaStateMachineTest, HasValidIpv6AddressTest, TestSize.Level1)
+{
+    StaStateMachine staStateMachine;
+    pStaStateMachine->pDhcpResultNotify
+        = new StaStateMachine::DhcpResultNotify(&staStateMachine);
+ 
+    IpV6Info ipv6Info;
+ 
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetDeviceType())
+        .WillRepeatedly(Return(static_cast<int>(ProductDeviceType::PHONE)));
+    EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->HasValidIpv6Address(ipv6Info));
+ 
+    ipv6Info.globalIpV6Address = "2001:db8::1";
+    EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->HasValidIpv6Address(ipv6Info));
+    ipv6Info.globalIpV6Address = "";
+ 
+    ipv6Info.randGlobalIpV6Address = "2001:db8::2";
+    EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->HasValidIpv6Address(ipv6Info));
+    ipv6Info.randGlobalIpV6Address = "";
+ 
+    ipv6Info.uniqueLocalAddress1 = "fd00::1";
+    EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->HasValidIpv6Address(ipv6Info));
+    ipv6Info.uniqueLocalAddress1 = "";
+ 
+    ipv6Info.uniqueLocalAddress2 = "fd00::2";
+    EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->HasValidIpv6Address(ipv6Info));
+    ipv6Info.uniqueLocalAddress2 = "";
+ 
+    EXPECT_CALL(WifiConfigCenter::GetInstance(), GetDeviceType())
+        .WillRepeatedly(Return(static_cast<int>(ProductDeviceType::PC)));
+    EXPECT_FALSE(pStaStateMachine->pDhcpResultNotify->HasValidIpv6Address(ipv6Info));
+ 
+    ipv6Info.uniqueLocalAddress1 = "fd00::1";
+    EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->HasValidIpv6Address(ipv6Info));
+    ipv6Info.uniqueLocalAddress1 = "";
+ 
+    ipv6Info.uniqueLocalAddress2 = "fd00::2";
+    EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->HasValidIpv6Address(ipv6Info));
+    ipv6Info.uniqueLocalAddress2 = "";
+ 
+    ipv6Info.globalIpV6Address = "2001:db8::1";
+    EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->HasValidIpv6Address(ipv6Info));
+    ipv6Info.globalIpV6Address = "";
+ 
+    ipv6Info.randGlobalIpV6Address = "2001:db8::2";
+    EXPECT_TRUE(pStaStateMachine->pDhcpResultNotify->HasValidIpv6Address(ipv6Info));
+}
+
 HWTEST_F(StaStateMachineTest, TryToSaveIpV4ResultHostnameMatchTest, TestSize.Level1)
 {
     TryToSaveIpV4ResultHostnameMatchTest();

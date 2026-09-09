@@ -1651,7 +1651,10 @@ bool HalDeviceManager::GetP2pSignalInfo(const std::string &interfaceName, const 
         return false;
     }
     const signed char *signedCharPointer = reinterpret_cast<const signed char *>(result.data());
-    DeserializeSignalPollResultFromPtr(signedCharPointer, result.size(), signalPollResult);
+    if (!DeserializeSignalPollResultFromPtr(signedCharPointer, result.size(), signalPollResult)) {
+        LOGE("HalDeviceManager GetP2pSignalInfo: DeserializeSignalPollResultFromPtr failed");
+        return false;
+    }
     LOGD("HalDeviceManager GetP2pSignalInfo finish, currentRssi %{public}d, associatedFreq %{public}d,\
         txBitrate %{public}d, rxBitrate %{public}d, currentNoise %{public}d, currentSnr %{public}d,\
         currentChload %{public}d, currentUlDelay %{public}d, [currentTxBytes %{public}" PRIu64 "],\
@@ -1740,23 +1743,52 @@ bool HalDeviceManager::ReadBytes(const signed char *buf, size_t bufSize, size_t 
     offset += len;
     return true;
 }
-void HalDeviceManager::DeserializeSignalPollBaseAttribute(const signed char *data, size_t dataSize, size_t &offset,
+bool HalDeviceManager::DeserializeSignalPollBaseAttribute(const signed char *data, size_t dataSize, size_t &offset,
     SignalPollResult &result)
 {
-    ReadInt32(data, dataSize, offset, result.currentRssi);
-    ReadInt32(data, dataSize, offset, result.associatedFreq);
-    ReadInt32(data, dataSize, offset, result.txBitrate);
-    ReadInt32(data, dataSize, offset, result.rxBitrate);
-    ReadInt32(data, dataSize, offset, result.currentNoise);
-    ReadInt32(data, dataSize, offset, result.currentSnr);
-    ReadInt32(data, dataSize, offset, result.currentChload);
-    ReadInt32(data, dataSize, offset, result.currentUlDelay);
-    ReadUInt64(data, dataSize, offset, result.currentTxBytes);
-    ReadUInt64(data, dataSize, offset, result.currentRxBytes);
-    ReadInt32(data, dataSize, offset, result.currentTxFailed);
-    ReadInt32(data, dataSize, offset, result.currentTxPackets);
-    ReadInt32(data, dataSize, offset, result.currentRxPackets);
-    ReadUInt16(data, dataSize, offset, result.chloadSelf);
+    if (!ReadInt32(data, dataSize, offset, result.currentRssi)) {
+        return false;
+    }
+    if (!ReadInt32(data, dataSize, offset, result.associatedFreq)) {
+        return false;
+    }
+    if (!ReadInt32(data, dataSize, offset, result.txBitrate)) {
+        return false;
+    }
+    if (!ReadInt32(data, dataSize, offset, result.rxBitrate)) {
+        return false;
+    }
+    if (!ReadInt32(data, dataSize, offset, result.currentNoise)) {
+        return false;
+    }
+    if (!ReadInt32(data, dataSize, offset, result.currentSnr)) {
+        return false;
+    }
+    if (!ReadInt32(data, dataSize, offset, result.currentChload)) {
+        return false;
+    }
+    if (!ReadInt32(data, dataSize, offset, result.currentUlDelay)) {
+        return false;
+    }
+    if (!ReadUInt64(data, dataSize, offset, result.currentTxBytes)) {
+        return false;
+    }
+    if (!ReadUInt64(data, dataSize, offset, result.currentRxBytes)) {
+        return false;
+    }
+    if (!ReadInt32(data, dataSize, offset, result.currentTxFailed)) {
+        return false;
+    }
+    if (!ReadInt32(data, dataSize, offset, result.currentTxPackets)) {
+        return false;
+    }
+    if (!ReadInt32(data, dataSize, offset, result.currentRxPackets)) {
+        return false;
+    }
+    if (!ReadUInt16(data, dataSize, offset, result.chloadSelf)) {
+        return false;
+    }
+    return true;
 }
 
 bool HalDeviceManager::DeserializeSignalPollResultFromPtr(const signed char *data, size_t dataSize,
@@ -1771,7 +1803,10 @@ bool HalDeviceManager::DeserializeSignalPollResultFromPtr(const signed char *dat
         return false;
     }
     size_t offset = 0;
-    DeserializeSignalPollBaseAttribute(data, dataSize, offset, result);
+    if (!DeserializeSignalPollBaseAttribute(data, dataSize, offset, result)) {
+        LOGE("DeserializeSignalPollResultFromPtr: DeserializeSignalPollBaseAttribute failed");
+        return false;
+    }
     uint16_t padding = 0;
     if (!ReadUInt16(data, dataSize, offset, padding)) {
         return false;

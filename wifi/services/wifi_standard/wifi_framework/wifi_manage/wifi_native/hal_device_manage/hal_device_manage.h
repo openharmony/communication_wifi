@@ -502,7 +502,7 @@ private:
     bool ReadUInt64(const signed char* buf, size_t bufSize, size_t &offset, uint64_t &value);
     bool ReadUInt16(const signed char* buf, size_t bufSize, size_t &offset, uint16_t &value);
     bool ReadBytes(const signed char* buf, size_t bufSize, size_t &offset, uint8_t* data, size_t len);
-    void DeserializeSignalPollBaseAttribute(const signed char* data, size_t dataSize, size_t &offset,
+    bool DeserializeSignalPollBaseAttribute(const signed char* data, size_t dataSize, size_t &offset,
                                             SignalPollResult &result);
     bool DeserializeSignalPollResultFromPtr(const signed char* data, size_t dataSize, SignalPollResult &result);
 

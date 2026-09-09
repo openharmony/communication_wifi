@@ -2391,6 +2391,7 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
     switch (currentTpType) {
         case IPTYPE_IPV4: {
             result.iptype = IPTYPE_IPV4;
+            result.isOptSuc = true;
             if (strcpy_s(result.strOptClientId, DHCP_MAX_FILE_BYTES,
                 staticIpAddress.ipAddress.address.GetIpv4Address().c_str()) != EOK) {
                 WIFI_LOGE("ConfigStaticIpAddress strOptClientId strcpy_s failed!");
@@ -2416,6 +2417,7 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
         }
         case IPTYPE_IPV6: {
             result.iptype = IPTYPE_IPV6;
+            result.isOptSuc = true;
             if (strcpy_s(result.strOptClientId, DHCP_MAX_FILE_BYTES,
                 staticIpAddress.ipAddress.address.GetIpv6Address().c_str()) != EOK) {
                 WIFI_LOGE("ConfigStaticIpAddress strOptClientId strcpy_s failed!");
@@ -2440,6 +2442,7 @@ bool StaStateMachine::ConfigStaticIpAddress(StaticIpAddress &staticIpAddress)
         }
         case IPTYPE_MIX: {
             result.iptype = IPTYPE_IPV4;
+            result.isOptSuc = true;
             if (strcpy_s(result.strOptClientId, DHCP_MAX_FILE_BYTES,
                 staticIpAddress.ipAddress.address.GetIpv4Address().c_str()) != EOK) {
                 WIFI_LOGE("ConfigStaticIpAddress strOptClientId strcpy_s failed!");

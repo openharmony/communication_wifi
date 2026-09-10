@@ -78,6 +78,7 @@ namespace {
 constexpr const char* WIFI_IS_CONNECT_FROM_USER = "persist.wifi.is_connect_from_user";
 constexpr int MAX_CHLOAD = 800;
 constexpr int PRE_ROAM_SCAN_WAIT_TIME_MS = 100;
+constexpr int HIDDEN_SSID_SCAN_WAIT_TIME_MS = 2000;
 
 #ifdef READ_MAC_FROM_OEM
 /*
@@ -851,13 +852,6 @@ bool StaStateMachine::InitState::NotAllowConnectToNetwork(int networkId, const s
         return true;
     }
 
-    if (config.hiddenSSID && NotExistInScanList(config) &&
-        (pStaStateMachine->selfCureService_ == nullptr ||
-        !pStaStateMachine->selfCureService_->IsSelfCureL2Connecting())) {
-        DealHiddenSsidConnectMiss(networkId);
-        return true;
-    }
-
 #ifdef FEATURE_WIFI_MDM_RESTRICTED_SUPPORT
     if (pStaStateMachine->WhetherRestrictedByMdm(config.ssid, config.bssid, !config.bssid.empty())) {
         WIFI_LOGI("NotAllowConnectToNetwork, RestrictedByMdm");
@@ -868,6 +862,16 @@ bool StaStateMachine::InitState::NotAllowConnectToNetwork(int networkId, const s
     }
 #endif
 
+    if (config.hiddenSSID && NotExistInScanList(config) &&
+        (pStaStateMachine->selfCureService_ == nullptr ||
+        !pStaStateMachine->selfCureService_->IsSelfCureL2Connecting())) {
+        DealHiddenSsidConnectMiss(networkId);
+        if (pStaStateMachine->linkedInfo.connState == ConnState::DISCONNECTED) {
+            return true;
+        } else {
+            usleep(HIDDEN_SSID_SCAN_WAIT_TIME_MS * MSEC);
+        }
+    }
     return false;
 }
 

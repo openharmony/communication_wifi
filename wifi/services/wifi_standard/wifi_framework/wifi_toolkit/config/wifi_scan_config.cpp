@@ -394,6 +394,7 @@ int WifiScanConfig::GetExternalScanInfoList(std::vector<WifiScanInfo> &results)
     int64_t currentTime = GetElapsedMicrosecondsSinceBoot();
     for (auto iter = externalWifiScanInfoList_.begin(); iter != externalWifiScanInfoList_.end();) {
         if (iter->disappearCount >= WIFI_DISAPPEAR_TIMES) {
+            ++iter;
             continue;
         }
         if (iter->timestamp > currentTime - WIFI_GET_SCAN_INFO_VALID_TIMESTAMP) {

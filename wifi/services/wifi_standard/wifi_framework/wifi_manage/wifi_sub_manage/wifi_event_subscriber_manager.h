@@ -201,6 +201,7 @@ private:
     void HandleCommNetConnManagerSysChange(int systemAbilityId, bool add);
     void HandleEthernetServiceChange(int systemAbilityId, bool add);
     void HandleDistributedKvDataServiceChange(bool add);
+    void HandleCesServiceChange(bool add);
     int GetLastStaStateByDatashare();
     void RegisterCesEvent();
 #ifdef HAS_POWERMGR_PART

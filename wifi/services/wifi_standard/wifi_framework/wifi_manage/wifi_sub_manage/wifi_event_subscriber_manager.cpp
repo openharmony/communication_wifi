@@ -119,7 +119,6 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
 {
     WIFI_LOGI("create WifiEventSubscriberManager");
     foldAction_ = GetFoldAction();
-    RegisterCesEvent();
     RegisterNotificationEvent();
 #ifdef HAS_POWERMGR_PART
     RegisterPowermgrEvent();
@@ -278,6 +277,16 @@ void WifiEventSubscriberManager::HandleDistributedKvDataServiceChange(bool add)
     }
 }
 
+void WifiEventSubscriberManager::HandleCesServiceChange(bool add)
+{
+    WIFI_LOGI("HandleCesServiceChange, add=[%{public}d]", add);
+    if (add) {
+        RegisterCesEvent();
+    } else {
+        UnRegisterCesEvent();
+    }
+}
+
 #ifdef FEATURE_P2P_SUPPORT
 void WifiEventSubscriberManager::HandleP2pBusinessChange(int systemAbilityId, bool add)
 {
@@ -322,6 +331,9 @@ void WifiEventSubscriberManager::OnSystemAbilityChanged(int systemAbilityId, boo
 #endif
         case COMM_ETHERNET_MANAGER_SYS_ABILITY_ID:
             HandleEthernetServiceChange(systemAbilityId, add);
+            break;
+        case COMMON_EVENT_SERVICE_ID:
+            HandleCesServiceChange(add);
             break;
         default:
             const Hid2dServiceEntry* entry = FindServiceBySaId(systemAbilityId);
@@ -485,6 +497,7 @@ void WifiEventSubscriberManager::InitSubscribeListener()
     SubscribeSystemAbility(APP_MGR_SERVICE_ID);
     SubscribeSystemAbility(COMM_NET_CONN_MANAGER_SYS_ABILITY_ID);
     SubscribeSystemAbility(COMM_ETHERNET_MANAGER_SYS_ABILITY_ID);
+    SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID);
     for (const auto& entry : GetHid2dServiceRegistry()) {
         if (entry.systemAbilityId != 0) {
             SubscribeSystemAbility(entry.systemAbilityId);

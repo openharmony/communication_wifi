@@ -290,6 +290,9 @@ std::string IpTools::ConvertIpv6AddressToCompleted(const std::string &address)
  
     size_t totalParts = 8;
     size_t existingParts = parts.size() + secondParts.size();
+    if (existingParts > totalParts) {
+        return address;
+    }
     size_t zeroPartsToInsert = totalParts - existingParts;
     int8_t bitNum = 4;
     parts.insert(parts.end(), zeroPartsToInsert, "0");

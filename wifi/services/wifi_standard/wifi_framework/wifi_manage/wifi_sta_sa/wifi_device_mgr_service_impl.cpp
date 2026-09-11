@@ -253,9 +253,17 @@ WifiDeviceConfig WifiDeviceMgrServiceImpl::SvcMakeConfig(const std::vector<std::
     std::string keyMgmt = Str16ToStr8(args[keyMgmtNum]);
     if (keyMgmt == "wpa3") {
         config.keyMgmt = KEY_MGMT_SAE;
+        if (args.size() <= static_cast<size_t>(preSharedKeyNum)) {
+            WIFI_LOGE("missing preSharedKey for wpa3");
+            return config;
+        }
         config.preSharedKey = Str16ToStr8(args[preSharedKeyNum]);
     } else if (keyMgmt == "wpa2") {
         config.keyMgmt = KEY_MGMT_WPA_PSK;
+        if (args.size() <= static_cast<size_t>(preSharedKeyNum)) {
+            WIFI_LOGE("missing preSharedKey for wpa2");
+            return config;
+        }
         config.preSharedKey = Str16ToStr8(args[preSharedKeyNum]);
     } else if (keyMgmt == "open") {
         config.keyMgmt = KEY_MGMT_NONE;

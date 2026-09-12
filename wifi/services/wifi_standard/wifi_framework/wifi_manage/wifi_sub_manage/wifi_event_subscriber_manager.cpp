@@ -281,9 +281,13 @@ void WifiEventSubscriberManager::HandleCesServiceChange(bool add)
 {
     WIFI_LOGI("HandleCesServiceChange, add=[%{public}d]", add);
     if (add) {
-        RegisterCesEvent();
-    } else {
+        if (!isCesEventRegistered) {
+            RegisterCesEvent();
+            isCesEventRegistered = true;
+        }
+    } else if (isCesEventRegistered) {
         UnRegisterCesEvent();
+        isCesEventRegistered = false;
     }
 }
 

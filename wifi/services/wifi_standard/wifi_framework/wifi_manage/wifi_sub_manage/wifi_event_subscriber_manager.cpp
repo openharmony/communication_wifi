@@ -119,6 +119,7 @@ WifiEventSubscriberManager::WifiEventSubscriberManager()
 {
     WIFI_LOGI("create WifiEventSubscriberManager");
     foldAction_ = GetFoldAction();
+    RegisterCesEvent();
     RegisterNotificationEvent();
 #ifdef HAS_POWERMGR_PART
     RegisterPowermgrEvent();

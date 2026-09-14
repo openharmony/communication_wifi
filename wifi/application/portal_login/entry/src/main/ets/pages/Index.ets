@@ -20,11 +20,10 @@ import { common, OpenLinkOptions, abilityAccessCtrl, Permissions } from '@kit.Ab
 import { BusinessError, emitter, deviceInfo } from '@kit.BasicServicesKit';
 import { SymbolGlyphModifier, window, CustomContentDialog } from '@kit.ArkUI';
 import { wifiManager } from '@kit.ConnectivityKit';
-import { connection } from '@kit.NetworkKit';
 import { call } from '@kit.TelephonyKit';
 import { inputMethodEngine } from '@kit.IMEKit';
 import {
-  getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
+  getUrl, bindToNetById, extractDomain, exitApp, shouldShowBrowseItem, UserAgentSet,
   validateURL, getIsInOOBE, getHmosUAComplexRegex, StringNumberPair, getRetryList, getDefaultUrl, modifyCode,
   convertToPermissions, reqPermissionsFromUser, modifyUserAgent, UserAgentCompatibleInfo, preventEnterKeyScript
 } from '../common/utils';
@@ -109,7 +108,6 @@ struct Index {
   @State private loadProgress: number = 0;
   private sheetItemHeight = 50;
   private contextMenuWidth = 224;
-  private netConnect: connection.NetConnection = connection.createNetConnection();
   private isInOOBE: boolean = getIsInOOBE();
   @StorageProp('topRectHeight') topRectHeight: number = 0;
   private isLoaded: boolean = false;
@@ -1008,12 +1006,6 @@ struct Index {
       this.actionBarMargin = 40;
       this.isWearable = true;
     }
-    this.netConnect.on('netLost', (data: connection.NetHandle) => {
-      handleNetworkChange(data, this.context);
-    });
-    this.netConnect.register((err: BusinessError) => {
-      hilog.error(DOMAIN, TAG, '%{public}s', 'Failed to register netconnect.' + JSON.stringify(err));
-    });
     bindToNetById(this.context)
     .then(()=>{
         hilog.info(DOMAIN, TAG, '%{public}s', 'aboutToAppear bindToNetById.');
@@ -1054,10 +1046,6 @@ struct Index {
 
   aboutToDisappear(): void {
     updateAboutToDisappear();
-    this.netConnect.unregister((err: BusinessError) => {
-      hilog.error(
-        DOMAIN, TAG, '%{public}s', 'Failed to unregister netconnect.' + JSON.stringify(err));
-    });
     emitter.off('WANT_UPDATE');
   }
 }

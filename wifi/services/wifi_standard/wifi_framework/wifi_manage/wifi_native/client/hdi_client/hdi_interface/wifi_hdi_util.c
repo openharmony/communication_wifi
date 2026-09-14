@@ -453,7 +453,14 @@ static void GetInfoElems(int length, int end, char *srcBuf, ScanInfo *pcmd)
         }
         if (srcBuf[start] == '[') {
             ++start;
-            infoElemsTemp[infoElemsSize].id = (unsigned int)atoi(srcBuf + start);
+            char *endPtr = NULL;
+            const int decimalBase = 10;
+            long ieId = strtol(srcBuf + start, &endPtr, decimalBase);
+            if (endPtr == srcBuf + start || ieId < 0 || ieId > (long)UINT8_MASK) {
+                LOGE("GetInfoElems parse ie id failed");
+                break;
+            }
+            infoElemsTemp[infoElemsSize].id = (unsigned int)ieId;
         }
         if (srcBuf[start] != ' ') {
             ++start;

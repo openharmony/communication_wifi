@@ -33,10 +33,10 @@ export default class EntryAbility extends UIAbility {
 
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     try {
-      wifiManager.on('wifiStateChange', this.wifiStateCallback);
-      hilog.info(DOMAIN, TAG, '%{public}s', 'Register wifiStateChange success');
+      wifiManager.on('wifiConnectionChange', this.wifiConnCallback);
+      hilog.info(DOMAIN, TAG, '%{public}s', 'Register wifiConnectionChange success');
     } catch (error) {
-      hilog.error(DOMAIN, TAG, 'Register wifiStateChange failed. code: %{public}s', `${error.code}`);
+      hilog.error(DOMAIN, TAG, 'Register wifiConnectionChange failed. code: %{public}s', `${error.code}`);
     }
     this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
     hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onCreate');
@@ -61,9 +61,9 @@ export default class EntryAbility extends UIAbility {
 
   onDestroy(): void {
     try {
-      wifiManager.off('wifiStateChange', this.wifiStateCallback);
+      wifiManager.off('wifiConnectionChange', this.wifiConnCallback);
     } catch (error) {
-      hilog.error(DOMAIN, TAG, 'Unregister wifiStateChange failed. code: %{public}s', `${error.code}`);
+      hilog.error(DOMAIN, TAG, 'Unregister wifiConnectionChange failed. code: %{public}s', `${error.code}`);
     }
     this.stopKeepScreenOnTimer();
     hilog.info(DOMAIN, TAG, '%{public}s', 'Ability onDestroy');
@@ -185,15 +185,11 @@ export default class EntryAbility extends UIAbility {
     this.keepScreenOnTimer = -1;
   }
 
-  private wifiStateCallback: (state: number) => void = (state: number) => {
-    switch (state) {
-      case 0:
-        if (deviceInfo.deviceType === 'wearable') {
-          this.context.terminateSelf();
-        }
-        break;
-      default:
-        break;
+  private wifiConnCallback: (state: number) => void = (state: number) => {
+    if (state !== 0) {
+      return;
     }
+    hilog.info(DOMAIN, TAG, '%{public}s', 'wifi disconnect, exitapp.');
+    this.context.terminateSelf();
   }
 }

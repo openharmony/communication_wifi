@@ -197,13 +197,6 @@ export function exitApp(context: common.UIAbilityContext): void {
   }
 }
 
-export function handleNetworkChange(data: connection.NetHandle, context: common.UIAbilityContext): void {
-  if (data.netId === netId_) {
-    hilog.info(DOMAIN, TAG, '%{public}s', 'exit app beacuse netlost.')
-    exitApp(context);
-  }
-}
-
 export function extractDomain(urlString: string): string {
   try {
     const urlObject = url.URL.parseURL(urlString);

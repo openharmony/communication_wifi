@@ -26,7 +26,8 @@ import { inputMethodEngine } from '@kit.IMEKit';
 import {
   getUrl, bindToNetById, extractDomain, handleNetworkChange, exitApp, shouldShowBrowseItem, UserAgentSet,
   validateURL, getIsInOOBE, getHmosUAComplexRegex, StringNumberPair, getRetryList, getDefaultUrl, modifyCode,
-  convertToPermissions, reqPermissionsFromUser, modifyUserAgent, UserAgentCompatibleInfo, preventEnterKeyScript
+  convertToPermissions, reqPermissionsFromUser, modifyUserAgent, UserAgentCompatibleInfo, preventEnterKeyScript,
+  modifyInputTypeAndScaleCode, centerCode
 } from '../common/utils';
 import {
   updateFinalUrl, updateOnHttpErrorReceive, updateOnErrorReceive, updateOnSslErrorEvent, updateAboutToDisappear,
@@ -102,6 +103,8 @@ struct Index {
   private mobileUA: string = UserAgentSet.mobileUA;
   private desktopUA:string = UserAgentSet.desktopUA;
   @State private selectedUA: string = this.harmonyUA; // default use harmony UA
+  @State private lastSelectedUA: string = this.selectedUA;
+  @State private lastUrl: string = '';
   @State private isMenuVisible: boolean = false;
   @State private isSelectUASheetVisible: boolean = false;
   @State private adaptPadding: number = 16;
@@ -388,6 +391,10 @@ struct Index {
               onDisappear: () => {
                 try {
                   this.webviewController.setCustomUserAgent(this.selectedUA);
+                  if (this.lastSelectedUA !== this.selectedUA) {
+                    this.lastUrl = '';
+                    this.lastSelectedUA = this.selectedUA;
+                  }
                   this.webviewController.refresh();
                 } catch (error) {
                   hilog.error(DOMAIN, TAG, '%{public}s',
@@ -527,6 +534,11 @@ struct Index {
             hilog.info(DOMAIN, TAG, 'overviewMode:%{public}s', this.overviewMode);
             this.harmonyUA = this.setUA(this.harmonyUARaw);
             this.selectedUA = this.harmonyUA;
+            if (this.isWearable) {
+              this.selectedUA = this.mobileUA;
+              hilog.info(DOMAIN, TAG, 'wearable set defalut UA to mobileUA');
+            }
+            this.lastSelectedUA = this.selectedUA;
             this.webviewController.setCustomUserAgent(this.selectedUA);
           } catch (error) {
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed to get UA. Code:${error.code}, message:${error.message}`);
@@ -547,6 +559,7 @@ struct Index {
           if (this.selectedUA === this.harmonyUA) {
             this.harmonyUA = this.setUA(this.harmonyUARaw);
             this.selectedUA = this.harmonyUA;
+            this.lastSelectedUA = this.selectedUA;
             try {
               this.webviewController.setCustomUserAgent(this.selectedUA);
               hilog.info(DOMAIN, TAG, '%{public}s', 'setCustomUserAgent enter.');
@@ -572,12 +585,35 @@ struct Index {
         .onProgressChange((event) => {
           this.loadProgress = event.newProgress;
         })
+        .textAutosizing(!this.isWearable) // 穿戴设备不进行字体自动调整
+        .forceEnableZoom(this.isWearable) // 穿戴设备使能强制缩放
         .onPageEnd((event) => {
           this.loadProgress = 100;
           this.renderExitRetryCount = 0;
+          if (this.isWearable) { // 穿戴设备调整默认缩放大小
+            try {
+              this.webviewController.runJavaScript(modifyInputTypeAndScaleCode);
+              hilog.info(DOMAIN, TAG, '%{public}s', 'runJavaScript modifyInputTypeAndScaleCode enter.');
+            } catch (error) {
+              hilog.error(DOMAIN, TAG, '%{public}s',
+                `onPageEnd wearable runJavaScript fail: Code:${error.code}, message:${error.message}`);
+            }
+          }
           if (event) {
             this.webUrl = event.url;
             hilog.info(DOMAIN, TAG, '%{public}s', 'Url:' + safeAnonymize(this.webUrl));
+            if (this.isWearable) { // 穿戴设备每次切换UA后对网页进行水平居中
+              try {
+                if (this.lastUrl !== this.webUrl) {
+                  this.webviewController.runJavaScript(centerCode);
+                  this.lastUrl = this.webUrl;
+                  hilog.info(DOMAIN, TAG, '%{public}s', 'runJavaScript centerCode enter.');
+                }
+              } catch (error) {
+                hilog.error(DOMAIN, TAG, '%{public}s',
+                  `onPageEnd wearable runJavaScript center fail: Code:${error.code}, message:${error.message}`);
+              }
+            }
             try {
               wifiManager.startWifiDetection();
               hilog.info(DOMAIN, TAG, '%{public}s', 'onPageEnd startWifiDetection');
@@ -845,21 +881,27 @@ struct Index {
         .width('100%')
     }
     .padding({ top: px2vp(this.topRectHeight) })
+    .onTouch((event: TouchEvent) => {
+      if (this.isWearable && event.type === TouchType.Down) {
+        if (event.touches && event.touches.length > 0) {
+          this.swipeStartX = event.touches[0].screenX;
+        }
+      }
+    })
     .parallelGesture(
-      PanGesture({ fingers: 1, direction: PanDirection.Horizontal, distance: 50 })
-        .onActionStart((event: GestureEvent) => {
-          const x = event.fingerList[0].globalX;
-          this.swipeStartX = typeof x === 'number' ? px2vp(x) : px2vp(parseFloat(x));
-        })
-        .onActionEnd((even: GestureEvent) => {
+      SwipeGesture({ fingers: 1, direction: SwipeDirection.Horizontal, speed: 0 })
+        .onAction((event: GestureEvent) => {
           if (!this.isWearable) {
             return;
           }
-          const EDGE_THRESHOLD = 45; // vp,Judge Edge Width
-          const startX = this.swipeStartX;
-          const fromLeftEdge = startX <= EDGE_THRESHOLD;
-          hilog.info(DOMAIN, TAG, '%{public}s', 'PanGesture end. startX:' + startX);
-          if (!fromLeftEdge) {
+          hilog.info(DOMAIN, TAG, '%{public}s',
+            `onAction startX:${this.swipeStartX}, speed:${event.speed}, angle:${event.angle}`);
+          const EDGE_THRESHOLD = 22; // vp,Judge Edge Width
+          if (this.swipeStartX < 0 || this.swipeStartX > EDGE_THRESHOLD) {
+            return;
+          }
+          const ANGLE_THRESHOLD = 30; // Judge angle
+          if (Math.abs(event.angle) > ANGLE_THRESHOLD) {
             return;
           }
           exitApp(this.context);

@@ -230,25 +230,8 @@ export function modifyUserAgent(originalUA: string, appendInfo: string): string 
 }
 
 export const modifyCode = `Object.defineProperty(navigator, 'platform', { get: () => 'Linux aarch64' });`;
-export const centerCode = `
-  // 创建绝对定位、水平居中、不可见的div元素
-  var marker = document.createElement('div');
-  marker.style.position = 'absolute';
-  marker.style.left = '50%';
-  marker.style.top = '0';
-  marker.style.width = '1px'; // 仅作坐标参考
-  marker.style.height = '1px'; // 仅作坐标参考
-  marker.style.visibility = 'hidden';
 
-  // 添加到body并将其滚动到视口中
-  // -behavior: 'instant' 表示无动画，立即滚动到位
-  // -block: 'start' 表示垂直方向上标记点对齐到视口顶部
-  // -inline: 'center' 表示水平方向上标记点对齐到视口中心
-  document.body.appendChild(marker);
-  marker.scrollIntoView({ behavior: 'instant', block: 'start', inline: 'center' });
-`;
-
-export const modifyInputTypeAndScaleCode = `
+export const modifyInputTypeCode = `
 (function() {
   var inputs = document.querySelectorAll('input');
   for (var i = 0; i < inputs.length; i++) {
@@ -258,32 +241,6 @@ export const modifyInputTypeAndScaleCode = `
       input.setAttribute('type', 'number');
     }
   }
-
-  var curScale = 1;
-  if (window.visualViewport) {
-    curScale = window.visualViewport.scale || 1;
-  }
-  var scaleValue = 1;
-  if (curScale >= 1) { // 已进行过缩放的场景忽略，避免缩放太小
-    scaleValue = 0.5;
-  }
-  // 注入 CSS transform 缩放
-  var existingStyle = document.getElementById('custom-scale-style');
-  if (existingStyle) {
-    existingStyle.remove();
-  }
-
-  var style = document.createElement('style');
-  style.id = 'custom-scale-style';
-  style.textContent = \`
-    html {
-      transform: scale(\${scaleValue}) !important;
-      transform-origin: 50% 0 !important; // 变化的原点： 水平居中/垂直顶部
-      width: 125% !important; // 扩大网页布局
-      height: 125% !important; // 扩大网页布局
-    }
-  \`;
-  document.head.appendChild(style);
 })();
 `;
 

@@ -1507,6 +1507,8 @@ public:
 
         signalInfo.signal = VALID_RSSI4;
         pStaStateMachine->UpdateLinkRssi(signalInfo);
+
+        pStaStateMachine->UpdateLinkRssi(signalInfo, VALID_RSSI3);
     }
 
     void DealSignalPollResultTest()

@@ -201,6 +201,7 @@ private:
     void HandleCommNetConnManagerSysChange(int systemAbilityId, bool add);
     void HandleEthernetServiceChange(int systemAbilityId, bool add);
     void HandleDistributedKvDataServiceChange(bool add);
+    void HandleCesServiceChange(bool add);
     int GetLastStaStateByDatashare();
     void RegisterCesEvent();
 #ifdef HAS_POWERMGR_PART
@@ -269,6 +270,7 @@ private:
     std::mutex settingsEnterEventMutex;
     std::mutex dataShareReadyEventMutex_;
     bool isCesEventSubscribered = false;
+    bool isCesEventRegistered = false;
     std::shared_ptr<CesEventSubscriber> cesEventSubscriber_ = nullptr;
     std::shared_ptr<NotificationEventSubscriber> wifiNotificationSubsciber_ = nullptr;
     std::shared_ptr<NetworkStateChangeSubscriber> networkStateChangeSubsciber_ = nullptr;

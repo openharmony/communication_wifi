@@ -718,22 +718,22 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacks(
             WIFI_LOGD("InvokeDeviceCallbacks, msg.msgCode: %{public}d, instId: %{public}d", msg.msgCode, msg.id);
             auto remote = itr->first;
             bool isFrozen = false;
-            int uid = mStaCallBackInfo[msg.id][remote].callingUid;
-            int pid = mStaCallBackInfo[msg.id][remote].callingPid;
+            WifiCallingInfo callingInfo = mStaCallBackInfo[msg.id][remote];
 #ifdef FEATURE_APP_FROZEN
-            isFrozen = IsAppFrozen(pid);
+            isFrozen = IsAppFrozen(callingInfo.callingPid);
 #endif
             WIFI_LOGD("Check calling APP is hardwareProxied,"
-                "uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d", uid, pid, isFrozen);
+                "uid: %{public}d, pid: %{public}d, hardwareProxied: %{public}d",
+                callingInfo.callingUid, callingInfo.callingPid, isFrozen);
             if (mStaCallBackInfo[msg.id][remote].regCallBackEventId.count(msg.msgCode) == 0) {
                 WIFI_LOGD("InvokeDeviceCallbacks, Not registered callback event! msg.msgCode: %{public}d,"
                     "instId: %{public}d", msg.msgCode, msg.id);
                 continue;
             }
-            if (IsStatusBarFrozen(uid, msg)) {
+            if (IsStatusBarFrozen(callingInfo.callingUid, msg)) {
                 continue;
             }
-            InvokeDeviceCallbacksExtral(isFrozen, msg, callback);
+            InvokeDeviceCallbacksExtral(isFrozen, msg, callback, callingInfo);
         }
     }
 }
@@ -777,7 +777,8 @@ bool WifiInternalEventDispatcher::IsStatusBarFrozen(int uid, const WifiEventCall
 }
 
 void WifiInternalEventDispatcher::InvokeDeviceCallbacksExtral(
-    bool isFrozen, const WifiEventCallbackMsg &msg, const sptr<IWifiDeviceCallBack> callback)
+    bool isFrozen, const WifiEventCallbackMsg &msg, const sptr<IWifiDeviceCallBack> callback,
+    const WifiCallingInfo &callingInfo)
 {
     if (callback == nullptr) {
         return;
@@ -787,7 +788,10 @@ void WifiInternalEventDispatcher::InvokeDeviceCallbacksExtral(
             callback->OnWifiStateChanged(msg.msgData);
             break;
         case WIFI_CBK_MSG_CONNECTION_CHANGE:
-            callback->OnWifiConnectionChanged(msg.msgData, msg.linkInfo);
+            {
+                WifiLinkedInfo linkInfo = ProcessLinkInfoForPermission(msg.linkInfo, callingInfo);
+                callback->OnWifiConnectionChanged(msg.msgData, linkInfo);
+            }
             break;
         case WIFI_CBK_MSG_RSSI_CHANGE:
             if (isFrozen == false) {
@@ -981,6 +985,83 @@ void WifiInternalEventDispatcher::HandleP2pGcLeaveGroup(sptr<IWifiP2pCallback> &
     }
 }
 
+WifiLinkedInfo WifiInternalEventDispatcher::ProcessLinkInfoForPermission(const WifiLinkedInfo &linkInfo,
+    const WifiCallingInfo &callingInfo)
+{
+    if ((callingInfo.callingPid == 0) || (callingInfo.callingUid == 0)) {
+        return linkInfo;
+    }
+    WifiLinkedInfo result = linkInfo;
+    if (WifiPermissionUtils::VerifyGetWifiLocalMacPermissionEx(callingInfo.callingPid, callingInfo.callingUid,
+        callingInfo.callingTokenId) == PERMISSION_DENIED) {
+        WIFI_LOGD("%{public}s: GET_WIFI_LOCAL_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
+            __func__, callingInfo.callingPid, callingInfo.callingUid);
+        result.macAddress = "";
+    }
+    if (WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(callingInfo.callingPid, callingInfo.callingUid,
+        callingInfo.callingTokenId) == PERMISSION_DENIED) {
+        WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
+            __func__, callingInfo.callingPid, callingInfo.callingUid);
+        result.bssid = "";
+    }
+    return result;
+}
+
+
+void WifiInternalEventDispatcher::HandleP2pServiceChange(sptr<IWifiP2pCallback> &callback,
+    const WifiEventCallbackMsg &msg, int pid, int uid, int tokenId)
+{
+    WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d, tokenId: %{private}d", __func__, pid, uid, tokenId);
+    if ((pid != 0) && (uid != 0) &&
+        WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
+        WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
+            __func__, pid, uid);
+        std::vector<WifiP2pServiceInfo> serviceInfoCopy = msg.serviceInfo;
+        for (auto &info : serviceInfoCopy) {
+            info.SetDeviceAddress("");
+        }
+        callback->OnP2pServicesChanged(serviceInfoCopy);
+    } else {
+        callback->OnP2pServicesChanged(msg.serviceInfo);
+    }
+}
+ 
+void WifiInternalEventDispatcher::HandleP2pConnectChange(sptr<IWifiP2pCallback> &callback,
+    const WifiEventCallbackMsg &msg, int pid, int uid, int tokenId)
+{
+    WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d, tokenId: %{private}d", __func__, pid, uid, tokenId);
+    if ((pid != 0) && (uid != 0) &&
+        WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
+        WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
+            __func__, pid, uid);
+        WifiP2pLinkedInfo p2pInfoCopy = msg.p2pInfo;
+        std::vector<GcInfo> gcInfoListCopy = p2pInfoCopy.GetClientInfoList();
+        p2pInfoCopy.ClearClientInfo();
+        for (auto &gcInfo : gcInfoListCopy) {
+            GcInfo gcInfoEmpty = gcInfo;
+            gcInfoEmpty.mac = "";
+            p2pInfoCopy.AddClientInfoList(gcInfoEmpty.mac, gcInfoEmpty.ip, gcInfoEmpty.host);
+        }
+        callback->OnP2pConnectionChanged(p2pInfoCopy);
+    } else {
+        callback->OnP2pConnectionChanged(msg.p2pInfo);
+    }
+}
+ 
+void WifiInternalEventDispatcher::HandleP2pPrivatePeerChange(sptr<IWifiP2pCallback> &callback,
+    const WifiEventCallbackMsg &msg, int pid, int uid, int tokenId)
+{
+    WIFI_LOGD("%{public}s pid: %{public}d, uid: %{public}d, tokenId: %{private}d", __func__, pid, uid, tokenId);
+    if ((pid != 0) && (uid != 0) &&
+        WifiPermissionUtils::VerifyGetWifiPeersMacPermissionEx(pid, uid, tokenId) == PERMISSION_DENIED) {
+        WIFI_LOGD("%{public}s: GET_WIFI_PEERS_MAC PERMISSION_DENIED, pid: %{public}d, uid: %{public}d",
+            __func__, pid, uid);
+        callback->OnP2pPrivatePeersChanged("");
+    } else {
+        callback->OnP2pPrivatePeersChanged(msg.privateWfdInfo);
+    }
+}
+
 void WifiInternalEventDispatcher::FreecfgInfo(CfgInfo* cfgInfo)
 {
     if (cfgInfo == nullptr) {
@@ -1016,10 +1097,10 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             HandleP2pPeerChange(callback, msg, pid, uid, tokenId);
             break;
         case WIFI_CBK_MSG_SERVICE_CHANGE:
-            callback->OnP2pServicesChanged(msg.serviceInfo);
+            HandleP2pServiceChange(callback, msg, pid, uid, tokenId);
             break;
         case WIFI_CBK_MSG_CONNECT_CHANGE:
-            callback->OnP2pConnectionChanged(msg.p2pInfo);
+            HandleP2pConnectChange(callback, msg, pid, uid, tokenId);
             break;
         case WIFI_CBK_MSG_DISCOVERY_CHANGE:
             callback->OnP2pDiscoveryChanged(msg.msgData);
@@ -1037,7 +1118,7 @@ void WifiInternalEventDispatcher::SendP2pCallbackMsg(sptr<IWifiP2pCallback> &cal
             SendConfigChangeEvent(callback, msg.cfgInfo);
             break;
         case WIFI_CBK_MSG_PRIVATE_PEER_CHANGE:
-            callback->OnP2pPrivatePeersChanged(msg.privateWfdInfo);
+            HandleP2pPrivatePeerChange(callback, msg, pid, uid, tokenId);
             break;
         case WIFI_CBK_MSG_P2P_CHR_ERRCODE_REPORT:
             callback->OnP2pChrErrCodeReport(msg.errCode);

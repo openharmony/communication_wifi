@@ -61,6 +61,8 @@ public:
 
     int VerifyGetWifiPeersMacPermissionEx(const int &pid, const int &uid, const int &tokenId);
 
+    int VerifyGetWifiLocalMacPermissionEx(const int &pid, const int &uid, const int &tokenId);
+
     int VerifyGetWifiInfoInternalPermission(const int &pid, const int &uid);
 
     int VerifyManageWifiHotspotExtPermission(const int &pid, const int &uid);

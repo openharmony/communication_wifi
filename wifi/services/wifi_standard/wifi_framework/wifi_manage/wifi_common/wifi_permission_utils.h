@@ -28,6 +28,7 @@ public:
     static int VerifyWifiConnectionPermission();
     static int VerifyGetScanInfosPermission();
     static int VerifyGetWifiLocalMacPermission();
+    static int VerifyGetWifiLocalMacPermissionEx(const int &pid, const int &uid, const int &tokenId);
     static int VerifySetWifiConfigPermission();
     static int VerifyGetWifiConfigPermission();
     static int VerifyGetWifiDirectDevicePermission();

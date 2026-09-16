@@ -56,6 +56,11 @@ int WifiPermissionUtils::VerifyGetWifiLocalMacPermission()
     return PERMISSION_GRANTED;
 }
 
+int WifiPermissionUtils::VerifyGetWifiLocalMacPermissionEx(const int &pid, const int &uid, const int &tokenId)
+{
+    return PERMISSION_GRANTED;
+}
+
 int WifiPermissionUtils::VerifySetWifiConfigPermission()
 {
     return PERMISSION_GRANTED;
@@ -136,6 +141,11 @@ int WifiPermissionUtils::VerifyGetWifiLocalMacPermission()
 {
     return WifiAuthCenter::GetInstance().VerifyGetWifiLocalMacPermission(
         IPCSkeleton::GetCallingPid(), IPCSkeleton::GetCallingUid());
+}
+
+int WifiPermissionUtils::VerifyGetWifiLocalMacPermissionEx(const int &pid, const int &uid, const int &tokenId)
+{
+    return WifiAuthCenter::GetInstance().VerifyGetWifiLocalMacPermissionEx(pid, uid, tokenId);
 }
 
 int WifiPermissionUtils::VerifySetWifiConfigPermission()

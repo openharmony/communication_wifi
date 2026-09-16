@@ -26,7 +26,7 @@ import {
   getUrl, bindToNetById, extractDomain, exitApp, shouldShowBrowseItem, UserAgentSet,
   validateURL, getIsInOOBE, getHmosUAComplexRegex, StringNumberPair, getRetryList, getDefaultUrl, modifyCode,
   convertToPermissions, reqPermissionsFromUser, modifyUserAgent, UserAgentCompatibleInfo, preventEnterKeyScript,
-  modifyInputTypeAndScaleCode, centerCode
+  modifyInputTypeCode
 } from '../common/utils';
 import {
   updateFinalUrl, updateOnHttpErrorReceive, updateOnErrorReceive, updateOnSslErrorEvent, updateAboutToDisappear,
@@ -102,8 +102,6 @@ struct Index {
   private mobileUA: string = UserAgentSet.mobileUA;
   private desktopUA:string = UserAgentSet.desktopUA;
   @State private selectedUA: string = this.harmonyUA; // default use harmony UA
-  @State private lastSelectedUA: string = this.selectedUA;
-  @State private lastUrl: string = '';
   @State private isMenuVisible: boolean = false;
   @State private isSelectUASheetVisible: boolean = false;
   @State private adaptPadding: number = 16;
@@ -389,10 +387,6 @@ struct Index {
               onDisappear: () => {
                 try {
                   this.webviewController.setCustomUserAgent(this.selectedUA);
-                  if (this.lastSelectedUA !== this.selectedUA) {
-                    this.lastUrl = '';
-                    this.lastSelectedUA = this.selectedUA;
-                  }
                   this.webviewController.refresh();
                 } catch (error) {
                   hilog.error(DOMAIN, TAG, '%{public}s',
@@ -532,11 +526,6 @@ struct Index {
             hilog.info(DOMAIN, TAG, 'overviewMode:%{public}s', this.overviewMode);
             this.harmonyUA = this.setUA(this.harmonyUARaw);
             this.selectedUA = this.harmonyUA;
-            if (this.isWearable) {
-              this.selectedUA = this.mobileUA;
-              hilog.info(DOMAIN, TAG, 'wearable set defalut UA to mobileUA');
-            }
-            this.lastSelectedUA = this.selectedUA;
             this.webviewController.setCustomUserAgent(this.selectedUA);
           } catch (error) {
             hilog.error(DOMAIN, TAG, '%{public}s', `Failed to get UA. Code:${error.code}, message:${error.message}`);
@@ -557,7 +546,6 @@ struct Index {
           if (this.selectedUA === this.harmonyUA) {
             this.harmonyUA = this.setUA(this.harmonyUARaw);
             this.selectedUA = this.harmonyUA;
-            this.lastSelectedUA = this.selectedUA;
             try {
               this.webviewController.setCustomUserAgent(this.selectedUA);
               hilog.info(DOMAIN, TAG, '%{public}s', 'setCustomUserAgent enter.');
@@ -588,10 +576,10 @@ struct Index {
         .onPageEnd((event) => {
           this.loadProgress = 100;
           this.renderExitRetryCount = 0;
-          if (this.isWearable) { // 穿戴设备调整默认缩放大小
+          if (this.isWearable) {
             try {
-              this.webviewController.runJavaScript(modifyInputTypeAndScaleCode);
-              hilog.info(DOMAIN, TAG, '%{public}s', 'runJavaScript modifyInputTypeAndScaleCode enter.');
+              this.webviewController.runJavaScript(modifyInputTypeCode);
+              hilog.info(DOMAIN, TAG, '%{public}s', 'runJavaScript modifyInputTypeCode enter.');
             } catch (error) {
               hilog.error(DOMAIN, TAG, '%{public}s',
                 `onPageEnd wearable runJavaScript fail: Code:${error.code}, message:${error.message}`);
@@ -600,18 +588,6 @@ struct Index {
           if (event) {
             this.webUrl = event.url;
             hilog.info(DOMAIN, TAG, '%{public}s', 'Url:' + safeAnonymize(this.webUrl));
-            if (this.isWearable) { // 穿戴设备每次切换UA后对网页进行水平居中
-              try {
-                if (this.lastUrl !== this.webUrl) {
-                  this.webviewController.runJavaScript(centerCode);
-                  this.lastUrl = this.webUrl;
-                  hilog.info(DOMAIN, TAG, '%{public}s', 'runJavaScript centerCode enter.');
-                }
-              } catch (error) {
-                hilog.error(DOMAIN, TAG, '%{public}s',
-                  `onPageEnd wearable runJavaScript center fail: Code:${error.code}, message:${error.message}`);
-              }
-            }
             try {
               wifiManager.startWifiDetection();
               hilog.info(DOMAIN, TAG, '%{public}s', 'onPageEnd startWifiDetection');

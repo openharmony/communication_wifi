@@ -2229,6 +2229,7 @@ NO_SANITIZE("cfi") napi_value EnableHiLinkHandshake(napi_env env, napi_callback_
     napi_value argv[argc];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));
+    WIFI_NAPI_ASSERT(env, argc >= 3, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);
     napi_valuetype valueType;
     napi_typeof(env, argv[2], &valueType);
     WIFI_NAPI_ASSERT(env, valueType == napi_object, WIFI_OPT_INVALID_PARAM, SYSCAP_WIFI_STA);

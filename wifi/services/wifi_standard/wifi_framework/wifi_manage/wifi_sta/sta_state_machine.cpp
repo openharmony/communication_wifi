@@ -163,6 +163,7 @@ constexpr int32_t MAX_NO_INTERNET_CNT = 3;
 constexpr uint32_t PKT_DIR_RPT_CNT = 3;
 constexpr int32_t DETECT_COUNT = 2;
 constexpr int64_t ROAM_SCAN_MAX_AGE_US = 20 * 1000 * 1000;  // 20s
+constexpr int32_t RSSI_THRESHOLD_SWITCH_CELL = -80;
 
 const std::map<int, int> wpa3FailreasonMap {
     {WLAN_STATUS_AUTH_TIMEOUT, WPA3_AUTH_TIMEOUT},
@@ -5456,10 +5457,17 @@ void StaStateMachine::UpdateLinkRssi(const WifiSignalPollInfo &signalInfo, int f
 
     if (linkedInfo.rssi != INVALID_RSSI_VALUE) {
         currentSignalLevel = WifiSettings::GetInstance().GetSignalLevel(linkedInfo.rssi, linkedInfo.band, m_instId);
-        if (currentSignalLevel != lastSignalLevel_) {
+        bool isReachRssiThre = (linkedInfo.rssi <= RSSI_THRESHOLD_SWITCH_CELL);
+        if (currentSignalLevel != lastSignalLevel_ || (!isNoticeReachRssiThre_ && isReachRssiThre)) {
             WifiConfigCenter::GetInstance().SaveLinkedInfo(linkedInfo, m_instId);
             InvokeOnStaRssiLevelChanged(linkedInfo.rssi);
             lastSignalLevel_ = currentSignalLevel;
+            if (!isNoticeReachRssiThre_ && isReachRssiThre) {
+                isNoticeReachRssiThre_ = true;
+            }
+        }
+        if (!isReachRssiThre && isNoticeReachRssiThre_) {
+            isNoticeReachRssiThre_ = false;
         }
     }
 

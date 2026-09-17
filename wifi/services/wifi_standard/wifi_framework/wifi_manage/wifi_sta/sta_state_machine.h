@@ -1219,6 +1219,7 @@ private:
     WifiDataReportService *wifiDataReportService_ = nullptr;
 #endif
 #endif
+    bool isNoticeReachRssiThre_ = false;
 };
 }  // namespace Wifi
 }  // namespace OHOS

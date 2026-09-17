@@ -253,19 +253,19 @@ export const preventEnterKeyScript = `
 `;
 
 export function loadUAWhiteList(context: common.Context): void {
-  let file: fs.File | undefined = undefined;
   try {
     const rawContent: Uint8Array = context.resourceManager.getRawFileContentSync('config.json');
     const decoder = util.TextDecoder.create('utf-8');
     const jsonString = decoder.decodeToString(rawContent);
     const config = JSON.parse(jsonString) as object;
     const filePath: string = config?.['configPath'];
-    file = fs.openSync(filePath, fs.OpenMode.READ_ONLY);
+    let file = fs.openSync(filePath, fs.OpenMode.READ_ONLY);
     hilog.info(DOMAIN, TAG, '%{public}s', 'loadUAWhiteList success open file');
     const stat = fs.statSync(file.fd);
     const fileSize = stat.size;
     let buf = new ArrayBuffer(fileSize);
     fs.readSync(file.fd, buf);
+    fs.closeSync(file.fd);
     let bufU8 = new Uint8Array(buf, 0, buf.byteLength);
     const jsonRaw = decoder.decodeToString(bufU8);
     const jsonConfig = JSON.parse(jsonRaw) as object;
@@ -284,10 +284,6 @@ export function loadUAWhiteList(context: common.Context): void {
   } catch (err) {
     hilog.error(DOMAIN, 'TAG', '%{public}s', 'Failed loadUAWhiteList error message: ' + err.message +
       ', error code: ' + err.code);
-  } finally {
-    if (file !== undefined) {
-      fs.closeSync(file.fd);
-    }
   }
 }
  

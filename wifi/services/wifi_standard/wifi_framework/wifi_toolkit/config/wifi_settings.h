@@ -143,7 +143,7 @@ public:
     bool WhetherSetWhiteListConfig();
 #endif
 
-    int RemoveDevice(int networkId);
+    int RemoveDevice(int networkId, bool removeEapCert = true);
 
     void ClearDeviceConfig(void);
 

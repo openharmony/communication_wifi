@@ -38,7 +38,7 @@ public:
     virtual ~MockWifiSettings() = default;
     virtual int SetWifiState(int state, int instId = 0) = 0;
     virtual int AddDeviceConfig(const WifiDeviceConfig &config) = 0;
-    virtual int RemoveDevice(int networkId) = 0;
+    virtual int RemoveDevice(int networkId, bool removeEapCert = true) = 0;
     virtual void ClearDeviceConfig() = 0;
     virtual int GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId = 0) = 0;
     virtual int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config, int instId = 0) = 0;
@@ -235,7 +235,7 @@ public:
     static WifiSettings &GetInstance(void);
     MOCK_METHOD2(SetWifiState, int(int state, int));
     MOCK_METHOD1(AddDeviceConfig, int(const WifiDeviceConfig &config));
-    MOCK_METHOD1(RemoveDevice, int(int networkId));
+    MOCK_METHOD2(RemoveDevice, int(int networkId, bool removeEapCert));
     MOCK_METHOD0(ClearDeviceConfig, void());
     MOCK_METHOD2(GetDeviceConfig, int(std::vector<WifiDeviceConfig> &results, int));
     MOCK_METHOD3(GetDeviceConfig, int(const int &networkId, WifiDeviceConfig &config, int));

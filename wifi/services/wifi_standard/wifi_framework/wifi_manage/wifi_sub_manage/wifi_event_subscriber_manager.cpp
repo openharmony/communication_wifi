@@ -1058,7 +1058,7 @@ void NotificationEventSubscriber::HandleCandidateConnect(const OHOS::EventFwk::C
             WIFI_LOGE("OnReceiveNotificationEvent get config fail");
             return;
         }
-        WifiSettings::GetInstance().RemoveDevice(connectSettings.networkId);
+        WifiSettings::GetInstance().RemoveDevice(connectSettings.networkId, false);
         config.uid = -1;
         config.isEphemeral = false;
         pService->ConnectToDevice(config);

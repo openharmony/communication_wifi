@@ -326,12 +326,12 @@ void WifiSettings::SyncAfterDecryped(WifiDeviceConfig &config)
 #endif
 }
 
-int WifiSettings::RemoveDevice(int networkId)
+int WifiSettings::RemoveDevice(int networkId, bool removeEapCert)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto iter = mWifiDeviceConfig.find(networkId);
     if (iter != mWifiDeviceConfig.end()) {
-        if (!iter->second.wifiEapConfig.clientCert.empty()) {
+        if (removeEapCert && !iter->second.wifiEapConfig.clientCert.empty()) {
             if (WifiCertUtils::UninstallCert(iter->second.wifiEapConfig.clientCert) != 0) {
                 LOGE("uninstall cert %{public}s fail", iter->second.wifiEapConfig.clientCert.c_str());
             } else {

@@ -21,7 +21,6 @@
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 #include <iostream>
 #include <vector>
 #include <thread>
@@ -63,7 +62,7 @@ IfConfig::~IfConfig()
 bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
 {
     int argvSize = static_cast<int>(vecCommandArg.size());
-    if (argvSize <= 0 || argvSize > MAX_COMMAND_ARG) {
+    if (argvSize > MAX_COMMAND_ARG) {
         LOGE("IfConfig ExecCommand vecCommandArg size invalid.");
         return false;
     }
@@ -77,8 +76,6 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
             int pid = fork();
             if (pid == -1) {
                 LOGE("ifconfig fork child process failed.");
-                close(fd[0]);
-                close(fd[1]);
                 return;
             }
             if (pid == 0) {
@@ -90,9 +87,7 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
                 execveStr[i] = nullptr;
                 char *env[] = {nullptr};
                 close(fd[0]);
-                if (dup2(fd[1], STDOUT_FILENO) < 0) {
-                    _exit(EXECVE_EXT_COMMAND);
-                }
+                dup2(fd[1], STDOUT_FILENO);
                 close(fd[1]);
                 /* last member of execveStr should be nullptr */
                 if (execve(vecCommandArg[0].c_str(), const_cast<char* const*>(execveStr), env) < 0) {
@@ -104,8 +99,6 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
             FILE *fp = fdopen(fd[0], "r");
             if (fp == nullptr) {
                 LOGE("ifconfig fdopen failed.");
-                close(fd[0]);
-                waitpid(pid, nullptr, 0);
                 return;
             }
             char buffer[RECEIVE_BUFFER_LEN];
@@ -113,7 +106,6 @@ bool IfConfig::ExecCommand(const std::vector<std::string> &vecCommandArg)
                 LOGD("exec cmd receive: %{public}s", buffer);
             }
             fclose(fp);
-            waitpid(pid, nullptr, 0);
         }
     );
     t.detach();

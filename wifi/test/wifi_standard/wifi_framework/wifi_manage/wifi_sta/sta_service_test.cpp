@@ -615,7 +615,7 @@ void StaServiceTest::StaServiceRemoveCandidateConfigTestSucc()
     EXPECT_CALL(WifiSettings::GetInstance(), GetCandidateConfig(_, _, _))
     .WillRepeatedly(Return(0));
     EXPECT_CALL(WifiSettings::GetInstance(), GetDeviceConfig(_, _, _)).Times(AtLeast(0)).WillRepeatedly(Return(1));
-    EXPECT_CALL(WifiSettings::GetInstance(), RemoveDevice(_)).Times(AtLeast(1));
+    EXPECT_CALL(WifiSettings::GetInstance(), RemoveDevice(_, _)).Times(AtLeast(1));
     EXPECT_CALL(WifiSettings::GetInstance(), SyncDeviceConfig()).Times(AtLeast(1));
     pStaService->RemoveCandidateConfig(uid, networkId);
 }

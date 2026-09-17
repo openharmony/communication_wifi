@@ -38,7 +38,7 @@ public:
     virtual ~MockWifiSettings() = default;
     virtual int SetWifiState(int state, int instId = 0) = 0;
     virtual int AddDeviceConfig(const WifiDeviceConfig &config) = 0;
-    virtual int RemoveDevice(int networkId) = 0;
+    virtual int RemoveDevice(int networkId, bool removeEapCert = true) = 0;
     virtual void ClearDeviceConfig() = 0;
     virtual int GetDeviceConfig(std::vector<WifiDeviceConfig> &results, int instId = 0) = 0;
     virtual int GetDeviceConfig(const int &networkId, WifiDeviceConfig &config, int instId = 0) = 0;
@@ -57,7 +57,8 @@ public:
     virtual bool SetNetworkCandidateScanResult(int networkId) = 0;
     virtual int GetCandidateConfigWithoutUid(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config) = 0;
-    virtual int GetCandidateConfigWithoutUid(const int &networkId, WifiDeviceConfig &config) = 0;
+    virtual int GetCandidateConfigWithoutUid(const int &networkId, WifiDeviceConfig &config,
+        bool includeSharedConfig = false) = 0;
     virtual int SyncDeviceConfig() = 0;
     virtual int ReloadDeviceConfig() = 0;
     virtual int GetIpInfo(IpInfo &info, int instId = 0) = 0;
@@ -235,7 +236,7 @@ public:
     static WifiSettings &GetInstance(void);
     MOCK_METHOD2(SetWifiState, int(int state, int));
     MOCK_METHOD1(AddDeviceConfig, int(const WifiDeviceConfig &config));
-    MOCK_METHOD1(RemoveDevice, int(int networkId));
+    MOCK_METHOD2(RemoveDevice, int(int networkId, bool removeEapCert));
     MOCK_METHOD0(ClearDeviceConfig, void());
     MOCK_METHOD2(GetDeviceConfig, int(std::vector<WifiDeviceConfig> &results, int));
     MOCK_METHOD3(GetDeviceConfig, int(const int &networkId, WifiDeviceConfig &config, int));
@@ -254,7 +255,8 @@ public:
     MOCK_METHOD1(SetNetworkCandidateScanResult, bool(int networkId));
     MOCK_METHOD3(GetCandidateConfigWithoutUid, int(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config));
-    MOCK_METHOD2(GetCandidateConfigWithoutUid, int(const int &networkId, WifiDeviceConfig &config));
+    MOCK_METHOD3(GetCandidateConfigWithoutUid, int(const int &networkId, WifiDeviceConfig &config,
+        bool includeSharedConfig));
     MOCK_METHOD0(SyncDeviceConfig, int());
     MOCK_METHOD0(ReloadDeviceConfig, int());
     MOCK_METHOD2(GetIpInfo, int(IpInfo &info, int));

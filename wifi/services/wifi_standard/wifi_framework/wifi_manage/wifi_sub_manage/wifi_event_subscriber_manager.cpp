@@ -1054,11 +1054,11 @@ void NotificationEventSubscriber::HandleCandidateConnect(const OHOS::EventFwk::C
     }
     if (connectSettings.addNetworkToSystem) {
         WifiDeviceConfig config;
-        if (WifiSettings::GetInstance().GetCandidateConfigWithoutUid(connectSettings.networkId, config) == -1) {
+        if (WifiSettings::GetInstance().GetCandidateConfigWithoutUid(connectSettings.networkId, config, true) == -1) {
             WIFI_LOGE("OnReceiveNotificationEvent get config fail");
             return;
         }
-        WifiSettings::GetInstance().RemoveDevice(connectSettings.networkId);
+        WifiSettings::GetInstance().RemoveDevice(connectSettings.networkId, false);
         config.uid = -1;
         config.isEphemeral = false;
         pService->ConnectToDevice(config);

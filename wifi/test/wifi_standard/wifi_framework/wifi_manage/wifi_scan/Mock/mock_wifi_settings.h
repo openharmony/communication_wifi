@@ -40,7 +40,7 @@ public:
     virtual int GetPackageInfoMap(std::map<std::string, std::vector<PackageInfo>> &filterMap) = 0;
     virtual int GetSignalLevel(const int &rssi, const int &band, int instId = 0) = 0;
     virtual int SyncDeviceConfig() = 0;
-    virtual int RemoveDevice(int networkId) = 0;
+    virtual int RemoveDevice(int networkId, bool removeEapCert = true) = 0;
     virtual int GetAllCandidateConfig(const int uid, std::vector<WifiDeviceConfig> &configs) = 0;
     virtual int SetAcceptUnvalidated(int networkId) = 0;
     virtual int SetWifiFlagOnAirplaneMode(bool ifOpen, int instId = 0) = 0;
@@ -68,7 +68,7 @@ public:
     MOCK_METHOD1(GetPackageInfoMap,  int(std::map<std::string, std::vector<PackageInfo>> &filterMap));
     MOCK_METHOD3(GetSignalLevel, int(const int &rssi, const int &band, int));
     MOCK_METHOD0(SyncDeviceConfig, int());
-    MOCK_METHOD1(RemoveDevice, int(int networkId));
+    MOCK_METHOD2(RemoveDevice, int(int networkId, bool removeEapCert));
     MOCK_METHOD2(GetAllCandidateConfig, int(const int uid, std::vector<WifiDeviceConfig> &configs));
     MOCK_METHOD1(SetAcceptUnvalidated, int(int networkId));
     MOCK_METHOD2(SetWifiFlagOnAirplaneMode, int(bool ifOpen, int instId));

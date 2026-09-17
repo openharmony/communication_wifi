@@ -326,12 +326,12 @@ void WifiSettings::SyncAfterDecryped(WifiDeviceConfig &config)
 #endif
 }
 
-int WifiSettings::RemoveDevice(int networkId)
+int WifiSettings::RemoveDevice(int networkId, bool removeEapCert)
 {
     std::unique_lock<std::mutex> lock(mStaMutex);
     auto iter = mWifiDeviceConfig.find(networkId);
     if (iter != mWifiDeviceConfig.end()) {
-        if (!iter->second.wifiEapConfig.clientCert.empty()) {
+        if (removeEapCert && !iter->second.wifiEapConfig.clientCert.empty()) {
             if (WifiCertUtils::UninstallCert(iter->second.wifiEapConfig.clientCert) != 0) {
                 LOGE("uninstall cert %{public}s fail", iter->second.wifiEapConfig.clientCert.c_str());
             } else {
@@ -742,10 +742,10 @@ int WifiSettings::GetCandidateConfig(const int uid, const int &networkId, WifiDe
     return -1;
 }
 
-int WifiSettings::GetCandidateConfigWithoutUid(const int &networkId, WifiDeviceConfig &config)
+int WifiSettings::GetCandidateConfigWithoutUid(const int &networkId, WifiDeviceConfig &config, bool includeSharedConfig)
 {
     std::vector<WifiDeviceConfig> configs;
-    if (GetAllCandidateConfigWithoutUid(configs) != 0) {
+    if (GetAllCandidateConfigWithoutUid(configs, includeSharedConfig) != 0) {
         return -1;
     }
 
@@ -758,7 +758,7 @@ int WifiSettings::GetCandidateConfigWithoutUid(const int &networkId, WifiDeviceC
     return -1;
 }
 
-int WifiSettings::GetAllCandidateConfigWithoutUid(std::vector<WifiDeviceConfig> &configs)
+int WifiSettings::GetAllCandidateConfigWithoutUid(std::vector<WifiDeviceConfig> &configs, bool includeSharedConfig)
 {
     if (!deviceConfigLoadFlag.test_and_set()) {
         LOGD("Reload wifi config");
@@ -768,7 +768,7 @@ int WifiSettings::GetAllCandidateConfigWithoutUid(std::vector<WifiDeviceConfig> 
     std::unique_lock<std::mutex> lock(mStaMutex);
     bool found = false;
     for (auto iter = mWifiDeviceConfig.begin(); iter != mWifiDeviceConfig.end(); iter++) {
-        if (iter->second.uid != -1 && !iter->second.isShared) {
+        if (iter->second.uid != -1 && (includeSharedConfig || !iter->second.isShared)) {
             configs.push_back(iter->second);
             found = true;
         }

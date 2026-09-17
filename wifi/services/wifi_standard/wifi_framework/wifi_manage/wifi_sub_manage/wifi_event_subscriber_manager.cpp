@@ -1054,7 +1054,7 @@ void NotificationEventSubscriber::HandleCandidateConnect(const OHOS::EventFwk::C
     }
     if (connectSettings.addNetworkToSystem) {
         WifiDeviceConfig config;
-        if (WifiSettings::GetInstance().GetCandidateConfigWithoutUid(connectSettings.networkId, config) == -1) {
+        if (WifiSettings::GetInstance().GetCandidateConfigWithoutUid(connectSettings.networkId, config, true) == -1) {
             WIFI_LOGE("OnReceiveNotificationEvent get config fail");
             return;
         }

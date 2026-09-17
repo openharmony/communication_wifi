@@ -57,7 +57,8 @@ public:
     virtual bool SetNetworkCandidateScanResult(int networkId) = 0;
     virtual int GetCandidateConfigWithoutUid(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config) = 0;
-    virtual int GetCandidateConfigWithoutUid(const int &networkId, WifiDeviceConfig &config) = 0;
+    virtual int GetCandidateConfigWithoutUid(const int &networkId, WifiDeviceConfig &config,
+        bool includeSharedConfig = false) = 0;
     virtual int SyncDeviceConfig() = 0;
     virtual int ReloadDeviceConfig() = 0;
     virtual int GetIpInfo(IpInfo &info, int instId = 0) = 0;
@@ -254,7 +255,8 @@ public:
     MOCK_METHOD1(SetNetworkCandidateScanResult, bool(int networkId));
     MOCK_METHOD3(GetCandidateConfigWithoutUid, int(const std::string &ssid, const std::string &keymgmt,
         WifiDeviceConfig &config));
-    MOCK_METHOD2(GetCandidateConfigWithoutUid, int(const int &networkId, WifiDeviceConfig &config));
+    MOCK_METHOD3(GetCandidateConfigWithoutUid, int(const int &networkId, WifiDeviceConfig &config,
+        bool includeSharedConfig));
     MOCK_METHOD0(SyncDeviceConfig, int());
     MOCK_METHOD0(ReloadDeviceConfig, int());
     MOCK_METHOD2(GetIpInfo, int(IpInfo &info, int));

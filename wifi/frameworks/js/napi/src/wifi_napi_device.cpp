@@ -33,7 +33,6 @@
 #define DNS_LENGTH 128
 // Number of Domains
 #define DOMAINS_NUM 1
-#define PARAMS_NUM 3
 
 namespace OHOS {
 namespace Wifi {
@@ -2227,6 +2226,7 @@ NO_SANITIZE("cfi") napi_value EnableHiLinkHandshake(napi_env env, napi_callback_
 {
     TRACE_FUNC_CALL;
     size_t argc = 3;
+    const int PARAMS_NUM = 3;
     napi_value argv[argc];
     napi_value thisVar;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, NULL));

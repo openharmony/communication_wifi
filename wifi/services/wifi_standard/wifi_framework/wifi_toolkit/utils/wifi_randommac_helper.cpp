@@ -274,6 +274,10 @@ int WifiRandomMacHelper::GenerateRandomMacAddressByLong(unsigned long long rando
 
 bool WifiRandomMacHelper::GetWifi2RandomMac(std::string &wifi2RandomMac)
 {
+    if (wifi2RandomMac.size() < (WIFI2_RANDOM_MAC_CHANGE_POS + WIFI2_RANDOM_MAC_CHANGE_LEN)) {
+        WIFI_LOGE("%{public}s invalid mac length", __func__);
+        return false;
+    }
     std::string inputStrMac = wifi2RandomMac.substr(WIFI2_RANDOM_MAC_CHANGE_POS, WIFI2_RANDOM_MAC_CHANGE_LEN);
     std::stringstream inputSsMac;
     inputSsMac << std::hex <<inputStrMac;

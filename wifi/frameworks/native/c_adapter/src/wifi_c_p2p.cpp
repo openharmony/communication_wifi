@@ -240,10 +240,10 @@ static OHOS::Wifi::ErrCode ConvertGroupInfoCppToC(const OHOS::Wifi::WifiP2pGroup
     if (cppGroup.GetPassphrase().size() >= PASSPHRASE_LENGTH) {
         WIFI_LOGE("passwork len is invaild");
         if (memcpy_s(group->passphrase, PASSPHRASE_LENGTH,
-            cppGroup.GetPassphrase().c_str(), PASSPHRASE_LENGTH) != EOK) {
-            WIFI_LOGE("memcpy_s passphrase failed!");
+            cppGroup.GetPassphrase().c_str(), PASSPHRASE_LENGTH - 1) != EOK) {
             return OHOS::Wifi::WIFI_OPT_FAILED;
         }
+        group->passphrase[PASSPHRASE_LENGTH - 1] = STR_END;
     } else {
         if (memcpy_s(group->passphrase, PASSPHRASE_LENGTH,
             cppGroup.GetPassphrase().c_str(), cppGroup.GetPassphrase().size()) != EOK) {

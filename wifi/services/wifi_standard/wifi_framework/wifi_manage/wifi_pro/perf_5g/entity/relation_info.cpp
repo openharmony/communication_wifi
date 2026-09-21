@@ -171,7 +171,13 @@ int RelationInfo::GetSameApScanRssiThreshold(int switchRssiThreshold)
         WIFI_LOGW("%{public}s, sameApTriggerScanRssiThreshold_ is empty, return 0", __FUNCTION__);
         return 0;
     }
-    return sameApTriggerScanRssiThreshold_[switchRssiThreshold - RSSI_RANGE_LOW_DBM];
+    size_t index = static_cast<size_t>(switchRssiThreshold - RSSI_RANGE_LOW_DBM);
+    if (index >= sameApTriggerScanRssiThreshold_.size()) {
+        WIFI_LOGW("%{public}s, index(%{public}zu) out of range, size(%{public}zu), return 0",
+            __FUNCTION__, index, sameApTriggerScanRssiThreshold_.size());
+        return 0;
+    }
+    return sameApTriggerScanRssiThreshold_[index];
 }
 
 }  // namespace Wifi

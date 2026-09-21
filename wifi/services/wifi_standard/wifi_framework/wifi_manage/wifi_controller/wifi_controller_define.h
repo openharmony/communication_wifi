@@ -139,6 +139,7 @@ enum class SoftApChrEventType {
     SOFT_AP_OPEN_SUC_CNT,
     SOFT_AP_CONN_CNT,
     SOFT_AP_CONN_SUC_CNT,
+    SOFT_AP_CLOSE_SUC_CNT,
 };
 
 }  // namespace Wifi

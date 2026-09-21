@@ -230,6 +230,8 @@ public:
 
     ErrCode GetWifiCapability(int capability, bool &enabled) override;
 
+    ErrCode GetSpecialWifiType(int &specialWifiType) override;
+
     ErrCode IsWlanSupported(bool &isSupported) override;
 private:
     bool Init();

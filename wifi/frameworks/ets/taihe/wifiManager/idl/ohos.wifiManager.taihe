@@ -27,6 +27,11 @@ enum WifiCapability: i32 {
     WIFI_AUTO_ENABLE = 0
 }
 
+enum SpecialWifiType: i32 {
+    DEFAULT = 0,
+    AIRPLANE_WIFI_CEAIR = 1001
+}
+
 enum EapMethod: i32 {
     EAP_NONE = 0,
     EAP_PEAP = 1,
@@ -481,6 +486,7 @@ function IsWlanSupported(): bool;
 
 function SetWifiCapability(capability: WifiCapability, enable: bool): void;
 function GetWifiCapability(capability: WifiCapability): bool;
+function GetSpecialWifiType(): SpecialWifiType;
 
 @gen_promise("connectToCandidateConfigWithUserAction")
 function ConnectToCandidateConfigWithUserActionSync(networkId: i32): void;

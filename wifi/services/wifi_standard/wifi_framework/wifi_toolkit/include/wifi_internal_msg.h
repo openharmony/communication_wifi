@@ -149,6 +149,11 @@ enum class WifiCapability {
     WIFI_AUTO_ENABLE = 0,
 };
 
+enum class SpecialWifiType {
+    DEFAULT = 0,
+    AIRPLANE_WIFI_CEAIR = 1001,
+};
+
 struct WifiCallingInfo {
     int callingUid;
     int callingPid;

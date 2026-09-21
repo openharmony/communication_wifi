@@ -308,6 +308,17 @@ static napi_value WifiCapabilityInit(napi_env env)
         static_cast<int>(WifiCapabilityJs::WIFI_AUTO_ENABLE), "WIFI_AUTO_ENABLE");
     return wifiCapability;
 }
+
+static napi_value SpecialWifiTypeInit(napi_env env)
+{
+    napi_value specialWifiType = nullptr;
+    napi_create_object(env, &specialWifiType);
+    SetNamedPropertyByInteger(env, specialWifiType,
+        static_cast<int>(SpecialWifiTypeJs::DEFAULT), "DEFAULT");
+    SetNamedPropertyByInteger(env, specialWifiType,
+        static_cast<int>(SpecialWifiTypeJs::AIRPLANE_WIFI_CEAIR), "AIRPLANE_WIFI_CEAIR");
+    return specialWifiType;
+}
 #endif
 
 static napi_value PropertyValueInit(napi_env env, napi_value exports)
@@ -336,6 +347,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
     napi_value wifiLinkTypeObj = WifiLinkTypeInit(env);
     napi_value wifiDetailStateObj = WifiDetailStateInit(env);
     napi_value wifiCapabilityObj = WifiCapabilityInit(env);
+    napi_value specialWifiTypeObj = SpecialWifiTypeInit(env);
 #endif
     napi_property_descriptor exportFuncs[] = {
 #ifdef ENABLE_NAPI_WIFI_MANAGER
@@ -350,6 +362,7 @@ static napi_value PropertyValueInit(napi_env env, napi_value exports)
         DECLARE_NAPI_PROPERTY("WifiLinkType", wifiLinkTypeObj),
         DECLARE_NAPI_PROPERTY("WifiDetailState", wifiDetailStateObj),
         DECLARE_NAPI_PROPERTY("WifiCapability", wifiCapabilityObj),
+        DECLARE_NAPI_PROPERTY("SpecialWifiType", specialWifiTypeObj),
 #endif
         DECLARE_NAPI_PROPERTY("SuppState", suppStateObj),
         DECLARE_NAPI_PROPERTY("WifiSecurityType", securityTypeObj),
@@ -476,6 +489,7 @@ static napi_value Init(napi_env env, napi_value exports) {
         DECLARE_NAPI_FUNCTION("isRandomMacDisabled", IsRandomMacDisabled),
         DECLARE_NAPI_FUNCTION("setWifiCapability", SetWifiCapability),
         DECLARE_NAPI_FUNCTION("getWifiCapability", GetWifiCapability),
+        DECLARE_NAPI_FUNCTION("getSpecialWifiType", GetSpecialWifiType),
     };
 
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(napi_property_descriptor), desc));

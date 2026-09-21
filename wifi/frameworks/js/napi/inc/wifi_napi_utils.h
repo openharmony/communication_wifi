@@ -336,6 +336,11 @@ enum class WifiCapabilityJs {
     WIFI_AUTO_ENABLE = 0,
 };
 
+enum class SpecialWifiTypeJs {
+    DEFAULT = 0,
+    AIRPLANE_WIFI_CEAIR = 1001,
+};
+
 }  // namespace Wifi
 }  // namespace OHOS
 

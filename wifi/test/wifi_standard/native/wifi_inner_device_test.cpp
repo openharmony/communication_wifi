@@ -246,5 +246,16 @@ HWTEST_F(WifiInnerDeviceTest, ResetAllFrozenAppTest, TestSize.Level1)
     WIFI_LOGE("ResetAllFrozenAppTest result(0x%{public}x)", result);
     EXPECT_GE(result, WIFI_OPT_SUCCESS);
 }
+
+HWTEST_F(WifiInnerDeviceTest, GetSpecialWifiTypeTest, TestSize.Level1)
+{
+    WIFI_LOGE("GetSpecialWifiTypeTest enter!");
+    EXPECT_TRUE(devicePtr != nullptr);
+    int specialWifiType = -1;
+    ErrCode result = devicePtr->GetSpecialWifiType(specialWifiType);
+    WIFI_LOGE("GetSpecialWifiTypeTest result(0x%{public}x)", result);
+    EXPECT_TRUE(result == WIFI_OPT_SUCCESS || result == WIFI_OPT_FAILED ||
+        result == WIFI_OPT_NON_SYSTEMAPP || result == WIFI_OPT_PERMISSION_DENIED);
+}
 } // namespace Wifi
 } // namespace OHOS

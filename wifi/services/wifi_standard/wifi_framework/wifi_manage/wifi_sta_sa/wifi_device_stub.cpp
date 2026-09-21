@@ -163,6 +163,8 @@ void WifiDeviceStub::InitHandleMapEx2()
         MessageParcel &data, MessageParcel &reply) { OnSetWifiCapability(code, data, reply); };
     handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_WIFI_CAPABILITY)] = [this](uint32_t code,
         MessageParcel &data, MessageParcel &reply) { OnGetWifiCapability(code, data, reply); };
+    handleFuncMap[static_cast<uint32_t>(DevInterfaceCode::WIFI_SVR_CMD_GET_SPECIAL_WIFI_TYPE)] = [this](uint32_t code,
+        MessageParcel &data, MessageParcel &reply) { OnGetSpecialWifiType(code, data, reply); };
     InitHandleMapEx3();
     return;
 }
@@ -1735,6 +1737,21 @@ void WifiDeviceStub::OnGetWifiCapability(uint32_t code, MessageParcel &data, Mes
 
     if (ret == WIFI_OPT_SUCCESS) {
         reply.WriteBool(enabled);
+    }
+
+    return;
+}
+
+void WifiDeviceStub::OnGetSpecialWifiType(uint32_t code, MessageParcel &data, MessageParcel &reply)
+{
+    WIFI_LOGD("run %{public}s code %{public}u, datasize %{public}zu", __func__, code, data.GetRawDataSize());
+    int specialWifiType = 0;
+    int ret = GetSpecialWifiType(specialWifiType);
+    reply.WriteInt32(0);
+    reply.WriteInt32(ret);
+
+    if (ret == WIFI_OPT_SUCCESS) {
+        reply.WriteInt32(specialWifiType);
     }
 
     return;

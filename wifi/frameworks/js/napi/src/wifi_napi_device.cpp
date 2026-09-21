@@ -2347,14 +2347,14 @@ NO_SANITIZE("cfi") napi_value GetWifiCapability(napi_env env, napi_callback_info
 NO_SANITIZE("cfi") napi_value GetSpecialWifiType(napi_env env, napi_callback_info info)
 {
     TRACE_FUNC_CALL;
-    WIFI_NAPI_RETURN_NUM_CODE(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
+    WIFI_NAPI_ASSERT(env, wifiDevicePtr != nullptr, WIFI_OPT_FAILED, SYSCAP_WIFI_STA);
 
     int specialWifiType = 0;
     ErrCode ret = wifiDevicePtr->GetSpecialWifiType(specialWifiType);
     if (ret != WIFI_OPT_SUCCESS) {
         WIFI_LOGE("Get special wifi type fail: %{public}d", ret);
-        WIFI_NAPI_RETURN_NUM_CODE(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
     }
+    WIFI_NAPI_ASSERT(env, ret == WIFI_OPT_SUCCESS, ret, SYSCAP_WIFI_STA);
 
     napi_value result;
     napi_create_int32(env, specialWifiType, &result);

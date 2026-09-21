@@ -2994,6 +2994,8 @@ ErrCode WifiDeviceServiceImpl::GetSpecialWifiType(int &specialWifiType)
     if (linkedInfo.ssid == "CEAIR-WIFI") {
         specialWifiType = static_cast<int>(SpecialWifiType::AIRPLANE_WIFI_CEAIR);
     }
+    WIFI_LOGI("GetSpecialWifiType:ssid=%{public}s, specialWifiType=%{public}d",
+        SsidAnonymize(linkedInfo.ssid).c_str(), specialWifiType);
     return WIFI_OPT_SUCCESS;
 }
 

@@ -762,6 +762,13 @@ ErrCode WifiDeviceImpl::GetWifiCapability(int capability, bool &enabled)
     return client_->GetWifiCapability(capability, enabled);
 }
 
+ErrCode WifiDeviceImpl::GetSpecialWifiType(int &specialWifiType)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    RETURN_IF_FAIL(GetWifiDeviceProxy());
+    return client_->GetSpecialWifiType(specialWifiType);
+}
+
 ErrCode WifiDeviceImpl::IsWlanSupported(bool &isSupported)
 {
     std::lock_guard<std::mutex> lock(mutex_);

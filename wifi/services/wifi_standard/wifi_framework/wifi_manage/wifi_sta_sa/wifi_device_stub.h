@@ -117,6 +117,7 @@ private:
     void OnSetBtCoexistState(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnSetWifiCapability(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnGetWifiCapability(uint32_t code, MessageParcel &data, MessageParcel &reply);
+    void OnGetSpecialWifiType(uint32_t code, MessageParcel &data, MessageParcel &reply);
     void OnIsWlanSupported(uint32_t code, MessageParcel &data, MessageParcel &reply);
     
 private:

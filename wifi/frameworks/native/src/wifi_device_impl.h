@@ -744,6 +744,14 @@ public:
     ErrCode GetWifiCapability(int capability, bool &enabled) override;
 
     /**
+     * @Description Get special wifi type
+     *
+     * @param specialWifiType - output special wifi type
+     * @return ErrCode - operation result
+     */
+    ErrCode GetSpecialWifiType(int &specialWifiType) override;
+
+    /**
      * @Description Check whether WiFi hardware module is present and supported
      *
      * @param isSupported - [out] whether WiFi hardware is supported

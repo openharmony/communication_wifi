@@ -134,7 +134,8 @@ struct Index {
   private sslErrorHandlers: SslErrorHandler[] = [];
   private sslUserDecision: number = -1;
   private swipeStartX: number = -1;
-
+  private webviewError: number = 0;
+  
   @Builder
   ContextMenu() {
     Menu() {

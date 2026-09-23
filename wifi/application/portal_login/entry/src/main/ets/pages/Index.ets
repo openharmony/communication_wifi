@@ -95,7 +95,9 @@ enum DeviceType {
 @Component
 struct Index {
   private webviewController: webview.WebviewController = new webview.WebviewController();
-  private netConnect: connection.NetConnection = connection.createNetConnection();
+  private netConnect: connection.NetConnection = connection.createNetConnection(
+    netCapabilities: {bearerTypes: [connection.NetBearType.BEARER_WIFI]}
+  );
   private context = getContext(this) as common.UIAbilityContext;
   @State private webUrl: string = getUrl();
   private defaultUrl: string = getDefaultUrl();

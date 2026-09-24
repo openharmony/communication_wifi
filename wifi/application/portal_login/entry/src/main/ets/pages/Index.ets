@@ -650,9 +650,10 @@ struct Index {
         })
         .onErrorReceive((event) => {
           if (event) {
-            updateOnErrorReceive(event.error.getErrorCode());
+            this.webviewError = event.error.getErrorCode();
+            updateOnErrorReceive(this.webviewError);
             hilog.info(DOMAIN, TAG, 'getErrorInfo:' + event.error.getErrorInfo());
-            hilog.info(DOMAIN, TAG, 'getErrorCode:' + event.error.getErrorCode());
+            hilog.info(DOMAIN, TAG, 'getErrorCode:' + this.webviewError);
           }
         })
         .onSslErrorEvent((event) => {

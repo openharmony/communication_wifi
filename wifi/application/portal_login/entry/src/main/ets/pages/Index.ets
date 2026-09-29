@@ -22,6 +22,7 @@ import { SymbolGlyphModifier, window, CustomContentDialog } from '@kit.ArkUI';
 import { wifiManager } from '@kit.ConnectivityKit';
 import { call } from '@kit.TelephonyKit';
 import { inputMethodEngine } from '@kit.IMEKit';
+import { connection } from '@kit.NetworkKit';
 import {
   getUrl, bindToNetById, extractDomain, exitApp, shouldShowBrowseItem, UserAgentSet,
   validateURL, getIsInOOBE, getHmosUAComplexRegex, StringNumberPair, getRetryList, getDefaultUrl, modifyCode,
@@ -94,6 +95,8 @@ enum DeviceType {
 @Component
 struct Index {
   private webviewController: webview.WebviewController = new webview.WebviewController();
+  private netConnect: connection.NetConnection = connection.createNetConnection();
+  private webviewError: number = 0;
   private context = getContext(this) as common.UIAbilityContext;
   @State private webUrl: string = getUrl();
   private defaultUrl: string = getDefaultUrl();
@@ -647,9 +650,10 @@ struct Index {
         })
         .onErrorReceive((event) => {
           if (event) {
-            updateOnErrorReceive(event.error.getErrorCode());
+            this.webviewError = event.error.getErrorCode();
+            updateOnErrorReceive(this.webviewError);
             hilog.info(DOMAIN, TAG, 'getErrorInfo:' + event.error.getErrorInfo());
-            hilog.info(DOMAIN, TAG, 'getErrorCode:' + event.error.getErrorCode());
+            hilog.info(DOMAIN, TAG, 'getErrorCode:' + this.webviewError);
           }
         })
         .onSslErrorEvent((event) => {
@@ -1059,6 +1063,22 @@ struct Index {
         .catch(()=>{
           hilog.error(DOMAIN, TAG, '%{public}s', 'on new want bindToNetById failed.');
         });
+    });
+    this.netConnect.on('netAvailable', (data: connection.NetHandle) => {
+      const ERR_NETWORK_CHANGED:number = -21;
+      setTimeout(() => {
+        if (this.webviewError === ERR_NETWORK_CHANGED) {
+          hilog.info(DOMAIN, TAG, '%{public}s', 'web err refresh');
+          try {
+            this.webviewController.refresh();
+          } catch (error) {
+            hilog.error(DOMAIN, TAG, '%{public}s', `Failed refresh. Code:${error.code}, message:${error.message}`);
+          }
+        }
+      }, 300);
+    });
+    this.netConnect.register((err: BusinessError) => {
+      hilog.error(DOMAIN, TAG, '%{public}s', 'Failed to register netconnect.' + JSON.stringify(err));
     });
   }
 
